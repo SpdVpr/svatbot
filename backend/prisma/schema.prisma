@@ -1,0 +1,359 @@
+// Prisma schema for SvatBot Marketplace
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Users table - for both customers and vendors
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  phone     String?
+  role      UserRole @default(USER)
+  verified  Boolean  @default(false)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  vendor           Vendor?
+  reviews          Review[]
+  favorites        Favorite[]
+  inquiries        Inquiry[]
+  adminSessions    AdminSession[]
+  emailTokens      EmailToken[]
+  passwordResets   PasswordReset[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  USER
+  VENDOR
+  ADMIN
+  SUPER_ADMIN
+}
+
+// Vendors table
+model Vendor {
+  id               String       @id @default(uuid())
+  userId           String       @unique
+  name             String
+  slug             String       @unique
+  category         VendorCategory
+  description      String
+  shortDescription String
+  businessName     String
+  businessId       String?
+  website          String?
+  email            String
+  phone            String
+  verified         Boolean      @default(false)
+  featured         Boolean      @default(false)
+  premium          Boolean      @default(false)
+  active           Boolean      @default(true)
+  responseTime     String       @default("< 24 hours")
+  yearsInBusiness  Int          @default(1)
+  workingRadius    Int          @default(50)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  // Relations
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  address          Address?
+  services         Service[]
+  images           VendorImage[]
+  portfolioImages  PortfolioImage[]
+  features         Feature[]
+  specialties      Specialty[]
+  availability     Availability?
+  priceRange       PriceRange?
+  reviews          Review[]
+  favorites        Favorite[]
+  inquiries        Inquiry[]
+  analytics        VendorAnalytics[]
+
+  @@map("vendors")
+}
+
+enum VendorCategory {
+  PHOTOGRAPHER
+  VENUE
+  CATERING
+  MUSIC
+  FLOWERS
+  DRESS
+  DECORATION
+  TRANSPORT
+  BEAUTY
+  JEWELRY
+  CAKE
+  OTHER
+}
+
+// Address table
+model Address {
+  id         String @id @default(uuid())
+  vendorId   String @unique
+  street     String
+  city       String
+  postalCode String
+  region     String
+  country    String @default("Czech Republic")
+  latitude   Float?
+  longitude  Float?
+
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@map("addresses")
+}
+
+// Services table
+model Service {
+  id          String      @id @default(uuid())
+  vendorId    String
+  name        String
+  description String
+  price       Int?
+  priceType   PriceType   @default(FIXED)
+  duration    String?
+  popular     Boolean     @default(false)
+  active      Boolean     @default(true)
+  sortOrder   Int         @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  vendor   Vendor           @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  includes ServiceInclude[]
+
+  @@map("services")
+}
+
+enum PriceType {
+  FIXED
+  PER_PERSON
+  PER_HOUR
+  PER_DAY
+  PACKAGE
+}
+
+model ServiceInclude {
+  id        String @id @default(uuid())
+  serviceId String
+  item      String
+  sortOrder Int    @default(0)
+
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@map("service_includes")
+}
+
+// Price range table
+model PriceRange {
+  id       String @id @default(uuid())
+  vendorId String @unique
+  min      Int
+  max      Int
+  currency String @default("CZK")
+  unit     String @default("per-event")
+
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@map("price_ranges")
+}
+
+// Vendor images table
+model VendorImage {
+  id        String @id @default(uuid())
+  vendorId  String
+  url       String
+  alt       String?
+  sortOrder Int    @default(0)
+  createdAt DateTime @default(now())
+
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@map("vendor_images")
+}
+
+// Portfolio images table
+model PortfolioImage {
+  id        String @id @default(uuid())
+  vendorId  String
+  url       String
+  alt       String?
+  sortOrder Int    @default(0)
+  createdAt DateTime @default(now())
+
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@map("portfolio_images")
+}
+
+// Features table
+model Feature {
+  id       String @id @default(uuid())
+  vendorId String
+  name     String
+
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@map("features")
+}
+
+// Specialties table
+model Specialty {
+  id       String @id @default(uuid())
+  vendorId String
+  name     String
+
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@map("specialties")
+}
+
+// Availability table
+model Availability {
+  id           String   @id @default(uuid())
+  vendorId     String   @unique
+  workingDays  String[] // JSON array of days
+  startTime    String   @default("09:00")
+  endTime      String   @default("17:00")
+  seasonalNote String?
+
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@map("availability")
+}
+
+// Reviews table
+model Review {
+  id           String   @id @default(uuid())
+  vendorId     String
+  userId       String
+  rating       Int      // 1-5
+  title        String?
+  text         String
+  quality      Int      @default(5)
+  communication Int     @default(5)
+  value        Int      @default(5)
+  professionalism Int   @default(5)
+  verified     Boolean  @default(false)
+  weddingDate  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("reviews")
+}
+
+// Favorites table
+model Favorite {
+  id       String @id @default(uuid())
+  userId   String
+  vendorId String
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, vendorId])
+  @@map("favorites")
+}
+
+// Inquiries table
+model Inquiry {
+  id          String        @id @default(uuid())
+  vendorId    String
+  userId      String?
+  name        String
+  email       String
+  phone       String?
+  weddingDate DateTime?
+  message     String
+  status      InquiryStatus @default(PENDING)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  user   User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("inquiries")
+}
+
+enum InquiryStatus {
+  PENDING
+  RESPONDED
+  CLOSED
+}
+
+// Admin sessions table
+model AdminSession {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("admin_sessions")
+}
+
+// Email verification tokens
+model EmailToken {
+  id        String    @id @default(uuid())
+  userId    String
+  token     String    @unique
+  type      TokenType
+  expiresAt DateTime
+  used      Boolean   @default(false)
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("email_tokens")
+}
+
+enum TokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
+
+// Password reset tokens
+model PasswordReset {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_resets")
+}
+
+// Analytics table
+model VendorAnalytics {
+  id        String   @id @default(uuid())
+  vendorId  String
+  date      DateTime @default(now())
+  views     Int      @default(0)
+  contacts  Int      @default(0)
+  favorites Int      @default(0)
+
+  vendor Vendor @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@unique([vendorId, date])
+  @@map("vendor_analytics")
+}

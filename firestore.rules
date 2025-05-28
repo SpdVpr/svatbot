@@ -1,0 +1,198 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    function isValidUser() {
+      return isAuthenticated() &&
+             request.auth.token.email_verified == true;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read, write: if isAuthenticated() && isOwner(userId);
+      allow create: if isAuthenticated() &&
+                       isOwner(userId) &&
+                       request.auth.token.email_verified == true;
+    }
+
+    // Weddings collection
+    match /weddings/{weddingId} {
+      allow read, write: if isAuthenticated() &&
+                            isOwner(resource.data.userId);
+      allow create: if isAuthenticated() &&
+                       isOwner(request.resource.data.userId) &&
+                       request.resource.data.keys().hasAll(['userId', 'brideName', 'groomName', 'budget', 'style', 'region']) &&
+                       request.resource.data.userId == request.auth.uid;
+    }
+
+    // Guests collection
+    match /guests/{guestId} {
+      allow read, write: if isAuthenticated() &&
+                            exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                            get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid;
+      allow create: if isAuthenticated() &&
+                       request.resource.data.keys().hasAll(['weddingId', 'firstName', 'lastName']) &&
+                       exists(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)) &&
+                       get(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)).data.userId == request.auth.uid;
+    }
+
+    // Tasks collection
+    match /tasks/{taskId} {
+      allow read, write: if isAuthenticated() &&
+                            exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                            get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid;
+      allow create: if isAuthenticated() &&
+                       request.resource.data.keys().hasAll(['weddingId', 'title', 'category', 'phase', 'priority', 'status']) &&
+                       exists(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)) &&
+                       get(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)).data.userId == request.auth.uid;
+    }
+
+    // Budget items collection
+    match /budgetItems/{budgetItemId} {
+      allow read, write: if isAuthenticated() &&
+                            exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                            get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid;
+      allow create: if isAuthenticated() &&
+                       request.resource.data.keys().hasAll(['weddingId', 'name', 'category', 'estimatedCost']) &&
+                       exists(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)) &&
+                       get(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)).data.userId == request.auth.uid;
+    }
+
+    // Timeline events collection
+    match /timelineEvents/{eventId} {
+      allow read, write: if isAuthenticated() &&
+                            exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                            get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid;
+      allow create: if isAuthenticated() &&
+                       request.resource.data.keys().hasAll(['weddingId', 'title', 'startTime', 'endTime', 'type']) &&
+                       exists(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)) &&
+                       get(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)).data.userId == request.auth.uid;
+    }
+
+    // Gift items collection
+    match /giftItems/{giftId} {
+      allow read, write: if isAuthenticated() &&
+                            exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                            get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid;
+      allow create: if isAuthenticated() &&
+                       request.resource.data.keys().hasAll(['weddingId', 'name', 'category', 'price', 'quantity']) &&
+                       exists(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)) &&
+                       get(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)).data.userId == request.auth.uid;
+    }
+
+    // Seating plans collection
+    match /seatingPlans/{planId} {
+      allow read, write: if isAuthenticated() &&
+                            exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                            get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid;
+      allow create: if isAuthenticated() &&
+                       request.resource.data.keys().hasAll(['weddingId', 'name', 'layout']) &&
+                       exists(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)) &&
+                       get(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)).data.userId == request.auth.uid;
+    }
+
+    // Public collections (read-only for authenticated users)
+
+    // Venues collection (public read, admin write)
+    match /venues/{venueId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Only admins can write (handled by Cloud Functions)
+    }
+
+    // Vendors collection (marketplace)
+    match /vendors/{vendorId} {
+      allow read: if resource.data.active == true ||
+                     isOwner(resource.data.userId) ||
+                     (isAuthenticated() && request.auth.token.role in ['admin', 'super_admin']);
+      allow create: if isAuthenticated() &&
+                       request.auth.uid == request.resource.data.userId;
+      allow update: if isOwner(resource.data.userId) ||
+                       (isAuthenticated() && request.auth.token.role in ['admin', 'super_admin']);
+      allow delete: if isOwner(resource.data.userId) ||
+                       (isAuthenticated() && request.auth.token.role in ['admin', 'super_admin']);
+    }
+
+    // Services collection
+    match /services/{serviceId} {
+      allow read: if resource.data.active == true ||
+                     isOwner(resource.data.userId) ||
+                     (isAuthenticated() && request.auth.token.role in ['admin', 'super_admin']);
+      allow create: if isAuthenticated() &&
+                       request.auth.token.role in ['vendor', 'admin', 'super_admin'];
+      allow update: if isOwner(resource.data.userId) ||
+                       (isAuthenticated() && request.auth.token.role in ['admin', 'super_admin']);
+      allow delete: if isOwner(resource.data.userId) ||
+                       (isAuthenticated() && request.auth.token.role in ['admin', 'super_admin']);
+    }
+
+    // Reviews collection
+    match /reviews/{reviewId} {
+      allow read: if resource.data.verified == true ||
+                     isOwner(resource.data.userId) ||
+                     (isAuthenticated() && request.auth.token.role in ['admin', 'super_admin']);
+      allow create: if isAuthenticated() &&
+                       request.auth.uid == request.resource.data.userId;
+      allow update: if isOwner(resource.data.userId) ||
+                       (isAuthenticated() && request.auth.token.role in ['admin', 'super_admin']);
+      allow delete: if isOwner(resource.data.userId) ||
+                       (isAuthenticated() && request.auth.token.role in ['admin', 'super_admin']);
+    }
+
+    // Inquiries collection
+    match /inquiries/{inquiryId} {
+      allow read: if isOwner(resource.data.userId) ||
+                     isOwner(resource.data.vendorUserId) ||
+                     (isAuthenticated() && request.auth.token.role in ['admin', 'super_admin']);
+      allow create: if isAuthenticated();
+      allow update: if isOwner(resource.data.userId) ||
+                       isOwner(resource.data.vendorUserId) ||
+                       (isAuthenticated() && request.auth.token.role in ['admin', 'super_admin']);
+      allow delete: if isAuthenticated() && request.auth.token.role in ['admin', 'super_admin'];
+    }
+
+    // Favorites collection
+    match /favorites/{favoriteId} {
+      allow read, write: if isOwner(resource.data.userId);
+      allow delete: if isAuthenticated() && request.auth.token.role in ['admin', 'super_admin'];
+    }
+
+    // Analytics collection
+    match /analytics/{analyticsId} {
+      allow read: if isOwner(resource.data.vendorUserId) ||
+                     (isAuthenticated() && request.auth.token.role in ['admin', 'super_admin']);
+      allow write: if false; // Only server can write analytics
+    }
+
+    // Notifications collection
+    match /notifications/{notificationId} {
+      allow read: if isOwner(resource.data.userId);
+      allow update: if isOwner(resource.data.userId); // For marking as read
+      allow create, delete: if isAuthenticated() && request.auth.token.role in ['admin', 'super_admin'];
+    }
+
+    // Admin logs collection
+    match /adminLogs/{logId} {
+      allow read: if isAuthenticated() && request.auth.token.role in ['admin', 'super_admin'];
+      allow write: if false; // Only server can write logs
+    }
+
+    // Task templates collection (public read, admin write)
+    match /taskTemplates/{templateId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Only admins can write
+    }
+
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
