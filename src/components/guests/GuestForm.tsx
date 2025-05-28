@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 import { GuestFormData, GuestCategory, InvitationType, DietaryRestriction } from '@/types/guest'
-import { 
-  X, 
-  User, 
-  Mail, 
-  Phone, 
+import {
+  X,
+  User,
+  Mail,
+  Phone,
   MapPin,
   Users,
   Calendar,
@@ -25,12 +25,12 @@ interface GuestFormProps {
   initialData?: Partial<GuestFormData>
 }
 
-export default function GuestForm({ 
-  onSubmit, 
-  onCancel, 
-  loading = false, 
+export default function GuestForm({
+  onSubmit,
+  onCancel,
+  loading = false,
   error,
-  initialData 
+  initialData
 }: GuestFormProps) {
   const [formData, setFormData] = useState<GuestFormData>({
     firstName: initialData?.firstName || '',
@@ -114,7 +114,7 @@ export default function GuestForm({
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!validateForm()) {
       return
     }
@@ -129,7 +129,7 @@ export default function GuestForm({
   // Handle input changes
   const handleChange = (field: keyof GuestFormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }))
-    
+
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }))
@@ -142,7 +142,7 @@ export default function GuestForm({
     const updated = current.includes(restriction)
       ? current.filter(r => r !== restriction)
       : [...current, restriction]
-    
+
     handleChange('dietaryRestrictions', updated)
   }
 
@@ -160,11 +160,11 @@ export default function GuestForm({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 mobile-modal">
+      <div className="bg-white rounded-xl max-w-4xl w-full mobile-modal-content overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
             {initialData ? 'Upravit hosta' : 'Přidat nového hosta'}
           </h2>
           <button
@@ -177,22 +177,22 @@ export default function GuestForm({
 
         {/* Error message */}
         {error && (
-          <div className="mx-6 mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-2">
+          <div className="mx-4 sm:mx-6 mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-2">
             <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
             <span className="text-red-700">{error}</span>
           </div>
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-8">
+        <form onSubmit={handleSubmit} className="mobile-form space-y-6 sm:space-y-8">
           {/* Basic Information */}
           <div>
             <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center space-x-2">
               <User className="w-5 h-5" />
               <span>Základní údaje</span>
             </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <div className="mobile-grid">
               {/* First Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -278,8 +278,8 @@ export default function GuestForm({
               <Calendar className="w-5 h-5" />
               <span>Svatební údaje</span>
             </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <div className="mobile-grid gap-6">
               {/* Category */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -361,8 +361,8 @@ export default function GuestForm({
               <Utensils className="w-5 h-5" />
               <span>Stravovací omezení</span>
             </h3>
-            
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
               {dietaryOptions.map((option) => (
                 <label key={option.value} className="flex items-center space-x-2 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
                   <input
@@ -400,7 +400,7 @@ export default function GuestForm({
               <Tag className="w-5 h-5" />
               <span>Štítky</span>
             </h3>
-            
+
             <div className="flex flex-wrap gap-2 mb-3">
               {formData.tags.map((tag) => (
                 <span
@@ -456,7 +456,7 @@ export default function GuestForm({
           </div>
 
           {/* Actions */}
-          <div className="flex space-x-3 pt-4 border-t border-gray-200">
+          <div className="mobile-buttons pt-4 border-t border-gray-200">
             <button
               type="button"
               onClick={onCancel}
