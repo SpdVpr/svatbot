@@ -403,6 +403,8 @@ export function useTask(): UseTaskReturn {
               status: 'completed',
               dueDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
               completedAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
+              isTemplate: false,
+              order: 1,
               createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
               updatedAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000)
             },
@@ -415,6 +417,8 @@ export function useTask(): UseTaskReturn {
               priority: 'high',
               status: 'in_progress',
               dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
+              isTemplate: false,
+              order: 1,
               createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
               updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
             },
@@ -427,6 +431,8 @@ export function useTask(): UseTaskReturn {
               priority: 'medium',
               status: 'pending',
               dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+              isTemplate: false,
+              order: 1,
               createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
               updatedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
             },
@@ -439,6 +445,8 @@ export function useTask(): UseTaskReturn {
               priority: 'high',
               status: 'pending',
               dueDate: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000), // 45 days from now
+              isTemplate: false,
+              order: 1,
               createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
               updatedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000)
             },
@@ -452,6 +460,8 @@ export function useTask(): UseTaskReturn {
               status: 'completed',
               dueDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
               completedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
+              isTemplate: false,
+              order: 1,
               createdAt: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000),
               updatedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000)
             }
