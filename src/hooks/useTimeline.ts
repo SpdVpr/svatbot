@@ -551,7 +551,8 @@ export function useTimeline(): UseTimelineReturn {
               attachments: [],
               tags: ['místo', 'rezervace'],
               createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
-              updatedAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000)
+              updatedAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
+              createdBy: user?.id || 'demo-user-id'
             },
             {
               id: 'demo-milestone-2',
@@ -577,7 +578,8 @@ export function useTimeline(): UseTimelineReturn {
               attachments: [],
               tags: ['fotograf', 'dodavatel'],
               createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
-              updatedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000)
+              updatedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+              createdBy: user?.id || 'demo-user-id'
             },
             {
               id: 'demo-milestone-3',
@@ -603,7 +605,8 @@ export function useTimeline(): UseTimelineReturn {
               attachments: [],
               tags: ['šaty', 'oblečení'],
               createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-              updatedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+              updatedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+              createdBy: user?.id || 'demo-user-id'
             },
             {
               id: 'demo-milestone-4',
@@ -629,7 +632,8 @@ export function useTimeline(): UseTimelineReturn {
               attachments: [],
               tags: ['menu', 'catering', 'hosté'],
               createdAt: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000),
-              updatedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000)
+              updatedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
+              createdBy: user?.id || 'demo-user-id'
             }
           ]
 
