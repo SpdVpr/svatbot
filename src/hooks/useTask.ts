@@ -415,7 +415,7 @@ export function useTask(): UseTaskReturn {
               description: 'Najít a objednat profesionálního svatebního fotografa',
               category: 'organization',
               priority: 'high',
-              status: 'in_progress',
+              status: 'in-progress',
               dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
               isTemplate: false,
               order: 1,
