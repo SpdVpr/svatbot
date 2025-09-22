@@ -413,7 +413,7 @@ export function useTask(): UseTaskReturn {
               weddingId: wedding.id,
               title: 'Objednat svatební fotografa',
               description: 'Najít a objednat profesionálního svatebního fotografa',
-              category: 'photography',
+              category: 'organization',
               priority: 'high',
               status: 'in_progress',
               dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
@@ -441,7 +441,7 @@ export function useTask(): UseTaskReturn {
               weddingId: wedding.id,
               title: 'Rezervovat hudbu/DJ',
               description: 'Zajistit hudební doprovod pro obřad a hostinu',
-              category: 'entertainment',
+              category: 'organization',
               priority: 'high',
               status: 'pending',
               dueDate: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000), // 45 days from now
@@ -455,7 +455,7 @@ export function useTask(): UseTaskReturn {
               weddingId: wedding.id,
               title: 'Objednat svatební dort',
               description: 'Vybrat a objednat svatební dort podle počtu hostů',
-              category: 'catering',
+              category: 'budget',
               priority: 'medium',
               status: 'completed',
               dueDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
