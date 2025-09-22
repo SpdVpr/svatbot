@@ -138,8 +138,6 @@ export function useAuth() {
           id: 'demo-user-id',
           email: 'demo@svatbot.cz',
           displayName: 'Demo Uživatel',
-          firstName: 'Demo',
-          lastName: 'Uživatel',
           photoURL: '',
           createdAt: new Date(),
           updatedAt: new Date()
