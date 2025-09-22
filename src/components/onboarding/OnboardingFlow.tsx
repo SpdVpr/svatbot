@@ -87,6 +87,38 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
     }
   }
 
+  const handleSkip = async () => {
+    try {
+      setIsCreating(true)
+
+      // Create minimal wedding data for skipped onboarding
+      const minimalWeddingData = {
+        brideName: '',
+        groomName: '',
+        email: user?.email || '',
+        weddingDate: undefined,
+        estimatedGuestCount: 50,
+        budget: 300000,
+        style: 'classic' as const,
+        region: 'Praha'
+      }
+
+      // Create wedding in Firebase
+      await createWedding(minimalWeddingData)
+
+      // Call completion callback (this will trigger redirect to dashboard)
+      onComplete(minimalWeddingData)
+
+      console.log('Minimal wedding created for skipped onboarding')
+    } catch (error) {
+      console.error('Error creating minimal wedding:', error)
+      // Even if there's an error, call onSkip to let parent handle it
+      onSkip()
+    } finally {
+      setIsCreating(false)
+    }
+  }
+
   const updateFormData = (updates: Partial<OnboardingData>) => {
     setFormData(prev => ({ ...prev, ...updates }))
   }
@@ -349,7 +381,7 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
           </div>
 
           <button
-            onClick={onSkip}
+            onClick={handleSkip}
             className="body-small text-text-muted hover:text-text-secondary"
           >
             Přeskočit zatím

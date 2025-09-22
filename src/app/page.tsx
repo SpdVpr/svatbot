@@ -37,7 +37,7 @@ export default function HomePage() {
           console.log('Wedding created successfully')
         }}
         onSkip={() => {
-          console.log('Onboarding skipped')
+          console.log('Onboarding skipped - will be handled in OnboardingFlow')
         }}
       />
     )
