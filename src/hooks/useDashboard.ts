@@ -18,7 +18,7 @@ export function useDashboard() {
   // Load layout from localStorage on mount
   useEffect(() => {
     if (user) {
-      const savedLayout = localStorage.getItem(`${DASHBOARD_STORAGE_KEY}-${user.uid}`)
+      const savedLayout = localStorage.getItem(`${DASHBOARD_STORAGE_KEY}-${user.id}`)
       if (savedLayout) {
         try {
           const parsedLayout = JSON.parse(savedLayout)
@@ -40,7 +40,7 @@ export function useDashboard() {
   // Save layout to localStorage whenever it changes
   useEffect(() => {
     if (user && !loading) {
-      localStorage.setItem(`${DASHBOARD_STORAGE_KEY}-${user.uid}`, JSON.stringify(layout))
+      localStorage.setItem(`${DASHBOARD_STORAGE_KEY}-${user.id}`, JSON.stringify(layout))
     }
   }, [layout, user, loading])
 
