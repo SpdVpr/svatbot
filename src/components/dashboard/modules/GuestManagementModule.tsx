@@ -39,7 +39,7 @@ export default function GuestManagementModule() {
             <div className="flex items-center justify-center w-8 h-8 bg-red-100 rounded-lg mx-auto mb-1">
               <UserX className="w-4 h-4 text-red-600" />
             </div>
-            <div className="text-sm font-bold text-gray-900">{stats.notAttending}</div>
+            <div className="text-sm font-bold text-gray-900">{stats.declined}</div>
             <div className="text-xs text-gray-500">Nepřijde</div>
           </div>
           <div className="text-center">
