@@ -7,6 +7,11 @@ import { useGuest } from '@/hooks/useGuest'
 export default function GuestManagementModule() {
   const { stats } = useGuest()
 
+  // Calculate response rate from available data
+  const responseRate = stats.total > 0
+    ? Math.round(((stats.attending + stats.declined + stats.maybe) / stats.total) * 100)
+    : 0
+
   return (
     <div className="wedding-card">
       <div className="flex items-center justify-between mb-4">
@@ -56,12 +61,12 @@ export default function GuestManagementModule() {
           <div>
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm text-gray-600">Míra odpovědí</span>
-              <span className="text-sm font-semibold">{stats.responseRate}%</span>
+              <span className="text-sm font-semibold">{responseRate}%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
                 className="bg-primary-500 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${stats.responseRate}%` }}
+                style={{ width: `${responseRate}%` }}
               />
             </div>
           </div>
@@ -72,13 +77,13 @@ export default function GuestManagementModule() {
           <div className={`text-sm px-3 py-1 rounded-full inline-block ${
             stats.total === 0
               ? 'bg-gray-100 text-gray-600'
-              : stats.responseRate < 50
+              : responseRate < 50
                 ? 'bg-yellow-100 text-yellow-700'
                 : 'bg-green-100 text-green-700'
           }`}>
             {stats.total === 0
               ? 'Žádní hosté'
-              : stats.responseRate < 50
+              : responseRate < 50
                 ? 'Čekáme na odpovědi'
                 : 'Dobré odpovědi'
             }
