@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { X, Mail, Lock, User, Eye, EyeOff } from 'lucide-react'
+import { X, Mail, Lock, User, Eye, EyeOff, Play } from 'lucide-react'
 import { cn } from '@/utils'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -9,9 +9,10 @@ interface AuthModalProps {
   mode: 'login' | 'register'
   onClose: () => void
   onSwitchMode: (mode: 'login' | 'register') => void
+  showDemoOption?: boolean
 }
 
-export default function AuthModal({ mode, onClose, onSwitchMode }: AuthModalProps) {
+export default function AuthModal({ mode, onClose, onSwitchMode, showDemoOption = true }: AuthModalProps) {
   const { login, register, loginWithGoogle, error, clearError } = useAuth()
   const [formData, setFormData] = useState({
     email: '',
@@ -111,6 +112,36 @@ export default function AuthModal({ mode, onClose, onSwitchMode }: AuthModalProp
       onClose()
     } catch (error: any) {
       console.error('Google login error:', error)
+      // Error is already handled by useAuth hook
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleDemoLogin = async () => {
+    try {
+      setIsLoading(true)
+      clearError()
+
+      // Fill demo credentials
+      setFormData({
+        email: 'demo@svatbot.cz',
+        password: 'demo123',
+        confirmPassword: '',
+        firstName: '',
+        lastName: '',
+        acceptTerms: false
+      })
+
+      // Login with demo credentials
+      await login({
+        email: 'demo@svatbot.cz',
+        password: 'demo123'
+      })
+
+      onClose()
+    } catch (error: any) {
+      console.error('Demo login error:', error)
       // Error is already handled by useAuth hook
     } finally {
       setIsLoading(false)
@@ -325,6 +356,22 @@ export default function AuthModal({ mode, onClose, onSwitchMode }: AuthModalProp
               </svg>
               {isLoading ? 'Přihlašování...' : 'Pokračovat s Google'}
             </button>
+
+            {/* Demo Account Button */}
+            {showDemoOption && isLogin && (
+              <button
+                type="button"
+                onClick={handleDemoLogin}
+                disabled={isLoading}
+                className={cn(
+                  "w-full flex items-center justify-center px-4 py-3 border-2 border-dashed border-primary-300 rounded-xl shadow-sm bg-primary-50 text-sm font-medium text-primary-700 hover:bg-primary-100 transition-colors",
+                  isLoading && "opacity-50 cursor-not-allowed"
+                )}
+              >
+                <Play className="w-5 h-5 mr-2 fill-current" />
+                {isLoading ? 'Přihlašování...' : 'Vyzkoušet demo účet'}
+              </button>
+            )}
           </div>
 
           {/* Submit Button */}

@@ -417,6 +417,112 @@ export function useGuest(): UseGuestReturn {
         setLoading(true)
         setError(null)
 
+        // Check if this is a demo user
+        const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding.id === 'demo-wedding'
+
+        if (isDemoUser) {
+          // Load demo guests
+          const demoGuests: Guest[] = [
+            {
+              id: 'demo-guest-1',
+              weddingId: wedding.id,
+              firstName: 'Marie',
+              lastName: 'Nováková',
+              email: 'marie.novakova@email.cz',
+              phone: '+420 777 123 456',
+              category: 'family-bride',
+              invitationType: 'ceremony-reception',
+              rsvpStatus: 'attending',
+              rsvpDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+              hasPlusOne: false,
+              dietaryRestrictions: [],
+              preferredContactMethod: 'email',
+              language: 'cs',
+              tags: [],
+              invitationSent: true,
+              invitationSentDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+              reminderSent: false,
+              createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
+              updatedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+              createdBy: user?.id || 'demo-user-id'
+            },
+            {
+              id: 'demo-guest-2',
+              weddingId: wedding.id,
+              firstName: 'Pavel',
+              lastName: 'Svoboda',
+              email: 'pavel.svoboda@email.cz',
+              phone: '+420 777 234 567',
+              category: 'friends-groom',
+              invitationType: 'ceremony-reception',
+              rsvpStatus: 'attending',
+              rsvpDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+              hasPlusOne: true,
+              plusOneName: 'Tereza Svobodová',
+              plusOneRsvpStatus: 'attending',
+              dietaryRestrictions: ['vegetarian'],
+              preferredContactMethod: 'email',
+              language: 'cs',
+              tags: [],
+              invitationSent: true,
+              invitationSentDate: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
+              reminderSent: false,
+              createdAt: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000),
+              updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+              createdBy: user?.id || 'demo-user-id'
+            },
+            {
+              id: 'demo-guest-3',
+              weddingId: wedding.id,
+              firstName: 'Anna',
+              lastName: 'Procházková',
+              email: 'anna.prochazka@email.cz',
+              category: 'family-bride',
+              invitationType: 'ceremony-reception',
+              rsvpStatus: 'pending',
+              hasPlusOne: false,
+              dietaryRestrictions: [],
+              preferredContactMethod: 'email',
+              language: 'cs',
+              tags: [],
+              invitationSent: true,
+              invitationSentDate: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
+              reminderSent: false,
+              createdAt: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000),
+              updatedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
+              createdBy: user?.id || 'demo-user-id'
+            },
+            {
+              id: 'demo-guest-4',
+              weddingId: wedding.id,
+              firstName: 'Tomáš',
+              lastName: 'Dvořák',
+              email: 'tomas.dvorak@email.cz',
+              phone: '+420 777 345 678',
+              category: 'colleagues-groom',
+              invitationType: 'ceremony-reception',
+              rsvpStatus: 'declined',
+              rsvpDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
+              hasPlusOne: false,
+              dietaryRestrictions: [],
+              preferredContactMethod: 'phone',
+              language: 'cs',
+              tags: [],
+              invitationSent: true,
+              invitationSentDate: new Date(Date.now() - 28 * 24 * 60 * 60 * 1000),
+              reminderSent: true,
+              reminderSentDate: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
+              createdAt: new Date(Date.now() - 42 * 24 * 60 * 60 * 1000),
+              updatedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
+              createdBy: user?.id || 'demo-user-id'
+            }
+          ]
+
+          console.log('🎭 Loaded demo guests:', demoGuests.length, demoGuests)
+          setGuests(demoGuests)
+          return
+        }
+
         try {
           // Try to load from Firestore
           const guestsQuery = query(
@@ -480,7 +586,7 @@ export function useGuest(): UseGuestReturn {
     }
 
     loadGuests()
-  }, [wedding?.id])
+  }, [wedding?.id, user?.id, user?.email])
 
   // Clear error
   const clearError = () => setError(null)

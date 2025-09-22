@@ -387,6 +387,81 @@ export function useTask(): UseTaskReturn {
         setLoading(true)
         setError(null)
 
+        // Check if this is a demo user
+        const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding.id === 'demo-wedding'
+
+        if (isDemoUser) {
+          // Load demo tasks
+          const demoTasks: Task[] = [
+            {
+              id: 'demo-task-1',
+              weddingId: wedding.id,
+              title: 'Rezervovat místo konání',
+              description: 'Najít a rezervovat místo pro svatební obřad a hostinu',
+              category: 'venue',
+              priority: 'high',
+              status: 'completed',
+              dueDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
+              completedAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
+              createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
+              updatedAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000)
+            },
+            {
+              id: 'demo-task-2',
+              weddingId: wedding.id,
+              title: 'Objednat svatební fotografa',
+              description: 'Najít a objednat profesionálního svatebního fotografa',
+              category: 'photography',
+              priority: 'high',
+              status: 'in_progress',
+              dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
+              createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
+              updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
+            },
+            {
+              id: 'demo-task-3',
+              weddingId: wedding.id,
+              title: 'Vybrat svatební šaty',
+              description: 'Najít a objednat svatební šaty včetně úprav',
+              category: 'design',
+              priority: 'medium',
+              status: 'pending',
+              dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+              createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+              updatedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+            },
+            {
+              id: 'demo-task-4',
+              weddingId: wedding.id,
+              title: 'Rezervovat hudbu/DJ',
+              description: 'Zajistit hudební doprovod pro obřad a hostinu',
+              category: 'entertainment',
+              priority: 'high',
+              status: 'pending',
+              dueDate: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000), // 45 days from now
+              createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
+              updatedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000)
+            },
+            {
+              id: 'demo-task-5',
+              weddingId: wedding.id,
+              title: 'Objednat svatební dort',
+              description: 'Vybrat a objednat svatební dort podle počtu hostů',
+              category: 'catering',
+              priority: 'medium',
+              status: 'completed',
+              dueDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
+              completedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
+              createdAt: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000),
+              updatedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000)
+            }
+          ]
+
+          console.log('🎭 Loaded demo tasks:', demoTasks.length, demoTasks)
+          setTasks(demoTasks)
+          return
+        }
+
         try {
           // Try to load from Firestore (simplified query to avoid index requirements)
           const tasksQuery = query(
@@ -448,7 +523,7 @@ export function useTask(): UseTaskReturn {
     }
 
     loadTasks()
-  }, [wedding?.id])
+  }, [wedding?.id, user?.id, user?.email])
 
   // Clear error
   const clearError = () => setError(null)

@@ -23,10 +23,10 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   title: {
-    default: 'SvatBot.cz - Moderní svatební plánovač',
+    default: 'SvatBot.cz - Moderní plánování svatby bez stresu',
     template: '%s | SvatBot.cz'
   },
-  description: 'Váš průvodce krásným svatebním plánováním krok za krokem. Kompletní aplikace pro plánování svatby v České republice.',
+  description: 'Plánujte svou dokonalou svatbu s moderními nástroji. Timeline, rozpočet, hosté a dodavatelé na jednom místě. Začněte zdarma!',
   keywords: [
     'svatba',
     'svatební plánovač',

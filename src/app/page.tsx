@@ -21,22 +21,28 @@ export default function HomePage() {
     return <WelcomeScreen />
   }
 
-  // Show onboarding if user is logged in but has no wedding
-  if (user && !wedding) {
+  // Check if this is a demo user
+  const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz'
+
+  // For demo users, always show dashboard immediately
+  if (isDemoUser) {
+    return <Dashboard />
+  }
+
+  // For regular users, show onboarding if no wedding exists
+  if (!wedding) {
     return (
       <OnboardingFlow
         onComplete={() => {
-          // Wedding will be automatically loaded by useWedding hook
           console.log('Wedding created successfully')
         }}
         onSkip={() => {
-          // For now, just show dashboard with demo data
           console.log('Onboarding skipped')
         }}
       />
     )
   }
 
-  // Show dashboard if user is logged in and has wedding
+  // Show dashboard for regular users with wedding
   return <Dashboard />
 }

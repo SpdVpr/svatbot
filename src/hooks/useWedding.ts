@@ -210,6 +210,41 @@ export function useWedding() {
       setError(null)
       setLoading(true)
 
+      // Check if this is a demo user
+      const isDemoUser = user.id === 'demo-user-id' || user.email === 'demo@svatbot.cz'
+
+      if (isDemoUser) {
+        // Create demo wedding immediately
+        const demoWedding: Wedding = {
+          id: 'demo-wedding',
+          userId: user.id,
+          brideName: 'Jana',
+          groomName: 'Petr',
+          weddingDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000), // 180 days from now
+          estimatedGuestCount: 85,
+          budget: 450000,
+          style: 'classic',
+          region: 'Praha',
+          status: 'planning',
+          progress: {
+            overall: 73,
+            foundation: 100,
+            venue: 85,
+            guests: 80,
+            budget: 65,
+            design: 45,
+            organization: 30,
+            final: 0
+          },
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+
+        console.log('🎭 Created demo wedding for demo user:', demoWedding)
+        setCurrentWedding(demoWedding)
+        return
+      }
+
       try {
         // Try to load from Firestore
         const weddingsQuery = query(

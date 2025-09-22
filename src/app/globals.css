@@ -185,6 +185,48 @@
   .loading-spinner {
     @apply animate-spin rounded-full border-2 border-gray-300 border-t-primary-500;
   }
+
+  /* Grid layout utilities */
+  .grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .grid-cols-5 {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .lg\:grid-cols-4 {
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .lg\:grid-cols-5 {
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+
+  .lg\:col-span-4 {
+    @media (min-width: 1024px) {
+      grid-column: span 4 / span 4;
+    }
+  }
+
+  .lg\:col-span-5 {
+    @media (min-width: 1024px) {
+      grid-column: span 5 / span 5;
+    }
+  }
+
+  /* Canvas width utilities */
+  .max-w-\[1600px\] {
+    max-width: 1600px;
+  }
+
+  .max-w-\[2000px\] {
+    max-width: 2000px;
+  }
 }
 
 /* Custom animations */

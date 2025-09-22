@@ -520,6 +520,72 @@ export function useTimeline(): UseTimelineReturn {
         setLoading(true)
         setError(null)
 
+        // Check if this is a demo user
+        const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding.id === 'demo-wedding'
+
+        if (isDemoUser) {
+          // Load demo milestones
+          const demoMilestones: Milestone[] = [
+            {
+              id: 'demo-milestone-1',
+              weddingId: wedding.id,
+              title: 'Rezervace místa konání',
+              description: 'Rezervovat a potvrdit místo konání svatby',
+              category: 'venue',
+              targetDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+              status: 'completed',
+              priority: 'critical',
+              completedDate: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
+              notes: 'Château Mcely rezervováno a potvrzeno',
+              createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
+              updatedAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000)
+            },
+            {
+              id: 'demo-milestone-2',
+              weddingId: wedding.id,
+              title: 'Výběr svatebního fotografa',
+              description: 'Najít a rezervovat svatebního fotografa',
+              category: 'photography',
+              targetDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+              status: 'in_progress',
+              priority: 'high',
+              notes: 'Konzultace s Photo Nejedlí naplánována',
+              createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
+              updatedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000)
+            },
+            {
+              id: 'demo-milestone-3',
+              weddingId: wedding.id,
+              title: 'Objednání svatebních šatů',
+              description: 'Vybrat a objednat svatební šaty',
+              category: 'attire',
+              targetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+              status: 'pending',
+              priority: 'medium',
+              notes: 'Termín na zkoušení domluvit',
+              createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+              updatedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+            },
+            {
+              id: 'demo-milestone-4',
+              weddingId: wedding.id,
+              title: 'Finalizace menu',
+              description: 'Potvrdit menu a počet hostů s cateringem',
+              category: 'catering',
+              targetDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+              status: 'pending',
+              priority: 'critical',
+              notes: 'Čeká na potvrzení počtu hostů',
+              createdAt: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000),
+              updatedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000)
+            }
+          ]
+
+          console.log('🎭 Loaded demo milestones:', demoMilestones.length, demoMilestones)
+          setMilestones(demoMilestones)
+          return
+        }
+
         try {
           // Try to load from Firestore (without orderBy to avoid index requirement)
           const milestonesQuery = query(
