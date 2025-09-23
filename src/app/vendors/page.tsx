@@ -73,7 +73,8 @@ export default function VendorsPage() {
             name: data.contactName,
             email: data.contactEmail,
             phone: data.contactPhone,
-            role: 'primary'
+            role: 'primary',
+            isPrimary: true
           }],
           address: data.address,
           businessName: data.businessName,
