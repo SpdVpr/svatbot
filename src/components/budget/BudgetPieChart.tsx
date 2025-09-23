@@ -157,7 +157,7 @@ export default function BudgetPieChart({ categoryStats }: BudgetPieChartProps) {
                 stroke="#fff"
                 strokeWidth="2"
                 className="hover:opacity-80 transition-opacity cursor-pointer"
-                title={`${slice.name}: ${formatCurrency(slice.value)} (${slice.percentage}%)`}
+
               />
             </g>
           ))}

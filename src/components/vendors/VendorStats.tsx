@@ -37,14 +37,22 @@ export default function VendorStats({
   onDeleteVendor,
   onViewVendor
 }: VendorStatsProps) {
-  const { vendors, stats } = useVendor()
+  const { vendors } = useVendor()
+
+  // Calculate stats from vendors
+  const stats = {
+    total: vendors.length,
+    confirmed: vendors.filter(v => v.status === 'contracted').length,
+    booked: vendors.filter(v => v.status === 'booked').length,
+    researching: vendors.filter(v => v.status === 'potential').length
+  }
 
   // Calculate additional stats
   const categoryStats = Object.entries(VENDOR_CATEGORIES).map(([key, category]) => {
     const categoryVendors = vendors.filter(vendor => vendor.category === key)
     const bookedCount = categoryVendors.filter(v => v.status === 'booked').length
-    const confirmedCount = categoryVendors.filter(v => v.status === 'confirmed').length
-    
+    const confirmedCount = categoryVendors.filter(v => v.status === 'contracted').length
+
     return {
       key,
       category,
@@ -55,7 +63,7 @@ export default function VendorStats({
     }
   }).filter(stat => stat.total > 0)
 
-  const completionRate = stats.total > 0 ? 
+  const completionRate = stats.total > 0 ?
     Math.round(((stats.booked + stats.confirmed) / stats.total) * 100) : 0
 
   if (compact) {
@@ -246,7 +254,8 @@ export default function VendorStats({
             <h4 className="font-medium text-green-900">Kontakty</h4>
           </div>
           <p className="text-3xl font-bold text-green-600">
-            {vendors.filter(v => v.phone || v.email).length}
+            {vendors.filter(v => v.contacts && v.contacts.length > 0 &&
+              v.contacts.some(c => c.phone || c.email)).length}
           </p>
           <p className="text-sm text-green-700">
             dodavatelů má kontakt
@@ -271,10 +280,10 @@ export default function VendorStats({
         <div className="mt-8">
           <VendorList
             vendors={vendors}
-            onAddVendor={onAddVendor}
-            onEditVendor={onEditVendor}
-            onDeleteVendor={onDeleteVendor}
-            onViewVendor={onViewVendor}
+            onAddVendor={onAddVendor || (() => {})}
+            onEditVendor={onEditVendor || (() => {})}
+            onDeleteVendor={onDeleteVendor || (() => {})}
+            onViewVendor={onViewVendor || (() => {})}
             loading={false}
           />
         </div>

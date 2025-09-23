@@ -10,7 +10,8 @@ import VendorForm from '@/components/vendor/VendorForm'
 import {
   Building,
   ArrowLeft,
-  AlertCircle
+  AlertCircle,
+  Plus
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -193,7 +194,7 @@ export default function VendorsPage() {
 
             <div className="flex items-center space-x-4">
               <div className="text-right">
-                <div className="text-2xl font-bold text-primary-600">{stats.total}</div>
+                <div className="text-2xl font-bold text-primary-600">{vendors.length}</div>
                 <div className="text-sm text-gray-600">Dodavatelů</div>
               </div>
               <button
