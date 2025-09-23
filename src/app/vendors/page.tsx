@@ -81,7 +81,14 @@ export default function VendorsPage() {
             country: 'Czech Republic'
           } : undefined,
           businessName: data.businessName,
-          services: data.services,
+          services: data.services.map(service => ({
+            id: `service-${Date.now()}-${Math.random()}`,
+            name: service.name,
+            description: service.description,
+            price: service.price,
+            priceType: service.priceType,
+            included: []
+          })),
           status: data.status,
           priority: data.priority,
           notes: data.notes,
