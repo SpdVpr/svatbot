@@ -76,7 +76,10 @@ export default function VendorsPage() {
             role: 'primary',
             isPrimary: true
           }],
-          address: data.address,
+          address: data.address ? {
+            ...data.address,
+            country: 'Czech Republic'
+          } : undefined,
           businessName: data.businessName,
           services: data.services,
           status: data.status,
