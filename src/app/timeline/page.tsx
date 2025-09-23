@@ -29,7 +29,7 @@ export default function TimelinePage() {
   const { user } = useAuth()
   const { wedding } = useWedding()
   const { milestones, loading, createMilestone, updateMilestone, applyTimelineTemplate, error } = useTimeline()
-  const [viewMode, setViewMode] = useState<'timeline' | 'list' | 'stats'>('timeline')
+  const [viewMode, setViewMode] = useState<'timeline' | 'list' | 'stats'>('stats')
   const [showMilestoneForm, setShowMilestoneForm] = useState(false)
   const [showTemplates, setShowTemplates] = useState(false)
   const [editingMilestone, setEditingMilestone] = useState<Milestone | null>(null)
@@ -142,8 +142,8 @@ export default function TimelinePage() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
-        {/* Breadcrumb */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Breadcrumb - Hidden on mobile */}
+        <div className="hidden sm:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center space-x-2 py-2 text-sm text-gray-500">
             <Link href="/" className="hover:text-gray-700 transition-colors">
               Dashboard
@@ -154,7 +154,71 @@ export default function TimelinePage() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          {/* Mobile header */}
+          <div className="sm:hidden space-y-4 py-4">
+            {/* Top row - Back button and title */}
+            <div className="flex items-center space-x-3">
+              <Link
+                href="/"
+                className="flex items-center justify-center w-8 h-8 text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Link>
+              <div>
+                <h1 className="text-lg font-bold text-gray-900">Timeline</h1>
+              </div>
+            </div>
+
+            {/* Main action button - prominent placement */}
+            <div className="flex justify-center">
+              <button
+                onClick={() => setShowMilestoneForm(true)}
+                className="btn-primary flex items-center space-x-2 px-6 py-3 text-base font-medium"
+              >
+                <Plus className="w-5 h-5" />
+                <span>Přidat milník</span>
+              </button>
+            </div>
+
+            {/* View mode toggle */}
+            <div className="flex items-center justify-center">
+              <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setViewMode('timeline')}
+                  className={`p-2 rounded-md transition-colors ${
+                    viewMode === 'timeline'
+                      ? 'bg-white text-primary-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <Calendar className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-2 rounded-md transition-colors ${
+                    viewMode === 'list'
+                      ? 'bg-white text-primary-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <List className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode('stats')}
+                  className={`p-2 rounded-md transition-colors ${
+                    viewMode === 'stats'
+                      ? 'bg-white text-primary-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <BarChart3 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop header */}
+          <div className="hidden sm:flex items-center justify-between h-16">
             {/* Back button and Title */}
             <div className="flex items-center space-x-4">
               <Link
@@ -162,7 +226,7 @@ export default function TimelinePage() {
                 className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
               >
                 <ArrowLeft className="w-5 h-5" />
-                <span className="hidden sm:inline">Zpět na dashboard</span>
+                <span>Zpět na dashboard</span>
               </Link>
               <div className="border-l border-gray-300 pl-4">
                 <h1 className="text-2xl font-bold text-gray-900">Timeline</h1>
@@ -211,12 +275,12 @@ export default function TimelinePage() {
               {/* Action buttons */}
               <button className="btn-outline flex items-center space-x-2">
                 <Clock className="w-4 h-4" />
-                <span>Schůzky</span>
+                <span className="hidden lg:inline">Schůzky</span>
               </button>
 
               <button className="btn-outline flex items-center space-x-2">
                 <Download className="w-4 h-4" />
-                <span>Export</span>
+                <span className="hidden lg:inline">Export</span>
               </button>
 
               <button
@@ -319,7 +383,12 @@ export default function TimelinePage() {
         ) : (
           /* Content based on view mode */
           <div className="space-y-6">
-            {viewMode === 'stats' && <TimelineStats />}
+            {viewMode === 'stats' && (
+              <TimelineStats
+                onCreateMilestone={() => setShowMilestoneForm(true)}
+                onEditMilestone={handleEditMilestone}
+              />
+            )}
 
             {(viewMode === 'timeline' || viewMode === 'list') && (
               <TimelineView

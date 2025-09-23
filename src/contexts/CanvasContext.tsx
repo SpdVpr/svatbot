@@ -5,10 +5,10 @@ import { createContext, useContext, useState, ReactNode } from 'react'
 type CanvasWidth = 'normal' | 'wide' | 'ultra-wide' | 'full-screen'
 
 const CANVAS_CONFIGS = {
-  'normal': { maxWidth: 'max-w-7xl', label: 'Normální šířka', description: 'Standardní šířka pro většinu monitorů' },
-  'wide': { maxWidth: 'max-w-[1600px]', label: 'Široká plocha', description: 'Rozšířená plocha pro široké monitory' },
-  'ultra-wide': { maxWidth: 'max-w-[2000px]', label: 'Ultra široká plocha', description: 'Maximální využití ultra-wide monitorů' },
-  'full-screen': { maxWidth: 'max-w-none', label: 'Celá obrazovka', description: 'Využití celé šířky obrazovky' }
+  'normal': { maxWidth: 'max-w-7xl', label: 'Normální šířka', shortLabel: 'Normální', description: 'Standardní šířka pro většinu monitorů' },
+  'wide': { maxWidth: 'max-w-[1600px]', label: 'Široká plocha', shortLabel: 'Široká', description: 'Rozšířená plocha pro široké monitory' },
+  'ultra-wide': { maxWidth: 'max-w-[2000px]', label: 'Ultra široká plocha', shortLabel: 'Ultra', description: 'Maximální využití ultra-wide monitorů' },
+  'full-screen': { maxWidth: 'max-w-none', label: 'Celá obrazovka', shortLabel: 'Celá', description: 'Využití celé šířky obrazovky' }
 }
 
 interface CanvasContextType {

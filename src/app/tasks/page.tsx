@@ -8,7 +8,7 @@ import TaskList from '@/components/tasks/TaskList'
 import TaskStats from '@/components/tasks/TaskStats'
 import TaskForm from '@/components/tasks/TaskForm'
 import TaskDebug from '@/components/debug/TaskDebug'
-import StatsCards from '@/components/shared/StatsCards'
+
 import { TaskFormData } from '@/types/task'
 import {
   Plus,
@@ -28,7 +28,7 @@ export default function TasksPage() {
   const { user } = useAuth()
   const { wedding } = useWedding()
   const { initializeTasksFromTemplates, tasks, loading, createTask, error, stats } = useTask()
-  const [viewMode, setViewMode] = useState<'list' | 'grid' | 'stats'>('list')
+  const [viewMode, setViewMode] = useState<'list' | 'grid' | 'stats'>('stats')
   const [showInitializeModal, setShowInitializeModal] = useState(false)
   const [showTaskForm, setShowTaskForm] = useState(false)
   const [taskFormLoading, setTaskFormLoading] = useState(false)
@@ -110,29 +110,33 @@ export default function TasksPage() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Mobile header */}
-          <div className="sm:hidden">
-            <div className="flex items-center justify-between h-14">
-              <div className="flex items-center space-x-3">
-                <Link
-                  href="/"
-                  className="flex items-center justify-center w-8 h-8 text-gray-600 hover:text-gray-900 transition-colors"
-                >
-                  <ArrowLeft className="w-5 h-5" />
-                </Link>
-                <div>
-                  <h1 className="text-lg font-bold text-gray-900">Úkoly</h1>
-                </div>
+          <div className="sm:hidden space-y-4 py-4">
+            {/* Top row - Back button and title */}
+            <div className="flex items-center space-x-3">
+              <Link
+                href="/"
+                className="flex items-center justify-center w-8 h-8 text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Link>
+              <div>
+                <h1 className="text-lg font-bold text-gray-900">Úkoly</h1>
               </div>
+            </div>
+
+            {/* Main action button - prominent placement */}
+            <div className="flex justify-center">
               <button
                 onClick={() => setShowTaskForm(true)}
-                className="flex items-center justify-center w-8 h-8 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                className="btn-primary flex items-center space-x-2 px-6 py-3 text-base font-medium"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-5 h-5" />
+                <span>Nový úkol</span>
               </button>
             </div>
 
-            {/* Mobile view mode toggle */}
-            <div className="flex items-center justify-center pb-3">
+            {/* View mode toggle */}
+            <div className="flex items-center justify-center">
               <div className="flex items-center bg-gray-100 rounded-lg p-1">
                 <button
                   onClick={() => setViewMode('list')}
@@ -328,18 +332,14 @@ export default function TasksPage() {
           </div>
         ) : (
           /* Content based on view mode */
-          <div className="space-y-8">
-            {/* Stats Cards - Always visible */}
-            <StatsCards type="tasks" stats={stats} />
+          <div className="space-y-6">
+            {viewMode === 'stats' && (
+              <TaskStats onCreateTask={() => setShowTaskForm(true)} />
+            )}
 
-            {/* Main content based on view mode */}
-            <div className="space-y-6">
-              {viewMode === 'stats' && <TaskStats />}
-
-              {(viewMode === 'list' || viewMode === 'grid') && (
-                <TaskList onCreateTask={() => setShowTaskForm(true)} />
-              )}
-            </div>
+            {(viewMode === 'list' || viewMode === 'grid') && (
+              <TaskList onCreateTask={() => setShowTaskForm(true)} />
+            )}
           </div>
         )}
       </div>

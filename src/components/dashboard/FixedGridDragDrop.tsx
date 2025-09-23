@@ -250,18 +250,129 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridD
     <div className={`mx-auto px-4 sm:px-6 lg:px-8 ${getCanvasMaxWidth()}`}>
       <div className="space-y-6">
       {/* Dashboard Controls */}
-      <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-gray-200">
-        <div className="flex items-center space-x-4">
-          <h2 className="text-lg font-semibold text-gray-900">Dashboard</h2>
+      <div className="bg-white p-3 sm:p-4 rounded-xl border border-gray-200">
+        {/* Mobile Layout */}
+        <div className="sm:hidden space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-gray-900">Dashboard</h2>
+            <button
+              onClick={toggleEditMode}
+              className={`btn-outline flex items-center space-x-1 text-sm px-2 py-1 ${
+                layout.isEditMode ? 'bg-primary-50 border-primary-300 text-primary-700' : ''
+              }`}
+            >
+              <Edit3 className="w-3 h-3" />
+              <span>{layout.isEditMode ? 'Hotovo' : 'Upravit'}</span>
+            </button>
+          </div>
+
           {layout.isEditMode && (
-            <div className="flex items-center space-x-2 text-sm text-primary-600">
-              <Edit3 className="w-4 h-4" />
-              <span>Režim úprav - Grid layout</span>
+            <div className="flex items-center space-x-2 text-xs text-primary-600">
+              <Edit3 className="w-3 h-3" />
+              <span>Režim úprav aktivní</span>
             </div>
           )}
+
+          {/* Mobile Controls Row */}
+          <div className="flex items-center justify-between space-x-2">
+            {/* Canvas Width - Mobile */}
+            <div className="relative flex-1" data-canvas-menu>
+              <button
+                onClick={() => setShowCanvasMenu(!showCanvasMenu)}
+                className="btn-outline w-full flex items-center justify-center space-x-1 text-xs px-2 py-1"
+                title="Šířka plochy"
+              >
+                <ArrowLeftRight className="w-3 h-3" />
+                <span className="truncate">{CANVAS_CONFIGS[canvasWidth].shortLabel || 'Šířka'}</span>
+              </button>
+              {showCanvasMenu && (
+                <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  {Object.entries(CANVAS_CONFIGS).map(([key, config]) => (
+                    <button
+                      key={key}
+                      onClick={() => {
+                        setCanvasWidth(key as CanvasWidth)
+                        setShowCanvasMenu(false)
+                      }}
+                      className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
+                        canvasWidth === key ? 'bg-primary-50 text-primary-700' : ''
+                      }`}
+                    >
+                      {config.shortLabel || config.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Grid Size - Mobile */}
+            <div className="relative flex-1" data-grid-size-menu>
+              <button
+                onClick={() => setShowGridSizeMenu(!showGridSizeMenu)}
+                className="btn-outline w-full flex items-center justify-center space-x-1 text-xs px-2 py-1"
+                title="Počet sloupců"
+              >
+                <Monitor className="w-3 h-3" />
+                <span>{GRID_CONFIGS[gridSize].cols} sl.</span>
+              </button>
+              {showGridSizeMenu && (
+                <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  {Object.entries(GRID_CONFIGS).map(([key, config]) => (
+                    <button
+                      key={key}
+                      onClick={() => {
+                        setGridSize(key as GridSize)
+                        setShowGridSizeMenu(false)
+                      }}
+                      className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
+                        gridSize === key ? 'bg-primary-50 text-primary-700' : ''
+                      }`}
+                    >
+                      {config.cols} sloupců
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Edit Mode Controls - Mobile */}
+            {layout.isEditMode && (
+              <>
+                <button
+                  onClick={toggleLock}
+                  className={`btn-outline flex items-center justify-center px-2 py-1 text-xs ${
+                    layout.isLocked ? 'bg-red-50 border-red-300 text-red-700' : ''
+                  }`}
+                  title={layout.isLocked ? 'Odemknout' : 'Zamknout'}
+                >
+                  {layout.isLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
+                </button>
+
+                <button
+                  onClick={resetLayout}
+                  className="btn-outline flex items-center justify-center px-2 py-1 text-xs text-gray-600 hover:text-red-600"
+                  title="Reset"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                </button>
+              </>
+            )}
+          </div>
         </div>
 
-        <div className="flex items-center space-x-2">
+        {/* Desktop Layout */}
+        <div className="hidden sm:flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <h2 className="text-lg font-semibold text-gray-900">Dashboard</h2>
+            {layout.isEditMode && (
+              <div className="flex items-center space-x-2 text-sm text-primary-600">
+                <Edit3 className="w-4 h-4" />
+                <span>Režim úprav - Grid layout</span>
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center space-x-2">
           {/* Canvas Width Selector */}
           <div className="relative" data-canvas-menu>
             <button
@@ -386,6 +497,7 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridD
               </button>
             </>
           )}
+          </div>
         </div>
       </div>
 

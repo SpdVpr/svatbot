@@ -229,48 +229,7 @@ export default function BudgetList({
         </div>
       )}
 
-      {/* Quick stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <div className="flex items-center space-x-2">
-            <DollarSign className="w-5 h-5 text-blue-500" />
-            <div>
-              <p className="text-sm text-text-muted">Rozpočet</p>
-              <p className="text-lg font-semibold">{formatCurrency(stats.totalBudget)}</p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <div className="flex items-center space-x-2">
-            <TrendingUp className="w-5 h-5 text-green-500" />
-            <div>
-              <p className="text-sm text-text-muted">Skutečnost</p>
-              <p className="text-lg font-semibold">{formatCurrency(stats.totalActual)}</p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <div className="flex items-center space-x-2">
-            <CheckCircle2 className="w-5 h-5 text-purple-500" />
-            <div>
-              <p className="text-sm text-text-muted">Zaplaceno</p>
-              <p className="text-lg font-semibold">{formatCurrency(stats.totalPaid)}</p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <div className="flex items-center space-x-2">
-            <TrendingDown className="w-5 h-5 text-orange-500" />
-            <div>
-              <p className="text-sm text-text-muted">Zbývá</p>
-              <p className="text-lg font-semibold">{formatCurrency(stats.totalRemaining)}</p>
-            </div>
-          </div>
-        </div>
-      </div>
+
 
       {/* Filters */}
       {showFilters && (

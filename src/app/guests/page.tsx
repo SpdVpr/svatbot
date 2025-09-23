@@ -7,7 +7,7 @@ import { useGuest } from '@/hooks/useGuest'
 import GuestList from '@/components/guests/GuestList'
 import GuestStats from '@/components/guests/GuestStats'
 import GuestForm from '@/components/guests/GuestForm'
-import StatsCards from '@/components/shared/StatsCards'
+
 import { Guest, GuestFormData } from '@/types/guest'
 import {
   Plus,
@@ -29,7 +29,7 @@ export default function GuestsPage() {
   const { user } = useAuth()
   const { wedding } = useWedding()
   const { guests, loading, createGuest, updateGuest, error, stats } = useGuest()
-  const [viewMode, setViewMode] = useState<'list' | 'grid' | 'stats'>('list')
+  const [viewMode, setViewMode] = useState<'list' | 'grid' | 'stats'>('stats')
   const [showGuestForm, setShowGuestForm] = useState(false)
   const [editingGuest, setEditingGuest] = useState<Guest | null>(null)
   const [guestFormLoading, setGuestFormLoading] = useState(false)
@@ -139,29 +139,33 @@ export default function GuestsPage() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Mobile header */}
-          <div className="sm:hidden">
-            <div className="flex items-center justify-between h-14">
-              <div className="flex items-center space-x-3">
-                <Link
-                  href="/"
-                  className="flex items-center justify-center w-8 h-8 text-gray-600 hover:text-gray-900 transition-colors"
-                >
-                  <ArrowLeft className="w-5 h-5" />
-                </Link>
-                <div>
-                  <h1 className="text-lg font-bold text-gray-900">Hosté</h1>
-                </div>
+          <div className="sm:hidden space-y-4 py-4">
+            {/* Top row - Back button and title */}
+            <div className="flex items-center space-x-3">
+              <Link
+                href="/"
+                className="flex items-center justify-center w-8 h-8 text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Link>
+              <div>
+                <h1 className="text-lg font-bold text-gray-900">Hosté</h1>
               </div>
+            </div>
+
+            {/* Main action button - prominent placement */}
+            <div className="flex justify-center">
               <button
                 onClick={() => setShowGuestForm(true)}
-                className="flex items-center justify-center w-8 h-8 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                className="btn-primary flex items-center space-x-2 px-6 py-3 text-base font-medium"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-5 h-5" />
+                <span>Přidat hosta</span>
               </button>
             </div>
 
-            {/* Mobile view mode toggle */}
-            <div className="flex items-center justify-center pb-3">
+            {/* View mode toggle */}
+            <div className="flex items-center justify-center">
               <div className="flex items-center bg-gray-100 rounded-lg p-1">
                 <button
                   onClick={() => setViewMode('list')}
@@ -359,22 +363,21 @@ export default function GuestsPage() {
           </div>
         ) : (
           /* Content based on view mode */
-          <div className="space-y-8">
-            {/* Stats Cards - Always visible */}
-            <StatsCards type="guests" stats={stats} />
+          <div className="space-y-6">
+            {viewMode === 'stats' && (
+              <GuestStats
+                onCreateGuest={() => setShowGuestForm(true)}
+                onEditGuest={handleEditGuest}
+              />
+            )}
 
-            {/* Main content based on view mode */}
-            <div className="space-y-6">
-              {viewMode === 'stats' && <GuestStats />}
-
-              {(viewMode === 'list' || viewMode === 'grid') && (
-                <GuestList
-                  viewMode={viewMode}
-                  onCreateGuest={() => setShowGuestForm(true)}
-                  onEditGuest={handleEditGuest}
-                />
-              )}
-            </div>
+            {(viewMode === 'list' || viewMode === 'grid') && (
+              <GuestList
+                viewMode={viewMode}
+                onCreateGuest={() => setShowGuestForm(true)}
+                onEditGuest={handleEditGuest}
+              />
+            )}
           </div>
         )}
       </div>

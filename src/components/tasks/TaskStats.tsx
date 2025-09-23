@@ -1,10 +1,11 @@
 'use client'
 
 import { useTask } from '@/hooks/useTask'
-import { 
-  CheckCircle2, 
-  Clock, 
-  AlertTriangle, 
+import TaskList from './TaskList'
+import {
+  CheckCircle2,
+  Clock,
+  AlertTriangle,
   Circle,
   TrendingUp,
   Calendar,
@@ -14,9 +15,16 @@ import {
 interface TaskStatsProps {
   compact?: boolean
   showProgress?: boolean
+  showTaskList?: boolean
+  onCreateTask?: () => void
 }
 
-export default function TaskStats({ compact = false, showProgress = true }: TaskStatsProps) {
+export default function TaskStats({
+  compact = false,
+  showProgress = true,
+  showTaskList = true,
+  onCreateTask
+}: TaskStatsProps) {
   const { tasks, stats } = useTask()
 
   // Calculate additional stats
@@ -260,6 +268,19 @@ export default function TaskStats({ compact = false, showProgress = true }: Task
           </p>
         </div>
       </div>
+
+      {/* Task List */}
+      {showTaskList && (
+        <div className="mt-8">
+          <TaskList
+            showHeader={false}
+            showFilters={true}
+            maxHeight="800px"
+            compact={false}
+            onCreateTask={onCreateTask}
+          />
+        </div>
+      )}
     </div>
   )
 }

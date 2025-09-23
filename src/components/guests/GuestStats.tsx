@@ -1,11 +1,13 @@
 'use client'
 
 import { useGuest } from '@/hooks/useGuest'
-import { 
-  Users, 
-  CheckCircle2, 
-  X, 
-  Clock, 
+import GuestList from './GuestList'
+import { Guest } from '@/types/guest'
+import {
+  Users,
+  CheckCircle2,
+  X,
+  Clock,
   AlertTriangle,
   UserPlus,
   Mail,
@@ -18,9 +20,18 @@ import {
 interface GuestStatsProps {
   compact?: boolean
   showProgress?: boolean
+  showGuestList?: boolean
+  onCreateGuest?: () => void
+  onEditGuest?: (guest: Guest) => void
 }
 
-export default function GuestStats({ compact = false, showProgress = true }: GuestStatsProps) {
+export default function GuestStats({
+  compact = false,
+  showProgress = true,
+  showGuestList = true,
+  onCreateGuest,
+  onEditGuest
+}: GuestStatsProps) {
   const { guests, stats } = useGuest()
 
   // Calculate additional stats
@@ -327,6 +338,21 @@ export default function GuestStats({ compact = false, showProgress = true }: Gue
           </p>
         </div>
       </div>
+
+      {/* Guest List */}
+      {showGuestList && (
+        <div className="mt-8">
+          <GuestList
+            showHeader={false}
+            showFilters={true}
+            maxHeight="800px"
+            compact={false}
+            viewMode="list"
+            onCreateGuest={onCreateGuest}
+            onEditGuest={onEditGuest}
+          />
+        </div>
+      )}
     </div>
   )
 }

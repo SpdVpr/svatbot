@@ -2,7 +2,8 @@
 
 import { useTimeline } from '@/hooks/useTimeline'
 import { useWedding } from '@/hooks/useWedding'
-import { MILESTONE_TYPES } from '@/types/timeline'
+import { MILESTONE_TYPES, Milestone } from '@/types/timeline'
+import TimelineView from './TimelineView'
 import {
   Calendar,
   Target,
@@ -18,9 +19,18 @@ import {
 interface TimelineStatsProps {
   compact?: boolean
   showProgress?: boolean
+  showTimelineView?: boolean
+  onCreateMilestone?: () => void
+  onEditMilestone?: (milestone: Milestone) => void
 }
 
-export default function TimelineStats({ compact = false, showProgress = true }: TimelineStatsProps) {
+export default function TimelineStats({
+  compact = false,
+  showProgress = true,
+  showTimelineView = true,
+  onCreateMilestone,
+  onEditMilestone
+}: TimelineStatsProps) {
   const { milestones, stats, getDaysUntilWedding, getUpcomingDeadlines } = useTimeline()
   const { wedding } = useWedding()
 
@@ -342,6 +352,21 @@ export default function TimelineStats({ compact = false, showProgress = true }: 
           </p>
         </div>
       </div>
+
+      {/* Timeline View */}
+      {showTimelineView && (
+        <div className="mt-8">
+          <TimelineView
+            showHeader={false}
+            showFilters={true}
+            maxHeight="800px"
+            compact={false}
+            viewMode="timeline"
+            onCreateMilestone={onCreateMilestone}
+            onEditMilestone={onEditMilestone}
+          />
+        </div>
+      )}
     </div>
   )
 }

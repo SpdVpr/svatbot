@@ -2,6 +2,8 @@
 
 import { useBudget } from '@/hooks/useBudget'
 import { BUDGET_CATEGORIES } from '@/types/budget'
+import BudgetPieChart from './BudgetPieChart'
+import BudgetList from './BudgetList'
 import {
   DollarSign,
   TrendingUp,
@@ -18,9 +20,18 @@ import {
 interface BudgetStatsProps {
   compact?: boolean
   showProgress?: boolean
+  showBudgetList?: boolean
+  onCreateItem?: () => void
+  onEditItem?: (item: any) => void
 }
 
-export default function BudgetStats({ compact = false, showProgress = true }: BudgetStatsProps) {
+export default function BudgetStats({
+  compact = false,
+  showProgress = true,
+  showBudgetList = true,
+  onCreateItem,
+  onEditItem
+}: BudgetStatsProps) {
   const { budgetItems, stats } = useBudget()
 
   // Format currency
@@ -248,55 +259,63 @@ export default function BudgetStats({ compact = false, showProgress = true }: Bu
         </div>
       )}
 
-      {/* Category breakdown */}
+      {/* Category breakdown with pie chart */}
       <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
+        <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center space-x-2">
           <PieChart className="w-5 h-5" />
           <span>Rozpočet podle kategorií</span>
         </h3>
 
-        <div className="space-y-4">
-          {categoryStats.map((stat) => (
-            <div key={stat.key} className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <span className="text-lg">{stat.category.icon}</span>
-                  <span className="font-medium text-gray-900">{stat.category.name}</span>
-                  {stat.isOverBudget && (
-                    <div title="Překročen rozpočet">
-                      <AlertTriangle className="w-4 h-4 text-red-500" />
-                    </div>
-                  )}
-                </div>
-                <div className="text-right">
-                  <p className="font-medium">
-                    {formatCurrency(stat.actual)} / {formatCurrency(stat.budgeted)}
-                  </p>
-                  <p className="text-sm text-text-muted">
-                    {stat.percentage.toFixed(1)}% rozpočtu
-                  </p>
-                </div>
-              </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Pie Chart */}
+          <div className="flex justify-center">
+            <BudgetPieChart categoryStats={categoryStats} />
+          </div>
 
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="flex h-2 rounded-full overflow-hidden">
-                  <div
-                    className="bg-green-500"
-                    style={{ width: `${Math.min((stat.paid / stat.budgeted) * 100, 100)}%` }}
-                  ></div>
-                  <div
-                    className={stat.isOverBudget ? "bg-red-500" : "bg-orange-500"}
-                    style={{ width: `${Math.min(((stat.actual - stat.paid) / stat.budgeted) * 100, 100)}%` }}
-                  ></div>
+          {/* Category Details */}
+          <div className="space-y-4">
+            {categoryStats.map((stat) => (
+              <div key={stat.key} className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-lg">{stat.category.icon}</span>
+                    <span className="font-medium text-gray-900">{stat.category.name}</span>
+                    {stat.isOverBudget && (
+                      <div title="Překročen rozpočet">
+                        <AlertTriangle className="w-4 h-4 text-red-500" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium">
+                      {formatCurrency(stat.actual)} / {formatCurrency(stat.budgeted)}
+                    </p>
+                    <p className="text-sm text-text-muted">
+                      {stat.percentage.toFixed(1)}% rozpočtu
+                    </p>
+                  </div>
+                </div>
+
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="flex h-2 rounded-full overflow-hidden">
+                    <div
+                      className="bg-green-500"
+                      style={{ width: `${Math.min((stat.paid / stat.budgeted) * 100, 100)}%` }}
+                    ></div>
+                    <div
+                      className={stat.isOverBudget ? "bg-red-500" : "bg-orange-500"}
+                      style={{ width: `${Math.min(((stat.actual - stat.paid) / stat.budgeted) * 100, 100)}%` }}
+                    ></div>
+                  </div>
+                </div>
+
+                <div className="flex justify-between text-xs text-text-muted">
+                  <span>Zaplaceno: {formatCurrency(stat.paid)}</span>
+                  <span>Zbývá: {formatCurrency(stat.remaining)}</span>
                 </div>
               </div>
-
-              <div className="flex justify-between text-xs text-text-muted">
-                <span>Zaplaceno: {formatCurrency(stat.paid)}</span>
-                <span>Zbývá: {formatCurrency(stat.remaining)}</span>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
@@ -363,6 +382,21 @@ export default function BudgetStats({ compact = false, showProgress = true }: Bu
           </p>
         </div>
       </div>
+
+      {/* Budget Items List */}
+      {showBudgetList && (
+        <div className="mt-8">
+          <BudgetList
+            showHeader={false}
+            showFilters={true}
+            maxHeight="800px"
+            compact={false}
+            viewMode="list"
+            onCreateItem={onCreateItem}
+            onEditItem={onEditItem}
+          />
+        </div>
+      )}
     </div>
   )
 }

@@ -1,29 +1,18 @@
 'use client'
 
 import { useState } from 'react'
+import { useAuth } from '@/hooks/useAuth'
+import { useVendor } from '@/hooks/useVendor'
+import { Vendor, VendorFormData } from '@/types/vendor'
+import VendorStats from '@/components/vendors/VendorStats'
+import VendorForm from '@/components/vendor/VendorForm'
+
 import {
   Building,
   ArrowLeft,
-  TrendingUp,
-  Users,
-  DollarSign,
-  CheckCircle,
-  AlertCircle,
-  Calendar,
-  Star,
-  Filter,
-  BarChart3,
-  Search,
-  ShoppingBag,
-  ExternalLink
+  AlertCircle
 } from 'lucide-react'
 import Link from 'next/link'
-import { useVendor } from '@/hooks/useVendor'
-import { useAuth } from '@/hooks/useAuth'
-import VendorForm from '@/components/vendor/VendorForm'
-import VendorList from '@/components/vendor/VendorList'
-import { Vendor, VendorFormData, VENDOR_CATEGORIES } from '@/types/vendor'
-import { currencyUtils } from '@/utils'
 
 export default function VendorsPage() {
   const { user } = useAuth()
@@ -40,7 +29,7 @@ export default function VendorsPage() {
 
   const [showForm, setShowForm] = useState(false)
   const [editingVendor, setEditingVendor] = useState<Vendor | null>(null)
-  const [viewingVendor, setViewingVendor] = useState<Vendor | null>(null)
+
 
   // Handle add vendor
   const handleAddVendor = () => {
@@ -54,9 +43,9 @@ export default function VendorsPage() {
     setShowForm(true)
   }
 
-  // Handle view vendor
+  // Handle view vendor - for now just edit
   const handleViewVendor = (vendor: Vendor) => {
-    setViewingVendor(vendor)
+    handleEditVendor(vendor)
   }
 
   // Handle delete vendor
@@ -84,23 +73,11 @@ export default function VendorsPage() {
             name: data.contactName,
             email: data.contactEmail,
             phone: data.contactPhone,
-            isPrimary: true
+            role: 'primary'
           }],
-          address: data.address ? {
-            ...data.address,
-            country: (data.address as any).country || 'Česká republika'
-          } : undefined,
+          address: data.address,
           businessName: data.businessName,
-          services: data.services.map((service: any) => ({
-            id: service.id || crypto.randomUUID(),
-            name: service.name,
-            description: service.description,
-            price: service.price,
-            priceType: service.priceType,
-            duration: service.duration,
-            included: service.included || [],
-            excluded: service.excluded
-          })),
+          services: data.services,
           status: data.status,
           priority: data.priority,
           notes: data.notes,
@@ -125,24 +102,15 @@ export default function VendorsPage() {
     setEditingVendor(null)
   }
 
-  // Get category stats for overview
-  const categoryStats = Object.entries(VENDOR_CATEGORIES).map(([key, config]) => ({
-    category: key,
-    name: config.name,
-    icon: config.icon,
-    color: config.color,
-    count: stats.byCategory[key as keyof typeof stats.byCategory] || 0,
-    vendors: vendors.filter(v => v.category === key)
-  })).filter(stat => stat.count > 0)
-
   if (!user) {
     return (
-      <div className="min-h-screen wedding-gradient flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <Building className="w-16 h-16 text-primary-500 mx-auto mb-4" />
-          <h2 className="heading-3 mb-2">Přihlaste se</h2>
-          <p className="body-normal text-text-muted">
-            Pro správu dodavatelů se musíte přihlásit.
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Přihlášení vyžadováno
+          </h1>
+          <p className="text-text-muted">
+            Pro přístup ke správě dodavatelů se musíte přihlásit.
           </p>
         </div>
       </div>
@@ -153,8 +121,47 @@ export default function VendorsPage() {
     <div className="min-h-screen bg-neutral-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200">
-        <div className="container-desktop py-6">
-          <div className="flex items-center justify-between">
+        {/* Breadcrumb - Hidden on mobile */}
+        <div className="hidden sm:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center space-x-2 py-2 text-sm text-gray-500">
+            <Link href="/" className="hover:text-gray-700 transition-colors">
+              Dashboard
+            </Link>
+            <span>/</span>
+            <span className="text-gray-900 font-medium">Dodavatelé</span>
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Mobile header */}
+          <div className="sm:hidden space-y-4 py-4">
+            {/* Top row - Back button and title */}
+            <div className="flex items-center space-x-3">
+              <Link
+                href="/"
+                className="flex items-center justify-center w-8 h-8 text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Link>
+              <div>
+                <h1 className="text-lg font-bold text-gray-900">Dodavatelé</h1>
+              </div>
+            </div>
+
+            {/* Main action button - prominent placement */}
+            <div className="flex justify-center">
+              <button
+                onClick={handleAddVendor}
+                className="btn-primary flex items-center space-x-2 px-6 py-3 text-base font-medium"
+              >
+                <Plus className="w-5 h-5" />
+                <span>Přidat dodavatele</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Desktop header */}
+          <div className="hidden sm:flex items-center justify-between py-6">
             <div className="flex items-center space-x-4">
               <Link
                 href="/"
@@ -163,11 +170,11 @@ export default function VendorsPage() {
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
               </Link>
               <div>
-                <h1 className="heading-3 flex items-center space-x-2">
+                <h1 className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
                   <Building className="w-6 h-6 text-primary-600" />
                   <span>Správa dodavatelů</span>
                 </h1>
-                <p className="body-small text-text-muted">
+                <p className="text-sm text-text-muted">
                   Spravujte všechny dodavatele pro vaši svatbu
                 </p>
               </div>
@@ -175,9 +182,16 @@ export default function VendorsPage() {
 
             <div className="flex items-center space-x-4">
               <div className="text-right">
-                <div className="text-2xl font-bold text-primary-600">{stats.totalVendors}</div>
+                <div className="text-2xl font-bold text-primary-600">{stats.total}</div>
                 <div className="text-sm text-gray-600">Dodavatelů</div>
               </div>
+              <button
+                onClick={handleAddVendor}
+                className="btn-primary flex items-center space-x-2"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Přidat dodavatele</span>
+              </button>
             </div>
           </div>
         </div>
@@ -202,165 +216,13 @@ export default function VendorsPage() {
             </div>
           )}
 
-          {/* Marketplace Integration Info */}
-          <div className="wedding-card bg-gradient-to-r from-primary-50 to-blue-50 border-primary-200">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="p-3 bg-primary-100 rounded-xl">
-                  <ShoppingBag className="w-6 h-6 text-primary-600" />
-                </div>
-                <div>
-                  <h3 className="heading-4 text-primary-900">Najděte nové dodavatele</h3>
-                  <p className="body-small text-primary-700">
-                    Prohlédněte si marketplace s ověřenými dodavateli a přidejte je do svého seznamu
-                  </p>
-                </div>
-              </div>
-              <div className="flex space-x-3">
-                <Link
-                  href="/marketplace"
-                  className="btn-primary flex items-center space-x-2"
-                >
-                  <Search className="w-4 h-4" />
-                  <span>Procházet marketplace</span>
-                  <ExternalLink className="w-4 h-4" />
-                </Link>
-              </div>
-            </div>
-
-            <div className="mt-4 pt-4 border-t border-primary-200">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                <div>
-                  <div className="text-2xl font-bold text-primary-600">500+</div>
-                  <div className="text-sm text-primary-700">Ověřených dodavatelů</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-primary-600">15</div>
-                  <div className="text-sm text-primary-700">Kategorií služeb</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-primary-600">4.8★</div>
-                  <div className="text-sm text-primary-700">Průměrné hodnocení</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Stats Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Total Vendors */}
-            <div className="wedding-card">
-              <div className="flex items-center space-x-3">
-                <div className="p-3 bg-primary-100 rounded-xl">
-                  <Building className="w-6 h-6 text-primary-600" />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-gray-900">{stats.totalVendors}</div>
-                  <div className="text-sm text-gray-600">Celkem dodavatelů</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Contracted Vendors */}
-            <div className="wedding-card">
-              <div className="flex items-center space-x-3">
-                <div className="p-3 bg-green-100 rounded-xl">
-                  <CheckCircle className="w-6 h-6 text-green-600" />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-gray-900">
-                    {(stats.byStatus.contracted || 0) + (stats.byStatus.booked || 0)}
-                  </div>
-                  <div className="text-sm text-gray-600">Rezervováno</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Total Services Value */}
-            <div className="wedding-card">
-              <div className="flex items-center space-x-3">
-                <div className="p-3 bg-blue-100 rounded-xl">
-                  <DollarSign className="w-6 h-6 text-blue-600" />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-gray-900">
-                    {currencyUtils.formatShort(stats.totalContractValue)}
-                  </div>
-                  <div className="text-sm text-gray-600">Hodnota služeb</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Completion Rate */}
-            <div className="wedding-card">
-              <div className="flex items-center space-x-3">
-                <div className="p-3 bg-purple-100 rounded-xl">
-                  <TrendingUp className="w-6 h-6 text-purple-600" />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-gray-900">{stats.completionRate}%</div>
-                  <div className="text-sm text-gray-600">Dokončeno</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Category Overview */}
-          {categoryStats.length > 0 && (
-            <div className="wedding-card">
-              <h2 className="heading-4 mb-6 flex items-center space-x-2">
-                <BarChart3 className="w-5 h-5 text-primary-600" />
-                <span>Přehled podle kategorií</span>
-              </h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {categoryStats.map((stat) => (
-                  <div key={stat.category} className="p-4 border border-gray-200 rounded-lg">
-                    <div className="flex items-center space-x-3 mb-3">
-                      <span className="text-2xl">{stat.icon}</span>
-                      <div>
-                        <h3 className="font-medium text-gray-900">{stat.name}</h3>
-                        <p className="text-sm text-gray-600">{stat.count} dodavatelů</p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-1">
-                      {stat.vendors.slice(0, 3).map((vendor) => (
-                        <div key={vendor.id} className="text-sm text-gray-600 truncate">
-                          • {vendor.name}
-                        </div>
-                      ))}
-                      {stat.vendors.length > 3 && (
-                        <div className="text-sm text-gray-500">
-                          a {stat.vendors.length - 3} dalších...
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Vendor List */}
-          <div className="wedding-card">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="heading-4">Seznam dodavatelů</h2>
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                <Users className="w-4 h-4" />
-                <span>{vendors.length} dodavatelů</span>
-              </div>
-            </div>
-
-            <VendorList
-              vendors={vendors}
-              onAddVendor={handleAddVendor}
-              onEditVendor={handleEditVendor}
-              onDeleteVendor={handleDeleteVendor}
-              onViewVendor={handleViewVendor}
-              loading={loading}
-            />
-          </div>
+          {/* Vendor Stats with List */}
+          <VendorStats
+            onAddVendor={handleAddVendor}
+            onEditVendor={handleEditVendor}
+            onDeleteVendor={handleDeleteVendor}
+            onViewVendor={handleViewVendor}
+          />
         </div>
       </main>
 
@@ -388,6 +250,8 @@ export default function VendorsPage() {
           isEditing={!!editingVendor}
         />
       )}
+
+
     </div>
   )
 }
