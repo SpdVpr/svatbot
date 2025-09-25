@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 
-const openai = new OpenAI({
+// Initialize OpenAI only if API key is available
+const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
-})
+}) : null
 
 const WEDDING_CONTEXT = `
 Jsi expert na svatební plánování v České republice. Znáš:
@@ -38,25 +39,29 @@ export async function POST(request: NextRequest) {
       - Preference: ${context.preferences?.join(', ') || 'žádné'}
     ` : ''
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: WEDDING_CONTEXT
-        },
-        {
-          role: "user",
-          content: `${contextInfo}\n\nOtázka: ${question}`
-        }
-      ],
-      max_tokens: 500,
-      temperature: 0.7
-    })
+    let content: string
 
-    const content = response.choices[0]?.message?.content
-    if (!content) {
-      throw new Error('Prázdná odpověď od AI')
+    if (!openai) {
+      // Mock response when OpenAI is not available
+      content = "Omlouvám se, AI asistent momentálně není dostupný. Zkuste to prosím později."
+    } else {
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: WEDDING_CONTEXT
+          },
+          {
+            role: "user",
+            content: `${contextInfo}\n\nOtázka: ${question}`
+          }
+        ],
+        max_tokens: 500,
+        temperature: 0.7
+      })
+
+      content = response.choices[0]?.message?.content || 'Omlouvám se, nepodařilo se mi odpovědět na vaši otázku.'
     }
 
     return NextResponse.json({ response: content })

@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 
-const openai = new OpenAI({
+// Initialize OpenAI only if API key is available
+const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
-})
+}) : null
 
 const WEDDING_CONTEXT = `
 Jsi expert na svatební plánování v České republice. Znáš:
@@ -51,19 +52,39 @@ export async function POST(request: NextRequest) {
       }
     `
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: WEDDING_CONTEXT },
-        { role: "user", content: prompt }
-      ],
-      max_tokens: 800,
-      temperature: 0.4
-    })
+    let content: string
 
-    const content = response.choices[0]?.message?.content
-    if (!content) {
-      throw new Error('Prázdná odpověď od AI')
+    if (!openai) {
+      // Mock response when OpenAI is not available
+      content = JSON.stringify({
+        timeline: [
+          { time: "09:00", activity: "Příprava nevěsty", duration: "2 hodiny", notes: "Líčení a účes" },
+          { time: "11:00", activity: "Příprava ženicha", duration: "1 hodina", notes: "Oblékání a fotografie" },
+          { time: "14:00", activity: "Obřad", duration: "30 minut", notes: "Hlavní ceremonie" },
+          { time: "15:00", activity: "Gratulace a fotografování", duration: "1 hodina" },
+          { time: "18:00", activity: "Svatební hostina", duration: "4 hodiny", notes: "Večeře a oslavy" }
+        ],
+        tips: [
+          "Naplánujte si rezervní čas pro každou aktivitu",
+          "Informujte všechny účastníky o časovém harmonogramu",
+          "Připravte si kontakty na všechny dodavatele"
+        ]
+      })
+    } else {
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: WEDDING_CONTEXT },
+          { role: "user", content: prompt }
+        ],
+        max_tokens: 800,
+        temperature: 0.4
+      })
+
+      content = response.choices[0]?.message?.content
+      if (!content) {
+        throw new Error('Prázdná odpověď od AI')
+      }
     }
 
     // Clean up the response - remove markdown code blocks if present
