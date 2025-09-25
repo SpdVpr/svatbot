@@ -144,14 +144,6 @@ export default function BudgetList({
     }
   }
 
-  // Format currency
-  const formatCurrency = (amount: number, currency: string = 'CZK') => {
-    return new Intl.NumberFormat('cs-CZ', {
-      style: 'currency',
-      currency: currency
-    }).format(amount)
-  }
-
   // Handle payment record
   const handleRecordPayment = async (itemId: string, amount: number) => {
     try {
