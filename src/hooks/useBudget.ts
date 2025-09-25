@@ -413,6 +413,28 @@ export function useBudget(): UseBudgetReturn {
               tags: [],
               isEstimate: false,
               isRecurring: false,
+              payments: [
+                {
+                  id: 'demo-payment-1-1',
+                  amount: 75000,
+                  currency: 'CZK',
+                  method: 'bank_transfer',
+                  date: new Date(Date.now() - 50 * 24 * 60 * 60 * 1000),
+                  description: 'Záloha 50%',
+                  status: 'completed',
+                  createdAt: new Date(Date.now() - 50 * 24 * 60 * 60 * 1000)
+                },
+                {
+                  id: 'demo-payment-1-2',
+                  amount: 70000,
+                  currency: 'CZK',
+                  method: 'bank_transfer',
+                  date: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
+                  description: 'Doplatek',
+                  status: 'completed',
+                  createdAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000)
+                }
+              ],
               createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
               updatedAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
               createdBy: user?.id || 'demo-user-id'
@@ -434,6 +456,18 @@ export function useBudget(): UseBudgetReturn {
               tags: [],
               isEstimate: false,
               isRecurring: false,
+              payments: [
+                {
+                  id: 'demo-payment-2-1',
+                  amount: 16000,
+                  currency: 'CZK',
+                  method: 'card',
+                  date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+                  description: 'Záloha 50%',
+                  status: 'completed',
+                  createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+                }
+              ],
               createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
               updatedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
               createdBy: user?.id || 'demo-user-id'
@@ -454,6 +488,7 @@ export function useBudget(): UseBudgetReturn {
               tags: [],
               isEstimate: true,
               isRecurring: false,
+              payments: [],
               createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
               updatedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
               createdBy: user?.id || 'demo-user-id'
@@ -475,6 +510,7 @@ export function useBudget(): UseBudgetReturn {
               tags: [],
               isEstimate: false,
               isRecurring: false,
+              payments: [],
               createdAt: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000),
               updatedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
               createdBy: user?.id || 'demo-user-id'
