@@ -504,7 +504,10 @@ export default function BudgetList({
                                     }`} />
                                     <span>{formatCurrency(payment.amount, payment.currency)}</span>
                                     <span className="text-gray-500">
-                                      {payment.date.toLocaleDateString('cs-CZ')}
+                                      {payment.date instanceof Date ?
+                                        payment.date.toLocaleDateString('cs-CZ') :
+                                        new Date(payment.date).toLocaleDateString('cs-CZ')
+                                      }
                                     </span>
                                   </div>
                                   <span className="text-gray-500">

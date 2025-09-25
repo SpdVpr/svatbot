@@ -649,7 +649,12 @@ export default function BudgetForm({
                       </div>
                       <div>
                         <span className="text-gray-500">Datum:</span>
-                        <p className="font-medium">{payment.date.toLocaleDateString('cs-CZ')}</p>
+                        <p className="font-medium">
+                          {payment.date instanceof Date ?
+                            payment.date.toLocaleDateString('cs-CZ') :
+                            new Date(payment.date).toLocaleDateString('cs-CZ')
+                          }
+                        </p>
                       </div>
                       <div>
                         <span className="text-gray-500">Způsob:</span>

@@ -62,7 +62,15 @@ export function useBudget(): UseBudgetReturn {
 
   // Convert Firestore data to BudgetItem
   const convertFirestoreBudgetItem = (id: string, data: any): BudgetItem => {
-    const payments = data.payments || []
+    const rawPayments = data.payments || []
+
+    // Convert payment dates from Firestore Timestamps to Date objects
+    const payments = rawPayments.map((payment: any) => ({
+      ...payment,
+      date: payment.date?.toDate ? payment.date.toDate() : new Date(payment.date),
+      createdAt: payment.createdAt?.toDate ? payment.createdAt.toDate() : new Date(payment.createdAt || Date.now())
+    }))
+
     // Calculate paidAmount from completed payments
     const calculatedPaidAmount = payments
       .filter((payment: any) => payment.status === 'completed')
@@ -121,7 +129,13 @@ export function useBudget(): UseBudgetReturn {
     if (item.isEstimate !== undefined) result.isEstimate = item.isEstimate
     if (item.isRecurring !== undefined) result.isRecurring = item.isRecurring
     if (item.recurringFrequency !== undefined) result.recurringFrequency = item.recurringFrequency || null
-    if (item.payments !== undefined) result.payments = item.payments || []
+    if (item.payments !== undefined) {
+      result.payments = (item.payments || []).map(payment => ({
+        ...payment,
+        date: payment.date instanceof Date ? Timestamp.fromDate(payment.date) : payment.date,
+        createdAt: payment.createdAt instanceof Date ? Timestamp.fromDate(payment.createdAt) : payment.createdAt
+      }))
+    }
     if (item.createdAt !== undefined) result.createdAt = Timestamp.fromDate(item.createdAt)
     if (item.updatedAt !== undefined) result.updatedAt = Timestamp.fromDate(item.updatedAt)
     if (item.createdBy !== undefined) result.createdBy = item.createdBy
