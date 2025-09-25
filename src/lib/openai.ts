@@ -87,7 +87,7 @@ export class WeddingAI {
       const response = await fetch('/api/ai/vendors', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category, budget, location, requirements, context })
+        body: JSON.stringify({ category, context })
       })
 
       if (!response.ok) {
@@ -149,7 +149,7 @@ export class WeddingAI {
       const response = await fetch('/api/ai/timeline', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ weddingDate, preferences, context })
+        body: JSON.stringify({ context })
       })
 
       if (!response.ok) {
@@ -217,7 +217,7 @@ export class WeddingAI {
       const response = await fetch('/api/ai/budget', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ budgetItems, totalBudget, context })
+        body: JSON.stringify({ currentBudget, totalBudget, context })
       })
 
       if (!response.ok) {
