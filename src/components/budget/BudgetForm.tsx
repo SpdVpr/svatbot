@@ -886,7 +886,7 @@ function PaymentModal({ payment, currency, onSave, onCancel }: PaymentModalProps
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >
                 <option value="card">Karta</option>
-                <option value="bank_transfer">Bankovní převod</option>
+                <option value="transfer">Bankovní převod</option>
                 <option value="cash">Hotovost</option>
                 <option value="check">Šek</option>
                 <option value="other">Jiné</option>
