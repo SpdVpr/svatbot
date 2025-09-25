@@ -349,7 +349,7 @@ export default function TimelinePage() {
                   location: '',
                   description: milestone.description
                 }))}
-                weddingDate={wedding?.weddingDate}
+                weddingDate={wedding?.weddingDate?.toISOString()}
                 onEventClick={(event) => {
                   const milestone = milestones.find(m => m.id === event.id)
                   if (milestone) {
