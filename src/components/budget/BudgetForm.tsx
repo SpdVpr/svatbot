@@ -176,21 +176,36 @@ export default function BudgetForm({
 
   // Remove payment
   const removePayment = (paymentId: string) => {
-    handleChange('payments', (formData.payments || []).filter(p => p.id !== paymentId))
+    const updatedPayments = (formData.payments || []).filter(p => p.id !== paymentId)
+    handleChange('payments', updatedPayments)
+
+    // Update paidAmount automatically
+    const newPaidAmount = updatedPayments
+      .filter(payment => payment.status === 'completed')
+      .reduce((sum, payment) => sum + payment.amount, 0)
+    handleChange('paidAmount', newPaidAmount)
+  }
+
+  // Calculate paid amount from completed payments
+  const calculatePaidAmount = () => {
+    const payments = formData.payments || []
+    return payments
+      .filter(payment => payment.status === 'completed')
+      .reduce((sum, payment) => sum + payment.amount, 0)
   }
 
   // Save payment
   const savePayment = (paymentData: Omit<BudgetItemPayment, 'id' | 'createdAt'>) => {
     const payments = formData.payments || []
+    let updatedPayments: BudgetItemPayment[]
 
     if (editingPayment) {
       // Update existing payment
-      const updatedPayments = payments.map(p =>
+      updatedPayments = payments.map(p =>
         p.id === editingPayment.id
           ? { ...p, ...paymentData }
           : p
       )
-      handleChange('payments', updatedPayments)
     } else {
       // Add new payment
       const newPayment: BudgetItemPayment = {
@@ -198,8 +213,16 @@ export default function BudgetForm({
         createdAt: new Date(),
         ...paymentData
       }
-      handleChange('payments', [...payments, newPayment])
+      updatedPayments = [...payments, newPayment]
     }
+
+    handleChange('payments', updatedPayments)
+
+    // Update paidAmount automatically
+    const newPaidAmount = updatedPayments
+      .filter(payment => payment.status === 'completed')
+      .reduce((sum, payment) => sum + payment.amount, 0)
+    handleChange('paidAmount', newPaidAmount)
 
     setShowPaymentModal(false)
     setEditingPayment(null)
@@ -391,27 +414,25 @@ export default function BudgetForm({
                 )}
               </div>
 
-              {/* Paid Amount */}
+              {/* Paid Amount - Read Only */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Částečně zaplaceno
                 </label>
-                <input
-                  type="number"
-                  value={formData.paidAmount}
-                  onChange={(e) => handleChange('paidAmount', parseFloat(e.target.value) || 0)}
-                  min="0"
-                  step="100"
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
-                    errors.paidAmount ? 'border-red-300' : 'border-gray-300'
-                  }`}
-                  disabled={loading}
-                />
-                {errors.paidAmount && (
-                  <p className="mt-1 text-sm text-red-600">{errors.paidAmount}</p>
-                )}
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={formatCurrency(calculatePaidAmount())}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"
+                    disabled
+                    readOnly
+                  />
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                    <span className="text-xs text-gray-500">Auto</span>
+                  </div>
+                </div>
                 <p className="mt-1 text-xs text-gray-500">
-                  Záloha nebo částečná platba
+                  Automaticky počítáno z plateb
                 </p>
               </div>
             </div>
@@ -509,6 +530,48 @@ export default function BudgetForm({
                 </p>
               </div>
             </div>
+          </div>
+
+          {/* Quick Add Payment */}
+          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-sm font-medium text-blue-900">Správa plateb</h4>
+                <p className="text-xs text-blue-700 mt-1">
+                  Přidejte zálohy, splátky nebo dokončené platby
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={addPayment}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors flex items-center space-x-2"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Přidat platbu</span>
+              </button>
+            </div>
+
+            {/* Payment summary */}
+            {formData.payments && formData.payments.length > 0 && (
+              <div className="mt-3 pt-3 border-t border-blue-200">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-blue-700">
+                    {formData.payments.length} plateb celkem
+                  </span>
+                  <span className="font-medium text-blue-900">
+                    {formatCurrency(formData.payments.reduce((sum, p) => sum + p.amount, 0))}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs text-blue-600 mt-1">
+                  <span>
+                    Dokončeno: {formData.payments.filter(p => p.status === 'completed').length}
+                  </span>
+                  <span>
+                    Zaplaceno: {formatCurrency(calculatePaidAmount())}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Vendor Information */}

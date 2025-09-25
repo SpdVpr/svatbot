@@ -62,6 +62,12 @@ export function useBudget(): UseBudgetReturn {
 
   // Convert Firestore data to BudgetItem
   const convertFirestoreBudgetItem = (id: string, data: any): BudgetItem => {
+    const payments = data.payments || []
+    // Calculate paidAmount from completed payments
+    const calculatedPaidAmount = payments
+      .filter((payment: any) => payment.status === 'completed')
+      .reduce((sum: number, payment: any) => sum + (payment.amount || 0), 0)
+
     return {
       id,
       weddingId: data.weddingId,
@@ -70,7 +76,7 @@ export function useBudget(): UseBudgetReturn {
       category: data.category,
       budgetedAmount: data.budgetedAmount || 0,
       actualAmount: data.actualAmount || 0,
-      paidAmount: data.paidAmount || 0,
+      paidAmount: calculatedPaidAmount, // Use calculated amount instead of stored value
       currency: data.currency || 'CZK',
       vendorId: data.vendorId,
       vendorName: data.vendorName,
@@ -84,7 +90,7 @@ export function useBudget(): UseBudgetReturn {
       isEstimate: data.isEstimate || false,
       isRecurring: data.isRecurring || false,
       recurringFrequency: data.recurringFrequency,
-      payments: data.payments || [],
+      payments: payments,
       createdAt: data.createdAt?.toDate() || new Date(),
       updatedAt: data.updatedAt?.toDate() || new Date(),
       createdBy: data.createdBy
