@@ -153,12 +153,12 @@ export default function VendorDetailPage() {
                 className={`p-2 rounded-lg transition-colors ${
                   isFavorite
                     ? 'bg-red-100 text-red-600'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    : 'bg-gray-600 text-white hover:bg-gray-500'
                 }`}
               >
                 <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
               </button>
-              <button className="p-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition-colors">
+              <button className="p-2 bg-gray-600 text-white hover:bg-gray-500 rounded-lg transition-colors">
                 <Share2 className="w-5 h-5" />
               </button>
             </div>

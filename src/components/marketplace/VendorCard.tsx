@@ -260,7 +260,7 @@ export default function VendorCard({ vendor, compact = false }: VendorCardProps)
                   ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
                   : isAdded
                     ? 'bg-green-100 text-green-700'
-                    : 'bg-primary-50 text-primary-700 hover:bg-primary-100'
+                    : 'bg-primary-600 text-white hover:bg-primary-500'
               }`}
             >
               {isAdding ? (

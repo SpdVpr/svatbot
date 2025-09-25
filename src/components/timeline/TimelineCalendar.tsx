@@ -103,14 +103,14 @@ export default function TimelineCalendar({ events, weddingDate, onEventClick }: 
           
           <button
             onClick={goToPreviousMonth}
-            className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+            className="p-2 bg-gray-600 text-white hover:bg-gray-500 rounded-lg"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          
+
           <button
             onClick={goToNextMonth}
-            className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+            className="p-2 bg-gray-600 text-white hover:bg-gray-500 rounded-lg"
           >
             <ChevronRight className="w-4 h-4" />
           </button>

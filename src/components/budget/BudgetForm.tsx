@@ -465,7 +465,7 @@ export default function BudgetForm({
               <button
                 type="button"
                 onClick={addTag}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-500 transition-colors"
                 disabled={loading}
               >
                 <Plus className="w-4 h-4" />

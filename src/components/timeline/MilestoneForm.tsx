@@ -349,7 +349,7 @@ export default function MilestoneForm({
                         const updatedDays = [...formData.reminderDays, day].sort((a, b) => b - a)
                         handleChange('reminderDays', updatedDays)
                       }}
-                      className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition-colors"
+                      className="text-xs px-2 py-1 bg-primary-600 text-white rounded hover:bg-primary-500 transition-colors"
                       disabled={loading}
                     >
                       {day}d
@@ -398,7 +398,7 @@ export default function MilestoneForm({
               <button
                 type="button"
                 onClick={addTag}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-500 transition-colors"
                 disabled={loading}
               >
                 <Plus className="w-4 h-4" />
