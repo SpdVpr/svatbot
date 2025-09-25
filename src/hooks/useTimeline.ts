@@ -18,6 +18,7 @@ import { useAuth } from './useAuth'
 import { useWedding } from './useWedding'
 import {
   Milestone,
+  MilestoneType,
   MilestoneFormData,
   TimelineFilters,
   TimelineStats,
@@ -66,7 +67,8 @@ export function useTimeline(): UseTimelineReturn {
   // Date converter for demo milestones
   const convertMilestoneDates = (milestone: any): Milestone => ({
     ...milestone,
-    description: milestone.description || undefined,
+    description: milestone.description || '',
+    type: milestone.type as MilestoneType,
     targetDate: new Date(milestone.targetDate),
     completedDate: milestone.completedDate ? new Date(milestone.completedDate) : undefined,
     notificationsSent: (milestone.notificationsSent || []).map((date: string) => new Date(date)),
