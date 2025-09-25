@@ -64,6 +64,14 @@ export default function BudgetList({
   const [showFiltersPanel, setShowFiltersPanel] = useState(false)
   const [selectedItems, setSelectedItems] = useState<string[]>([])
 
+  // Format currency
+  const formatCurrency = (amount: number, currency: string = 'CZK') => {
+    return new Intl.NumberFormat('cs-CZ', {
+      style: 'currency',
+      currency: currency
+    }).format(amount)
+  }
+
   // Filter and sort budget items
   const filteredItems = budgetItems.filter(item => {
     // Search filter
@@ -174,6 +182,12 @@ export default function BudgetList({
         console.error('Error deleting budget item:', error)
       }
     }
+  }
+
+  // Handle add payment
+  const handleAddPayment = (item: BudgetItem) => {
+    // This will open the edit form with focus on payments
+    onEditItem?.(item)
   }
 
   if (loading) {
@@ -475,6 +489,46 @@ export default function BudgetList({
                           )}
                         </div>
 
+                        {/* Payments */}
+                        {item.payments && item.payments.length > 0 && (
+                          <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-sm font-medium text-gray-700">
+                                Platby ({item.payments.length})
+                              </span>
+                              <span className="text-sm text-gray-500">
+                                Celkem: {formatCurrency(item.payments.reduce((sum, p) => sum + p.amount, 0))}
+                              </span>
+                            </div>
+                            <div className="space-y-1">
+                              {item.payments.slice(0, 3).map((payment, index) => (
+                                <div key={payment.id} className="flex items-center justify-between text-xs">
+                                  <div className="flex items-center space-x-2">
+                                    <span className={`w-2 h-2 rounded-full ${
+                                      payment.status === 'completed' ? 'bg-green-500' :
+                                      payment.status === 'pending' ? 'bg-yellow-500' :
+                                      payment.status === 'failed' ? 'bg-red-500' :
+                                      'bg-gray-500'
+                                    }`} />
+                                    <span>{formatCurrency(payment.amount, payment.currency)}</span>
+                                    <span className="text-gray-500">
+                                      {payment.date.toLocaleDateString('cs-CZ')}
+                                    </span>
+                                  </div>
+                                  <span className="text-gray-500">
+                                    {payment.method || 'Neurčeno'}
+                                  </span>
+                                </div>
+                              ))}
+                              {item.payments.length > 3 && (
+                                <div className="text-xs text-gray-500 text-center pt-1">
+                                  ... a {item.payments.length - 3} dalších plateb
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
                         {/* Tags */}
                         {item.tags.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-2">
@@ -492,6 +546,15 @@ export default function BudgetList({
 
                       {/* Actions */}
                       <div className="flex items-center space-x-2">
+                        {/* Add payment button */}
+                        <button
+                          onClick={() => handleAddPayment(item)}
+                          className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                          title="Přidat platbu"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+
                         {/* Quick payment button */}
                         {item.paymentStatus !== 'paid' && item.actualAmount > item.paidAmount && (
                           <button

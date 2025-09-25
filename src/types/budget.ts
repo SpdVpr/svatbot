@@ -65,6 +65,7 @@ export interface BudgetItem {
   paymentMethod?: PaymentMethod
   dueDate?: Date
   paidDate?: Date
+  payments: BudgetItemPayment[]
   
   // Priority and notes
   priority: 'low' | 'medium' | 'high' | 'critical'
@@ -166,6 +167,18 @@ export interface Payment {
   createdBy: string
 }
 
+export interface BudgetItemPayment {
+  id: string
+  amount: number
+  currency: string
+  method?: PaymentMethod
+  date: Date
+  description?: string
+  reference?: string
+  status: 'pending' | 'completed' | 'failed' | 'cancelled'
+  createdAt: Date
+}
+
 export interface BudgetStats {
   // Overall budget
   totalBudget: number
@@ -240,6 +253,7 @@ export interface BudgetFormData {
   notes?: string
   tags: string[]
   isEstimate: boolean
+  payments?: BudgetItemPayment[]
 }
 
 export interface VendorFormData {

@@ -84,6 +84,7 @@ export function useBudget(): UseBudgetReturn {
       isEstimate: data.isEstimate || false,
       isRecurring: data.isRecurring || false,
       recurringFrequency: data.recurringFrequency,
+      payments: data.payments || [],
       createdAt: data.createdAt?.toDate() || new Date(),
       updatedAt: data.updatedAt?.toDate() || new Date(),
       createdBy: data.createdBy
@@ -114,6 +115,7 @@ export function useBudget(): UseBudgetReturn {
     if (item.isEstimate !== undefined) result.isEstimate = item.isEstimate
     if (item.isRecurring !== undefined) result.isRecurring = item.isRecurring
     if (item.recurringFrequency !== undefined) result.recurringFrequency = item.recurringFrequency || null
+    if (item.payments !== undefined) result.payments = item.payments || []
     if (item.createdAt !== undefined) result.createdAt = Timestamp.fromDate(item.createdAt)
     if (item.updatedAt !== undefined) result.updatedAt = Timestamp.fromDate(item.updatedAt)
     if (item.createdBy !== undefined) result.createdBy = item.createdBy
@@ -150,6 +152,7 @@ export function useBudget(): UseBudgetReturn {
         tags: data.tags,
         isEstimate: data.isEstimate,
         isRecurring: false,
+        payments: data.payments || [],
         createdAt: new Date(),
         updatedAt: new Date(),
         createdBy: user.id

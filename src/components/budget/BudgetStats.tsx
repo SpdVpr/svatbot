@@ -79,7 +79,7 @@ export default function BudgetStats({
             <Target className="w-5 h-5 text-blue-500" />
             <div>
               <p className="text-2xl font-bold text-gray-900">{formatCurrency(stats.totalBudget)}</p>
-              <p className="text-sm text-text-muted">Předběžná částka</p>
+              <p className="text-sm text-text-muted">Celkový budget</p>
             </div>
           </div>
         </div>
@@ -123,12 +123,12 @@ export default function BudgetStats({
   return (
     <div className="space-y-6">
       {/* Main stats grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
         {/* Total budget */}
         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-text-muted">Celková předběžná částka</p>
+              <p className="text-sm font-medium text-text-muted">Celkový budget</p>
               <p className="text-3xl font-bold text-gray-900 mt-1">{formatCurrency(stats.totalBudget)}</p>
             </div>
             <div className="p-3 bg-blue-100 rounded-full">
@@ -138,6 +138,26 @@ export default function BudgetStats({
           <div className="mt-4 flex items-center text-sm">
             <span className="text-text-muted">
               {budgetItems.length} položek
+            </span>
+          </div>
+        </div>
+
+        {/* Total budgeted */}
+        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-text-muted">Předběžné náklady</p>
+              <p className="text-3xl font-bold text-blue-600 mt-1">
+                {formatCurrency(budgetItems.reduce((sum, item) => sum + item.budgetedAmount, 0))}
+              </p>
+            </div>
+            <div className="p-3 bg-blue-50 rounded-full">
+              <DollarSign className="w-6 h-6 text-blue-600" />
+            </div>
+          </div>
+          <div className="mt-4 flex items-center text-sm">
+            <span className="text-blue-600 font-medium">
+              {stats.totalBudget > 0 ? Math.round((budgetItems.reduce((sum, item) => sum + item.budgetedAmount, 0) / stats.totalBudget) * 100) : 0}% z budgetu
             </span>
           </div>
         </div>
