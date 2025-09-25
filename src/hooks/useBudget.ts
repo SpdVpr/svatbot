@@ -531,6 +531,7 @@ export function useBudget(): UseBudgetReturn {
               tags: [],
               isEstimate: true,
               isRecurring: false,
+              payments: [],
               createdAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
               updatedAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
               createdBy: user?.id || 'demo-user-id'
