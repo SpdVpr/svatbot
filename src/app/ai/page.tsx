@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useWedding } from '@/hooks/useWedding'
 import { useSearchParams } from 'next/navigation'
@@ -21,7 +21,7 @@ import AIVendorRecommendations from '@/components/ai/AIVendorRecommendations'
 import AITimelineGenerator from '@/components/ai/AITimelineGenerator'
 import AIBudgetOptimizer from '@/components/ai/AIBudgetOptimizer'
 
-export default function AIPage() {
+function AIPageContent() {
   const { user } = useAuth()
   const { wedding } = useWedding()
   const searchParams = useSearchParams()
@@ -292,5 +292,20 @@ export default function AIPage() {
         )}
       </main>
     </div>
+  )
+}
+
+export default function AIPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <Bot className="w-12 h-12 text-pink-600 mx-auto mb-4 animate-pulse" />
+          <p className="text-gray-600">Načítám AI asistenta...</p>
+        </div>
+      </div>
+    }>
+      <AIPageContent />
+    </Suspense>
   )
 }
