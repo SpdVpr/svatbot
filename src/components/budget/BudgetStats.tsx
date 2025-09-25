@@ -72,7 +72,7 @@ export default function BudgetStats({
 
   if (compact) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {/* Total budget */}
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <div className="flex items-center space-x-2">
@@ -95,24 +95,22 @@ export default function BudgetStats({
           </div>
         </div>
 
-        {/* Total paid */}
+        {/* Payment Status */}
         <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <div className="flex items-center space-x-2">
-            <CheckCircle2 className="w-5 h-5 text-green-500" />
-            <div>
-              <p className="text-2xl font-bold text-green-600">{formatCurrency(stats.totalPaid)}</p>
-              <p className="text-sm text-text-muted">Zaplaceno</p>
-            </div>
+          <div className="flex items-center space-x-2 mb-2">
+            <CreditCard className="w-5 h-5 text-green-500" />
+            <div className="text-sm text-text-muted">Platby</div>
           </div>
-        </div>
-
-        {/* Remaining */}
-        <div className="bg-white p-4 rounded-lg border border-gray-200">
-          <div className="flex items-center space-x-2">
-            <TrendingDown className="w-5 h-5 text-purple-500" />
-            <div>
-              <p className="text-2xl font-bold text-purple-600">{formatCurrency(stats.totalRemaining)}</p>
-              <p className="text-sm text-text-muted">Zbývá</p>
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-green-600">Zaplaceno</span>
+              <span className="text-lg font-bold text-green-600">{formatCurrency(stats.totalPaid)}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-orange-600">Zbývá</span>
+              <span className="text-lg font-bold text-orange-600">
+                {formatCurrency(stats.totalActual - stats.totalPaid)}
+              </span>
             </div>
           </div>
         </div>
@@ -123,7 +121,7 @@ export default function BudgetStats({
   return (
     <div className="space-y-6">
       {/* Main stats grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Total budget */}
         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
           <div className="flex items-center justify-between">
@@ -180,41 +178,35 @@ export default function BudgetStats({
           </div>
         </div>
 
-        {/* Total paid */}
+        {/* Payment Status */}
         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-text-muted">Zaplaceno</p>
-              <p className="text-3xl font-bold text-green-600 mt-1">{formatCurrency(stats.totalPaid)}</p>
-            </div>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-medium text-text-muted">Stav plateb</h3>
             <div className="p-3 bg-green-100 rounded-full">
-              <CheckCircle2 className="w-6 h-6 text-green-600" />
+              <CreditCard className="w-6 h-6 text-green-600" />
             </div>
           </div>
-          <div className="mt-4 flex items-center text-sm">
-            <span className="text-green-600 font-medium">{stats.paidPercentage}% zaplaceno</span>
-          </div>
-        </div>
 
-        {/* Remaining */}
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-text-muted">Zbývá zaplatit</p>
-              <p className="text-3xl font-bold text-purple-600 mt-1">
-                {formatCurrency(stats.totalActual - stats.totalPaid)}
-              </p>
+          {/* Paid amount */}
+          <div className="mb-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Zaplaceno</span>
+              <span className="text-sm font-medium text-green-600">{stats.paidPercentage}%</span>
             </div>
-            <div className="p-3 bg-purple-100 rounded-full">
-              <CreditCard className="w-6 h-6 text-purple-600" />
-            </div>
+            <p className="text-2xl font-bold text-green-600">{formatCurrency(stats.totalPaid)}</p>
           </div>
-          <div className="mt-4 flex items-center text-sm">
-            {stats.itemsPending > 0 ? (
-              <span className="text-orange-600">{stats.itemsPending} čeká na platbu</span>
-            ) : (
-              <span className="text-green-600">Vše zaplaceno</span>
-            )}
+
+          {/* Remaining amount */}
+          <div className="pt-3 border-t border-gray-100">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Zbývá zaplatit</span>
+              <span className="text-sm font-medium text-orange-600">
+                {stats.itemsPending > 0 ? `${stats.itemsPending} položek` : 'Hotovo'}
+              </span>
+            </div>
+            <p className="text-2xl font-bold text-orange-600">
+              {formatCurrency(stats.totalActual - stats.totalPaid)}
+            </p>
           </div>
         </div>
       </div>
