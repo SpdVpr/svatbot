@@ -229,11 +229,13 @@ export interface BudgetFormData {
   category: BudgetCategory
   budgetedAmount: number
   actualAmount: number
+  paidAmount: number
   currency: string
   vendorName?: string
   paymentStatus: PaymentStatus
   paymentMethod?: PaymentMethod
   dueDate?: Date
+  paidDate?: Date
   priority: 'low' | 'medium' | 'high' | 'critical'
   notes?: string
   tags: string[]

@@ -434,7 +434,7 @@ export default function BudgetList({
                         {/* Financial info */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-2">
                           <div>
-                            <span className="text-gray-500">Rozpočet:</span>
+                            <span className="text-gray-500">Předběžná částka:</span>
                             <p className="font-medium">{formatCurrency(item.budgetedAmount, item.currency)}</p>
                           </div>
                           <div>
@@ -462,13 +462,16 @@ export default function BudgetList({
                           </div>
                         </div>
 
-                        {/* Vendor and due date */}
+                        {/* Vendor and dates */}
                         <div className="flex items-center space-x-4 text-sm text-gray-600">
                           {item.vendorName && (
                             <span>📍 {item.vendorName}</span>
                           )}
                           {item.dueDate && (
                             <span>📅 Splatnost: {item.dueDate.toLocaleDateString('cs-CZ')}</span>
+                          )}
+                          {item.paidDate && (
+                            <span>💳 Zaplaceno: {item.paidDate.toLocaleDateString('cs-CZ')}</span>
                           )}
                         </div>
 

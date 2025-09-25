@@ -136,12 +136,13 @@ export function useBudget(): UseBudgetReturn {
         category: data.category,
         budgetedAmount: data.budgetedAmount,
         actualAmount: data.actualAmount,
-        paidAmount: 0,
+        paidAmount: data.paidAmount,
         currency: data.currency,
         vendorName: data.vendorName,
         paymentStatus: data.paymentStatus,
         paymentMethod: data.paymentMethod,
         dueDate: data.dueDate,
+        paidDate: data.paidDate,
         priority: data.priority,
         notes: data.notes,
         tags: data.tags,
@@ -205,10 +206,14 @@ export function useBudget(): UseBudgetReturn {
 
       try {
         // Try to update in Firestore
-        const itemRef = doc(db, 'budgetItems', itemId)
-        await updateDoc(itemRef, convertToFirestoreData(updatedData as any))
+        if (user && wedding?.id) {
+          const itemRef = doc(db, 'budgetItems', itemId)
+          await updateDoc(itemRef, convertToFirestoreData(updatedData as any))
+        } else {
+          throw new Error('User not authenticated or wedding not found')
+        }
       } catch (firestoreError) {
-        console.warn('⚠️ Firestore not available, updating localStorage fallback')
+        console.warn('⚠️ Firestore not available, updating localStorage fallback', firestoreError)
         if (wedding) {
           const savedItems = localStorage.getItem(`budgetItems_${wedding.id}`) || '[]'
           const existingItems = JSON.parse(savedItems)

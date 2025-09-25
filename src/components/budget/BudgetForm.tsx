@@ -35,11 +35,13 @@ export default function BudgetForm({
     category: initialData?.category || 'other',
     budgetedAmount: initialData?.budgetedAmount || 0,
     actualAmount: initialData?.actualAmount || 0,
+    paidAmount: initialData?.paidAmount || 0,
     currency: initialData?.currency || 'CZK',
     vendorName: initialData?.vendorName || '',
     paymentStatus: initialData?.paymentStatus || 'pending',
     paymentMethod: initialData?.paymentMethod || undefined,
     dueDate: initialData?.dueDate || undefined,
+    paidDate: initialData?.paidDate || undefined,
     priority: initialData?.priority || 'medium',
     notes: initialData?.notes || '',
     tags: initialData?.tags || [],
@@ -91,11 +93,19 @@ export default function BudgetForm({
     }
 
     if (formData.budgetedAmount <= 0) {
-      newErrors.budgetedAmount = 'Rozpočtovaná částka musí být větší než 0'
+      newErrors.budgetedAmount = 'Předběžná částka musí být větší než 0'
     }
 
     if (formData.actualAmount < 0) {
       newErrors.actualAmount = 'Skutečná částka nemůže být záporná'
+    }
+
+    if (formData.paidAmount < 0) {
+      newErrors.paidAmount = 'Zaplacená částka nemůže být záporná'
+    }
+
+    if (formData.paidAmount > Math.max(formData.budgetedAmount, formData.actualAmount)) {
+      newErrors.paidAmount = 'Zaplacená částka nemůže být vyšší než předběžná nebo skutečná částka'
     }
 
     setErrors(newErrors)
@@ -264,7 +274,7 @@ export default function BudgetForm({
               <span>Finanční údaje</span>
             </h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Currency */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -287,7 +297,7 @@ export default function BudgetForm({
               {/* Budgeted Amount */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Rozpočtovaná částka *
+                  Předběžná částka *
                 </label>
                 <input
                   type="number"
@@ -325,6 +335,30 @@ export default function BudgetForm({
                   <p className="mt-1 text-sm text-red-600">{errors.actualAmount}</p>
                 )}
               </div>
+
+              {/* Paid Amount */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Částečně zaplaceno
+                </label>
+                <input
+                  type="number"
+                  value={formData.paidAmount}
+                  onChange={(e) => handleChange('paidAmount', parseFloat(e.target.value) || 0)}
+                  min="0"
+                  step="100"
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                    errors.paidAmount ? 'border-red-300' : 'border-gray-300'
+                  }`}
+                  disabled={loading}
+                />
+                {errors.paidAmount && (
+                  <p className="mt-1 text-sm text-red-600">{errors.paidAmount}</p>
+                )}
+                <p className="mt-1 text-xs text-gray-500">
+                  Záloha nebo částečná platba
+                </p>
+              </div>
             </div>
 
             {/* Estimate checkbox */}
@@ -349,7 +383,7 @@ export default function BudgetForm({
               <span>Platební údaje</span>
             </h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Payment Status */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -401,6 +435,23 @@ export default function BudgetForm({
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   disabled={loading}
                 />
+              </div>
+
+              {/* Paid Date */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Datum platby
+                </label>
+                <input
+                  type="date"
+                  value={formData.paidDate ? formData.paidDate.toISOString().split('T')[0] : ''}
+                  onChange={(e) => handleChange('paidDate', e.target.value ? new Date(e.target.value) : undefined)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  disabled={loading}
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  Kdy byla platba provedena
+                </p>
               </div>
             </div>
           </div>
