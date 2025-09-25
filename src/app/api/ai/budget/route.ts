@@ -87,10 +87,7 @@ export async function POST(request: NextRequest) {
         temperature: 0.4
       })
 
-      content = response.choices[0]?.message?.content
-      if (!content) {
-        throw new Error('Prázdná odpověď od AI')
-      }
+      content = response.choices[0]?.message?.content || 'Nepodařilo se získat odpověď od AI'
     }
 
     // Clean up the response - remove markdown code blocks if present
