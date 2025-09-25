@@ -65,10 +65,10 @@ export function useTimeline(): UseTimelineReturn {
   const [error, setError] = useState<string | null>(null)
 
   // Date converter for demo milestones
-  const convertMilestoneDates = (milestone: any): Milestone => ({
+  const convertMilestoneDates = (milestone: any): any => ({
     ...milestone,
     description: milestone.description || '',
-    type: milestone.type as MilestoneType,
+    type: milestone.type,
     targetDate: new Date(milestone.targetDate),
     completedDate: milestone.completedDate ? new Date(milestone.completedDate) : undefined,
     notificationsSent: (milestone.notificationsSent || []).map((date: string) => new Date(date)),
