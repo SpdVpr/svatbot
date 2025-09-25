@@ -186,7 +186,7 @@ export default function AIBudgetOptimizer({
             <div>
               <span className="text-gray-500">Využito:</span>
               <span className="font-medium text-gray-900 ml-2">
-                {stats?.totalSpent?.toLocaleString()} Kč
+                {stats?.totalActual?.toLocaleString()} Kč
               </span>
             </div>
             <div>
@@ -198,7 +198,7 @@ export default function AIBudgetOptimizer({
             <div>
               <span className="text-gray-500">Zbývá:</span>
               <span className="font-medium text-green-600 ml-2">
-                {stats?.remaining?.toLocaleString()} Kč
+                {stats?.totalRemaining?.toLocaleString()} Kč
               </span>
             </div>
           </div>
@@ -331,7 +331,7 @@ export default function AIBudgetOptimizer({
                       const currentItem = budgetItems?.find(item => 
                         item.category.toLowerCase().includes(category.toLowerCase())
                       )
-                      const currentAmount = currentItem?.amount || 0
+                      const currentAmount = currentItem?.budgetedAmount || 0
                       const difference = amount - currentAmount
                       
                       return (

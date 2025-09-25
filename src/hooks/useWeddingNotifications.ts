@@ -72,19 +72,19 @@ export function useWeddingNotifications() {
   const { user } = useAuth()
 
   useEffect(() => {
-    if (!user?.uid) {
+    if (!user?.id) {
       setNotifications([])
       setUnreadCount(0)
       setLoading(false)
       return
     }
 
-    console.log('Setting up notifications listener for user:', user.uid)
+    console.log('Setting up notifications listener for user:', user.id)
 
     // Real-time listener for wedding notifications
     const q = query(
       collection(db, 'weddingNotifications'),
-      where('userId', '==', user.uid),
+      where('userId', '==', user.id),
       orderBy('createdAt', 'desc'),
       limit(100)
     )
@@ -132,11 +132,11 @@ export function useWeddingNotifications() {
       expiresIn?: number // minutes
     }
   ) => {
-    if (!user?.uid) return
+    if (!user?.id) return
 
     try {
       const notification: Omit<WeddingNotification, 'id'> = {
-        userId: user.uid,
+        userId: user.id,
         type,
         title,
         message,

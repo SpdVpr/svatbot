@@ -48,7 +48,7 @@ interface UseSeatingReturn {
   setCurrentPlan: (planId: string) => void
 
   // Table management
-  createTable: (data: TableFormData) => Promise<Table>
+  createTable: (data: TableFormData, planId?: string) => Promise<Table>
   updateTable: (tableId: string, updates: Partial<Table>) => Promise<void>
   deleteTable: (tableId: string) => Promise<void>
   moveTable: (tableId: string, position: { x: number; y: number }) => Promise<void>

@@ -36,7 +36,7 @@ function DashboardContent() {
 
   // Demo function for testing notifications
   const handleTestNotifications = () => {
-    console.log('Testing notifications...', { user: user?.uid, createNotification })
+    console.log('Testing notifications...', { user: user?.id, createNotification })
 
     // Test simple toasts first
     showSimpleToast('info', 'Notifikace Test', 'Testování notifikačního systému...')
@@ -54,7 +54,7 @@ function DashboardContent() {
     }, 3000)
 
     // Try Firebase notifications if user is authenticated
-    if (user?.uid && createNotification) {
+    if (user?.id && createNotification) {
       setTimeout(() => {
         createDemoNotifications(createNotification, showToast)
       }, 4000)

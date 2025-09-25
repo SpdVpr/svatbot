@@ -36,7 +36,7 @@ export function useAI() {
     return {
       budget: stats?.totalBudget || wedding?.budget,
       guestCount: wedding?.estimatedGuestCount || guests?.length,
-      weddingDate: wedding?.weddingDate,
+      weddingDate: wedding?.weddingDate || undefined,
       location: wedding?.region,
       style: wedding?.style,
       preferences: [], // TODO: Add preferences to wedding type

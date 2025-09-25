@@ -67,9 +67,9 @@ export const createDemoNotifications = async (createNotification: any, showToast
       )
 
       // Show toast for high priority notifications
-      if (notification.options.priority === 'high' || notification.options.priority === 'urgent') {
+      if (notification.options.priority === 'high' || notification.options.priority === 'medium') {
         showToast(
-          notification.options.priority === 'urgent' ? 'error' : 'warning',
+          notification.options.priority === 'high' ? 'error' : 'warning',
           notification.title,
           notification.message,
           notification.options

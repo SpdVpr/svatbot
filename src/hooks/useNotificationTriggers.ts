@@ -14,16 +14,16 @@ export function useNotificationTriggers() {
   const { user } = useAuth()
   const { wedding } = useWedding()
   const { tasks } = useTask()
-  const { budget } = useBudget()
+  const { budgetItems, stats } = useBudget()
   const { guests } = useGuest()
 
   // Check for overdue tasks
   useEffect(() => {
-    if (!user?.uid || !tasks || tasks.length === 0) return
+    if (!user?.id || !tasks || tasks.length === 0) return
 
     const now = new Date()
     const overdueTasks = tasks.filter(task => 
-      !task.completed && 
+      !task.completedAt &&
       task.dueDate && 
       new Date(task.dueDate) < now
     )
@@ -57,14 +57,14 @@ export function useNotificationTriggers() {
 
   // Check for tasks due soon
   useEffect(() => {
-    if (!user?.uid || !tasks || tasks.length === 0) return
+    if (!user?.id || !tasks || tasks.length === 0) return
 
     const now = new Date()
     const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000)
     const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
 
     const tasksDueSoon = tasks.filter(task => 
-      !task.completed && 
+      !task.completedAt &&
       task.dueDate && 
       new Date(task.dueDate) >= now &&
       new Date(task.dueDate) <= nextWeek
@@ -92,10 +92,10 @@ export function useNotificationTriggers() {
 
   // Check budget alerts
   useEffect(() => {
-    if (!user?.uid || !budget || !budget.items || budget.items.length === 0) return
+    if (!user?.id || !budgetItems || budgetItems.length === 0) return
 
-    const totalBudget = budget.totalBudget || 0
-    const totalSpent = budget.items.reduce((sum, item) => sum + (item.actualCost || 0), 0)
+    const totalBudget = stats?.totalBudget || 0
+    const totalSpent = budgetItems.reduce((sum: number, item: any) => sum + (item.actualAmount || 0), 0)
     const budgetUsagePercentage = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0
 
     // Budget exceeded
@@ -136,17 +136,17 @@ export function useNotificationTriggers() {
 
     // Check for overdue payments
     const now = new Date()
-    const overduePayments = budget.items.filter(item => 
-      item.paymentDue && 
-      new Date(item.paymentDue) < now &&
-      (item.actualCost || 0) < (item.estimatedCost || 0)
+    const overduePayments = budgetItems.filter((item: any) =>
+      item.dueDate &&
+      new Date(item.dueDate) < now &&
+      (item.paidAmount || 0) < (item.budgetedAmount || 0)
     )
 
-    overduePayments.forEach(item => {
+    overduePayments.forEach((item: any) => {
       createNotification(
         WeddingNotificationType.PAYMENT_OVERDUE,
         'Platba po termínu',
-        `Platba pro "${item.name}" měla být uhrazena ${new Date(item.paymentDue!).toLocaleDateString()}.`,
+        `Platba pro "${item.name}" měla být uhrazena ${new Date(item.dueDate!).toLocaleDateString()}.`,
         {
           priority: 'urgent',
           category: 'budget',
@@ -155,11 +155,11 @@ export function useNotificationTriggers() {
         }
       )
     })
-  }, [user, budget, createNotification, showToast])
+  }, [user, budgetItems, stats, createNotification, showToast])
 
   // Wedding countdown notifications
   useEffect(() => {
-    if (!user?.uid || !wedding?.weddingDate) return
+    if (!user?.id || !wedding?.weddingDate) return
 
     const now = new Date()
     const weddingDate = new Date(wedding.weddingDate)
@@ -210,9 +210,9 @@ export function useNotificationTriggers() {
 
   // RSVP notifications
   useEffect(() => {
-    if (!user?.uid || !guests || guests.length === 0) return
+    if (!user?.id || !guests || guests.length === 0) return
 
-    const confirmedGuests = guests.filter(guest => guest.rsvpStatus === 'confirmed').length
+    const confirmedGuests = guests.filter(guest => guest.rsvpStatus === 'attending').length
     const pendingGuests = guests.filter(guest => guest.rsvpStatus === 'pending').length
     const totalGuests = guests.length
 
@@ -236,9 +236,9 @@ export function useNotificationTriggers() {
     }
 
     // New RSVP received (this would typically be triggered by a real-time listener)
-    const recentlyConfirmed = guests.filter(guest => 
-      guest.rsvpStatus === 'confirmed' && 
-      guest.updatedAt && 
+    const recentlyConfirmed = guests.filter(guest =>
+      guest.rsvpStatus === 'attending' &&
+      guest.updatedAt &&
       new Date(guest.updatedAt).getTime() > Date.now() - 24 * 60 * 60 * 1000 // Last 24 hours
     )
 
@@ -246,7 +246,7 @@ export function useNotificationTriggers() {
       showToast(
         'success',
         'Nové potvrzení účasti',
-        `${guest.name} potvrdil/a účast na svatbě`,
+        `${guest.firstName} ${guest.lastName} potvrdil/a účast na svatbě`,
         { priority: 'medium', actionUrl: '/guests' }
       )
     })
@@ -254,7 +254,7 @@ export function useNotificationTriggers() {
 
   // System backup reminder
   useEffect(() => {
-    if (!user?.uid) return
+    if (!user?.id) return
     const lastBackup = localStorage.getItem('lastBackupReminder')
     const now = Date.now()
     const oneWeek = 7 * 24 * 60 * 60 * 1000

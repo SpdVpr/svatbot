@@ -32,23 +32,20 @@ export class WeddingAI {
         - Preference: ${context.preferences?.join(', ') || 'žádné'}
       ` : ''
 
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content: WEDDING_CONTEXT
-          },
-          {
-            role: "user",
-            content: `${contextInfo}\n\nOtázka: ${question}`
-          }
-        ],
-        max_tokens: 500,
-        temperature: 0.7
+      // TODO: Implement API call to /api/ai/chat
+      const response = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question, context })
       })
 
-      return response.choices[0]?.message?.content || 'Omlouvám se, nepodařilo se mi odpovědět na vaši otázku.'
+      if (!response.ok) {
+        throw new Error('Failed to get AI response')
+      }
+
+      const data = await response.json()
+
+      return data.response || 'Omlouvám se, nepodařilo se mi odpovědět na vaši otázku.'
     } catch (error) {
       console.error('AI Assistant error:', error)
       if (error instanceof Error) {
@@ -86,17 +83,19 @@ export class WeddingAI {
         }
       `
 
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: WEDDING_CONTEXT },
-          { role: "user", content: prompt }
-        ],
-        max_tokens: 600,
-        temperature: 0.5
+      // TODO: Implement API call to /api/ai/vendors
+      const response = await fetch('/api/ai/vendors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category, budget, location, requirements, context })
       })
 
-      const content = response.choices[0]?.message?.content
+      if (!response.ok) {
+        throw new Error('Failed to get vendor recommendations')
+      }
+
+      const data = await response.json()
+      const content = data.response
       console.log('Vendor recommendations - AI response:', content)
 
       if (!content) throw new Error('No response from AI')
@@ -146,17 +145,19 @@ export class WeddingAI {
         }
       `
 
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: WEDDING_CONTEXT },
-          { role: "user", content: prompt }
-        ],
-        max_tokens: 800,
-        temperature: 0.6
+      // TODO: Implement API call to /api/ai/timeline
+      const response = await fetch('/api/ai/timeline', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ weddingDate, preferences, context })
       })
 
-      const content = response.choices[0]?.message?.content
+      if (!response.ok) {
+        throw new Error('Failed to generate timeline')
+      }
+
+      const data = await response.json()
+      const content = data.response
       console.log('Timeline generation - AI response:', content)
 
       if (!content) throw new Error('No response from AI')
@@ -212,17 +213,19 @@ export class WeddingAI {
         }
       `
 
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: WEDDING_CONTEXT },
-          { role: "user", content: prompt }
-        ],
-        max_tokens: 700,
-        temperature: 0.4
+      // TODO: Implement API call to /api/ai/budget
+      const response = await fetch('/api/ai/budget', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ budgetItems, totalBudget, context })
       })
 
-      const content = response.choices[0]?.message?.content
+      if (!response.ok) {
+        throw new Error('Failed to optimize budget')
+      }
+
+      const data = await response.json()
+      const content = data.response
       console.log('Budget optimization - AI response:', content)
 
       if (!content) throw new Error('No response from AI')
@@ -279,17 +282,19 @@ export class WeddingAI {
         Odpověz ve formátu JSON s prioritami a deadliny.
       `
 
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: WEDDING_CONTEXT },
-          { role: "user", content: prompt }
-        ],
-        max_tokens: 800,
-        temperature: 0.3
+      // TODO: Implement API call for task optimization
+      const response = await fetch('/api/ai/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tasks, context })
       })
 
-      const content = response.choices[0]?.message?.content
+      if (!response.ok) {
+        throw new Error('Failed to optimize tasks')
+      }
+
+      const data = await response.json()
+      const content = data.response
       if (!content) throw new Error('No response from AI')
 
       return JSON.parse(content)
@@ -319,17 +324,19 @@ export class WeddingAI {
         Poskytni konkrétní, praktické doporučení v 2-3 větách. Zaměř se na nejdůležitější kroky.
       `
 
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: WEDDING_CONTEXT },
-          { role: "user", content: prompt }
-        ],
-        max_tokens: 300,
-        temperature: 0.7
+      // TODO: Implement API call for smart suggestions
+      const response = await fetch('/api/ai/suggestions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ context })
       })
 
-      const content = response.choices[0]?.message?.content
+      if (!response.ok) {
+        throw new Error('Failed to get smart suggestions')
+      }
+
+      const data = await response.json()
+      const content = data.response
       if (!content) throw new Error('No response from AI')
 
       return content.trim()
