@@ -101,18 +101,14 @@ export default function RootLayout({
       montserrat.variable
     )}>
       <head>
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-        <link rel="manifest" href="/site.webmanifest" />
         <meta name="theme-color" content="#F8BBD9" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="SvatBot.cz" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="msapplication-TileColor" content="#F8BBD9" />
-        <meta name="msapplication-config" content="/browserconfig.xml" />
       </head>
       <body className={cn(
         'min-h-screen bg-neutral-50 font-sans antialiased',
@@ -127,6 +123,9 @@ export default function RootLayout({
 
         {/* Portal for toasts */}
         <div id="toast-root" />
+
+        {/* Portal for notifications */}
+        <div id="notification-root" />
       </body>
     </html>
   )

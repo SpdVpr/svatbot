@@ -22,7 +22,24 @@ export function useDashboard() {
       if (savedLayout) {
         try {
           const parsedLayout = JSON.parse(savedLayout)
-          setLayout(parsedLayout)
+
+          // Check if we need to add new modules (like ai-timeline)
+          const existingModuleTypes = parsedLayout.modules.map((m: DashboardModule) => m.type)
+          const newModules = DEFAULT_DASHBOARD_MODULES.filter(
+            defaultModule => !existingModuleTypes.includes(defaultModule.type)
+          )
+
+          // If there are new modules, add them to the layout
+          if (newModules.length > 0) {
+            console.log('Adding new modules to dashboard:', newModules.map(m => m.type))
+            const updatedLayout = {
+              ...parsedLayout,
+              modules: [...parsedLayout.modules, ...newModules]
+            }
+            setLayout(updatedLayout)
+          } else {
+            setLayout(parsedLayout)
+          }
         } catch (error) {
           console.error('Error parsing saved dashboard layout:', error)
           // Use default layout if parsing fails
@@ -32,6 +49,13 @@ export function useDashboard() {
             isLocked: false
           })
         }
+      } else {
+        // No saved layout, use default
+        setLayout({
+          modules: DEFAULT_DASHBOARD_MODULES,
+          isEditMode: false,
+          isLocked: false
+        })
       }
     }
     setLoading(false)
@@ -91,11 +115,17 @@ export function useDashboard() {
   }
 
   const resetLayout = () => {
-    setLayout({
+    const newLayout = {
       modules: DEFAULT_DASHBOARD_MODULES,
       isEditMode: false,
       isLocked: false
-    })
+    }
+    setLayout(newLayout)
+
+    // Also clear localStorage to ensure fresh start
+    if (user) {
+      localStorage.removeItem(`${DASHBOARD_STORAGE_KEY}-${user.id}`)
+    }
   }
 
   const getVisibleModules = () => {

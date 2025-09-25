@@ -63,6 +63,10 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     width: currentPlan.venueLayout.width,
     height: currentPlan.venueLayout.height
   })
+
+  // Mobile long press detection
+  const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null)
+  const [isLongPress, setIsLongPress] = useState(false)
   const [tableFormData, setTableFormData] = useState<{
     name: string
     shape: TableShape
@@ -131,10 +135,54 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     setDraggedTablePosition(null)
   }, [isDragging, selectedTable, draggedTablePosition, moveTable])
 
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (longPressTimer) {
+        clearTimeout(longPressTimer)
+      }
+    }
+  }, [longPressTimer])
+
+  // Mobile long press handlers
+  const handleTouchStart = (tableId: string) => {
+    setIsLongPress(false)
+    const timer = setTimeout(() => {
+      setIsLongPress(true)
+      const table = tables.find(t => t.id === tableId)
+      if (table) {
+        handleEditTable(table)
+      }
+    }, 500) // 500ms for long press
+    setLongPressTimer(timer)
+  }
+
+  const handleTouchEnd = () => {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer)
+      setLongPressTimer(null)
+    }
+    // Reset long press flag after a short delay
+    setTimeout(() => setIsLongPress(false), 100)
+  }
+
+  const handleTouchMove = () => {
+    // Cancel long press if user moves finger
+    if (longPressTimer) {
+      clearTimeout(longPressTimer)
+      setLongPressTimer(null)
+    }
+  }
+
   // Add new table
   const handleAddTable = async () => {
     try {
-      console.log('🪑 Adding table to plan:', currentPlan.id)
+      console.log('🪑 Adding table to plan:', currentPlan?.id || 'none')
+      if (!currentPlan) {
+        alert('Nejdříve vyberte nebo vytvořte plán usazení')
+        return
+      }
+
       await createTable({
         name: tableFormData.name || `Stůl ${tables.length + 1}`,
         shape: tableFormData.shape,
@@ -143,7 +191,8 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
         position: { x: 200, y: 200 },
         rotation: 0,
         color: tableFormData.color
-      })
+      }, currentPlan.id) // Explicitly pass planId
+
       setShowTableForm(false)
       setTableFormData({
         name: '',
@@ -547,6 +596,14 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                     }}
                     onMouseDown={(e) => handleTableDragStart(table.id, e)}
                     onDoubleClick={() => handleEditTable(table)}
+                    onTouchStart={() => handleTouchStart(table.id)}
+                    onTouchEnd={handleTouchEnd}
+                    onTouchMove={handleTouchMove}
+                    title={
+                      typeof window !== 'undefined' && 'ontouchstart' in window
+                        ? `${table.name} - Dlouhé stisknutí pro úpravu, táhněte pro přesun`
+                        : `${table.name} - Dvojklik pro úpravu, táhněte pro přesun`
+                    }
                   >
                     {/* Table shape */}
                     <div
@@ -709,9 +766,29 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
       {showTableForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
               {editingTable ? 'Upravit stůl' : 'Přidat nový stůl'}
             </h3>
+
+            {/* Tip for editing tables */}
+            {!editingTable && (
+              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-start space-x-2">
+                  <div className="w-5 h-5 text-blue-600 mt-0.5">
+                    💡
+                  </div>
+                  <div className="text-sm text-blue-800">
+                    <p className="font-medium mb-1">Tip pro úpravu stolů:</p>
+                    <p className="hidden sm:block">
+                      Po přidání můžete rozměry a vlastnosti stolu upravit <strong>dvojklikem</strong> na stůl v plánu.
+                    </p>
+                    <p className="sm:hidden">
+                      Po přidání můžete rozměry a vlastnosti stolu upravit <strong>dlouhým stisknutím</strong> na stůl v plánu.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="space-y-4">
               {/* Table name */}

@@ -22,6 +22,13 @@ interface TaskListProps {
   maxHeight?: string
   compact?: boolean
   onCreateTask?: () => void
+  tasks?: Task[] // Optional - if not provided, will use useTask hook
+  loading?: boolean
+  error?: string | null
+  stats?: any
+  toggleTaskStatus?: (taskId: string) => Promise<void>
+  deleteTask?: (taskId: string) => Promise<void>
+  clearError?: () => void
 }
 
 export default function TaskList({
@@ -29,20 +36,33 @@ export default function TaskList({
   showFilters = true,
   maxHeight = '600px',
   compact = false,
-  onCreateTask
+  onCreateTask,
+  tasks: propTasks,
+  loading: propLoading,
+  error: propError,
+  stats: propStats,
+  toggleTaskStatus: propToggleTaskStatus,
+  deleteTask: propDeleteTask,
+  clearError: propClearError
 }: TaskListProps) {
-  const {
-    tasks,
-    loading,
-    error,
-    stats,
-    toggleTaskStatus,
-    deleteTask,
-    clearError
-  } = useTask()
+  const hookData = useTask()
+
+  // Check if this is a demo user - if so, use props, otherwise use hook data
+  const isDemoUser = hookData.tasks.length > 0 && hookData.tasks[0]?.weddingId === 'demo-wedding'
+
+  // Use props for demo users, hook data for normal users
+  const tasks = isDemoUser && propTasks ? propTasks : hookData.tasks
+  const loading = isDemoUser && propLoading !== undefined ? propLoading : hookData.loading
+  const error = isDemoUser && propError !== undefined ? propError : hookData.error
+  const stats = isDemoUser && propStats ? propStats : hookData.stats
+  const toggleTaskStatus = isDemoUser && propToggleTaskStatus ? propToggleTaskStatus : hookData.toggleTaskStatus
+  const deleteTask = isDemoUser && propDeleteTask ? propDeleteTask : hookData.deleteTask
+  const clearError = isDemoUser && propClearError ? propClearError : hookData.clearError
 
   // Debug logging
   console.log('📋 TaskList render - tasks:', tasks.length, tasks)
+  console.log('📋 TaskList render - isDemoUser:', isDemoUser)
+  console.log('📋 TaskList render - using props:', isDemoUser && !!propTasks)
 
   const [filters, setFilters] = useState<TaskFilters>({})
   const [viewOptions, setViewOptions] = useState<TaskViewOptions>({
@@ -97,6 +117,16 @@ export default function TaskList({
 
   // Group tasks
   const groupedTasks = groupTasksBy(filteredTasks, viewOptions.groupBy)
+
+  // Debug grouping
+  console.log('🔍 TaskList grouping:', {
+    filteredTasksCount: filteredTasks.length,
+    groupedTasks: Object.keys(groupedTasks).map(key => ({
+      group: key,
+      count: groupedTasks[key].length,
+      tasks: groupedTasks[key].map(t => t.title)
+    }))
+  })
 
   // Get priority icon and color
   const getPriorityDisplay = (priority: string) => {

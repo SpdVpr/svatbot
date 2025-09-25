@@ -26,6 +26,14 @@ import {
   TimelineTemplate,
   TIMELINE_TEMPLATES
 } from '@/types/timeline'
+import {
+  isDemoUser,
+  loadDemoData,
+  addDemoItem,
+  updateDemoItem,
+  deleteDemoItem,
+  generateDemoId
+} from '@/utils/demoSession'
 
 interface UseTimelineReturn {
   milestones: Milestone[]
@@ -54,6 +62,16 @@ export function useTimeline(): UseTimelineReturn {
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Date converter for demo milestones
+  const convertMilestoneDates = (milestone: any): Milestone => ({
+    ...milestone,
+    targetDate: new Date(milestone.targetDate),
+    completedDate: milestone.completedDate ? new Date(milestone.completedDate) : undefined,
+    notificationsSent: (milestone.notificationsSent || []).map((date: string) => new Date(date)),
+    createdAt: new Date(milestone.createdAt),
+    updatedAt: new Date(milestone.updatedAt)
+  })
 
   // Convert Firestore data to Milestone
   const convertFirestoneMilestone = (id: string, data: any): Milestone => {
@@ -89,38 +107,49 @@ export function useTimeline(): UseTimelineReturn {
 
   // Convert Milestone to Firestore data
   const convertToFirestoreData = (milestone: Omit<Milestone, 'id'>): any => {
+    // Helper function to safely convert to Date
+    const safeDate = (date: any): Date => {
+      if (date instanceof Date) return date
+      if (typeof date === 'string') return new Date(date)
+      if (date && typeof date.toDate === 'function') return date.toDate()
+      return new Date()
+    }
+
     return {
       weddingId: milestone.weddingId,
       title: milestone.title,
       description: milestone.description || null,
       type: milestone.type,
-      targetDate: Timestamp.fromDate(milestone.targetDate),
-      completedDate: milestone.completedDate ? Timestamp.fromDate(milestone.completedDate) : null,
+      targetDate: Timestamp.fromDate(safeDate(milestone.targetDate)),
+      completedDate: milestone.completedDate ? Timestamp.fromDate(safeDate(milestone.completedDate)) : null,
       period: milestone.period,
       status: milestone.status,
       progress: milestone.progress,
-      dependsOn: milestone.dependsOn,
-      blockedBy: milestone.blockedBy,
-      taskIds: milestone.taskIds,
-      budgetItemIds: milestone.budgetItemIds,
-      guestIds: milestone.guestIds,
-      vendorIds: milestone.vendorIds,
+      dependsOn: milestone.dependsOn || [],
+      blockedBy: milestone.blockedBy || [],
+      taskIds: milestone.taskIds || [],
+      budgetItemIds: milestone.budgetItemIds || [],
+      guestIds: milestone.guestIds || [],
+      vendorIds: milestone.vendorIds || [],
       priority: milestone.priority,
       isRequired: milestone.isRequired,
-      reminderDays: milestone.reminderDays,
-      notificationsSent: milestone.notificationsSent.map(date => Timestamp.fromDate(date)),
+      reminderDays: milestone.reminderDays || 7,
+      notificationsSent: (milestone.notificationsSent || []).map(date => Timestamp.fromDate(safeDate(date))),
       notes: milestone.notes || null,
-      attachments: milestone.attachments,
-      tags: milestone.tags,
-      createdAt: Timestamp.fromDate(milestone.createdAt),
-      updatedAt: Timestamp.fromDate(milestone.updatedAt),
+      attachments: milestone.attachments || [],
+      tags: milestone.tags || [],
+      createdAt: Timestamp.fromDate(safeDate(milestone.createdAt)),
+      updatedAt: Timestamp.fromDate(safeDate(milestone.updatedAt)),
       createdBy: milestone.createdBy
     }
   }
 
   // Create new milestone
   const createMilestone = async (data: MilestoneFormData, skipLoading = false): Promise<Milestone> => {
+    console.log('🎯 createMilestone called with:', { data, user: !!user, wedding: !!wedding })
+
     if (!wedding || !user) {
+      console.error('❌ Missing user or wedding:', { user: !!user, wedding: !!wedding })
       throw new Error('Žádná svatba nebo uživatel není vybrán')
     }
 
@@ -130,38 +159,71 @@ export function useTimeline(): UseTimelineReturn {
         setLoading(true)
       }
 
+      console.log('📋 Creating milestone data object...')
+
+      // Ensure targetDate is a proper Date object
+      const targetDate = data.targetDate instanceof Date ? data.targetDate : new Date(data.targetDate)
+
       // Calculate period based on target date and wedding date
-      const period = calculatePeriod(data.targetDate, wedding.weddingDate ? new Date(wedding.weddingDate) : new Date())
+      const period = calculatePeriod(targetDate, wedding.weddingDate ? new Date(wedding.weddingDate) : new Date())
 
       const milestoneData: Omit<Milestone, 'id'> = {
         weddingId: wedding.id,
         title: data.title,
-        description: data.description,
+        description: data.description || '',
         type: data.type,
-        targetDate: data.targetDate,
+        targetDate: targetDate,
         period,
         status: 'upcoming',
         progress: 0,
-        dependsOn: data.dependsOn,
+        dependsOn: data.dependsOn || [],
         blockedBy: [],
         taskIds: [],
         budgetItemIds: [],
         guestIds: [],
         vendorIds: [],
         priority: data.priority,
-        isRequired: data.isRequired,
-        reminderDays: data.reminderDays,
+        isRequired: data.isRequired || false,
+        reminderDays: data.reminderDays || 7,
         notificationsSent: [],
-        notes: data.notes,
+        notes: data.notes || '',
         attachments: [],
-        tags: data.tags,
+        tags: data.tags || [],
         createdAt: new Date(),
         updatedAt: new Date(),
         createdBy: user.id
       }
 
+      // Check if this is a demo user
+      const isDemo = isDemoUser(user.id, user.email, wedding.id)
+
+      if (isDemo) {
+        console.log('🎭 Creating demo milestone (sessionStorage)')
+        // For demo users, save to sessionStorage only
+        const demoId = generateDemoId('milestone')
+        const newMilestone: Milestone = { id: demoId, ...milestoneData }
+
+        // Update demo data using utility function
+        const updatedMilestones = addDemoItem(
+          {
+            weddingId: wedding.id,
+            userId: user.id,
+            collectionName: 'milestones'
+          },
+          newMilestone,
+          (a, b) => a.targetDate.getTime() - b.targetDate.getTime(),
+          convertMilestoneDates
+        )
+
+        // Update local state immediately
+        setMilestones(updatedMilestones)
+        console.log('🎭 Updated demo milestones state:', updatedMilestones.length)
+
+        return newMilestone
+      }
+
       try {
-        // Try to save to Firestore
+        // Try to save to Firestore (for real users)
         const docRef = await addDoc(collection(db, 'milestones'), convertToFirestoreData(milestoneData))
         const newMilestone: Milestone = { id: docRef.id, ...milestoneData }
 
@@ -216,6 +278,10 @@ export function useTimeline(): UseTimelineReturn {
 
   // Update milestone
   const updateMilestone = async (milestoneId: string, updates: Partial<Milestone>): Promise<void> => {
+    if (!wedding || !user) {
+      throw new Error('Žádná svatba nebo uživatel není vybrán')
+    }
+
     try {
       setError(null)
 
@@ -224,8 +290,32 @@ export function useTimeline(): UseTimelineReturn {
         updatedAt: new Date()
       }
 
+      // Check if this is a demo user
+      const isDemo = isDemoUser(user.id, user.email, wedding.id)
+
+      if (isDemo) {
+        console.log('🎭 Updating demo milestone (sessionStorage)')
+        // For demo users, update in sessionStorage only
+        const updatedMilestones = updateDemoItem(
+          {
+            weddingId: wedding.id,
+            userId: user.id,
+            collectionName: 'milestones'
+          },
+          milestoneId,
+          updatedData,
+          (a, b) => a.targetDate.getTime() - b.targetDate.getTime(),
+          convertMilestoneDates
+        )
+
+        // Update local state immediately
+        setMilestones(updatedMilestones)
+        console.log('🎭 Updated demo milestone in state')
+        return
+      }
+
       try {
-        // Try to update in Firestore
+        // Try to update in Firestore (for real users)
         const milestoneRef = doc(db, 'milestones', milestoneId)
         await updateDoc(milestoneRef, convertToFirestoreData(updatedData as any))
       } catch (firestoreError) {
@@ -254,11 +344,37 @@ export function useTimeline(): UseTimelineReturn {
 
   // Delete milestone
   const deleteMilestone = async (milestoneId: string): Promise<void> => {
+    if (!wedding || !user) {
+      throw new Error('Žádná svatba nebo uživatel není vybrán')
+    }
+
     try {
       setError(null)
 
+      // Check if this is a demo user
+      const isDemo = isDemoUser(user.id, user.email, wedding.id)
+
+      if (isDemo) {
+        console.log('🎭 Deleting demo milestone (sessionStorage)')
+        // For demo users, delete from sessionStorage only
+        const updatedMilestones = deleteDemoItem(
+          {
+            weddingId: wedding.id,
+            userId: user.id,
+            collectionName: 'milestones'
+          },
+          milestoneId,
+          convertMilestoneDates
+        )
+
+        // Update local state immediately
+        setMilestones(updatedMilestones)
+        console.log('🎭 Deleted demo milestone from state')
+        return
+      }
+
       try {
-        // Try to delete from Firestore
+        // Try to delete from Firestore (for real users)
         await deleteDoc(doc(db, 'milestones', milestoneId))
       } catch (firestoreError) {
         console.warn('⚠️ Firestore not available, deleting from localStorage fallback')
@@ -521,11 +637,33 @@ export function useTimeline(): UseTimelineReturn {
         setError(null)
 
         // Check if this is a demo user
-        const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding.id === 'demo-wedding'
+        const isDemo = isDemoUser(user?.id, user?.email, wedding.id)
+        console.log('🎭 Demo user check:', {
+          isDemo,
+          userId: user?.id,
+          userEmail: user?.email,
+          weddingId: wedding.id,
+          isDemoUserId: user?.id === 'demo-user-id',
+          isDemoEmail: user?.email === 'demo@svatbot.cz',
+          isDemoWedding: wedding.id === 'demo-wedding'
+        })
 
-        if (isDemoUser) {
-          // Load demo milestones
-          const demoMilestones: Milestone[] = [
+        // Special handling for demo users - wait for demo wedding to be created
+        if ((user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz') && wedding.id !== 'demo-wedding') {
+          console.log('🎭 Demo user detected but demo wedding not ready yet, waiting...')
+          setLoading(false)
+          return
+        }
+
+        if (isDemo) {
+          // Load demo milestones using utility function
+          const demoMilestones = loadDemoData(
+            {
+              weddingId: wedding.id,
+              userId: user?.id || 'demo-user-id',
+              collectionName: 'milestones'
+            },
+            () => [
             {
               id: 'demo-milestone-1',
               weddingId: wedding.id,
@@ -635,7 +773,8 @@ export function useTimeline(): UseTimelineReturn {
               updatedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
               createdBy: user?.id || 'demo-user-id'
             }
-          ]
+          ],
+          convertMilestoneDates)
 
           console.log('🎭 Loaded demo milestones:', demoMilestones.length, demoMilestones)
           setMilestones(demoMilestones)

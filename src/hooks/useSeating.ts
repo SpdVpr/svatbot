@@ -104,6 +104,12 @@ export function useSeating(): UseSeatingReturn {
       console.log('🪑 Loaded from localStorage:', existingPlans)
       setSeatingPlans(existingPlans)
 
+      // Automatically set first plan as current if none is set
+      if (existingPlans.length > 0 && !currentPlan) {
+        console.log('🪑 Auto-setting first plan as current:', existingPlans[0].name)
+        setCurrentPlanState(existingPlans[0])
+      }
+
       // Load tables and seats for the wedding
       loadTablesAndSeats(wedding.id)
 

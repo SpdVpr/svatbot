@@ -1,6 +1,6 @@
 export interface DashboardModule {
   id: string
-  type: 'wedding-countdown' | 'quick-actions' | 'main-features' | 'upcoming-tasks' | 'marketplace' | 'phase-progress' | 'quick-stats' | 'coming-soon' | 'task-management' | 'guest-management' | 'budget-tracking' | 'timeline-planning' | 'vendor-management' | 'seating-plan'
+  type: 'wedding-countdown' | 'quick-actions' | 'main-features' | 'upcoming-tasks' | 'marketplace' | 'phase-progress' | 'quick-stats' | 'coming-soon' | 'task-management' | 'guest-management' | 'budget-tracking' | 'timeline-planning' | 'vendor-management' | 'seating-plan' | 'ai-assistant' | 'ai-timeline'
   title: string
   size: 'small' | 'medium' | 'large' | 'full'
   position: {
@@ -149,13 +149,33 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     order: 11
   },
   {
+    id: 'ai-assistant',
+    type: 'ai-assistant',
+    title: 'AI Asistent',
+    size: 'medium',
+    position: { row: 4, column: 2 },
+    isVisible: true,
+    isLocked: false,
+    order: 12
+  },
+  {
+    id: 'ai-timeline',
+    type: 'ai-timeline',
+    title: 'AI Timeline',
+    size: 'large',
+    position: { row: 5, column: 0 },
+    isVisible: true,
+    isLocked: false,
+    order: 13
+  },
+  {
     id: 'coming-soon',
     type: 'coming-soon',
     title: 'Připravované funkce',
     size: 'full',
-    position: { row: 5, column: 0 },
+    position: { row: 6, column: 0 },
     isVisible: false,
     isLocked: false,
-    order: 12
+    order: 14
   }
 ]

@@ -17,15 +17,36 @@ interface TaskStatsProps {
   showProgress?: boolean
   showTaskList?: boolean
   onCreateTask?: () => void
+  tasks?: any[] // Optional - if not provided, will use useTask hook
+  stats?: any
+  loading?: boolean
+  error?: string | null
+  toggleTaskStatus?: (taskId: string) => Promise<void>
+  deleteTask?: (taskId: string) => Promise<void>
+  clearError?: () => void
 }
 
 export default function TaskStats({
   compact = false,
   showProgress = true,
   showTaskList = true,
-  onCreateTask
+  onCreateTask,
+  tasks: propTasks,
+  stats: propStats,
+  loading: propLoading,
+  error: propError,
+  toggleTaskStatus: propToggleTaskStatus,
+  deleteTask: propDeleteTask,
+  clearError: propClearError
 }: TaskStatsProps) {
-  const { tasks, stats } = useTask()
+  const hookData = useTask()
+
+  // Check if this is a demo user - if so, use props, otherwise use hook data
+  const isDemoUser = hookData.tasks.length > 0 && hookData.tasks[0]?.weddingId === 'demo-wedding'
+
+  // Use props for demo users, hook data for normal users
+  const tasks = isDemoUser && propTasks ? propTasks : hookData.tasks
+  const stats = isDemoUser && propStats ? propStats : hookData.stats
 
   // Calculate additional stats
   const todayTasks = tasks.filter(task => {
@@ -278,6 +299,13 @@ export default function TaskStats({
             maxHeight="800px"
             compact={false}
             onCreateTask={onCreateTask}
+            tasks={isDemoUser ? tasks : undefined}
+            loading={isDemoUser ? propLoading : undefined}
+            error={isDemoUser ? propError : undefined}
+            stats={isDemoUser ? stats : undefined}
+            toggleTaskStatus={isDemoUser ? propToggleTaskStatus : undefined}
+            deleteTask={isDemoUser ? propDeleteTask : undefined}
+            clearError={isDemoUser ? propClearError : undefined}
           />
         </div>
       )}

@@ -14,12 +14,63 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import WeddingSettings from '@/components/wedding/WeddingSettings'
+import AIAssistant from '@/components/ai/AIAssistant'
+import LiveNotifications, { LiveToastNotifications } from '@/components/notifications/LiveNotifications'
+import SimpleToastContainer, { showSimpleToast } from '@/components/notifications/SimpleToast'
+import { useNotificationTriggers } from '@/hooks/useNotificationTriggers'
+import { useWeddingNotifications, useLiveToastNotifications } from '@/hooks/useWeddingNotifications'
+import { createDemoNotifications, createTestToast } from '@/utils/demoNotifications'
 
 function DashboardContent() {
   const { currentWedding } = useWeddingStore()
   const { logout, user } = useAuth()
   const { getCanvasMaxWidth } = useCanvas()
   const [showWeddingSettings, setShowWeddingSettings] = useState(false)
+
+  // Initialize notification triggers
+  useNotificationTriggers()
+
+  // Demo notification hooks (for testing)
+  const { createNotification } = useWeddingNotifications()
+  const { showToast } = useLiveToastNotifications()
+
+  // Demo function for testing notifications
+  const handleTestNotifications = () => {
+    console.log('Testing notifications...', { user: user?.uid, createNotification })
+
+    // Test simple toasts first
+    showSimpleToast('info', 'Notifikace Test', 'Testování notifikačního systému...')
+
+    setTimeout(() => {
+      showSimpleToast('warning', 'Úkol brzy termín', 'Objednat svatební dort má termín zítra.')
+    }, 1000)
+
+    setTimeout(() => {
+      showSimpleToast('error', 'Rozpočet překročen', 'Překročili jste rozpočet o 15%.')
+    }, 2000)
+
+    setTimeout(() => {
+      showSimpleToast('success', 'RSVP potvrzeno', 'Jana Nováková potvrdila účast na svatbě.')
+    }, 3000)
+
+    // Try Firebase notifications if user is authenticated
+    if (user?.uid && createNotification) {
+      setTimeout(() => {
+        createDemoNotifications(createNotification, showToast)
+      }, 4000)
+    }
+  }
+
+  const handleTestToast = () => {
+    console.log('Testing toast...')
+    // Test simple toast
+    showSimpleToast('success', 'Test Toast', 'Toto je testovací toast notifikace!')
+
+    // Also test the complex toast if available
+    if (showToast) {
+      createTestToast(showToast)
+    }
+  }
 
   // Create mock wedding if none exists (for demo purposes or demo user)
   const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || currentWedding?.id === 'demo-wedding'
@@ -79,6 +130,7 @@ function DashboardContent() {
               </div>
             </div>
             <div className="flex items-center space-x-2">
+              <LiveNotifications />
               <button
                 onClick={() => setShowWeddingSettings(true)}
                 className="mobile-nav-button text-gray-600 hover:text-gray-900 hover:bg-gray-100"
@@ -145,6 +197,7 @@ function DashboardContent() {
                 <p className="body-small text-text-muted">Přihlášen jako</p>
                 <p className="body-small font-medium">{user?.displayName || user?.email}</p>
               </div>
+              <LiveNotifications />
               <button
                 onClick={() => setShowWeddingSettings(true)}
                 className="btn-outline flex items-center space-x-2"
@@ -160,6 +213,25 @@ function DashboardContent() {
                 <LogOut className="w-4 h-4" />
                 <span className="hidden sm:inline">Odhlásit</span>
               </button>
+              {/* Development Test Buttons */}
+              {true && (
+                <>
+                  <button
+                    onClick={handleTestToast}
+                    className="btn-outline text-xs px-2 py-1"
+                    title="Test Toast"
+                  >
+                    🍞
+                  </button>
+                  <button
+                    onClick={handleTestNotifications}
+                    className="btn-outline text-xs px-2 py-1"
+                    title="Test Notifications"
+                  >
+                    🔔
+                  </button>
+                </>
+              )}
               <button className="btn-primary">
                 <span className="hidden sm:inline">Pokračovat v plánování</span>
                 <span className="sm:hidden">Plánovat</span>
@@ -184,6 +256,15 @@ function DashboardContent() {
           }}
         />
       )}
+
+      {/* Floating AI Assistant */}
+      <AIAssistant compact={true} />
+
+      {/* Live Toast Notifications */}
+      <LiveToastNotifications />
+
+      {/* Simple Toast Container */}
+      <SimpleToastContainer />
     </div>
   )
 }

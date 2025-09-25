@@ -159,12 +159,7 @@ export function useBudget(): UseBudgetReturn {
 
         console.log('✅ Budget item created in Firestore:', newItem)
 
-        // Update local state immediately
-        setBudgetItems(prev => {
-          const updated = [...prev, newItem]
-          console.log('💰 Updated local budget items state:', updated.length, updated)
-          return updated
-        })
+        // Don't update state here - let Firestore listener handle it
 
         return newItem
       } catch (firestoreError) {
@@ -178,9 +173,14 @@ export function useBudget(): UseBudgetReturn {
         const existingItems = JSON.parse(savedItems)
         existingItems.push(newItem)
         localStorage.setItem(`budgetItems_${wedding.id}`, JSON.stringify(existingItems))
+        console.log('💾 Budget item saved to localStorage (fallback)')
 
-        // Update local state
-        setBudgetItems(prev => [...prev, newItem])
+        // Update local state immediately for localStorage fallback
+        setBudgetItems(prev => {
+          const updated = [...prev, newItem]
+          console.log('💰 Updated local budget items state (localStorage):', updated.length, updated)
+          return updated
+        })
 
         return newItem
       }

@@ -8,6 +8,8 @@ import TimelineView from '@/components/timeline/TimelineView'
 import TimelineStats from '@/components/timeline/TimelineStats'
 import MilestoneForm from '@/components/timeline/MilestoneForm'
 import TimelineTemplates from '@/components/timeline/TimelineTemplates'
+import TimelineCalendar from '@/components/timeline/TimelineCalendar'
+import GoogleCalendarIntegration from '@/components/timeline/GoogleCalendarIntegration'
 import { MilestoneFormData, Milestone, TimelineTemplate } from '@/types/timeline'
 import {
   Plus,
@@ -29,7 +31,7 @@ export default function TimelinePage() {
   const { user } = useAuth()
   const { wedding } = useWedding()
   const { milestones, loading, createMilestone, updateMilestone, applyTimelineTemplate, error } = useTimeline()
-  const [viewMode, setViewMode] = useState<'timeline' | 'list' | 'stats'>('stats')
+  // Removed viewMode - showing everything on one page
   const [showMilestoneForm, setShowMilestoneForm] = useState(false)
   const [showTemplates, setShowTemplates] = useState(false)
   const [editingMilestone, setEditingMilestone] = useState<Milestone | null>(null)
@@ -41,15 +43,20 @@ export default function TimelinePage() {
 
   // Handle create milestone
   const handleCreateMilestone = async (data: MilestoneFormData) => {
+    console.log('🚀 Starting milestone creation with data:', data)
     try {
       setMilestoneFormLoading(true)
-      await createMilestone(data)
+      console.log('📝 Calling createMilestone...')
+      const result = await createMilestone(data)
+      console.log('✅ Milestone created successfully:', result)
       setShowMilestoneForm(false)
+      console.log('🔄 Modal closed, milestone should appear in list')
     } catch (error) {
-      console.error('Error creating milestone:', error)
+      console.error('❌ Error creating milestone:', error)
       throw error // Re-throw to show error in form
     } finally {
       setMilestoneFormLoading(false)
+      console.log('🏁 Milestone creation process finished')
     }
   }
 
@@ -170,7 +177,7 @@ export default function TimelinePage() {
             </div>
 
             {/* Main action button - prominent placement */}
-            <div className="flex justify-center">
+            <div className="flex justify-center space-x-3">
               <button
                 onClick={() => setShowMilestoneForm(true)}
                 className="btn-primary flex items-center space-x-2 px-6 py-3 text-base font-medium"
@@ -178,42 +185,14 @@ export default function TimelinePage() {
                 <Plus className="w-5 h-5" />
                 <span>Přidat milník</span>
               </button>
-            </div>
 
-            {/* View mode toggle */}
-            <div className="flex items-center justify-center">
-              <div className="flex items-center bg-gray-100 rounded-lg p-1">
-                <button
-                  onClick={() => setViewMode('timeline')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'timeline'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <Calendar className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'list'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <List className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode('stats')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'stats'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <BarChart3 className="w-4 h-4" />
-                </button>
-              </div>
+              <button
+                onClick={() => setShowTemplates(true)}
+                className="btn-outline flex items-center space-x-2 px-6 py-3 text-base font-medium"
+              >
+                <Zap className="w-5 h-5" />
+                <span>Šablony</span>
+              </button>
             </div>
           </div>
 
@@ -238,44 +217,12 @@ export default function TimelinePage() {
 
             {/* Actions */}
             <div className="flex items-center space-x-3">
-              {/* View mode toggle */}
-              <div className="flex items-center bg-gray-100 rounded-lg p-1">
-                <button
-                  onClick={() => setViewMode('timeline')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'timeline'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <Calendar className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'list'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <List className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode('stats')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'stats'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <BarChart3 className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Action buttons */}
-              <button className="btn-outline flex items-center space-x-2">
-                <Clock className="w-4 h-4" />
-                <span className="hidden lg:inline">Schůzky</span>
+              <button
+                onClick={() => setShowTemplates(true)}
+                className="btn-outline flex items-center space-x-2"
+              >
+                <Zap className="w-4 h-4" />
+                <span className="hidden lg:inline">Šablony</span>
               </button>
 
               <button className="btn-outline flex items-center space-x-2">
@@ -381,22 +328,45 @@ export default function TimelinePage() {
             </div>
           </div>
         ) : (
-          /* Content based on view mode */
-          <div className="space-y-6">
-            {viewMode === 'stats' && (
-              <TimelineStats
-                onCreateMilestone={() => setShowMilestoneForm(true)}
-                onEditMilestone={handleEditMilestone}
-              />
-            )}
+          /* All content on one page */
+          <div className="space-y-8">
+            {/* Stats Overview */}
+            <TimelineStats
+              onCreateMilestone={() => setShowMilestoneForm(true)}
+              onEditMilestone={handleEditMilestone}
+            />
 
-            {(viewMode === 'timeline' || viewMode === 'list') && (
-              <TimelineView
-                viewMode={viewMode}
-                onCreateMilestone={() => setShowMilestoneForm(true)}
-                onEditMilestone={handleEditMilestone}
+            {/* Calendar and Google Integration */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+              {/* Timeline Calendar */}
+              <TimelineCalendar
+                events={milestones.map(milestone => ({
+                  id: milestone.id,
+                  title: milestone.title,
+                  startTime: milestone.targetDate ? new Date(milestone.targetDate).toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' }) : '09:00',
+                  endTime: milestone.targetDate ? new Date(new Date(milestone.targetDate).getTime() + 60*60*1000).toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' }) : '10:00',
+                  type: milestone.type,
+                  location: '',
+                  description: milestone.description
+                }))}
+                weddingDate={wedding?.weddingDate}
+                onEventClick={(event) => {
+                  const milestone = milestones.find(m => m.id === event.id)
+                  if (milestone) {
+                    handleEditMilestone(milestone)
+                  }
+                }}
               />
-            )}
+
+              {/* Google Calendar Integration */}
+              <GoogleCalendarIntegration
+                onSync={() => {
+                  console.log('Calendar sync completed')
+                }}
+              />
+            </div>
+
+
           </div>
         )}
       </div>

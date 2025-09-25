@@ -61,6 +61,16 @@ class GoogleCalendarService {
   // Initialize Google Calendar authentication
   async initAuth(): Promise<boolean> {
     try {
+      const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
+
+      // Demo mode for testing
+      if (!clientId || clientId === 'demo_google_client_id') {
+        console.log('Demo mode: Simulating Google Calendar connection')
+        this.accessToken = 'demo_access_token'
+        localStorage.setItem('google_calendar_access_token', 'demo_access_token')
+        return true
+      }
+
       // Check if we have valid tokens
       if (this.accessToken) {
         const isValid = await this.validateToken()
@@ -170,6 +180,12 @@ class GoogleCalendarService {
     if (!this.accessToken) {
       const authSuccess = await this.initAuth()
       if (!authSuccess) return null
+    }
+
+    // Demo mode
+    if (this.accessToken === 'demo_access_token') {
+      console.log('Demo mode: Creating calendar event', event)
+      return `demo_event_${Date.now()}`
     }
 
     try {

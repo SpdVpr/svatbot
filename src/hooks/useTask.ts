@@ -102,6 +102,9 @@ export function useTask(): UseTaskReturn {
       throw new Error('Žádná svatba není vybrána')
     }
 
+    // Check if this is a demo user - use sessionStorage instead of Firestore
+    const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding.id === 'demo-wedding'
+
     try {
       setError(null)
       setLoading(true)
@@ -122,19 +125,44 @@ export function useTask(): UseTaskReturn {
         updatedAt: new Date()
       }
 
+      if (isDemoUser) {
+        console.log('🎭 Demo user detected - using sessionStorage for task creation')
+
+        // Create task with local ID for demo user
+        const localId = `demo-task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+        const newTask: Task = { id: localId, ...taskData }
+
+        // Save to sessionStorage for demo user
+        const sessionKey = `demo_tasks_${wedding.id}`
+        const savedTasks = sessionStorage.getItem(sessionKey) || '[]'
+        const existingTasks = JSON.parse(savedTasks)
+        existingTasks.push(newTask)
+        sessionStorage.setItem(sessionKey, JSON.stringify(existingTasks))
+
+        console.log('✅ Demo task created in sessionStorage:', newTask)
+
+        // Update local state immediately
+        setTasks(prev => {
+          const updated = [...prev, newTask]
+          console.log('📝 Updated demo tasks state:', updated.length, updated)
+          console.log('📝 Previous tasks:', prev.length, prev.map(t => t.title))
+          console.log('📝 New task added:', newTask.title)
+          console.log('📝 Updated tasks:', updated.map(t => t.title))
+          return updated
+        })
+
+        return newTask
+      }
+
       try {
-        // Try to save to Firestore
+        // Try to save to Firestore for real users
         const docRef = await addDoc(collection(db, 'tasks'), convertToFirestoreData(taskData))
         const newTask: Task = { id: docRef.id, ...taskData }
 
         console.log('✅ Task created in Firestore:', newTask)
 
-        // Update local state immediately for better UX
-        setTasks(prev => {
-          const updated = [...prev, newTask]
-          console.log('📝 Updated local tasks state:', updated.length, updated)
-          return updated
-        })
+        // Don't update state here - let Firestore listener handle it
+        // This ensures consistency with the database
 
         return newTask
       } catch (firestoreError) {
@@ -143,14 +171,19 @@ export function useTask(): UseTaskReturn {
         const localId = `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
         const newTask: Task = { id: localId, ...taskData }
 
-        // Save to localStorage
+        // Save to localStorage as fallback
         const savedTasks = localStorage.getItem(`tasks_${wedding.id}`) || '[]'
         const existingTasks = JSON.parse(savedTasks)
         existingTasks.push(newTask)
         localStorage.setItem(`tasks_${wedding.id}`, JSON.stringify(existingTasks))
+        console.log('💾 Task saved to localStorage (fallback)')
 
-        // Update local state
-        setTasks(prev => [...prev, newTask])
+        // Update local state immediately for localStorage fallback
+        setTasks(prev => {
+          const updated = [...prev, newTask]
+          console.log('📝 Updated local tasks state (localStorage):', updated.length, updated)
+          return updated
+        })
 
         return newTask
       }
@@ -165,6 +198,11 @@ export function useTask(): UseTaskReturn {
 
   // Update task
   const updateTask = async (taskId: string, updates: Partial<Task>): Promise<void> => {
+    if (!wedding) return
+
+    // Check if this is a demo user - use sessionStorage instead of Firestore
+    const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding.id === 'demo-wedding'
+
     try {
       setError(null)
 
@@ -173,27 +211,52 @@ export function useTask(): UseTaskReturn {
         updatedAt: new Date()
       }
 
-      try {
-        // Try to update in Firestore
-        const taskRef = doc(db, 'tasks', taskId)
-        await updateDoc(taskRef, convertToFirestoreData(updatedData as any))
-      } catch (firestoreError) {
-        console.warn('⚠️ Firestore not available, updating localStorage fallback')
-        if (wedding) {
-          const savedTasks = localStorage.getItem(`tasks_${wedding.id}`) || '[]'
-          const existingTasks = JSON.parse(savedTasks)
-          const taskIndex = existingTasks.findIndex((t: Task) => t.id === taskId)
-          if (taskIndex !== -1) {
-            existingTasks[taskIndex] = { ...existingTasks[taskIndex], ...updatedData }
-            localStorage.setItem(`tasks_${wedding.id}`, JSON.stringify(existingTasks))
+      if (isDemoUser) {
+        console.log('🎭 Demo user detected - updating task in sessionStorage:', taskId, updatedData)
+
+        // Update in sessionStorage for demo user
+        const sessionKey = `demo_tasks_${wedding.id}`
+        const savedTasks = sessionStorage.getItem(sessionKey) || '[]'
+        const existingTasks = JSON.parse(savedTasks)
+        const taskIndex = existingTasks.findIndex((t: Task) => t.id === taskId)
+        if (taskIndex !== -1) {
+          existingTasks[taskIndex] = { ...existingTasks[taskIndex], ...updatedData }
+          sessionStorage.setItem(sessionKey, JSON.stringify(existingTasks))
+          console.log('✅ Demo task updated in sessionStorage')
+        }
+      } else {
+        try {
+          // Try to update in Firestore for real users
+          const taskRef = doc(db, 'tasks', taskId)
+          await updateDoc(taskRef, convertToFirestoreData(updatedData as any))
+          console.log('✅ Task updated in Firestore:', taskId)
+          // Don't update state here - let Firestore listener handle it
+          return
+        } catch (firestoreError) {
+          console.warn('⚠️ Firestore not available, updating localStorage fallback')
+          if (wedding) {
+            const savedTasks = localStorage.getItem(`tasks_${wedding.id}`) || '[]'
+            const existingTasks = JSON.parse(savedTasks)
+            const taskIndex = existingTasks.findIndex((t: Task) => t.id === taskId)
+            if (taskIndex !== -1) {
+              existingTasks[taskIndex] = { ...existingTasks[taskIndex], ...updatedData }
+              localStorage.setItem(`tasks_${wedding.id}`, JSON.stringify(existingTasks))
+              console.log('💾 Task updated in localStorage (fallback)')
+            }
           }
+          // Update local state only for localStorage fallback
+          setTasks(prev => prev.map(task =>
+            task.id === taskId ? { ...task, ...updatedData } : task
+          ))
         }
       }
 
-      // Update local state
-      setTasks(prev => prev.map(task =>
-        task.id === taskId ? { ...task, ...updatedData } : task
-      ))
+      // Update local state for demo users
+      if (isDemoUser) {
+        setTasks(prev => prev.map(task =>
+          task.id === taskId ? { ...task, ...updatedData } : task
+        ))
+      }
     } catch (error: any) {
       console.error('Error updating task:', error)
       setError('Chyba při aktualizaci úkolu')
@@ -203,24 +266,47 @@ export function useTask(): UseTaskReturn {
 
   // Delete task
   const deleteTask = async (taskId: string): Promise<void> => {
+    if (!wedding) return
+
+    // Check if this is a demo user - use sessionStorage instead of Firestore
+    const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding.id === 'demo-wedding'
+
     try {
       setError(null)
 
-      try {
-        // Try to delete from Firestore
-        await deleteDoc(doc(db, 'tasks', taskId))
-      } catch (firestoreError) {
-        console.warn('⚠️ Firestore not available, deleting from localStorage fallback')
-        if (wedding) {
+      if (isDemoUser) {
+        console.log('🎭 Demo user detected - deleting task from sessionStorage:', taskId)
+
+        // Delete from sessionStorage for demo user
+        const sessionKey = `demo_tasks_${wedding.id}`
+        const savedTasks = sessionStorage.getItem(sessionKey) || '[]'
+        const existingTasks = JSON.parse(savedTasks)
+        const filteredTasks = existingTasks.filter((t: Task) => t.id !== taskId)
+        sessionStorage.setItem(sessionKey, JSON.stringify(filteredTasks))
+        console.log('✅ Demo task deleted from sessionStorage')
+      } else {
+        try {
+          // Try to delete from Firestore for real users
+          await deleteDoc(doc(db, 'tasks', taskId))
+          console.log('✅ Task deleted from Firestore:', taskId)
+          // Don't update state here - let Firestore listener handle it
+          return
+        } catch (firestoreError) {
+          console.warn('⚠️ Firestore not available, deleting from localStorage fallback')
           const savedTasks = localStorage.getItem(`tasks_${wedding.id}`) || '[]'
           const existingTasks = JSON.parse(savedTasks)
           const filteredTasks = existingTasks.filter((t: Task) => t.id !== taskId)
           localStorage.setItem(`tasks_${wedding.id}`, JSON.stringify(filteredTasks))
+          console.log('💾 Task deleted from localStorage (fallback)')
+          // Update local state only for localStorage fallback
+          setTasks(prev => prev.filter(task => task.id !== taskId))
         }
       }
 
-      // Update local state
-      setTasks(prev => prev.filter(task => task.id !== taskId))
+      // Update local state for demo users
+      if (isDemoUser) {
+        setTasks(prev => prev.filter(task => task.id !== taskId))
+      }
     } catch (error: any) {
       console.error('Error deleting task:', error)
       setError('Chyba při mazání úkolu')
@@ -390,8 +476,35 @@ export function useTask(): UseTaskReturn {
         // Check if this is a demo user
         const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding.id === 'demo-wedding'
 
+        console.log('🔍 Demo user detection in useTask:')
+        console.log('🔍 user?.id:', user?.id)
+        console.log('🔍 user?.email:', user?.email)
+        console.log('🔍 wedding.id:', wedding.id)
+        console.log('🔍 isDemoUser:', isDemoUser)
+
         if (isDemoUser) {
-          // Load demo tasks
+          console.log('🎭 Demo user detected - loading tasks from sessionStorage')
+
+          // Try to load existing demo tasks from sessionStorage first
+          const sessionKey = `demo_tasks_${wedding.id}`
+          const savedDemoTasks = sessionStorage.getItem(sessionKey)
+
+          if (savedDemoTasks) {
+            console.log('📦 Found existing demo tasks in sessionStorage')
+            const parsedTasks = JSON.parse(savedDemoTasks).map((task: any) => ({
+              ...task,
+              dueDate: task.dueDate ? new Date(task.dueDate) : undefined,
+              completedAt: task.completedAt ? new Date(task.completedAt) : undefined,
+              createdAt: new Date(task.createdAt),
+              updatedAt: new Date(task.updatedAt)
+            }))
+            console.log('🎭 Loaded demo tasks from sessionStorage:', parsedTasks.length, parsedTasks)
+            setTasks(parsedTasks)
+            return
+          }
+
+          // If no session data exists, create fresh demo tasks
+          console.log('🆕 Creating fresh demo tasks')
           const demoTasks: Task[] = [
             {
               id: 'demo-task-1',
@@ -467,13 +580,15 @@ export function useTask(): UseTaskReturn {
             }
           ]
 
-          console.log('🎭 Loaded demo tasks:', demoTasks.length, demoTasks)
+          // Save fresh demo tasks to sessionStorage
+          sessionStorage.setItem(sessionKey, JSON.stringify(demoTasks))
+          console.log('🎭 Created and saved fresh demo tasks:', demoTasks.length, demoTasks)
           setTasks(demoTasks)
           return
         }
 
         try {
-          // Try to load from Firestore (simplified query to avoid index requirements)
+          // Try to load from Firestore first for normal users
           const tasksQuery = query(
             collection(db, 'tasks'),
             where('weddingId', '==', wedding.id)
@@ -485,6 +600,10 @@ export function useTask(): UseTaskReturn {
             )
             console.log('📝 Loaded tasks from Firestore:', loadedTasks.length, loadedTasks)
             setTasks(loadedTasks)
+
+            // Clear localStorage when Firestore loads successfully
+            localStorage.removeItem(`tasks_${wedding.id}`)
+            console.log('🧹 Cleared localStorage after successful Firestore load')
           }, (error) => {
             console.warn('Firestore snapshot error, using localStorage fallback:', error)
             // Load from localStorage fallback
@@ -497,7 +616,7 @@ export function useTask(): UseTaskReturn {
                 createdAt: new Date(task.createdAt),
                 updatedAt: new Date(task.updatedAt)
               }))
-              console.log('📦 Loaded tasks from localStorage:', parsedTasks.length, parsedTasks)
+              console.log('📦 Loaded tasks from localStorage (error fallback):', parsedTasks.length, parsedTasks)
               setTasks(parsedTasks)
             } else {
               console.log('📦 No tasks in localStorage for wedding:', wedding.id)

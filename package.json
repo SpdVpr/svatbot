@@ -51,6 +51,7 @@
     "google-auth-library": "^9.15.1",
     "lucide-react": "^0.290.0",
     "next": "^14.0.0",
+    "openai": "^5.23.0",
     "postcss": "^8.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

@@ -27,7 +27,17 @@ import Link from 'next/link'
 export default function TasksPage() {
   const { user } = useAuth()
   const { wedding } = useWedding()
-  const { initializeTasksFromTemplates, tasks, loading, createTask, error, stats } = useTask()
+  const {
+    initializeTasksFromTemplates,
+    tasks,
+    loading,
+    createTask,
+    error,
+    stats,
+    toggleTaskStatus,
+    deleteTask,
+    clearError
+  } = useTask()
   const [viewMode, setViewMode] = useState<'list' | 'grid' | 'stats'>('stats')
   const [showInitializeModal, setShowInitializeModal] = useState(false)
   const [showTaskForm, setShowTaskForm] = useState(false)
@@ -35,6 +45,16 @@ export default function TasksPage() {
 
   // Check if user has any tasks
   const hasTasks = tasks.length > 0
+
+  // Check if this is a demo user
+  const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding?.id === 'demo-wedding'
+
+  // Debug logging for tasks state
+  console.log('🔍 TasksPage render - user:', user?.id, user?.email)
+  console.log('🔍 TasksPage render - wedding:', wedding?.id)
+  console.log('🔍 TasksPage render - isDemoUser:', isDemoUser)
+  console.log('🔍 TasksPage render - tasks count:', tasks.length)
+  console.log('🔍 TasksPage render - tasks:', tasks.map(t => ({ id: t.id, title: t.title })))
 
   // Handle initialize tasks from templates
   const handleInitializeTasks = async () => {
@@ -49,8 +69,12 @@ export default function TasksPage() {
   // Handle create task
   const handleCreateTask = async (data: TaskFormData) => {
     try {
+      console.log('🚀 Starting task creation:', data.title)
+      console.log('🚀 Current tasks before creation:', tasks.length)
       setTaskFormLoading(true)
-      await createTask(data)
+      const newTask = await createTask(data)
+      console.log('✅ Task created successfully:', newTask.title)
+      console.log('✅ Tasks count after creation should be:', tasks.length + 1)
       setShowTaskForm(false)
     } catch (error) {
       console.error('Error creating task:', error)
@@ -334,11 +358,29 @@ export default function TasksPage() {
           /* Content based on view mode */
           <div className="space-y-6">
             {viewMode === 'stats' && (
-              <TaskStats onCreateTask={() => setShowTaskForm(true)} />
+              <TaskStats
+                onCreateTask={() => setShowTaskForm(true)}
+                tasks={isDemoUser ? tasks : undefined}
+                stats={isDemoUser ? stats : undefined}
+                loading={isDemoUser ? loading : undefined}
+                error={isDemoUser ? error : undefined}
+                toggleTaskStatus={isDemoUser ? toggleTaskStatus : undefined}
+                deleteTask={isDemoUser ? deleteTask : undefined}
+                clearError={isDemoUser ? clearError : undefined}
+              />
             )}
 
             {(viewMode === 'list' || viewMode === 'grid') && (
-              <TaskList onCreateTask={() => setShowTaskForm(true)} />
+              <TaskList
+                onCreateTask={() => setShowTaskForm(true)}
+                tasks={isDemoUser ? tasks : undefined}
+                loading={isDemoUser ? loading : undefined}
+                error={isDemoUser ? error : undefined}
+                stats={isDemoUser ? stats : undefined}
+                toggleTaskStatus={isDemoUser ? toggleTaskStatus : undefined}
+                deleteTask={isDemoUser ? deleteTask : undefined}
+                clearError={isDemoUser ? clearError : undefined}
+              />
             )}
           </div>
         )}

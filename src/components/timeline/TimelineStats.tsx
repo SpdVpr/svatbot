@@ -327,31 +327,7 @@ export default function TimelineStats({
         </div>
       )}
 
-      {/* Wedding countdown */}
-      <div className={`p-6 rounded-xl border-2 shadow-sm ${getCountdownColor(daysUntilWedding)}`}>
-        <div className="text-center">
-          <div className="flex items-center justify-center mb-4">
-            <Heart className="w-12 h-12 text-pink-600" />
-          </div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-2">
-            {wedding?.brideName} & {wedding?.groomName}
-          </h3>
-          <p className="text-4xl font-bold text-pink-600 mb-2">
-            {daysUntilWedding}
-          </p>
-          <p className="text-lg text-gray-700">
-            {daysUntilWedding === 1 ? 'den' : daysUntilWedding < 5 ? 'dny' : 'dní'} do svatby
-          </p>
-          <p className="text-sm text-gray-600 mt-2">
-            {wedding?.weddingDate ? wedding.weddingDate.toLocaleDateString('cs-CZ', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            }) : 'Datum svatby není nastaveno'}
-          </p>
-        </div>
-      </div>
+
 
       {/* Timeline View */}
       {showTimelineView && (
