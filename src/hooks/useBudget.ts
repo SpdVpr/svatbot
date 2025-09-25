@@ -91,32 +91,34 @@ export function useBudget(): UseBudgetReturn {
   }
 
   // Convert BudgetItem to Firestore data
-  const convertToFirestoreData = (item: Omit<BudgetItem, 'id'>): any => {
-    return {
-      weddingId: item.weddingId,
-      name: item.name,
-      description: item.description || null,
-      category: item.category,
-      budgetedAmount: item.budgetedAmount,
-      actualAmount: item.actualAmount,
-      paidAmount: item.paidAmount,
-      currency: item.currency,
-      vendorId: item.vendorId || null,
-      vendorName: item.vendorName || null,
-      paymentStatus: item.paymentStatus,
-      paymentMethod: item.paymentMethod || null,
-      dueDate: item.dueDate ? Timestamp.fromDate(item.dueDate) : null,
-      paidDate: item.paidDate ? Timestamp.fromDate(item.paidDate) : null,
-      priority: item.priority,
-      notes: item.notes || null,
-      tags: item.tags,
-      isEstimate: item.isEstimate,
-      isRecurring: item.isRecurring,
-      recurringFrequency: item.recurringFrequency || null,
-      createdAt: Timestamp.fromDate(item.createdAt),
-      updatedAt: Timestamp.fromDate(item.updatedAt),
-      createdBy: item.createdBy
-    }
+  const convertToFirestoreData = (item: Partial<BudgetItem>): any => {
+    const result: any = {}
+
+    if (item.weddingId !== undefined) result.weddingId = item.weddingId
+    if (item.name !== undefined) result.name = item.name
+    if (item.description !== undefined) result.description = item.description || null
+    if (item.category !== undefined) result.category = item.category
+    if (item.budgetedAmount !== undefined) result.budgetedAmount = item.budgetedAmount
+    if (item.actualAmount !== undefined) result.actualAmount = item.actualAmount
+    if (item.paidAmount !== undefined) result.paidAmount = item.paidAmount
+    if (item.currency !== undefined) result.currency = item.currency
+    if (item.vendorId !== undefined) result.vendorId = item.vendorId || null
+    if (item.vendorName !== undefined) result.vendorName = item.vendorName || null
+    if (item.paymentStatus !== undefined) result.paymentStatus = item.paymentStatus
+    if (item.paymentMethod !== undefined) result.paymentMethod = item.paymentMethod || null
+    if (item.dueDate !== undefined) result.dueDate = item.dueDate ? Timestamp.fromDate(item.dueDate) : null
+    if (item.paidDate !== undefined) result.paidDate = item.paidDate ? Timestamp.fromDate(item.paidDate) : null
+    if (item.priority !== undefined) result.priority = item.priority
+    if (item.notes !== undefined) result.notes = item.notes || null
+    if (item.tags !== undefined) result.tags = item.tags
+    if (item.isEstimate !== undefined) result.isEstimate = item.isEstimate
+    if (item.isRecurring !== undefined) result.isRecurring = item.isRecurring
+    if (item.recurringFrequency !== undefined) result.recurringFrequency = item.recurringFrequency || null
+    if (item.createdAt !== undefined) result.createdAt = Timestamp.fromDate(item.createdAt)
+    if (item.updatedAt !== undefined) result.updatedAt = Timestamp.fromDate(item.updatedAt)
+    if (item.createdBy !== undefined) result.createdBy = item.createdBy
+
+    return result
   }
 
   // Create new budget item

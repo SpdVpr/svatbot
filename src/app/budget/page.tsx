@@ -66,7 +66,28 @@ export default function BudgetPage() {
 
     try {
       setBudgetFormLoading(true)
-      await updateBudgetItem(editingItem.id, data)
+
+      // Map BudgetFormData to Partial<BudgetItem>
+      const updateData: Partial<BudgetItem> = {
+        name: data.name,
+        description: data.description,
+        category: data.category,
+        budgetedAmount: data.budgetedAmount,
+        actualAmount: data.actualAmount,
+        paidAmount: data.paidAmount,
+        currency: data.currency,
+        vendorName: data.vendorName,
+        paymentStatus: data.paymentStatus,
+        paymentMethod: data.paymentMethod,
+        dueDate: data.dueDate,
+        paidDate: data.paidDate,
+        priority: data.priority,
+        notes: data.notes,
+        tags: data.tags,
+        isEstimate: data.isEstimate
+      }
+
+      await updateBudgetItem(editingItem.id, updateData)
       setShowBudgetForm(false)
       setEditingItem(null)
     } catch (error) {
