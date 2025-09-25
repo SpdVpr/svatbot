@@ -28,7 +28,8 @@ export default function AIBudgetOptimizer({
   className = '' 
 }: AIBudgetOptimizerProps) {
   const { optimizeBudget, loading, error, clearError } = useAI()
-  const { budgetItems, totalBudget, stats } = useBudget()
+  const { budgetItems, stats, getTotalBudget } = useBudget()
+  const totalBudget = getTotalBudget()
   
   const [optimization, setOptimization] = useState<{
     analysis: string
