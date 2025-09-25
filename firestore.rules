@@ -10,17 +10,13 @@ service cloud.firestore {
       return request.auth.uid == userId;
     }
 
-    function isValidUser() {
-      return isAuthenticated() &&
-             request.auth.token.email_verified == true;
-    }
+
 
     // Users collection
     match /users/{userId} {
-      allow read, write: if isAuthenticated() && isOwner(userId);
-      allow create: if isAuthenticated() &&
-                       isOwner(userId) &&
-                       request.auth.token.email_verified == true;
+      allow read: if isAuthenticated() && isOwner(userId);
+      allow write: if isAuthenticated() && isOwner(userId);
+      allow create: if isAuthenticated() && isOwner(userId);
     }
 
     // Weddings collection

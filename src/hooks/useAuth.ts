@@ -42,12 +42,19 @@ export function useAuth() {
   const convertFirebaseUser = async (firebaseUser: FirebaseUser): Promise<User> => {
     let userData = null
 
-    try {
-      // Try to get additional user data from Firestore
-      const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid))
-      userData = userDoc.data()
-    } catch (error) {
-      console.warn('Firestore not available, using Firebase Auth data only:', error)
+    // Only try to access Firestore if user has verified email
+    if (firebaseUser.emailVerified) {
+      try {
+        // Try to get additional user data from Firestore
+        const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid))
+        if (userDoc.exists()) {
+          userData = userDoc.data()
+        }
+      } catch (error) {
+        console.warn('Firestore not available for user data, using Firebase Auth data only:', error)
+      }
+    } else {
+      console.log('User email not verified, skipping Firestore user data fetch')
     }
 
     return {
