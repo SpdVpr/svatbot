@@ -181,6 +181,9 @@ export function useRobustGuests() {
     initializationRef.current = { weddingId: currentWeddingId, initialized: true }
     setLoading(true)
 
+    // Store cleanup function for Firebase listener
+    let cleanup: (() => void) | null = null
+
     if (isDemoUserInEffect) {
       // Demo user - try original demo key first, then robust key
       const originalDemoKey = 'simple-demo-guests'
@@ -219,39 +222,105 @@ export function useRobustGuests() {
       }
       setLoading(false)
     } else {
-      // Real user - try original localStorage key first, then robust key
-      const originalKey = `guests_${currentWeddingId}`
-      const robustKey = `robust-guests_${currentWeddingId}`
+      // Real user - load from Firestore with real-time listener
+      console.log('🔥 Setting up Firebase listener for real user')
 
-      let saved = localStorage.getItem(originalKey)
-      let keyUsed = originalKey
+      // Import Firebase modules dynamically
+      import('@/config/firebase').then(({ db }) => {
+        import('firebase/firestore').then(({ collection, query, where, onSnapshot }) => {
+          const guestsQuery = query(
+            collection(db, 'guests'),
+            where('weddingId', '==', currentWeddingId)
+          )
 
-      if (!saved) {
-        saved = localStorage.getItem(robustKey)
-        keyUsed = robustKey
-      }
+          const unsubscribe = onSnapshot(guestsQuery, (snapshot) => {
+            const loadedGuests = snapshot.docs.map(doc => {
+              const data = doc.data()
+              return {
+                id: doc.id,
+                weddingId: data.weddingId,
+                firstName: data.firstName,
+                lastName: data.lastName,
+                email: data.email,
+                phone: data.phone,
+                address: data.address,
+                category: data.category,
+                invitationType: data.invitationType,
+                rsvpStatus: data.rsvpStatus,
+                rsvpDate: data.rsvpDate ? data.rsvpDate.toDate() : undefined,
+                hasPlusOne: data.hasPlusOne,
+                plusOneName: data.plusOneName,
+                plusOneRsvpStatus: data.plusOneRsvpStatus,
+                dietaryRestrictions: data.dietaryRestrictions || [],
+                dietaryNotes: data.dietaryNotes,
+                accessibilityNeeds: data.accessibilityNeeds,
+                accommodationNeeds: data.accommodationNeeds,
+                preferredContactMethod: data.preferredContactMethod,
+                language: data.language,
+                notes: data.notes,
+                tags: data.tags || [],
+                invitationSent: data.invitationSent,
+                invitationSentDate: data.invitationSentDate ? data.invitationSentDate.toDate() : undefined,
+                reminderSent: data.reminderSent,
+                reminderSentDate: data.reminderSentDate ? data.reminderSentDate.toDate() : undefined,
+                sortOrder: data.sortOrder,
+                createdAt: data.createdAt ? data.createdAt.toDate() : new Date(),
+                updatedAt: data.updatedAt ? data.updatedAt.toDate() : new Date(),
+                createdBy: data.createdBy
+              }
+            })
 
-      if (saved) {
-        try {
-          const parsedGuests = JSON.parse(saved)
-          console.log('📦 Loaded real guests from localStorage:', parsedGuests.length, 'using key:', keyUsed)
-          setGuests(parsedGuests)
-          setLoading(false)
+            // Sort by sortOrder
+            loadedGuests.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+            console.log('🔥 Loaded guests from Firestore:', loadedGuests.length)
+            setGuests(loadedGuests)
+            guestsRef.current = loadedGuests
+            setLoading(false)
+          }, (error) => {
+            console.warn('🔥 Firestore snapshot error, using localStorage fallback:', error)
+            // Fallback to localStorage
+            const originalKey = `guests_${currentWeddingId}`
+            const robustKey = `robust-guests_${currentWeddingId}`
 
-          // Migrate to robust key if using original
-          if (keyUsed === originalKey) {
-            localStorage.setItem(robustKey, saved)
-            console.log('📦 Migrated data to robust key')
-          }
-        } catch {
-          console.log('📦 Invalid localStorage data')
+            let saved = localStorage.getItem(originalKey) || localStorage.getItem(robustKey)
+
+            if (saved) {
+              try {
+                const parsedGuests = JSON.parse(saved)
+                console.log('📦 Loaded guests from localStorage fallback:', parsedGuests.length)
+                setGuests(parsedGuests)
+                guestsRef.current = parsedGuests
+              } catch {
+                console.log('📦 Invalid localStorage fallback data')
+                setGuests([])
+                guestsRef.current = []
+              }
+            } else {
+              console.log('📦 No fallback data available')
+              setGuests([])
+              guestsRef.current = []
+            }
+            setLoading(false)
+          })
+
+          // Store cleanup function
+          cleanup = () => unsubscribe()
+        }).catch((error) => {
+          console.error('❌ Failed to load Firestore modules:', error)
           setGuests([])
           setLoading(false)
-        }
-      } else {
-        console.log('📦 No localStorage data for real user, checking both keys')
+        })
+      }).catch((error) => {
+        console.error('❌ Failed to load Firebase config:', error)
         setGuests([])
         setLoading(false)
+      })
+    }
+
+    // Return cleanup function
+    return () => {
+      if (cleanup) {
+        cleanup()
       }
     }
   }, [wedding?.id]) // Only depend on wedding ID - isDemoUser is calculated inside
