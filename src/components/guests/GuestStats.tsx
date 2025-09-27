@@ -314,12 +314,15 @@ export default function GuestStats({
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {Object.entries(stats.byCategory).map(([category, categoryStats]) => (
-              <div key={category} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <span className="text-gray-700">{getGuestCategoryLabel(category)}</span>
-                <span className="font-medium text-gray-900">{categoryStats.total} hostů</span>
-              </div>
-            ))}
+            {Object.entries(stats.byCategory).map(([category, categoryStats]) => {
+              const stats = categoryStats as { total: number; attending: number; declined: number; pending: number }
+              return (
+                <div key={category} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <span className="text-gray-700">{getGuestCategoryLabel(category)}</span>
+                  <span className="font-medium text-gray-900">{stats.total} hostů</span>
+                </div>
+              )
+            })}
           </div>
         </div>
       )}
