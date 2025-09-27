@@ -152,6 +152,8 @@ export function useGuest(isActive: boolean = true): UseGuestReturn {
         rsvpStatus: 'pending',
         hasPlusOne: data.hasPlusOne,
         plusOneName: data.plusOneName,
+        hasChildren: data.hasChildren || false,
+        children: data.children || [],
         dietaryRestrictions: data.dietaryRestrictions,
         dietaryNotes: data.dietaryNotes,
         accessibilityNeeds: data.accessibilityNeeds,
