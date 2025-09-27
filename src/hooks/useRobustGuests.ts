@@ -21,6 +21,11 @@ const getDemoGuests = (): Guest[] => [
     hasPlusOne: true,
     plusOneName: 'Marie Nováková',
     plusOneRsvpStatus: 'attending',
+    hasChildren: true,
+    children: [
+      { name: 'Tomáš Novák', age: 8 },
+      { name: 'Anna Nováková', age: 5 }
+    ],
     dietaryRestrictions: [],
     preferredContactMethod: 'email',
     language: 'cs',
@@ -44,6 +49,8 @@ const getDemoGuests = (): Guest[] => [
     rsvpStatus: 'attending',
     rsvpDate: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000),
     hasPlusOne: false,
+    hasChildren: false,
+    children: [],
     dietaryRestrictions: ['vegetarian'],
     preferredContactMethod: 'phone',
     language: 'cs',
@@ -66,6 +73,10 @@ const getDemoGuests = (): Guest[] => [
     rsvpStatus: 'maybe',
     hasPlusOne: true,
     plusOneName: 'Tomáš Krásný',
+    hasChildren: true,
+    children: [
+      { name: 'Lukáš Krásný', age: 12 }
+    ],
     dietaryRestrictions: [],
     preferredContactMethod: 'email',
     language: 'cs',
@@ -89,6 +100,8 @@ const getDemoGuests = (): Guest[] => [
     rsvpStatus: 'declined',
     rsvpDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
     hasPlusOne: false,
+    hasChildren: false,
+    children: [],
     dietaryRestrictions: [],
     preferredContactMethod: 'phone',
     language: 'cs',
