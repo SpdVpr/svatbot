@@ -19,6 +19,7 @@ import { useAuth } from './useAuth'
 import { useWedding } from './useWedding'
 import {
   Guest,
+  GuestCategory,
   GuestFormData,
   GuestFilters,
   GuestStats,
