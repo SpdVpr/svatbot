@@ -43,6 +43,7 @@ interface UseGuestReturn {
   getGuestsByCategory: (category: string) => Guest[]
   sendInvitations: (guestIds: string[]) => Promise<void>
   sendReminders: (guestIds: string[]) => Promise<void>
+  reorderGuests: (reorderedGuests: Guest[]) => Promise<void>
   clearError: () => void
 }
 
@@ -447,9 +448,20 @@ export function useGuest(isActive: boolean = true): UseGuestReturn {
     plusOnesAttending: guests.filter(g => g.hasPlusOne && g.plusOneRsvpStatus === 'attending').length,
     plusOnes: guests.filter(g => g.hasPlusOne).length,
     byCategory: guests.reduce((acc, guest) => {
-      acc[guest.category] = (acc[guest.category] || 0) + 1
+      if (!acc[guest.category]) {
+        acc[guest.category] = {
+          total: 0,
+          attending: 0,
+          declined: 0,
+          pending: 0
+        }
+      }
+      acc[guest.category].total += 1
+      if (guest.rsvpStatus === 'attending') acc[guest.category].attending += 1
+      else if (guest.rsvpStatus === 'declined') acc[guest.category].declined += 1
+      else acc[guest.category].pending += 1
       return acc
-    }, {} as Record<string, number>),
+    }, {} as Record<GuestCategory, { total: number; attending: number; declined: number; pending: number }>),
     ceremonyOnly: guests.filter(g => g.invitationType === 'ceremony-only').length,
     receptionOnly: guests.filter(g => g.invitationType === 'reception-only').length,
     ceremonyAndReception: guests.filter(g => g.invitationType === 'ceremony-reception').length,

@@ -39,7 +39,6 @@ export default function MarketplacePage() {
   // Handle search
   const handleSearch = (query: string) => {
     setFilters({ ...filters, search: query })
-    setViewMode('browse')
   }
 
   // Clear all filters

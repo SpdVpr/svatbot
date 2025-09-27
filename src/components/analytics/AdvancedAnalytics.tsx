@@ -59,13 +59,7 @@ export default function AdvancedAnalytics() {
     )
   }
 
-  const tabs = [
-    { id: 'overview', label: 'Přehled', icon: BarChart3 },
-    { id: 'tasks', label: 'Úkoly', icon: CheckCircle },
-    { id: 'budget', label: 'Rozpočet', icon: DollarSign },
-    { id: 'guests', label: 'Hosté', icon: Users },
-    { id: 'trends', label: 'Trendy', icon: TrendingUp }
-  ] as const
+  // Removed tabs - using overview as default (most comprehensive)
 
   return (
     <div className="space-y-6">
@@ -154,9 +148,9 @@ export default function AdvancedAnalytics() {
       <div className="wedding-card">
         <div className="space-y-6">
           <h4 className="font-medium">Celkový přehled</h4>
-            
-            {/* Key Metrics */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+          {/* Key Metrics */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg">
                 <div className="text-3xl font-bold text-blue-600">{analytics.overview.totalProgress}%</div>
                 <div className="text-sm text-blue-700">Celkový pokrok</div>
@@ -173,10 +167,10 @@ export default function AdvancedAnalytics() {
                 <div className="text-3xl font-bold text-pink-600">{Math.round(analytics.guests.responseRate)}%</div>
                 <div className="text-sm text-pink-700">Odpovědi hostů</div>
               </div>
-            </div>
+          </div>
 
-            {/* Status Indicator */}
-            <div className="flex items-center justify-center p-6 bg-gray-50 rounded-lg">
+          {/* Status Indicator */}
+          <div className="flex items-center justify-center p-6 bg-gray-50 rounded-lg">
               {analytics.overview.onTrack ? (
                 <div className="flex items-center space-x-3 text-green-600">
                   <CheckCircle className="w-8 h-8" />
@@ -194,7 +188,6 @@ export default function AdvancedAnalytics() {
                   </div>
                 </div>
               )}
-            </div>
           </div>
         </div>
       </div>
