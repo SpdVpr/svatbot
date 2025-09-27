@@ -25,15 +25,9 @@ function AIPageContent() {
   const { user } = useAuth()
   const { wedding } = useWedding()
   const searchParams = useSearchParams()
-  const [activeTab, setActiveTab] = useState<'chat' | 'vendors' | 'timeline' | 'budget'>('chat')
+  // Removed activeTab - using chat as default (most interactive)
 
-  // Set active tab from URL parameter
-  useEffect(() => {
-    const tab = searchParams.get('tab')
-    if (tab && ['chat', 'vendors', 'timeline', 'budget'].includes(tab)) {
-      setActiveTab(tab as 'chat' | 'vendors' | 'timeline' | 'budget')
-    }
-  }, [searchParams])
+  // Removed tab switching - always show chat (most interactive)
 
   // Get pre-filled question from URL
   const prefilledQuestion = searchParams.get('question')
@@ -120,121 +114,45 @@ function AIPageContent() {
         </div>
       </header>
 
-      {/* Navigation Tabs */}
+      {/* Chat indicator */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex space-x-8">
-            {tabs.map((tab) => {
-              const IconComponent = tab.icon
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`
-                    flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors
-                    ${activeTab === tab.id
-                      ? 'border-primary-500 text-primary-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                    }
-                  `}
-                >
-                  <IconComponent className="w-4 h-4" />
-                  <span>{tab.name}</span>
-                </button>
-              )
-            })}
-          </nav>
+          <div className="flex items-center py-4">
+            <div className="flex items-center space-x-2 border-b-2 border-primary-500 text-primary-600 py-4 px-1">
+              <MessageCircle className="w-4 h-4" />
+              <span className="font-medium text-sm">AI Chat</span>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Tab Description */}
+        {/* Chat Description */}
         <div className="mb-8">
           <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-blue-100 rounded-lg">
-                {(() => {
-                  const currentTab = tabs.find(t => t.id === activeTab)
-                  const IconComponent = currentTab?.icon || Bot
-                  return <IconComponent className="w-5 h-5 text-blue-600" />
-                })()}
+                <MessageCircle className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <h2 className="font-semibold text-blue-900">
-                  {tabs.find(t => t.id === activeTab)?.name}
-                </h2>
-                <p className="text-sm text-blue-700">
-                  {tabs.find(t => t.id === activeTab)?.description}
-                </p>
+                <h2 className="font-semibold text-blue-900">AI Chat</h2>
+                <p className="text-sm text-blue-700">Zeptejte se na cokoliv o svatbě</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Tab Content */}
+        {/* Chat Content */}
         <div className="space-y-8">
-          {activeTab === 'chat' && (
-            <div className="max-w-4xl mx-auto">
-              <AIAssistant
-                className="h-[600px]"
-                compact={false}
-                defaultOpen={true}
-                prefilledQuestion={prefilledQuestion}
-              />
-            </div>
-          )}
-
-          {activeTab === 'vendors' && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <AIVendorRecommendations 
-                category="venue"
-                onVendorSelect={(vendor) => {
-                  console.log('Selected vendor:', vendor)
-                }}
-              />
-              <AIVendorRecommendations 
-                category="photographer"
-                onVendorSelect={(vendor) => {
-                  console.log('Selected vendor:', vendor)
-                }}
-              />
-              <AIVendorRecommendations 
-                category="catering"
-                onVendorSelect={(vendor) => {
-                  console.log('Selected vendor:', vendor)
-                }}
-              />
-              <AIVendorRecommendations 
-                category="florist"
-                onVendorSelect={(vendor) => {
-                  console.log('Selected vendor:', vendor)
-                }}
-              />
-            </div>
-          )}
-
-          {activeTab === 'timeline' && (
-            <div className="max-w-4xl mx-auto">
-              <AITimelineGenerator 
-                onTimelineSave={(timeline) => {
-                  console.log('Timeline saved:', timeline)
-                  // TODO: Save to timeline module
-                }}
-              />
-            </div>
-          )}
-
-          {activeTab === 'budget' && (
-            <div className="max-w-4xl mx-auto">
-              <AIBudgetOptimizer 
-                onOptimizationApply={(optimization) => {
-                  console.log('Optimization applied:', optimization)
-                  // TODO: Apply to budget module
-                }}
-              />
-            </div>
-          )}
+          <div className="max-w-4xl mx-auto">
+            <AIAssistant
+              className="h-[600px]"
+              compact={false}
+              defaultOpen={true}
+              prefilledQuestion={prefilledQuestion}
+            />
+          </div>
         </div>
 
         {/* Wedding Context Info */}

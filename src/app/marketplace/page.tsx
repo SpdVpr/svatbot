@@ -23,7 +23,7 @@ export default function MarketplacePage() {
     clearFilters
   } = useMarketplace()
 
-  const [viewMode, setViewMode] = useState<'browse' | 'category' | 'featured'>('browse')
+  // Removed viewMode - using browse view as default (most comprehensive)
   const [showFilters, setShowFilters] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<VendorCategory | null>(null)
 
@@ -34,7 +34,6 @@ export default function MarketplacePage() {
     setSelectedCategory(category)
     // Clear all filters and set only the selected category
     setFilters({ category: [category] })
-    setViewMode('browse')
   }
 
   // Handle search
@@ -91,38 +90,9 @@ export default function MarketplacePage() {
             </div>
 
             <div className="flex items-center space-x-3">
-              {/* View Mode Toggle */}
-              <div className="flex bg-neutral-100 rounded-lg p-1">
-                <button
-                  onClick={() => setViewMode('browse')}
-                  className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                    viewMode === 'browse'
-                      ? 'bg-white text-text-primary shadow-sm'
-                      : 'text-text-secondary hover:text-text-primary'
-                  }`}
-                >
-                  Procházet
-                </button>
-                <button
-                  onClick={() => setViewMode('category')}
-                  className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                    viewMode === 'category'
-                      ? 'bg-white text-text-primary shadow-sm'
-                      : 'text-text-secondary hover:text-text-primary'
-                  }`}
-                >
-                  Kategorie
-                </button>
-                <button
-                  onClick={() => setViewMode('featured')}
-                  className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                    viewMode === 'featured'
-                      ? 'bg-white text-text-primary shadow-sm'
-                      : 'text-text-secondary hover:text-text-primary'
-                  }`}
-                >
-                  Doporučené
-                </button>
+              {/* Browse view indicator */}
+              <div className="flex bg-primary-100 rounded-lg px-3 py-2">
+                <span className="text-sm font-medium text-primary-700">Procházet všechny dodavatele</span>
               </div>
 
               {/* Filters Toggle */}
@@ -208,83 +178,52 @@ export default function MarketplacePage() {
           </div>
         )}
 
-        {/* Category View */}
-        {viewMode === 'category' && (
-          <div className="space-y-8">
-            <div>
-              <h2 className="heading-3 mb-4">Kategorie dodavatelů</h2>
-              <CategoryGrid
-                onCategorySelect={handleCategorySelect}
-                stats={stats}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Featured View */}
-        {viewMode === 'featured' && (
-          <div className="space-y-8">
-            <div>
-              <h2 className="heading-3 mb-4">Doporučení dodavatelé</h2>
-              <FeaturedVendors vendors={featuredVendors} />
-            </div>
-          </div>
-        )}
-
-        {/* Browse View */}
-        {viewMode === 'browse' && (
-          <div className="space-y-8">
-            {/* Featured Section (only if no filters) */}
-            {Object.keys(filters).length === 0 && (
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="heading-3">Doporučení dodavatelé</h2>
-                  <button
-                    onClick={() => setViewMode('featured')}
-                    className="btn-ghost text-sm"
-                  >
-                    Zobrazit všechny
-                  </button>
-                </div>
-                <FeaturedVendors vendors={featuredVendors.slice(0, 3)} />
-              </div>
-            )}
-
-            {/* All Vendors */}
+        {/* Browse View - comprehensive display */}
+        <div className="space-y-8">
+          {/* Featured Section (only if no filters) */}
+          {Object.keys(filters).length === 0 && (
             <div>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="heading-3">
-                  {selectedCategory
-                    ? `${VENDOR_CATEGORIES[selectedCategory].name} (${filteredVendors.length})`
-                    : `Všichni dodavatelé (${filteredVendors.length})`
-                  }
-                </h2>
-
-                {selectedCategory && (
-                  <button
-                    onClick={() => {
-                      setSelectedCategory(null)
-                      setFilters({})
-                    }}
-                    className="btn-ghost text-sm"
-                  >
-                    Zobrazit všechny kategorie
-                  </button>
-                )}
+                <h2 className="heading-3">Doporučení dodavatelé</h2>
               </div>
-
-              <VendorGrid
-                vendors={filteredVendors}
-                loading={loading}
-                emptyMessage={
-                  Object.keys(filters).length > 0
-                    ? "Žádní dodavatelé nevyhovují zadaným filtrům"
-                    : "Zatím nejsou k dispozici žádní dodavatelé"
-                }
-              />
+              <FeaturedVendors vendors={featuredVendors.slice(0, 3)} />
             </div>
+          )}
+
+          {/* All Vendors */}
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="heading-3">
+                {selectedCategory
+                  ? `${VENDOR_CATEGORIES[selectedCategory].name} (${filteredVendors.length})`
+                  : `Všichni dodavatelé (${filteredVendors.length})`
+                }
+              </h2>
+
+              {selectedCategory && (
+                <button
+                  onClick={() => {
+                    setSelectedCategory(null)
+                    setFilters({})
+                  }}
+                  className="btn-ghost text-sm"
+                >
+                  Zobrazit všechny kategorie
+                </button>
+              )}
+            </div>
+
+            <VendorGrid
+              vendors={filteredVendors}
+              loading={loading}
+              emptyMessage={
+                Object.keys(filters).length > 0
+                  ? "Žádní dodavatelé nevyhovují zadaným filtrům"
+                  : "Zatím nejsou k dispozici žádní dodavatelé"
+              }
+            />
           </div>
-        )}
+        </div>
       </div>
     </div>
   )

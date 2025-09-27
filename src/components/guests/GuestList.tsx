@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { Guest, GuestFilters, GuestViewOptions } from '@/types/guest'
 import { useGuest } from '@/hooks/useGuest'
 import GuestCard from './GuestCard'
@@ -18,10 +18,15 @@ import {
   MoreHorizontal,
   Edit,
   Trash2,
-  Send
+  Send,
+  GripVertical,
+  HelpCircle
 } from 'lucide-react'
 
 interface GuestListProps {
+  guests?: Guest[]
+  stats?: any
+  updateGuest?: (guestId: string, updates: Partial<Guest>) => Promise<void>
   showHeader?: boolean
   showFilters?: boolean
   maxHeight?: string
@@ -29,26 +34,35 @@ interface GuestListProps {
   viewMode?: 'list' | 'grid'
   onCreateGuest?: () => void
   onEditGuest?: (guest: Guest) => void
+  onGuestReorder?: (guests: Guest[]) => void
 }
 
 export default function GuestList({
+  guests: propGuests,
+  stats: propStats,
+  updateGuest: propUpdateGuest,
   showHeader = true,
   showFilters = true,
   maxHeight = '600px',
   compact = false,
   viewMode = 'list',
   onCreateGuest,
-  onEditGuest
+  onEditGuest,
+  onGuestReorder
 }: GuestListProps) {
-  const {
-    guests,
-    loading,
-    error,
-    stats,
-    updateRSVP,
-    deleteGuest,
-    clearError
-  } = useGuest()
+
+  // Use props if provided, otherwise fallback to hook
+  const hookData = useGuest()
+  const guests = propGuests || hookData.guests
+  const stats = propStats || hookData.stats
+  const updateGuest = propUpdateGuest || hookData.updateGuest
+  const { loading, error, updateRSVP, deleteGuest, clearError } = hookData
+
+  console.log('🔧 GuestList render:', {
+    viewMode,
+    guestsCount: guests.length,
+    onGuestReorder: !!onGuestReorder
+  })
 
   const [filters, setFilters] = useState<GuestFilters>({})
   const [viewOptions, setViewOptions] = useState<GuestViewOptions>({
@@ -62,6 +76,24 @@ export default function GuestList({
   const [searchTerm, setSearchTerm] = useState('')
   const [showFiltersPanel, setShowFiltersPanel] = useState(false)
   const [selectedGuests, setSelectedGuests] = useState<string[]>([])
+
+  // Drag and drop state
+  const [draggedGuest, setDraggedGuest] = useState<string | null>(null)
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [touchStartY, setTouchStartY] = useState<number | null>(null)
+  const [touchCurrentY, setTouchCurrentY] = useState<number | null>(null)
+  const dragTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const onGuestReorderRef = useRef(onGuestReorder)
+
+  // Keep ref updated
+  useEffect(() => {
+    console.log('🔄 Updating onGuestReorderRef:', {
+      onGuestReorder: !!onGuestReorder,
+      type: typeof onGuestReorder
+    })
+    onGuestReorderRef.current = onGuestReorder
+  }, [onGuestReorder])
 
   // Filter and sort guests
   const filteredGuests = guests.filter(guest => {
@@ -104,7 +136,7 @@ export default function GuestList({
       case 'declined':
         return { icon: X, color: 'text-red-500', bg: 'bg-red-50', label: 'Nepřijde' }
       case 'maybe':
-        return { icon: AlertTriangle, color: 'text-yellow-500', bg: 'bg-yellow-50', label: 'Možná' }
+        return { icon: HelpCircle, color: 'text-yellow-500', bg: 'bg-yellow-50', label: 'Možná' }
       case 'pending':
         return { icon: Clock, color: 'text-gray-500', bg: 'bg-gray-50', label: 'Čeká' }
       default:
@@ -129,9 +161,14 @@ export default function GuestList({
   // Handle RSVP status change
   const handleRSVPChange = async (guestId: string, status: Guest['rsvpStatus']) => {
     try {
-      await updateRSVP(guestId, status)
+      console.log('🔄 RSVP change:', guestId, status)
+      await updateGuest(guestId, {
+        rsvpStatus: status,
+        rsvpDate: new Date()
+      })
+      console.log('✅ RSVP updated successfully')
     } catch (error) {
-      console.error('Error updating RSVP:', error)
+      console.error('❌ Error updating RSVP:', error)
     }
   }
 
@@ -143,6 +180,184 @@ export default function GuestList({
         : [...prev, guestId]
     )
   }
+
+  // Drag and drop handlers
+  const handleDragStart = useCallback((e: React.DragEvent, guestId: string, index: number) => {
+    console.log('🚀 DRAG START:', { guestId, index, viewMode })
+
+    // Only enable drag and drop in list view
+    if (viewMode !== 'list') {
+      console.log('❌ Not in list view, cancelling drag')
+      return
+    }
+
+    console.log('✅ Starting drag operation')
+    setDraggedGuest(guestId)
+    setIsDragging(true)
+    setDragOverIndex(null)
+
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/plain', guestId)
+
+    // Clear any existing timeout
+    if (dragTimeoutRef.current) {
+      clearTimeout(dragTimeoutRef.current)
+    }
+  }, [viewMode])
+
+  const handleDragEnd = useCallback((e: React.DragEvent) => {
+    console.log('🏁 DRAG END')
+    dragTimeoutRef.current = setTimeout(() => {
+      setDraggedGuest(null)
+      setDragOverIndex(null)
+      setIsDragging(false)
+    }, 50)
+  }, [])
+
+  const handleDragOver = useCallback((e: React.DragEvent, index: number) => {
+    console.log('📍 DRAG OVER:', index)
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (!draggedGuest || !isDragging || viewMode !== 'list') {
+      console.log('❌ Drag over cancelled:', { draggedGuest, isDragging, viewMode })
+      return
+    }
+
+    e.dataTransfer.dropEffect = 'move'
+
+    if (dragOverIndex !== index) {
+      console.log('✅ Setting drag over index:', index)
+      setDragOverIndex(index)
+    }
+  }, [draggedGuest, isDragging, dragOverIndex, viewMode])
+
+  const handleDrop = useCallback((e: React.DragEvent, dropIndex: number) => {
+    console.log('🎯 DROP EVENT:', dropIndex)
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (!draggedGuest || !isDragging || viewMode !== 'list') {
+      console.log('❌ Drop cancelled:', { draggedGuest, isDragging, viewMode })
+      return
+    }
+
+    const draggedIndex = filteredGuests.findIndex(g => g.id === draggedGuest)
+    console.log('📊 Drop indices:', { draggedIndex, dropIndex })
+
+    if (draggedIndex === -1 || draggedIndex === dropIndex) {
+      setDraggedGuest(null)
+      setDragOverIndex(null)
+      setIsDragging(false)
+      return
+    }
+
+    // Reorder guests
+    const newGuests = [...filteredGuests]
+    const [removed] = newGuests.splice(draggedIndex, 1)
+    newGuests.splice(dropIndex, 0, removed)
+
+    // Call reorder callback directly
+    console.log('🔍 Direct callback check:', {
+      onGuestReorder: !!onGuestReorder,
+      onGuestReorderType: typeof onGuestReorder
+    })
+
+    if (onGuestReorder && typeof onGuestReorder === 'function') {
+      console.log('📞 Calling direct callback with', newGuests.length, 'guests')
+      onGuestReorder(newGuests)
+    } else {
+      console.log('❌ No direct callback available')
+    }
+
+    // Clear states
+    setDraggedGuest(null)
+    setDragOverIndex(null)
+    setIsDragging(false)
+
+    // Clear timeout
+    if (dragTimeoutRef.current) {
+      clearTimeout(dragTimeoutRef.current)
+    }
+  }, [draggedGuest, isDragging, viewMode, filteredGuests, onGuestReorder])
+
+  // Touch handlers for mobile
+  const handleTouchStart = useCallback((e: React.TouchEvent, guestId: string) => {
+    if (viewMode !== 'list') return
+
+    const touch = e.touches[0]
+    setTouchStartY(touch.clientY)
+    setTouchCurrentY(touch.clientY)
+    setDraggedGuest(guestId)
+
+    // Add haptic feedback on supported devices
+    if ('vibrate' in navigator) {
+      navigator.vibrate(50)
+    }
+
+    // Add visual feedback class
+    const element = e.currentTarget as HTMLElement
+    element.classList.add('haptic-feedback')
+    setTimeout(() => {
+      element.classList.remove('haptic-feedback')
+    }, 100)
+  }, [viewMode])
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!draggedGuest || !touchStartY || viewMode !== 'list') return
+
+    e.preventDefault()
+    const touch = e.touches[0]
+    setTouchCurrentY(touch.clientY)
+
+    // Calculate which guest we're over
+    const elements = document.querySelectorAll('[data-guest-index]')
+    let newDragOverIndex = null
+
+    elements.forEach((element, index) => {
+      const rect = element.getBoundingClientRect()
+      if (touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+        newDragOverIndex = index
+      }
+    })
+
+    if (newDragOverIndex !== null && newDragOverIndex !== dragOverIndex) {
+      setDragOverIndex(newDragOverIndex)
+      setIsDragging(true)
+    }
+  }, [draggedGuest, touchStartY, dragOverIndex, viewMode])
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (!draggedGuest || viewMode !== 'list') return
+
+    if (isDragging && dragOverIndex !== null) {
+      const draggedIndex = filteredGuests.findIndex(g => g.id === draggedGuest)
+
+      if (draggedIndex !== -1 && draggedIndex !== dragOverIndex) {
+        // Reorder guests
+        const newGuests = [...filteredGuests]
+        const [removed] = newGuests.splice(draggedIndex, 1)
+        newGuests.splice(dragOverIndex, 0, removed)
+
+        // Call reorder callback
+        if (onGuestReorder) {
+          onGuestReorder(newGuests)
+        }
+
+        // Add success haptic feedback
+        if ('vibrate' in navigator) {
+          navigator.vibrate([50, 50, 50])
+        }
+      }
+    }
+
+    // Clear all drag states
+    setDraggedGuest(null)
+    setDragOverIndex(null)
+    setIsDragging(false)
+    setTouchStartY(null)
+    setTouchCurrentY(null)
+  }, [draggedGuest, isDragging, dragOverIndex, filteredGuests, onGuestReorder, viewMode])
 
   if (loading) {
     return (
@@ -175,7 +390,7 @@ export default function GuestList({
   }
 
   return (
-    <div className="space-y-4">
+    <div className={`space-y-4 ${isDragging ? 'dragging-active' : ''}`}>
       {/* Header */}
       {showHeader && (
         <div className="flex items-center justify-between">
@@ -194,6 +409,18 @@ export default function GuestList({
               <span>Přidat hosta</span>
             </button>
           )}
+        </div>
+      )}
+
+
+
+      {/* Drag and drop hint for list view */}
+      {viewMode === 'list' && filteredGuests.length > 1 && (
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+          <p className="text-xs text-gray-600 flex items-center space-x-2">
+            <GripVertical className="w-3 h-3" />
+            <span>Klikněte a přetáhněte hosty pro změnu pořadí</span>
+          </p>
         </div>
       )}
 
@@ -344,7 +571,7 @@ export default function GuestList({
               ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'
               : 'space-y-2'
             }>
-              {groupGuests.map((guest) => {
+              {groupGuests.map((guest, groupIndex) => {
                 if (viewMode === 'grid') {
                   return (
                     <GuestCard
@@ -358,13 +585,35 @@ export default function GuestList({
                   )
                 }
 
-                // List view (original code)
+                // List view with drag and drop
+                // Get the global index in filteredGuests array
+                const globalIndex = filteredGuests.findIndex(g => g.id === guest.id)
                 const rsvpDisplay = getRSVPDisplay(guest.rsvpStatus)
+                const isDraggedItem = draggedGuest === guest.id
+                const isDragOver = dragOverIndex === globalIndex
 
                 return (
                   <div
                     key={guest.id}
-                    className="p-4 border rounded-lg bg-white hover:shadow-sm transition-shadow"
+                    data-guest-index={globalIndex}
+                    data-testid={`guest-item-${guest.id}`}
+                    title={viewMode === 'list' ? 'Klikněte a přetáhněte pro změnu pořadí' : undefined}
+                    className={`
+                      p-4 border rounded-lg bg-white guest-list-item touch-drag-item touch-feedback
+                      ${isDraggedItem ? 'dragging' : 'hover:shadow-sm'}
+                      ${isDragOver ? 'drag-over' : 'border-gray-200'}
+                      ${viewMode === 'list' ? 'cursor-move select-none hover:border-gray-300' : ''}
+                      ${isDragging && !isDraggedItem ? 'moving' : ''}
+                    `}
+                    draggable={viewMode === 'list'}
+                    onDragStart={(e) => handleDragStart(e, guest.id, globalIndex)}
+                    onDragEnd={handleDragEnd}
+                    onDragOver={(e) => handleDragOver(e, globalIndex)}
+                    onDrop={(e) => handleDrop(e, globalIndex)}
+                    onTouchStart={(e) => handleTouchStart(e, guest.id)}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                    onMouseDown={() => console.log('🖱️ MOUSE DOWN on guest:', guest.firstName)}
                   >
                     <div className="flex items-start justify-between">
                       {/* Guest info */}
@@ -455,6 +704,13 @@ export default function GuestList({
                             title="Označit jako přijde"
                           >
                             <CheckCircle2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleRSVPChange(guest.id, 'maybe')}
+                            className={`p-1 rounded ${guest.rsvpStatus === 'maybe' ? 'bg-yellow-100 text-yellow-600' : 'text-gray-400 hover:text-yellow-600'}`}
+                            title="Označit jako možná"
+                          >
+                            <HelpCircle className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleRSVPChange(guest.id, 'declined')}

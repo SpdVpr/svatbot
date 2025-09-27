@@ -77,6 +77,7 @@ export interface Guest {
   reminderSentDate?: Date
 
   // Metadata
+  sortOrder?: number // For drag and drop ordering
   createdAt: Date
   updatedAt: Date
   createdBy: string // User ID who added the guest

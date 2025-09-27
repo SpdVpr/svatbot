@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   collection,
   doc,
@@ -46,12 +46,14 @@ interface UseGuestReturn {
   clearError: () => void
 }
 
-export function useGuest(): UseGuestReturn {
+export function useGuest(isActive: boolean = true): UseGuestReturn {
   const { user } = useAuth()
   const { wedding } = useWedding()
   const [guests, setGuests] = useState<Guest[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [dataLoaded, setDataLoaded] = useState(false)
+  const [isDemoMode, setIsDemoMode] = useState(false)
 
   // Convert Firestore data to Guest
   const convertFirestoreGuest = (id: string, data: any): Guest => {
@@ -82,6 +84,7 @@ export function useGuest(): UseGuestReturn {
       invitationSentDate: data.invitationSentDate?.toDate(),
       reminderSent: data.reminderSent || false,
       reminderSentDate: data.reminderSentDate?.toDate(),
+      sortOrder: data.sortOrder || 0,
       createdAt: data.createdAt?.toDate() || new Date(),
       updatedAt: data.updatedAt?.toDate() || new Date(),
       createdBy: data.createdBy
@@ -116,6 +119,7 @@ export function useGuest(): UseGuestReturn {
       invitationSentDate: guest.invitationSentDate ? Timestamp.fromDate(guest.invitationSentDate) : null,
       reminderSent: guest.reminderSent,
       reminderSentDate: guest.reminderSentDate ? Timestamp.fromDate(guest.reminderSentDate) : null,
+      sortOrder: guest.sortOrder || 0,
       createdAt: Timestamp.fromDate(guest.createdAt),
       updatedAt: Timestamp.fromDate(guest.updatedAt),
       createdBy: guest.createdBy
@@ -154,13 +158,34 @@ export function useGuest(): UseGuestReturn {
         tags: data.tags,
         invitationSent: false,
         reminderSent: false,
+        sortOrder: guests.length, // Add to end
         createdAt: new Date(),
         updatedAt: new Date(),
         createdBy: user.id
       }
 
+      // Check if this is demo mode
+      if (isDemoMode) {
+        // Demo user - use only localStorage
+        console.log('🎭 Demo user - creating guest in localStorage only')
+        const localId = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        const newGuest: Guest = { id: localId, ...guestData }
+
+        // Save to localStorage
+        const savedGuests = localStorage.getItem(`guests_${wedding.id}`) || '[]'
+        const existingGuests = JSON.parse(savedGuests)
+        existingGuests.push(newGuest)
+        localStorage.setItem(`guests_${wedding.id}`, JSON.stringify(existingGuests))
+
+        // Update local state
+        setGuests(prev => [...prev, newGuest])
+        console.log('✅ Demo guest created in localStorage')
+
+        return newGuest
+      }
+
+      // Regular user - try Firestore first, fallback to localStorage
       try {
-        // Try to save to Firestore
         const docRef = await addDoc(collection(db, 'guests'), convertToFirestoreData(guestData))
         const newGuest: Guest = { id: docRef.id, ...guestData }
 
@@ -210,10 +235,37 @@ export function useGuest(): UseGuestReturn {
         updatedAt: new Date()
       }
 
+      // Check if this is demo mode
+      if (isDemoMode) {
+        // Demo user - update both local state and localStorage synchronously
+        console.log('🎭 Demo mode - updating ONLY local state (no localStorage reload)')
+
+        // Update local state ONLY - localStorage will be updated but won't trigger reload
+        const updatedGuests = guests.map(guest =>
+          guest.id === guestId ? { ...guest, ...updatedData } : guest
+        )
+        setGuests(updatedGuests)
+
+        // Update localStorage silently (for persistence but no reload)
+        if (wedding) {
+          localStorage.setItem(`guests_${wedding.id}`, JSON.stringify(updatedGuests))
+          console.log('✅ Demo guest updated - localStorage updated silently')
+        }
+        return
+      }
+
+      // Regular user - update local state first, then try Firestore
+      setGuests(prev => prev.map(guest =>
+        guest.id === guestId ? { ...guest, ...updatedData } : guest
+      ))
+
       try {
-        // Try to update in Firestore
         const guestRef = doc(db, 'guests', guestId)
-        await updateDoc(guestRef, convertToFirestoreData(updatedData as any))
+        await updateDoc(guestRef, convertToFirestoreData({
+          ...updates,
+          updatedAt: new Date()
+        } as any))
+        console.log('✅ Guest updated in Firestore')
       } catch (firestoreError) {
         console.warn('⚠️ Firestore not available, updating localStorage fallback')
         if (wedding) {
@@ -223,14 +275,12 @@ export function useGuest(): UseGuestReturn {
           if (guestIndex !== -1) {
             existingGuests[guestIndex] = { ...existingGuests[guestIndex], ...updatedData }
             localStorage.setItem(`guests_${wedding.id}`, JSON.stringify(existingGuests))
+            console.log('✅ Guest updated in localStorage fallback')
+          } else {
+            console.error('❌ Guest not found in localStorage:', guestId)
           }
         }
       }
-
-      // Update local state
-      setGuests(prev => prev.map(guest =>
-        guest.id === guestId ? { ...guest, ...updatedData } : guest
-      ))
     } catch (error: any) {
       console.error('Error updating guest:', error)
       setError('Chyba při aktualizaci hosta')
@@ -396,7 +446,10 @@ export function useGuest(): UseGuestReturn {
     totalWithPlusOnes: guests.filter(g => g.hasPlusOne).length,
     plusOnesAttending: guests.filter(g => g.hasPlusOne && g.plusOneRsvpStatus === 'attending').length,
     plusOnes: guests.filter(g => g.hasPlusOne).length,
-    byCategory: {} as any, // Will be calculated separately
+    byCategory: guests.reduce((acc, guest) => {
+      acc[guest.category] = (acc[guest.category] || 0) + 1
+      return acc
+    }, {} as Record<string, number>),
     ceremonyOnly: guests.filter(g => g.invitationType === 'ceremony-only').length,
     receptionOnly: guests.filter(g => g.invitationType === 'reception-only').length,
     ceremonyAndReception: guests.filter(g => g.invitationType === 'ceremony-reception').length,
@@ -405,10 +458,29 @@ export function useGuest(): UseGuestReturn {
     accommodationNeeds: guests.filter(g => g.accommodationNeeds).length
   }
 
-  // Load guests when wedding changes
+  // Load guests when wedding changes - ONLY ONCE
   useEffect(() => {
+    if (!isActive) {
+      console.log('🚫 useGuest hook is INACTIVE - skipping all operations')
+      return
+    }
+
     if (!wedding) {
       setGuests([])
+      setDataLoaded(false)
+      setIsDemoMode(false)
+      return
+    }
+
+    // Don't reload if data is already loaded for this wedding (prevents overwriting edits)
+    if (dataLoaded) {
+      console.log('🔄 Data already loaded, skipping reload to preserve edits')
+      return
+    }
+
+    // NEVER reload for demo mode after first load
+    if (isDemoMode) {
+      console.log('🎭 Demo mode active - BLOCKING all further reloads')
       return
     }
 
@@ -417,11 +489,23 @@ export function useGuest(): UseGuestReturn {
         setLoading(true)
         setError(null)
 
-        // Check if this is a demo user
-        const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding.id === 'demo-wedding'
+        // Check if this is a demo user (check wedding ID first to avoid user dependency)
+        const isDemoUser = wedding.id === 'demo-wedding' || user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz'
 
         if (isDemoUser) {
-          // Load demo guests
+          setIsDemoMode(true)
+
+          // Check if demo guests already exist in localStorage (edited data)
+          const savedDemoGuests = localStorage.getItem(`guests_${wedding.id}`)
+          if (savedDemoGuests) {
+            console.log('🎭 Loading existing demo guests from localStorage - FINAL TIME')
+            const existingGuests = JSON.parse(savedDemoGuests)
+            setGuests(existingGuests)
+            return
+          }
+
+          // Load fresh demo guests only if none exist
+          console.log('🎭 Creating fresh demo guests')
           const demoGuests: Guest[] = [
             {
               id: 'demo-guest-1',
@@ -519,6 +603,10 @@ export function useGuest(): UseGuestReturn {
           ]
 
           console.log('🎭 Loaded demo guests:', demoGuests.length, demoGuests)
+
+          // Save demo guests to localStorage for editing
+          localStorage.setItem(`guests_${wedding.id}`, JSON.stringify(demoGuests))
+
           setGuests(demoGuests)
           return
         }
@@ -534,6 +622,8 @@ export function useGuest(): UseGuestReturn {
             const loadedGuests = snapshot.docs.map(doc =>
               convertFirestoreGuest(doc.id, doc.data())
             )
+            // Sort by sortOrder on client side
+            loadedGuests.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
             console.log('👥 Loaded guests from Firestore:', loadedGuests.length, loadedGuests)
             setGuests(loadedGuests)
           }, (error) => {
@@ -582,11 +672,62 @@ export function useGuest(): UseGuestReturn {
         setError('Chyba při načítání hostů')
       } finally {
         setLoading(false)
+        setDataLoaded(true)
       }
     }
 
     loadGuests()
-  }, [wedding?.id, user?.id, user?.email])
+  }, [wedding?.id]) // ONLY wedding ID - no user dependencies to prevent re-renders
+
+  // Reset dataLoaded when wedding changes (but preserve demo mode)
+  useEffect(() => {
+    if (!isDemoMode) {
+      setDataLoaded(false)
+    }
+  }, [wedding?.id, isDemoMode])
+
+  // Reorder guests
+  const reorderGuests = useCallback(async (reorderedGuests: Guest[]) => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      // Update local state immediately for better UX
+      setGuests(reorderedGuests)
+
+      // Update order in Firestore
+      if (user?.id && wedding?.id) {
+        try {
+          // Update each guest with new sortOrder
+          const updatePromises = reorderedGuests.map((guest, index) => {
+            const guestRef = doc(db, 'guests', guest.id)
+            return updateDoc(guestRef, { sortOrder: index })
+          })
+
+          await Promise.all(updatePromises)
+          console.log('✅ Guest order updated in Firestore')
+        } catch (firestoreError) {
+          console.warn('⚠️ Firestore not available, using localStorage fallback')
+          if (wedding) {
+            localStorage.setItem(`guests_${wedding.id}`, JSON.stringify(reorderedGuests))
+          }
+        }
+      } else {
+        // Fallback to localStorage
+        if (wedding) {
+          localStorage.setItem(`guests_${wedding.id}`, JSON.stringify(reorderedGuests))
+        }
+      }
+
+      console.log('✅ Guests reordered successfully')
+    } catch (error: any) {
+      console.error('Error reordering guests:', error)
+      setError('Chyba při změně pořadí hostů')
+      throw error
+    } finally {
+      setLoading(false)
+    }
+  }, [wedding, user])
 
   // Clear error
   const clearError = () => setError(null)
@@ -607,6 +748,7 @@ export function useGuest(): UseGuestReturn {
     getGuestsByCategory,
     sendInvitations,
     sendReminders,
+    reorderGuests,
     clearError
   }
 }

@@ -30,7 +30,7 @@ export default function BudgetPage() {
   const { user } = useAuth()
   const { wedding } = useWedding()
   const { budgetItems, loading, createBudgetItem, updateBudgetItem, error } = useBudget()
-  const [viewMode, setViewMode] = useState<'list' | 'grid' | 'stats'>('stats')
+  // Removed viewMode - using stats view as default (most informative)
   const [showBudgetForm, setShowBudgetForm] = useState(false)
   const [showTemplates, setShowTemplates] = useState(false)
   const [editingItem, setEditingItem] = useState<BudgetItem | null>(null)
@@ -204,39 +204,11 @@ export default function BudgetPage() {
               </button>
             </div>
 
-            {/* View mode toggle */}
+            {/* Stats view indicator */}
             <div className="flex items-center justify-center">
-              <div className="flex items-center bg-gray-100 rounded-lg p-1">
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'list'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <List className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'grid'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <Grid3X3 className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode('stats')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'stats'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <BarChart3 className="w-4 h-4" />
-                </button>
+              <div className="flex items-center bg-primary-100 rounded-lg px-3 py-2">
+                <BarChart3 className="w-4 h-4 text-primary-600 mr-2" />
+                <span className="text-sm font-medium text-primary-700">Statistiky a přehled</span>
               </div>
             </div>
           </div>
@@ -262,39 +234,7 @@ export default function BudgetPage() {
 
             {/* Actions */}
             <div className="flex items-center space-x-3">
-              {/* View mode toggle */}
-              <div className="flex items-center bg-gray-100 rounded-lg p-1">
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'list'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <List className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'grid'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <Grid3X3 className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode('stats')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'stats'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <BarChart3 className="w-4 h-4" />
-                </button>
-              </div>
+
 
               {/* Action buttons */}
               <button className="btn-outline flex items-center space-x-2">
@@ -329,104 +269,96 @@ export default function BudgetPage() {
             </div>
           </div>
         ) : (
-          /* Content based on view mode */
+          /* Stats view - most informative display */
           <div className="space-y-6">
-            {viewMode === 'stats' && (
-              <BudgetStats
-                onCreateItem={() => setShowBudgetForm(true)}
-                onEditItem={handleEditBudgetItem}
-              />
-            )}
-
-            {(viewMode === 'list' || viewMode === 'grid') && (
-              <>
-                {!hasBudgetItems ? (
-                  /* Empty state for list/grid views */
-                  <div className="text-center py-12">
-                    <div className="w-24 h-24 mx-auto mb-6 bg-primary-100 rounded-full flex items-center justify-center">
-                      <DollarSign className="w-12 h-12 text-primary-600" />
-                    </div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                      Začněte s plánováním rozpočtu
-                    </h2>
-                    <p className="text-text-muted mb-8 max-w-md mx-auto">
-                      Vytvořte si rozpočet pro vaši svatbu, sledujte výdaje a udržujte
-                      finanční plánování pod kontrolou.
-                    </p>
-
-                    <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4">
-                      <button
-                        onClick={() => setShowBudgetForm(true)}
-                        className="btn-primary flex items-center space-x-2"
-                      >
-                        <Plus className="w-4 h-4" />
-                        <span>Přidat první položku</span>
-                      </button>
-
-                      <button
-                        onClick={() => setShowTemplates(true)}
-                        className="btn-outline flex items-center space-x-2"
-                      >
-                        <Target className="w-4 h-4" />
-                        <span>Použít šablonu</span>
-                      </button>
-                    </div>
-
-                    {/* Quick navigation */}
-                    <div className="mt-8 text-center">
-                      <Link
-                        href="/"
-                        className="inline-flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
-                      >
-                        <Home className="w-4 h-4" />
-                        <span>Zpět na hlavní obrazovku</span>
-                      </Link>
-                    </div>
-
-                    {/* Features preview */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 max-w-4xl mx-auto">
-                      <div className="text-center">
-                        <div className="w-12 h-12 mx-auto mb-3 bg-blue-100 rounded-full flex items-center justify-center">
-                          <DollarSign className="w-6 h-6 text-blue-600" />
-                        </div>
-                        <h3 className="font-medium text-gray-900 mb-2">Správa rozpočtu</h3>
-                        <p className="text-sm text-text-muted">
-                          Sledujte plánované vs skutečné náklady podle kategorií
-                        </p>
-                      </div>
-
-                      <div className="text-center">
-                        <div className="w-12 h-12 mx-auto mb-3 bg-green-100 rounded-full flex items-center justify-center">
-                          <BarChart3 className="w-6 h-6 text-green-600" />
-                        </div>
-                        <h3 className="font-medium text-gray-900 mb-2">Analýzy a reporty</h3>
-                        <p className="text-sm text-text-muted">
-                          Detailní přehledy výdajů a využití rozpočtu
-                        </p>
-                      </div>
-
-                      <div className="text-center">
-                        <div className="w-12 h-12 mx-auto mb-3 bg-purple-100 rounded-full flex items-center justify-center">
-                          <FileText className="w-6 h-6 text-purple-600" />
-                        </div>
-                        <h3 className="font-medium text-gray-900 mb-2">Platby a faktury</h3>
-                        <p className="text-sm text-text-muted">
-                          Sledování plateb, termínů splatnosti a dodavatelů
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <BudgetList
-                    viewMode={viewMode}
-                    onCreateItem={() => setShowBudgetForm(true)}
-                    onEditItem={handleEditBudgetItem}
-                  />
-                )}
-              </>
-            )}
+            <BudgetStats
+              onCreateItem={() => setShowBudgetForm(true)}
+              onEditItem={handleEditBudgetItem}
+            />
           </div>
         )}
+
+        {/* Empty state when no budget items */}
+        {!loading && !hasBudgetItems && (
+          <div className="space-y-6">
+            <div className="text-center py-12">
+              <div className="w-24 h-24 mx-auto mb-6 bg-primary-100 rounded-full flex items-center justify-center">
+                <DollarSign className="w-12 h-12 text-primary-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                Začněte s plánováním rozpočtu
+              </h2>
+              <p className="text-text-muted mb-8 max-w-md mx-auto">
+                Vytvořte si rozpočet pro vaši svatbu, sledujte výdaje a udržujte
+                finanční plánování pod kontrolou.
+              </p>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+                <button
+                  onClick={() => setShowBudgetForm(true)}
+                  className="btn-primary flex items-center space-x-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Přidat první položku</span>
+                </button>
+
+                <button
+                  onClick={() => setShowTemplates(true)}
+                  className="btn-outline flex items-center space-x-2"
+                >
+                  <Target className="w-4 h-4" />
+                  <span>Použít šablonu</span>
+                </button>
+              </div>
+
+              {/* Quick navigation */}
+              <div className="mt-8 text-center">
+                <Link
+                  href="/"
+                  className="inline-flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  <Home className="w-4 h-4" />
+                  <span>Zpět na hlavní obrazovku</span>
+                </Link>
+              </div>
+
+              {/* Features preview */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 max-w-4xl mx-auto">
+                <div className="text-center">
+                  <div className="w-12 h-12 mx-auto mb-3 bg-blue-100 rounded-full flex items-center justify-center">
+                    <DollarSign className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <h3 className="font-medium text-gray-900 mb-2">Správa rozpočtu</h3>
+                  <p className="text-sm text-text-muted">
+                    Sledujte plánované vs skutečné náklady podle kategorií
+                  </p>
+                </div>
+
+                <div className="text-center">
+                  <div className="w-12 h-12 mx-auto mb-3 bg-green-100 rounded-full flex items-center justify-center">
+                    <BarChart3 className="w-6 h-6 text-green-600" />
+                  </div>
+                  <h3 className="font-medium text-gray-900 mb-2">Analýzy a reporty</h3>
+                  <p className="text-sm text-text-muted">
+                    Detailní přehledy výdajů a využití rozpočtu
+                  </p>
+                </div>
+
+                <div className="text-center">
+                  <div className="w-12 h-12 mx-auto mb-3 bg-purple-100 rounded-full flex items-center justify-center">
+                    <FileText className="w-6 h-6 text-purple-600" />
+                  </div>
+                  <h3 className="font-medium text-gray-900 mb-2">Export a sdílení</h3>
+                  <p className="text-sm text-text-muted">
+                    Exportujte rozpočet do PDF nebo sdílejte s partnery
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+
       </div>
 
       {/* Budget Form Modal */}

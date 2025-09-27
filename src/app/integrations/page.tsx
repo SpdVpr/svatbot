@@ -19,7 +19,7 @@ import AdvancedAnalytics from '@/components/analytics/AdvancedAnalytics'
 type IntegrationTab = 'calendar' | 'email' | 'analytics'
 
 export default function IntegrationsPage() {
-  const [activeTab, setActiveTab] = useState<IntegrationTab>('calendar')
+  // Removed activeTab - using calendar as default (most useful)
 
   const tabs = [
     {
@@ -107,70 +107,29 @@ export default function IntegrationsPage() {
             </div>
           </div>
 
-          {/* Tab Navigation */}
+          {/* Calendar Integration indicator */}
           <div className="wedding-card">
-            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-1 bg-gray-100 rounded-lg p-1">
-              {tabs.map(tab => {
-                const Icon = tab.icon
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex-1 flex items-center justify-center space-x-3 px-4 py-3 rounded-md text-sm font-medium transition-colors ${
-                      activeTab === tab.id
-                        ? 'bg-white text-primary-600 shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    <Icon className="w-5 h-5" />
-                    <div className="text-left">
-                      <div className="font-medium">{tab.label}</div>
-                      <div className="text-xs text-gray-500 hidden sm:block">{tab.description}</div>
-                    </div>
-                  </button>
-                )
-              })}
+            <div className="flex items-center justify-center bg-primary-100 rounded-lg p-4">
+              <Calendar className="w-5 h-5 text-primary-600 mr-3" />
+              <div className="text-left">
+                <div className="font-medium text-primary-700">Google Calendar</div>
+                <div className="text-xs text-primary-600">Synchronizace událostí s kalendářem</div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Tab Content */}
+        {/* Calendar Integration Content */}
         <div className="space-y-6">
-          {activeTab === 'calendar' && (
-            <div>
-              <div className="mb-6">
-                <h2 className="heading-2 mb-2">Google Calendar integrace</h2>
-                <p className="body-large text-text-muted">
-                  Synchronizujte všechny svatební události, úkoly a schůzky s vaším Google Calendar
-                </p>
-              </div>
-              <GoogleCalendarIntegration />
+          <div>
+            <div className="mb-6">
+              <h2 className="heading-2 mb-2">Google Calendar integrace</h2>
+              <p className="body-large text-text-muted">
+                Synchronizujte všechny svatební události, úkoly a schůzky s vaším Google Calendar
+              </p>
             </div>
-          )}
-
-          {activeTab === 'email' && (
-            <div>
-              <div className="mb-6">
-                <h2 className="heading-2 mb-2">Email notifikace</h2>
-                <p className="body-large text-text-muted">
-                  Nastavte automatické připomínky a notifikace pro důležité svatební události
-                </p>
-              </div>
-              <EmailNotifications />
-            </div>
-          )}
-
-          {activeTab === 'analytics' && (
-            <div>
-              <div className="mb-6">
-                <h2 className="heading-2 mb-2">Pokročilá analytika</h2>
-                <p className="body-large text-text-muted">
-                  Získejte detailní přehledy o pokroku vaší svatby a personalizovaná doporučení
-                </p>
-              </div>
-              <AdvancedAnalytics />
-            </div>
-          )}
+            <GoogleCalendarIntegration />
+          </div>
         </div>
 
         {/* Additional Features */}

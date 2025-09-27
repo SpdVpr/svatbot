@@ -19,7 +19,7 @@ import {
 } from 'lucide-react'
 
 export default function AdvancedAnalytics() {
-  const [activeTab, setActiveTab] = useState<'overview' | 'tasks' | 'budget' | 'guests' | 'trends'>('overview')
+  // Removed activeTab - using overview as default (most comprehensive)
   
   const { 
     analytics, 
@@ -102,25 +102,10 @@ export default function AdvancedAnalytics() {
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
-          {tabs.map(tab => {
-            const Icon = tab.icon
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  activeTab === tab.id
-                    ? 'bg-white text-primary-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                <span>{tab.label}</span>
-              </button>
-            )
-          })}
+        {/* Overview indicator */}
+        <div className="flex items-center justify-center bg-primary-100 rounded-lg p-3">
+          <BarChart3 className="w-4 h-4 text-primary-600 mr-2" />
+          <span className="text-sm font-medium text-primary-700">Přehled</span>
         </div>
       </div>
 
@@ -165,11 +150,10 @@ export default function AdvancedAnalytics() {
         </div>
       )}
 
-      {/* Analytics Content */}
+      {/* Analytics Content - Overview */}
       <div className="wedding-card">
-        {activeTab === 'overview' && (
-          <div className="space-y-6">
-            <h4 className="font-medium">Celkový přehled</h4>
+        <div className="space-y-6">
+          <h4 className="font-medium">Celkový přehled</h4>
             
             {/* Key Metrics */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -212,197 +196,7 @@ export default function AdvancedAnalytics() {
               )}
             </div>
           </div>
-        )}
-
-        {activeTab === 'tasks' && (
-          <div className="space-y-6">
-            <h4 className="font-medium">Analýza úkolů</h4>
-            
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center p-4 border border-gray-200 rounded-lg">
-                <div className="text-2xl font-bold text-gray-900">{analytics.tasks.total}</div>
-                <div className="text-sm text-gray-600">Celkem úkolů</div>
-              </div>
-              <div className="text-center p-4 border border-green-200 rounded-lg bg-green-50">
-                <div className="text-2xl font-bold text-green-600">{analytics.tasks.completed}</div>
-                <div className="text-sm text-green-700">Dokončeno</div>
-              </div>
-              <div className="text-center p-4 border border-red-200 rounded-lg bg-red-50">
-                <div className="text-2xl font-bold text-red-600">{analytics.tasks.overdue}</div>
-                <div className="text-sm text-red-700">Po termínu</div>
-              </div>
-              <div className="text-center p-4 border border-yellow-200 rounded-lg bg-yellow-50">
-                <div className="text-2xl font-bold text-yellow-600">{analytics.tasks.upcoming}</div>
-                <div className="text-sm text-yellow-700">Nadcházející</div>
-              </div>
-            </div>
-
-            {/* Task Categories */}
-            <div>
-              <h5 className="font-medium mb-3">Úkoly podle kategorií</h5>
-              <div className="space-y-2">
-                {Object.entries(analytics.tasks.byCategory).map(([category, count]) => (
-                  <div key={category} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <span className="capitalize">{category}</span>
-                    <span className="font-medium">{count}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Productivity Score */}
-            <div className="p-4 bg-blue-50 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-medium">Skóre produktivity</span>
-                <span className="text-2xl font-bold text-blue-600">{Math.round(analytics.tasks.productivityScore)}</span>
-              </div>
-              <div className="w-full bg-blue-200 rounded-full h-2">
-                <div 
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${Math.min(analytics.tasks.productivityScore, 100)}%` }}
-                ></div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'budget' && (
-          <div className="space-y-6">
-            <h4 className="font-medium">Analýza rozpočtu</h4>
-            
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center p-4 border border-gray-200 rounded-lg">
-                <div className="text-lg font-bold text-gray-900">{analytics.budget.totalBudget.toLocaleString()} Kč</div>
-                <div className="text-sm text-gray-600">Celkový rozpočet</div>
-              </div>
-              <div className="text-center p-4 border border-blue-200 rounded-lg bg-blue-50">
-                <div className="text-lg font-bold text-blue-600">{analytics.budget.totalSpent.toLocaleString()} Kč</div>
-                <div className="text-sm text-blue-700">Utraceno</div>
-              </div>
-              <div className="text-center p-4 border border-green-200 rounded-lg bg-green-50">
-                <div className="text-lg font-bold text-green-600">{analytics.budget.remaining.toLocaleString()} Kč</div>
-                <div className="text-sm text-green-700">Zbývá</div>
-              </div>
-              <div className="text-center p-4 border border-purple-200 rounded-lg bg-purple-50">
-                <div className="text-lg font-bold text-purple-600">{Math.round(analytics.budget.percentageUsed)}%</div>
-                <div className="text-sm text-purple-700">Využito</div>
-              </div>
-            </div>
-
-            {/* Budget Progress */}
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-medium">Využití rozpočtu</span>
-                <span className="text-sm text-gray-600">{analytics.budget.totalSpent.toLocaleString()} / {analytics.budget.totalBudget.toLocaleString()} Kč</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-3">
-                <div 
-                  className={`h-3 rounded-full transition-all duration-300 ${
-                    analytics.budget.percentageUsed > 90 ? 'bg-red-500' :
-                    analytics.budget.percentageUsed > 75 ? 'bg-yellow-500' : 'bg-green-500'
-                  }`}
-                  style={{ width: `${Math.min(analytics.budget.percentageUsed, 100)}%` }}
-                ></div>
-              </div>
-            </div>
-
-            {/* Over Budget Categories */}
-            {analytics.budget.overBudgetCategories.length > 0 && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                <h5 className="font-medium text-red-900 mb-2">Překročené kategorie</h5>
-                <div className="space-y-1">
-                  {analytics.budget.overBudgetCategories.map(category => (
-                    <div key={category} className="text-sm text-red-700">• {category}</div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === 'guests' && (
-          <div className="space-y-6">
-            <h4 className="font-medium">Analýza hostů</h4>
-            
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center p-4 border border-gray-200 rounded-lg">
-                <div className="text-2xl font-bold text-gray-900">{analytics.guests.total}</div>
-                <div className="text-sm text-gray-600">Celkem pozvaných</div>
-              </div>
-              <div className="text-center p-4 border border-green-200 rounded-lg bg-green-50">
-                <div className="text-2xl font-bold text-green-600">{analytics.guests.attending}</div>
-                <div className="text-sm text-green-700">Přijde</div>
-              </div>
-              <div className="text-center p-4 border border-red-200 rounded-lg bg-red-50">
-                <div className="text-2xl font-bold text-red-600">{analytics.guests.notAttending}</div>
-                <div className="text-sm text-red-700">Nepřijde</div>
-              </div>
-              <div className="text-center p-4 border border-yellow-200 rounded-lg bg-yellow-50">
-                <div className="text-2xl font-bold text-yellow-600">{analytics.guests.pending}</div>
-                <div className="text-sm text-yellow-700">Neodpověděli</div>
-              </div>
-            </div>
-
-            {/* Response Rate */}
-            <div className="p-4 bg-blue-50 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-medium">Míra odpovědí</span>
-                <span className="text-2xl font-bold text-blue-600">{Math.round(analytics.guests.responseRate)}%</span>
-              </div>
-              <div className="w-full bg-blue-200 rounded-full h-2">
-                <div 
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${analytics.guests.responseRate}%` }}
-                ></div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'trends' && (
-          <div className="space-y-6">
-            <h4 className="font-medium">Trendy a pokrok</h4>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="p-4 border border-gray-200 rounded-lg">
-                <h5 className="font-medium mb-3">Skóre produktivity</h5>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-purple-600">{Math.round(analytics.trends.productivityScore)}</div>
-                  <div className="text-sm text-gray-600">ze 100 bodů</div>
-                </div>
-              </div>
-              
-              <div className="p-4 border border-gray-200 rounded-lg">
-                <h5 className="font-medium mb-3">Skóre zapojení</h5>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-green-600">{Math.round(analytics.trends.engagementScore)}</div>
-                  <div className="text-sm text-gray-600">ze 100 bodů</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Weekly Progress Trend */}
-            <div className="p-4 border border-gray-200 rounded-lg">
-              <h5 className="font-medium mb-3">Týdenní pokrok</h5>
-              <div className="space-y-2">
-                {analytics.trends.weeklyProgress.map((week, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <span className="text-sm">{week.week}</span>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-24 bg-gray-200 rounded-full h-2">
-                        <div 
-                          className="bg-primary-600 h-2 rounded-full"
-                          style={{ width: `${week.progress}%` }}
-                        ></div>
-                      </div>
-                      <span className="text-sm font-medium w-8">{week.progress}%</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   )

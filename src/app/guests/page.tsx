@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useWedding } from '@/hooks/useWedding'
-import { useGuest } from '@/hooks/useGuest'
+import { useRobustGuests } from '@/hooks/useRobustGuests'
 import GuestList from '@/components/guests/GuestList'
 import GuestStats from '@/components/guests/GuestStats'
 import GuestForm from '@/components/guests/GuestForm'
@@ -26,16 +26,29 @@ import {
 import Link from 'next/link'
 
 export default function GuestsPage() {
+  console.log('🏠 GuestsPage render START')
   const { user } = useAuth()
   const { wedding } = useWedding()
-  const { guests, loading, createGuest, updateGuest, error, stats } = useGuest()
-  const [viewMode, setViewMode] = useState<'list' | 'grid' | 'stats'>('stats')
+
+  // Use robust hook
+  const { guests, loading, createGuest, updateGuest, error, stats, reorderGuests } = useRobustGuests()
+
+  console.log('🏠 Using ROBUST hook')
+  console.log('🏠 useGuest result:', { reorderGuests: !!reorderGuests, type: typeof reorderGuests })
+  // Removed viewMode - using stats view as default (most informative)
   const [showGuestForm, setShowGuestForm] = useState(false)
   const [editingGuest, setEditingGuest] = useState<Guest | null>(null)
   const [guestFormLoading, setGuestFormLoading] = useState(false)
 
   // Check if user has any guests
   const hasGuests = guests.length > 0
+
+  console.log('🏠 Guests page:', {
+    hasGuests,
+    guestsCount: guests.length,
+    loading,
+    guests: guests.map(g => g.firstName)
+  })
 
   // Handle create guest
   const handleCreateGuest = async (data: GuestFormData) => {
@@ -56,6 +69,28 @@ export default function GuestsPage() {
     setEditingGuest(guest)
     setShowGuestForm(true)
   }
+
+  // Simple test function
+  const handleGuestReorder = async (reorderedGuests: Guest[]) => {
+    console.log('🔄 handleGuestReorder called with:', reorderedGuests.length, 'guests')
+    try {
+      await reorderGuests(reorderedGuests)
+      console.log('✅ Reorder completed')
+    } catch (error) {
+      console.error('❌ Error reordering guests:', error)
+    }
+  }
+
+  console.log('🏠 handleGuestReorder created:', {
+    handleGuestReorder: !!handleGuestReorder,
+    handleGuestReorderType: typeof handleGuestReorder,
+    reorderGuests: !!reorderGuests,
+    reorderGuestsType: typeof reorderGuests
+  })
+
+  const handleShowGuestForm = useCallback(() => setShowGuestForm(true), [])
+
+
 
   // Handle update guest
   const handleUpdateGuest = async (data: GuestFormData) => {
@@ -164,39 +199,11 @@ export default function GuestsPage() {
               </button>
             </div>
 
-            {/* View mode toggle */}
+            {/* Stats view indicator */}
             <div className="flex items-center justify-center">
-              <div className="flex items-center bg-gray-100 rounded-lg p-1">
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'list'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <List className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'grid'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <Grid3X3 className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode('stats')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'stats'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <BarChart3 className="w-4 h-4" />
-                </button>
+              <div className="flex items-center bg-primary-100 rounded-lg px-3 py-2">
+                <BarChart3 className="w-4 h-4 text-primary-600 mr-2" />
+                <span className="text-sm font-medium text-primary-700">Statistiky a přehled</span>
               </div>
             </div>
           </div>
@@ -222,45 +229,15 @@ export default function GuestsPage() {
 
             {/* Actions */}
             <div className="flex items-center space-x-3">
-              {/* View mode toggle */}
-              <div className="flex items-center bg-gray-100 rounded-lg p-1">
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'list'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <List className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'grid'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <Grid3X3 className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode('stats')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'stats'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <BarChart3 className="w-4 h-4" />
-                </button>
-              </div>
 
               {/* Action buttons */}
-              <button className="btn-outline flex items-center space-x-2">
+              <Link
+                href="/guests/import"
+                className="btn-outline flex items-center space-x-2"
+              >
                 <Upload className="w-4 h-4" />
                 <span className="hidden lg:inline">Import</span>
-              </button>
+              </Link>
 
               <button className="btn-outline flex items-center space-x-2">
                 <Download className="w-4 h-4" />
@@ -311,10 +288,13 @@ export default function GuestsPage() {
                 <span>Přidat prvního hosta</span>
               </button>
 
-              <button className="btn-outline flex items-center space-x-2">
+              <Link
+                href="/guests/import"
+                className="btn-outline flex items-center space-x-2"
+              >
                 <Upload className="w-4 h-4" />
                 <span>Importovat ze souboru</span>
-              </button>
+              </Link>
             </div>
 
             {/* Quick navigation */}
@@ -362,22 +342,15 @@ export default function GuestsPage() {
             </div>
           </div>
         ) : (
-          /* Content based on view mode */
+          /* Stats view - most informative display */
           <div className="space-y-6">
-            {viewMode === 'stats' && (
-              <GuestStats
-                onCreateGuest={() => setShowGuestForm(true)}
-                onEditGuest={handleEditGuest}
-              />
-            )}
-
-            {(viewMode === 'list' || viewMode === 'grid') && (
-              <GuestList
-                viewMode={viewMode}
-                onCreateGuest={() => setShowGuestForm(true)}
-                onEditGuest={handleEditGuest}
-              />
-            )}
+            <GuestStats
+              guests={guests}
+              stats={stats}
+              updateGuest={updateGuest}
+              onCreateGuest={() => setShowGuestForm(true)}
+              onEditGuest={handleEditGuest}
+            />
           </div>
         )}
       </div>

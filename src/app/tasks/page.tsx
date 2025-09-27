@@ -38,7 +38,7 @@ export default function TasksPage() {
     deleteTask,
     clearError
   } = useTask()
-  const [viewMode, setViewMode] = useState<'list' | 'grid' | 'stats'>('stats')
+  // Removed viewMode - using stats view as default (most informative)
   const [showInitializeModal, setShowInitializeModal] = useState(false)
   const [showTaskForm, setShowTaskForm] = useState(false)
   const [taskFormLoading, setTaskFormLoading] = useState(false)
@@ -159,39 +159,11 @@ export default function TasksPage() {
               </button>
             </div>
 
-            {/* View mode toggle */}
+            {/* Stats view indicator */}
             <div className="flex items-center justify-center">
-              <div className="flex items-center bg-gray-100 rounded-lg p-1">
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'list'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <List className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'grid'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <Grid3X3 className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode('stats')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'stats'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <BarChart3 className="w-4 h-4" />
-                </button>
+              <div className="flex items-center bg-primary-100 rounded-lg px-3 py-2">
+                <BarChart3 className="w-4 h-4 text-primary-600 mr-2" />
+                <span className="text-sm font-medium text-primary-700">Statistiky a přehled</span>
               </div>
             </div>
           </div>
@@ -217,39 +189,6 @@ export default function TasksPage() {
 
             {/* Actions */}
             <div className="flex items-center space-x-3">
-              {/* View mode toggle */}
-              <div className="flex items-center bg-gray-100 rounded-lg p-1">
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'list'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <List className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'grid'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <Grid3X3 className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode('stats')}
-                  className={`p-2 rounded-md transition-colors ${
-                    viewMode === 'stats'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <BarChart3 className="w-4 h-4" />
-                </button>
-              </div>
 
               {/* Action buttons */}
               <button className="btn-outline flex items-center space-x-2">
@@ -355,33 +294,18 @@ export default function TasksPage() {
             </div>
           </div>
         ) : (
-          /* Content based on view mode */
+          /* Stats view - most informative display */
           <div className="space-y-6">
-            {viewMode === 'stats' && (
-              <TaskStats
-                onCreateTask={() => setShowTaskForm(true)}
-                tasks={isDemoUser ? tasks : undefined}
-                stats={isDemoUser ? stats : undefined}
-                loading={isDemoUser ? loading : undefined}
-                error={isDemoUser ? error : undefined}
-                toggleTaskStatus={isDemoUser ? toggleTaskStatus : undefined}
-                deleteTask={isDemoUser ? deleteTask : undefined}
-                clearError={isDemoUser ? clearError : undefined}
-              />
-            )}
-
-            {(viewMode === 'list' || viewMode === 'grid') && (
-              <TaskList
-                onCreateTask={() => setShowTaskForm(true)}
-                tasks={isDemoUser ? tasks : undefined}
-                loading={isDemoUser ? loading : undefined}
-                error={isDemoUser ? error : undefined}
-                stats={isDemoUser ? stats : undefined}
-                toggleTaskStatus={isDemoUser ? toggleTaskStatus : undefined}
-                deleteTask={isDemoUser ? deleteTask : undefined}
-                clearError={isDemoUser ? clearError : undefined}
-              />
-            )}
+            <TaskStats
+              onCreateTask={() => setShowTaskForm(true)}
+              tasks={isDemoUser ? tasks : undefined}
+              stats={isDemoUser ? stats : undefined}
+              loading={isDemoUser ? loading : undefined}
+              error={isDemoUser ? error : undefined}
+              toggleTaskStatus={isDemoUser ? toggleTaskStatus : undefined}
+              deleteTask={isDemoUser ? deleteTask : undefined}
+              clearError={isDemoUser ? clearError : undefined}
+            />
           </div>
         )}
       </div>

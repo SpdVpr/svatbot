@@ -291,6 +291,13 @@ export function useWedding() {
   useEffect(() => {
     if (!user || !currentWedding) return
 
+    // Skip Firestore for demo users
+    const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || currentWedding?.id === 'demo-wedding'
+    if (isDemoUser) {
+      console.log('🎭 Demo user - skipping Firestore wedding updates')
+      return
+    }
+
     try {
       const weddingRef = doc(db, 'weddings', currentWedding.id)
 

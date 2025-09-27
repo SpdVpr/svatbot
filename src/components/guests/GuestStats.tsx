@@ -1,6 +1,5 @@
 'use client'
 
-import { useGuest } from '@/hooks/useGuest'
 import GuestList from './GuestList'
 import { Guest } from '@/types/guest'
 import {
@@ -16,8 +15,12 @@ import {
   TrendingUp,
   PieChart
 } from 'lucide-react'
+import { getGuestCategoryLabel } from '@/utils/guestCategories'
 
 interface GuestStatsProps {
+  guests: Guest[]
+  stats: any
+  updateGuest: (guestId: string, updates: Partial<Guest>) => Promise<void>
   compact?: boolean
   showProgress?: boolean
   showGuestList?: boolean
@@ -26,13 +29,15 @@ interface GuestStatsProps {
 }
 
 export default function GuestStats({
+  guests,
+  stats,
+  updateGuest,
   compact = false,
   showProgress = true,
   showGuestList = true,
   onCreateGuest,
   onEditGuest
 }: GuestStatsProps) {
-  const { guests, stats } = useGuest()
 
   // Calculate additional stats
   const responseRate = stats.total > 0 ? 
@@ -263,7 +268,7 @@ export default function GuestStats({
         {/* Additional info */}
         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Dodatečné informace</h3>
-          
+
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
@@ -272,7 +277,7 @@ export default function GuestStats({
               </div>
               <span className="font-medium">{stats.totalWithPlusOnes}</span>
             </div>
-            
+
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Mail className="w-4 h-4 text-green-500" />
@@ -280,7 +285,7 @@ export default function GuestStats({
               </div>
               <span className="font-medium">{guestsWithContact}</span>
             </div>
-            
+
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Utensils className="w-4 h-4 text-orange-500" />
@@ -288,7 +293,7 @@ export default function GuestStats({
               </div>
               <span className="font-medium">{guestsWithDietaryRestrictions}</span>
             </div>
-            
+
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Mail className="w-4 h-4 text-purple-500" />
@@ -299,6 +304,25 @@ export default function GuestStats({
           </div>
         </div>
       </div>
+
+      {/* Categories breakdown */}
+      {Object.keys(stats.byCategory).length > 0 && (
+        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
+            <Users className="w-5 h-5" />
+            <span>Kategorie hostů</span>
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {Object.entries(stats.byCategory).map(([category, count]) => (
+              <div key={category} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <span className="text-gray-700">{getGuestCategoryLabel(category)}</span>
+                <span className="font-medium text-gray-900">{count} hostů</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Quick insights */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -343,6 +367,9 @@ export default function GuestStats({
       {showGuestList && (
         <div className="mt-8">
           <GuestList
+            guests={guests}
+            stats={stats}
+            updateGuest={updateGuest}
             showHeader={false}
             showFilters={true}
             maxHeight="800px"
