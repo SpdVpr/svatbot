@@ -402,7 +402,7 @@ export function useRobustGuests() {
       } else if (user && wedding?.id) {
         try {
           const { doc, setDoc } = await import('firebase/firestore')
-          const { db } = await import('@/lib/firebase')
+          const { db } = await import('@/config/firebase')
 
           const weddingRef = doc(db, 'weddings', wedding.id)
           const cleanedGuests = reorderedGuests.map(cleanForFirestore)
