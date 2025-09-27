@@ -108,7 +108,20 @@ const cleanForFirestore = (obj: any): any => {
   const cleaned: any = {}
   for (const [key, value] of Object.entries(obj)) {
     if (value !== undefined) {
-      cleaned[key] = value
+      // Handle arrays (like children)
+      if (Array.isArray(value)) {
+        cleaned[key] = value.map(item =>
+          typeof item === 'object' && item !== null ? cleanForFirestore(item) : item
+        )
+      }
+      // Handle nested objects
+      else if (typeof value === 'object' && value !== null && !(value instanceof Date)) {
+        cleaned[key] = cleanForFirestore(value)
+      }
+      // Handle primitive values
+      else {
+        cleaned[key] = value
+      }
     }
   }
   return cleaned
@@ -251,6 +264,8 @@ export function useRobustGuests() {
                 hasPlusOne: data.hasPlusOne,
                 plusOneName: data.plusOneName,
                 plusOneRsvpStatus: data.plusOneRsvpStatus,
+                hasChildren: data.hasChildren || false,
+                children: data.children || [],
                 dietaryRestrictions: data.dietaryRestrictions || [],
                 dietaryNotes: data.dietaryNotes,
                 accessibilityNeeds: data.accessibilityNeeds,
@@ -377,8 +392,13 @@ export function useRobustGuests() {
 
   // Create guest function
   const createGuest = useCallback(async (data: GuestFormData): Promise<Guest> => {
+    // Generate unique ID
+    const guestId = isDemoUser
+      ? `demo-guest-${Date.now()}`
+      : `guest-${user?.id || 'unknown'}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+
     const newGuest: Guest = {
-      id: isDemoUser ? `demo-guest-${Date.now()}` : `temp-${Date.now()}`,
+      id: guestId,
       weddingId: wedding?.id || '',
       firstName: data.firstName,
       lastName: data.lastName,
@@ -390,6 +410,8 @@ export function useRobustGuests() {
       rsvpStatus: 'pending',
       hasPlusOne: data.hasPlusOne,
       plusOneName: data.plusOneName,
+      hasChildren: data.hasChildren || false,
+      children: data.children || [],
       dietaryRestrictions: data.dietaryRestrictions || [],
       dietaryNotes: data.dietaryNotes,
       accessibilityNeeds: data.accessibilityNeeds,
@@ -409,18 +431,50 @@ export function useRobustGuests() {
     // Update local state immediately
     const updatedGuests = [...guestsRef.current, newGuest]
     setGuests(updatedGuests)
+    guestsRef.current = updatedGuests
 
     // Save to localStorage (use compatible keys)
     const storageKey = isDemoUser ? 'simple-demo-guests' : `guests_${wedding?.id}`
     localStorage.setItem(storageKey, JSON.stringify(updatedGuests))
     console.log('✅ Guest created and saved to localStorage with key:', storageKey)
 
+    // For real users, save to Firestore
+    if (!isDemoUser && user && wedding?.id) {
+      // Import Firestore dynamically to avoid blocking
+      import('@/config/firebase').then(({ db }) => {
+        import('firebase/firestore').then(({ doc, setDoc }) => {
+          const guestRef = doc(db, 'guests', newGuest.id)
+          const cleanedGuest = cleanForFirestore(newGuest)
+          setDoc(guestRef, cleanedGuest).then(() => {
+            console.log('✅ New guest synced to Firestore')
+          }).catch((error) => {
+            console.warn('⚠️ Firestore sync failed for new guest:', error.message)
+          })
+        })
+      }).catch((error) => {
+        console.warn('⚠️ Failed to load Firestore modules:', error)
+      })
+    }
+
     return newGuest
   }, [isDemoUser, wedding?.id, user?.id])
 
   // Calculate stats
+  const totalAttendees = guests.reduce((total, guest) => {
+    let count = 1 // The guest themselves
+    if (guest.hasPlusOne) count += 1 // Add plus one regardless of RSVP status for total count
+    if (guest.hasChildren && guest.children) {
+      count += guest.children.length // Add children regardless of RSVP status for total count
+    }
+    return total + count
+  }, 0)
+
+  const totalChildren = guests.reduce((total, guest) => {
+    return total + (guest.children?.length || 0)
+  }, 0)
+
   const stats = {
-    total: guests.length,
+    total: totalAttendees,
     attending: guests.filter(g => g.rsvpStatus === 'attending').length,
     declined: guests.filter(g => g.rsvpStatus === 'declined').length,
     pending: guests.filter(g => g.rsvpStatus === 'pending').length,
@@ -428,6 +482,8 @@ export function useRobustGuests() {
     totalWithPlusOnes: guests.filter(g => g.hasPlusOne).length,
     plusOnesAttending: guests.filter(g => g.hasPlusOne && g.plusOneRsvpStatus === 'attending').length,
     plusOnes: guests.filter(g => g.hasPlusOne).length,
+    totalWithChildren: guests.filter(g => g.hasChildren && g.children && g.children.length > 0).length,
+    totalChildren: totalChildren,
     byCategory: guests.reduce((acc, guest) => {
       acc[guest.category] = (acc[guest.category] || 0) + 1
       return acc

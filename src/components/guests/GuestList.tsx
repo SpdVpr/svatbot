@@ -645,6 +645,13 @@ export default function GuestList({
                               +1 {guest.plusOneName && `(${guest.plusOneName})`}
                             </span>
                           )}
+
+                          {/* Children indicator */}
+                          {guest.hasChildren && guest.children && guest.children.length > 0 && (
+                            <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                              {guest.children.length} {guest.children.length === 1 ? 'dítě' : 'děti'}
+                            </span>
+                          )}
                         </div>
 
                         {/* Contact info */}
@@ -662,6 +669,23 @@ export default function GuestList({
                                 <span>{guest.phone}</span>
                               </div>
                             )}
+                          </div>
+                        )}
+
+                        {/* Children details */}
+                        {guest.hasChildren && guest.children && guest.children.length > 0 && (
+                          <div className="mb-2">
+                            <div className="text-xs text-gray-600 mb-1">Děti:</div>
+                            <div className="flex flex-wrap gap-1">
+                              {guest.children.map((child, index) => (
+                                <span
+                                  key={index}
+                                  className="text-xs bg-green-50 text-green-700 px-2 py-1 rounded-full"
+                                >
+                                  {child.name} ({child.age} let)
+                                </span>
+                              ))}
+                            </div>
                           </div>
                         )}
 

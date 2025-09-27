@@ -21,6 +21,11 @@ const getInitialDemoGuests = (): Guest[] => [
     hasPlusOne: true,
     plusOneName: 'Marie Nováková',
     plusOneRsvpStatus: 'attending',
+    hasChildren: true,
+    children: [
+      { name: 'Tomáš Novák', age: 8 },
+      { name: 'Anna Nováková', age: 5 }
+    ],
     dietaryRestrictions: [],
     preferredContactMethod: 'email',
     language: 'cs',
@@ -44,6 +49,8 @@ const getInitialDemoGuests = (): Guest[] => [
     rsvpStatus: 'attending',
     rsvpDate: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000),
     hasPlusOne: false,
+    hasChildren: false,
+    children: [],
     dietaryRestrictions: ['vegetarian'],
     preferredContactMethod: 'phone',
     language: 'cs',
@@ -66,6 +73,10 @@ const getInitialDemoGuests = (): Guest[] => [
     rsvpStatus: 'maybe',
     hasPlusOne: true,
     plusOneName: 'Tomáš Krásný',
+    hasChildren: true,
+    children: [
+      { name: 'Lukáš Krásný', age: 12 }
+    ],
     dietaryRestrictions: [],
     preferredContactMethod: 'email',
     language: 'cs',
@@ -89,6 +100,8 @@ const getInitialDemoGuests = (): Guest[] => [
     rsvpStatus: 'declined',
     rsvpDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
     hasPlusOne: false,
+    hasChildren: false,
+    children: [],
     dietaryRestrictions: [],
     preferredContactMethod: 'phone',
     language: 'cs',
@@ -157,6 +170,8 @@ export function useDemoGuests(isActive: boolean = true) {
       rsvpStatus: 'pending',
       hasPlusOne: data.hasPlusOne,
       plusOneName: data.plusOneName,
+      hasChildren: data.hasChildren || false,
+      children: data.children || [],
       dietaryRestrictions: data.dietaryRestrictions,
       dietaryNotes: data.dietaryNotes,
       accessibilityNeeds: data.accessibilityNeeds,
@@ -188,8 +203,21 @@ export function useDemoGuests(isActive: boolean = true) {
   }, [guests])
 
   // Calculate stats
+  const totalAttendees = guests.reduce((total, guest) => {
+    let count = 1 // The guest themselves
+    if (guest.hasPlusOne) count += 1 // Add plus one regardless of RSVP status for total count
+    if (guest.hasChildren && guest.children) {
+      count += guest.children.length // Add children regardless of RSVP status for total count
+    }
+    return total + count
+  }, 0)
+
+  const totalChildren = guests.reduce((total, guest) => {
+    return total + (guest.children?.length || 0)
+  }, 0)
+
   const stats = {
-    total: guests.length,
+    total: totalAttendees,
     attending: guests.filter(g => g.rsvpStatus === 'attending').length,
     declined: guests.filter(g => g.rsvpStatus === 'declined').length,
     pending: guests.filter(g => g.rsvpStatus === 'pending').length,
@@ -197,6 +225,8 @@ export function useDemoGuests(isActive: boolean = true) {
     totalWithPlusOnes: guests.filter(g => g.hasPlusOne).length,
     plusOnesAttending: guests.filter(g => g.hasPlusOne && g.plusOneRsvpStatus === 'attending').length,
     plusOnes: guests.filter(g => g.hasPlusOne).length,
+    totalWithChildren: guests.filter(g => g.hasChildren && g.children && g.children.length > 0).length,
+    totalChildren: totalChildren,
     byCategory: guests.reduce((acc, guest) => {
       acc[guest.category] = (acc[guest.category] || 0) + 1
       return acc

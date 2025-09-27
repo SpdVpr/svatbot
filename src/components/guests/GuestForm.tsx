@@ -42,6 +42,8 @@ export default function GuestForm({
     invitationType: initialData?.invitationType || 'ceremony-reception',
     hasPlusOne: initialData?.hasPlusOne || false,
     plusOneName: initialData?.plusOneName || '',
+    hasChildren: initialData?.hasChildren || false,
+    children: initialData?.children || [],
     dietaryRestrictions: initialData?.dietaryRestrictions || [],
     dietaryNotes: initialData?.dietaryNotes || '',
     accessibilityNeeds: initialData?.accessibilityNeeds || '',
@@ -107,6 +109,17 @@ export default function GuestForm({
       newErrors.plusOneName = 'Jméno doprovodu je povinné'
     }
 
+    if (formData.hasChildren && formData.children) {
+      formData.children.forEach((child, index) => {
+        if (!child.name.trim()) {
+          newErrors[`child_${index}_name`] = 'Jméno dítěte je povinné'
+        }
+        if (child.age < 0 || child.age > 18) {
+          newErrors[`child_${index}_age`] = 'Věk dítěte musí být mezi 0-18 let'
+        }
+      })
+    }
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -157,6 +170,32 @@ export default function GuestForm({
   // Remove tag
   const removeTag = (tagToRemove: string) => {
     handleChange('tags', formData.tags.filter(tag => tag !== tagToRemove))
+  }
+
+  // Add child
+  const addChild = () => {
+    setFormData(prev => ({
+      ...prev,
+      children: [...(prev.children || []), { name: '', age: 0 }]
+    }))
+  }
+
+  // Remove child
+  const removeChild = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      children: prev.children?.filter((_, i) => i !== index) || []
+    }))
+  }
+
+  // Update child
+  const updateChild = (index: number, field: 'name' | 'age', value: string | number) => {
+    setFormData(prev => ({
+      ...prev,
+      children: prev.children?.map((child, i) =>
+        i === index ? { ...child, [field]: value } : child
+      ) || []
+    }))
   }
 
   return (
@@ -230,7 +269,119 @@ export default function GuestForm({
                   <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>
                 )}
               </div>
+            </div>
 
+            {/* Plus One */}
+            <div className="mt-4">
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={formData.hasPlusOne}
+                  onChange={(e) => handleChange('hasPlusOne', e.target.checked)}
+                  className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                  disabled={loading}
+                />
+                <span className="text-sm font-medium text-gray-700">Má doprovod (+1)</span>
+              </label>
+
+              {formData.hasPlusOne && (
+                <div className="mt-3">
+                  <input
+                    type="text"
+                    placeholder="Jméno doprovodu"
+                    value={formData.plusOneName}
+                    onChange={(e) => handleChange('plusOneName', e.target.value)}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                      errors.plusOneName ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                    disabled={loading}
+                  />
+                  {errors.plusOneName && (
+                    <p className="mt-1 text-sm text-red-600">{errors.plusOneName}</p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Children */}
+            <div className="mt-4">
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={formData.hasChildren}
+                  onChange={(e) => {
+                    handleChange('hasChildren', e.target.checked)
+                    if (!e.target.checked) {
+                      handleChange('children', [])
+                    }
+                  }}
+                  className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                  disabled={loading}
+                />
+                <span className="text-sm font-medium text-gray-700">Má děti</span>
+              </label>
+
+              {formData.hasChildren && (
+                <div className="mt-3 space-y-3">
+                  {formData.children?.map((child, index) => (
+                    <div key={index} className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          placeholder="Jméno dítěte"
+                          value={child.name}
+                          onChange={(e) => updateChild(index, 'name', e.target.value)}
+                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                            errors[`child_${index}_name`] ? 'border-red-300' : 'border-gray-300'
+                          }`}
+                          disabled={loading}
+                        />
+                        {errors[`child_${index}_name`] && (
+                          <p className="mt-1 text-sm text-red-600">{errors[`child_${index}_name`]}</p>
+                        )}
+                      </div>
+                      <div className="w-20">
+                        <input
+                          type="number"
+                          placeholder="Věk"
+                          min="0"
+                          max="18"
+                          value={child.age}
+                          onChange={(e) => updateChild(index, 'age', parseInt(e.target.value) || 0)}
+                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                            errors[`child_${index}_age`] ? 'border-red-300' : 'border-gray-300'
+                          }`}
+                          disabled={loading}
+                        />
+                        {errors[`child_${index}_age`] && (
+                          <p className="mt-1 text-sm text-red-600">{errors[`child_${index}_age`]}</p>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeChild(index)}
+                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        disabled={loading}
+                      >
+                        <Minus className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+
+                  <button
+                    type="button"
+                    onClick={addChild}
+                    className="flex items-center space-x-2 px-3 py-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+                    disabled={loading}
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Přidat dítě</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="mobile-grid mt-4">
               {/* Email */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -320,38 +471,6 @@ export default function GuestForm({
                   {invitationTypeOptions.find(opt => opt.value === formData.invitationType)?.description}
                 </p>
               </div>
-            </div>
-
-            {/* Plus One */}
-            <div className="mt-4">
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={formData.hasPlusOne}
-                  onChange={(e) => handleChange('hasPlusOne', e.target.checked)}
-                  className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                  disabled={loading}
-                />
-                <span className="text-sm font-medium text-gray-700">Má doprovod (+1)</span>
-              </label>
-
-              {formData.hasPlusOne && (
-                <div className="mt-3">
-                  <input
-                    type="text"
-                    placeholder="Jméno doprovodu"
-                    value={formData.plusOneName}
-                    onChange={(e) => handleChange('plusOneName', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
-                      errors.plusOneName ? 'border-red-300' : 'border-gray-300'
-                    }`}
-                    disabled={loading}
-                  />
-                  {errors.plusOneName && (
-                    <p className="mt-1 text-sm text-red-600">{errors.plusOneName}</p>
-                  )}
-                </div>
-              )}
             </div>
           </div>
 

@@ -67,6 +67,9 @@ export default function GuestStats({
             <div>
               <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
               <p className="text-sm text-text-muted">Celkem</p>
+              {stats.totalChildren > 0 && (
+                <p className="text-xs text-gray-400">{stats.totalChildren} dětí</p>
+              )}
             </div>
           </div>
         </div>
@@ -122,10 +125,19 @@ export default function GuestStats({
               <Users className="w-6 h-6 text-gray-600" />
             </div>
           </div>
-          <div className="mt-4 flex items-center text-sm">
-            <span className="text-text-muted">
-              {stats.totalWithPlusOnes} s doprovodem
-            </span>
+          <div className="mt-4 space-y-1">
+            <div className="flex items-center text-sm">
+              <span className="text-text-muted">
+                {stats.totalWithPlusOnes} s doprovodem
+              </span>
+            </div>
+            {stats.totalChildren > 0 && (
+              <div className="flex items-center text-sm">
+                <span className="text-gray-400">
+                  {stats.totalChildren} dětí
+                </span>
+              </div>
+            )}
           </div>
         </div>
 

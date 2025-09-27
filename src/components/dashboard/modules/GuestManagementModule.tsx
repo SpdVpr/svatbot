@@ -29,6 +29,9 @@ export default function GuestManagementModule() {
         <div className="bg-primary-50 p-4 rounded-lg text-center">
           <div className="text-2xl font-bold text-primary-600 mb-1">{stats.total}</div>
           <div className="text-sm text-primary-700">Celkem hostů</div>
+          {stats.totalChildren > 0 && (
+            <div className="text-xs text-primary-600 mt-1">{stats.totalChildren} dětí</div>
+          )}
         </div>
 
         {/* RSVP Stats */}

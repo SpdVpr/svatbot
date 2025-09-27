@@ -74,6 +74,8 @@ export function useGuest(isActive: boolean = true): UseGuestReturn {
       hasPlusOne: data.hasPlusOne || false,
       plusOneName: data.plusOneName,
       plusOneRsvpStatus: data.plusOneRsvpStatus,
+      hasChildren: data.hasChildren || false,
+      children: data.children || [],
       dietaryRestrictions: data.dietaryRestrictions || [],
       dietaryNotes: data.dietaryNotes,
       accessibilityNeeds: data.accessibilityNeeds,
@@ -438,8 +440,21 @@ export function useGuest(isActive: boolean = true): UseGuestReturn {
   }
 
   // Calculate guest statistics
+  const totalAttendees = guests.reduce((total, guest) => {
+    let count = 1 // The guest themselves
+    if (guest.hasPlusOne) count += 1 // Add plus one regardless of RSVP status for total count
+    if (guest.hasChildren && guest.children) {
+      count += guest.children.length // Add children regardless of RSVP status for total count
+    }
+    return total + count
+  }, 0)
+
+  const totalChildren = guests.reduce((total, guest) => {
+    return total + (guest.children?.length || 0)
+  }, 0)
+
   const stats: GuestStats = {
-    total: guests.length,
+    total: totalAttendees, // Now includes plus ones and children
     invited: guests.filter(g => g.invitationSent).length,
     attending: guests.filter(g => g.rsvpStatus === 'attending').length,
     declined: guests.filter(g => g.rsvpStatus === 'declined').length,
@@ -448,6 +463,8 @@ export function useGuest(isActive: boolean = true): UseGuestReturn {
     totalWithPlusOnes: guests.filter(g => g.hasPlusOne).length,
     plusOnesAttending: guests.filter(g => g.hasPlusOne && g.plusOneRsvpStatus === 'attending').length,
     plusOnes: guests.filter(g => g.hasPlusOne).length,
+    totalWithChildren: guests.filter(g => g.hasChildren && g.children && g.children.length > 0).length,
+    totalChildren: totalChildren,
     byCategory: guests.reduce((acc, guest) => {
       if (!acc[guest.category]) {
         acc[guest.category] = {

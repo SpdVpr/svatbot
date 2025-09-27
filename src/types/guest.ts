@@ -56,6 +56,13 @@ export interface Guest {
   plusOneName?: string
   plusOneRsvpStatus?: RSVPStatus
 
+  // Children
+  hasChildren: boolean
+  children?: {
+    name: string
+    age: number
+  }[]
+
   // Special requirements
   dietaryRestrictions: DietaryRestriction[]
   dietaryNotes?: string
@@ -136,6 +143,10 @@ export interface GuestStats {
   plusOnesAttending: number
   plusOnes: number
 
+  // Children
+  totalWithChildren: number
+  totalChildren: number
+
   // By category
   byCategory: Record<GuestCategory, {
     total: number
@@ -182,6 +193,11 @@ export interface GuestFormData {
   invitationType: InvitationType
   hasPlusOne: boolean
   plusOneName?: string
+  hasChildren: boolean
+  children?: {
+    name: string
+    age: number
+  }[]
   dietaryRestrictions: DietaryRestriction[]
   dietaryNotes?: string
   accessibilityNeeds?: string
