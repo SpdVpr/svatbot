@@ -450,7 +450,7 @@ export default function GuestImportPage() {
                           {guest.phone || '-'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {categoryDisplayMapping[guest.category] || guest.category}
+                          {guest.category ? (categoryDisplayMapping[guest.category] || guest.category) : 'Nezadáno'}
                         </td>
                       </tr>
                     ))}
