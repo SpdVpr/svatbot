@@ -389,7 +389,32 @@ export function useRobustGuests() {
     getGuestsByCategory: (category: string) => guests.filter(g => g.category === category),
     sendInvitations: async () => {},
     sendReminders: async () => {},
-    reorderGuests: async () => {},
+    reorderGuests: async (reorderedGuests: Guest[]) => {
+      console.log('🔄 Reordering guests:', reorderedGuests.length)
+      setGuests(reorderedGuests)
+      guestsRef.current = reorderedGuests
+
+      // Save to storage
+      if (isDemoUser) {
+        const storageKey = 'simple-demo-guests'
+        localStorage.setItem(storageKey, JSON.stringify(reorderedGuests))
+        console.log('✅ Demo guests reordered and saved to localStorage')
+      } else if (user && wedding?.id) {
+        try {
+          const { doc, setDoc } = await import('firebase/firestore')
+          const { db } = await import('@/lib/firebase')
+
+          const weddingRef = doc(db, 'weddings', wedding.id)
+          const cleanedGuests = reorderedGuests.map(cleanForFirestore)
+
+          await setDoc(weddingRef, { guests: cleanedGuests }, { merge: true })
+          console.log('✅ Firebase guests reordered and saved')
+        } catch (error) {
+          console.error('❌ Error saving reordered guests to Firebase:', error)
+          throw error
+        }
+      }
+    },
     clearError: () => setError(null)
   }
 }
