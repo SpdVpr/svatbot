@@ -121,6 +121,41 @@ export default function GuestList({
       return false
     }
 
+    // Children filter
+    if (filters.hasChildren !== undefined && guest.hasChildren !== filters.hasChildren) {
+      return false
+    }
+
+    // Dietary restrictions filter
+    if (filters.hasDietaryRestrictions !== undefined && (guest.dietaryRestrictions.length > 0) !== filters.hasDietaryRestrictions) {
+      return false
+    }
+
+    // Specific dietary restrictions filter
+    if (filters.dietaryRestrictions && filters.dietaryRestrictions.length > 0 && !filters.dietaryRestrictions.some(dr => guest.dietaryRestrictions.includes(dr))) {
+      return false
+    }
+
+    // Accommodation interest filter
+    if (filters.accommodationInterest && !filters.accommodationInterest.includes(guest.accommodationInterest || 'not_interested')) {
+      return false
+    }
+
+    // Accommodation payment filter
+    if (filters.accommodationPayment && guest.accommodationInterest === 'interested' && !filters.accommodationPayment.includes(guest.accommodationPayment || 'paid_by_guest')) {
+      return false
+    }
+
+    // Invitation sent filter
+    if (filters.invitationSent !== undefined && guest.invitationSent !== filters.invitationSent) {
+      return false
+    }
+
+    // Invitation method filter
+    if (filters.invitationMethod && guest.invitationSent && !filters.invitationMethod.includes(guest.invitationMethod || 'sent')) {
+      return false
+    }
+
     return true
   })
 
