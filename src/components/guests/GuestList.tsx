@@ -703,6 +703,21 @@ export default function GuestList({
                           </div>
                         )}
 
+                        {/* Invitation status */}
+                        {guest.invitationSent && (
+                          <div className="flex flex-wrap gap-1 mb-2">
+                            <span
+                              className={`text-xs px-2 py-1 rounded-full ${
+                                guest.invitationMethod === 'sent'
+                                  ? 'bg-blue-100 text-blue-700'
+                                  : 'bg-green-100 text-green-700'
+                              }`}
+                            >
+                              {guest.invitationMethod === 'sent' ? 'Pozvánka odeslána' : 'Pozvánka předána'}
+                            </span>
+                          </div>
+                        )}
+
 
                       </div>
 

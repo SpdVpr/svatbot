@@ -13,7 +13,8 @@ import {
   Phone,
   Utensils,
   TrendingUp,
-  PieChart
+  PieChart,
+  Send
 } from 'lucide-react'
 import { getGuestCategoryLabel } from '@/utils/guestCategories'
 
@@ -257,15 +258,15 @@ export default function GuestStats({
         </div>
       )}
 
-      {/* Category breakdown */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Invitations section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Invitation types */}
         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
             <PieChart className="w-5 h-5" />
             <span>Typy pozvánek</span>
           </h3>
-          
+
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-gray-700">Obřad + hostina</span>
@@ -278,6 +279,33 @@ export default function GuestStats({
             <div className="flex items-center justify-between">
               <span className="text-gray-700">Pouze hostina</span>
               <span className="font-medium">{stats.receptionOnly}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Invitation status */}
+        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
+            <Send className="w-5 h-5" />
+            <span>Stav pozvánek</span>
+          </h3>
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-700">Celkem doručeno</span>
+              <span className="font-medium">{totalInvitationsSent}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-700">Odeslané</span>
+              <span className="font-medium">{invitationsSent}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-700">Předané osobně</span>
+              <span className="font-medium">{invitationsDeliveredPersonally}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-700">Zbývá doručit</span>
+              <span className="font-medium">{stats.total - totalInvitationsSent}</span>
             </div>
           </div>
         </div>
@@ -310,32 +338,13 @@ export default function GuestStats({
               </div>
               <span className="font-medium">{guestsWithDietaryRestrictions}</span>
             </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Mail className="w-4 h-4 text-purple-500" />
-                <span className="text-gray-700">Pozvánky celkem</span>
-              </div>
-              <span className="font-medium">{totalInvitationsSent}</span>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Mail className="w-4 h-4 text-blue-500" />
-                <span className="text-gray-700">Odeslané</span>
-              </div>
-              <span className="font-medium">{invitationsSent}</span>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <UserPlus className="w-4 h-4 text-green-500" />
-                <span className="text-gray-700">Předané osobně</span>
-              </div>
-              <span className="font-medium">{invitationsDeliveredPersonally}</span>
-            </div>
           </div>
         </div>
+      </div>
+
+      {/* Category breakdown */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
       </div>
 
 
