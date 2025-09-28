@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Calendar, Download, CheckCircle, AlertCircle, Smartphone, Monitor } from 'lucide-react'
+import { Calendar, Download, CheckCircle, AlertCircle, Smartphone, Monitor, ExternalLink, Settings, RefreshCw } from 'lucide-react'
 import { useAppleCalendar, createICalEventsFromMilestones } from '@/hooks/useAppleCalendar'
 import { useTimeline } from '@/hooks/useTimeline'
 import { useWedding } from '@/hooks/useWedding'
@@ -11,19 +11,22 @@ interface AppleCalendarIntegrationProps {
 }
 
 export default function AppleCalendarIntegration({ onSync }: AppleCalendarIntegrationProps) {
-  const { 
-    isSupported, 
-    isLoading, 
-    error, 
-    downloadEvent, 
-    downloadCalendar, 
+  const {
+    isSupported,
+    isLoading,
+    error,
+    downloadEvent,
+    downloadCalendar,
     getCalendarAppName,
-    isAppleDevice 
+    isAppleDevice
   } = useAppleCalendar()
-  
+
   const { milestones } = useTimeline()
   const { wedding } = useWedding()
   const [downloadStatus, setDownloadStatus] = useState<'idle' | 'downloading' | 'success' | 'error'>('idle')
+  const [showCalDAVSetup, setShowCalDAVSetup] = useState(false)
+  const [caldavCredentials, setCaldavCredentials] = useState({ username: '', password: '' })
+  const [isCalDAVConnected, setIsCalDAVConnected] = useState(false)
 
   const calendarAppName = getCalendarAppName()
   const isApple = isAppleDevice()

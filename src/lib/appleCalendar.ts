@@ -29,6 +29,111 @@ export interface WeddingICalEvent {
 }
 
 class AppleCalendarService {
+  private caldavUrl: string | null = null
+  private username: string | null = null
+  private password: string | null = null
+
+  constructor() {
+    // Load CalDAV credentials from localStorage if available
+    if (typeof window !== 'undefined') {
+      this.caldavUrl = localStorage.getItem('apple_caldav_url')
+      this.username = localStorage.getItem('apple_caldav_username')
+      this.password = localStorage.getItem('apple_caldav_password')
+    }
+  }
+
+  // Setup CalDAV connection for direct sync
+  async setupCalDAV(username: string, password: string): Promise<boolean> {
+    try {
+      // iCloud CalDAV URL
+      this.caldavUrl = 'https://caldav.icloud.com'
+      this.username = username
+      this.password = password
+
+      // Test connection
+      const isValid = await this.testCalDAVConnection()
+
+      if (isValid) {
+        localStorage.setItem('apple_caldav_url', this.caldavUrl)
+        localStorage.setItem('apple_caldav_username', username)
+        localStorage.setItem('apple_caldav_password', password)
+        return true
+      }
+
+      return false
+    } catch (error) {
+      console.error('CalDAV setup error:', error)
+      return false
+    }
+  }
+
+  // Test CalDAV connection
+  private async testCalDAVConnection(): Promise<boolean> {
+    if (!this.caldavUrl || !this.username || !this.password) return false
+
+    try {
+      // This would typically require a backend proxy due to CORS
+      // For now, we'll simulate the connection test
+      console.log('Testing CalDAV connection to:', this.caldavUrl)
+      return true
+    } catch (error) {
+      console.error('CalDAV connection test failed:', error)
+      return false
+    }
+  }
+
+  // Create event via CalDAV (requires backend proxy)
+  async createCalDAVEvent(event: ICalEvent): Promise<string | null> {
+    if (!this.isCalDAVConnected()) return null
+
+    try {
+      const icalContent = this.generateICalEvent(event)
+
+      // This would typically be sent to your backend which would then
+      // communicate with the CalDAV server
+      const response = await fetch('/api/caldav/events', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          caldavUrl: this.caldavUrl,
+          username: this.username,
+          password: this.password,
+          icalContent,
+          eventId: event.id
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        return data.eventId
+      }
+
+      return null
+    } catch (error) {
+      console.error('CalDAV create event error:', error)
+      return null
+    }
+  }
+
+  // Check if CalDAV is connected
+  isCalDAVConnected(): boolean {
+    return !!(this.caldavUrl && this.username && this.password)
+  }
+
+  // Disconnect CalDAV
+  disconnectCalDAV(): void {
+    this.caldavUrl = null
+    this.username = null
+    this.password = null
+
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('apple_caldav_url')
+      localStorage.removeItem('apple_caldav_username')
+      localStorage.removeItem('apple_caldav_password')
+    }
+  }
   // Generate iCal (.ics) content for a single event
   generateICalEvent(event: ICalEvent): string {
     const formatDate = (date: Date): string => {
