@@ -76,6 +76,11 @@ export interface Guest {
   // Internal notes
   notes?: string
 
+  // Accommodation
+  hasAccommodation: boolean
+  accommodationType?: 'single' | 'double' | 'suite' | 'family' // Typ pokoje
+  accommodationPayment?: 'paid_by_guest' | 'paid_by_couple' | 'sponsored' // Způsob platby
+
   // Tracking
   invitationSent: boolean
   invitationSentDate?: Date
@@ -173,6 +178,9 @@ export interface GuestFilters {
   invitationType?: InvitationType[]
   hasPlusOne?: boolean
   dietaryRestrictions?: DietaryRestriction[]
+  hasAccommodation?: boolean
+  accommodationType?: 'single' | 'double' | 'suite' | 'family'
+  accommodationPayment?: 'paid_by_guest' | 'paid_by_couple' | 'sponsored'
   invitationSent?: boolean
   invitationMethod?: 'sent' | 'delivered_personally'
   groupId?: string
@@ -205,6 +213,9 @@ export interface GuestFormData {
   preferredContactMethod: 'email' | 'phone' | 'mail'
   language: 'cs' | 'en' | 'sk' | 'de'
   notes?: string
+  hasAccommodation?: boolean
+  accommodationType?: 'single' | 'double' | 'suite' | 'family'
+  accommodationPayment?: 'paid_by_guest' | 'paid_by_couple' | 'sponsored'
   invitationSent?: boolean
   invitationMethod?: 'sent' | 'delivered_personally'
 }

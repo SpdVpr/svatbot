@@ -55,6 +55,16 @@ export default function GuestStats({
   const invitationsDeliveredPersonally = guests.filter(g => g.invitationSent && g.invitationMethod === 'delivered_personally').length
   const totalInvitationsSent = invitationsSent + invitationsDeliveredPersonally
 
+  // Accommodation statistics
+  const guestsWithAccommodation = guests.filter(g => g.hasAccommodation).length
+  const singleRooms = guests.filter(g => g.hasAccommodation && g.accommodationType === 'single').length
+  const doubleRooms = guests.filter(g => g.hasAccommodation && g.accommodationType === 'double').length
+  const suites = guests.filter(g => g.hasAccommodation && g.accommodationType === 'suite').length
+  const familyRooms = guests.filter(g => g.hasAccommodation && g.accommodationType === 'family').length
+  const paidByGuest = guests.filter(g => g.hasAccommodation && g.accommodationPayment === 'paid_by_guest').length
+  const paidByCouple = guests.filter(g => g.hasAccommodation && g.accommodationPayment === 'paid_by_couple').length
+  const sponsored = guests.filter(g => g.hasAccommodation && g.accommodationPayment === 'sponsored').length
+
   // Get response rate color
   const getResponseRateColor = (rate: number) => {
     if (rate >= 80) return 'text-green-600 bg-green-100'
@@ -260,25 +270,36 @@ export default function GuestStats({
 
       {/* Invitations section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Invitation types */}
+        {/* Accommodation */}
         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-            <PieChart className="w-5 h-5" />
-            <span>Typy pozvánek</span>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 21l4-4 4 4" />
+            </svg>
+            <span>Ubytování</span>
           </h3>
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-gray-700">Obřad + hostina</span>
-              <span className="font-medium">{stats.ceremonyAndReception}</span>
+              <span className="text-gray-700">Celkem ubytováno</span>
+              <span className="font-medium">{guestsWithAccommodation}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-700">Pouze obřad</span>
-              <span className="font-medium">{stats.ceremonyOnly}</span>
+              <span className="text-gray-700">Dvoulůžkové pokoje</span>
+              <span className="font-medium">{doubleRooms}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-700">Pouze hostina</span>
-              <span className="font-medium">{stats.receptionOnly}</span>
+              <span className="text-gray-700">Apartmány</span>
+              <span className="font-medium">{suites}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-700">Jednolůžkové pokoje</span>
+              <span className="font-medium">{singleRooms}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-700">Rodinné pokoje</span>
+              <span className="font-medium">{familyRooms}</span>
             </div>
           </div>
         </div>

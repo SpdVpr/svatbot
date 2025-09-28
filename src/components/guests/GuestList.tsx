@@ -75,7 +75,6 @@ export default function GuestList({
   })
   const [searchTerm, setSearchTerm] = useState('')
   const [showFiltersPanel, setShowFiltersPanel] = useState(false)
-  const [selectedGuests, setSelectedGuests] = useState<string[]>([])
 
   // Drag and drop state
   const [draggedGuest, setDraggedGuest] = useState<string | null>(null)
@@ -172,14 +171,7 @@ export default function GuestList({
     }
   }
 
-  // Handle guest selection
-  const toggleGuestSelection = (guestId: string) => {
-    setSelectedGuests(prev =>
-      prev.includes(guestId)
-        ? prev.filter(id => id !== guestId)
-        : [...prev, guestId]
-    )
-  }
+
 
   // Drag and drop handlers
   const handleDragStart = useCallback((e: React.DragEvent, guestId: string, index: number) => {
@@ -578,8 +570,6 @@ export default function GuestList({
                       key={guest.id}
                       guest={guest}
                       showContactInfo={viewOptions.showContactInfo}
-                      isSelected={selectedGuests.includes(guest.id)}
-                      onSelect={toggleGuestSelection}
                       onEdit={onEditGuest}
                     />
                   )
@@ -620,12 +610,6 @@ export default function GuestList({
                       <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-2">
                           <div className="flex items-center space-x-2">
-                            <input
-                              type="checkbox"
-                              checked={selectedGuests.includes(guest.id)}
-                              onChange={() => toggleGuestSelection(guest.id)}
-                              className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                            />
                             <h4 className="font-medium text-gray-900">
                               {guest.firstName} {guest.lastName}
                             </h4>
@@ -785,68 +769,7 @@ export default function GuestList({
         )}
       </div>
 
-      {/* Bulk actions */}
-      {selectedGuests.length > 0 && (
-        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-50">
-          <div className="flex items-center space-x-4">
-            <span className="text-sm font-medium text-gray-700">
-              {selectedGuests.length} vybraných hostů
-            </span>
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={async () => {
-                  try {
-                    // TODO: Implement send invitations
-                    console.log('Sending invitations to:', selectedGuests)
-                    alert('Funkce "Poslat pozvánky" bude implementována v další verzi')
-                  } catch (error) {
-                    console.error('Error sending invitations:', error)
-                  }
-                }}
-                className="btn-outline btn-sm flex items-center space-x-1"
-              >
-                <Send className="w-3 h-3" />
-                <span>Poslat pozvánky</span>
-              </button>
-              <button
-                onClick={() => {
-                  // TODO: Implement bulk edit
-                  console.log('Bulk editing:', selectedGuests)
-                  alert('Funkce "Hromadná úprava" bude implementována v další verzi')
-                }}
-                className="btn-outline btn-sm flex items-center space-x-1"
-              >
-                <Edit className="w-3 h-3" />
-                <span>Upravit</span>
-              </button>
-              <button
-                onClick={async () => {
-                  if (window.confirm(`Opravdu chcete smazat ${selectedGuests.length} hostů?`)) {
-                    try {
-                      for (const guestId of selectedGuests) {
-                        await deleteGuest(guestId)
-                      }
-                      setSelectedGuests([])
-                    } catch (error) {
-                      console.error('Error deleting guests:', error)
-                    }
-                  }
-                }}
-                className="btn-outline btn-sm text-red-600 border-red-300 hover:bg-red-50 flex items-center space-x-1"
-              >
-                <Trash2 className="w-3 h-3" />
-                <span>Smazat</span>
-              </button>
-            </div>
-            <button
-              onClick={() => setSelectedGuests([])}
-              className="text-gray-400 hover:text-gray-600"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
+
     </div>
   )
 }

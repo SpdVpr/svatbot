@@ -50,6 +50,9 @@ export default function GuestForm({
     preferredContactMethod: initialData?.preferredContactMethod || 'email',
     language: initialData?.language || 'cs',
     notes: initialData?.notes || '',
+    hasAccommodation: initialData?.hasAccommodation || false,
+    accommodationType: initialData?.accommodationType || 'double',
+    accommodationPayment: initialData?.accommodationPayment || 'paid_by_guest',
     invitationSent: initialData?.invitationSent || false,
     invitationMethod: initialData?.invitationMethod || 'sent'
   })
@@ -499,6 +502,137 @@ export default function GuestForm({
                 />
               </div>
             )}
+          </div>
+
+          {/* Accommodation Section */}
+          <div>
+            <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center space-x-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 21l4-4 4 4" />
+              </svg>
+              <span>Ubytování</span>
+            </h3>
+
+            <div className="space-y-4">
+              <div className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  id="hasAccommodation"
+                  checked={formData.hasAccommodation}
+                  onChange={(e) => handleChange('hasAccommodation', e.target.checked)}
+                  className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 focus:ring-2"
+                  disabled={loading}
+                />
+                <label htmlFor="hasAccommodation" className="text-sm font-medium text-gray-700">
+                  Ubytování zajištěno
+                </label>
+              </div>
+
+              {formData.hasAccommodation && (
+                <div className="ml-7 space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Typ pokoje
+                    </label>
+                    <div className="space-y-2">
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="accommodationType"
+                          value="single"
+                          checked={formData.accommodationType === 'single'}
+                          onChange={(e) => handleChange('accommodationType', e.target.value)}
+                          className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500 focus:ring-2"
+                          disabled={loading}
+                        />
+                        <span className="ml-2 text-sm text-gray-700">Jednolůžkový pokoj</span>
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="accommodationType"
+                          value="double"
+                          checked={formData.accommodationType === 'double'}
+                          onChange={(e) => handleChange('accommodationType', e.target.value)}
+                          className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500 focus:ring-2"
+                          disabled={loading}
+                        />
+                        <span className="ml-2 text-sm text-gray-700">Dvoulůžkový pokoj</span>
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="accommodationType"
+                          value="suite"
+                          checked={formData.accommodationType === 'suite'}
+                          onChange={(e) => handleChange('accommodationType', e.target.value)}
+                          className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500 focus:ring-2"
+                          disabled={loading}
+                        />
+                        <span className="ml-2 text-sm text-gray-700">Apartmán</span>
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="accommodationType"
+                          value="family"
+                          checked={formData.accommodationType === 'family'}
+                          onChange={(e) => handleChange('accommodationType', e.target.value)}
+                          className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500 focus:ring-2"
+                          disabled={loading}
+                        />
+                        <span className="ml-2 text-sm text-gray-700">Rodinný pokoj</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Způsob platby
+                    </label>
+                    <div className="space-y-2">
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="accommodationPayment"
+                          value="paid_by_guest"
+                          checked={formData.accommodationPayment === 'paid_by_guest'}
+                          onChange={(e) => handleChange('accommodationPayment', e.target.value)}
+                          className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500 focus:ring-2"
+                          disabled={loading}
+                        />
+                        <span className="ml-2 text-sm text-gray-700">Platí host</span>
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="accommodationPayment"
+                          value="paid_by_couple"
+                          checked={formData.accommodationPayment === 'paid_by_couple'}
+                          onChange={(e) => handleChange('accommodationPayment', e.target.value)}
+                          className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500 focus:ring-2"
+                          disabled={loading}
+                        />
+                        <span className="ml-2 text-sm text-gray-700">Platí novomanželé</span>
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="accommodationPayment"
+                          value="sponsored"
+                          checked={formData.accommodationPayment === 'sponsored'}
+                          onChange={(e) => handleChange('accommodationPayment', e.target.value)}
+                          className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500 focus:ring-2"
+                          disabled={loading}
+                        />
+                        <span className="ml-2 text-sm text-gray-700">Sponzorováno</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Invitation Status */}

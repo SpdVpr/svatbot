@@ -22,20 +22,16 @@ interface GuestCardProps {
   guest: Guest
   compact?: boolean
   showContactInfo?: boolean
-  isSelected?: boolean
-  onSelect?: (guestId: string) => void
   onEdit?: (guest: Guest) => void
   onClick?: () => void
 }
 
-export default function GuestCard({ 
-  guest, 
-  compact = false, 
+export default function GuestCard({
+  guest,
+  compact = false,
   showContactInfo = true,
-  isSelected = false,
-  onSelect,
   onEdit,
-  onClick 
+  onClick
 }: GuestCardProps) {
   const { updateRSVP, deleteGuest } = useGuest()
   const [showActions, setShowActions] = useState(false)
@@ -128,28 +124,12 @@ export default function GuestCard({
     <div
       className={`
         relative group border rounded-lg transition-all duration-200 cursor-pointer
-        ${isSelected 
-          ? 'border-primary-300 bg-primary-50' 
-          : 'border-gray-200 bg-white hover:border-primary-300 hover:shadow-sm'
-        }
+        border-gray-200 bg-white hover:border-primary-300 hover:shadow-sm
         ${compact ? 'p-3' : 'p-4'}
       `}
       onClick={onClick}
     >
-      {/* Selection checkbox */}
-      {onSelect && (
-        <div className="absolute top-2 left-2">
-          <input
-            type="checkbox"
-            checked={isSelected}
-            onChange={(e) => {
-              e.stopPropagation()
-              onSelect(guest.id)
-            }}
-            className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-          />
-        </div>
-      )}
+
 
       {/* Actions menu */}
       <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -200,7 +180,7 @@ export default function GuestCard({
         </div>
       </div>
 
-      <div className={`${onSelect ? 'ml-6' : ''} space-y-3`}>
+      <div className="space-y-3">
         {/* Guest name and status */}
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
