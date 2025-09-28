@@ -90,7 +90,7 @@ class GoogleCalendarService {
         throw new Error('Google Client ID not configured')
       }
 
-      const redirectUri = `${window.location.origin}/auth/google/callback`
+      const redirectUri = `${window.location.origin}/api/auth/google/callback`
       const scope = SCOPES.join(' ')
       
       const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
