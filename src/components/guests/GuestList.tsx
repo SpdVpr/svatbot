@@ -443,7 +443,7 @@ export default function GuestList({
           {/* Filters panel */}
           {showFiltersPanel && (
             <div className="p-4 bg-gray-50 rounded-lg space-y-3">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {/* Category filter */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -505,6 +505,102 @@ export default function GuestList({
                     <option value="">Všichni</option>
                     <option value="true">S doprovodem</option>
                     <option value="false">Bez doprovodu</option>
+                  </select>
+                </div>
+
+                {/* Children filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Děti
+                  </label>
+                  <select
+                    value={filters.hasChildren === undefined ? '' : filters.hasChildren.toString()}
+                    onChange={(e) => setFilters(prev => ({
+                      ...prev,
+                      hasChildren: e.target.value === '' ? undefined : e.target.value === 'true'
+                    }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="">Všichni</option>
+                    <option value="true">S dětmi</option>
+                    <option value="false">Bez dětí</option>
+                  </select>
+                </div>
+
+                {/* Dietary restrictions filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Stravovací omezení
+                  </label>
+                  <select
+                    value={filters.hasDietaryRestrictions === undefined ? '' : filters.hasDietaryRestrictions.toString()}
+                    onChange={(e) => setFilters(prev => ({
+                      ...prev,
+                      hasDietaryRestrictions: e.target.value === '' ? undefined : e.target.value === 'true'
+                    }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="">Všichni</option>
+                    <option value="true">Má omezení</option>
+                    <option value="false">Bez omezení</option>
+                  </select>
+                </div>
+
+                {/* Accommodation interest filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Ubytování
+                  </label>
+                  <select
+                    value={filters.accommodationInterest?.[0] || ''}
+                    onChange={(e) => setFilters(prev => ({
+                      ...prev,
+                      accommodationInterest: e.target.value ? [e.target.value as any] : undefined
+                    }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="">Všichni</option>
+                    <option value="interested">Má zájem</option>
+                    <option value="not_interested">Nemá zájem</option>
+                  </select>
+                </div>
+
+                {/* Accommodation payment filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Platba ubytování
+                  </label>
+                  <select
+                    value={filters.accommodationPayment?.[0] || ''}
+                    onChange={(e) => setFilters(prev => ({
+                      ...prev,
+                      accommodationPayment: e.target.value ? [e.target.value as any] : undefined
+                    }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="">Všechny</option>
+                    <option value="paid_by_guest">Platí host</option>
+                    <option value="paid_by_couple">Platí novomanželé</option>
+                    <option value="sponsored">Sponzorováno</option>
+                  </select>
+                </div>
+
+                {/* Invitation method filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Způsob pozvánky
+                  </label>
+                  <select
+                    value={filters.invitationMethod?.[0] || ''}
+                    onChange={(e) => setFilters(prev => ({
+                      ...prev,
+                      invitationMethod: e.target.value ? [e.target.value as any] : undefined
+                    }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="">Všechny</option>
+                    <option value="sent">Odeslané</option>
+                    <option value="delivered_personally">Předané osobně</option>
                   </select>
                 </div>
               </div>

@@ -77,8 +77,8 @@ export interface Guest {
   notes?: string
 
   // Accommodation
-  hasAccommodation: boolean
-  accommodationType?: 'single' | 'double' | 'suite' | 'family' // Typ pokoje
+  accommodationInterest?: 'interested' | 'not_interested' // Zájem o ubytování
+  accommodationType?: string // Volný text pro typ ubytování
   accommodationPayment?: 'paid_by_guest' | 'paid_by_couple' | 'sponsored' // Způsob platby
 
   // Tracking
@@ -177,12 +177,13 @@ export interface GuestFilters {
   rsvpStatus?: RSVPStatus[]
   invitationType?: InvitationType[]
   hasPlusOne?: boolean
+  hasChildren?: boolean
   dietaryRestrictions?: DietaryRestriction[]
-  hasAccommodation?: boolean
-  accommodationType?: 'single' | 'double' | 'suite' | 'family'
-  accommodationPayment?: 'paid_by_guest' | 'paid_by_couple' | 'sponsored'
+  hasDietaryRestrictions?: boolean
+  accommodationInterest?: ('interested' | 'not_interested')[]
+  accommodationPayment?: ('paid_by_guest' | 'paid_by_couple' | 'sponsored')[]
   invitationSent?: boolean
-  invitationMethod?: 'sent' | 'delivered_personally'
+  invitationMethod?: ('sent' | 'delivered_personally')[]
   groupId?: string
 }
 
@@ -213,8 +214,8 @@ export interface GuestFormData {
   preferredContactMethod: 'email' | 'phone' | 'mail'
   language: 'cs' | 'en' | 'sk' | 'de'
   notes?: string
-  hasAccommodation?: boolean
-  accommodationType?: 'single' | 'double' | 'suite' | 'family'
+  accommodationInterest?: 'interested' | 'not_interested'
+  accommodationType?: string
   accommodationPayment?: 'paid_by_guest' | 'paid_by_couple' | 'sponsored'
   invitationSent?: boolean
   invitationMethod?: 'sent' | 'delivered_personally'

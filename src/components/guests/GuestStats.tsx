@@ -56,14 +56,11 @@ export default function GuestStats({
   const totalInvitationsSent = invitationsSent + invitationsDeliveredPersonally
 
   // Accommodation statistics
-  const guestsWithAccommodation = guests.filter(g => g.hasAccommodation).length
-  const singleRooms = guests.filter(g => g.hasAccommodation && g.accommodationType === 'single').length
-  const doubleRooms = guests.filter(g => g.hasAccommodation && g.accommodationType === 'double').length
-  const suites = guests.filter(g => g.hasAccommodation && g.accommodationType === 'suite').length
-  const familyRooms = guests.filter(g => g.hasAccommodation && g.accommodationType === 'family').length
-  const paidByGuest = guests.filter(g => g.hasAccommodation && g.accommodationPayment === 'paid_by_guest').length
-  const paidByCouple = guests.filter(g => g.hasAccommodation && g.accommodationPayment === 'paid_by_couple').length
-  const sponsored = guests.filter(g => g.hasAccommodation && g.accommodationPayment === 'sponsored').length
+  const guestsInterestedInAccommodation = guests.filter(g => g.accommodationInterest === 'interested').length
+  const guestsNotInterestedInAccommodation = guests.filter(g => g.accommodationInterest === 'not_interested').length
+  const paidByGuest = guests.filter(g => g.accommodationInterest === 'interested' && g.accommodationPayment === 'paid_by_guest').length
+  const paidByCouple = guests.filter(g => g.accommodationInterest === 'interested' && g.accommodationPayment === 'paid_by_couple').length
+  const sponsored = guests.filter(g => g.accommodationInterest === 'interested' && g.accommodationPayment === 'sponsored').length
 
   // Get response rate color
   const getResponseRateColor = (rate: number) => {
@@ -282,24 +279,24 @@ export default function GuestStats({
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-gray-700">Celkem ubytováno</span>
-              <span className="font-medium">{guestsWithAccommodation}</span>
+              <span className="text-gray-700">Má zájem o ubytování</span>
+              <span className="font-medium">{guestsInterestedInAccommodation}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-700">Dvoulůžkové pokoje</span>
-              <span className="font-medium">{doubleRooms}</span>
+              <span className="text-gray-700">Nemá zájem</span>
+              <span className="font-medium">{guestsNotInterestedInAccommodation}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-700">Apartmány</span>
-              <span className="font-medium">{suites}</span>
+              <span className="text-gray-700">Platí host</span>
+              <span className="font-medium">{paidByGuest}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-700">Jednolůžkové pokoje</span>
-              <span className="font-medium">{singleRooms}</span>
+              <span className="text-gray-700">Platí novomanželé</span>
+              <span className="font-medium">{paidByCouple}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-700">Rodinné pokoje</span>
-              <span className="font-medium">{familyRooms}</span>
+              <span className="text-gray-700">Sponzorováno</span>
+              <span className="font-medium">{sponsored}</span>
             </div>
           </div>
         </div>

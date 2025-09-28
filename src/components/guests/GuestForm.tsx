@@ -50,8 +50,8 @@ export default function GuestForm({
     preferredContactMethod: initialData?.preferredContactMethod || 'email',
     language: initialData?.language || 'cs',
     notes: initialData?.notes || '',
-    hasAccommodation: initialData?.hasAccommodation || false,
-    accommodationType: initialData?.accommodationType || 'double',
+    accommodationInterest: initialData?.accommodationInterest || 'not_interested',
+    accommodationType: initialData?.accommodationType || '',
     accommodationPayment: initialData?.accommodationPayment || 'paid_by_guest',
     invitationSent: initialData?.invitationSent || false,
     invitationMethod: initialData?.invitationMethod || 'sent'
@@ -515,76 +515,53 @@ export default function GuestForm({
             </h3>
 
             <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <input
-                  type="checkbox"
-                  id="hasAccommodation"
-                  checked={formData.hasAccommodation}
-                  onChange={(e) => handleChange('hasAccommodation', e.target.checked)}
-                  className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 focus:ring-2"
-                  disabled={loading}
-                />
-                <label htmlFor="hasAccommodation" className="text-sm font-medium text-gray-700">
-                  Ubytování zajištěno
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Zájem o ubytování
                 </label>
+                <div className="space-y-2">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="accommodationInterest"
+                      value="interested"
+                      checked={formData.accommodationInterest === 'interested'}
+                      onChange={(e) => handleChange('accommodationInterest', e.target.value)}
+                      className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500 focus:ring-2"
+                      disabled={loading}
+                    />
+                    <span className="ml-2 text-sm text-gray-700">Má zájem o ubytování</span>
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="accommodationInterest"
+                      value="not_interested"
+                      checked={formData.accommodationInterest === 'not_interested'}
+                      onChange={(e) => handleChange('accommodationInterest', e.target.value)}
+                      className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500 focus:ring-2"
+                      disabled={loading}
+                    />
+                    <span className="ml-2 text-gray-700">Nemá zájem o ubytování</span>
+                  </label>
+                </div>
               </div>
 
-              {formData.hasAccommodation && (
-                <div className="ml-7 space-y-4">
+              {formData.accommodationInterest === 'interested' && (
+                <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Typ pokoje
+                    <label htmlFor="accommodationType" className="block text-sm font-medium text-gray-700 mb-2">
+                      Typ ubytování
                     </label>
-                    <div className="space-y-2">
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          name="accommodationType"
-                          value="single"
-                          checked={formData.accommodationType === 'single'}
-                          onChange={(e) => handleChange('accommodationType', e.target.value)}
-                          className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500 focus:ring-2"
-                          disabled={loading}
-                        />
-                        <span className="ml-2 text-sm text-gray-700">Jednolůžkový pokoj</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          name="accommodationType"
-                          value="double"
-                          checked={formData.accommodationType === 'double'}
-                          onChange={(e) => handleChange('accommodationType', e.target.value)}
-                          className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500 focus:ring-2"
-                          disabled={loading}
-                        />
-                        <span className="ml-2 text-sm text-gray-700">Dvoulůžkový pokoj</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          name="accommodationType"
-                          value="suite"
-                          checked={formData.accommodationType === 'suite'}
-                          onChange={(e) => handleChange('accommodationType', e.target.value)}
-                          className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500 focus:ring-2"
-                          disabled={loading}
-                        />
-                        <span className="ml-2 text-sm text-gray-700">Apartmán</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          name="accommodationType"
-                          value="family"
-                          checked={formData.accommodationType === 'family'}
-                          onChange={(e) => handleChange('accommodationType', e.target.value)}
-                          className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500 focus:ring-2"
-                          disabled={loading}
-                        />
-                        <span className="ml-2 text-sm text-gray-700">Rodinný pokoj</span>
-                      </label>
-                    </div>
+                    <input
+                      type="text"
+                      id="accommodationType"
+                      value={formData.accommodationType}
+                      onChange={(e) => handleChange('accommodationType', e.target.value)}
+                      placeholder="např. dvoulůžkový pokoj, apartmán, rodinný pokoj..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+                      disabled={loading}
+                    />
                   </div>
 
                   <div>

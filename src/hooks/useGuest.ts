@@ -83,7 +83,7 @@ export function useGuest(isActive: boolean = true): UseGuestReturn {
       preferredContactMethod: data.preferredContactMethod || 'email',
       language: data.language || 'cs',
       notes: data.notes,
-      hasAccommodation: data.hasAccommodation || false,
+      accommodationInterest: data.accommodationInterest,
       accommodationType: data.accommodationType,
       accommodationPayment: data.accommodationPayment,
       invitationSent: data.invitationSent || false,
@@ -121,7 +121,7 @@ export function useGuest(isActive: boolean = true): UseGuestReturn {
       preferredContactMethod: guest.preferredContactMethod,
       language: guest.language,
       notes: guest.notes || null,
-      hasAccommodation: guest.hasAccommodation,
+      accommodationInterest: guest.accommodationInterest,
       accommodationType: guest.accommodationType,
       accommodationPayment: guest.accommodationPayment,
       invitationSent: guest.invitationSent,
@@ -167,7 +167,7 @@ export function useGuest(isActive: boolean = true): UseGuestReturn {
         preferredContactMethod: data.preferredContactMethod,
         language: data.language,
         notes: data.notes,
-        hasAccommodation: data.hasAccommodation || false,
+        accommodationInterest: data.accommodationInterest || 'not_interested',
         accommodationType: data.accommodationType,
         accommodationPayment: data.accommodationPayment,
         invitationSent: data.invitationSent || false,
@@ -398,7 +398,7 @@ export function useGuest(isActive: boolean = true): UseGuestReturn {
           preferredContactMethod: 'email',
           language: 'cs',
           notes: guestData.notes,
-          hasAccommodation: false,
+          accommodationInterest: 'not_interested',
           invitationSent: false,
           invitationMethod: 'sent'
         }
@@ -428,7 +428,13 @@ export function useGuest(isActive: boolean = true): UseGuestReturn {
       if (filters.rsvpStatus && !filters.rsvpStatus.includes(guest.rsvpStatus)) return false
       if (filters.invitationType && !filters.invitationType.includes(guest.invitationType)) return false
       if (filters.hasPlusOne !== undefined && guest.hasPlusOne !== filters.hasPlusOne) return false
+      if (filters.hasChildren !== undefined && guest.hasChildren !== filters.hasChildren) return false
+      if (filters.hasDietaryRestrictions !== undefined && (guest.dietaryRestrictions.length > 0) !== filters.hasDietaryRestrictions) return false
+      if (filters.dietaryRestrictions && filters.dietaryRestrictions.length > 0 && !filters.dietaryRestrictions.some(dr => guest.dietaryRestrictions.includes(dr))) return false
+      if (filters.accommodationInterest && !filters.accommodationInterest.includes(guest.accommodationInterest || 'not_interested')) return false
+      if (filters.accommodationPayment && guest.accommodationInterest === 'interested' && !filters.accommodationPayment.includes(guest.accommodationPayment || 'paid_by_guest')) return false
       if (filters.invitationSent !== undefined && guest.invitationSent !== filters.invitationSent) return false
+      if (filters.invitationMethod && guest.invitationSent && !filters.invitationMethod.includes(guest.invitationMethod || 'sent')) return false
       return true
     })
   }
@@ -569,8 +575,8 @@ export function useGuest(isActive: boolean = true): UseGuestReturn {
               dietaryRestrictions: [],
               preferredContactMethod: 'email',
               language: 'cs',
-              hasAccommodation: true,
-              accommodationType: 'double',
+              accommodationInterest: 'interested',
+              accommodationType: 'dvoulůžkový pokoj',
               accommodationPayment: 'paid_by_guest',
               invitationSent: true,
               invitationMethod: 'sent',
@@ -601,7 +607,7 @@ export function useGuest(isActive: boolean = true): UseGuestReturn {
               dietaryRestrictions: ['vegetarian'],
               preferredContactMethod: 'email',
               language: 'cs',
-              hasAccommodation: false,
+              accommodationInterest: 'not_interested',
               invitationSent: true,
               invitationMethod: 'delivered_personally',
               invitationSentDate: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
@@ -625,8 +631,8 @@ export function useGuest(isActive: boolean = true): UseGuestReturn {
               dietaryRestrictions: [],
               preferredContactMethod: 'email',
               language: 'cs',
-              hasAccommodation: true,
-              accommodationType: 'suite',
+              accommodationInterest: 'interested',
+              accommodationType: 'apartmán s výhledem',
               accommodationPayment: 'paid_by_couple',
               invitationSent: true,
               invitationMethod: 'sent',
@@ -653,7 +659,7 @@ export function useGuest(isActive: boolean = true): UseGuestReturn {
               dietaryRestrictions: [],
               preferredContactMethod: 'phone',
               language: 'cs',
-              hasAccommodation: false,
+              accommodationInterest: 'not_interested',
               invitationSent: true,
               invitationMethod: 'sent',
               invitationSentDate: new Date(Date.now() - 28 * 24 * 60 * 60 * 1000),
