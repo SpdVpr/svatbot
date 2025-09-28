@@ -23,6 +23,7 @@ import VendorManagementModule from './modules/VendorManagementModule'
 import SeatingPlanModule from './modules/SeatingPlanModule'
 import AIAssistantModule from './modules/AIAssistantModule'
 import AITimelineModule from './modules/AITimelineModule'
+import MoodboardModule from './modules/MoodboardModule'
 
 interface FixedGridDragDropProps {
   onWeddingSettingsClick: () => void
@@ -231,6 +232,8 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridD
         return <AIAssistantModule />
       case 'ai-timeline':
         return <AITimelineModule />
+      case 'moodboard':
+        return <MoodboardModule />
       default:
         return (
           <div className="wedding-card">

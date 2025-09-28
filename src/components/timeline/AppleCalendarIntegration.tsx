@@ -57,7 +57,7 @@ export default function AppleCalendarIntegration({ onSync }: AppleCalendarIntegr
       case 'downloading': return 'Stahuji...'
       case 'success': return 'Staženo!'
       case 'error': return 'Chyba stahování'
-      default: return `Stáhnout do ${calendarAppName}`
+      default: return 'Stáhnout kalendář'
     }
   }
 
@@ -90,17 +90,13 @@ export default function AppleCalendarIntegration({ onSync }: AppleCalendarIntegr
     <div className="bg-white rounded-lg border border-gray-200 p-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-3">
-          <div className={`p-2 rounded-lg ${isApple ? 'bg-gray-100' : 'bg-blue-100'}`}>
-            {isApple ? (
-              <Smartphone className="w-5 h-5 text-gray-600" />
-            ) : (
-              <Monitor className="w-5 h-5 text-blue-600" />
-            )}
+          <div className="p-2 rounded-lg bg-blue-100">
+            <Calendar className="w-5 h-5 text-blue-600" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">{calendarAppName}</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Stáhnout kalendář</h3>
             <p className="text-sm text-gray-600">
-              Stáhnout kalendář (.ics soubor)
+              (.ics soubor)
             </p>
           </div>
         </div>
@@ -129,7 +125,7 @@ export default function AppleCalendarIntegration({ onSync }: AppleCalendarIntegr
             <div>
               <p className="font-medium text-blue-900">Univerzální kompatibilita</p>
               <p className="text-sm text-blue-700 mt-1">
-                iCal soubory fungují s Apple Calendar, Google Calendar, Outlook a většinou ostatních kalendářových aplikací.
+                Funguje s Apple Calendar, Google Calendar, Outlook, Thunderbird a většinou ostatních kalendářových aplikací.
               </p>
             </div>
           </div>
@@ -167,17 +163,7 @@ export default function AppleCalendarIntegration({ onSync }: AppleCalendarIntegr
           </ol>
         </div>
 
-        {isApple && (
-          <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
-            <div className="flex items-center space-x-2">
-              <Smartphone className="w-4 h-4 text-gray-600" />
-              <span className="text-sm font-medium text-gray-900">Apple zařízení detekováno</span>
-            </div>
-            <p className="text-sm text-gray-600 mt-1">
-              Soubor se automaticky otevře v Apple Calendar aplikaci.
-            </p>
-          </div>
-        )}
+
       </div>
     </div>
   )
