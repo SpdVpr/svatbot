@@ -13,10 +13,26 @@ interface TimelineEvent {
   type: string
   location?: string
   description?: string
+  date?: Date
+}
+
+interface Milestone {
+  id: string
+  title: string
+  description?: string
+  type: string
+  targetDate?: Date
+  priority: 'low' | 'medium' | 'high' | 'critical'
+  isRequired: boolean
+  reminderDays?: number[]
+  notes?: string
+  tags?: string[]
+  dependsOn?: string[]
 }
 
 interface TimelineCalendarProps {
   events: TimelineEvent[]
+  milestones?: Milestone[]
   weddingDate?: string
   onEventClick?: (event: TimelineEvent) => void
 }
@@ -29,7 +45,7 @@ const eventTypeColors = {
   other: 'bg-gray-100 text-gray-800 border-gray-200'
 }
 
-export default function TimelineCalendar({ events, weddingDate, onEventClick }: TimelineCalendarProps) {
+export default function TimelineCalendar({ events, milestones, weddingDate, onEventClick }: TimelineCalendarProps) {
   const [currentDate, setCurrentDate] = useState(() => {
     if (weddingDate) {
       return new Date(weddingDate)
@@ -41,17 +57,39 @@ export default function TimelineCalendar({ events, weddingDate, onEventClick }: 
   const monthEnd = endOfMonth(currentDate)
   const calendarDays = eachDayOfInterval({ start: monthStart, end: monthEnd })
 
-  // Group events by date (assuming all events are on wedding day)
+  // Group events by their actual dates
   const eventsByDate = useMemo(() => {
     const grouped: { [key: string]: TimelineEvent[] } = {}
-    
-    if (weddingDate && events) {
-      const dateKey = format(new Date(weddingDate), 'yyyy-MM-dd')
-      grouped[dateKey] = events
+
+    if (milestones && milestones.length > 0) {
+      milestones.forEach(milestone => {
+        if (milestone.targetDate) {
+          const eventDate = new Date(milestone.targetDate)
+          const dateKey = format(eventDate, 'yyyy-MM-dd')
+
+          if (!grouped[dateKey]) {
+            grouped[dateKey] = []
+          }
+
+          // Create event from milestone
+          const event: TimelineEvent = {
+            id: milestone.id,
+            title: milestone.title,
+            startTime: eventDate.toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' }),
+            endTime: new Date(eventDate.getTime() + 60*60*1000).toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' }),
+            type: milestone.type,
+            location: '',
+            description: milestone.description,
+            date: eventDate
+          }
+
+          grouped[dateKey].push(event)
+        }
+      })
     }
-    
+
     return grouped
-  }, [events, weddingDate])
+  }, [milestones])
 
   const getEventsForDay = (day: Date) => {
     const dateKey = format(day, 'yyyy-MM-dd')

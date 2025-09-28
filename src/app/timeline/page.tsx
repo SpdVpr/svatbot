@@ -10,6 +10,7 @@ import MilestoneForm from '@/components/timeline/MilestoneForm'
 import TimelineTemplates from '@/components/timeline/TimelineTemplates'
 import TimelineCalendar from '@/components/timeline/TimelineCalendar'
 import GoogleCalendarIntegration from '@/components/timeline/GoogleCalendarIntegration'
+import AppleCalendarIntegration from '@/components/timeline/AppleCalendarIntegration'
 import { MilestoneFormData, Milestone, TimelineTemplate } from '@/types/timeline'
 import {
   Plus,
@@ -347,8 +348,10 @@ export default function TimelinePage() {
                   endTime: milestone.targetDate ? new Date(new Date(milestone.targetDate).getTime() + 60*60*1000).toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' }) : '10:00',
                   type: milestone.type,
                   location: '',
-                  description: milestone.description
+                  description: milestone.description,
+                  date: milestone.targetDate ? new Date(milestone.targetDate) : new Date()
                 }))}
+                milestones={milestones}
                 weddingDate={wedding?.weddingDate?.toISOString()}
                 onEventClick={(event) => {
                   const milestone = milestones.find(m => m.id === event.id)
@@ -358,12 +361,22 @@ export default function TimelinePage() {
                 }}
               />
 
-              {/* Google Calendar Integration */}
-              <GoogleCalendarIntegration
-                onSync={() => {
-                  console.log('Calendar sync completed')
-                }}
-              />
+              {/* Calendar Integration */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">Kalendářová integrace</h3>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <GoogleCalendarIntegration
+                    onSync={() => {
+                      console.log('Google Calendar sync completed')
+                    }}
+                  />
+                  <AppleCalendarIntegration
+                    onSync={() => {
+                      console.log('Apple Calendar sync completed')
+                    }}
+                  />
+                </div>
+              </div>
             </div>
 
 
