@@ -66,12 +66,9 @@ class MicrosoftCalendarService {
     try {
       const clientId = process.env.NEXT_PUBLIC_MICROSOFT_CLIENT_ID
 
-      // Demo mode for testing
+      // Check if Microsoft Graph API is properly configured
       if (!clientId || clientId === 'demo_microsoft_client_id') {
-        console.log('Demo mode: Simulating Microsoft Calendar connection')
-        this.accessToken = 'demo_access_token'
-        localStorage.setItem('microsoft_calendar_access_token', 'demo_access_token')
-        return true
+        throw new Error('Microsoft Calendar API není nakonfigurováno. Kontaktujte administrátora pro nastavení API klíčů.')
       }
 
       // Check if we have valid tokens
@@ -84,7 +81,7 @@ class MicrosoftCalendarService {
       return await this.startOAuthFlow()
     } catch (error) {
       console.error('Microsoft Calendar auth error:', error)
-      return false
+      throw error
     }
   }
 

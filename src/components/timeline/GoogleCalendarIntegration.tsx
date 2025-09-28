@@ -120,18 +120,41 @@ export default function GoogleCalendarIntegration({ onSync }: GoogleCalendarInte
             <p className="text-gray-600 mb-6">
               Synchronizujte své svatební události s Google Calendar pro lepší přehled a připomínky.
             </p>
-            <button
-              onClick={handleConnect}
-              disabled={isLoading}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <ExternalLink className="w-4 h-4 mr-2" />
-              )}
-              {isLoading ? 'Připojuji...' : 'Připojit Google Calendar'}
-            </button>
+
+            {error && error.includes('není nakonfigurováno') ? (
+              <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="flex items-start space-x-3">
+                  <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
+                  <div className="text-left">
+                    <p className="font-medium text-yellow-900 mb-2">Google Calendar API není nakonfigurováno</p>
+                    <p className="text-sm text-yellow-800 mb-3">
+                      Pro funkční synchronizaci s Google Calendar je potřeba nastavit API klíče.
+                      Mezitím můžete použít Apple Calendar export.
+                    </p>
+                    <div className="text-xs text-yellow-700">
+                      <p className="font-medium mb-1">Pro administrátory:</p>
+                      <p>1. Vytvořte projekt v Google Cloud Console</p>
+                      <p>2. Povolte Calendar API</p>
+                      <p>3. Vytvořte OAuth 2.0 credentials</p>
+                      <p>4. Nastavte NEXT_PUBLIC_GOOGLE_CLIENT_ID</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={handleConnect}
+                disabled={isLoading}
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? (
+                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                )}
+                {isLoading ? 'Připojuji...' : 'Připojit Google Calendar'}
+              </button>
+            )}
           </div>
         ) : (
           <div className="space-y-4">
