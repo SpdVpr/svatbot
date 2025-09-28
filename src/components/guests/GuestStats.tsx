@@ -60,7 +60,7 @@ export default function GuestStats({
   const guestsNotInterestedInAccommodation = guests.filter(g => g.accommodationInterest === 'not_interested').length
   const paidByGuest = guests.filter(g => g.accommodationInterest === 'interested' && g.accommodationPayment === 'paid_by_guest').length
   const paidByCouple = guests.filter(g => g.accommodationInterest === 'interested' && g.accommodationPayment === 'paid_by_couple').length
-  const sponsored = guests.filter(g => g.accommodationInterest === 'interested' && g.accommodationPayment === 'sponsored').length
+
 
   // Get response rate color
   const getResponseRateColor = (rate: number) => {
@@ -294,10 +294,7 @@ export default function GuestStats({
               <span className="text-gray-700">Platí novomanželé</span>
               <span className="font-medium">{paidByCouple}</span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-700">Sponzorováno</span>
-              <span className="font-medium">{sponsored}</span>
-            </div>
+
           </div>
         </div>
 

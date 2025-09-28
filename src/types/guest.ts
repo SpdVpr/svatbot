@@ -79,7 +79,7 @@ export interface Guest {
   // Accommodation
   accommodationInterest?: 'interested' | 'not_interested' // Zájem o ubytování
   accommodationType?: string // Volný text pro typ ubytování
-  accommodationPayment?: 'paid_by_guest' | 'paid_by_couple' | 'sponsored' // Způsob platby
+  accommodationPayment?: 'paid_by_guest' | 'paid_by_couple' // Způsob platby
 
   // Tracking
   invitationSent: boolean
@@ -181,7 +181,7 @@ export interface GuestFilters {
   dietaryRestrictions?: DietaryRestriction[]
   hasDietaryRestrictions?: boolean
   accommodationInterest?: ('interested' | 'not_interested')[]
-  accommodationPayment?: ('paid_by_guest' | 'paid_by_couple' | 'sponsored')[]
+  accommodationPayment?: ('paid_by_guest' | 'paid_by_couple')[]
   invitationSent?: boolean
   invitationMethod?: ('sent' | 'delivered_personally')[]
   groupId?: string
@@ -216,7 +216,7 @@ export interface GuestFormData {
   notes?: string
   accommodationInterest?: 'interested' | 'not_interested'
   accommodationType?: string
-  accommodationPayment?: 'paid_by_guest' | 'paid_by_couple' | 'sponsored'
+  accommodationPayment?: 'paid_by_guest' | 'paid_by_couple'
   invitationSent?: boolean
   invitationMethod?: 'sent' | 'delivered_personally'
 }

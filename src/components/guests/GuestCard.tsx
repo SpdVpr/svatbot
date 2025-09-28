@@ -253,8 +253,8 @@ export default function GuestCard({
         )}
 
         {/* Invitation status */}
-        {guest.invitationSent && (
-          <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1">
+          {guest.invitationSent && (
             <span
               className={`text-xs px-2 py-1 rounded-full ${
                 guest.invitationMethod === 'sent'
@@ -264,8 +264,13 @@ export default function GuestCard({
             >
               {guest.invitationMethod === 'sent' ? 'Pozvánka odeslána' : 'Pozvánka předána'}
             </span>
-          </div>
-        )}
+          )}
+          {guest.accommodationInterest === 'interested' && guest.accommodationType && (
+            <span className="text-xs px-2 py-1 rounded-full bg-orange-100 text-orange-700">
+              🏨 {guest.accommodationType}
+            </span>
+          )}
+        </div>
 
 
 

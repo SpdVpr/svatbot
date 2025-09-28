@@ -581,7 +581,7 @@ export default function GuestList({
                     <option value="">Všechny</option>
                     <option value="paid_by_guest">Platí host</option>
                     <option value="paid_by_couple">Platí novomanželé</option>
-                    <option value="sponsored">Sponzorováno</option>
+
                   </select>
                 </div>
 
@@ -784,8 +784,8 @@ export default function GuestList({
                         )}
 
                         {/* Invitation status */}
-                        {guest.invitationSent && (
-                          <div className="flex flex-wrap gap-1 mb-2">
+                        <div className="flex flex-wrap gap-1 mb-2">
+                          {guest.invitationSent && (
                             <span
                               className={`text-xs px-2 py-1 rounded-full ${
                                 guest.invitationMethod === 'sent'
@@ -795,8 +795,13 @@ export default function GuestList({
                             >
                               {guest.invitationMethod === 'sent' ? 'Pozvánka odeslána' : 'Pozvánka předána'}
                             </span>
-                          </div>
-                        )}
+                          )}
+                          {guest.accommodationInterest === 'interested' && guest.accommodationType && (
+                            <span className="text-xs px-2 py-1 rounded-full bg-orange-100 text-orange-700">
+                              🏨 {guest.accommodationType}
+                            </span>
+                          )}
+                        </div>
 
 
                       </div>
