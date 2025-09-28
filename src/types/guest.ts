@@ -75,11 +75,11 @@ export interface Guest {
 
   // Internal notes
   notes?: string
-  tags: string[] // Custom tags for organization
 
   // Tracking
   invitationSent: boolean
   invitationSentDate?: Date
+  invitationMethod?: 'sent' | 'delivered_personally' // Způsob doručení pozvánky
   reminderSent: boolean
   reminderSentDate?: Date
 
@@ -174,7 +174,7 @@ export interface GuestFilters {
   hasPlusOne?: boolean
   dietaryRestrictions?: DietaryRestriction[]
   invitationSent?: boolean
-  tags?: string[]
+  invitationMethod?: 'sent' | 'delivered_personally'
   groupId?: string
 }
 
@@ -205,7 +205,8 @@ export interface GuestFormData {
   preferredContactMethod: 'email' | 'phone' | 'mail'
   language: 'cs' | 'en' | 'sk' | 'de'
   notes?: string
-  tags: string[]
+  invitationSent?: boolean
+  invitationMethod?: 'sent' | 'delivered_personally'
 }
 
 export interface BulkGuestOperation {

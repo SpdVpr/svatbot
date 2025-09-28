@@ -272,24 +272,7 @@ export default function GuestCard({
           </div>
         )}
 
-        {/* Tags */}
-        {guest.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {guest.tags.slice(0, 2).map((tag) => (
-              <span
-                key={tag}
-                className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"
-              >
-                {tag}
-              </span>
-            ))}
-            {guest.tags.length > 2 && (
-              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-                +{guest.tags.length - 2}
-              </span>
-            )}
-          </div>
-        )}
+
 
         {/* RSVP Quick Actions */}
         <div className="flex items-center justify-between pt-2 border-t border-gray-100">

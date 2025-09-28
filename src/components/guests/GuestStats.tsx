@@ -49,6 +49,11 @@ export default function GuestStats({
   const guestsWithContact = guests.filter(g => g.email || g.phone).length
   const guestsWithDietaryRestrictions = guests.filter(g => g.dietaryRestrictions.length > 0).length
 
+  // Invitation statistics
+  const invitationsSent = guests.filter(g => g.invitationSent && g.invitationMethod === 'sent').length
+  const invitationsDeliveredPersonally = guests.filter(g => g.invitationSent && g.invitationMethod === 'delivered_personally').length
+  const totalInvitationsSent = invitationsSent + invitationsDeliveredPersonally
+
   // Get response rate color
   const getResponseRateColor = (rate: number) => {
     if (rate >= 80) return 'text-green-600 bg-green-100'
@@ -309,9 +314,25 @@ export default function GuestStats({
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Mail className="w-4 h-4 text-purple-500" />
-                <span className="text-gray-700">Pozvánky odeslány</span>
+                <span className="text-gray-700">Pozvánky celkem</span>
               </div>
-              <span className="font-medium">{stats.invited}</span>
+              <span className="font-medium">{totalInvitationsSent}</span>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Mail className="w-4 h-4 text-blue-500" />
+                <span className="text-gray-700">Odeslané</span>
+              </div>
+              <span className="font-medium">{invitationsSent}</span>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <UserPlus className="w-4 h-4 text-green-500" />
+                <span className="text-gray-700">Předané osobně</span>
+              </div>
+              <span className="font-medium">{invitationsDeliveredPersonally}</span>
             </div>
           </div>
         </div>

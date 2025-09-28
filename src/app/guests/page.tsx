@@ -379,7 +379,8 @@ export default function GuestsPage() {
             preferredContactMethod: editingGuest.preferredContactMethod,
             language: editingGuest.language,
             notes: editingGuest.notes,
-            tags: editingGuest.tags
+            invitationSent: editingGuest.invitationSent,
+            invitationMethod: editingGuest.invitationMethod
           } : undefined}
         />
       )}

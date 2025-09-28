@@ -11,7 +11,6 @@ import {
   Users,
   Calendar,
   Utensils,
-  Tag,
   AlertCircle,
   Plus,
   Minus
@@ -51,12 +50,12 @@ export default function GuestForm({
     preferredContactMethod: initialData?.preferredContactMethod || 'email',
     language: initialData?.language || 'cs',
     notes: initialData?.notes || '',
-    tags: initialData?.tags || []
+    invitationSent: initialData?.invitationSent || false,
+    invitationMethod: initialData?.invitationMethod || 'sent'
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [showAddress, setShowAddress] = useState(!!initialData?.address)
-  const [newTag, setNewTag] = useState('')
 
   // Category options
   const categoryOptions = [
@@ -159,18 +158,7 @@ export default function GuestForm({
     handleChange('dietaryRestrictions', updated)
   }
 
-  // Add tag
-  const addTag = () => {
-    if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
-      handleChange('tags', [...formData.tags, newTag.trim()])
-      setNewTag('')
-    }
-  }
 
-  // Remove tag
-  const removeTag = (tagToRemove: string) => {
-    handleChange('tags', formData.tags.filter(tag => tag !== tagToRemove))
-  }
 
   // Add child
   const addChild = () => {
@@ -513,49 +501,65 @@ export default function GuestForm({
             )}
           </div>
 
-          {/* Tags */}
+          {/* Invitation Status */}
           <div>
             <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center space-x-2">
-              <Tag className="w-5 h-5" />
-              <span>Štítky</span>
+              <Mail className="w-5 h-5" />
+              <span>Pozvánka</span>
             </h3>
 
-            <div className="flex flex-wrap gap-2 mb-3">
-              {formData.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-primary-100 text-primary-700"
-                >
-                  {tag}
-                  <button
-                    type="button"
-                    onClick={() => removeTag(tag)}
-                    className="ml-2 hover:text-primary-900"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              ))}
-            </div>
+            <div className="space-y-4">
+              <div className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  id="invitationSent"
+                  checked={formData.invitationSent}
+                  onChange={(e) => handleChange('invitationSent', e.target.checked)}
+                  className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 focus:ring-2"
+                  disabled={loading}
+                />
+                <label htmlFor="invitationSent" className="text-sm font-medium text-gray-700">
+                  Pozvánka byla doručena
+                </label>
+              </div>
 
-            <div className="flex space-x-2">
-              <input
-                type="text"
-                value={newTag}
-                onChange={(e) => setNewTag(e.target.value)}
-                placeholder="Přidat štítek..."
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                disabled={loading}
-              />
-              <button
-                type="button"
-                onClick={addTag}
-                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-500 transition-colors"
-                disabled={loading}
-              >
-                <Plus className="w-4 h-4" />
-              </button>
+              {formData.invitationSent && (
+                <div className="ml-7 space-y-2">
+                  <p className="text-sm text-gray-600 mb-2">Způsob doručení:</p>
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        id="sent"
+                        name="invitationMethod"
+                        value="sent"
+                        checked={formData.invitationMethod === 'sent'}
+                        onChange={(e) => handleChange('invitationMethod', e.target.value as 'sent' | 'delivered_personally')}
+                        className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500 focus:ring-2"
+                        disabled={loading}
+                      />
+                      <label htmlFor="sent" className="text-sm text-gray-700">
+                        Odeslána (email/pošta)
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        id="delivered_personally"
+                        name="invitationMethod"
+                        value="delivered_personally"
+                        checked={formData.invitationMethod === 'delivered_personally'}
+                        onChange={(e) => handleChange('invitationMethod', e.target.value as 'sent' | 'delivered_personally')}
+                        className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500 focus:ring-2"
+                        disabled={loading}
+                      />
+                      <label htmlFor="delivered_personally" className="text-sm text-gray-700">
+                        Předána osobně
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

@@ -703,19 +703,7 @@ export default function GuestList({
                           </div>
                         )}
 
-                        {/* Tags */}
-                        {guest.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-1">
-                            {guest.tags.map((tag) => (
-                              <span
-                                key={tag}
-                                className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        )}
+
                       </div>
 
                       {/* Actions */}
