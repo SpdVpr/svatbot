@@ -11,7 +11,6 @@ import TimelineTemplates from '@/components/timeline/TimelineTemplates'
 import TimelineCalendar from '@/components/timeline/TimelineCalendar'
 import GoogleCalendarIntegration from '@/components/timeline/GoogleCalendarIntegration'
 import AppleCalendarIntegration from '@/components/timeline/AppleCalendarIntegration'
-import MicrosoftCalendarIntegration from '@/components/timeline/MicrosoftCalendarIntegration'
 import { MilestoneFormData, Milestone, TimelineTemplate } from '@/types/timeline'
 import {
   Plus,
@@ -365,15 +364,10 @@ export default function TimelinePage() {
               {/* Calendar Integration */}
               <div className="bg-white rounded-lg border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-6">Kalendářová integrace</h3>
-                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <GoogleCalendarIntegration
                     onSync={() => {
                       console.log('Google Calendar sync completed')
-                    }}
-                  />
-                  <MicrosoftCalendarIntegration
-                    onSync={() => {
-                      console.log('Microsoft Calendar sync completed')
                     }}
                   />
                   <AppleCalendarIntegration

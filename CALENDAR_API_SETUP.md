@@ -1,6 +1,6 @@
 # Nastavení Calendar API pro SvatBot
 
-Tento dokument popisuje, jak nastavit Google Calendar a Microsoft Calendar API pro funkční synchronizaci kalendářů.
+Tento dokument popisuje, jak nastavit Google Calendar API pro funkční synchronizaci kalendářů a jak používat Apple Calendar (.ics) export.
 
 ## 🔧 Google Calendar API Setup
 
@@ -36,42 +36,28 @@ NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_actual_client_id_here
 GOOGLE_CLIENT_SECRET=your_actual_client_secret_here
 ```
 
-## 🔧 Microsoft Calendar API Setup
+## 📱 Apple Calendar (.ics Export)
 
-### Krok 1: Vytvořte Azure App Registration
+Apple Calendar integrace funguje pomocí univerzálního .ics formátu, který je kompatibilní s:
 
-1. Jděte na [Azure Portal](https://portal.azure.com/)
-2. Vyberte **Azure Active Directory**
-3. Jděte na **App registrations**
-4. Klikněte na **+ New registration**
-5. Nastavte:
-   - **Name:** SvatBot Calendar Integration
-   - **Supported account types:** Accounts in any organizational directory and personal Microsoft accounts
-   - **Redirect URI:** Web - `https://svatbot.cz/api/auth/microsoft/callback`
+- **Apple Calendar** (iPhone, iPad, Mac)
+- **Google Calendar** (import .ics souborů)
+- **Microsoft Outlook** (všechny platformy)
+- **Ostatní kalendářové aplikace**
 
-### Krok 2: Nastavte API Permissions
+### Jak používat:
 
-1. V aplikaci jděte na **API permissions**
-2. Klikněte na **+ Add a permission**
-3. Vyberte **Microsoft Graph**
-4. Vyberte **Delegated permissions**
-5. Přidejte: `Calendars.ReadWrite`
+1. Jděte na `/timeline` stránku
+2. V sekci "Apple Calendar" klikněte na **"Stáhnout do Apple Calendar"**
+3. Stáhne se .ics soubor s všemi milníky
+4. Otevřete soubor - automaticky se přidá do vašeho kalendáře
 
-### Krok 3: Vytvořte Client Secret
+### Výhody .ics exportu:
 
-1. Jděte na **Certificates & secrets**
-2. Klikněte na **+ New client secret**
-3. Nastavte popis a expiraci
-4. Zkopírujte hodnotu (zobrazí se pouze jednou!)
-
-### Krok 4: Aktualizujte Environment Variables
-
-V `.env.local` nastavte:
-
-```env
-NEXT_PUBLIC_MICROSOFT_CLIENT_ID=your_actual_client_id_here
-MICROSOFT_CLIENT_SECRET=your_actual_client_secret_here
-```
+- ✅ **Žádné API klíče** - funguje okamžitě
+- ✅ **Univerzální kompatibilita** - funguje se všemi kalendáři
+- ✅ **Bezpečné** - žádné přihlašování nebo oprávnění
+- ✅ **Offline** - soubor můžete uložit a použít později
 
 ## 🚀 Deployment na Vercel
 
@@ -87,10 +73,6 @@ MICROSOFT_CLIENT_SECRET=your_actual_client_secret_here
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_actual_client_id_here
 GOOGLE_CLIENT_SECRET=your_actual_client_secret_here
 
-# Microsoft Calendar API
-NEXT_PUBLIC_MICROSOFT_CLIENT_ID=your_actual_client_id_here
-MICROSOFT_CLIENT_SECRET=your_actual_client_secret_here
-
 # App URL (pro production)
 NEXT_PUBLIC_APP_URL=https://svatbot.cz
 ```
@@ -101,9 +83,6 @@ Ujistěte se, že máte nastavené správné redirect URIs:
 
 **Google Calendar:**
 - `https://svatbot.cz/api/auth/google/callback`
-
-**Microsoft Calendar:**
-- `https://svatbot.cz/api/auth/microsoft/callback`
 
 ## 🧪 Testování
 
@@ -131,14 +110,15 @@ Ujistěte se, že máte nastavené správné redirect URIs:
   - Zkontrolujte, že Google Calendar API je povoleno
   - Zkontrolujte OAuth consent screen nastavení
 
-### Microsoft Calendar Issues
+### Apple Calendar (.ics) Issues
 
-- **Error: "invalid_client"**
-  - Zkontrolujte Client ID a Client Secret
-  - Zkontrolujte, že redirect URI je správně nastaveno
+- **Soubor se nestáhne**
+  - Zkontrolujte, že máte vytvořené milníky v timeline
+  - Zkontrolujte blokování pop-up oken v prohlížeči
 
-- **Error: "insufficient_scope"**
-  - Zkontrolujte, že `Calendars.ReadWrite` permission je přidáno a schváleno
+- **Soubor se neotevře automaticky**
+  - Ručně otevřete stažený .ics soubor
+  - Nebo importujte soubor přímo v kalendářové aplikaci
 
 ## 📝 Notes
 
