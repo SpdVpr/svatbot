@@ -317,27 +317,7 @@ export default function GuestStats({
         </div>
       </div>
 
-      {/* Categories breakdown */}
-      {Object.keys(stats.byCategory).length > 0 && (
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-            <Users className="w-5 h-5" />
-            <span>Kategorie hostů</span>
-          </h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {Object.entries(stats.byCategory).map(([category, categoryStats]) => {
-              const stats = categoryStats as { total: number; attending: number; declined: number; pending: number }
-              return (
-                <div key={category} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <span className="text-gray-700">{getGuestCategoryLabel(category)}</span>
-                  <span className="font-medium text-gray-900">{stats.total} hostů</span>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      )}
 
       {/* Quick insights */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
