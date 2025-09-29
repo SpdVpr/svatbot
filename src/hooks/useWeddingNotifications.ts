@@ -145,10 +145,12 @@ export function useWeddingNotifications() {
         data: options?.data,
         actionUrl: options?.actionUrl,
         read: false,
-        createdAt: serverTimestamp(),
-        expiresAt: options?.expiresIn 
-          ? new Date(Date.now() + options.expiresIn * 60 * 1000)
-          : undefined
+        createdAt: serverTimestamp()
+      }
+
+      // Only add expiresAt if expiresIn is provided
+      if (options?.expiresIn) {
+        notification.expiresAt = new Date(Date.now() + options.expiresIn * 60 * 1000)
       }
 
       await addDoc(collection(db, 'weddingNotifications'), notification)

@@ -21,12 +21,27 @@ service firebase.storage {
     // Wedding photos and documents
     match /weddings/{weddingId}/{allPaths=**} {
       allow read: if isAuthenticated() &&
-                     exists(/databases/(default)/documents/weddings/$(weddingId)) &&
-                     get(/databases/(default)/documents/weddings/$(weddingId)).data.userId == request.auth.uid;
+                     firestore.exists(/databases/(default)/documents/weddings/$(weddingId)) &&
+                     firestore.get(/databases/(default)/documents/weddings/$(weddingId)).data.userId == request.auth.uid;
       allow write: if isAuthenticated() &&
-                      exists(/databases/(default)/documents/weddings/$(weddingId)) &&
-                      get(/databases/(default)/documents/weddings/$(weddingId)).data.userId == request.auth.uid &&
+                      firestore.exists(/databases/(default)/documents/weddings/$(weddingId)) &&
+                      firestore.get(/databases/(default)/documents/weddings/$(weddingId)).data.userId == request.auth.uid &&
                       request.resource.size < 10 * 1024 * 1024; // 10MB limit
+    }
+
+    // Moodboard images (including thumbnails subfolder)
+    match /moodboards/{weddingId}/{allPaths=**} {
+      allow read: if isAuthenticated() &&
+                     firestore.exists(/databases/(default)/documents/weddings/$(weddingId)) &&
+                     firestore.get(/databases/(default)/documents/weddings/$(weddingId)).data.userId == request.auth.uid;
+      allow write: if isAuthenticated() &&
+                      firestore.exists(/databases/(default)/documents/weddings/$(weddingId)) &&
+                      firestore.get(/databases/(default)/documents/weddings/$(weddingId)).data.userId == request.auth.uid &&
+                      request.resource.size < 10 * 1024 * 1024 && // 10MB limit
+                      request.resource.contentType.matches('image/.*');
+      allow delete: if isAuthenticated() &&
+                       firestore.exists(/databases/(default)/documents/weddings/$(weddingId)) &&
+                       firestore.get(/databases/(default)/documents/weddings/$(weddingId)).data.userId == request.auth.uid;
     }
 
     // Helper function for admin check

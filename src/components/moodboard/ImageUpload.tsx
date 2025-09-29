@@ -3,12 +3,15 @@
 import { useState, useRef } from 'react'
 import { Upload, X, Image as ImageIcon, Plus } from 'lucide-react'
 import Image from 'next/image'
+import { WEDDING_CATEGORIES, WeddingCategory } from '@/hooks/useMoodboard'
+import { formatFileSize } from '@/utils/imageCompression'
 
 interface ImageUploadProps {
   onUpload: (file: File, metadata?: {
     title?: string
     description?: string
     tags?: string[]
+    category?: WeddingCategory
   }) => Promise<any>
   isLoading: boolean
 }
@@ -19,6 +22,7 @@ interface PendingImage {
   title: string
   description: string
   tags: string[]
+  category: WeddingCategory
 }
 
 export default function ImageUpload({ onUpload, isLoading }: ImageUploadProps) {
@@ -44,7 +48,8 @@ export default function ImageUpload({ onUpload, isLoading }: ImageUploadProps) {
       preview: URL.createObjectURL(file),
       title: file.name.replace(/\.[^/.]+$/, ''), // Remove extension
       description: '',
-      tags: []
+      tags: [],
+      category: 'other' as WeddingCategory
     }))
 
     setPendingImages(prev => [...prev, ...newPendingImages])
@@ -93,16 +98,20 @@ export default function ImageUpload({ onUpload, isLoading }: ImageUploadProps) {
 
   const uploadImage = async (pendingImage: PendingImage, index: number) => {
     try {
+      updatePendingImage(index, { isUploading: true })
+
       await onUpload(pendingImage.file, {
         title: pendingImage.title,
         description: pendingImage.description,
-        tags: pendingImage.tags
+        tags: pendingImage.tags,
+        category: pendingImage.category
       })
-      
+
       // Remove from pending after successful upload
       removePendingImage(index)
     } catch (err) {
-      alert('Nepodařilo se nahrát obrázek')
+      updatePendingImage(index, { isUploading: false })
+      alert('Nepodařilo se nahrát obrázek: ' + (err as Error).message)
     }
   }
 
@@ -214,7 +223,10 @@ export default function ImageUpload({ onUpload, isLoading }: ImageUploadProps) {
                   {/* Form */}
                   <div className="flex-1 space-y-3">
                     <div className="flex items-center justify-between">
-                      <h4 className="font-medium text-gray-900">Obrázek {index + 1}</h4>
+                      <div>
+                        <h4 className="font-medium text-gray-900">Obrázek {index + 1}</h4>
+                        <p className="text-sm text-gray-500">{formatFileSize(pendingImage.file.size)}</p>
+                      </div>
                       <button
                         onClick={() => removePendingImage(index)}
                         className="text-gray-400 hover:text-gray-600"
@@ -238,6 +250,24 @@ export default function ImageUpload({ onUpload, isLoading }: ImageUploadProps) {
                       rows={2}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent resize-none"
                     />
+
+                    {/* Category */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Kategorie
+                      </label>
+                      <select
+                        value={pendingImage.category}
+                        onChange={(e) => updatePendingImage(index, { category: e.target.value as WeddingCategory })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                      >
+                        {Object.entries(WEDDING_CATEGORIES).map(([key, category]) => (
+                          <option key={key} value={key}>
+                            {category.icon} {category.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
                     {/* Tags */}
                     <div>

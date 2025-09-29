@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Heart, Image as ImageIcon, Plus, ArrowRight } from 'lucide-react'
+import { Heart, Image as ImageIcon, Plus, ArrowRight, Palette } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useMoodboard } from '@/hooks/useMoodboard'
@@ -46,10 +46,11 @@ export default function MoodboardModule() {
           </p>
           <Link
             href="/moodboard"
-            className="inline-flex items-center px-3 py-2 bg-pink-600 text-white text-sm rounded-lg hover:bg-pink-700 transition-colors"
+            className="btn-primary inline-flex items-center space-x-2"
           >
-            <Plus className="w-4 h-4 mr-2" />
-            Začít vytvářet
+            <Palette className="w-4 h-4" />
+            <span>Spravovat moodboard</span>
+            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       ) : (
@@ -66,12 +67,15 @@ export default function MoodboardModule() {
             </div>
           </div>
 
-          {/* Image Grid Preview */}
+          {/* Image Grid Preview - Moodboard style */}
           <div className="grid grid-cols-3 gap-2">
             {displayImages.map((image, index) => (
               <div
                 key={image.id}
-                className="aspect-square relative rounded-lg overflow-hidden bg-gray-100"
+                className="relative rounded-xl overflow-hidden bg-gray-100 shadow-sm hover:shadow-md transition-shadow"
+                style={{
+                  aspectRatio: index % 3 === 0 ? '1' : index % 3 === 1 ? '4/5' : '5/4'
+                }}
               >
                 <Image
                   src={image.thumbnailUrl || image.url}
@@ -80,46 +84,58 @@ export default function MoodboardModule() {
                   className="object-cover"
                   sizes="(max-width: 768px) 33vw, (max-width: 1024px) 20vw, 15vw"
                 />
+
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
+
                 {image.isFavorite && (
-                  <div className="absolute top-1 right-1">
-                    <Heart className="w-3 h-3 text-pink-600 fill-current" />
+                  <div className="absolute top-2 right-2 bg-pink-500 text-white p-1 rounded-full shadow-lg">
+                    <Heart className="w-2.5 h-2.5 fill-current" />
                   </div>
                 )}
+
+                {/* Source indicator */}
+                <div className="absolute bottom-2 left-2">
+                  {image.source === 'pinterest' && (
+                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                  )}
+                  {image.source === 'upload' && (
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  )}
+                </div>
+
                 {/* Show +X more overlay on last image if there are more */}
                 {index === 5 && totalImages > 6 && (
-                  <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
-                    <span className="text-white text-xs font-medium">
+                  <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center">
+                    <span className="text-white text-sm font-semibold">
                       +{totalImages - 6}
                     </span>
                   </div>
                 )}
               </div>
             ))}
-            
+
             {/* Fill empty slots if less than 6 images */}
             {displayImages.length < 6 && Array.from({ length: 6 - displayImages.length }).map((_, index) => (
               <div
                 key={`empty-${index}`}
-                className="aspect-square rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center"
+                className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center hover:border-pink-300 hover:bg-pink-50 transition-colors cursor-pointer"
+                onClick={() => window.location.href = '/moodboard'}
               >
-                <Plus className="w-4 h-4 text-gray-400" />
+                <Plus className="w-5 h-5 text-gray-400" />
               </div>
             ))}
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex space-x-2">
+          {/* Action Button */}
+          <div className="mt-4 pt-4 border-t border-gray-200">
             <Link
-              href="/moodboard?tab=upload"
-              className="flex-1 px-3 py-2 bg-pink-600 text-white text-sm rounded-lg hover:bg-pink-700 transition-colors text-center"
+              href="/moodboard"
+              className="btn-primary w-full flex items-center justify-center space-x-2"
             >
-              Nahrát fotky
-            </Link>
-            <Link
-              href="/moodboard?tab=pinterest"
-              className="flex-1 px-3 py-2 border border-gray-300 text-gray-700 text-sm rounded-lg hover:bg-gray-50 transition-colors text-center"
-            >
-              Pinterest
+              <Palette className="w-4 h-4" />
+              <span>Spravovat moodboard</span>
+              <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
