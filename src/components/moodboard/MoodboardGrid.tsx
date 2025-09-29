@@ -56,14 +56,12 @@ export default function MoodboardGrid({
       return () => document.removeEventListener('keydown', handleEscape)
     }
   }, [selectedImage, isDeleting])
-  const [filter, setFilter] = useState<'all' | 'favorites' | 'pinterest' | 'uploads' | WeddingCategory>('all')
+  const [filter, setFilter] = useState<'all' | 'favorites' | 'uploads' | WeddingCategory>('all')
 
   const filteredImages = images.filter(image => {
     switch (filter) {
       case 'favorites':
         return image.isFavorite
-      case 'pinterest':
-        return image.source === 'pinterest'
       case 'uploads':
         return image.source === 'upload'
       case 'all':
@@ -165,7 +163,6 @@ export default function MoodboardGrid({
           {[
             { key: 'all', label: 'Všechny', count: images.length },
             { key: 'favorites', label: 'Oblíbené', count: images.filter(img => img.isFavorite).length },
-            { key: 'pinterest', label: 'Pinterest', count: images.filter(img => img.source === 'pinterest').length },
             { key: 'uploads', label: 'Nahrané', count: images.filter(img => img.source === 'upload').length }
           ].map(filterOption => (
             <button
@@ -249,7 +246,7 @@ export default function MoodboardGrid({
             <div className="col-span-2 text-center py-12 text-gray-400">
               <div className="text-6xl mb-4">🎨</div>
               <p className="text-lg font-medium">Váš moodboard je prázdný</p>
-              <p className="text-sm">Nahrajte fotky nebo importujte inspiraci z Pinterestu</p>
+              <p className="text-sm">Nahrajte fotky pro vytvoření moodboardu</p>
             </div>
           )}
         </div>
@@ -311,7 +308,6 @@ export default function MoodboardGrid({
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">
             {filter === 'favorites' && 'Žádné oblíbené obrázky'}
-            {filter === 'pinterest' && 'Žádné obrázky z Pinterestu'}
             {filter === 'uploads' && 'Žádné nahrané obrázky'}
             {filter === 'all' && 'Žádné obrázky'}
           </h3>
@@ -410,17 +406,7 @@ export default function MoodboardGrid({
                     <span>{selectedImage.createdAt.toLocaleDateString('cs-CZ')}</span>
                   </div>
 
-                  {selectedImage.source === 'pinterest' && selectedImage.sourceUrl && (
-                    <a
-                      href={selectedImage.sourceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center space-x-2 text-sm text-pink-600 hover:text-pink-700"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      <span>Zobrazit na Pinterestu</span>
-                    </a>
-                  )}
+
 
                   {/* Category section */}
                   <div>

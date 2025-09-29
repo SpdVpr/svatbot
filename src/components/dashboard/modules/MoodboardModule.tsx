@@ -96,9 +96,6 @@ export default function MoodboardModule() {
 
                 {/* Source indicator */}
                 <div className="absolute bottom-2 left-2">
-                  {image.source === 'pinterest' && (
-                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                  )}
                   {image.source === 'upload' && (
                     <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                   )}

@@ -31,7 +31,7 @@ export interface MoodboardImage {
   thumbnailUrl: string
   title: string
   description: string
-  source: 'pinterest' | 'upload'
+  source: 'upload'
   sourceUrl: string
   isFavorite: boolean
   tags: string[]
@@ -133,56 +133,7 @@ export function useMoodboard() {
     return () => unsubscribe()
   }, [user, wedding?.id])
 
-  // Add image from Pinterest
-  const addPinterestImage = async (imageData: {
-    url: string
-    thumbnailUrl?: string
-    title?: string
-    description?: string
-    sourceUrl?: string
-    tags?: string[]
-  }) => {
-    if (!user || !wedding?.id) return
 
-    try {
-      setIsLoading(true)
-      
-      const newImage: Omit<MoodboardImage, 'id'> = {
-        url: imageData.url,
-        thumbnailUrl: imageData.thumbnailUrl || '',
-        title: imageData.title || 'Pinterest obrázek',
-        description: imageData.description || '',
-        source: 'pinterest',
-        sourceUrl: imageData.sourceUrl || '',
-        isFavorite: false,
-        tags: imageData.tags || [],
-        category: 'other' as WeddingCategory,
-        createdAt: new Date(),
-        userId: user.id,
-        weddingId: wedding.id,
-        storageRef: ''
-      }
-
-      const docRef = await addDoc(collection(db, 'moodboards'), {
-        ...newImage,
-        createdAt: serverTimestamp()
-      })
-
-      const addedImage: MoodboardImage = {
-        ...newImage,
-        id: docRef.id
-      }
-
-      setImages(prev => [addedImage, ...prev])
-      return addedImage
-    } catch (err) {
-      console.error('Error adding Pinterest image:', err)
-      setError('Nepodařilo se přidat obrázek z Pinterestu')
-      throw err
-    } finally {
-      setIsLoading(false)
-    }
-  }
 
   // Upload image file with compression
   const uploadImage = async (file: File, metadata?: {
@@ -328,7 +279,7 @@ export function useMoodboard() {
     if (imageData instanceof File) {
       return uploadImage(imageData)
     } else {
-      return addPinterestImage(imageData)
+      throw new Error('Pouze upload souborů je podporován')
     }
   }
 
@@ -381,7 +332,6 @@ export function useMoodboard() {
     isLoading,
     error,
     addImage,
-    addPinterestImage,
     uploadImage,
     removeImage,
     toggleFavorite,

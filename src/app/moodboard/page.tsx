@@ -1,16 +1,15 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Upload, Search, Heart, Download, Trash2, Plus } from 'lucide-react'
+import { ArrowLeft, Upload, Heart, Download, Trash2, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useMoodboard } from '@/hooks/useMoodboard'
 import MoodboardGrid from '@/components/moodboard/MoodboardGrid'
-import PinterestImport from '@/components/moodboard/PinterestImport'
 import ImageUpload from '@/components/moodboard/ImageUpload'
 
 export default function MoodboardPage() {
   const { images, isLoading, addImage, removeImage, toggleFavorite, updateImagePosition, updateImageCategory } = useMoodboard()
-  const [activeTab, setActiveTab] = useState<'grid' | 'pinterest' | 'upload'>('grid')
+  const [activeTab, setActiveTab] = useState<'grid' | 'upload'>('grid')
   const [isInitialLoad, setIsInitialLoad] = useState(true)
 
   // Handle initial load state
@@ -21,7 +20,6 @@ export default function MoodboardPage() {
   }, [isLoading])
 
   const favoriteImages = images.filter(img => img.isFavorite)
-  const pinterestImages = images.filter(img => img.source === 'pinterest')
   const uploadedImages = images.filter(img => img.source === 'upload')
 
   const tabs = [
@@ -33,17 +31,10 @@ export default function MoodboardPage() {
       description: 'Vaše svatební inspirace'
     },
     {
-      id: 'pinterest' as const,
-      label: 'Hledat inspiraci',
-      icon: Search,
-      count: 0,
-      description: 'Importovat z Pinterestu'
-    },
-    {
       id: 'upload' as const,
       label: 'Nahrát fotky',
       icon: Upload,
-      count: 0,
+      count: uploadedImages.length,
       description: 'Vlastní obrázky'
     }
   ]
@@ -132,22 +123,14 @@ export default function MoodboardPage() {
                       Moodboard vám pomůže vizualizovat styl a náladu vaší svatby.
                       Sbírejte inspirace, barvy a nápady na jednom místě.
                     </p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                      <button
-                        onClick={() => setActiveTab('pinterest')}
-                        className="flex flex-col items-center p-6 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-colors"
-                      >
-                        <Search className="w-8 h-8 text-red-600 mb-3" />
-                        <h4 className="font-semibold text-red-900 mb-1">Hledat inspiraci</h4>
-                        <p className="text-sm text-red-700 text-center">Importujte obrázky z Pinterestu</p>
-                      </button>
+                    <div className="flex justify-center mb-8">
                       <button
                         onClick={() => setActiveTab('upload')}
-                        className="flex flex-col items-center p-6 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors"
+                        className="flex flex-col items-center p-8 bg-pink-50 border border-pink-200 rounded-xl hover:bg-pink-100 transition-colors"
                       >
-                        <Upload className="w-8 h-8 text-blue-600 mb-3" />
-                        <h4 className="font-semibold text-blue-900 mb-1">Nahrát fotky</h4>
-                        <p className="text-sm text-blue-700 text-center">Přidejte vlastní obrázky</p>
+                        <Upload className="w-12 h-12 text-pink-600 mb-4" />
+                        <h4 className="font-semibold text-pink-900 mb-2 text-lg">Nahrát fotky</h4>
+                        <p className="text-sm text-pink-700 text-center">Přidejte vlastní svatební inspirace</p>
                       </button>
                     </div>
                   </div>
@@ -155,7 +138,7 @@ export default function MoodboardPage() {
               ) : (
                 <div>
                   {/* Stats */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                     <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
                       <div className="text-2xl font-bold text-gray-900">{images.length}</div>
                       <div className="text-sm text-gray-600">Celkem obrázků</div>
@@ -163,10 +146,6 @@ export default function MoodboardPage() {
                     <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
                       <div className="text-2xl font-bold text-pink-600">{favoriteImages.length}</div>
                       <div className="text-sm text-gray-600">Oblíbené</div>
-                    </div>
-                    <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
-                      <div className="text-2xl font-bold text-red-600">{pinterestImages.length}</div>
-                      <div className="text-sm text-gray-600">Z Pinterestu</div>
                     </div>
                     <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
                       <div className="text-2xl font-bold text-blue-600">{uploadedImages.length}</div>
@@ -185,13 +164,6 @@ export default function MoodboardPage() {
                 </div>
               )}
             </div>
-          )}
-
-          {activeTab === 'pinterest' && (
-            <PinterestImport
-              onImport={addImage}
-              isLoading={isLoading}
-            />
           )}
 
           {activeTab === 'upload' && (
