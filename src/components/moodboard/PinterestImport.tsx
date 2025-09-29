@@ -75,13 +75,87 @@ const mockPinterestResults = [
 ]
 
 export default function PinterestImport({ onImport, isLoading }: PinterestImportProps) {
+  const [boardUrl, setBoardUrl] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState(mockPinterestResults)
   const [importingIds, setImportingIds] = useState<Set<string>>(new Set())
+  const [isLoadingBoard, setIsLoadingBoard] = useState(false)
+  const [importMode, setImportMode] = useState<'board' | 'search'>('board')
+  const [isBulkImporting, setIsBulkImporting] = useState(false)
+
+  const extractBoardFromUrl = (url: string) => {
+    // Extract Pinterest board info from URL
+    // Examples:
+    // https://pinterest.com/username/board-name/
+    // https://www.pinterest.com/username/board-name/
+    // https://cz.pinterest.com/username/board-name/
+    const match = url.match(/pinterest\.com\/([^\/]+)\/([^\/]+)\/?/)
+    if (match) {
+      return {
+        username: match[1],
+        boardName: match[2]
+      }
+    }
+    return null
+  }
+
+  const loadPinterestBoard = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!boardUrl.trim()) {
+      alert('Prosím zadejte URL Pinterest boardu')
+      return
+    }
+
+    const boardInfo = extractBoardFromUrl(boardUrl)
+    if (!boardInfo) {
+      alert('Neplatná URL Pinterest boardu. Použijte formát: https://pinterest.com/username/board-name/')
+      return
+    }
+
+    setIsLoadingBoard(true)
+
+    try {
+      // Call our API endpoint to fetch Pinterest board
+      const response = await fetch('/api/pinterest/board', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: boardInfo.username,
+          boardName: boardInfo.boardName,
+          url: boardUrl
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Nepodařilo se načíst Pinterest board')
+      }
+
+      const data = await response.json()
+
+      if (data.pins && data.pins.length > 0) {
+        setSearchResults(data.pins)
+        alert(`Úspěšně načteno ${data.pins.length} obrázků z Pinterest boardu!`)
+      } else {
+        // Fallback to demo data if Pinterest fails
+        setSearchResults(mockPinterestResults)
+        alert('Pinterest board se nepodařilo načíst. Zobrazuji demo obrázky.')
+      }
+    } catch (error) {
+      console.error('Error loading Pinterest board:', error)
+      // Fallback to demo data
+      setSearchResults(mockPinterestResults)
+      alert('Pinterest board se nepodařilo načíst. Zobrazuji demo obrázky pro ukázku funkcionality.')
+    } finally {
+      setIsLoadingBoard(false)
+    }
+  }
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     // In a real implementation, this would call Pinterest API
     // For now, we'll filter mock results
     if (searchQuery.trim()) {
@@ -99,7 +173,7 @@ export default function PinterestImport({ onImport, isLoading }: PinterestImport
   const handleImport = async (item: typeof mockPinterestResults[0]) => {
     try {
       setImportingIds(prev => new Set(prev).add(item.id))
-      
+
       await onImport({
         url: item.url,
         thumbnailUrl: item.thumbnailUrl,
@@ -108,7 +182,7 @@ export default function PinterestImport({ onImport, isLoading }: PinterestImport
         sourceUrl: item.sourceUrl,
         tags: item.tags
       })
-      
+
       // Remove from results after successful import
       setSearchResults(prev => prev.filter(result => result.id !== item.id))
     } catch (err) {
@@ -122,40 +196,176 @@ export default function PinterestImport({ onImport, isLoading }: PinterestImport
     }
   }
 
+  const handleBulkImport = async () => {
+    if (searchResults.length === 0) return
+
+    const confirmed = confirm(`Chcete importovat všech ${searchResults.length} obrázků najednou?`)
+    if (!confirmed) return
+
+    setIsBulkImporting(true)
+    let successCount = 0
+    let errorCount = 0
+
+    for (const item of searchResults) {
+      try {
+        await onImport({
+          url: item.url,
+          thumbnailUrl: item.thumbnailUrl,
+          title: item.title,
+          description: item.description,
+          sourceUrl: item.sourceUrl,
+          tags: item.tags
+        })
+        successCount++
+      } catch (err) {
+        errorCount++
+        console.error('Failed to import:', item.title, err)
+      }
+
+      // Small delay to prevent overwhelming the server
+      await new Promise(resolve => setTimeout(resolve, 500))
+    }
+
+    setIsBulkImporting(false)
+    setSearchResults([]) // Clear results after bulk import
+
+    if (errorCount === 0) {
+      alert(`Úspěšně importováno všech ${successCount} obrázků!`)
+    } else {
+      alert(`Importováno ${successCount} obrázků, ${errorCount} se nepodařilo importovat.`)
+    }
+  }
+
   return (
     <div className="space-y-6">
-      {/* Info Banner */}
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <div className="flex items-start space-x-3">
-          <ExternalLink className="w-5 h-5 text-yellow-600 mt-0.5" />
-          <div>
-            <h3 className="font-medium text-yellow-900">Pinterest Import (Demo)</h3>
-            <p className="text-sm text-yellow-700 mt-1">
-              Tato funkce je momentálně v demo režimu s ukázkovými obrázky. 
-              V produkční verzi bude možné importovat skutečné obrázky z Pinterestu.
-            </p>
-          </div>
-        </div>
+      {/* Mode Toggle */}
+      <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
+        <button
+          onClick={() => setImportMode('board')}
+          className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            importMode === 'board'
+              ? 'bg-white text-gray-900 shadow-sm'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          Import celého boardu
+        </button>
+        <button
+          onClick={() => setImportMode('search')}
+          className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            importMode === 'search'
+              ? 'bg-white text-gray-900 shadow-sm'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          Vyhledávání
+        </button>
       </div>
 
-      {/* Search */}
-      <form onSubmit={handleSearch} className="flex space-x-4">
-        <div className="flex-1">
-          <input
-            type="text"
-            placeholder="Hledat svatební inspirace na Pinterestu..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-          />
+      {importMode === 'board' ? (
+        /* Board Import */
+        <div className="space-y-4">
+          {/* Info */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-start space-x-3">
+              <ExternalLink className="w-5 h-5 text-blue-600 mt-0.5" />
+              <div>
+                <h3 className="font-medium text-blue-900">Import Pinterest Boardu</h3>
+                <p className="text-sm text-blue-700 mt-1">
+                  Vložte URL vašeho Pinterest boardu a importujte všechny obrázky najednou.
+                  Board musí být veřejný.
+                </p>
+                <p className="text-xs text-blue-600 mt-2">
+                  Příklad: https://pinterest.com/username/wedding-inspiration/
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Board URL Input */}
+          <form onSubmit={loadPinterestBoard} className="flex space-x-4">
+            <div className="flex-1">
+              <input
+                type="url"
+                placeholder="https://pinterest.com/username/board-name/"
+                value={boardUrl}
+                onChange={(e) => setBoardUrl(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                disabled={isLoadingBoard}
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={isLoadingBoard || !boardUrl.trim()}
+              className="px-6 py-3 bg-pink-600 text-white rounded-lg hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {isLoadingBoard ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                'Načíst board'
+              )}
+            </button>
+          </form>
         </div>
-        <button
-          type="submit"
-          className="px-6 py-3 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors"
-        >
-          <Search className="w-5 h-5" />
-        </button>
-      </form>
+      ) : (
+        /* Search Mode */
+        <div className="space-y-4">
+          {/* Info Banner */}
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div className="flex items-start space-x-3">
+              <Search className="w-5 h-5 text-yellow-600 mt-0.5" />
+              <div>
+                <h3 className="font-medium text-yellow-900">Vyhledávání (Demo)</h3>
+                <p className="text-sm text-yellow-700 mt-1">
+                  Tato funkce je momentálně v demo režimu s ukázkovými obrázky.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Search */}
+          <form onSubmit={handleSearch} className="flex space-x-4">
+            <div className="flex-1">
+              <input
+                type="text"
+                placeholder="Hledat svatební inspirace na Pinterestu..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+              />
+            </div>
+            <button
+              type="submit"
+              className="px-6 py-3 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* Bulk Import Button */}
+      {searchResults.length > 0 && (
+        <div className="flex justify-between items-center">
+          <p className="text-sm text-gray-600">
+            Nalezeno {searchResults.length} obrázků
+          </p>
+          <button
+            onClick={handleBulkImport}
+            disabled={isBulkImporting || isLoading}
+            className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {isBulkImporting ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin inline-block mr-2" />
+                Importuji všechny...
+              </>
+            ) : (
+              `Importovat všech ${searchResults.length}`
+            )}
+          </button>
+        </div>
+      )}
 
       {/* Results */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
