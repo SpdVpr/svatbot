@@ -23,6 +23,7 @@ interface PendingImage {
   description: string
   tags: string[]
   category: WeddingCategory
+  isUploading?: boolean
 }
 
 export default function ImageUpload({ onUpload, isLoading }: ImageUploadProps) {
