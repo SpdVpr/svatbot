@@ -11,6 +11,7 @@ interface MoodboardGridProps {
   onRemove: (imageId: string) => Promise<void>
   onToggleFavorite: (imageId: string) => Promise<void>
   onPositionChange?: (imageId: string, position: { x: number; y: number }, size?: { width: number; height: number }) => void
+  onUpdateCategory?: (imageId: string, category: WeddingCategory) => Promise<void>
   isLoading: boolean
 }
 
@@ -19,10 +20,13 @@ export default function MoodboardGrid({
   onRemove,
   onToggleFavorite,
   onPositionChange,
+  onUpdateCategory,
   isLoading
 }: MoodboardGridProps) {
   const [selectedImage, setSelectedImage] = useState<MoodboardImage | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isEditingCategory, setIsEditingCategory] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState<WeddingCategory>('other')
 
   // Handle Escape key to close modal
   useEffect(() => {
@@ -77,6 +81,17 @@ export default function MoodboardGrid({
       await onToggleFavorite(imageId)
     } catch (err) {
       alert('Nepodařilo se aktualizovat oblíbené')
+    }
+  }
+
+  const handleUpdateCategory = async (imageId: string, category: WeddingCategory) => {
+    if (!onUpdateCategory) return
+
+    try {
+      await onUpdateCategory(imageId, category)
+      setIsEditingCategory(false)
+    } catch (err) {
+      alert('Nepodařilo se změnit kategorii obrázku')
     }
   }
 
@@ -269,6 +284,59 @@ export default function MoodboardGrid({
                       <span>Zobrazit na Pinterestu</span>
                     </a>
                   )}
+
+                  {/* Category section */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-medium text-gray-900">Kategorie:</p>
+                      {!isEditingCategory && (
+                        <button
+                          onClick={() => {
+                            setSelectedCategory(selectedImage.category)
+                            setIsEditingCategory(true)
+                          }}
+                          className="text-xs text-pink-600 hover:text-pink-700"
+                        >
+                          Upravit
+                        </button>
+                      )}
+                    </div>
+
+                    {isEditingCategory ? (
+                      <div className="space-y-2">
+                        <select
+                          value={selectedCategory}
+                          onChange={(e) => setSelectedCategory(e.target.value as WeddingCategory)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-sm"
+                        >
+                          {Object.entries(WEDDING_CATEGORIES).map(([key, category]) => (
+                            <option key={key} value={key}>
+                              {category.icon} {category.label}
+                            </option>
+                          ))}
+                        </select>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => handleUpdateCategory(selectedImage.id, selectedCategory)}
+                            className="px-3 py-1 bg-pink-600 text-white text-xs rounded hover:bg-pink-700"
+                          >
+                            Uložit
+                          </button>
+                          <button
+                            onClick={() => setIsEditingCategory(false)}
+                            className="px-3 py-1 bg-gray-200 text-gray-700 text-xs rounded hover:bg-gray-300"
+                          >
+                            Zrušit
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center space-x-2">
+                        <span className="text-lg">{WEDDING_CATEGORIES[selectedImage.category]?.icon}</span>
+                        <span className="text-sm text-gray-700">{WEDDING_CATEGORIES[selectedImage.category]?.label}</span>
+                      </div>
+                    )}
+                  </div>
 
                   {selectedImage.tags.length > 0 && (
                     <div>

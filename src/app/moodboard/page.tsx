@@ -9,7 +9,7 @@ import PinterestImport from '@/components/moodboard/PinterestImport'
 import ImageUpload from '@/components/moodboard/ImageUpload'
 
 export default function MoodboardPage() {
-  const { images, isLoading, addImage, removeImage, toggleFavorite, updateImagePosition } = useMoodboard()
+  const { images, isLoading, addImage, removeImage, toggleFavorite, updateImagePosition, updateImageCategory } = useMoodboard()
   const [activeTab, setActiveTab] = useState<'grid' | 'pinterest' | 'upload'>('grid')
   const [isInitialLoad, setIsInitialLoad] = useState(true)
 
@@ -179,6 +179,7 @@ export default function MoodboardPage() {
                     onRemove={removeImage}
                     onToggleFavorite={toggleFavorite}
                     onPositionChange={updateImagePosition}
+                    onUpdateCategory={updateImageCategory}
                     isLoading={false}
                   />
                 </div>

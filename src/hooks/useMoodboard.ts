@@ -357,6 +357,25 @@ export function useMoodboard() {
     }
   }
 
+  // Update image category
+  const updateImageCategory = async (imageId: string, category: WeddingCategory) => {
+    if (!user || !wedding?.id) return
+
+    try {
+      const imageRef = doc(db, 'moodboards', imageId)
+      await updateDoc(imageRef, { category })
+
+      // Update local state
+      setImages(prev => prev.map(img =>
+        img.id === imageId
+          ? { ...img, category }
+          : img
+      ))
+    } catch (err) {
+      console.error('❌ Error updating image category:', err)
+    }
+  }
+
   return {
     images,
     isLoading,
@@ -366,6 +385,7 @@ export function useMoodboard() {
     uploadImage,
     removeImage,
     toggleFavorite,
-    updateImagePosition
+    updateImagePosition,
+    updateImageCategory
   }
 }
