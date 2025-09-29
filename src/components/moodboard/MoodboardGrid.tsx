@@ -218,6 +218,7 @@ export default function MoodboardGrid({
               key={image.id}
               className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer group"
               onClick={() => handleImageClick(image)}
+              style={{ minHeight: '150px' }}
             >
               <Image
                 src={image.thumbnailUrl || image.url}

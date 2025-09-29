@@ -463,10 +463,12 @@ export function useTask(): UseTaskReturn {
 
   // Load tasks when wedding changes
   useEffect(() => {
-    if (!wedding) {
+    if (!wedding?.id) {
       setTasks([])
       return
     }
+
+    let unsubscribe: (() => void) | null = null
 
     const loadTasks = async () => {
       try {
@@ -476,21 +478,17 @@ export function useTask(): UseTaskReturn {
         // Check if this is a demo user
         const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding.id === 'demo-wedding'
 
-        console.log('🔍 Demo user detection in useTask:')
-        console.log('🔍 user?.id:', user?.id)
-        console.log('🔍 user?.email:', user?.email)
-        console.log('🔍 wedding.id:', wedding.id)
-        console.log('🔍 isDemoUser:', isDemoUser)
+        // Only log once per wedding change
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🔍 Loading tasks for wedding:', wedding.id, 'isDemoUser:', isDemoUser)
+        }
 
         if (isDemoUser) {
-          console.log('🎭 Demo user detected - loading tasks from sessionStorage')
-
           // Try to load existing demo tasks from sessionStorage first
           const sessionKey = `demo_tasks_${wedding.id}`
           const savedDemoTasks = sessionStorage.getItem(sessionKey)
 
           if (savedDemoTasks) {
-            console.log('📦 Found existing demo tasks in sessionStorage')
             const parsedTasks = JSON.parse(savedDemoTasks).map((task: any) => ({
               ...task,
               dueDate: task.dueDate ? new Date(task.dueDate) : undefined,
@@ -498,13 +496,11 @@ export function useTask(): UseTaskReturn {
               createdAt: new Date(task.createdAt),
               updatedAt: new Date(task.updatedAt)
             }))
-            console.log('🎭 Loaded demo tasks from sessionStorage:', parsedTasks.length, parsedTasks)
             setTasks(parsedTasks)
             return
           }
 
           // If no session data exists, create fresh demo tasks
-          console.log('🆕 Creating fresh demo tasks')
           const demoTasks: Task[] = [
             {
               id: 'demo-task-1',
@@ -582,7 +578,6 @@ export function useTask(): UseTaskReturn {
 
           // Save fresh demo tasks to sessionStorage
           sessionStorage.setItem(sessionKey, JSON.stringify(demoTasks))
-          console.log('🎭 Created and saved fresh demo tasks:', demoTasks.length, demoTasks)
           setTasks(demoTasks)
           return
         }
@@ -594,16 +589,17 @@ export function useTask(): UseTaskReturn {
             where('weddingId', '==', wedding.id)
           )
 
-          const unsubscribe = onSnapshot(tasksQuery, (snapshot) => {
+          unsubscribe = onSnapshot(tasksQuery, (snapshot) => {
             const loadedTasks = snapshot.docs.map(doc =>
               convertFirestoreTask(doc.id, doc.data())
             )
-            console.log('📝 Loaded tasks from Firestore:', loadedTasks.length, loadedTasks)
+            if (process.env.NODE_ENV === 'development') {
+              console.log('📝 Loaded tasks from Firestore:', loadedTasks.length)
+            }
             setTasks(loadedTasks)
 
             // Clear localStorage when Firestore loads successfully
             localStorage.removeItem(`tasks_${wedding.id}`)
-            console.log('🧹 Cleared localStorage after successful Firestore load')
           }, (error) => {
             console.warn('Firestore snapshot error, using localStorage fallback:', error)
             // Load from localStorage fallback
@@ -652,7 +648,14 @@ export function useTask(): UseTaskReturn {
     }
 
     loadTasks()
-  }, [wedding?.id, user?.id, user?.email])
+
+    // Cleanup function
+    return () => {
+      if (unsubscribe) {
+        unsubscribe()
+      }
+    }
+  }, [wedding?.id]) // Only depend on wedding.id, not user changes
 
   // Clear error
   const clearError = () => setError(null)

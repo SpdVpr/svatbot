@@ -91,7 +91,9 @@ export function useWeddingNotifications() {
 
     const unsubscribe = onSnapshot(q,
       (snapshot) => {
-        console.log('Notifications snapshot received:', snapshot.docs.length)
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Notifications snapshot received:', snapshot.docs.length)
+        }
         const notificationData = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
