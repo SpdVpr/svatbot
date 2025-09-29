@@ -79,6 +79,7 @@ export function useMoodboard() {
   const [images, setImages] = useState<MoodboardImage[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [cleanupDone, setCleanupDone] = useState(false)
 
   // Load images from Firestore with real-time updates
   useEffect(() => {
@@ -98,27 +99,41 @@ export function useMoodboard() {
     // Use onSnapshot for real-time updates
     const unsubscribe = onSnapshot(q,
       (snapshot) => {
-        const loadedImages: MoodboardImage[] = snapshot.docs.map(doc => {
-          const data = doc.data()
-          return {
-            id: doc.id,
-            url: data.url || '',
-            thumbnailUrl: data.thumbnailUrl || '',
-            title: data.title || 'Bez názvu',
-            description: data.description || '',
-            source: data.source || 'upload',
-            sourceUrl: data.sourceUrl || '',
-            isFavorite: data.isFavorite || false,
-            tags: data.tags || [],
-            category: data.category || 'other',
-            position: data.position || undefined,
-            size: data.size || undefined,
-            createdAt: data.createdAt?.toDate() || new Date(),
-            userId: data.userId || '',
-            weddingId: data.weddingId || '',
-            storageRef: data.storageRef || ''
-          }
-        }) as MoodboardImage[]
+        const loadedImages: MoodboardImage[] = snapshot.docs
+          .filter(doc => {
+            const data = doc.data()
+            // Filter out Pinterest images
+            const isPinterestImage = (
+              data.source === 'pinterest' ||
+              (data.url && (
+                data.url.includes('pinterest.com') ||
+                data.url.includes('pinimg.com') ||
+                data.sourceUrl?.includes('pinterest.com')
+              ))
+            )
+            return !isPinterestImage
+          })
+          .map(doc => {
+            const data = doc.data()
+            return {
+              id: doc.id,
+              url: data.url || '',
+              thumbnailUrl: data.thumbnailUrl || '',
+              title: data.title || 'Bez názvu',
+              description: data.description || '',
+              source: data.source || 'upload',
+              sourceUrl: data.sourceUrl || '',
+              isFavorite: data.isFavorite || false,
+              tags: data.tags || [],
+              category: data.category || 'other',
+              position: data.position || undefined,
+              size: data.size || undefined,
+              createdAt: data.createdAt?.toDate() || new Date(),
+              userId: data.userId || '',
+              weddingId: data.weddingId || '',
+              storageRef: data.storageRef || ''
+            }
+          }) as MoodboardImage[]
 
         setImages(loadedImages)
         setIsLoading(false)
@@ -133,7 +148,56 @@ export function useMoodboard() {
     return () => unsubscribe()
   }, [user, wedding?.id])
 
+  // Cleanup Pinterest data on mount
+  useEffect(() => {
+    if (!user || !wedding?.id || cleanupDone) return
 
+    const cleanupPinterestImages = async () => {
+      try {
+        console.log('🧹 Cleaning up Pinterest images for user:', user.id)
+
+        const q = query(
+          collection(db, 'moodboards'),
+          where('userId', '==', user.id),
+          where('weddingId', '==', wedding.id)
+        )
+
+        const snapshot = await getDocs(q)
+        let deletedCount = 0
+
+        for (const docSnapshot of snapshot.docs) {
+          const data = docSnapshot.data()
+
+          // Check if this is a Pinterest image or has Pinterest URL
+          const isPinterestImage = (
+            data.source === 'pinterest' ||
+            (data.url && (
+              data.url.includes('pinterest.com') ||
+              data.url.includes('pinimg.com') ||
+              data.sourceUrl?.includes('pinterest.com')
+            ))
+          )
+
+          if (isPinterestImage) {
+            console.log(`🗑️ Deleting Pinterest image: ${docSnapshot.id}`)
+            await deleteDoc(doc(db, 'moodboards', docSnapshot.id))
+            deletedCount++
+          }
+        }
+
+        if (deletedCount > 0) {
+          console.log(`✅ Cleaned up ${deletedCount} Pinterest images`)
+        }
+
+        setCleanupDone(true)
+      } catch (error) {
+        console.error('❌ Error cleaning up Pinterest images:', error)
+        setCleanupDone(true) // Don't retry on error
+      }
+    }
+
+    cleanupPinterestImages()
+  }, [user, wedding?.id, cleanupDone])
 
   // Upload image file with compression
   const uploadImage = async (file: File, metadata?: {
