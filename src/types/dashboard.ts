@@ -154,7 +154,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     title: 'AI Asistent',
     size: 'medium',
     position: { row: 4, column: 2 },
-    isVisible: true,
+    isVisible: false,
     isLocked: false,
     order: 12
   },

@@ -81,7 +81,7 @@ export default function AITimelineModule({ className = '' }: AITimelineModulePro
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold flex items-center space-x-2">
           <Calendar className="w-5 h-5 text-purple-600" />
-          <span>Svatební den</span>
+          <span>Harmonogram svatebního dne</span>
         </h3>
         <Link href="/svatebni-den" className="text-sm text-primary-600 hover:underline">
           Otevřít
@@ -101,7 +101,7 @@ export default function AITimelineModule({ className = '' }: AITimelineModulePro
               </div>
 
               <div className="text-xs text-purple-700 text-center">
-                Kompletní plán svatebního dne
+                Kompletní harmonogram svatebního dne
               </div>
             </div>
 
@@ -218,7 +218,7 @@ export default function AITimelineModule({ className = '' }: AITimelineModulePro
           className="btn-primary w-full flex items-center justify-center space-x-2"
         >
           <Calendar className="w-4 h-4" />
-          <span>Spravovat svatební den</span>
+          <span>Spravovat harmonogram</span>
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>

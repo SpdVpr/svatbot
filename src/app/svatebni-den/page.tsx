@@ -151,7 +151,7 @@ export default function SvatebniDenPage() {
               <div className="h-6 w-px bg-gray-300" />
               <h1 className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
                 <Calendar className="w-6 h-6 text-purple-600" />
-                <span>Svatební den</span>
+                <span>Harmonogram svatebního dne</span>
               </h1>
             </div>
             

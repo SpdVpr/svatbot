@@ -257,8 +257,8 @@ function DashboardContent() {
         />
       )}
 
-      {/* Floating AI Assistant */}
-      <AIAssistant compact={true} />
+      {/* Floating AI Assistant - Hidden */}
+      {/* <AIAssistant compact={true} /> */}
 
       {/* Live Toast Notifications */}
       <LiveToastNotifications />
