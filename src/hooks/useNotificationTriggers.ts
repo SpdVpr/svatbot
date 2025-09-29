@@ -17,6 +17,10 @@ export function useNotificationTriggers() {
   const { budgetItems, stats } = useBudget()
   const { guests } = useGuest()
 
+  // Disable notification triggers completely to prevent spam
+  // TODO: Implement proper deduplication logic later
+  return
+
   // Check for overdue tasks
   useEffect(() => {
     if (!user?.id || !tasks || tasks.length === 0) return

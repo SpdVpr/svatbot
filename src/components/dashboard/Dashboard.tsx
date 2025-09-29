@@ -17,7 +17,7 @@ import WeddingSettings from '@/components/wedding/WeddingSettings'
 import AIAssistant from '@/components/ai/AIAssistant'
 import LiveNotifications, { LiveToastNotifications } from '@/components/notifications/LiveNotifications'
 import SimpleToastContainer, { showSimpleToast } from '@/components/notifications/SimpleToast'
-import { useNotificationTriggers } from '@/hooks/useNotificationTriggers'
+// import { useNotificationTriggers } from '@/hooks/useNotificationTriggers'
 import { useWeddingNotifications, useLiveToastNotifications } from '@/hooks/useWeddingNotifications'
 import { createDemoNotifications, createTestToast } from '@/utils/demoNotifications'
 
@@ -27,11 +27,11 @@ function DashboardContent() {
   const { getCanvasMaxWidth } = useCanvas()
   const [showWeddingSettings, setShowWeddingSettings] = useState(false)
 
-  // Initialize notification triggers
-  useNotificationTriggers()
+  // Initialize notification triggers - DISABLED to prevent spam
+  // useNotificationTriggers()
 
   // Demo notification hooks (for testing)
-  const { createNotification } = useWeddingNotifications()
+  const { createNotification, deleteAllNotifications } = useWeddingNotifications()
   const { showToast } = useLiveToastNotifications()
 
   // Demo function for testing notifications
@@ -58,6 +58,15 @@ function DashboardContent() {
       setTimeout(() => {
         createDemoNotifications(createNotification, showToast)
       }, 4000)
+    }
+  }
+
+  const handleDeleteAllNotifications = async () => {
+    const result = await deleteAllNotifications()
+    if (result?.success) {
+      showSimpleToast('success', 'Notifikace smazány', `Smazáno ${result.deletedCount} notifikací!`)
+    } else {
+      showSimpleToast('error', 'Chyba', 'Chyba při mazání notifikací')
     }
   }
 
@@ -229,6 +238,13 @@ function DashboardContent() {
                     title="Test Notifications"
                   >
                     🔔
+                  </button>
+                  <button
+                    onClick={handleDeleteAllNotifications}
+                    className="btn-outline text-xs px-2 py-1 text-red-600"
+                    title="Delete All Notifications"
+                  >
+                    🗑️
                   </button>
                 </>
               )}

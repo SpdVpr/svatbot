@@ -75,9 +75,19 @@ export function useWeddingNotifications() {
   const { user } = useAuth()
   const listenerRef = useRef<(() => void) | null>(null)
 
-  // Cleanup duplicates on first load
+  // Cleanup duplicates on first load (only once per user)
   useEffect(() => {
     if (!user?.id || cleanupDone) return
+
+    // Check if cleanup was already done for this user
+    const cleanupKey = `notifications-cleanup-done-${user.id}`
+    const wasCleanupDone = localStorage.getItem(cleanupKey)
+
+    if (wasCleanupDone) {
+      console.log('🧹 Notifications cleanup already done for user:', user.id)
+      setCleanupDone(true)
+      return
+    }
 
     const cleanupDuplicates = async () => {
       try {
@@ -94,17 +104,36 @@ export function useWeddingNotifications() {
         const seen = new Set<string>()
         const toDelete: string[] = []
 
-        // Find duplicates
+        // Find duplicates - group by unique key and keep the most recent one
+        const notificationGroups = new Map<string, any[]>()
+
         for (const docSnapshot of snapshot.docs) {
           const data = docSnapshot.data()
           const uniqueKey = `${data.userId}_${data.type}_${data.title}_${data.message}`
 
-          if (seen.has(uniqueKey)) {
-            toDelete.push(docSnapshot.id)
-          } else {
-            seen.add(uniqueKey)
+          if (!notificationGroups.has(uniqueKey)) {
+            notificationGroups.set(uniqueKey, [])
           }
+
+          notificationGroups.get(uniqueKey)!.push({
+            id: docSnapshot.id,
+            data: data,
+            createdAt: data.createdAt?.toDate() || new Date(0)
+          })
         }
+
+        // For each group, keep the most recent one and delete the rest
+        notificationGroups.forEach((notifications, uniqueKey) => {
+          if (notifications.length > 1) {
+            // Sort by creation date (newest first)
+            notifications.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+
+            // Keep the first (newest) one, delete the rest
+            for (let i = 1; i < notifications.length; i++) {
+              toDelete.push(notifications[i].id)
+            }
+          }
+        })
 
         // Delete duplicates
         for (const notificationId of toDelete) {
@@ -115,10 +144,14 @@ export function useWeddingNotifications() {
           console.log(`✅ Cleaned up ${toDelete.length} duplicate notifications`)
         }
 
+        // Mark cleanup as done for this user
+        localStorage.setItem(cleanupKey, 'true')
         setCleanupDone(true)
       } catch (error) {
         console.error('❌ Error cleaning up notifications:', error)
-        setCleanupDone(true) // Don't retry on error
+        // Mark cleanup as done even on error to prevent infinite retries
+        localStorage.setItem(cleanupKey, 'true')
+        setCleanupDone(true)
       }
     }
 
@@ -263,6 +296,50 @@ export function useWeddingNotifications() {
     return notifications.filter(n => n.priority === priority)
   }, [notifications])
 
+  // Reset cleanup flag (for debugging)
+  const resetCleanup = useCallback(() => {
+    if (user?.id) {
+      const cleanupKey = `notifications-cleanup-done-${user.id}`
+      localStorage.removeItem(cleanupKey)
+      setCleanupDone(false)
+      console.log('🔄 Cleanup flag reset for user:', user.id)
+    }
+  }, [user?.id])
+
+  // Delete all notifications for current user (for debugging)
+  const deleteAllNotifications = useCallback(async () => {
+    if (!user?.id) return
+
+    try {
+      console.log('🗑️ Deleting all notifications for user:', user.id)
+
+      const q = query(
+        collection(db, 'weddingNotifications'),
+        where('userId', '==', user.id)
+      )
+
+      const snapshot = await getDocs(q)
+      let deletedCount = 0
+
+      for (const docSnapshot of snapshot.docs) {
+        await deleteDoc(doc(db, 'weddingNotifications', docSnapshot.id))
+        deletedCount++
+      }
+
+      console.log(`✅ Deleted ${deletedCount} notifications`)
+
+      // Reset cleanup flag so cleanup can run again if needed
+      const cleanupKey = `notifications-cleanup-done-${user.id}`
+      localStorage.removeItem(cleanupKey)
+      setCleanupDone(false)
+
+      return { success: true, deletedCount }
+    } catch (error) {
+      console.error('❌ Error deleting notifications:', error)
+      return { success: false, error }
+    }
+  }, [user?.id])
+
   return {
     notifications,
     unreadCount,
@@ -271,7 +348,9 @@ export function useWeddingNotifications() {
     markAsRead,
     markAllAsRead,
     getNotificationsByCategory,
-    getNotificationsByPriority
+    getNotificationsByPriority,
+    resetCleanup,
+    deleteAllNotifications
   }
 }
 
