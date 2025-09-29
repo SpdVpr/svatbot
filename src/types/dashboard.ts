@@ -1,6 +1,6 @@
 export interface DashboardModule {
   id: string
-  type: 'wedding-countdown' | 'quick-actions' | 'main-features' | 'upcoming-tasks' | 'marketplace' | 'phase-progress' | 'coming-soon' | 'task-management' | 'guest-management' | 'budget-tracking' | 'timeline-planning' | 'vendor-management' | 'seating-plan' | 'ai-assistant' | 'ai-timeline' | 'moodboard'
+  type: 'wedding-countdown' | 'quick-actions' | 'main-features' | 'upcoming-tasks' | 'marketplace' | 'coming-soon' | 'task-management' | 'guest-management' | 'budget-tracking' | 'timeline-planning' | 'vendor-management' | 'seating-plan' | 'ai-assistant' | 'ai-timeline' | 'moodboard'
   title: string
   size: 'small' | 'medium' | 'large' | 'full'
   position: {
@@ -128,16 +128,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     isLocked: false,
     order: 9
   },
-  {
-    id: 'phase-progress',
-    type: 'phase-progress',
-    title: 'Pokrok podle fází',
-    size: 'large',
-    position: { row: 4, column: 0 },
-    isVisible: true,
-    isLocked: false,
-    order: 10
-  },
+
 
   {
     id: 'ai-assistant',
@@ -147,7 +138,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     position: { row: 4, column: 2 },
     isVisible: false,
     isLocked: false,
-    order: 11
+    order: 10
   },
   {
     id: 'ai-timeline',
@@ -157,7 +148,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     position: { row: 5, column: 0 },
     isVisible: true,
     isLocked: false,
-    order: 12
+    order: 11
   },
   {
     id: 'moodboard',
@@ -167,7 +158,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     position: { row: 5, column: 2 },
     isVisible: true,
     isLocked: false,
-    order: 13
+    order: 12
   },
   {
     id: 'coming-soon',
@@ -177,6 +168,6 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     position: { row: 6, column: 0 },
     isVisible: false,
     isLocked: false,
-    order: 14
+    order: 13
   }
 ]
