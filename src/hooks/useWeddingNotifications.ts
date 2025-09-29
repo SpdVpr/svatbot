@@ -69,10 +69,43 @@ export function useWeddingNotifications() {
   const [notifications, setNotifications] = useState<WeddingNotification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [cleanupDone, setCleanupDone] = useState(false)
   const { user } = useAuth()
 
+  // Cleanup duplicates on first load
   useEffect(() => {
-    if (!user?.id) {
+    if (!user?.id || cleanupDone) return
+
+    const cleanupDuplicates = async () => {
+      try {
+        console.log('🧹 Cleaning up duplicate notifications for user:', user.id)
+
+        const response = await fetch('/api/cleanup/notifications', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: user.id,
+            action: 'duplicates'
+          })
+        })
+
+        const result = await response.json()
+        if (result.success && result.deletedCount > 0) {
+          console.log(`✅ Cleaned up ${result.deletedCount} duplicate notifications`)
+        }
+
+        setCleanupDone(true)
+      } catch (error) {
+        console.error('❌ Error cleaning up notifications:', error)
+        setCleanupDone(true) // Don't retry on error
+      }
+    }
+
+    cleanupDuplicates()
+  }, [user?.id, cleanupDone])
+
+  useEffect(() => {
+    if (!user?.id || !cleanupDone) {
       setNotifications([])
       setUnreadCount(0)
       setLoading(false)
@@ -119,7 +152,7 @@ export function useWeddingNotifications() {
     )
 
     return unsubscribe
-  }, [user])
+  }, [user?.id, cleanupDone]) // Only depend on user.id and cleanup status
 
   // Create new notification
   const createNotification = useCallback(async (
