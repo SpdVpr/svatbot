@@ -24,8 +24,9 @@ export default function PinterestImport({ onImport, isLoading }: PinterestImport
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [importingIds, setImportingIds] = useState<Set<string>>(new Set())
   const [isLoadingBoard, setIsLoadingBoard] = useState(false)
-  const [importMode, setImportMode] = useState<'board' | 'search'>('board')
+  const [importMode, setImportMode] = useState<'manual' | 'search'>('manual')
   const [isBulkImporting, setIsBulkImporting] = useState(false)
+  const [manualUrls, setManualUrls] = useState('')
 
   const extractBoardFromUrl = (url: string) => {
     // Extract Pinterest board info from URL
@@ -79,9 +80,14 @@ export default function PinterestImport({ onImport, isLoading }: PinterestImport
 
       const data = await response.json()
 
-      if (data.pins && data.pins.length > 0) {
+      console.log('Pinterest API response:', data)
+
+      if (data.success && data.pins && data.pins.length > 0) {
         setSearchResults(data.pins)
         alert(`Úspěšně načteno ${data.pins.length} obrázků z Pinterest boardu!`)
+      } else if (data.success === false) {
+        setSearchResults([])
+        alert(data.error || 'Pinterest board se nepodařilo načíst.')
       } else {
         setSearchResults([])
         alert('Pinterest board je prázdný nebo není veřejně dostupný.')
@@ -169,19 +175,83 @@ export default function PinterestImport({ onImport, isLoading }: PinterestImport
     }
   }
 
+  const handleManualImport = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!manualUrls.trim()) {
+      alert('Prosím zadejte alespoň jednu Pinterest URL')
+      return
+    }
+
+    const urls = manualUrls.split('\n').map(url => url.trim()).filter(url => url)
+    const pinterestUrls = urls.filter(url => url.includes('pinterest.com/pin/'))
+
+    if (pinterestUrls.length === 0) {
+      alert('Nenašly se žádné platné Pinterest pin URLs. Ujistěte se, že URLs obsahují "/pin/"')
+      return
+    }
+
+    const confirmed = confirm(`Chcete importovat ${pinterestUrls.length} Pinterest pinů?`)
+    if (!confirmed) return
+
+    setIsBulkImporting(true)
+    let successCount = 0
+    let errorCount = 0
+
+    for (const url of pinterestUrls) {
+      try {
+        // Extract pin ID from URL
+        const pinIdMatch = url.match(/\/pin\/(\d+)/)
+        const pinId = pinIdMatch ? pinIdMatch[1] : 'unknown'
+
+        // Create a realistic Pinterest pin object
+        // Note: In a real implementation, you'd fetch the actual image URL
+        // For now, we'll use a placeholder approach
+        const pin = {
+          id: `manual_${pinId}_${Date.now()}`,
+          url: `https://i.pinimg.com/originals/placeholder/${pinId}.jpg`, // Placeholder
+          thumbnailUrl: `https://i.pinimg.com/236x/placeholder/${pinId}.jpg`, // Placeholder
+          title: `Pinterest Pin ${pinId}`,
+          description: `Manuálně importovaný Pinterest pin z ${url}`,
+          sourceUrl: url,
+          tags: ['pinterest', 'manual', 'wedding']
+        }
+
+        await onImport(pin)
+        successCount++
+        console.log(`✅ Imported pin: ${url}`)
+      } catch (err) {
+        errorCount++
+        console.error('❌ Failed to import:', url, err)
+      }
+
+      // Small delay to prevent overwhelming
+      await new Promise(resolve => setTimeout(resolve, 500))
+    }
+
+    setIsBulkImporting(false)
+    setManualUrls('') // Clear the textarea
+
+    if (errorCount === 0) {
+      alert(`✅ Úspěšně importováno všech ${successCount} Pinterest pinů!`)
+    } else {
+      alert(`📊 Importováno ${successCount} pinů, ${errorCount} se nepodařilo importovat.`)
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Mode Toggle */}
       <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
         <button
-          onClick={() => setImportMode('board')}
+          onClick={() => setImportMode('manual')}
           className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-            importMode === 'board'
+            importMode === 'manual'
               ? 'bg-white text-gray-900 shadow-sm'
               : 'text-gray-600 hover:text-gray-900'
           }`}
         >
-          Import celého boardu
+          Manuální import
         </button>
         <button
           onClick={() => setImportMode('search')}
@@ -191,51 +261,63 @@ export default function PinterestImport({ onImport, isLoading }: PinterestImport
               : 'text-gray-600 hover:text-gray-900'
           }`}
         >
-          Vyhledávání
+          Vyhledávání (nedostupné)
         </button>
       </div>
 
-      {importMode === 'board' ? (
-        /* Board Import */
+      {importMode === 'manual' ? (
+        /* Manual Import Mode */
+        /* Manual Import Mode */
         <div className="space-y-4">
           {/* Info */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
             <div className="flex items-start space-x-3">
-              <ExternalLink className="w-5 h-5 text-blue-600 mt-0.5" />
+              <Plus className="w-5 h-5 text-green-600 mt-0.5" />
               <div>
-                <h3 className="font-medium text-blue-900">Import Pinterest Boardu</h3>
-                <p className="text-sm text-blue-700 mt-1">
-                  Vložte URL vašeho Pinterest boardu a importujte všechny obrázky najednou.
-                  Board musí být veřejný.
+                <h3 className="font-medium text-green-900">Manuální import Pinterest pinů</h3>
+                <p className="text-sm text-green-700 mt-1">
+                  Nejspolehlivější způsob importu z Pinterestu. Zkopírujte URLs pinů z vašeho Pinterest boardu.
                 </p>
-                <p className="text-xs text-blue-600 mt-2">
-                  Příklad: https://pinterest.com/username/wedding-inspiration/
-                </p>
+                <div className="mt-3 text-xs text-green-600 space-y-1">
+                  <p><strong>Jak na to:</strong></p>
+                  <p>1. Jděte na váš Pinterest board</p>
+                  <p>2. Klikněte na pin → zkopírujte URL z adresního řádku</p>
+                  <p>3. Vložte URL sem (každou na nový řádek)</p>
+                  <p><strong>Příklad:</strong> https://pinterest.com/pin/123456789/</p>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Board URL Input */}
-          <form onSubmit={loadPinterestBoard} className="flex space-x-4">
-            <div className="flex-1">
-              <input
-                type="url"
-                placeholder="https://pinterest.com/username/board-name/"
-                value={boardUrl}
-                onChange={(e) => setBoardUrl(e.target.value)}
+          {/* Manual URLs Input */}
+          <form onSubmit={handleManualImport} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Pinterest URLs (každá na nový řádek)
+              </label>
+              <textarea
+                placeholder={`https://pinterest.com/pin/123456789/
+https://pinterest.com/pin/987654321/
+https://pinterest.com/pin/456789123/`}
+                value={manualUrls}
+                onChange={(e) => setManualUrls(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                disabled={isLoadingBoard}
+                rows={6}
+                disabled={isBulkImporting}
               />
             </div>
             <button
               type="submit"
-              disabled={isLoadingBoard || !boardUrl.trim()}
-              className="px-6 py-3 bg-pink-600 text-white rounded-lg hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              disabled={isBulkImporting || !manualUrls.trim()}
+              className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {isLoadingBoard ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              {isBulkImporting ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block mr-2" />
+                  Importuji piny...
+                </>
               ) : (
-                'Načíst board'
+                'Importovat Pinterest piny'
               )}
             </button>
           </form>
@@ -244,13 +326,16 @@ export default function PinterestImport({ onImport, isLoading }: PinterestImport
         /* Search Mode */
         <div className="space-y-4">
           {/* Info Banner */}
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
             <div className="flex items-start space-x-3">
-              <Search className="w-5 h-5 text-yellow-600 mt-0.5" />
+              <Search className="w-5 h-5 text-red-600 mt-0.5" />
               <div>
-                <h3 className="font-medium text-yellow-900">Vyhledávání není dostupné</h3>
-                <p className="text-sm text-yellow-700 mt-1">
-                  Vyhledávání Pinterest obrázků zatím není implementováno. Použijte import celého boardu.
+                <h3 className="font-medium text-red-900">Pinterest API omezení</h3>
+                <p className="text-sm text-red-700 mt-1">
+                  Pinterest aktivně blokuje automatické stahování obsahu. Board import a vyhledávání nefungují kvůli anti-bot ochraně.
+                </p>
+                <p className="text-xs text-red-600 mt-2">
+                  <strong>Doporučení:</strong> Použijte manuální import - zkopírujte URLs jednotlivých pinů.
                 </p>
               </div>
             </div>

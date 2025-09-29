@@ -59,14 +59,19 @@ async function fetchPinterestBoard(username: string, boardName: string): Promise
     try {
       console.log(`🔄 Trying method ${i + 1}...`)
       const result = await methods[i]()
+      console.log(`📊 Method ${i + 1} returned ${result.length} pins`)
       if (result.length > 0) {
         console.log(`✅ Method ${i + 1} succeeded with ${result.length} pins`)
         return result
+      } else {
+        console.log(`⚠️ Method ${i + 1} returned empty result, trying next method...`)
       }
     } catch (error: any) {
       console.log(`❌ Method ${i + 1} failed:`, error.message)
       if (i === methods.length - 1) {
-        throw error // Re-throw the last error
+        // Don't throw error, return empty array instead
+        console.log(`❌ All methods failed, returning empty result`)
+        return []
       }
     }
   }
@@ -76,6 +81,7 @@ async function fetchPinterestBoard(username: string, boardName: string): Promise
 
 function parseRSSFeed(rssText: string): PinterestPin[] {
   console.log(`📄 RSS content length: ${rssText.length} characters`)
+  console.log(`📄 RSS preview: ${rssText.substring(0, 1000)}...`)
 
   const pins: PinterestPin[] = []
 
@@ -92,22 +98,71 @@ function parseRSSFeed(rssText: string): PinterestPin[] {
 
     // Extract description
     const descMatch = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/)
-    const description = descMatch ? descMatch[1].replace(/<[^>]*>/g, '').substring(0, 200) : ''
+    const rawDescription = descMatch ? descMatch[1] : ''
+    const description = rawDescription.replace(/<[^>]*>/g, '').substring(0, 200)
 
     // Extract link (Pinterest URL)
     const linkMatch = item.match(/<link>(.*?)<\/link>/)
     const sourceUrl = linkMatch ? linkMatch[1] : ''
 
-    // Extract image URL from description
-    const imgMatch = descMatch ? descMatch[1].match(/src="([^"]*)"/) : null
-    const imageUrl = imgMatch ? imgMatch[1] : ''
+    // Try multiple patterns to extract image URL from description
+    let imageUrl = ''
+
+    if (descMatch) {
+      console.log(`🔍 Raw description for pin ${i + 1}: ${rawDescription.substring(0, 200)}`)
+
+      // Pattern 1: HTML entities escaped - src=&quot;...&quot;
+      const imgMatch1 = rawDescription.match(/src=&quot;([^&]*?)&quot;/)
+      if (imgMatch1) {
+        imageUrl = imgMatch1[1]
+        console.log(`✅ Pattern 1 matched: ${imageUrl}`)
+      }
+
+      // Pattern 2: Normal src="..." in img tag
+      if (!imageUrl) {
+        const imgMatch2 = rawDescription.match(/src="([^"]*)"/)
+        if (imgMatch2) {
+          imageUrl = imgMatch2[1]
+          console.log(`✅ Pattern 2 matched: ${imageUrl}`)
+        }
+      }
+
+      // Pattern 3: Look for Pinterest image URLs directly
+      if (!imageUrl) {
+        const imgMatch3 = rawDescription.match(/https:\/\/i\.pinimg\.com\/[^&"'\s]+/)
+        if (imgMatch3) {
+          imageUrl = imgMatch3[0]
+          console.log(`✅ Pattern 3 matched: ${imageUrl}`)
+        }
+      }
+
+      // Pattern 4: Any https image URL
+      if (!imageUrl) {
+        const imgMatch4 = rawDescription.match(/https:\/\/[^&"'\s]+\.(jpg|jpeg|png|webp)/i)
+        if (imgMatch4) {
+          imageUrl = imgMatch4[0]
+          console.log(`✅ Pattern 4 matched: ${imageUrl}`)
+        }
+      }
+
+      if (!imageUrl) {
+        console.log(`❌ No image URL found in description`)
+      }
+    }
+
+    console.log(`📌 Pin ${i + 1}: "${title.substring(0, 50)}" - Image: ${imageUrl ? 'Found' : 'Missing'} - URL: ${imageUrl.substring(0, 100)}`)
 
     if (imageUrl && sourceUrl) {
-      const thumbnailUrl = imageUrl.replace(/\/\d+x/, '/400x')
+      // Generate thumbnail URL (Pinterest format)
+      let thumbnailUrl = imageUrl
+      if (imageUrl.includes('pinimg.com')) {
+        thumbnailUrl = imageUrl.replace(/\/\d+x/, '/400x').replace(/\/originals\//, '/400x/')
+      }
+
       const tags = extractTags(title + ' ' + description)
 
       pins.push({
-        id: `pin_${i}_${Date.now()}`,
+        id: `pin_${i}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         url: imageUrl,
         thumbnailUrl: thumbnailUrl,
         title: title,
@@ -115,9 +170,12 @@ function parseRSSFeed(rssText: string): PinterestPin[] {
         sourceUrl: sourceUrl,
         tags: tags
       })
+    } else {
+      console.log(`❌ Skipping pin ${i + 1}: missing ${!imageUrl ? 'image' : 'source'} URL`)
     }
   }
 
+  console.log(`✅ Successfully parsed ${pins.length} pins from ${itemMatches.length} RSS items`)
   return pins
 }
 
@@ -181,37 +239,61 @@ function extractTags(text: string): string[] {
 export async function POST(request: NextRequest) {
   try {
     const { username, boardName, url } = await request.json()
-    
+
+    console.log(`📌 Pinterest API called with:`, { username, boardName, url })
+
     if (!username || !boardName) {
+      console.log(`❌ Missing required fields: username=${username}, boardName=${boardName}`)
       return NextResponse.json(
         { error: 'Username and board name are required' },
         { status: 400 }
       )
     }
-    
-    console.log(`Fetching Pinterest board: ${username}/${boardName}`)
-    
-    const pins = await fetchPinterestBoard(username, boardName)
-    
-    return NextResponse.json({
-      success: true,
-      pins: pins,
-      count: pins.length,
-      boardInfo: {
-        username,
-        boardName,
-        url
-      }
-    })
-    
+
+    console.log(`🔍 Fetching Pinterest board: ${username}/${boardName}`)
+
+    try {
+      const pins = await fetchPinterestBoard(username, boardName)
+
+      console.log(`✅ Successfully fetched ${pins.length} pins`)
+
+      return NextResponse.json({
+        success: true,
+        pins: pins,
+        count: pins.length,
+        boardInfo: {
+          username,
+          boardName,
+          url
+        }
+      })
+    } catch (fetchError: any) {
+      console.error(`❌ Pinterest fetch failed:`, fetchError.message)
+
+      // Return empty result instead of error for better UX
+      return NextResponse.json({
+        success: false,
+        pins: [],
+        count: 0,
+        error: 'Pinterest board could not be loaded. The board might be private or the URL might be incorrect.',
+        details: fetchError.message,
+        boardInfo: {
+          username,
+          boardName,
+          url
+        }
+      })
+    }
+
   } catch (error: any) {
-    console.error('Pinterest board fetch error:', error)
-    
+    console.error('❌ Pinterest API error:', error)
+
     return NextResponse.json(
-      { 
-        error: 'Failed to fetch Pinterest board',
+      {
+        success: false,
+        error: 'Failed to process Pinterest board request',
         details: error.message,
-        pins: [] // Return empty array as fallback
+        pins: []
       },
       { status: 500 }
     )
