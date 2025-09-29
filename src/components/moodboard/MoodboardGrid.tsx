@@ -27,6 +27,21 @@ export default function MoodboardGrid({
   const [isDeleting, setIsDeleting] = useState(false)
   const [isEditingCategory, setIsEditingCategory] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<WeddingCategory>('other')
+  const [isMobile, setIsMobile] = useState(false)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [touchEnd, setTouchEnd] = useState<number | null>(null)
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // Handle Escape key to close modal
   useEffect(() => {
@@ -95,6 +110,52 @@ export default function MoodboardGrid({
     }
   }
 
+  // Mobile gallery navigation
+  const handleImageClick = (image: MoodboardImage) => {
+    const index = images.findIndex(img => img.id === image.id)
+    setCurrentImageIndex(index)
+    setSelectedImage(image)
+  }
+
+  const navigateToNext = () => {
+    const nextIndex = (currentImageIndex + 1) % images.length
+    setCurrentImageIndex(nextIndex)
+    setSelectedImage(images[nextIndex])
+    setIsEditingCategory(false)
+  }
+
+  const navigateToPrevious = () => {
+    const prevIndex = currentImageIndex === 0 ? images.length - 1 : currentImageIndex - 1
+    setCurrentImageIndex(prevIndex)
+    setSelectedImage(images[prevIndex])
+    setIsEditingCategory(false)
+  }
+
+  // Touch handlers for swipe navigation
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null)
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+
+    const distance = touchStart - touchEnd
+    const isLeftSwipe = distance > 50
+    const isRightSwipe = distance < -50
+
+    if (isLeftSwipe && images.length > 1) {
+      navigateToNext()
+    }
+    if (isRightSwipe && images.length > 1) {
+      navigateToPrevious()
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Filters */}
@@ -148,49 +209,94 @@ export default function MoodboardGrid({
         </div>
       </div>
 
-      {/* Interactive Moodboard Canvas */}
-      <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 md:p-8 min-h-[800px] md:min-h-[1200px] overflow-hidden border border-gray-200 touch-none">
-        {/* Background pattern */}
-        <div className="absolute inset-0 opacity-5">
-          <div
-            className="w-full h-full"
-            style={{
-              backgroundImage: `
-                radial-gradient(circle at 1px 1px, rgba(0,0,0,0.15) 1px, transparent 0)
-              `,
-              backgroundSize: '15px 15px'
-            }}
-          />
-        </div>
+      {/* Conditional rendering based on device type */}
+      {isMobile ? (
+        /* Mobile Gallery Grid */
+        <div className="grid grid-cols-2 gap-3 p-4">
+          {filteredImages.map((image) => (
+            <div
+              key={image.id}
+              className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer group"
+              onClick={() => handleImageClick(image)}
+            >
+              <Image
+                src={image.thumbnailUrl || image.url}
+                alt={image.title || 'Moodboard obrázek'}
+                fill
+                className="object-cover transition-transform group-hover:scale-105"
+                sizes="(max-width: 768px) 50vw, 25vw"
+              />
 
-        {/* Moodboard title overlay */}
-        <div className="absolute top-4 left-4 text-gray-400 text-sm font-medium pointer-events-none">
-          Svatební Moodboard • {filteredImages.length} {filteredImages.length === 1 ? 'obrázek' : filteredImages.length < 5 ? 'obrázky' : 'obrázků'}
-        </div>
+              {/* Overlay with favorite indicator */}
+              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all">
+                {image.isFavorite && (
+                  <div className="absolute top-2 right-2">
+                    <Heart className="w-4 h-4 text-red-500 fill-current" />
+                  </div>
+                )}
+              </div>
 
-        {/* Images */}
-        {filteredImages.map((image) => (
-          <SimpleMoodboardCard
-            key={image.id}
-            image={image}
-            onToggleFavorite={handleToggleFavorite}
-            onRemove={handleRemove}
-            onImageClick={setSelectedImage}
-            onPositionChange={onPositionChange || (() => {})}
-          />
-        ))}
+              {/* Category indicator */}
+              <div className="absolute bottom-2 left-2">
+                <span className="text-lg">{WEDDING_CATEGORIES[image.category]?.icon}</span>
+              </div>
+            </div>
+          ))}
 
-        {/* Instructions overlay when empty */}
-        {filteredImages.length === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="text-center text-gray-400">
+          {/* Empty state for mobile */}
+          {filteredImages.length === 0 && (
+            <div className="col-span-2 text-center py-12 text-gray-400">
               <div className="text-6xl mb-4">🎨</div>
               <p className="text-lg font-medium">Váš moodboard je prázdný</p>
-              <p className="text-sm">Přidejte obrázky a uspořádejte je přetažením</p>
+              <p className="text-sm">Nahrajte fotky nebo importujte inspiraci z Pinterestu</p>
             </div>
+          )}
+        </div>
+      ) : (
+        /* Desktop Interactive Canvas */
+        <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 md:p-8 min-h-[800px] md:min-h-[1200px] overflow-hidden border border-gray-200 touch-none">
+          {/* Background pattern */}
+          <div className="absolute inset-0 opacity-5">
+            <div
+              className="w-full h-full"
+              style={{
+                backgroundImage: `
+                  radial-gradient(circle at 1px 1px, rgba(0,0,0,0.15) 1px, transparent 0)
+                `,
+                backgroundSize: '15px 15px'
+              }}
+            />
           </div>
-        )}
-      </div>
+
+          {/* Moodboard title overlay */}
+          <div className="absolute top-4 left-4 text-gray-400 text-sm font-medium pointer-events-none">
+            Svatební Moodboard • {filteredImages.length} {filteredImages.length === 1 ? 'obrázek' : filteredImages.length < 5 ? 'obrázky' : 'obrázků'}
+          </div>
+
+          {/* Images */}
+          {filteredImages.map((image) => (
+            <SimpleMoodboardCard
+              key={image.id}
+              image={image}
+              onToggleFavorite={handleToggleFavorite}
+              onRemove={handleRemove}
+              onImageClick={setSelectedImage}
+              onPositionChange={onPositionChange || (() => {})}
+            />
+          ))}
+
+          {/* Instructions overlay when empty */}
+          {filteredImages.length === 0 && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="text-center text-gray-400">
+                <div className="text-6xl mb-4">🎨</div>
+                <p className="text-lg font-medium">Váš moodboard je prázdný</p>
+                <p className="text-sm">Přidejte obrázky a uspořádejte je přetažením</p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Empty state */}
       {filteredImages.length === 0 && (
@@ -226,6 +332,9 @@ export default function MoodboardGrid({
               setSelectedImage(null)
             }
           }}
+          onTouchStart={isMobile ? handleTouchStart : undefined}
+          onTouchMove={isMobile ? handleTouchMove : undefined}
+          onTouchEnd={isMobile ? handleTouchEnd : undefined}
         >
           <div className="bg-white rounded-lg max-w-4xl max-h-[90vh] overflow-hidden relative mx-4">
             {/* Close button */}
@@ -237,7 +346,34 @@ export default function MoodboardGrid({
               <X className="w-4 h-4 md:w-5 md:h-5" />
             </button>
 
-            <div className="flex flex-col md:flex-row">
+            {/* Mobile navigation buttons */}
+            {isMobile && images.length > 1 && (
+              <>
+                <button
+                  onClick={navigateToPrevious}
+                  className="absolute left-2 top-1/2 transform -translate-y-1/2 z-10 p-3 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-70 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <button
+                  onClick={navigateToNext}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 z-10 p-3 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-70 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+
+                {/* Image counter */}
+                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 z-10 px-3 py-1 bg-black bg-opacity-50 text-white text-sm rounded-full">
+                  {currentImageIndex + 1} / {images.length}
+                </div>
+              </>
+            )}
+
+            <div className={`flex ${isMobile ? 'flex-col' : 'flex-col md:flex-row'}`}>
               {/* Image */}
               <div className="flex-1 relative">
                 <Image
@@ -245,12 +381,12 @@ export default function MoodboardGrid({
                   alt={selectedImage.title || 'Moodboard image'}
                   width={800}
                   height={600}
-                  className="object-contain max-h-[70vh]"
+                  className={`object-contain ${isMobile ? 'max-h-[50vh]' : 'max-h-[70vh]'}`}
                 />
               </div>
-              
+
               {/* Details */}
-              <div className="w-full md:w-80 p-4 md:p-6 md:border-l border-gray-200">
+              <div className={`w-full ${isMobile ? 'max-h-[40vh] overflow-y-auto' : 'md:w-80'} p-4 md:p-6 ${!isMobile ? 'md:border-l' : 'border-t'} border-gray-200`}>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900">
                     {selectedImage.title || 'Bez názvu'}
