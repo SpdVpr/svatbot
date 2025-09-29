@@ -12,7 +12,7 @@ import UpcomingTasksModule from './modules/UpcomingTasksModule'
 import MainFeaturesModule from './modules/MainFeaturesModule'
 import MarketplaceModule from './modules/MarketplaceModule'
 import PhaseProgressModule from './modules/PhaseProgressModule'
-import QuickStatsModule from './modules/QuickStatsModule'
+// import QuickStatsModule from './modules/QuickStatsModule' // REMOVED
 import ComingSoonModule from './modules/ComingSoonModule'
 import TaskManagementModule from './modules/TaskManagementModule'
 import GuestManagementModule from './modules/GuestManagementModule'
@@ -269,8 +269,8 @@ export default function GridDragDrop({ onWeddingSettingsClick }: GridDragDropPro
         return <MarketplaceModule />
       case 'phase-progress':
         return <PhaseProgressModule />
-      case 'quick-stats':
-        return <QuickStatsModule />
+      // case 'quick-stats': // REMOVED
+      //   return <QuickStatsModule />
       case 'coming-soon':
         return <ComingSoonModule />
       case 'task-management':

@@ -222,8 +222,8 @@ function DashboardContent() {
                 <LogOut className="w-4 h-4" />
                 <span className="hidden sm:inline">Odhlásit</span>
               </button>
-              {/* Development Test Buttons */}
-              {true && (
+              {/* Development Test Buttons - HIDDEN */}
+              {false && (
                 <>
                   <button
                     onClick={handleTestToast}
