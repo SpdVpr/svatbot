@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import {
   collection,
   query,
@@ -10,6 +10,8 @@ import {
   doc,
   updateDoc,
   addDoc,
+  deleteDoc,
+  getDocs,
   serverTimestamp,
   limit
 } from 'firebase/firestore'
@@ -71,6 +73,7 @@ export function useWeddingNotifications() {
   const [loading, setLoading] = useState(true)
   const [cleanupDone, setCleanupDone] = useState(false)
   const { user } = useAuth()
+  const listenerRef = useRef<(() => void) | null>(null)
 
   // Cleanup duplicates on first load
   useEffect(() => {
@@ -80,18 +83,36 @@ export function useWeddingNotifications() {
       try {
         console.log('🧹 Cleaning up duplicate notifications for user:', user.id)
 
-        const response = await fetch('/api/cleanup/notifications', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userId: user.id,
-            action: 'duplicates'
-          })
-        })
+        // Direct Firestore cleanup instead of API call
+        const q = query(
+          collection(db, 'weddingNotifications'),
+          where('userId', '==', user.id),
+          orderBy('createdAt', 'desc')
+        )
 
-        const result = await response.json()
-        if (result.success && result.deletedCount > 0) {
-          console.log(`✅ Cleaned up ${result.deletedCount} duplicate notifications`)
+        const snapshot = await getDocs(q)
+        const seen = new Set<string>()
+        const toDelete: string[] = []
+
+        // Find duplicates
+        for (const docSnapshot of snapshot.docs) {
+          const data = docSnapshot.data()
+          const uniqueKey = `${data.userId}_${data.type}_${data.title}_${data.message}`
+
+          if (seen.has(uniqueKey)) {
+            toDelete.push(docSnapshot.id)
+          } else {
+            seen.add(uniqueKey)
+          }
+        }
+
+        // Delete duplicates
+        for (const notificationId of toDelete) {
+          await deleteDoc(doc(db, 'weddingNotifications', notificationId))
+        }
+
+        if (toDelete.length > 0) {
+          console.log(`✅ Cleaned up ${toDelete.length} duplicate notifications`)
         }
 
         setCleanupDone(true)
@@ -110,6 +131,13 @@ export function useWeddingNotifications() {
       setUnreadCount(0)
       setLoading(false)
       return
+    }
+
+    // Cleanup existing listener
+    if (listenerRef.current) {
+      console.log('🧹 Cleaning up existing listener')
+      listenerRef.current()
+      listenerRef.current = null
     }
 
     console.log('Setting up notifications listener for user:', user.id)
@@ -151,7 +179,15 @@ export function useWeddingNotifications() {
       }
     )
 
-    return unsubscribe
+    // Store the unsubscribe function
+    listenerRef.current = unsubscribe
+
+    return () => {
+      if (listenerRef.current) {
+        listenerRef.current()
+        listenerRef.current = null
+      }
+    }
   }, [user?.id, cleanupDone]) // Only depend on user.id and cleanup status
 
   // Create new notification
