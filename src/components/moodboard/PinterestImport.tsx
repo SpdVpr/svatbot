@@ -16,68 +16,12 @@ interface PinterestImportProps {
   isLoading: boolean
 }
 
-// Mock Pinterest data for demonstration
-const mockPinterestResults = [
-  {
-    id: '1',
-    url: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400',
-    title: 'Elegant Wedding Bouquet',
-    description: 'Beautiful white and pink roses with eucalyptus',
-    sourceUrl: 'https://pinterest.com/pin/example1',
-    tags: ['bouquet', 'roses', 'wedding', 'flowers']
-  },
-  {
-    id: '2',
-    url: 'https://images.unsplash.com/photo-1465495976277-4387d4b0e4a6?w=800',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1465495976277-4387d4b0e4a6?w=400',
-    title: 'Rustic Wedding Decoration',
-    description: 'Wooden signs and mason jars for rustic wedding theme',
-    sourceUrl: 'https://pinterest.com/pin/example2',
-    tags: ['rustic', 'decoration', 'mason jars', 'wooden']
-  },
-  {
-    id: '3',
-    url: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400',
-    title: 'Wedding Cake Design',
-    description: 'Three-tier white wedding cake with floral decorations',
-    sourceUrl: 'https://pinterest.com/pin/example3',
-    tags: ['cake', 'wedding cake', 'floral', 'white']
-  },
-  {
-    id: '4',
-    url: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=400',
-    title: 'Bridal Dress Inspiration',
-    description: 'Elegant A-line wedding dress with lace details',
-    sourceUrl: 'https://pinterest.com/pin/example4',
-    tags: ['dress', 'bridal', 'lace', 'a-line']
-  },
-  {
-    id: '5',
-    url: 'https://images.unsplash.com/photo-1606800052052-a08af7148866?w=800',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1606800052052-a08af7148866?w=400',
-    title: 'Wedding Table Setting',
-    description: 'Romantic table setting with candles and flowers',
-    sourceUrl: 'https://pinterest.com/pin/example5',
-    tags: ['table setting', 'candles', 'romantic', 'flowers']
-  },
-  {
-    id: '6',
-    url: 'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=800',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=400',
-    title: 'Wedding Venue Decoration',
-    description: 'Outdoor wedding ceremony with floral arch',
-    sourceUrl: 'https://pinterest.com/pin/example6',
-    tags: ['venue', 'outdoor', 'ceremony', 'arch']
-  }
-]
+// No demo data - only real Pinterest results
 
 export default function PinterestImport({ onImport, isLoading }: PinterestImportProps) {
   const [boardUrl, setBoardUrl] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
-  const [searchResults, setSearchResults] = useState(mockPinterestResults)
+  const [searchResults, setSearchResults] = useState<any[]>([])
   const [importingIds, setImportingIds] = useState<Set<string>>(new Set())
   const [isLoadingBoard, setIsLoadingBoard] = useState(false)
   const [importMode, setImportMode] = useState<'board' | 'search'>('board')
@@ -139,15 +83,13 @@ export default function PinterestImport({ onImport, isLoading }: PinterestImport
         setSearchResults(data.pins)
         alert(`Úspěšně načteno ${data.pins.length} obrázků z Pinterest boardu!`)
       } else {
-        // Fallback to demo data if Pinterest fails
-        setSearchResults(mockPinterestResults)
-        alert('Pinterest board se nepodařilo načíst. Zobrazuji demo obrázky.')
+        setSearchResults([])
+        alert('Pinterest board je prázdný nebo není veřejně dostupný.')
       }
     } catch (error) {
       console.error('Error loading Pinterest board:', error)
-      // Fallback to demo data
-      setSearchResults(mockPinterestResults)
-      alert('Pinterest board se nepodařilo načíst. Zobrazuji demo obrázky pro ukázku funkcionality.')
+      setSearchResults([])
+      alert('Pinterest board se nepodařilo načíst. Zkontrolujte URL a zkuste to znovu.')
     } finally {
       setIsLoadingBoard(false)
     }
@@ -156,21 +98,12 @@ export default function PinterestImport({ onImport, isLoading }: PinterestImport
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // In a real implementation, this would call Pinterest API
-    // For now, we'll filter mock results
-    if (searchQuery.trim()) {
-      const filtered = mockPinterestResults.filter(item =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-      )
-      setSearchResults(filtered)
-    } else {
-      setSearchResults(mockPinterestResults)
-    }
+    // Search functionality not implemented yet
+    alert('Vyhledávání Pinterest obrázků zatím není implementováno. Použijte import boardu.')
+    setSearchResults([])
   }
 
-  const handleImport = async (item: typeof mockPinterestResults[0]) => {
+  const handleImport = async (item: any) => {
     try {
       setImportingIds(prev => new Set(prev).add(item.id))
 
@@ -315,9 +248,9 @@ export default function PinterestImport({ onImport, isLoading }: PinterestImport
             <div className="flex items-start space-x-3">
               <Search className="w-5 h-5 text-yellow-600 mt-0.5" />
               <div>
-                <h3 className="font-medium text-yellow-900">Vyhledávání (Demo)</h3>
+                <h3 className="font-medium text-yellow-900">Vyhledávání není dostupné</h3>
                 <p className="text-sm text-yellow-700 mt-1">
-                  Tato funkce je momentálně v demo režimu s ukázkovými obrázky.
+                  Vyhledávání Pinterest obrázků zatím není implementováno. Použijte import celého boardu.
                 </p>
               </div>
             </div>
@@ -421,7 +354,7 @@ export default function PinterestImport({ onImport, isLoading }: PinterestImport
               
               {/* Tags */}
               <div className="flex flex-wrap gap-1 mb-3">
-                {item.tags.slice(0, 3).map((tag, index) => (
+                {item.tags?.slice(0, 3).map((tag: string, index: number) => (
                   <span
                     key={index}
                     className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full"
@@ -429,7 +362,7 @@ export default function PinterestImport({ onImport, isLoading }: PinterestImport
                     {tag}
                   </span>
                 ))}
-                {item.tags.length > 3 && (
+                {item.tags?.length > 3 && (
                   <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
                     +{item.tags.length - 3}
                   </span>
