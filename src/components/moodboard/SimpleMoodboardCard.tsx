@@ -7,7 +7,7 @@ import { MoodboardImage, WEDDING_CATEGORIES } from '@/hooks/useMoodboard'
 interface SimpleMoodboardCardProps {
   image: MoodboardImage
   onImageClick: (image: MoodboardImage) => void
-  onPositionChange: (imageId: string, position: { x: number; y: number }, size: { width: number; height: number }) => void
+  onPositionChange: (imageId: string, position: { x: number; y: number }, size?: { width: number; height: number }) => void
   onToggleFavorite: (imageId: string) => void
   onRemove: (imageId: string) => void
 }

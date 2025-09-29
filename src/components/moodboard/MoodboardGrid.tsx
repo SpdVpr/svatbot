@@ -161,7 +161,7 @@ export default function MoodboardGrid({
             onToggleFavorite={handleToggleFavorite}
             onRemove={handleRemove}
             onImageClick={setSelectedImage}
-            onPositionChange={onPositionChange}
+            onPositionChange={onPositionChange || (() => {})}
           />
         ))}
 

@@ -156,7 +156,7 @@ export function useMoodboard() {
         sourceUrl: imageData.sourceUrl || '',
         isFavorite: false,
         tags: imageData.tags || [],
-        category: imageData.category || 'other',
+        category: 'other' as WeddingCategory,
         createdAt: new Date(),
         userId: user.id,
         weddingId: wedding.id,
