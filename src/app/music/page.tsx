@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import SpotifySearch from '@/components/music/SpotifySearch'
 import SongCard from '@/components/music/SongCard'
 import { MusicPlayerProvider, useMusicPlayer } from '@/components/music/MusicPlayer'
-import { SpotifyTrack } from '@/lib/spotify'
+import { SpotifyTrack, spotifyClient } from '@/lib/spotify'
 import { useMusic, Song } from '@/hooks/useMusic'
 
 function MusicPageContent() {
@@ -251,23 +251,39 @@ function MusicPageContent() {
             {categories.map(category => (
               <div key={category.id} className="wedding-card">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-3 flex-1">
                     <span className="text-2xl">{category.icon}</span>
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
-                        <span>{category.name}</span>
-                        {category.required && (
-                          <span className="text-xs px-2 py-0.5 bg-red-100 text-red-700 rounded-full">
-                            Povinné
-                          </span>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+                          <span>{category.name}</span>
+                          {category.required && (
+                            <span className="text-xs px-2 py-0.5 bg-red-100 text-red-700 rounded-full">
+                              Povinné
+                            </span>
+                          )}
+                        </h3>
+                        {/* Total Duration */}
+                        {category.songs.length > 0 && (
+                          <div className="flex items-center space-x-2 text-sm">
+                            <span className="text-gray-600">
+                              {category.songs.length} {category.songs.length === 1 ? 'píseň' : category.songs.length < 5 ? 'písně' : 'písní'}
+                            </span>
+                            <span className="text-gray-400">•</span>
+                            <span className="font-medium text-purple-600">
+                              {spotifyClient.formatDuration(
+                                category.songs.reduce((sum, song) => sum + (song.duration || 0), 0)
+                              )}
+                            </span>
+                          </div>
                         )}
-                      </h3>
+                      </div>
                       <p className="text-sm text-gray-600">{category.description}</p>
                     </div>
                   </div>
                   <button
                     onClick={() => setShowAddSong(category.id)}
-                    className="btn-outline text-sm flex items-center space-x-1"
+                    className="btn-outline text-sm flex items-center space-x-1 ml-4"
                   >
                     <Plus className="w-4 h-4" />
                     <span>Přidat</span>

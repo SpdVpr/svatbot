@@ -175,6 +175,15 @@ export default function SpotifySearch({ onSelectTrack, placeholder }: SpotifySea
 
                     {/* Actions */}
                     <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {/* Add Button - FIRST */}
+                      <button
+                        onClick={() => handleSelectTrack(track)}
+                        className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                        title="Přidat do playlistu"
+                      >
+                        <Plus className="w-5 h-5" />
+                      </button>
+
                       {/* Preview Button */}
                       {track.preview_url && (
                         <button
@@ -190,7 +199,7 @@ export default function SpotifySearch({ onSelectTrack, placeholder }: SpotifySea
                         </button>
                       )}
 
-                      {/* Spotify Link */}
+                      {/* Spotify Link - LAST */}
                       <a
                         href={track.external_urls.spotify}
                         target="_blank"
@@ -200,15 +209,6 @@ export default function SpotifySearch({ onSelectTrack, placeholder }: SpotifySea
                       >
                         <ExternalLink className="w-5 h-5" />
                       </a>
-
-                      {/* Add Button */}
-                      <button
-                        onClick={() => handleSelectTrack(track)}
-                        className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
-                        title="Přidat do playlistu"
-                      >
-                        <Plus className="w-5 h-5" />
-                      </button>
                     </div>
                   </div>
                 ))}

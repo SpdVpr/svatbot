@@ -30,10 +30,10 @@ export default function SongCard({ song, onRemove, isPlaying, onPlayToggle }: So
   return (
     <div className="bg-white rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all group">
       <div className="flex items-center space-x-3 p-3">
-        {/* Drag Handle */}
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing">
+        {/* Drag Handle - Hidden for now, can be enabled later */}
+        {/* <div className="opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing">
           <GripVertical className="w-5 h-5 text-gray-400" />
-        </div>
+        </div> */}
 
         {/* Album Cover */}
         <div className="relative w-14 h-14 flex-shrink-0 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg overflow-hidden">
@@ -74,16 +74,16 @@ export default function SongCard({ song, onRemove, isPlaying, onPlayToggle }: So
           )}
         </div>
 
-        {/* Actions */}
+        {/* Actions - Always visible */}
         <div className="flex items-center space-x-1">
-          {/* Play/Pause Button */}
-          {song.previewUrl && onPlayToggle && (
+          {/* Play/Pause Button - Always visible if preview exists */}
+          {song.previewUrl && onPlayToggle ? (
             <button
               onClick={onPlayToggle}
               className={`p-2 rounded-lg transition-all ${
                 isPlaying
-                  ? 'bg-green-500 text-white hover:bg-green-600'
-                  : 'text-green-600 hover:bg-green-50'
+                  ? 'bg-green-500 text-white hover:bg-green-600 shadow-lg'
+                  : 'bg-green-50 text-green-600 hover:bg-green-100 border border-green-200'
               }`}
               title={isPlaying ? "Zastavit" : "Přehrát ukázku"}
             >
@@ -93,7 +93,11 @@ export default function SongCard({ song, onRemove, isPlaying, onPlayToggle }: So
                 <Play className="w-5 h-5" />
               )}
             </button>
-          )}
+          ) : song.previewUrl ? (
+            <div className="p-2 text-gray-300" title="Ukázka není dostupná">
+              <Music className="w-5 h-5" />
+            </div>
+          ) : null}
 
           {/* Spotify Link */}
           {song.spotifyUrl && (
