@@ -46,6 +46,11 @@ class SpotifyClient {
         this.accessToken = data.access_token
         // Set expiry to 5 minutes before actual expiry for safety
         this.tokenExpiry = Date.now() + (data.expires_in - 300) * 1000
+
+        if (!this.accessToken) {
+          throw new Error('Access token is null')
+        }
+
         return this.accessToken
       }
 
