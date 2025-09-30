@@ -1,10 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { Heart, Sparkles, CheckCircle, ArrowRight, Calendar, Users, DollarSign, Clock, Star, Shield, Zap } from 'lucide-react'
+import { Heart, Sparkles, CheckCircle, ArrowRight, Calendar, Users, DollarSign, Clock, Star, Shield, Zap, Briefcase, TrendingUp, Award } from 'lucide-react'
 import { cn } from '@/utils'
 import { useAuth } from '@/hooks/useAuth'
 import AuthModal from '@/components/auth/AuthModal'
+import Link from 'next/link'
 
 export default function WelcomeScreen() {
   const { login, clearError } = useAuth()
@@ -523,8 +524,142 @@ export default function WelcomeScreen() {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        </section>
 
+        {/* Vendor Registration CTA Section */}
+        <section className="py-20 bg-gradient-to-br from-accent-50 to-orange-50">
+          <div className="container-desktop">
+            <div className="max-w-6xl mx-auto">
+              <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+                <div className="grid md:grid-cols-2 gap-0">
+                  {/* Left Column - Info */}
+                  <div className="p-12 bg-gradient-to-br from-accent-500 to-orange-500 text-white">
+                    <div className="flex items-center space-x-2 mb-6">
+                      <Briefcase className="w-8 h-8" />
+                      <span className="text-sm font-semibold uppercase tracking-wide">Pro dodavatele</span>
+                    </div>
 
+                    <h2 className="text-4xl font-bold mb-6">
+                      Nabízíte svatební služby?
+                    </h2>
+
+                    <p className="text-xl text-white/90 mb-8 leading-relaxed">
+                      Zaregistrujte se do našeho marketplace a oslovte tisíce párů, které plánují svatbu.
+                    </p>
+
+                    <div className="space-y-4 mb-8">
+                      <div className="flex items-start space-x-3">
+                        <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                          <CheckCircle className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold mb-1">Zvyšte viditelnost</h4>
+                          <p className="text-white/80 text-sm">Vaše služby uvidí páry aktivně hledající dodavatele</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start space-x-3">
+                        <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                          <TrendingUp className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold mb-1">Získejte nové zakázky</h4>
+                          <p className="text-white/80 text-sm">Přímý kontakt s potenciálními klienty</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start space-x-3">
+                        <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                          <Award className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold mb-1">Prezentujte své portfolio</h4>
+                          <p className="text-white/80 text-sm">Fotografie, recenze a detailní popis služeb</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start space-x-3">
+                        <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                          <Star className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold mb-1">Budujte důvěru</h4>
+                          <p className="text-white/80 text-sm">Ověřený profil a hodnocení od klientů</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium">Registrace</span>
+                        <span className="text-2xl font-bold">ZDARMA</span>
+                      </div>
+                      <p className="text-xs text-white/70">
+                        Bez skrytých poplatků • Schválení do 24-48 hodin
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Right Column - CTA */}
+                  <div className="p-12 flex flex-col justify-center bg-gradient-to-br from-gray-50 to-white">
+                    <div className="mb-8">
+                      <div className="inline-flex items-center px-4 py-2 bg-success-100 rounded-full mb-6">
+                        <CheckCircle className="w-4 h-4 text-success-600 mr-2" />
+                        <span className="text-sm font-medium text-success-700">
+                          Rychlá registrace za 5 minut
+                        </span>
+                      </div>
+
+                      <h3 className="text-3xl font-bold text-gray-900 mb-4">
+                        Začněte ještě dnes
+                      </h3>
+
+                      <p className="text-gray-600 mb-8 leading-relaxed">
+                        Vyplňte jednoduchý formulář, nahrajte fotografie z vašich svateb a začněte získávat nové klienty.
+                      </p>
+
+                      <Link
+                        href="/marketplace/register"
+                        className="btn-primary w-full flex items-center justify-center space-x-3 px-8 py-5 text-lg font-semibold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 mb-6"
+                      >
+                        <Briefcase className="w-5 h-5" />
+                        <span>Zaregistrovat se jako dodavatel</span>
+                        <ArrowRight className="w-5 h-5" />
+                      </Link>
+
+                      <div className="text-center">
+                        <p className="text-sm text-gray-500 mb-4">
+                          Již máte účet?{' '}
+                          <button
+                            onClick={handleLogin}
+                            className="text-primary-600 hover:text-primary-700 font-medium"
+                          >
+                            Přihlaste se
+                          </button>
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Stats */}
+                    <div className="grid grid-cols-3 gap-4 pt-8 border-t border-gray-200">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-accent-600 mb-1">500+</div>
+                        <div className="text-xs text-gray-600">Aktivních párů</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-accent-600 mb-1">100+</div>
+                        <div className="text-xs text-gray-600">Dodavatelů</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-accent-600 mb-1">4.8★</div>
+                        <div className="text-xs text-gray-600">Průměrné hodnocení</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>

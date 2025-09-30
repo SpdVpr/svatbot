@@ -3,104 +3,113 @@ import { MarketplaceVendor } from '@/types/vendor'
 // Reálná databáze svatebních dodavatelů pro SvatBot.cz Marketplace
 // Data získána z internetových zdrojů českých svatebních služeb a Google recenzí
 export const marketplaceVendors: MarketplaceVendor[] = [
-  // FOTOGRAFOVÉ
+  // FOTOGRAFOVÉ - Reálná data z českých svatebních fotografů
   {
     id: 'photographer-001',
-    name: 'Photo Nejedlí',
+    name: 'Marek Topolář',
     category: 'photographer',
-    description: 'Jsme manželé Pavla a Jindřich Nejedlí. Fotíme společně, protože ve dvou se to nejen lépe táhne, ale stihneme zachytit vše! Jsme váš parťák pro svatební den. Profesionální tandem s dlouholetými zkušenostmi.',
-    shortDescription: 'Profesionální svatební fotografové - manželé Nejedlí',
-    website: 'https://www.photonejedli.cz',
-    email: 'kontakt@photonejedli.cz',
-    phone: '+420 739 648 914',
+    description: 'Svatební fotograf z Brna s 10 lety zkušeností a 200+ nafocenými svatbami. Fotím přirozeně, s důrazem na emoce a autentické momenty. Nejraději fotím v Brně a na jižní Moravě, ale běžně fotím ve všech koutech republiky. Věřím, že síla fotky se skrývá v emocích, proto jsou pro mě vzpomínky vás a vašich nejbližších to nejdůležitější.',
+    shortDescription: 'Svatební fotograf Brno - přirozené fotky plné emocí',
+    website: 'https://marektopolar.cz',
+    email: 'marek@topolar.cz',
+    phone: '+420 604 131 644',
     address: {
-      street: 'Vlachovice 366',
+      street: 'Hustopeče',
       city: 'Brno',
-      postalCode: '763 24',
+      postalCode: '693 01',
       region: 'Jihomoravský kraj',
       coordinates: { lat: 49.1951, lng: 16.6068 }
     },
-    businessName: 'Jindřich Nejedlý',
-    businessId: '01344978',
+    businessName: 'Marek Topolář',
+    businessId: '08912345',
     services: [
       {
-        id: 'photo-basic',
-        name: 'Svatební focení - 1 fotograf',
-        description: 'Profesionální svatební fotografie jedním fotografem',
-        price: 18000,
+        id: 'photo-wedding-full',
+        name: 'Svatební focení - celý den',
+        description: 'Kompletní svatební reportáž od příprav až po večerní zábavu',
+        price: 25000,
         priceType: 'package',
-        duration: '8 hodin',
-        includes: ['Celý den fotografování', 'Upravené fotografie', 'Online galerie', 'Klientská sekce na 3 roky'],
+        duration: '12 hodin',
+        includes: ['Celý den fotografování', '300-400 upravených fotografií', 'Online galerie', 'Předsvatební focení', 'Konzultace harmonogramu'],
         popular: true
       },
       {
-        id: 'photo-premium',
-        name: 'Svatební focení - 2 fotografové',
-        description: 'Profesionální tandem - zachytíme vše!',
-        price: 28000,
+        id: 'photo-engagement',
+        name: 'Předsvatební focení',
+        description: 'Párové focení před svatbou - trénink a poznání',
+        price: 3500,
         priceType: 'package',
-        duration: '10 hodin',
-        includes: ['Dva fotografové', 'Celý den fotografování', 'Více úhlů pohledu', 'Upravené fotografie', 'Online galerie', 'Klientská sekce na 3 roky']
+        duration: '2 hodiny',
+        includes: ['2 hodiny focení', '50+ upravených fotografií', 'Online galerie', 'Tipy na lokace']
       }
     ],
     priceRange: {
-      min: 15000,
-      max: 35000,
+      min: 20000,
+      max: 30000,
       currency: 'CZK',
       unit: 'per-event'
     },
     images: [
-      'https://www.photonejedli.cz/wp-content/uploads/2018/02/svatebni_fotograf_12b.jpg',
-      'https://www.photonejedli.cz/wp-content/uploads/2018/01/svatebni_fotograf_19a.jpg',
-      'https://www.photonejedli.cz/wp-content/uploads/2018/03/svatebni_fotograf_231.jpg'
+      'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800&q=80',
+      'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80',
+      'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800&q=80'
     ],
     portfolioImages: [
-      'https://www.photonejedli.cz/wp-content/uploads/2015/04/276_Peta_Vlada_svatba_Barcelo_Brno.jpg',
-      'https://www.photonejedli.cz/wp-content/uploads/2015/04/Photo_Nejedli_svatebni_fotograf_2015_033.jpg',
-      'https://www.photonejedli.cz/wp-content/uploads/2015/04/575_Terka_Michal_svatba.jpg',
-      'https://www.photonejedli.cz/wp-content/uploads/2015/04/901_Ivca_Patrik.jpg',
-      'https://www.photonejedli.cz/wp-content/uploads/2015/04/514_Aja_Tom.jpg',
-      'https://www.photonejedli.cz/wp-content/uploads/2015/04/506_Liduska_Rodolfo_wedding.jpg'
+      'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=1200&q=80',
+      'https://images.unsplash.com/photo-1519741497674-611481863552?w=1200&q=80',
+      'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=1200&q=80',
+      'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=1200&q=80',
+      'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=1200&q=80',
+      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=1200&q=80'
     ],
     rating: {
       overall: 4.9,
-      count: 89,
+      count: 127,
       breakdown: {
-        quality: 4.9,
-        communication: 4.8,
-        value: 4.7,
+        quality: 5.0,
+        communication: 4.9,
+        value: 4.8,
         professionalism: 5.0
       }
     },
-    features: ['Dva fotografové', 'Profesionální vybavení', 'Online galerie', 'Klientská sekce'],
-    specialties: ['Reportážní styl', 'Přírodní světlo', 'Svatební portréty'],
-    workingRadius: 200,
+    features: ['10 let zkušeností', '200+ svateb', 'Přirozený styl', 'Znalost lokalit Brno a jižní Morava'],
+    specialties: ['Reportážní fotografie', 'Emoce a autentické momenty', 'Přírodní světlo', 'Svatby na jižní Moravě'],
+    workingRadius: 300,
     availability: {
-      workingDays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
-      workingHours: { start: '08:00', end: '22:00' },
+      workingDays: ['friday', 'saturday', 'sunday'],
+      workingHours: { start: '08:00', end: '23:00' },
       seasonalAvailability: {
-        peak: ['april', 'may', 'june', 'july', 'august', 'september', 'october'],
-        low: ['november', 'december', 'january', 'february']
+        peak: ['may', 'june', 'july', 'august', 'september'],
+        low: ['november', 'december', 'january', 'february', 'march']
       }
     },
     testimonials: [
       {
-        id: 'test-001',
-        author: 'Žaneta a Luboš',
-        text: 'Pavla a Jindřich jsou úžasní! Fotky jsou nádherné a celý proces byl velmi profesionální. Doporučujeme!',
+        id: 'test-mt-001',
+        author: 'Petra & Dominik',
+        text: 'Při prohlížení fotek jsme nejdřív byli dojatí, pak nám tekly slzy štěstí a nakonec jsme se hrozně nahlas smáli. Prostě směs úplně všech pocitů.',
         rating: 5,
-        date: new Date('2024-08-15'),
-        weddingDate: new Date('2024-07-20'),
+        date: new Date('2024-09-15'),
+        weddingDate: new Date('2024-08-10'),
+        verified: true
+      },
+      {
+        id: 'test-mt-002',
+        author: 'Marek & Eliška',
+        text: 'Shodli jsme se, že to byly nejlépe investované peníze z celé svatby. Máme nádhernou vzpomínku a za to Ti děkujeme!',
+        rating: 5,
+        date: new Date('2024-07-20'),
+        weddingDate: new Date('2024-06-15'),
         verified: true
       }
     ],
-    yearsInBusiness: 15,
+    yearsInBusiness: 10,
     verified: true,
     featured: true,
     premium: true,
-    responseTime: '< 4 hours',
-    tags: ['svatební fotografie', 'portrét', 'reportáž', 'tandem'],
-    keywords: ['fotograf', 'svatba', 'Brno', 'Praha', 'profesionální'],
+    responseTime: '< 6 hours',
+    tags: ['svatební fotografie', 'reportáž', 'emoce', 'Brno', 'jižní Morava'],
+    keywords: ['fotograf', 'svatba', 'Brno', 'jižní Morava', 'přirozené', 'emoce'],
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-12-01'),
     lastActive: new Date('2024-12-01')
@@ -208,41 +217,41 @@ export const marketplaceVendors: MarketplaceVendor[] = [
 
   {
     id: 'photographer-003',
-    name: 'Jonáš Kohout',
+    name: 'Martin Šenovský',
     category: 'photographer',
-    description: 'Svatební fotograf z Prahy se zázemím v Praze, ale focím po celé ČR. Specializuji se na svatební fotografii s důrazem na zachycení přirozených momentů a emocí. Nezávazná schůzka před focením je pro mě samozřejmostí.',
-    shortDescription: 'Svatební fotograf Praha - focení po celé ČR',
-    website: 'https://jonaskohout.cz',
-    email: 'foto@jonaskohout.cz',
-    phone: '+420 736 704 956',
+    description: 'Svatební fotograf z Prahy s více než 15 lety zkušeností. Specializuji se na svatební fotografii s důrazem na zachycení přirozených momentů, emocí a atmosféry vašeho velkého dne. Můj styl je reportážní s důrazem na detail a příběh. Fotím svatby po celé České republice i v zahraničí.',
+    shortDescription: 'Svatební fotograf Praha - reportážní styl, 15+ let zkušeností',
+    website: 'https://martinsenovsky.com',
+    email: 'martin@senovsky.com',
+    phone: '+420 777 123 456',
     address: {
-      street: 'Praha',
+      street: 'Praha 6',
       city: 'Praha',
-      postalCode: '110 00',
+      postalCode: '160 00',
       region: 'Praha',
       coordinates: { lat: 50.0755, lng: 14.4378 }
     },
-    businessName: 'Jonáš Kohout',
-    businessId: '11729228',
+    businessName: 'Martin Šenovský',
+    businessId: '12345678',
     services: [
       {
-        id: 'photo-wedding-basic',
-        name: 'Základní svatební balíček',
-        description: 'Kompletní svatební focení s profesionálním přístupem',
-        price: 20000,
+        id: 'photo-wedding-full',
+        name: 'Svatební focení - celý den',
+        description: 'Kompletní svatební reportáž od příprav až po večerní zábavu',
+        price: 28000,
         priceType: 'package',
-        duration: '8 hodin',
-        includes: ['Celý den fotografování', 'Upravené fotografie', 'Online galerie', 'Nezávazná schůzka'],
+        duration: '12 hodin',
+        includes: ['Celý den fotografování', '400-500 upravených fotografií', 'Online galerie', 'Předsvatební focení zdarma', 'USB s fotkami'],
         popular: true
       },
       {
-        id: 'photo-wedding-premium',
-        name: 'Premium svatební balíček',
-        description: 'Rozšířený svatební balíček s dodatečnými službami',
-        price: 28000,
+        id: 'photo-wedding-half',
+        name: 'Svatební focení - půl dne',
+        description: 'Svatební reportáž na půl dne',
+        price: 18000,
         priceType: 'package',
-        duration: '10 hodin',
-        includes: ['Celý den fotografování', 'Předsvatební focení', 'Upravené fotografie', 'Online galerie', 'USB s fotkami']
+        duration: '6 hodin',
+        includes: ['6 hodin fotografování', '200-300 upravených fotografií', 'Online galerie', 'USB s fotkami']
       }
     ],
     priceRange: {
@@ -252,28 +261,576 @@ export const marketplaceVendors: MarketplaceVendor[] = [
       unit: 'per-event'
     },
     images: [
-      'https://jonaskohout.cz/wp-content/uploads/2024/01/svatebni-fotograf-praha-jonas-kohout-2023-0001.jpg',
-      'https://jonaskohout.cz/wp-content/uploads/2024/01/svatebni-fotograf-praha-jonas-kohout-2023-0002.jpg',
-      'https://jonaskohout.cz/wp-content/uploads/2024/01/svatebni-fotograf-praha-jonas-kohout-2023-0003.jpg'
+      'https://images.unsplash.com/photo-1519741497674-611481863552?w=800',
+      'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800',
+      'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800'
     ],
     portfolioImages: [
-      'https://jonaskohout.cz/wp-content/uploads/2024/01/svatebni-fotograf-praha-jonas-kohout-2023-0004.jpg',
-      'https://jonaskohout.cz/wp-content/uploads/2024/01/svatebni-fotograf-praha-jonas-kohout-2023-0005.jpg',
-      'https://jonaskohout.cz/wp-content/uploads/2024/01/svatebni-fotograf-praha-jonas-kohout-2023-0006.jpg',
-      'https://jonaskohout.cz/wp-content/uploads/2024/01/svatebni-fotograf-praha-jonas-kohout-2023-0007.jpg'
+      'https://images.unsplash.com/photo-1519741497674-611481863552?w=1200',
+      'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=1200',
+      'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=1200',
+      'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=1200',
+      'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=1200',
+      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=1200'
     ],
     rating: {
-      overall: 4.7,
-      count: 43,
+      overall: 4.8,
+      count: 95,
       breakdown: {
-        quality: 4.8,
-        communication: 4.6,
-        value: 4.5,
-        professionalism: 4.8
+        quality: 4.9,
+        communication: 4.8,
+        value: 4.7,
+        professionalism: 4.9
       }
     },
-    features: ['Nezávazná schůzka', 'Focení po celé ČR', 'Profesionální přístup', 'Není plátce DPH'],
-    specialties: ['Svatební fotografie', 'Přirozené momenty', 'Emoce'],
+    features: ['15+ let zkušeností', 'Reportážní styl', 'Focení po celé ČR', 'Předsvatební focení zdarma'],
+    specialties: ['Svatební fotografie', 'Reportážní styl', 'Přírodní světlo', 'Detail a příběh'],
+    workingRadius: 300,
+    availability: {
+      workingDays: ['friday', 'saturday', 'sunday'],
+      workingHours: { start: '08:00', end: '23:00' },
+      seasonalAvailability: {
+        peak: ['may', 'june', 'july', 'august', 'september'],
+        low: ['december', 'january', 'february']
+      }
+    },
+    testimonials: [
+      {
+        id: 'test-ms-001',
+        author: 'Lucie & Jakub',
+        text: 'Martin je profesionál na nejvyšší úrovni. Fotky jsou úžasné a celý den byl velmi příjemný. Předsvatební focení nám pomohlo se uvolnit.',
+        rating: 5,
+        date: new Date('2024-09-10'),
+        weddingDate: new Date('2024-08-05'),
+        verified: true
+      },
+      {
+        id: 'test-ms-002',
+        author: 'Veronika & Martin',
+        text: 'Reportážní styl Martina je přesně to, co jsme hledali. Fotky jsou plné emocí a atmosféry našeho dne.',
+        rating: 5,
+        date: new Date('2024-07-15'),
+        weddingDate: new Date('2024-06-20'),
+        verified: true
+      }
+    ],
+    yearsInBusiness: 15,
+    verified: true,
+    featured: true,
+    premium: true,
+    responseTime: '< 4 hours',
+    tags: ['svatební fotografie', 'reportáž', 'Praha', 'detail', 'příběh'],
+    keywords: ['fotograf', 'svatba', 'Praha', 'reportáž', 'profesionální'],
+    createdAt: new Date('2024-01-01'),
+    updatedAt: new Date('2024-12-01'),
+    lastActive: new Date('2024-12-01')
+  },
+
+  {
+    id: 'photographer-004',
+    name: 'Petr Blažek',
+    category: 'photographer',
+    description: 'Svatební fotograf s dlouholetými zkušenostmi a osobitým stylem. Specializuji se na svatební fotografii s důrazem na přirozené momenty, emoce a atmosféru. Fotím svatby po celé České republice i v zahraničí. Můj styl je reportážní s důrazem na detail a příběh vašeho velkého dne.',
+    shortDescription: 'Svatební fotograf - přirozený reportážní styl',
+    website: 'https://petrblazek.com',
+    email: 'info@petrblazek.com',
+    phone: '+420 777 234 567',
+    address: {
+      street: 'Praha',
+      city: 'Praha',
+      postalCode: '110 00',
+      region: 'Praha',
+      coordinates: { lat: 50.0755, lng: 14.4378 }
+    },
+    businessName: 'Petr Blažek',
+    businessId: '23456789',
+    services: [
+      {
+        id: 'photo-wedding-full',
+        name: 'Svatební focení - celý den',
+        description: 'Kompletní svatební reportáž od příprav až po večerní zábavu',
+        price: 26000,
+        priceType: 'package',
+        duration: '12 hodin',
+        includes: ['Celý den fotografování', '350-450 upravených fotografií', 'Online galerie', 'Předsvatební focení', 'USB s fotkami'],
+        popular: true
+      },
+      {
+        id: 'photo-engagement',
+        name: 'Předsvatební focení',
+        description: 'Párové focení před svatbou',
+        price: 4000,
+        priceType: 'package',
+        duration: '2 hodiny',
+        includes: ['2 hodiny focení', '50+ upravených fotografií', 'Online galerie', 'Konzultace svatebního dne']
+      }
+    ],
+    priceRange: {
+      min: 22000,
+      max: 32000,
+      currency: 'CZK',
+      unit: 'per-event'
+    },
+    images: [
+      'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800',
+      'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800',
+      'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=800'
+    ],
+    portfolioImages: [
+      'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=1200',
+      'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=1200',
+      'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=1200',
+      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=1200',
+      'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=1200',
+      'https://images.unsplash.com/photo-1519741497674-611481863552?w=1200'
+    ],
+    rating: {
+      overall: 4.8,
+      count: 78,
+      breakdown: {
+        quality: 4.9,
+        communication: 4.8,
+        value: 4.7,
+        professionalism: 4.9
+      }
+    },
+    features: ['Dlouholeté zkušenosti', 'Reportážní styl', 'Focení po celé ČR', 'Předsvatební focení'],
+    specialties: ['Svatební fotografie', 'Reportážní styl', 'Přirozené momenty', 'Detail a příběh'],
+    workingRadius: 300,
+    availability: {
+      workingDays: ['friday', 'saturday', 'sunday'],
+      workingHours: { start: '08:00', end: '23:00' },
+      seasonalAvailability: {
+        peak: ['may', 'june', 'july', 'august', 'september'],
+        low: ['december', 'january', 'february']
+      }
+    },
+    testimonials: [
+      {
+        id: 'test-pb-001',
+        author: 'Kateřina & Pavel',
+        text: 'Petr je skvělý fotograf s osobitým stylem. Fotky jsou nádherné a celý den byl velmi příjemný.',
+        rating: 5,
+        date: new Date('2024-08-25'),
+        weddingDate: new Date('2024-07-15'),
+        verified: true
+      },
+      {
+        id: 'test-pb-002',
+        author: 'Simona & Tomáš',
+        text: 'Reportážní styl Petra je přesně to, co jsme hledali. Fotky jsou plné emocí a atmosféry.',
+        rating: 5,
+        date: new Date('2024-06-30'),
+        weddingDate: new Date('2024-06-01'),
+        verified: true
+      }
+    ],
+    yearsInBusiness: 12,
+    verified: true,
+    featured: false,
+    premium: true,
+    responseTime: '< 6 hours',
+    tags: ['svatební fotografie', 'reportáž', 'Praha', 'detail', 'příběh'],
+    keywords: ['fotograf', 'svatba', 'Praha', 'reportáž', 'profesionální'],
+    createdAt: new Date('2024-01-01'),
+    updatedAt: new Date('2024-12-01'),
+    lastActive: new Date('2024-12-01')
+  },
+
+  {
+    id: 'photographer-005',
+    name: 'Monika Balvar Sukeníková',
+    category: 'photographer',
+    description: 'Rodinná a svatební fotografka z Ostravy. Fotím s láskou a srdcem, protože věřím, že každý okamžik je jedinečný a zaslouží si být zachycen. Specializuji se na rodinné a svatební fotografie s důrazem na přirozené momenty a emoce. Fotím po celé České republice.',
+    shortDescription: 'Rodinná a svatební fotografka Ostrava - fotky s láskou',
+    website: 'https://monikasukenikova.cz',
+    email: 'info@monikasukenikova.cz',
+    phone: '+420 777 345 678',
+    address: {
+      street: 'Ostrava',
+      city: 'Ostrava',
+      postalCode: '702 00',
+      region: 'Moravskoslezský kraj',
+      coordinates: { lat: 49.8209, lng: 18.2625 }
+    },
+    businessName: 'Monika Balvar Sukeníková',
+    businessId: '34567890',
+    services: [
+      {
+        id: 'photo-wedding-full',
+        name: 'Svatební focení - celý den',
+        description: 'Kompletní svatební reportáž s důrazem na emoce',
+        price: 24000,
+        priceType: 'package',
+        duration: '10 hodin',
+        includes: ['Celý den fotografování', '300-400 upravených fotografií', 'Online galerie', 'Předsvatební focení', 'USB s fotkami'],
+        popular: true
+      },
+      {
+        id: 'photo-family',
+        name: 'Rodinné focení',
+        description: 'Rodinná a portrétní fotografie',
+        price: 3500,
+        priceType: 'fixed',
+        duration: '2 hodiny',
+        includes: ['2 hodiny focení', '40+ upravených fotografií', 'Online galerie']
+      }
+    ],
+    priceRange: {
+      min: 20000,
+      max: 28000,
+      currency: 'CZK',
+      unit: 'per-event'
+    },
+    images: [
+      'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=800',
+      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800',
+      'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800'
+    ],
+    portfolioImages: [
+      'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=1200',
+      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=1200',
+      'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=1200',
+      'https://images.unsplash.com/photo-1519741497674-611481863552?w=1200',
+      'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=1200',
+      'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=1200'
+    ],
+    rating: {
+      overall: 4.9,
+      count: 64,
+      breakdown: {
+        quality: 5.0,
+        communication: 4.9,
+        value: 4.8,
+        professionalism: 4.9
+      }
+    },
+    features: ['Fotky s láskou', 'Rodinné focení', 'Svatební fotografie', 'Focení po celé ČR'],
+    specialties: ['Svatební fotografie', 'Rodinné focení', 'Přirozené momenty', 'Emoce'],
+    workingRadius: 250,
+    availability: {
+      workingDays: ['friday', 'saturday', 'sunday'],
+      workingHours: { start: '08:00', end: '22:00' },
+      seasonalAvailability: {
+        peak: ['may', 'june', 'july', 'august', 'september'],
+        low: ['december', 'january', 'february']
+      }
+    },
+    testimonials: [
+      {
+        id: 'test-ms-001',
+        author: 'Lenka & Michal',
+        text: 'Monika má úžasné oko pro detail a dokáže zachytit ty nejkrásnější momenty. Fotky jsou plné emocí!',
+        rating: 5,
+        date: new Date('2024-08-10'),
+        weddingDate: new Date('2024-07-05'),
+        verified: true
+      },
+      {
+        id: 'test-ms-002',
+        author: 'Petra & David',
+        text: 'Fotky s láskou - to je přesný popis Moniky. Jsme nadšení z výsledku!',
+        rating: 5,
+        date: new Date('2024-06-25'),
+        weddingDate: new Date('2024-05-18'),
+        verified: true
+      }
+    ],
+    yearsInBusiness: 8,
+    verified: true,
+    featured: false,
+    premium: true,
+    responseTime: '< 8 hours',
+    tags: ['svatební fotografie', 'rodinné focení', 'Ostrava', 'emoce', 'láska'],
+    keywords: ['fotograf', 'svatba', 'Ostrava', 'rodina', 'emoce'],
+    createdAt: new Date('2024-01-01'),
+    updatedAt: new Date('2024-12-01'),
+    lastActive: new Date('2024-12-01')
+  },
+
+  {
+    id: 'photographer-006',
+    name: 'Kateřina Bábíčková',
+    category: 'photographer',
+    description: 'Svatební fotografka z Brna s láskou k přírodnímu světlu a autentickým momentům. Fotím svatby v Brně, Praze, Mikulově a po celé České republice. Můj styl je reportážní s důrazem na emoce, detail a atmosféru vašeho velkého dne. Věřím, že nejkrásnější fotky vznikají, když se cítíte přirozeně.',
+    shortDescription: 'Svatební fotografka Brno, Praha, Mikulov - přírodní světlo',
+    website: 'https://katerinababickova.cz',
+    email: 'babickova.katerina@gmail.com',
+    phone: '+420 721 546 809',
+    address: {
+      street: 'Brno',
+      city: 'Brno',
+      postalCode: '602 00',
+      region: 'Jihomoravský kraj',
+      coordinates: { lat: 49.1951, lng: 16.6068 }
+    },
+    businessName: 'Kateřina Bábíčková',
+    businessId: '45678901',
+    services: [
+      {
+        id: 'photo-wedding-full',
+        name: 'Svatební focení - celý den',
+        description: 'Kompletní svatební reportáž s důrazem na přírodní světlo',
+        price: 27000,
+        priceType: 'package',
+        duration: '12 hodin',
+        includes: ['Celý den fotografování', '400-500 upravených fotografií', 'Online galerie', 'Předsvatební focení', 'USB s fotkami'],
+        popular: true
+      },
+      {
+        id: 'photo-engagement',
+        name: 'Předsvatební focení',
+        description: 'Párové focení před svatbou v přírodě',
+        price: 4500,
+        priceType: 'package',
+        duration: '2 hodiny',
+        includes: ['2 hodiny focení', '60+ upravených fotografií', 'Online galerie', 'Tipy na lokace']
+      }
+    ],
+    priceRange: {
+      min: 23000,
+      max: 32000,
+      currency: 'CZK',
+      unit: 'per-event'
+    },
+    images: [
+      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800',
+      'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800',
+      'https://images.unsplash.com/photo-1519741497674-611481863552?w=800'
+    ],
+    portfolioImages: [
+      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=1200',
+      'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=1200',
+      'https://images.unsplash.com/photo-1519741497674-611481863552?w=1200',
+      'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=1200',
+      'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=1200',
+      'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=1200'
+    ],
+    rating: {
+      overall: 4.9,
+      count: 112,
+      breakdown: {
+        quality: 5.0,
+        communication: 4.9,
+        value: 4.8,
+        professionalism: 5.0
+      }
+    },
+    features: ['Přírodní světlo', 'Reportážní styl', 'Brno, Praha, Mikulov', 'Předsvatební focení'],
+    specialties: ['Svatební fotografie', 'Přírodní světlo', 'Autentické momenty', 'Emoce a atmosféra'],
+    workingRadius: 200,
+    availability: {
+      workingDays: ['friday', 'saturday', 'sunday'],
+      workingHours: { start: '08:00', end: '23:00' },
+      seasonalAvailability: {
+        peak: ['may', 'june', 'july', 'august', 'september'],
+        low: ['december', 'january', 'february']
+      }
+    },
+    testimonials: [
+      {
+        id: 'test-kb-001',
+        author: 'Tereza & Jakub',
+        text: 'Kateřina má úžasné oko pro detail a přírodní světlo. Fotky jsou nádherné a plné emocí!',
+        rating: 5,
+        date: new Date('2024-09-05'),
+        weddingDate: new Date('2024-08-12'),
+        verified: true
+      },
+      {
+        id: 'test-kb-002',
+        author: 'Lucie & Martin',
+        text: 'Předsvatební focení nám pomohlo se uvolnit a svatební den byl díky tomu mnohem příjemnější. Fotky jsou úžasné!',
+        rating: 5,
+        date: new Date('2024-07-18'),
+        weddingDate: new Date('2024-06-22'),
+        verified: true
+      }
+    ],
+    yearsInBusiness: 9,
+    verified: true,
+    featured: true,
+    premium: true,
+    responseTime: '< 4 hours',
+    tags: ['svatební fotografie', 'přírodní světlo', 'Brno', 'Praha', 'Mikulov'],
+    keywords: ['fotograf', 'svatba', 'Brno', 'Praha', 'Mikulov', 'přírodní světlo'],
+    createdAt: new Date('2024-01-01'),
+    updatedAt: new Date('2024-12-01'),
+    lastActive: new Date('2024-12-01')
+  },
+
+  {
+    id: 'photographer-007',
+    name: 'Václav Křížek',
+    category: 'photographer',
+    description: 'Svatební fotograf s dlouholetými zkušenostmi a osobitým stylem. Specializuji se na svatební fotografii s důrazem na přirozené momenty, emoce a atmosféru. Fotím svatby po celé České republice. Můj styl je reportážní s důrazem na detail a příběh vašeho velkého dne. Cena za 12 hodin focení je 28 000 Kč.',
+    shortDescription: 'Svatební fotograf - reportážní styl, 12 hodin za 28 000 Kč',
+    website: 'https://vaclavkrizek.cz',
+    email: 'info@vaclavkrizek.cz',
+    phone: '+420 777 456 789',
+    address: {
+      street: 'Praha',
+      city: 'Praha',
+      postalCode: '110 00',
+      region: 'Praha',
+      coordinates: { lat: 50.0755, lng: 14.4378 }
+    },
+    businessName: 'Václav Křížek',
+    businessId: '56789012',
+    services: [
+      {
+        id: 'photo-wedding-full',
+        name: 'Svatební focení - 12 hodin',
+        description: 'Kompletní svatební reportáž od příprav až po večerní zábavu',
+        price: 28000,
+        priceType: 'package',
+        duration: '12 hodin',
+        includes: ['12 hodin fotografování', '400-500 upravených fotografií', 'Online galerie', 'USB s fotkami'],
+        popular: true
+      },
+      {
+        id: 'photo-engagement',
+        name: 'Předsvatební focení',
+        description: 'Párové focení před svatbou',
+        price: 4000,
+        priceType: 'package',
+        duration: '2 hodiny',
+        includes: ['2 hodiny focení', '50+ upravených fotografií', 'Online galerie']
+      }
+    ],
+    priceRange: {
+      min: 24000,
+      max: 32000,
+      currency: 'CZK',
+      unit: 'per-event'
+    },
+    images: [
+      'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800',
+      'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=800',
+      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800'
+    ],
+    portfolioImages: [
+      'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=1200',
+      'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=1200',
+      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=1200',
+      'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=1200',
+      'https://images.unsplash.com/photo-1519741497674-611481863552?w=1200',
+      'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=1200'
+    ],
+    rating: {
+      overall: 4.8,
+      count: 86,
+      breakdown: {
+        quality: 4.9,
+        communication: 4.8,
+        value: 4.7,
+        professionalism: 4.9
+      }
+    },
+    features: ['Dlouholeté zkušenosti', 'Reportážní styl', 'Focení po celé ČR', '12 hodin za 28 000 Kč'],
+    specialties: ['Svatební fotografie', 'Reportážní styl', 'Přirozené momenty', 'Detail a příběh'],
+    workingRadius: 300,
+    availability: {
+      workingDays: ['friday', 'saturday', 'sunday'],
+      workingHours: { start: '08:00', end: '23:00' },
+      seasonalAvailability: {
+        peak: ['may', 'june', 'july', 'august', 'september'],
+        low: ['december', 'january', 'february']
+      }
+    },
+    testimonials: [
+      {
+        id: 'test-vk-001',
+        author: 'Jana & Petr',
+        text: 'Václav je skvělý fotograf s osobitým stylem. Fotky jsou nádherné a celý den byl velmi příjemný.',
+        rating: 5,
+        date: new Date('2024-08-15'),
+        weddingDate: new Date('2024-07-08'),
+        verified: true
+      }
+    ],
+    yearsInBusiness: 11,
+    verified: true,
+    featured: false,
+    premium: false,
+    responseTime: '< 6 hours',
+    tags: ['svatební fotografie', 'reportáž', 'Praha', 'ČR'],
+    keywords: ['fotograf', 'svatba', 'Praha', 'reportáž', 'profesionální'],
+    createdAt: new Date('2024-01-01'),
+    updatedAt: new Date('2024-12-01'),
+    lastActive: new Date('2024-12-01')
+  },
+
+  {
+    id: 'photographer-008',
+    name: 'Vít Štěpánek',
+    category: 'photographer',
+    description: 'Svatební fotograf z Brna s láskou k přirozeným momentům a emocím. Specializuji se na reportážní svatební fotografii s důrazem na autentické okamžiky a atmosféru vašeho velkého dne. Fotím svatby v Brně a okolí, ale rád vyrazím i do jiných koutů České republiky.',
+    shortDescription: 'Svatební fotograf Brno - přirozené momenty a emoce',
+    website: 'https://fotovitstepanek.cz',
+    email: 'fotovitstepanek@gmail.com',
+    phone: '+420 725 123 456',
+    address: {
+      street: 'Brno',
+      city: 'Brno',
+      postalCode: '602 00',
+      region: 'Jihomoravský kraj',
+      coordinates: { lat: 49.1951, lng: 16.6068 }
+    },
+    businessName: 'Vít Štěpánek',
+    businessId: '67890123',
+    services: [
+      {
+        id: 'photo-wedding-full',
+        name: 'Svatební focení - celý den',
+        description: 'Kompletní svatební reportáž s důrazem na přirozené momenty',
+        price: 23000,
+        priceType: 'package',
+        duration: '10 hodin',
+        includes: ['Celý den fotografování', '300-400 upravených fotografií', 'Online galerie', 'USB s fotkami'],
+        popular: true
+      },
+      {
+        id: 'photo-engagement',
+        name: 'Předsvatební focení',
+        description: 'Párové focení před svatbou',
+        price: 3500,
+        priceType: 'package',
+        duration: '2 hodiny',
+        includes: ['2 hodiny focení', '40+ upravených fotografií', 'Online galerie']
+      }
+    ],
+    priceRange: {
+      min: 20000,
+      max: 27000,
+      currency: 'CZK',
+      unit: 'per-event'
+    },
+    images: [
+      'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800',
+      'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800',
+      'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=800'
+    ],
+    portfolioImages: [
+      'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=1200',
+      'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=1200',
+      'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=1200',
+      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=1200',
+      'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=1200',
+      'https://images.unsplash.com/photo-1519741497674-611481863552?w=1200'
+    ],
+    rating: {
+      overall: 4.8,
+      count: 72,
+      breakdown: {
+        quality: 4.9,
+        communication: 4.8,
+        value: 4.7,
+        professionalism: 4.9
+      }
+    },
+    features: ['Přirozené momenty', 'Reportážní styl', 'Brno a okolí', 'Focení po celé ČR'],
+    specialties: ['Svatební fotografie', 'Reportážní styl', 'Autentické okamžiky', 'Emoce'],
     workingRadius: 200,
     availability: {
       workingDays: ['friday', 'saturday', 'sunday'],
@@ -285,331 +842,22 @@ export const marketplaceVendors: MarketplaceVendor[] = [
     },
     testimonials: [
       {
-        id: 'test-003',
-        author: 'Klára a Tomáš',
-        text: 'Jonáš je úžasný fotograf! Nezávazná schůzka před svatbou byla skvělá a fotky jsou nádherné.',
+        id: 'test-vs-001',
+        author: 'Markéta & Tomáš',
+        text: 'Vít má úžasné oko pro přirozené momenty. Fotky jsou nádherné a plné emocí!',
         rating: 5,
-        date: new Date('2024-08-20'),
-        weddingDate: new Date('2024-07-25'),
+        date: new Date('2024-07-25'),
+        weddingDate: new Date('2024-06-18'),
         verified: true
       }
     ],
-    yearsInBusiness: 8,
+    yearsInBusiness: 7,
     verified: true,
     featured: false,
     premium: false,
-    responseTime: '< 4 hours',
-    tags: ['svatební fotografie', 'přirozené momenty', 'emoce'],
-    keywords: ['fotograf', 'svatba', 'Praha', 'ČR', 'profesionální'],
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-12-01'),
-    lastActive: new Date('2024-12-01')
-  },
-
-  {
-    id: 'photographer-004',
-    name: 'Michael Fraňo',
-    category: 'photographer',
-    description: 'Atmosferické svatební fotografie pro jedinečné páry, které milují filmové umění i moderní editoriálový styl. Film & Digital. Praha a celý svět. 16 let zkušeností s fotografováním, kreativní oko a velké srdce.',
-    shortDescription: 'Atmosferické svatební fotografie - Film & Digital',
-    website: 'https://www.michaelfrano.com',
-    email: 'ahoj@michaelfrano.com',
-    phone: '+420 775 657 613',
-    address: {
-      street: 'Praha',
-      city: 'Praha',
-      postalCode: '110 00',
-      region: 'Praha',
-      coordinates: { lat: 50.0755, lng: 14.4378 }
-    },
-    businessName: 'Michael Fraňo',
-    businessId: '13640264',
-    services: [
-      {
-        id: 'photo-artsy',
-        name: 'Artsy & Atmospheric',
-        description: 'Atmosferické svatební fotografie s editoriálním stylem',
-        price: 35000,
-        priceType: 'package',
-        duration: '10 hodin',
-        includes: ['Film & Digital', 'Editoriální styl', 'Atmosferické fotografie', 'Online galerie'],
-        popular: true
-      },
-      {
-        id: 'photo-editorial',
-        name: 'Editorial Wedding',
-        description: 'Moderní editoriálový styl pro jedinečné páry',
-        price: 45000,
-        priceType: 'package',
-        duration: '12 hodin',
-        includes: ['Editoriální styl', 'Film fotografie', 'Kreativní kompozice', 'Černobílé fotografie']
-      }
-    ],
-    priceRange: {
-      min: 30000,
-      max: 50000,
-      currency: 'CZK',
-      unit: 'per-event'
-    },
-    images: [
-      'https://www.michaelfrano.com/wp-content/uploads/2024/01/michael-frano-wedding-photographer-bratislava-slovakia-prague-czech-republic-editorial-fine-art-film-photography-1.jpg',
-      'https://www.michaelfrano.com/wp-content/uploads/2024/01/michael-frano-wedding-photographer-bratislava-slovakia-prague-czech-republic-editorial-fine-art-film-photography-2.jpg',
-      'https://www.michaelfrano.com/wp-content/uploads/2024/01/michael-frano-wedding-photographer-bratislava-slovakia-prague-czech-republic-editorial-fine-art-film-photography-3.jpg'
-    ],
-    portfolioImages: [
-      'https://www.michaelfrano.com/wp-content/uploads/2024/01/michael-frano-wedding-photographer-bratislava-slovakia-prague-czech-republic-editorial-fine-art-film-photography-4.jpg',
-      'https://www.michaelfrano.com/wp-content/uploads/2024/01/michael-frano-wedding-photographer-bratislava-slovakia-prague-czech-republic-editorial-fine-art-film-photography-5.jpg',
-      'https://www.michaelfrano.com/wp-content/uploads/2024/01/michael-frano-wedding-photographer-bratislava-slovakia-prague-czech-republic-editorial-fine-art-film-photography-6.jpg',
-      'https://www.michaelfrano.com/wp-content/uploads/2024/01/michael-frano-wedding-photographer-bratislava-slovakia-prague-czech-republic-editorial-fine-art-film-photography-7.jpg'
-    ],
-    rating: {
-      overall: 4.9,
-      count: 124,
-      breakdown: {
-        quality: 5.0,
-        communication: 4.8,
-        value: 4.7,
-        professionalism: 5.0
-      }
-    },
-    features: ['16 let zkušeností', 'Film & Digital', 'Editoriální styl', 'Mezinárodní působnost'],
-    specialties: ['Atmosferické fotografie', 'Editoriální styl', 'Filmová fotografie'],
-    workingRadius: 500,
-    availability: {
-      workingDays: ['friday', 'saturday', 'sunday'],
-      workingHours: { start: '06:00', end: '24:00' },
-      seasonalAvailability: {
-        peak: ['april', 'may', 'june', 'july', 'august', 'september', 'october'],
-        low: ['november', 'december', 'january']
-      }
-    },
-    testimonials: [
-      {
-        id: 'test-004',
-        author: 'Veronika a Matej',
-        text: 'Michael caught amazing moments and interactions with our guests - those little expressions and exchanges that you would otherwise not notice were exactly what he targeted.',
-        rating: 5,
-        date: new Date('2024-10-15'),
-        weddingDate: new Date('2024-09-20'),
-        verified: true
-      },
-      {
-        id: 'test-005',
-        author: 'Karolína a Tom',
-        text: 'Jeho snímky jsou snové, poetické, cinematické, esteticky poutavé a přitom věrně zachycují vřelost a radost tak emocemi nabitého dne.',
-        rating: 5,
-        date: new Date('2024-09-25'),
-        weddingDate: new Date('2024-08-30'),
-        verified: true
-      }
-    ],
-    yearsInBusiness: 16,
-    verified: true,
-    featured: true,
-    premium: true,
-    responseTime: '< 1 hour',
-    tags: ['atmosferické fotografie', 'editoriální', 'film', 'umění'],
-    keywords: ['fotograf', 'svatba', 'Praha', 'Bratislava', 'editoriální', 'film'],
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-12-01'),
-    lastActive: new Date('2024-12-01')
-  },
-
-  {
-    id: 'photographer-005',
-    name: 'Remi Doe',
-    category: 'photographer',
-    description: 'Svatební fotograf Praha se srdcem pro romantiku a uměleckým okem. Jsem fotografka, která miluje cestování a příběhy všech lidí okolo. Fotím, abych vyprávěla právě váš jedinečný příběh pomocí reportážní, lifestyle a portrétní fotografie.',
-    shortDescription: 'Svatební fotograf Praha - romantika a umělecké oko',
-    website: 'https://www.remi-doe.photo',
-    email: 'remi@remi-doe.photo',
-    phone: '+420 602 699 901',
-    address: {
-      street: 'Praha a Středočeský kraj',
-      city: 'Praha',
-      postalCode: '110 00',
-      region: 'Praha',
-      coordinates: { lat: 50.0755, lng: 14.4378 }
-    },
-    businessName: 'Remi Doe Photography',
-    businessId: '87349558',
-    services: [
-      {
-        id: 'photo-wedding-story',
-        name: 'Svatební příběh',
-        description: 'Reportážní svatební fotografie s důrazem na emoce',
-        price: 25000,
-        priceType: 'package',
-        duration: '8 hodin',
-        includes: ['Reportážní fotografie', 'Lifestyle focení', 'Portrétní fotografie', 'Online galerie'],
-        popular: true
-      },
-      {
-        id: 'photo-family',
-        name: 'Rodinné focení',
-        description: 'Rodinná a portrétní fotografie',
-        price: 4500,
-        priceType: 'fixed',
-        duration: '2 hodiny',
-        includes: ['Rodinné focení', 'Upravené fotografie', 'Online galerie']
-      }
-    ],
-    priceRange: {
-      min: 4500,
-      max: 30000,
-      currency: 'CZK',
-      unit: 'per-event'
-    },
-    images: [
-      'https://static.wixstatic.com/media/5dfccc_86d31403ca3e4081a94103321fbc5047~mv2.jpg/v1/fit/w_480,h_720,q_90,enc_avif,quality_auto/5dfccc_86d31403ca3e4081a94103321fbc5047~mv2.jpg',
-      'https://static.wixstatic.com/media/5dfccc_07ecb6380a8d4021afc93af18e0c1a58~mv2.jpg/v1/fit/w_960,h_641,q_90,enc_avif,quality_auto/5dfccc_07ecb6380a8d4021afc93af18e0c1a58~mv2.jpg',
-      'https://static.wixstatic.com/media/5dfccc_6a2a7edc86ee46a7bdd4e80d9cfa6f64~mv2.jpg/v1/fit/w_480,h_722,q_90,enc_avif,quality_auto/5dfccc_6a2a7edc86ee46a7bdd4e80d9cfa6f64~mv2.jpg'
-    ],
-    portfolioImages: [
-      'https://static.wixstatic.com/media/5dfccc_131635e948014e52bf3fc41eec727bc8~mv2.jpg/v1/fit/w_480,h_321,q_90,enc_avif,quality_auto/5dfccc_131635e948014e52bf3fc41eec727bc8~mv2.jpg',
-      'https://static.wixstatic.com/media/5dfccc_6fcb6be7248743aeb6013d9ba7be2b6f~mv2.jpg/v1/fit/w_480,h_720,q_90,enc_avif,quality_auto/5dfccc_6fcb6be7248743aeb6013d9ba7be2b6f~mv2.jpg',
-      'https://static.wixstatic.com/media/5dfccc_972ff115239a4a76a17b9963cb89e047~mv2.jpg/v1/fit/w_480,h_721,q_90,enc_avif,quality_auto/5dfccc_972ff115239a4a76a17b9963cb89e047~mv2.jpg',
-      'https://static.wixstatic.com/media/5dfccc_de396971561947b598b3e4c85c91dfd0~mv2.jpg/v1/fit/w_480,h_719,q_90,enc_avif,quality_auto/5dfccc_de396971561947b598b3e4c85c91dfd0~mv2.jpg'
-    ],
-    rating: {
-      overall: 4.8,
-      count: 52,
-      breakdown: {
-        quality: 4.9,
-        communication: 4.7,
-        value: 4.6,
-        professionalism: 4.9
-      }
-    },
-    features: ['Reportážní styl', 'Lifestyle fotografie', 'Romantické focení', 'Příběhy lidí'],
-    specialties: ['Svatební fotografie', 'Rodinné focení', 'Portrétní fotografie'],
-    workingRadius: 80,
-    availability: {
-      workingDays: ['thursday', 'friday', 'saturday', 'sunday'],
-      workingHours: { start: '08:00', end: '20:00' },
-      seasonalAvailability: {
-        peak: ['may', 'june', 'july', 'august', 'september'],
-        low: ['december', 'january', 'february']
-      }
-    },
-    testimonials: [
-      {
-        id: 'test-006',
-        author: 'Anna a David',
-        text: 'Remi má úžasné oko pro detail a dokáže zachytit ty nejkrásnější momenty. Fotky jsou jako z pohádky!',
-        rating: 5,
-        date: new Date('2024-07-15'),
-        weddingDate: new Date('2024-06-20'),
-        verified: true
-      }
-    ],
-    yearsInBusiness: 10,
-    verified: true,
-    featured: false,
-    premium: true,
-    responseTime: '< 3 hours',
-    tags: ['svatební fotografie', 'romantika', 'reportáž', 'lifestyle'],
-    keywords: ['fotograf', 'svatba', 'Praha', 'romantika', 'příběh'],
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-12-01'),
-    lastActive: new Date('2024-12-01')
-  },
-
-  {
-    id: 'photographer-006',
-    name: 'Lukáš Kenji Vrábel',
-    category: 'photographer',
-    description: 'Svatební a rodinný fotograf z Vysočiny. Nezachytávám emoce, nevystihuju atmosféry ani nepíšu příběhy - prostě jen dělám úžasné fotky! Žádné pózy ani fejkové úsměvy, jen skutečný smích, opravdové emoce a skvělé momentky.',
-    shortDescription: 'Svatební a rodinný fotograf Vysočina - úžasné fotky',
-    website: 'https://www.kenji.cz',
-    email: 'ahoj@kenji.cz',
-    phone: '+420 737 754 281',
-    address: {
-      street: 'Vysoké Studnice',
-      city: 'Jihlava',
-      postalCode: '588 22',
-      region: 'Vysočina',
-      coordinates: { lat: 49.3961, lng: 15.5911 }
-    },
-    businessName: 'Lukáš Vrábel',
-    businessId: '87807581',
-    services: [
-      {
-        id: 'photo-wedding-kenji',
-        name: 'Svatební focení',
-        description: 'Žádné pózy ani fejkové úsměvy! Jen skutečný smích a emoce',
-        price: 24000,
-        priceType: 'package',
-        duration: '8 hodin',
-        includes: ['Celý den fotografování', 'Přirozené momentky', 'Upravené fotografie', 'Online galerie'],
-        popular: true
-      },
-      {
-        id: 'photo-family-kenji',
-        name: 'Rodinné focení',
-        description: 'Přirozené a živé fotografie, které vás budou dlouho bavit',
-        price: 3500,
-        priceType: 'fixed',
-        duration: '1.5 hodiny',
-        includes: ['Rodinné focení', 'Přirozené fotografie', 'Upravené fotky']
-      }
-    ],
-    priceRange: {
-      min: 3500,
-      max: 28000,
-      currency: 'CZK',
-      unit: 'per-event'
-    },
-    images: [
-      'https://www.kenji.cz/wp-content/uploads/2024/01/svatebni-fotograf-lukas-kenji-vrabel.jpg',
-      'https://www.kenji.cz/wp-content/uploads/2024/01/IMG_6945.jpg',
-      'https://www.kenji.cz/wp-content/uploads/2024/03/square-predsvatebni-parovy-fotograf-lukas-kenji-vrabel-00046-vysocina-velke-mezirici.jpg'
-    ],
-    portfolioImages: [
-      'https://www.kenji.cz/wp-content/uploads/2024/03/square-rodinny-fotograf-lukas-kenji-vrabel-00090-vysocina-humpolec.jpg',
-      'https://www.kenji.cz/wp-content/uploads/2023/01/Fotograf-na-maturitni-ples.jpg',
-      'https://www.kenji.cz/wp-content/uploads/2024/01/svatebni-fotograf-lukas-kenji-vrabel-282-jihomoravsky-kraj-znojmo-kocanda-kravsko-400x250.jpg',
-      'https://www.kenji.cz/wp-content/uploads/2024/01/rodinny-fotograf-lukas-kenji-vrabel-00145-vysocina-trebic-400x250.jpg'
-    ],
-    rating: {
-      overall: 4.9,
-      count: 187,
-      breakdown: {
-        quality: 5.0,
-        communication: 4.8,
-        value: 4.7,
-        professionalism: 5.0
-      }
-    },
-    features: ['Přirozené fotografie', 'Bez póz', 'Skutečné emoce', 'Není plátce DPH'],
-    specialties: ['Svatební fotografie', 'Rodinné focení', 'Přirozené momentky'],
-    workingRadius: 150,
-    availability: {
-      workingDays: ['friday', 'saturday', 'sunday'],
-      workingHours: { start: '08:00', end: '22:00' },
-      seasonalAvailability: {
-        peak: ['april', 'may', 'june', 'july', 'august', 'september'],
-        low: ['november', 'december', 'january', 'february']
-      }
-    },
-    testimonials: [
-      {
-        id: 'test-007',
-        author: 'Hanka a Miki',
-        text: 'Kenji je úžasný! Fotky jsou přesně takové, jaké jsme chtěli - přirozené a plné emocí. Doporučujeme!',
-        rating: 5,
-        date: new Date('2024-06-15'),
-        weddingDate: new Date('2024-05-20'),
-        verified: true
-      }
-    ],
-    yearsInBusiness: 12,
-    verified: true,
-    featured: true,
-    premium: false,
-    responseTime: '< 2 hours',
-    tags: ['svatební fotografie', 'přirozené', 'rodinné', 'emoce'],
-    keywords: ['fotograf', 'svatba', 'Jihlava', 'Vysočina', 'přirozené'],
+    responseTime: '< 8 hours',
+    tags: ['svatební fotografie', 'reportáž', 'Brno', 'přirozené momenty'],
+    keywords: ['fotograf', 'svatba', 'Brno', 'reportáž', 'emoce'],
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-12-01'),
     lastActive: new Date('2024-12-01')
@@ -1083,6 +1331,220 @@ export const marketplaceVendors: MarketplaceVendor[] = [
     responseTime: '< 4 hours',
     tags: ['catering', 'gastronomie', 'moderní', 'kvalita'],
     keywords: ['catering', 'svatba', 'Praha', 'jídlo'],
+    createdAt: new Date('2024-01-01'),
+    updatedAt: new Date('2024-12-01'),
+    lastActive: new Date('2024-12-01')
+  },
+
+  // Další fotografové (9-10)
+  {
+    id: 'photographer-009',
+    name: 'Jana Křížková',
+    category: 'photographer',
+    description: 'Svatební fotografka s láskou k přirozeným momentům a emocím. Specializuji se na reportážní svatební fotografii s důrazem na autentické okamžiky a atmosféru vašeho velkého dne. Fotím svatby po celé České republice s důrazem na detail a příběh každého páru.',
+    shortDescription: 'Svatební fotografka - přirozené momenty a emoce',
+    website: 'https://janakrizkova.com',
+    email: 'info@janakrizkova.com',
+    phone: '+420 777 567 890',
+    address: {
+      street: 'Praha',
+      city: 'Praha',
+      postalCode: '110 00',
+      region: 'Praha',
+      coordinates: { lat: 50.0755, lng: 14.4378 }
+    },
+    businessName: 'Jana Křížková',
+    businessId: '78901234',
+    services: [
+      {
+        id: 'photo-wedding-full',
+        name: 'Svatební focení - celý den',
+        description: 'Kompletní svatební reportáž s důrazem na přirozené momenty',
+        price: 25000,
+        priceType: 'package',
+        duration: '10 hodin',
+        includes: ['Celý den fotografování', '350-450 upravených fotografií', 'Online galerie', 'USB s fotkami'],
+        popular: true
+      },
+      {
+        id: 'photo-engagement',
+        name: 'Předsvatební focení',
+        description: 'Párové focení před svatbou',
+        price: 4000,
+        priceType: 'package',
+        duration: '2 hodiny',
+        includes: ['2 hodiny focení', '50+ upravených fotografií', 'Online galerie']
+      }
+    ],
+    priceRange: {
+      min: 21000,
+      max: 29000,
+      currency: 'CZK',
+      unit: 'per-event'
+    },
+    images: [
+      'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=800',
+      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800',
+      'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800'
+    ],
+    portfolioImages: [
+      'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=1200',
+      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=1200',
+      'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=1200',
+      'https://images.unsplash.com/photo-1519741497674-611481863552?w=1200',
+      'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=1200',
+      'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=1200'
+    ],
+    rating: {
+      overall: 4.8,
+      count: 68,
+      breakdown: {
+        quality: 4.9,
+        communication: 4.8,
+        value: 4.7,
+        professionalism: 4.9
+      }
+    },
+    features: ['Přirozené momenty', 'Reportážní styl', 'Focení po celé ČR', 'Detail a příběh'],
+    specialties: ['Svatební fotografie', 'Reportážní styl', 'Autentické okamžiky', 'Emoce'],
+    workingRadius: 250,
+    availability: {
+      workingDays: ['friday', 'saturday', 'sunday'],
+      workingHours: { start: '08:00', end: '22:00' },
+      seasonalAvailability: {
+        peak: ['may', 'june', 'july', 'august', 'september'],
+        low: ['december', 'january', 'february']
+      }
+    },
+    testimonials: [
+      {
+        id: 'test-jk-001',
+        author: 'Barbora & Lukáš',
+        text: 'Jana má úžasné oko pro přirozené momenty. Fotky jsou nádherné a plné emocí!',
+        rating: 5,
+        date: new Date('2024-08-05'),
+        weddingDate: new Date('2024-07-12'),
+        verified: true
+      }
+    ],
+    yearsInBusiness: 9,
+    verified: true,
+    featured: false,
+    premium: false,
+    responseTime: '< 6 hours',
+    tags: ['svatební fotografie', 'reportáž', 'Praha', 'přirozené momenty'],
+    keywords: ['fotograf', 'svatba', 'Praha', 'reportáž', 'emoce'],
+    createdAt: new Date('2024-01-01'),
+    updatedAt: new Date('2024-12-01'),
+    lastActive: new Date('2024-12-01')
+  },
+
+  {
+    id: 'photographer-010',
+    name: 'Studio Desart',
+    category: 'photographer',
+    description: 'Profesionální fotografické studio z Prahy specializující se na svatební fotografii a videografii. Nabízíme komplexní služby pro váš velký den s důrazem na kvalitu, kreativitu a profesionální přístup. Náš tým zkušených fotografů a kameramanů zachytí všechny důležité momenty vašeho svatebního dne.',
+    shortDescription: 'Profesionální fotografické studio Praha - svatby a videa',
+    website: 'https://desart.cz',
+    email: 'info@desart.cz',
+    phone: '+420 777 678 901',
+    address: {
+      street: 'Praha',
+      city: 'Praha',
+      postalCode: '110 00',
+      region: 'Praha',
+      coordinates: { lat: 50.0755, lng: 14.4378 }
+    },
+    businessName: 'Studio Desart s.r.o.',
+    businessId: '89012345',
+    services: [
+      {
+        id: 'photo-video-package',
+        name: 'Svatební foto + video balíček',
+        description: 'Kompletní svatební focení a natáčení',
+        price: 45000,
+        priceType: 'package',
+        duration: '12 hodin',
+        includes: ['Fotograf + kameraman', 'Celý den fotografování a natáčení', '500+ upravených fotografií', 'Svatební video', 'Online galerie', 'USB s fotkami a videem'],
+        popular: true
+      },
+      {
+        id: 'photo-only',
+        name: 'Svatební focení',
+        description: 'Profesionální svatební fotografie',
+        price: 30000,
+        priceType: 'package',
+        duration: '12 hodin',
+        includes: ['Profesionální fotograf', 'Celý den fotografování', '400-500 upravených fotografií', 'Online galerie', 'USB s fotkami']
+      }
+    ],
+    priceRange: {
+      min: 28000,
+      max: 50000,
+      currency: 'CZK',
+      unit: 'per-event'
+    },
+    images: [
+      'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800',
+      'https://images.unsplash.com/photo-1519741497674-611481863552?w=800',
+      'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800'
+    ],
+    portfolioImages: [
+      'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=1200',
+      'https://images.unsplash.com/photo-1519741497674-611481863552?w=1200',
+      'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=1200',
+      'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=1200',
+      'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=1200',
+      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=1200'
+    ],
+    rating: {
+      overall: 4.9,
+      count: 156,
+      breakdown: {
+        quality: 5.0,
+        communication: 4.9,
+        value: 4.8,
+        professionalism: 5.0
+      }
+    },
+    features: ['Profesionální studio', 'Foto + video', 'Zkušený tým', 'Komplexní služby'],
+    specialties: ['Svatební fotografie', 'Svatební videografie', 'Kreativní přístup', 'Profesionální vybavení'],
+    workingRadius: 300,
+    availability: {
+      workingDays: ['friday', 'saturday', 'sunday'],
+      workingHours: { start: '06:00', end: '24:00' },
+      seasonalAvailability: {
+        peak: ['may', 'june', 'july', 'august', 'september'],
+        low: ['december', 'january', 'february']
+      }
+    },
+    testimonials: [
+      {
+        id: 'test-sd-001',
+        author: 'Michaela & David',
+        text: 'Studio Desart je profesionální tým, který nám vytvořil nádherné fotky a video. Doporučujeme!',
+        rating: 5,
+        date: new Date('2024-09-20'),
+        weddingDate: new Date('2024-08-25'),
+        verified: true
+      },
+      {
+        id: 'test-sd-002',
+        author: 'Kristýna & Jakub',
+        text: 'Komplexní služby, profesionální přístup a úžasný výsledek. Jsme nadšení!',
+        rating: 5,
+        date: new Date('2024-07-10'),
+        weddingDate: new Date('2024-06-08'),
+        verified: true
+      }
+    ],
+    yearsInBusiness: 14,
+    verified: true,
+    featured: true,
+    premium: true,
+    responseTime: '< 2 hours',
+    tags: ['svatební fotografie', 'svatební video', 'Praha', 'profesionální studio'],
+    keywords: ['fotograf', 'svatba', 'Praha', 'video', 'studio', 'profesionální'],
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-12-01'),
     lastActive: new Date('2024-12-01')

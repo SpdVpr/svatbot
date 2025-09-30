@@ -12,7 +12,8 @@ import {
   orderBy,
   onSnapshot,
   getDocs,
-  Timestamp
+  Timestamp,
+  deleteField
 } from 'firebase/firestore'
 import { db } from '@/config/firebase'
 import { useAuth } from './useAuth'
@@ -228,12 +229,45 @@ export function useTask(): UseTaskReturn {
         try {
           // Try to update in Firestore for real users
           const taskRef = doc(db, 'tasks', taskId)
-          await updateDoc(taskRef, convertToFirestoreData(updatedData as any))
-          console.log('✅ Task updated in Firestore:', taskId)
+
+          // Prepare Firestore update data
+          const firestoreUpdates: any = {}
+
+          // Handle each field properly
+          if (updates.status !== undefined) firestoreUpdates.status = updates.status
+          if (updates.title !== undefined) firestoreUpdates.title = updates.title
+          if (updates.description !== undefined) firestoreUpdates.description = updates.description
+          if (updates.category !== undefined) firestoreUpdates.category = updates.category
+          if (updates.priority !== undefined) firestoreUpdates.priority = updates.priority
+          if (updates.assignedTo !== undefined) firestoreUpdates.assignedTo = updates.assignedTo
+          if (updates.notes !== undefined) firestoreUpdates.notes = updates.notes
+          if (updates.isTemplate !== undefined) firestoreUpdates.isTemplate = updates.isTemplate
+          if (updates.templateId !== undefined) firestoreUpdates.templateId = updates.templateId
+          if (updates.order !== undefined) firestoreUpdates.order = updates.order
+
+          // Handle dates - convert to Timestamp or delete field
+          if (updates.dueDate !== undefined) {
+            firestoreUpdates.dueDate = updates.dueDate ? Timestamp.fromDate(updates.dueDate) : null
+          }
+
+          // Handle completedAt - if undefined, delete the field
+          if ('completedAt' in updates) {
+            if (updates.completedAt === undefined || updates.completedAt === null) {
+              firestoreUpdates.completedAt = deleteField()
+            } else {
+              firestoreUpdates.completedAt = Timestamp.fromDate(updates.completedAt)
+            }
+          }
+
+          // Always update updatedAt
+          firestoreUpdates.updatedAt = Timestamp.fromDate(new Date())
+
+          await updateDoc(taskRef, firestoreUpdates)
+          console.log('✅ Task updated in Firestore:', taskId, firestoreUpdates)
           // Don't update state here - let Firestore listener handle it
           return
         } catch (firestoreError) {
-          console.warn('⚠️ Firestore not available, updating localStorage fallback')
+          console.warn('⚠️ Firestore not available, updating localStorage fallback', firestoreError)
           if (wedding) {
             const savedTasks = localStorage.getItem(`tasks_${wedding.id}`) || '[]'
             const existingTasks = JSON.parse(savedTasks)

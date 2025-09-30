@@ -248,10 +248,6 @@ function DashboardContent() {
                   </button>
                 </>
               )}
-              <button className="btn-primary">
-                <span className="hidden sm:inline">Pokračovat v plánování</span>
-                <span className="sm:hidden">Plánovat</span>
-              </button>
             </div>
           </div>
         </div>
@@ -273,8 +269,8 @@ function DashboardContent() {
         />
       )}
 
-      {/* Floating AI Assistant - Hidden */}
-      {/* <AIAssistant compact={true} /> */}
+      {/* Floating AI Assistant */}
+      <AIAssistant compact={true} />
 
       {/* Live Toast Notifications */}
       <LiveToastNotifications />

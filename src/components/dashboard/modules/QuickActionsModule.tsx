@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Zap, Plus, Users, DollarSign, Search, Bot } from 'lucide-react'
+import { Zap, Plus, Users, DollarSign, Search, Bot, ListChecks } from 'lucide-react'
 
 export default function QuickActionsModule() {
   const quickActions = [
@@ -11,6 +11,13 @@ export default function QuickActionsModule() {
       description: 'Nový svatební úkol',
       href: '/tasks',
       color: 'text-white bg-blue-600 hover:bg-blue-500'
+    },
+    {
+      icon: ListChecks,
+      title: 'Svatební checklist',
+      description: 'Předpřipravené úkoly',
+      href: '/checklist',
+      color: 'text-white bg-pink-600 hover:bg-pink-500'
     },
     {
       icon: Users,

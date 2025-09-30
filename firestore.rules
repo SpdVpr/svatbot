@@ -219,6 +219,31 @@ service cloud.firestore {
       allow write: if false; // Only admins can write
     }
 
+    // Checklist completed items collection
+    match /checklist_completed/{weddingId} {
+      allow read, write: if isAuthenticated() &&
+                            exists(/databases/$(database)/documents/weddings/$(weddingId)) &&
+                            get(/databases/$(database)/documents/weddings/$(weddingId)).data.userId == request.auth.uid;
+      allow create: if isAuthenticated() &&
+                       exists(/databases/$(database)/documents/weddings/$(weddingId)) &&
+                       get(/databases/$(database)/documents/weddings/$(weddingId)).data.userId == request.auth.uid;
+    }
+
+    // Marketplace vendors collection
+    match /marketplaceVendors/{vendorId} {
+      // Anyone can read marketplace vendors (public marketplace)
+      allow read: if true;
+
+      // Anyone authenticated can create a vendor registration (will be pending approval)
+      allow create: if isAuthenticated() &&
+                       request.resource.data.keys().hasAll(['name', 'category', 'email', 'phone']) &&
+                       request.resource.data.verified == false &&
+                       request.resource.data.status == 'pending';
+
+      // Only admins can update/delete (handled by admin panel)
+      allow update, delete: if false;
+    }
+
     // Deny all other access
     match /{document=**} {
       allow read, write: if false;

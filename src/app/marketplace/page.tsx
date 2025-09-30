@@ -7,7 +7,7 @@ import FeaturedVendors from '@/components/marketplace/FeaturedVendors'
 import CategoryGrid from '@/components/marketplace/CategoryGrid'
 import VendorGrid from '@/components/marketplace/VendorGrid'
 import MarketplaceFilters from '@/components/marketplace/MarketplaceFilters'
-import { Search, Filter, TrendingUp, ArrowLeft, Home } from 'lucide-react'
+import { Search, Filter, TrendingUp, ArrowLeft, Home, Plus } from 'lucide-react'
 import Link from 'next/link'
 
 export default function MarketplacePage() {
@@ -70,6 +70,14 @@ export default function MarketplacePage() {
                 <TrendingUp className="w-4 h-4" />
                 <span className="body-small">{stats.totalVendors} dodavatelů</span>
               </div>
+
+              <Link
+                href="/marketplace/register"
+                className="btn-primary flex items-center space-x-2"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Přidat inzerát</span>
+              </Link>
             </div>
           </div>
 

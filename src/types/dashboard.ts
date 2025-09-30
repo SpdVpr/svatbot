@@ -1,6 +1,6 @@
 export interface DashboardModule {
   id: string
-  type: 'wedding-countdown' | 'quick-actions' | 'main-features' | 'upcoming-tasks' | 'marketplace' | 'coming-soon' | 'task-management' | 'guest-management' | 'budget-tracking' | 'timeline-planning' | 'vendor-management' | 'seating-plan' | 'ai-assistant' | 'ai-timeline' | 'moodboard'
+  type: 'wedding-countdown' | 'quick-actions' | 'main-features' | 'upcoming-tasks' | 'marketplace' | 'coming-soon' | 'task-management' | 'guest-management' | 'budget-tracking' | 'timeline-planning' | 'vendor-management' | 'seating-plan' | 'ai-timeline' | 'moodboard' | 'wedding-checklist' | 'music-playlist'
   title: string
   size: 'small' | 'medium' | 'large' | 'full'
   position: {
@@ -128,18 +128,6 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     isLocked: false,
     order: 9
   },
-
-
-  {
-    id: 'ai-assistant',
-    type: 'ai-assistant',
-    title: 'AI Asistent',
-    size: 'medium',
-    position: { row: 4, column: 2 },
-    isVisible: false,
-    isLocked: false,
-    order: 10
-  },
   {
     id: 'ai-timeline',
     type: 'ai-timeline',
@@ -148,7 +136,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     position: { row: 5, column: 0 },
     isVisible: true,
     isLocked: false,
-    order: 11
+    order: 10
   },
   {
     id: 'moodboard',
@@ -158,7 +146,27 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     position: { row: 5, column: 2 },
     isVisible: true,
     isLocked: false,
+    order: 11
+  },
+  {
+    id: 'wedding-checklist',
+    type: 'wedding-checklist',
+    title: 'Svatební checklist',
+    size: 'medium',
+    position: { row: 4, column: 0 },
+    isVisible: true,
+    isLocked: false,
     order: 12
+  },
+  {
+    id: 'music-playlist',
+    type: 'music-playlist',
+    title: 'Svatební hudba',
+    size: 'large',
+    position: { row: 4, column: 1 },
+    isVisible: true,
+    isLocked: false,
+    order: 13
   },
   {
     id: 'coming-soon',
@@ -168,6 +176,6 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     position: { row: 6, column: 0 },
     isVisible: false,
     isLocked: false,
-    order: 13
+    order: 14
   }
 ]

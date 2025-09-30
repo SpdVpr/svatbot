@@ -11,8 +11,6 @@ import QuickActionsModule from './modules/QuickActionsModule'
 import UpcomingTasksModule from './modules/UpcomingTasksModule'
 import MainFeaturesModule from './modules/MainFeaturesModule'
 import MarketplaceModule from './modules/MarketplaceModule'
-// import PhaseProgressModule from './modules/PhaseProgressModule' // REMOVED
-// import QuickStatsModule from './modules/QuickStatsModule' // REMOVED
 import ComingSoonModule from './modules/ComingSoonModule'
 import TaskManagementModule from './modules/TaskManagementModule'
 import GuestManagementModule from './modules/GuestManagementModule'
@@ -20,6 +18,10 @@ import BudgetTrackingModule from './modules/BudgetTrackingModule'
 import TimelinePlanningModule from './modules/TimelinePlanningModule'
 import VendorManagementModule from './modules/VendorManagementModule'
 import SeatingPlanModule from './modules/SeatingPlanModule'
+import WeddingChecklistModule from './modules/WeddingChecklistModule'
+import AITimelineModule from './modules/AITimelineModule'
+import MoodboardModule from './modules/MoodboardModule'
+import MusicPlaylistModule from './modules/MusicPlaylistModule'
 
 interface SimpleDragDropProps {
   onWeddingSettingsClick: () => void
@@ -181,10 +183,6 @@ export default function SimpleDragDrop({ onWeddingSettingsClick }: SimpleDragDro
         return <MainFeaturesModule />
       case 'marketplace':
         return <MarketplaceModule />
-      // case 'phase-progress': // REMOVED
-      //   return <PhaseProgressModule />
-      // case 'quick-stats': // REMOVED
-      //   return <QuickStatsModule />
       case 'coming-soon':
         return <ComingSoonModule />
       case 'task-management':
@@ -199,6 +197,14 @@ export default function SimpleDragDrop({ onWeddingSettingsClick }: SimpleDragDro
         return <VendorManagementModule />
       case 'seating-plan':
         return <SeatingPlanModule />
+      case 'wedding-checklist':
+        return <WeddingChecklistModule />
+      case 'ai-timeline':
+        return <AITimelineModule />
+      case 'moodboard':
+        return <MoodboardModule />
+      case 'music-playlist':
+        return <MusicPlaylistModule />
       default:
         return (
           <div className="wedding-card">
