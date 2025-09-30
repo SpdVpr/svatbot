@@ -144,7 +144,7 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
 
       // Map checklist category to task category
       const categoryMap: Record<ChecklistItem['category'], TaskFormData['category']> = {
-        'beauty': 'beauty',
+        'beauty': 'design',
         'preparation': 'organization',
         'post-wedding': 'custom',
         'legal': 'custom',
