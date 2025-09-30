@@ -17,6 +17,11 @@ service cloud.firestore {
       allow read: if isAuthenticated() && isOwner(userId);
       allow write: if isAuthenticated() && isOwner(userId);
       allow create: if isAuthenticated() && isOwner(userId);
+
+      // Wedding subcollection (music, settings, etc.)
+      match /wedding/{document=**} {
+        allow read, write: if isAuthenticated() && isOwner(userId);
+      }
     }
 
     // Weddings collection

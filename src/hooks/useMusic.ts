@@ -172,6 +172,23 @@ export function useMusic() {
     loadMusicData()
   }, [user?.id])
 
+  // Clean data - remove undefined values (Firebase doesn't support them)
+  const cleanData = (obj: any): any => {
+    if (obj === null || obj === undefined) return null
+    if (Array.isArray(obj)) return obj.map(cleanData)
+    if (typeof obj === 'object') {
+      const cleaned: any = {}
+      for (const key in obj) {
+        const value = obj[key]
+        if (value !== undefined) {
+          cleaned[key] = cleanData(value)
+        }
+      }
+      return cleaned
+    }
+    return obj
+  }
+
   // Save music data to Firebase
   const saveMusicData = async () => {
     if (!user?.id) return
@@ -179,13 +196,15 @@ export function useMusic() {
     setSaving(true)
     try {
       const musicRef = doc(db, 'users', user.id, 'wedding', 'music')
-      const musicData: MusicData = {
-        vendor,
-        categories,
+
+      // Clean data to remove undefined values
+      const cleanedData = {
+        vendor: cleanData(vendor),
+        categories: cleanData(categories),
         updatedAt: new Date()
       }
 
-      await setDoc(musicRef, musicData, { merge: true })
+      await setDoc(musicRef, cleanedData, { merge: true })
       console.log('✅ Music data saved to Firebase')
     } catch (error) {
       console.error('Error saving music data:', error)
