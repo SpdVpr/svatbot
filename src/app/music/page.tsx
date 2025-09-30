@@ -293,15 +293,27 @@ function MusicPageContent() {
                 {/* Songs */}
                 {category.songs.length > 0 ? (
                   <div className="space-y-2">
-                    {category.songs.map(song => (
-                      <SongCard
-                        key={song.id}
-                        song={song}
-                        onRemove={() => removeSong(category.id, song.id)}
-                        isPlaying={currentSong?.id === song.id && isPlaying}
-                        onPlayToggle={song.previewUrl ? () => toggle(song as any) : undefined}
-                      />
-                    ))}
+                    {category.songs.map(song => {
+                      const handlePlayToggle = song.previewUrl ? () => {
+                        toggle({
+                          id: song.id,
+                          title: song.title,
+                          artist: song.artist,
+                          previewUrl: song.previewUrl,
+                          albumCover: song.albumCover
+                        })
+                      } : undefined
+
+                      return (
+                        <SongCard
+                          key={song.id}
+                          song={song}
+                          onRemove={() => removeSong(category.id, song.id)}
+                          isPlaying={currentSong?.id === song.id && isPlaying}
+                          onPlayToggle={handlePlayToggle}
+                        />
+                      )
+                    })}
                   </div>
                 ) : (
                   <div className="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">

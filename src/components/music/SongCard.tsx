@@ -27,6 +27,15 @@ interface SongCardProps {
 export default function SongCard({ song, onRemove, isPlaying, onPlayToggle }: SongCardProps) {
   const [showNotes, setShowNotes] = useState(false)
 
+  // Debug log
+  console.log('SongCard:', {
+    title: song.title,
+    hasPreviewUrl: !!song.previewUrl,
+    previewUrl: song.previewUrl,
+    hasOnPlayToggle: !!onPlayToggle,
+    isPlaying
+  })
+
   return (
     <div className="bg-white rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all group">
       <div className="flex items-center space-x-3 p-3">
