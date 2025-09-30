@@ -5,6 +5,7 @@ const nextConfig = {
       'firebasestorage.googleapis.com',
       'lh3.googleusercontent.com',
       'platform-lookaside.fbsbx.com',
+      'i.scdn.co', // Spotify album covers
     ],
   },
   env: {

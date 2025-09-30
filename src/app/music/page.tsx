@@ -1,144 +1,31 @@
 'use client'
 
 import { useState } from 'react'
-import { Music, ArrowLeft, Save, User, Phone, Mail, Sparkles, Edit2, Plus } from 'lucide-react'
+import { Music, ArrowLeft, Save, User, Phone, Mail, Sparkles, Edit2, Plus, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import SpotifySearch from '@/components/music/SpotifySearch'
 import SongCard from '@/components/music/SongCard'
 import { MusicPlayerProvider, useMusicPlayer } from '@/components/music/MusicPlayer'
 import { SpotifyTrack } from '@/lib/spotify'
-
-interface Song {
-  id: string
-  title: string
-  artist: string
-  spotifyUrl?: string
-  spotifyTrackId?: string
-  albumCover?: string
-  previewUrl?: string
-  duration?: number
-  notes?: string
-}
-
-interface MusicCategory {
-  id: string
-  name: string
-  description: string
-  icon: string
-  songs: Song[]
-  required?: boolean
-}
+import { useMusic, Song } from '@/hooks/useMusic'
 
 function MusicPageContent() {
   const router = useRouter()
   const { currentSong, isPlaying, toggle } = useMusicPlayer()
-
-  const [vendor, setVendor] = useState({
-    name: '',
-    contact: '',
-    email: ''
-  })
+  const {
+    vendor,
+    categories,
+    loading,
+    saving,
+    updateVendor,
+    addSong,
+    removeSong,
+    totalSongs,
+    requiredCategories,
+    completedRequired
+  } = useMusic()
 
   const [editingVendor, setEditingVendor] = useState(false)
-
-  const [categories, setCategories] = useState<MusicCategory[]>([
-    {
-      id: 'groom-entrance',
-      name: 'Nástup ženicha',
-      description: 'Hudba při příchodu ženicha k oltáři',
-      icon: '🤵',
-      songs: [],
-      required: true
-    },
-    {
-      id: 'bridesmaids-entrance',
-      name: 'Nástup družiček',
-      description: 'Hudba při příchodu družiček',
-      icon: '👰‍♀️',
-      songs: [],
-      required: true
-    },
-    {
-      id: 'bride-entrance',
-      name: 'Nástup nevěsty',
-      description: 'Nejdůležitější okamžik - příchod nevěsty',
-      icon: '💍',
-      songs: [],
-      required: true
-    },
-    {
-      id: 'signing',
-      name: 'Podpis oddacího listu',
-      description: 'Hudba během podpisu dokumentů',
-      icon: '✍️',
-      songs: []
-    },
-    {
-      id: 'congratulations',
-      name: 'Gratulace',
-      description: 'Hudba při gratulacích hostů',
-      icon: '🎉',
-      songs: []
-    },
-    {
-      id: 'guard-of-honor',
-      name: 'Špalír',
-      description: 'Hudba při odchodu novomanželů špalírem',
-      icon: '🎊',
-      songs: []
-    },
-    {
-      id: 'first-dance',
-      name: 'První tanec',
-      description: 'Váš první tanec jako manželé',
-      icon: '💃',
-      songs: [],
-      required: true
-    },
-    {
-      id: 'parent-dance',
-      name: 'Tanec s rodiči',
-      description: 'Tanec nevěsty s otcem a ženicha s matkou',
-      icon: '👨‍👩‍👧',
-      songs: []
-    },
-    {
-      id: 'cake-cutting',
-      name: 'Krájení dortu',
-      description: 'Hudba při krájení svatebního dortu',
-      icon: '🎂',
-      songs: []
-    },
-    {
-      id: 'party-must-have',
-      name: 'Párty - nesmí chybět',
-      description: 'Písně, které rozproudí zábavu',
-      icon: '🎵',
-      songs: []
-    },
-    {
-      id: 'party-favorites',
-      name: 'Oblíbené písně',
-      description: 'Vaše oblíbené písně na večírek',
-      icon: '🎶',
-      songs: []
-    },
-    {
-      id: 'slow-songs',
-      name: 'Pomalé písně',
-      description: 'Romantické písně pro pomalé tance',
-      icon: '💕',
-      songs: []
-    },
-    {
-      id: 'do-not-play',
-      name: 'Nehrát!',
-      description: 'Písně, které určitě nechcete slyšet',
-      icon: '🚫',
-      songs: []
-    }
-  ])
-
   const [showAddSong, setShowAddSong] = useState<string | null>(null)
 
   const handleAddSpotifyTrack = (categoryId: string, track: SpotifyTrack) => {
@@ -153,39 +40,24 @@ function MusicPageContent() {
       duration: track.duration_ms
     }
 
-    setCategories(prev => prev.map(cat => {
-      if (cat.id === categoryId) {
-        return {
-          ...cat,
-          songs: [...cat.songs, newSong]
-        }
-      }
-      return cat
-    }))
-
+    addSong(categoryId, newSong)
     setShowAddSong(null)
   }
 
-  const handleRemoveSong = (categoryId: string, songId: string) => {
-    setCategories(prev => prev.map(cat => {
-      if (cat.id === categoryId) {
-        return {
-          ...cat,
-          songs: cat.songs.filter(s => s.id !== songId)
-        }
-      }
-      return cat
-    }))
-  }
-
   const handleSaveVendor = () => {
-    // TODO: Save to Firebase
     setEditingVendor(false)
   }
 
-  const totalSongs = categories.reduce((sum, cat) => sum + cat.songs.length, 0)
-  const requiredCategories = categories.filter(c => c.required)
-  const completedRequired = requiredCategories.filter(c => c.songs.length > 0).length
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-purple-500 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Načítání playlistu...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -206,14 +78,17 @@ function MusicPageContent() {
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">Svatební hudba</h1>
-                  <p className="text-sm text-gray-600">{totalSongs} písní v playlistu</p>
+                  <p className="text-sm text-gray-600">
+                    {totalSongs} písní v playlistu
+                    {saving && <span className="ml-2 text-purple-600">• Ukládání...</span>}
+                  </p>
                 </div>
               </div>
             </div>
-            <button className="btn-primary flex items-center space-x-2">
-              <Save className="w-4 h-4" />
-              <span>Uložit změny</span>
-            </button>
+            <div className="flex items-center space-x-2">
+              {saving && <Loader2 className="w-4 h-4 text-purple-500 animate-spin" />}
+              <span className="text-sm text-gray-600">Auto-save zapnuto</span>
+            </div>
           </div>
         </div>
       </div>
@@ -247,7 +122,7 @@ function MusicPageContent() {
                     <input
                       type="text"
                       value={vendor.name}
-                      onChange={(e) => setVendor({ ...vendor, name: e.target.value })}
+                      onChange={(e) => updateVendor({ ...vendor, name: e.target.value })}
                       placeholder="DJ Martin Hudba"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     />
@@ -260,7 +135,7 @@ function MusicPageContent() {
                     <input
                       type="tel"
                       value={vendor.contact}
-                      onChange={(e) => setVendor({ ...vendor, contact: e.target.value })}
+                      onChange={(e) => updateVendor({ ...vendor, contact: e.target.value })}
                       placeholder="+420 777 888 999"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     />
@@ -273,7 +148,7 @@ function MusicPageContent() {
                     <input
                       type="email"
                       value={vendor.email}
-                      onChange={(e) => setVendor({ ...vendor, email: e.target.value })}
+                      onChange={(e) => updateVendor({ ...vendor, email: e.target.value })}
                       placeholder="martin@djhudba.cz"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     />
@@ -406,7 +281,7 @@ function MusicPageContent() {
                       <SongCard
                         key={song.id}
                         song={song}
-                        onRemove={() => handleRemoveSong(category.id, song.id)}
+                        onRemove={() => removeSong(category.id, song.id)}
                         isPlaying={currentSong?.id === song.id && isPlaying}
                         onPlayToggle={song.previewUrl ? () => toggle(song as any) : undefined}
                       />
