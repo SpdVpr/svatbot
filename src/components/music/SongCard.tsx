@@ -26,15 +26,7 @@ interface SongCardProps {
 
 export default function SongCard({ song, onRemove, isPlaying, onPlayToggle }: SongCardProps) {
   const [showNotes, setShowNotes] = useState(false)
-
-  // Debug log
-  console.log('SongCard:', {
-    title: song.title,
-    hasPreviewUrl: !!song.previewUrl,
-    previewUrl: song.previewUrl,
-    hasOnPlayToggle: !!onPlayToggle,
-    isPlaying
-  })
+  const [showPlayer, setShowPlayer] = useState(false)
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all group">
@@ -85,28 +77,24 @@ export default function SongCard({ song, onRemove, isPlaying, onPlayToggle }: So
 
         {/* Actions - Always visible */}
         <div className="flex items-center space-x-1">
-          {/* Play/Pause Button - Always visible if preview exists */}
-          {song.previewUrl && onPlayToggle ? (
+          {/* Play Button - Toggle Spotify Embed Player */}
+          {song.spotifyTrackId && (
             <button
-              onClick={onPlayToggle}
+              onClick={() => setShowPlayer(!showPlayer)}
               className={`p-2 rounded-lg transition-all ${
-                isPlaying
+                showPlayer
                   ? 'bg-green-500 text-white hover:bg-green-600 shadow-lg'
                   : 'bg-green-50 text-green-600 hover:bg-green-100 border border-green-200'
               }`}
-              title={isPlaying ? "Zastavit" : "Přehrát ukázku"}
+              title={showPlayer ? "Skrýt přehrávač" : "Přehrát ukázku"}
             >
-              {isPlaying ? (
+              {showPlayer ? (
                 <Pause className="w-5 h-5" />
               ) : (
                 <Play className="w-5 h-5" />
               )}
             </button>
-          ) : song.previewUrl ? (
-            <div className="p-2 text-gray-300" title="Ukázka není dostupná">
-              <Music className="w-5 h-5" />
-            </div>
-          ) : null}
+          )}
 
           {/* Spotify Link */}
           {song.spotifyUrl && (
@@ -137,6 +125,23 @@ export default function SongCard({ song, onRemove, isPlaying, onPlayToggle }: So
         <div className="px-3 pb-3">
           <div className="bg-purple-50 rounded-lg p-3 border border-purple-100">
             <p className="text-sm text-gray-700">{song.notes}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Spotify Embed Player */}
+      {showPlayer && song.spotifyTrackId && (
+        <div className="px-3 pb-3">
+          <div className="rounded-lg overflow-hidden border border-gray-200 shadow-lg">
+            <iframe
+              src={`https://open.spotify.com/embed/track/${song.spotifyTrackId}?utm_source=generator&theme=0`}
+              width="100%"
+              height="152"
+              frameBorder="0"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy"
+              title={`Spotify player for ${song.title}`}
+            />
           </div>
         </div>
       )}
