@@ -130,7 +130,8 @@ export default function ImageUploadSection({
       // Create unique filename
       const timestamp = Date.now()
       const folder = type === 'main' ? 'svatbot' : 'portfolio'
-      const filename = `${folder}/${user.uid}/${timestamp}_${pendingImage.file.name.replace(/\s+/g, '_')}`
+      const userId = user?.id || 'anonymous'
+      const filename = `${folder}/${userId}/${timestamp}_${pendingImage.file.name.replace(/\s+/g, '_')}`
 
       // Upload to Firebase Storage
       const storageRef = ref(storage, filename)
