@@ -172,17 +172,15 @@ export function useMusic() {
     loadMusicData()
   }, [user?.id])
 
-  // Clean data - remove undefined values (Firebase doesn't support them)
+  // Clean data - convert undefined to null (Firebase doesn't support undefined)
   const cleanData = (obj: any): any => {
-    if (obj === null || obj === undefined) return null
+    if (obj === undefined) return null
+    if (obj === null) return null
     if (Array.isArray(obj)) return obj.map(cleanData)
     if (typeof obj === 'object') {
       const cleaned: any = {}
       for (const key in obj) {
-        const value = obj[key]
-        if (value !== undefined) {
-          cleaned[key] = cleanData(value)
-        }
+        cleaned[key] = cleanData(obj[key])
       }
       return cleaned
     }

@@ -29,6 +29,12 @@ function MusicPageContent() {
   const [showAddSong, setShowAddSong] = useState<string | null>(null)
 
   const handleAddSpotifyTrack = (categoryId: string, track: SpotifyTrack) => {
+    console.log('🎵 Adding Spotify track:', {
+      name: track.name,
+      preview_url: track.preview_url,
+      hasPreview: !!track.preview_url
+    })
+
     const newSong: Song = {
       id: Date.now().toString(),
       title: track.name,
@@ -39,6 +45,8 @@ function MusicPageContent() {
       previewUrl: track.preview_url || undefined,
       duration: track.duration_ms
     }
+
+    console.log('💾 Saving song:', newSong)
 
     addSong(categoryId, newSong)
     setShowAddSong(null)
