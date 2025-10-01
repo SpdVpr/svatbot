@@ -6,12 +6,22 @@
   },
   "rewrites": [
     {
-      "source": "/(.*)",
-      "destination": "/wedding/$subdomain$1",
+      "source": "/",
+      "destination": "/wedding/$subdomain",
       "has": [
         {
           "type": "host",
-          "value": "(?<subdomain>[^.]+)\\.svatbot\\.cz$"
+          "value": "(?<subdomain>[^.]+)\\.svatbot\\.cz"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/wedding/$subdomain/$1",
+      "has": [
+        {
+          "type": "host",
+          "value": "(?<subdomain>[^.]+)\\.svatbot\\.cz"
         }
       ]
     }
