@@ -70,7 +70,7 @@ export default function HeroSectionEditor({ content, onChange }: HeroSectionEdit
   const handleImageUpload = async (file: File) => {
     try {
       console.log('🖼️ Nahrávání obrázku do Firebase Storage...')
-      const result = await uploadImage(file, 'wedding-websites/hero')
+      const result = await uploadImage(file, 'wedding-websites')
       console.log('✅ Obrázek nahrán:', result.url)
       handleInputChange('mainImage', result.url)
     } catch (error) {

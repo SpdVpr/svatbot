@@ -53,6 +53,10 @@ export function useWeddingImageUpload() {
       const weddingId = wedding.id
       const filename = `${folder}/${weddingId}/${timestamp}_${file.name.replace(/\s+/g, '_')}`
 
+      console.log('📁 Storage path:', filename)
+      console.log('👤 User ID:', user.id)
+      console.log('💒 Wedding ID:', weddingId)
+
       // Upload to Firebase Storage
       const storageRef = ref(storage, filename)
       const snapshot = await uploadBytes(storageRef, compressedResult.file)
