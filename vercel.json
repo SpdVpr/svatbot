@@ -34,5 +34,9 @@
         }
       ]
     }
+  ],
+  "domains": [
+    "svatbot.cz",
+    "*.svatbot.cz"
   ]
 }
