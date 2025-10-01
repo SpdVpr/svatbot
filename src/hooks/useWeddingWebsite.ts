@@ -1,13 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { db } from '@/lib/firebase'
-import { 
-  collection, 
-  query, 
-  where, 
-  getDocs, 
-  doc, 
+import { db } from '@/config/firebase'
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
   getDoc,
   addDoc,
   updateDoc,
@@ -16,13 +16,13 @@ import {
   onSnapshot
 } from 'firebase/firestore'
 import type { WeddingWebsite, WebsiteFormData } from '@/types/wedding-website'
-import { useAuth } from '@/contexts/AuthContext'
-import { useWedding } from '@/contexts/WeddingContext'
+import { useAuthStore } from '@/stores/authStore'
+import { useWeddingStore } from '@/stores/weddingStore'
 
 export function useWeddingWebsite(customUrl?: string) {
-  const { user } = useAuth()
-  const { wedding } = useWedding()
-  
+  const { user } = useAuthStore()
+  const { currentWedding: wedding } = useWeddingStore()
+
   const [website, setWebsite] = useState<WeddingWebsite | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

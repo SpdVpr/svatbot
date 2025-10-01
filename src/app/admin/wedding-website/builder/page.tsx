@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@/contexts/AuthContext'
-import { useWedding } from '@/contexts/WeddingContext'
+import { useAuthStore } from '@/stores/authStore'
+import { useWeddingStore } from '@/stores/weddingStore'
 import { useWeddingWebsite } from '@/hooks/useWeddingWebsite'
 import { ArrowLeft, ArrowRight, Save, Eye, Rocket } from 'lucide-react'
 import TemplateSelector from '@/components/wedding-website/builder/TemplateSelector'
@@ -14,8 +14,8 @@ type Step = 'template' | 'url' | 'content' | 'preview'
 
 export default function WeddingWebsiteBuilderPage() {
   const router = useRouter()
-  const { user } = useAuth()
-  const { wedding } = useWedding()
+  const { user } = useAuthStore()
+  const { currentWedding: wedding } = useWeddingStore()
   const { website, createWebsite, updateWebsite, publishWebsite, loading } = useWeddingWebsite()
 
   const [currentStep, setCurrentStep] = useState<Step>('template')

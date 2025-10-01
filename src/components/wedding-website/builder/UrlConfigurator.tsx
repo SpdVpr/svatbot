@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { Check, X, Loader2, ExternalLink, Copy, CheckCheck } from 'lucide-react'
 import { validateCustomUrl, normalizeCustomUrl, generateCustomUrlSuggestions } from '@/lib/subdomain'
 import { useWeddingWebsite } from '@/hooks/useWeddingWebsite'
-import { useWedding } from '@/contexts/WeddingContext'
+import { useWeddingStore } from '@/stores/weddingStore'
 
 interface UrlConfiguratorProps {
   customUrl: string
@@ -12,7 +12,7 @@ interface UrlConfiguratorProps {
 }
 
 export default function UrlConfigurator({ customUrl, onUrlChange }: UrlConfiguratorProps) {
-  const { wedding } = useWedding()
+  const { currentWedding: wedding } = useWeddingStore()
   const { checkUrlAvailability } = useWeddingWebsite()
   
   const [inputValue, setInputValue] = useState(customUrl)

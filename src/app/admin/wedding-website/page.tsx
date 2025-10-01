@@ -3,15 +3,15 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useWeddingWebsite } from '@/hooks/useWeddingWebsite'
-import { useAuth } from '@/contexts/AuthContext'
-import { useWedding } from '@/contexts/WeddingContext'
+import { useAuthStore } from '@/stores/authStore'
+import { useWeddingStore } from '@/stores/weddingStore'
 import { ExternalLink, Eye, Settings, BarChart3, MessageSquare, Plus, Edit, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 
 export default function WeddingWebsitePage() {
   const router = useRouter()
-  const { user } = useAuth()
-  const { wedding } = useWedding()
+  const { user } = useAuthStore()
+  const { currentWedding: wedding } = useWeddingStore()
   const { website, loading, deleteWebsite } = useWeddingWebsite()
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
