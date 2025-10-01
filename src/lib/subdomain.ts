@@ -172,7 +172,7 @@ export function generateCustomUrlSuggestions(
   suggestions.push(`svatba-${normalizedBride}-${normalizedGroom}`)
   
   // Odstranění duplicit
-  return [...new Set(suggestions)]
+  return Array.from(new Set(suggestions))
 }
 
 /**

@@ -89,7 +89,7 @@ export default function HeroSection({ content }: HeroSectionProps) {
     <section 
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
       style={mainImage ? {
-        mainImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${mainImage})`,
+        backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${mainImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'

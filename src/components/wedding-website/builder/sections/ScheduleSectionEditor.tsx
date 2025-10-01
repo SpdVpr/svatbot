@@ -53,8 +53,8 @@ export default function ScheduleSectionEditor({ content, onChange }: ScheduleSec
     if (!wedding) return
 
     const weddingDate = wedding.weddingDate
-    const ceremonyTime = typeof wedding.venue === 'object' ? wedding.venue.ceremonyTime : '14:00'
-    const receptionTime = typeof wedding.venue === 'object' ? wedding.venue.receptionTime : '18:00'
+    const ceremonyTime = '14:00' // Default ceremony time
+    const receptionTime = '18:00' // Default reception time
 
     const defaultSchedule: ScheduleItem[] = [
       {

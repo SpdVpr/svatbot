@@ -56,9 +56,12 @@ export default function InfoSectionEditor({ content, onChange }: InfoSectionEdit
       ...content,
       enabled: true,
       ceremony: {
-        ...content.ceremony,
+        time: content.ceremony?.time || '',
         venue: typeof wedding.venue === 'string' ? wedding.venue : wedding.venue?.name || content.ceremony?.venue || '',
-        address: typeof wedding.venue === 'object' ? wedding.venue?.address || '' : content.ceremony?.address || '',
+        address: typeof wedding.venue === 'object' && wedding.venue?.address
+          ? `${wedding.venue.address.street}, ${wedding.venue.address.city} ${wedding.venue.address.postalCode}`.trim()
+          : content.ceremony?.address || '',
+        coordinates: content.ceremony?.coordinates
       }
     }
 

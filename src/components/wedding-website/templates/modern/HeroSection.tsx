@@ -89,7 +89,7 @@ export default function ModernHeroSection({ content }: HeroSectionProps) {
     <section 
       className="relative min-h-screen flex items-center justify-center"
       style={mainImage ? {
-        mainImage: `linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)), url(${mainImage})`,
+        backgroundImage: `linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)), url(${mainImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
