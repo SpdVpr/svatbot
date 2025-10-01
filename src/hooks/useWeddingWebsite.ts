@@ -248,6 +248,12 @@ export function useWeddingWebsite(customUrl?: string) {
 
       // Použijeme customUrl jako document ID
       const docRef = doc(db, 'weddingWebsites', data.customUrl)
+
+      // Debug document ID
+      console.log('📄 Document ID:', data.customUrl)
+      console.log('📄 Document ID length:', data.customUrl.length)
+      console.log('📄 Document ID valid chars:', /^[a-zA-Z0-9_-]+$/.test(data.customUrl))
+
       // Vyčistíme data pro Firestore (převedeme Date na Timestamp)
       console.log('🧹 Starting cleanForFirestore for website data...')
       const cleanedData = cleanForFirestore(websiteData, 0, 'websiteData')
@@ -256,6 +262,33 @@ export function useWeddingWebsite(customUrl?: string) {
       console.log('Original data:', websiteData)
       console.log('Cleaned data:', cleanedData)
       console.log('🧹 cleanForFirestore completed')
+
+      // Check document size
+      const dataSize = JSON.stringify(cleanedData).length
+      console.log('📊 Document size (bytes):', dataSize)
+      console.log('📊 Document size (MB):', (dataSize / 1024 / 1024).toFixed(2))
+
+      // Check for invalid field names
+      const checkFieldNames = (obj: any, path = ''): string[] => {
+        const invalidFields: string[] = []
+        if (obj && typeof obj === 'object' && !Array.isArray(obj)) {
+          for (const [key, value] of Object.entries(obj)) {
+            // Firestore field name rules: no dots, no __
+            if (key.includes('.') || key.startsWith('__')) {
+              invalidFields.push(`${path}.${key}`)
+            }
+            if (value && typeof value === 'object') {
+              invalidFields.push(...checkFieldNames(value, `${path}.${key}`))
+            }
+          }
+        }
+        return invalidFields
+      }
+
+      const invalidFields = checkFieldNames(cleanedData)
+      if (invalidFields.length > 0) {
+        console.error('❌ Invalid field names found:', invalidFields)
+      }
 
       await setDoc(docRef, cleanedData)
 
