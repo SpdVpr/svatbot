@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { Calendar, Upload, X, Image as ImageIcon, Move, RotateCw } from 'lucide-react'
+import { Calendar, Upload, X, Image as ImageIcon, Move, RotateCw, Loader2 } from 'lucide-react'
 import { useWeddingStore } from '@/stores/weddingStore'
+import { useWeddingImageUpload } from '@/hooks/useWeddingImageUpload'
 import type { HeroContent } from '@/types/wedding-website'
 import { Timestamp } from 'firebase/firestore'
 
@@ -39,6 +40,7 @@ interface HeroSectionEditorProps {
 
 export default function HeroSectionEditor({ content, onChange }: HeroSectionEditorProps) {
   const { currentWedding: wedding } = useWeddingStore()
+  const { uploadImage, uploading, progress, error: uploadError } = useWeddingImageUpload()
   const [dragOver, setDragOver] = useState(false)
   const [imagePosition, setImagePosition] = useState({ x: 50, y: 50 }) // Procenta
   const [imageScale, setImageScale] = useState(100) // Procenta
@@ -65,14 +67,22 @@ export default function HeroSectionEditor({ content, onChange }: HeroSectionEdit
     })
   }
 
-  const handleImageUpload = (file: File) => {
-    // TODO: Implement image upload to Firebase Storage
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const imageUrl = e.target?.result as string
-      handleInputChange('mainImage', imageUrl)
+  const handleImageUpload = async (file: File) => {
+    try {
+      console.log('🖼️ Nahrávání obrázku do Firebase Storage...')
+      const result = await uploadImage(file, 'wedding-websites/hero')
+      console.log('✅ Obrázek nahrán:', result.url)
+      handleInputChange('mainImage', result.url)
+    } catch (error) {
+      console.error('❌ Chyba při nahrávání obrázku:', error)
+      // Fallback to base64 if upload fails
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const imageUrl = e.target?.result as string
+        handleInputChange('mainImage', imageUrl)
+      }
+      reader.readAsDataURL(file)
     }
-    reader.readAsDataURL(file)
   }
 
   const handleDrop = (e: React.DragEvent) => {
@@ -332,16 +342,36 @@ export default function HeroSectionEditor({ content, onChange }: HeroSectionEdit
               Přetáhněte fotku sem nebo klikněte pro výběr
             </p>
             
-            <label className="inline-flex items-center gap-2 bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 transition-colors cursor-pointer">
-              <Upload className="w-4 h-4" />
-              Vybrat fotku
+            <label className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-colors cursor-pointer ${
+              uploading
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-pink-500 hover:bg-pink-600'
+            } text-white`}>
+              {uploading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Nahrávání... {progress > 0 && `${Math.round(progress)}%`}
+                </>
+              ) : (
+                <>
+                  <Upload className="w-4 h-4" />
+                  Vybrat fotku
+                </>
+              )}
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleFileSelect}
                 className="hidden"
+                disabled={uploading}
               />
             </label>
+
+            {uploadError && (
+              <p className="text-red-600 text-sm mt-2">
+                Chyba při nahrávání: {uploadError}
+              </p>
+            )}
             
             <p className="text-sm text-gray-500 mt-2">
               Doporučená velikost: 1920x1080px, max 5MB

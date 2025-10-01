@@ -1,0 +1,118 @@
+'use client'
+
+import { useState } from 'react'
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { storage } from '@/config/firebase'
+import { useAuthStore } from '@/stores/authStore'
+import { compressImage } from '@/utils/imageCompression'
+
+interface UploadResult {
+  url: string
+  filename: string
+  size: number
+}
+
+export function useWeddingImageUpload() {
+  const [uploading, setUploading] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [error, setError] = useState<string | null>(null)
+  const { user } = useAuthStore()
+
+  const uploadImage = async (
+    file: File,
+    folder: string = 'wedding-websites'
+  ): Promise<UploadResult> => {
+    if (!user) throw new Error('Authentication required')
+
+    try {
+      setUploading(true)
+      setError(null)
+      setProgress(0)
+
+      // Compress image before upload
+      const compressionOptions = {
+        maxWidth: 1920,
+        maxHeight: 1920,
+        quality: 0.8,
+        maxSizeKB: 1000 // Max 1MB
+      }
+
+      console.log(`🖼️ Komprese obrázku: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`)
+      
+      const compressedResult = await compressImage(file, compressionOptions)
+      
+      console.log(`✅ Komprese dokončena: ${(compressedResult.originalSize / 1024 / 1024).toFixed(2)}MB → ${(compressedResult.compressedSize / 1024 / 1024).toFixed(2)}MB (${compressedResult.compressionRatio}% úspora)`)
+
+      setProgress(50)
+
+      // Create unique filename
+      const timestamp = Date.now()
+      const userId = user.id
+      const filename = `${folder}/${userId}/${timestamp}_${file.name.replace(/\s+/g, '_')}`
+
+      // Upload to Firebase Storage
+      const storageRef = ref(storage, filename)
+      const snapshot = await uploadBytes(storageRef, compressedResult.file)
+      
+      setProgress(80)
+
+      // Get download URL
+      const url = await getDownloadURL(snapshot.ref)
+
+      setProgress(100)
+
+      return {
+        url,
+        filename,
+        size: compressedResult.compressedSize
+      }
+    } catch (err: any) {
+      console.error('Error uploading image:', err)
+      setError(err.message)
+      throw err
+    } finally {
+      setUploading(false)
+      setProgress(0)
+    }
+  }
+
+  const uploadMultiple = async (
+    files: File[],
+    folder: string = 'wedding-websites'
+  ): Promise<UploadResult[]> => {
+    if (!user) throw new Error('Authentication required')
+
+    const results: UploadResult[] = []
+    let completed = 0
+
+    try {
+      setUploading(true)
+      setError(null)
+
+      for (const file of files) {
+        const result = await uploadImage(file, folder)
+        results.push(result)
+
+        completed++
+        const progressPercent = (completed / files.length) * 100
+        setProgress(progressPercent)
+      }
+
+      return results
+    } catch (err: any) {
+      setError(err.message)
+      throw err
+    } finally {
+      setUploading(false)
+      setProgress(0)
+    }
+  }
+
+  return {
+    uploadImage,
+    uploadMultiple,
+    uploading,
+    progress,
+    error
+  }
+}
