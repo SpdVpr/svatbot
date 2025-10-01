@@ -271,6 +271,42 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // Wedding websites collection
+    match /weddingWebsites/{websiteId} {
+      // Owner can read/write their own website
+      allow read, write: if isAuthenticated() &&
+                            exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                            get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid;
+
+      // Owner can create website
+      allow create: if isAuthenticated() &&
+                       request.resource.data.keys().hasAll(['weddingId', 'userId', 'customUrl', 'template']) &&
+                       exists(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)) &&
+                       get(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)).data.userId == request.auth.uid &&
+                       request.auth.uid == request.resource.data.userId;
+
+      // Public read for published websites (for guests)
+      allow get: if resource.data.isPublished == true;
+    }
+
+    // RSVPs collection
+    match /rsvps/{rsvpId} {
+      // Owner can read all RSVPs for their wedding
+      allow read: if isAuthenticated() &&
+                     exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                     get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid;
+
+      // Owner can update/delete RSVPs
+      allow update, delete: if isAuthenticated() &&
+                               exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                               get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid;
+
+      // Anyone can create RSVP (guests submitting)
+      allow create: if request.resource.data.keys().hasAll(['websiteId', 'weddingId', 'name', 'email', 'status', 'guestCount']) &&
+                       exists(/databases/$(database)/documents/weddingWebsites/$(request.resource.data.websiteId)) &&
+                       get(/databases/$(database)/documents/weddingWebsites/$(request.resource.data.websiteId)).data.isPublished == true;
+    }
+
     // Deny all other access
     match /{document=**} {
       allow read, write: if false;
