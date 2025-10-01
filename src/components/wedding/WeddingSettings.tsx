@@ -27,7 +27,7 @@ export default function WeddingSettings({ onClose, onSave }: WeddingSettingsProp
     brideName: wedding?.brideName || '',
     groomName: wedding?.groomName || '',
     weddingDate: wedding?.weddingDate ? (() => {
-      const date = wedding.weddingDate
+      const date: any = wedding.weddingDate
       // Handle Firestore Timestamp
       if (date && typeof date.toDate === 'function') {
         return date.toDate().toISOString().split('T')[0]
