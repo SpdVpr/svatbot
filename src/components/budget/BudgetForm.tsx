@@ -813,8 +813,23 @@ function PaymentModal({ payment, currency, onSave, onCancel }: PaymentModalProps
     onSave(paymentData)
   }
 
-  const formatDate = (date: Date) => {
-    return date.toISOString().split('T')[0]
+  const formatDate = (date: Date | any) => {
+    // Handle Firestore Timestamp
+    if (date && typeof date.toDate === 'function') {
+      return date.toDate().toISOString().split('T')[0]
+    }
+
+    // Handle Date object
+    if (date instanceof Date) {
+      return date.toISOString().split('T')[0]
+    }
+
+    // Handle string dates
+    if (typeof date === 'string') {
+      return new Date(date).toISOString().split('T')[0]
+    }
+
+    return ''
   }
 
   const parseDate = (dateString: string) => {

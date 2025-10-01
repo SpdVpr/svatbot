@@ -26,7 +26,22 @@ export default function WeddingSettings({ onClose, onSave }: WeddingSettingsProp
   const [formData, setFormData] = useState({
     brideName: wedding?.brideName || '',
     groomName: wedding?.groomName || '',
-    weddingDate: wedding?.weddingDate ? new Date(wedding.weddingDate).toISOString().split('T')[0] : '',
+    weddingDate: wedding?.weddingDate ? (() => {
+      const date = wedding.weddingDate
+      // Handle Firestore Timestamp
+      if (date && typeof date.toDate === 'function') {
+        return date.toDate().toISOString().split('T')[0]
+      }
+      // Handle Date object
+      if (date instanceof Date) {
+        return date.toISOString().split('T')[0]
+      }
+      // Handle string dates
+      if (typeof date === 'string') {
+        return new Date(date).toISOString().split('T')[0]
+      }
+      return ''
+    })() : '',
     location: typeof wedding?.venue === 'string' ? wedding.venue : wedding?.venue?.name || '',
     budget: wedding?.budget || 0,
     guestCount: wedding?.estimatedGuestCount || 0,

@@ -94,9 +94,25 @@ export default function HeroSectionEditor({ content, onChange }: HeroSectionEdit
     }
   }
 
-  const formatDateForInput = (date: Date | null) => {
+  const formatDateForInput = (date: Date | any | null) => {
     if (!date) return ''
-    return date.toISOString().split('T')[0]
+
+    // Handle Firestore Timestamp
+    if (date && typeof date.toDate === 'function') {
+      return date.toDate().toISOString().split('T')[0]
+    }
+
+    // Handle Date object
+    if (date instanceof Date) {
+      return date.toISOString().split('T')[0]
+    }
+
+    // Handle string dates
+    if (typeof date === 'string') {
+      return new Date(date).toISOString().split('T')[0]
+    }
+
+    return ''
   }
 
   const parseInputDate = (dateString: string) => {

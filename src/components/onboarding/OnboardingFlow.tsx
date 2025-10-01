@@ -165,7 +165,22 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
               </label>
               <input
                 type="date"
-                value={formData.weddingDate ? formData.weddingDate.toISOString().split('T')[0] : ''}
+                value={formData.weddingDate ? (() => {
+                  const date = formData.weddingDate
+                  // Handle Firestore Timestamp
+                  if (date && typeof date.toDate === 'function') {
+                    return date.toDate().toISOString().split('T')[0]
+                  }
+                  // Handle Date object
+                  if (date instanceof Date) {
+                    return date.toISOString().split('T')[0]
+                  }
+                  // Handle string dates
+                  if (typeof date === 'string') {
+                    return new Date(date).toISOString().split('T')[0]
+                  }
+                  return ''
+                })() : ''}
                 onChange={(e) => updateFormData({
                   weddingDate: e.target.value ? new Date(e.target.value) : undefined
                 })}
