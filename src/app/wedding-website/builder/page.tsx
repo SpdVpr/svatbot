@@ -8,7 +8,10 @@ import { useWeddingWebsite } from '@/hooks/useWeddingWebsite'
 import { ArrowLeft, ArrowRight, Save, Eye, Rocket } from 'lucide-react'
 import TemplateSelector from '@/components/wedding-website/builder/TemplateSelector'
 import UrlConfigurator from '@/components/wedding-website/builder/UrlConfigurator'
-import type { TemplateType } from '@/types/wedding-website'
+import ContentEditor from '@/components/wedding-website/builder/ContentEditor'
+import ClassicEleganceTemplate from '@/components/wedding-website/templates/ClassicEleganceTemplate'
+import ModernMinimalistTemplate from '@/components/wedding-website/templates/ModernMinimalistTemplate'
+import type { TemplateType, WebsiteContent, WeddingWebsite } from '@/types/wedding-website'
 
 type Step = 'template' | 'url' | 'content' | 'preview'
 
@@ -23,6 +26,24 @@ export default function WeddingWebsiteBuilderPage() {
     website?.template || null
   )
   const [customUrl, setCustomUrl] = useState(website?.customUrl || '')
+  const [content, setContent] = useState<WebsiteContent>(website?.content || {
+    hero: {
+      bride: wedding?.brideName || '',
+      groom: wedding?.groomName || '',
+      weddingDate: wedding?.weddingDate || new Date(),
+      tagline: '',
+      backgroundImage: null
+    },
+    story: { enabled: false },
+    info: { enabled: true },
+    schedule: { enabled: false, items: [] },
+    rsvp: { enabled: true, mealSelection: false, plusOneAllowed: true, songRequests: false },
+    accommodation: { enabled: false },
+    gift: { enabled: false },
+    gallery: { enabled: false, images: [], allowGuestUploads: false },
+    contact: { enabled: true },
+    faq: { enabled: false, items: [] },
+  })
   const [isSaving, setIsSaving] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)
 
@@ -36,6 +57,7 @@ export default function WeddingWebsiteBuilderPage() {
     if (website) {
       setSelectedTemplate(website.template)
       setCustomUrl(website.customUrl)
+      setContent(website.content)
       // Pokud už web existuje, přejdi na content step
       setCurrentStep('content')
     }
@@ -79,28 +101,14 @@ export default function WeddingWebsiteBuilderPage() {
         await createWebsite({
           customUrl,
           template: selectedTemplate,
-          content: {
-            hero: {
-              bride: wedding.brideName || '',
-              groom: wedding.groomName || '',
-              weddingDate: wedding.date || new Date(),
-            },
-            story: { enabled: false },
-            info: { enabled: true },
-            schedule: { enabled: false, items: [] },
-            rsvp: { enabled: true, mealSelection: false, plusOneAllowed: true, songRequests: false },
-            accommodation: { enabled: false },
-            gift: { enabled: false },
-            gallery: { enabled: false, images: [], allowGuestUploads: false },
-            contact: { enabled: true },
-            faq: { enabled: false, items: [] },
-          },
+          content,
         })
       } else {
         // Aktualizace existujícího webu
         await updateWebsite({
           template: selectedTemplate,
           customUrl,
+          content,
         })
       }
 
@@ -122,8 +130,8 @@ export default function WeddingWebsiteBuilderPage() {
     setIsPublishing(true)
     try {
       await publishWebsite()
-      alert('Web byl úspěšně publikován!')
-      router.push('/admin/wedding-website')
+      alert('Web byl úspěšně publikován! Nyní je dostupný na adrese: ' + customUrl + '.svatbot.cz')
+      // Zůstaneme v builderu, aby uživatel mohl dále editovat
     } catch (error) {
       console.error('Error publishing website:', error)
       alert('Chyba při publikování webu')
@@ -151,7 +159,7 @@ export default function WeddingWebsiteBuilderPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
-                onClick={() => router.push('/admin/wedding-website')}
+                onClick={() => router.push('/wedding-website')}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
@@ -243,26 +251,83 @@ export default function WeddingWebsiteBuilderPage() {
         )}
 
         {currentStep === 'content' && (
-          <div className="bg-white rounded-lg p-8 text-center">
-            <div className="text-6xl mb-4">🚧</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Content Editor
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Tato sekce je ve vývoji. Zde budete moci upravit obsah jednotlivých sekcí webu.
-            </p>
-          </div>
+          <ContentEditor
+            content={content}
+            onContentChange={setContent}
+          />
         )}
 
         {currentStep === 'preview' && (
-          <div className="bg-white rounded-lg p-8 text-center">
-            <div className="text-6xl mb-4">👀</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Náhled webu
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Tato sekce je ve vývoji. Zde uvidíte náhled vašeho svatebního webu.
-            </p>
+          <div className="space-y-6">
+            {/* Preview Header */}
+            <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                    Náhled webu
+                  </h2>
+                  <p className="text-gray-600">
+                    Takto bude váš svatební web vypadat pro hosty
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="text-sm text-gray-500">
+                    Šablona: <span className="font-medium">{selectedTemplate}</span>
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    URL: <span className="font-mono text-blue-600">{customUrl}.svatbot.cz</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Preview Content */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div className="bg-gray-100 px-4 py-2 border-b border-gray-200">
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-1">
+                    <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                    <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                    <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                  </div>
+                  <div className="text-sm text-gray-600 font-mono">
+                    {customUrl}.svatbot.cz
+                  </div>
+                </div>
+              </div>
+
+              <div className="max-h-screen overflow-y-auto">
+                {selectedTemplate === 'classic-elegance' && (
+                  <ClassicEleganceTemplate
+                    website={{
+                      id: 'preview',
+                      weddingId: wedding?.id || 'preview',
+                      customUrl,
+                      template: selectedTemplate,
+                      content,
+                      isPublished: false,
+                      createdAt: new Date(),
+                      updatedAt: new Date()
+                    } as WeddingWebsite}
+                  />
+                )}
+
+                {selectedTemplate === 'modern-minimalist' && (
+                  <ModernMinimalistTemplate
+                    website={{
+                      id: 'preview',
+                      weddingId: wedding?.id || 'preview',
+                      customUrl,
+                      template: selectedTemplate,
+                      content,
+                      isPublished: false,
+                      createdAt: new Date(),
+                      updatedAt: new Date()
+                    } as WeddingWebsite}
+                  />
+                )}
+              </div>
+            </div>
           </div>
         )}
 
@@ -277,14 +342,36 @@ export default function WeddingWebsiteBuilderPage() {
             Zpět
           </button>
 
-          <button
-            onClick={handleNext}
-            disabled={!canGoNext() || currentStepIndex === steps.length - 1}
-            className="inline-flex items-center gap-2 bg-pink-500 text-white px-6 py-3 rounded-lg hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Další
-            <ArrowRight className="w-5 h-5" />
-          </button>
+          {currentStepIndex === steps.length - 1 ? (
+            <div className="flex items-center gap-3">
+              {!website?.isPublished && (
+                <button
+                  onClick={handlePublish}
+                  disabled={isPublishing || !canGoNext()}
+                  className="inline-flex items-center gap-2 bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Rocket className="w-5 h-5" />
+                  {isPublishing ? 'Publikování...' : 'Publikovat web'}
+                </button>
+              )}
+
+              {website?.isPublished && (
+                <div className="flex items-center gap-2 text-green-600">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="font-medium">Web je publikován</span>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={handleNext}
+              disabled={!canGoNext()}
+              className="inline-flex items-center gap-2 bg-pink-500 text-white px-6 py-3 rounded-lg hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Další
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          )}
         </div>
       </div>
     </div>

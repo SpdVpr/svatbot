@@ -275,18 +275,18 @@ service cloud.firestore {
     match /weddingWebsites/{websiteId} {
       // Owner can read/write their own website
       allow read, write: if isAuthenticated() &&
-                            exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
-                            get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid;
+                            resource.data.userId == request.auth.uid;
 
       // Owner can create website
       allow create: if isAuthenticated() &&
                        request.resource.data.keys().hasAll(['weddingId', 'userId', 'customUrl', 'template']) &&
-                       exists(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)) &&
-                       get(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)).data.userId == request.auth.uid &&
                        request.auth.uid == request.resource.data.userId;
 
       // Public read for published websites (for guests)
       allow get: if resource.data.isPublished == true;
+
+      // Allow checking if document exists (for URL availability)
+      allow get: if true;
     }
 
     // RSVPs collection

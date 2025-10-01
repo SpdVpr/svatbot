@@ -23,14 +23,19 @@ export interface HeroContent {
 
 // Story Section
 export interface StoryTimelineItem {
-  date: Date
+  id: string
+  date: string
   title: string
   description: string
+  icon: string
   image?: string
 }
 
 export interface StoryContent {
   enabled: boolean
+  title?: string
+  subtitle?: string
+  description?: string
   howWeMet?: {
     title: string
     text: string
@@ -57,13 +62,22 @@ export interface VenueInfo {
   }
 }
 
+export interface CustomInfo {
+  id: string
+  title: string
+  description: string
+  icon: string
+}
+
 export interface InfoContent {
   enabled: boolean
   ceremony?: VenueInfo
   reception?: VenueInfo
   dressCode?: string
+  dressCodeDetails?: string
   parking?: string
   accessibility?: string
+  customInfo?: CustomInfo[]
 }
 
 // Schedule Section
@@ -80,14 +94,24 @@ export interface ScheduleContent {
 }
 
 // RSVP Section
+export interface MealOption {
+  id: string
+  name: string
+  description: string
+}
+
 export interface RSVPContent {
   enabled: boolean
   deadline?: Date
   mealSelection: boolean
-  mealOptions?: string[]
+  mealOptions?: MealOption[]
   plusOneAllowed: boolean
   songRequests: boolean
+  dietaryRestrictions?: boolean
   message?: string
+  contactName?: string
+  contactPhone?: string
+  contactEmail?: string
 }
 
 // Accommodation Section
@@ -129,16 +153,22 @@ export interface GiftContent {
 
 // Gallery Section
 export interface GalleryImage {
+  id: string
   url: string
+  thumbnailUrl?: string
   caption?: string
+  alt: string
   uploadedBy?: string
   uploadedAt: Date
 }
 
 export interface GalleryContent {
   enabled: boolean
-  images: GalleryImage[]
-  allowGuestUploads: boolean
+  title?: string
+  subtitle?: string
+  description?: string
+  images?: GalleryImage[]
+  allowGuestUploads?: boolean
 }
 
 // Contact Section

@@ -1,6 +1,6 @@
 export interface DashboardModule {
   id: string
-  type: 'wedding-countdown' | 'quick-actions' | 'main-features' | 'upcoming-tasks' | 'marketplace' | 'coming-soon' | 'task-management' | 'guest-management' | 'budget-tracking' | 'timeline-planning' | 'vendor-management' | 'seating-plan' | 'ai-timeline' | 'moodboard' | 'wedding-checklist' | 'music-playlist' | 'food-drinks'
+  type: 'wedding-countdown' | 'quick-actions' | 'main-features' | 'upcoming-tasks' | 'marketplace' | 'coming-soon' | 'task-management' | 'guest-management' | 'budget-tracking' | 'timeline-planning' | 'vendor-management' | 'seating-plan' | 'ai-timeline' | 'moodboard' | 'wedding-checklist' | 'music-playlist' | 'food-drinks' | 'wedding-website'
   title: string
   size: 'small' | 'medium' | 'large' | 'full'
   position: {
@@ -179,6 +179,16 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     order: 14
   },
   {
+    id: 'wedding-website',
+    type: 'wedding-website',
+    title: 'Svatební web',
+    size: 'medium',
+    position: { row: 4, column: 2 },
+    isVisible: true,
+    isLocked: false,
+    order: 15
+  },
+  {
     id: 'coming-soon',
     type: 'coming-soon',
     title: 'Připravované funkce',
@@ -186,6 +196,6 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     position: { row: 6, column: 0 },
     isVisible: false,
     isLocked: false,
-    order: 15
+    order: 16
   }
 ]

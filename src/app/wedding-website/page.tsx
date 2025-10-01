@@ -92,7 +92,7 @@ export default function WeddingWebsitePage() {
             </div>
 
             <Link
-              href="/admin/wedding-website/builder"
+              href="/wedding-website/builder"
               className="inline-flex items-center gap-2 bg-pink-500 text-white px-6 py-3 rounded-lg hover:bg-pink-600 transition-colors"
             >
               <Plus className="w-5 h-5" />
@@ -105,7 +105,7 @@ export default function WeddingWebsitePage() {
   }
 
   // Pokud web existuje, zobraz dashboard
-  const websiteUrl = `https://${website.subdomain}`
+  const websiteUrl = `https://${website.customUrl}.svatbot.cz`
   const previewUrl = `/wedding/${website.customUrl}`
 
   const handleDelete = async () => {
@@ -144,7 +144,7 @@ export default function WeddingWebsitePage() {
               </Link>
 
               <Link
-                href="/admin/wedding-website/builder"
+                href="/wedding-website/builder"
                 className="inline-flex items-center gap-2 bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 transition-colors"
               >
                 <Edit className="w-4 h-4" />
@@ -175,7 +175,7 @@ export default function WeddingWebsitePage() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-sm text-pink-600 hover:text-pink-700"
               >
-                {website.subdomain}
+                {website.customUrl}.svatbot.cz
                 <ExternalLink className="w-3 h-3" />
               </a>
             )}
@@ -228,7 +228,7 @@ export default function WeddingWebsitePage() {
         {/* Quick actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Link
-            href="/admin/wedding-website/builder"
+            href="/wedding-website/builder"
             className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
           >
             <Edit className="w-8 h-8 text-pink-500 mb-3" />
