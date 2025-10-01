@@ -468,7 +468,7 @@ export function useMenu(): UseMenuReturn {
     }
 
     loadMenuData()
-  }, [wedding?.id, user?.uid, user?.email])
+  }, [wedding?.id, user?.id, user?.email])
 
   const clearError = () => setError(null)
 
