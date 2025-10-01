@@ -28,7 +28,7 @@ export default function UrlConfigurator({ customUrl, onUrlChange }: UrlConfigura
       const generatedSuggestions = generateCustomUrlSuggestions(
         wedding.brideName || 'nevesta',
         wedding.groomName || 'zenich',
-        wedding.date
+        wedding.weddingDate
       )
       setSuggestions(generatedSuggestions.slice(0, 4))
     }
