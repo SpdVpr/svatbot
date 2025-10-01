@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { storage } from '@/config/firebase'
 import { useAuthStore } from '@/stores/authStore'
+import { useWeddingStore } from '@/stores/weddingStore'
 import { compressImage } from '@/utils/imageCompression'
 
 interface UploadResult {
@@ -17,12 +18,14 @@ export function useWeddingImageUpload() {
   const [progress, setProgress] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const { user } = useAuthStore()
+  const { currentWedding: wedding } = useWeddingStore()
 
   const uploadImage = async (
     file: File,
     folder: string = 'wedding-websites'
   ): Promise<UploadResult> => {
     if (!user) throw new Error('Authentication required')
+    if (!wedding) throw new Error('Wedding context required')
 
     try {
       setUploading(true)
@@ -45,10 +48,10 @@ export function useWeddingImageUpload() {
 
       setProgress(50)
 
-      // Create unique filename
+      // Create unique filename using wedding ID (matches storage rules)
       const timestamp = Date.now()
-      const userId = user.id
-      const filename = `${folder}/${userId}/${timestamp}_${file.name.replace(/\s+/g, '_')}`
+      const weddingId = wedding.id
+      const filename = `${folder}/${weddingId}/${timestamp}_${file.name.replace(/\s+/g, '_')}`
 
       // Upload to Firebase Storage
       const storageRef = ref(storage, filename)
@@ -81,6 +84,7 @@ export function useWeddingImageUpload() {
     folder: string = 'wedding-websites'
   ): Promise<UploadResult[]> => {
     if (!user) throw new Error('Authentication required')
+    if (!wedding) throw new Error('Wedding context required')
 
     const results: UploadResult[] = []
     let completed = 0
