@@ -23,6 +23,7 @@ import AITimelineModule from './modules/AITimelineModule'
 import MoodboardModule from './modules/MoodboardModule'
 import WeddingChecklistModule from './modules/WeddingChecklistModule'
 import MusicPlaylistModule from './modules/MusicPlaylistModule'
+import FoodDrinksModule from './modules/FoodDrinksModule'
 
 interface FixedGridDragDropProps {
   onWeddingSettingsClick: () => void
@@ -231,6 +232,8 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridD
         return <WeddingChecklistModule />
       case 'music-playlist':
         return <MusicPlaylistModule />
+      case 'food-drinks':
+        return <FoodDrinksModule />
       default:
         return (
           <div className="wedding-card">

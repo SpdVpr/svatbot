@@ -1,6 +1,6 @@
 export interface DashboardModule {
   id: string
-  type: 'wedding-countdown' | 'quick-actions' | 'main-features' | 'upcoming-tasks' | 'marketplace' | 'coming-soon' | 'task-management' | 'guest-management' | 'budget-tracking' | 'timeline-planning' | 'vendor-management' | 'seating-plan' | 'ai-timeline' | 'moodboard' | 'wedding-checklist' | 'music-playlist'
+  type: 'wedding-countdown' | 'quick-actions' | 'main-features' | 'upcoming-tasks' | 'marketplace' | 'coming-soon' | 'task-management' | 'guest-management' | 'budget-tracking' | 'timeline-planning' | 'vendor-management' | 'seating-plan' | 'ai-timeline' | 'moodboard' | 'wedding-checklist' | 'music-playlist' | 'food-drinks'
   title: string
   size: 'small' | 'medium' | 'large' | 'full'
   position: {
@@ -162,11 +162,21 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     id: 'music-playlist',
     type: 'music-playlist',
     title: 'Svatební hudba',
-    size: 'large',
+    size: 'medium',
     position: { row: 4, column: 1 },
     isVisible: true,
     isLocked: false,
     order: 13
+  },
+  {
+    id: 'food-drinks',
+    type: 'food-drinks',
+    title: 'Jídlo a Pití',
+    size: 'medium',
+    position: { row: 3, column: 3 },
+    isVisible: true,
+    isLocked: false,
+    order: 14
   },
   {
     id: 'coming-soon',
@@ -176,6 +186,6 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     position: { row: 6, column: 0 },
     isVisible: false,
     isLocked: false,
-    order: 14
+    order: 15
   }
 ]

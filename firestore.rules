@@ -123,6 +123,28 @@ service cloud.firestore {
                        request.auth.uid == request.resource.data.userId;
     }
 
+    // Menu items collection
+    match /menuItems/{menuItemId} {
+      allow read, write: if isAuthenticated() &&
+                            exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                            get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid;
+      allow create: if isAuthenticated() &&
+                       request.resource.data.keys().hasAll(['weddingId', 'name', 'category', 'estimatedQuantity']) &&
+                       exists(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)) &&
+                       get(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)).data.userId == request.auth.uid;
+    }
+
+    // Drink items collection
+    match /drinkItems/{drinkItemId} {
+      allow read, write: if isAuthenticated() &&
+                            exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                            get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid;
+      allow create: if isAuthenticated() &&
+                       request.resource.data.keys().hasAll(['weddingId', 'name', 'category', 'estimatedQuantity']) &&
+                       exists(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)) &&
+                       get(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)).data.userId == request.auth.uid;
+    }
+
     // Public collections (read-only for authenticated users)
 
     // Venues collection (public read, admin write)

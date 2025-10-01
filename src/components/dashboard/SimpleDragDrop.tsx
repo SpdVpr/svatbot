@@ -22,6 +22,7 @@ import WeddingChecklistModule from './modules/WeddingChecklistModule'
 import AITimelineModule from './modules/AITimelineModule'
 import MoodboardModule from './modules/MoodboardModule'
 import MusicPlaylistModule from './modules/MusicPlaylistModule'
+import FoodDrinksModule from './modules/FoodDrinksModule'
 
 interface SimpleDragDropProps {
   onWeddingSettingsClick: () => void
@@ -205,6 +206,8 @@ export default function SimpleDragDrop({ onWeddingSettingsClick }: SimpleDragDro
         return <MoodboardModule />
       case 'music-playlist':
         return <MusicPlaylistModule />
+      case 'food-drinks':
+        return <FoodDrinksModule />
       default:
         return (
           <div className="wedding-card">

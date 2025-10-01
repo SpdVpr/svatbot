@@ -1,0 +1,138 @@
+'use client'
+
+import Link from 'next/link'
+import { UtensilsCrossed, Wine, CheckCircle, Clock, ArrowRight, Leaf, Wheat } from 'lucide-react'
+import { useMenu } from '@/hooks/useMenu'
+import { currencyUtils } from '@/utils'
+
+export default function FoodDrinksModule() {
+  const { stats } = useMenu()
+
+  return (
+    <div className="wedding-card">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold flex items-center space-x-2">
+          <UtensilsCrossed className="w-5 h-5 text-pink-600" />
+          <span>Jídlo a Pití</span>
+        </h3>
+        <Link href="/menu" className="text-sm text-primary-600 hover:underline">
+          Otevřít
+        </Link>
+      </div>
+
+      <div className="space-y-4">
+        {/* Cost Overview */}
+        <div className="bg-pink-50 p-4 rounded-lg">
+          <div className="text-center mb-3">
+            <div className="text-2xl font-bold text-pink-600">
+              {currencyUtils.formatShort(stats.totalEstimatedCost)}
+            </div>
+            <div className="text-sm text-pink-700">Odhadované náklady</div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-2 text-center text-sm">
+            <div>
+              <div className="font-bold text-gray-900">{stats.totalMenuItems}</div>
+              <div className="text-xs text-gray-600">Jídel</div>
+            </div>
+            <div>
+              <div className="font-bold text-gray-900">{stats.totalDrinkItems}</div>
+              <div className="text-xs text-gray-600">Nápojů</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Food & Drink Stats */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="text-center">
+            <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg mx-auto mb-1">
+              <Leaf className="w-4 h-4 text-green-600" />
+            </div>
+            <div className="text-sm font-bold text-gray-900">{stats.vegetarianOptions}</div>
+            <div className="text-xs text-gray-500">Vegetariánské</div>
+          </div>
+          <div className="text-center">
+            <div className="flex items-center justify-center w-8 h-8 bg-amber-100 rounded-lg mx-auto mb-1">
+              <Wheat className="w-4 h-4 text-amber-600" />
+            </div>
+            <div className="text-sm font-bold text-gray-900">{stats.glutenFreeOptions}</div>
+            <div className="text-xs text-gray-500">Bezlepkové</div>
+          </div>
+        </div>
+
+        {/* Drinks Stats */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="text-center">
+            <div className="flex items-center justify-center w-8 h-8 bg-purple-100 rounded-lg mx-auto mb-1">
+              <Wine className="w-4 h-4 text-purple-600" />
+            </div>
+            <div className="text-sm font-bold text-gray-900">{stats.alcoholicDrinks}</div>
+            <div className="text-xs text-gray-500">Alkoholické</div>
+          </div>
+          <div className="text-center">
+            <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-lg mx-auto mb-1">
+              <Wine className="w-4 h-4 text-blue-600" />
+            </div>
+            <div className="text-sm font-bold text-gray-900">{stats.nonAlcoholicDrinks}</div>
+            <div className="text-xs text-gray-500">Nealko</div>
+          </div>
+        </div>
+
+        {/* Status Overview */}
+        <div className="bg-gray-50 p-3 rounded-lg">
+          <div className="text-sm font-medium text-gray-900 mb-2">Stav příprav</div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-gray-600 flex items-center">
+                <CheckCircle className="w-3 h-3 mr-1 text-green-600" />
+                Potvrzeno
+              </span>
+              <span className="font-semibold text-gray-900">{stats.confirmedItems}</span>
+            </div>
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-gray-600 flex items-center">
+                <Clock className="w-3 h-3 mr-1 text-yellow-600" />
+                Plánováno
+              </span>
+              <span className="font-semibold text-gray-900">{stats.plannedItems}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Status Badge */}
+        <div className="text-center">
+          <div className={`text-sm px-3 py-1 rounded-full inline-block ${
+            stats.totalMenuItems === 0 && stats.totalDrinkItems === 0
+              ? 'bg-gray-100 text-gray-600'
+              : stats.confirmedItems === 0
+                ? 'bg-yellow-100 text-yellow-700'
+                : stats.confirmedItems < (stats.totalMenuItems + stats.totalDrinkItems) / 2
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'bg-green-100 text-green-700'
+          }`}>
+            {stats.totalMenuItems === 0 && stats.totalDrinkItems === 0
+              ? 'Žádné položky'
+              : stats.confirmedItems === 0
+                ? 'Plánování menu'
+                : stats.confirmedItems < (stats.totalMenuItems + stats.totalDrinkItems) / 2
+                  ? 'Probíhá výběr'
+                  : 'Menu připraveno'
+            }
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4 pt-4 border-t border-gray-200">
+        <Link 
+          href="/menu" 
+          className="btn-primary w-full flex items-center justify-center space-x-2"
+        >
+          <UtensilsCrossed className="w-4 h-4" />
+          <span>Spravovat menu</span>
+          <ArrowRight className="w-4 h-4" />
+        </Link>
+      </div>
+    </div>
+  )
+}
+
