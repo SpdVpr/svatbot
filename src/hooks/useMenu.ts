@@ -119,7 +119,7 @@ export function useMenu(): UseMenuReturn {
         weddingId: wedding.id,
         ...data,
         totalCost,
-        actualQuantity: null,
+        actualQuantity: undefined,
         currency: 'CZK',
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now()
@@ -238,7 +238,7 @@ export function useMenu(): UseMenuReturn {
         weddingId: wedding.id,
         ...data,
         totalCost,
-        actualQuantity: null,
+        actualQuantity: undefined,
         currency: 'CZK',
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now()
