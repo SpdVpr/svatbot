@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/stores/authStore'
 import { useWeddingStore } from '@/stores/weddingStore'
 import { useWeddingWebsite } from '@/hooks/useWeddingWebsite'
-import { ArrowLeft, ArrowRight, Save, Eye, Rocket } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Save, Eye, Rocket, Home } from 'lucide-react'
 import TemplateSelector from '@/components/wedding-website/builder/TemplateSelector'
 import UrlConfigurator from '@/components/wedding-website/builder/UrlConfigurator'
 import ContentEditor from '@/components/wedding-website/builder/ContentEditor'
@@ -159,10 +159,12 @@ export default function WeddingWebsiteBuilderPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
-                onClick={() => router.push('/wedding-website')}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                onClick={() => router.push('/')}
+                className="inline-flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600"
+                title="Zpět na dashboard"
               >
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
+                <Home className="w-5 h-5" />
+                <span className="text-sm font-medium">Dashboard</span>
               </button>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">
