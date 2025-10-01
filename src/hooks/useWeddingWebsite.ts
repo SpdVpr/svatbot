@@ -34,6 +34,11 @@ const cleanForFirestore = (obj: any, depth = 0, path = ''): any => {
 
   // Primitive types
   if (typeof obj === 'string' || typeof obj === 'number' || typeof obj === 'boolean') {
+    // Check for base64 data URLs that are too large
+    if (typeof obj === 'string' && obj.startsWith('data:image/') && obj.length > 100000) {
+      console.warn(`Large base64 image found at path ${path}, size: ${obj.length} bytes - removing to prevent document size limit`)
+      return undefined // Remove large base64 images
+    }
     return obj
   }
 
@@ -267,6 +272,30 @@ export function useWeddingWebsite(customUrl?: string) {
       const dataSize = JSON.stringify(cleanedData).length
       console.log('📊 Document size (bytes):', dataSize)
       console.log('📊 Document size (MB):', (dataSize / 1024 / 1024).toFixed(2))
+
+      // Firestore limit is 1MB
+      if (dataSize > 1048576) {
+        console.error('🚨 Document too large for Firestore! Size:', (dataSize / 1024 / 1024).toFixed(2), 'MB (limit: 1MB)')
+
+        // Try to identify large fields
+        const checkFieldSizes = (obj: any, path = ''): void => {
+          if (obj && typeof obj === 'object' && !Array.isArray(obj)) {
+            for (const [key, value] of Object.entries(obj)) {
+              const fieldPath = path ? `${path}.${key}` : key
+              const fieldSize = JSON.stringify(value).length
+              if (fieldSize > 50000) { // 50KB threshold
+                console.log(`📊 Large field: ${fieldPath} = ${(fieldSize / 1024).toFixed(1)}KB`)
+              }
+              if (value && typeof value === 'object') {
+                checkFieldSizes(value, fieldPath)
+              }
+            }
+          }
+        }
+
+        checkFieldSizes(cleanedData)
+        throw new Error('Dokument je příliš velký pro uložení (limit 1MB). Zkuste odstranit některé obrázky.')
+      }
 
       // Check for invalid field names
       const checkFieldNames = (obj: any, path = ''): string[] => {
