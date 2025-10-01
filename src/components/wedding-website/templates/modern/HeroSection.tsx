@@ -2,20 +2,67 @@
 
 import { Calendar } from 'lucide-react'
 import type { HeroContent } from '@/types/wedding-website'
+import { Timestamp } from 'firebase/firestore'
+
+// Helper funkce pro formátování data
+const formatDate = (date: any): string => {
+  if (!date) return ''
+
+  let dateObj: Date
+
+  if (date instanceof Date) {
+    dateObj = date
+  } else if (date instanceof Timestamp) {
+    dateObj = date.toDate()
+  } else if (typeof date === 'string') {
+    dateObj = new Date(date)
+  } else if (date.seconds) {
+    // Firestore Timestamp object
+    dateObj = new Date(date.seconds * 1000)
+  } else {
+    return ''
+  }
+
+  return dateObj.toLocaleDateString('cs-CZ', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  })
+}
+
+// Helper funkce pro převod na Date objekt
+const toDate = (date: any): Date | null => {
+  if (!date) return null
+
+  if (date instanceof Date) {
+    return date
+  } else if (date instanceof Timestamp) {
+    return date.toDate()
+  } else if (typeof date === 'string') {
+    return new Date(date)
+  } else if (date.seconds) {
+    // Firestore Timestamp object
+    return new Date(date.seconds * 1000)
+  }
+
+  return null
+}
 
 interface HeroSectionProps {
   content: HeroContent
 }
 
 export default function ModernHeroSection({ content }: HeroSectionProps) {
-  const { bride, groom, weddingDate, tagline, backgroundImage } = content
+  const { bride, groom, weddingDate, tagline, mainImage } = content
 
   // Výpočet odpočtu do svatby
   const getTimeUntilWedding = () => {
     if (!weddingDate) return null
-    
+
     const now = new Date()
-    const wedding = new Date(weddingDate)
+    const wedding = toDate(weddingDate)
+    if (!wedding) return null
+
     const diffTime = wedding.getTime() - now.getTime()
     
     if (diffTime <= 0) {
@@ -41,15 +88,15 @@ export default function ModernHeroSection({ content }: HeroSectionProps) {
   return (
     <section 
       className="relative min-h-screen flex items-center justify-center"
-      style={backgroundImage ? {
-        backgroundImage: `linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)), url(${backgroundImage})`,
+      style={mainImage ? {
+        mainImage: `linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)), url(${mainImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
       } : {}}
     >
       {/* Geometric background pattern */}
-      {!backgroundImage && (
+      {!mainImage && (
         <div className="absolute inset-0 bg-white">
           <div className="absolute inset-0 opacity-5">
             <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -105,11 +152,7 @@ export default function ModernHeroSection({ content }: HeroSectionProps) {
             <div className="inline-flex items-center gap-4 px-8 py-4 border border-gray-300 bg-white bg-opacity-90">
               <Calendar className="w-5 h-5 text-gray-900" />
               <span className="text-xl font-light text-gray-900 tracking-wide">
-                {weddingDate.toLocaleDateString('cs-CZ', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric'
-                })}
+                {formatDate(weddingDate)}
               </span>
             </div>
           </div>

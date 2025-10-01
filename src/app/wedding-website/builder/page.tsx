@@ -32,7 +32,7 @@ export default function WeddingWebsiteBuilderPage() {
       groom: wedding?.groomName || '',
       weddingDate: wedding?.weddingDate || new Date(),
       tagline: '',
-      backgroundImage: null
+      mainImage: undefined
     },
     story: { enabled: false },
     info: { enabled: true },

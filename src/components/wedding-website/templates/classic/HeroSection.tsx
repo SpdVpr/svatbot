@@ -2,20 +2,67 @@
 
 import { Calendar, Heart } from 'lucide-react'
 import type { HeroContent } from '@/types/wedding-website'
+import { Timestamp } from 'firebase/firestore'
+
+// Helper funkce pro formátování data
+const formatDate = (date: any): string => {
+  if (!date) return ''
+
+  let dateObj: Date
+
+  if (date instanceof Date) {
+    dateObj = date
+  } else if (date instanceof Timestamp) {
+    dateObj = date.toDate()
+  } else if (typeof date === 'string') {
+    dateObj = new Date(date)
+  } else if (date.seconds) {
+    // Firestore Timestamp object
+    dateObj = new Date(date.seconds * 1000)
+  } else {
+    return ''
+  }
+
+  return dateObj.toLocaleDateString('cs-CZ', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  })
+}
+
+// Helper funkce pro převod na Date objekt
+const toDate = (date: any): Date | null => {
+  if (!date) return null
+
+  if (date instanceof Date) {
+    return date
+  } else if (date instanceof Timestamp) {
+    return date.toDate()
+  } else if (typeof date === 'string') {
+    return new Date(date)
+  } else if (date.seconds) {
+    // Firestore Timestamp object
+    return new Date(date.seconds * 1000)
+  }
+
+  return null
+}
 
 interface HeroSectionProps {
   content: HeroContent
 }
 
 export default function HeroSection({ content }: HeroSectionProps) {
-  const { bride, groom, weddingDate, tagline, backgroundImage } = content
+  const { bride, groom, weddingDate, tagline, mainImage } = content
 
   // Výpočet odpočtu do svatby
   const getTimeUntilWedding = () => {
     if (!weddingDate) return null
-    
+
     const now = new Date()
-    const wedding = new Date(weddingDate)
+    const wedding = toDate(weddingDate)
+    if (!wedding) return null
+
     const diffTime = wedding.getTime() - now.getTime()
     
     if (diffTime <= 0) {
@@ -41,15 +88,15 @@ export default function HeroSection({ content }: HeroSectionProps) {
   return (
     <section 
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
-      style={backgroundImage ? {
-        backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${backgroundImage})`,
+      style={mainImage ? {
+        mainImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${mainImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
       } : {}}
     >
       {/* Background pattern overlay */}
-      {!backgroundImage && (
+      {!mainImage && (
         <div className="absolute inset-0 bg-gradient-to-br from-amber-50 via-white to-rose-50">
           <div className="absolute inset-0 opacity-10">
             <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -80,13 +127,13 @@ export default function HeroSection({ content }: HeroSectionProps) {
         {/* Names */}
         <div className="mb-8">
           <h1 className={`text-6xl md:text-8xl font-bold mb-4 font-serif ${
-            backgroundImage ? 'text-white' : 'text-gray-900'
+            mainImage ? 'text-white' : 'text-gray-900'
           }`}>
             {bride && groom ? (
               <>
                 <span className="block">{bride}</span>
                 <span className={`text-4xl md:text-5xl mx-4 ${
-                  backgroundImage ? 'text-amber-200' : 'text-amber-600'
+                  mainImage ? 'text-amber-200' : 'text-amber-600'
                 }`}>
                   &
                 </span>
@@ -100,13 +147,13 @@ export default function HeroSection({ content }: HeroSectionProps) {
           {/* Decorative line */}
           <div className="flex items-center justify-center my-8">
             <div className={`h-px w-16 ${
-              backgroundImage ? 'bg-white' : 'bg-amber-400'
+              mainImage ? 'bg-white' : 'bg-amber-400'
             }`}></div>
             <Heart className={`w-6 h-6 mx-4 ${
-              backgroundImage ? 'text-white' : 'text-rose-400'
+              mainImage ? 'text-white' : 'text-rose-400'
             }`} />
             <div className={`h-px w-16 ${
-              backgroundImage ? 'bg-white' : 'bg-amber-400'
+              mainImage ? 'bg-white' : 'bg-amber-400'
             }`}></div>
           </div>
         </div>
@@ -115,17 +162,13 @@ export default function HeroSection({ content }: HeroSectionProps) {
         {weddingDate && (
           <div className="mb-8">
             <div className={`inline-flex items-center gap-3 px-6 py-3 rounded-full ${
-              backgroundImage 
+              mainImage 
                 ? 'bg-white bg-opacity-20 backdrop-blur-sm text-white' 
                 : 'bg-white shadow-lg text-gray-900'
             }`}>
               <Calendar className="w-5 h-5" />
               <span className="text-xl font-semibold">
-                {weddingDate.toLocaleDateString('cs-CZ', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric'
-                })}
+                {formatDate(weddingDate)}
               </span>
             </div>
           </div>
@@ -135,7 +178,7 @@ export default function HeroSection({ content }: HeroSectionProps) {
         {countdown && (
           <div className="mb-8">
             <p className={`text-lg font-medium ${
-              backgroundImage ? 'text-amber-200' : 'text-amber-600'
+              mainImage ? 'text-amber-200' : 'text-amber-600'
             }`}>
               {countdown.message}
             </p>
@@ -146,7 +189,7 @@ export default function HeroSection({ content }: HeroSectionProps) {
         {tagline && (
           <div className="mb-12">
             <p className={`text-xl md:text-2xl italic font-light max-w-2xl mx-auto leading-relaxed ${
-              backgroundImage ? 'text-white' : 'text-gray-700'
+              mainImage ? 'text-white' : 'text-gray-700'
             }`}>
               "{tagline}"
             </p>
@@ -156,10 +199,10 @@ export default function HeroSection({ content }: HeroSectionProps) {
         {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
           <div className={`w-6 h-10 border-2 rounded-full flex justify-center ${
-            backgroundImage ? 'border-white' : 'border-gray-400'
+            mainImage ? 'border-white' : 'border-gray-400'
           }`}>
             <div className={`w-1 h-3 rounded-full mt-2 ${
-              backgroundImage ? 'bg-white' : 'bg-gray-400'
+              mainImage ? 'bg-white' : 'bg-gray-400'
             }`}></div>
           </div>
         </div>
@@ -171,7 +214,7 @@ export default function HeroSection({ content }: HeroSectionProps) {
           <Heart
             key={i}
             className={`absolute w-4 h-4 opacity-20 animate-pulse ${
-              backgroundImage ? 'text-white' : 'text-rose-300'
+              mainImage ? 'text-white' : 'text-rose-300'
             }`}
             style={{
               left: `${Math.random() * 100}%`,

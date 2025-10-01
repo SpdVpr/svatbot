@@ -4,6 +4,33 @@ import { useState, useRef } from 'react'
 import { Calendar, Upload, X, Image as ImageIcon, Move, RotateCw } from 'lucide-react'
 import { useWeddingStore } from '@/stores/weddingStore'
 import type { HeroContent } from '@/types/wedding-website'
+import { Timestamp } from 'firebase/firestore'
+
+// Helper funkce pro formátování data
+const formatDate = (date: any): string => {
+  if (!date) return ''
+
+  let dateObj: Date
+
+  if (date instanceof Date) {
+    dateObj = date
+  } else if (date instanceof Timestamp) {
+    dateObj = date.toDate()
+  } else if (typeof date === 'string') {
+    dateObj = new Date(date)
+  } else if (date.seconds) {
+    // Firestore Timestamp object
+    dateObj = new Date(date.seconds * 1000)
+  } else {
+    return ''
+  }
+
+  return dateObj.toLocaleDateString('cs-CZ', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  })
+}
 
 interface HeroSectionEditorProps {
   content: HeroContent
@@ -43,7 +70,7 @@ export default function HeroSectionEditor({ content, onChange }: HeroSectionEdit
     const reader = new FileReader()
     reader.onload = (e) => {
       const imageUrl = e.target?.result as string
-      handleInputChange('backgroundImage', imageUrl)
+      handleInputChange('mainImage', imageUrl)
     }
     reader.readAsDataURL(file)
   }
@@ -171,13 +198,13 @@ export default function HeroSectionEditor({ content, onChange }: HeroSectionEdit
           Hlavní fotka
         </label>
         
-        {content.backgroundImage ? (
+        {content.mainImage ? (
           <div className="space-y-4">
             {/* Image Preview */}
             <div className="relative bg-gray-100 rounded-lg overflow-hidden" style={{ height: '300px' }}>
               <img
                 ref={imageRef}
-                src={content.backgroundImage}
+                src={content.mainImage}
                 alt="Hlavní fotka"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-200"
                 style={{
@@ -195,7 +222,7 @@ export default function HeroSectionEditor({ content, onChange }: HeroSectionEdit
 
               {/* Remove button */}
               <button
-                onClick={() => handleInputChange('backgroundImage', null)}
+                onClick={() => handleInputChange('mainImage', undefined)}
                 className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
               >
                 <X className="w-4 h-4" />
@@ -312,28 +339,24 @@ export default function HeroSectionEditor({ content, onChange }: HeroSectionEdit
         <h4 className="font-semibold text-gray-900 mb-4">Náhled</h4>
         <div 
           className="relative bg-gradient-to-br from-pink-100 to-purple-100 rounded-lg p-8 text-center min-h-[200px] flex flex-col justify-center"
-          style={content.backgroundImage ? {
-            backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${content.backgroundImage})`,
+          style={content.mainImage ? {
+            backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${content.mainImage})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           } : {}}
         >
-          <h1 className={`text-4xl font-bold mb-2 ${content.backgroundImage ? 'text-white' : 'text-gray-900'}`}>
+          <h1 className={`text-4xl font-bold mb-2 ${content.mainImage ? 'text-white' : 'text-gray-900'}`}>
             {content.bride && content.groom ? `${content.bride} & ${content.groom}` : 'Jména snoubenců'}
           </h1>
           
           {content.weddingDate && (
-            <p className={`text-lg mb-2 ${content.backgroundImage ? 'text-white' : 'text-gray-700'}`}>
-              {content.weddingDate.toLocaleDateString('cs-CZ', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
-              })}
+            <p className={`text-lg mb-2 ${content.mainImage ? 'text-white' : 'text-gray-700'}`}>
+              {formatDate(content.weddingDate)}
             </p>
           )}
           
           {content.tagline && (
-            <p className={`text-sm italic ${content.backgroundImage ? 'text-white' : 'text-gray-600'}`}>
+            <p className={`text-sm italic ${content.mainImage ? 'text-white' : 'text-gray-600'}`}>
               {content.tagline}
             </p>
           )}

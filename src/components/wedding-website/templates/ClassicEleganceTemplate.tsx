@@ -8,6 +8,33 @@ import RSVPSection from './classic/RSVPSection'
 import StorySection from './classic/StorySection'
 import ScheduleSection from './classic/ScheduleSection'
 import GallerySection from './classic/GallerySection'
+import { Timestamp } from 'firebase/firestore'
+
+// Helper funkce pro formátování data
+const formatDate = (date: any): string => {
+  if (!date) return ''
+
+  let dateObj: Date
+
+  if (date instanceof Date) {
+    dateObj = date
+  } else if (date instanceof Timestamp) {
+    dateObj = date.toDate()
+  } else if (typeof date === 'string') {
+    dateObj = new Date(date)
+  } else if (date.seconds) {
+    // Firestore Timestamp object
+    dateObj = new Date(date.seconds * 1000)
+  } else {
+    return ''
+  }
+
+  return dateObj.toLocaleDateString('cs-CZ', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  })
+}
 
 interface ClassicEleganceTemplateProps {
   website: WeddingWebsite
@@ -176,11 +203,7 @@ export default function ClassicEleganceTemplate({ website }: ClassicEleganceTemp
             </h3>
             {content.hero.weddingDate && (
               <p className="text-gray-300">
-                {content.hero.weddingDate.toLocaleDateString('cs-CZ', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric'
-                })}
+                {formatDate(content.hero.weddingDate)}
               </p>
             )}
           </div>

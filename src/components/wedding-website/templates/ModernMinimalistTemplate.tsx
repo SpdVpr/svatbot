@@ -5,6 +5,33 @@ import type { WeddingWebsite } from '@/types/wedding-website'
 import ModernHeroSection from './modern/HeroSection'
 import ModernInfoSection from './modern/InfoSection'
 import ModernRSVPSection from './modern/RSVPSection'
+import { Timestamp } from 'firebase/firestore'
+
+// Helper funkce pro formátování data
+const formatDate = (date: any): string => {
+  if (!date) return ''
+
+  let dateObj: Date
+
+  if (date instanceof Date) {
+    dateObj = date
+  } else if (date instanceof Timestamp) {
+    dateObj = date.toDate()
+  } else if (typeof date === 'string') {
+    dateObj = new Date(date)
+  } else if (date.seconds) {
+    // Firestore Timestamp object
+    dateObj = new Date(date.seconds * 1000)
+  } else {
+    return ''
+  }
+
+  return dateObj.toLocaleDateString('cs-CZ', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  })
+}
 
 interface ModernMinimalistTemplateProps {
   website: WeddingWebsite
@@ -276,11 +303,7 @@ export default function ModernMinimalistTemplate({ website }: ModernMinimalistTe
             </h3>
             {content.hero.weddingDate && (
               <p className="text-gray-400">
-                {content.hero.weddingDate.toLocaleDateString('cs-CZ', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric'
-                })}
+                {formatDate(content.hero.weddingDate)}
               </p>
             )}
           </div>

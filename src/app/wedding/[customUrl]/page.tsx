@@ -72,6 +72,16 @@ export default async function WeddingWebsitePage({ params }: PageProps) {
   // Načíst data z Firestore
   const website = await getWeddingWebsite(customUrl)
 
+  console.log('📄 Website data:', website ? 'found' : 'not found')
+  if (website) {
+    console.log('📊 Website details:', {
+      id: website.id,
+      customUrl: website.customUrl,
+      isPublished: website.isPublished,
+      template: website.template
+    })
+  }
+
   // Pokud web neexistuje nebo není publikovaný, zobraz 404
   if (!website) {
     return (
