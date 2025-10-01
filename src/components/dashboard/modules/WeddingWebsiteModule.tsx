@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Globe, Plus, Edit, Eye, BarChart3, ExternalLink, Loader2 } from 'lucide-react'
+import { Globe, Plus, Edit, Eye, BarChart3, ExternalLink, Loader2, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { useWeddingWebsite } from '@/hooks/useWeddingWebsite'
 
@@ -10,7 +10,7 @@ interface WeddingWebsiteModuleProps {
 }
 
 export default function WeddingWebsiteModule({ onResize }: WeddingWebsiteModuleProps) {
-  const { website, loading } = useWeddingWebsite()
+  const { website, loading, error } = useWeddingWebsite()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -63,7 +63,7 @@ export default function WeddingWebsiteModule({ onResize }: WeddingWebsiteModuleP
     )
   }
 
-  // Pokud web neexistuje
+  // Pokud web neexistuje nebo se načítá
   if (!website) {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
@@ -77,20 +77,39 @@ export default function WeddingWebsiteModule({ onResize }: WeddingWebsiteModuleP
           </div>
         </div>
 
-        <div className="text-center py-6">
-          <div className="text-4xl mb-3">💒</div>
-          <p className="text-gray-600 text-sm mb-4">
-            Vytvořte krásný web pro vaše hosty
-          </p>
-          
-          <Link
-            href="/wedding-website/builder"
-            className="inline-flex items-center gap-2 bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition-colors text-sm"
-          >
-            <Plus className="w-4 h-4" />
-            Vytvořit web
-          </Link>
-        </div>
+        {loading ? (
+          <div className="text-center py-6">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-500 mb-3"></div>
+            <p className="text-gray-600 text-sm">Načítání webu...</p>
+          </div>
+        ) : (
+          <div className="text-center py-6">
+            <div className="text-4xl mb-3">💒</div>
+            <p className="text-gray-600 text-sm mb-4">
+              {error ? 'Chyba při načítání webu' : 'Vytvořte krásný web pro vaše hosty'}
+            </p>
+
+            <div className="flex flex-col gap-2">
+              <Link
+                href="/wedding-website/builder"
+                className="inline-flex items-center gap-2 bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition-colors text-sm"
+              >
+                <Plus className="w-4 h-4" />
+                {error ? 'Vytvořit nový web' : 'Vytvořit web'}
+              </Link>
+
+              {error && (
+                <Link
+                  href="/wedding-website"
+                  className="inline-flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+                >
+                  <Settings className="w-4 h-4" />
+                  Správa webů
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="mt-4 pt-4 border-t border-gray-100">
           <div className="grid grid-cols-3 gap-3 text-center">
