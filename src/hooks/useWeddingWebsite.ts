@@ -21,10 +21,10 @@ import { useAuthStore } from '@/stores/authStore'
 import { useWeddingStore } from '@/stores/weddingStore'
 
 // Helper funkce pro převod Date objektů na Timestamp pro Firestore
-const cleanForFirestore = (obj: any, depth = 0): any => {
+const cleanForFirestore = (obj: any, depth = 0, path = ''): any => {
   // Prevent infinite recursion
-  if (depth > 10) {
-    console.warn('Max depth reached in cleanForFirestore, returning null')
+  if (depth > 15) {
+    console.warn(`Max depth reached in cleanForFirestore at path: ${path}`)
     return null
   }
 
@@ -41,7 +41,7 @@ const cleanForFirestore = (obj: any, depth = 0): any => {
   if (obj instanceof Date) {
     // Check if date is valid
     if (isNaN(obj.getTime())) {
-      console.warn('Invalid date found, converting to null:', obj)
+      console.warn(`Invalid date found at path ${path}, converting to null:`, obj)
       return null
     }
     return Timestamp.fromDate(obj)
@@ -54,27 +54,47 @@ const cleanForFirestore = (obj: any, depth = 0): any => {
 
   // Functions - skip them
   if (typeof obj === 'function') {
+    console.log(`Skipping function at path: ${path}`)
     return undefined
   }
 
   // File objects - skip them
   if (obj instanceof File || obj instanceof Blob) {
+    console.log(`Skipping File/Blob at path: ${path}`)
     return undefined
   }
 
   // DOM elements - skip them
   if (typeof HTMLElement !== 'undefined' && obj instanceof HTMLElement) {
+    console.log(`Skipping HTMLElement at path: ${path}`)
     return undefined
   }
 
   // React refs - skip them
   if (obj && typeof obj === 'object' && 'current' in obj && Object.keys(obj).length === 1) {
+    console.log(`Skipping React ref at path: ${path}`)
     return undefined
+  }
+
+  // Special objects that might cause issues
+  if (obj && typeof obj === 'object') {
+    const constructor = obj.constructor
+    const constructorName = constructor ? constructor.name : 'Unknown'
+
+    // Skip known problematic objects
+    if (constructorName === 'FileList' || constructorName === 'DataTransfer' ||
+        constructorName === 'Event' || constructorName === 'SyntheticEvent' ||
+        constructorName === 'MouseEvent' || constructorName === 'KeyboardEvent') {
+      console.log(`Skipping ${constructorName} at path: ${path}`)
+      return undefined
+    }
   }
 
   // Arrays
   if (Array.isArray(obj)) {
-    const cleaned = obj.map(item => cleanForFirestore(item, depth + 1)).filter(item => item !== undefined)
+    const cleaned = obj.map((item, index) =>
+      cleanForFirestore(item, depth + 1, `${path}[${index}]`)
+    ).filter(item => item !== undefined)
     return cleaned
   }
 
@@ -91,7 +111,8 @@ const cleanForFirestore = (obj: any, depth = 0): any => {
           continue
         }
 
-        const cleanedValue = cleanForFirestore(value, depth + 1)
+        const newPath = path ? `${path}.${key}` : key
+        const cleanedValue = cleanForFirestore(value, depth + 1, newPath)
         if (cleanedValue !== undefined) {
           cleaned[key] = cleanedValue
         }
@@ -101,9 +122,9 @@ const cleanForFirestore = (obj: any, depth = 0): any => {
       // For class instances, try JSON serialization as last resort
       try {
         const serialized = JSON.parse(JSON.stringify(obj))
-        return cleanForFirestore(serialized, depth + 1)
+        return cleanForFirestore(serialized, depth + 1, path)
       } catch (error) {
-        console.warn('Could not serialize object for Firestore:', obj, error)
+        console.warn(`Could not serialize object at path ${path}:`, obj, error)
         return null
       }
     }
@@ -228,11 +249,13 @@ export function useWeddingWebsite(customUrl?: string) {
       // Použijeme customUrl jako document ID
       const docRef = doc(db, 'weddingWebsites', data.customUrl)
       // Vyčistíme data pro Firestore (převedeme Date na Timestamp)
-      const cleanedData = cleanForFirestore(websiteData)
+      console.log('🧹 Starting cleanForFirestore for website data...')
+      const cleanedData = cleanForFirestore(websiteData, 0, 'websiteData')
 
       // Debug logging
       console.log('Original data:', websiteData)
       console.log('Cleaned data:', cleanedData)
+      console.log('🧹 cleanForFirestore completed')
 
       await setDoc(docRef, cleanedData)
 
@@ -264,7 +287,7 @@ export function useWeddingWebsite(customUrl?: string) {
       const cleanedUpdates = cleanForFirestore({
         ...updates,
         updatedAt: Timestamp.now(),
-      })
+      }, 0, 'updates')
 
       await updateDoc(docRef, cleanedUpdates)
     } catch (err: any) {
