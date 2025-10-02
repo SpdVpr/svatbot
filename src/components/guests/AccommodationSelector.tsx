@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useAccommodation } from '@/hooks/useAccommodation'
+import { useAccommodationWithGuests } from '@/hooks/useAccommodationWithGuests'
 import { Building2, Bed, X, AlertCircle, Plus } from 'lucide-react'
 import { Guest } from '@/types/guest'
 
@@ -16,7 +16,7 @@ export default function AccommodationSelector({
   onUpdate,
   onClose
 }: AccommodationSelectorProps) {
-  const { accommodations } = useAccommodation()
+  const { accommodations } = useAccommodationWithGuests()
   const [selectedAccommodationId, setSelectedAccommodationId] = useState(guest.accommodationId || '')
   const [selectedRoomId, setSelectedRoomId] = useState(guest.roomId || '')
   const [saving, setSaving] = useState(false)
@@ -103,21 +103,42 @@ export default function AccommodationSelector({
                   Pokoj
                 </label>
                 {availableRooms.length > 0 ? (
-                  <select
-                    id="room"
-                    value={selectedRoomId}
-                    onChange={(e) => setSelectedRoomId(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    disabled={saving}
-                  >
-                    <option value="">-- Vyberte pokoj --</option>
-                    {availableRooms.map(room => (
-                      <option key={room.id} value={room.id}>
-                        {room.name} - {room.capacity} osob
-                        {room.pricePerNight && ` (${room.pricePerNight} Kč/noc)`}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="space-y-2">
+                    <select
+                      id="room"
+                      value={selectedRoomId}
+                      onChange={(e) => setSelectedRoomId(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      disabled={saving}
+                    >
+                      <option value="">-- Vyberte pokoj --</option>
+                      {availableRooms.map(room => {
+                        const roomOccupancy = selectedAccommodation?.roomOccupancies?.find(r => r.roomId === room.id)
+                        const isOccupied = roomOccupancy?.isOccupied || false
+                        const occupiedBy = roomOccupancy?.occupiedBy?.guestName
+
+                        return (
+                          <option key={room.id} value={room.id}>
+                            {isOccupied ? '🔴' : '🟢'} {room.name} - {room.capacity} osob
+                            {room.pricePerNight && ` (${room.pricePerNight} Kč/noc)`}
+                            {isOccupied && occupiedBy ? ` - Obsazeno: ${occupiedBy}` : ''}
+                          </option>
+                        )
+                      })}
+                    </select>
+
+                    {/* Legend */}
+                    <div className="flex items-center gap-4 text-xs text-gray-600">
+                      <div className="flex items-center gap-1">
+                        <span>🟢</span>
+                        <span>Volný</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <span>🔴</span>
+                        <span>Obsazený</span>
+                      </div>
+                    </div>
+                  </div>
                 ) : (
                   <div className="text-sm text-gray-500 italic">
                     V tomto ubytování nejsou zatím žádné pokoje.

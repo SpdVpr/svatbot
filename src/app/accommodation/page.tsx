@@ -3,21 +3,23 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { 
-  Building2, 
-  Plus, 
-  Search, 
-  Filter, 
-  MapPin, 
-  Bed, 
-  Users, 
-  Phone, 
+import {
+  Building2,
+  Plus,
+  Search,
+  Filter,
+  MapPin,
+  Bed,
+  Users,
+  Phone,
   Mail,
   Globe,
   Edit,
   Trash2,
   Eye,
-  ArrowLeft
+  ArrowLeft,
+  Home,
+  ChevronRight
 } from 'lucide-react'
 import { useAccommodationWithGuests, type AccommodationStatsWithGuests } from '@/hooks/useAccommodationWithGuests'
 import type { Accommodation } from '@/types'

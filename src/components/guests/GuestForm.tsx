@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { GuestFormData, GuestCategory, InvitationType, DietaryRestriction } from '@/types/guest'
-import { useAccommodation } from '@/hooks/useAccommodation'
+import { useAccommodationWithGuests } from '@/hooks/useAccommodationWithGuests'
 import {
   X,
   User,
@@ -33,7 +33,7 @@ export default function GuestForm({
   error,
   initialData
 }: GuestFormProps) {
-  const { accommodations } = useAccommodation()
+  const { accommodations } = useAccommodationWithGuests()
   const [formData, setFormData] = useState<GuestFormData>({
     firstName: initialData?.firstName || '',
     lastName: initialData?.lastName || '',
@@ -601,21 +601,42 @@ export default function GuestForm({
                             }
 
                             return (
-                              <select
-                                id="roomId"
-                                value={formData.roomId || ''}
-                                onChange={(e) => handleChange('roomId', e.target.value || undefined)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                                disabled={loading}
-                              >
-                                <option value="">-- Vyberte pokoj --</option>
-                                {availableRooms.map(room => (
-                                  <option key={room.id} value={room.id}>
-                                    {room.name} - {room.capacity} osob
-                                    {room.pricePerNight && ` (${room.pricePerNight.toLocaleString()} Kč/noc)`}
-                                  </option>
-                                ))}
-                              </select>
+                              <div className="space-y-2">
+                                <select
+                                  id="roomId"
+                                  value={formData.roomId || ''}
+                                  onChange={(e) => handleChange('roomId', e.target.value || undefined)}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                  disabled={loading}
+                                >
+                                  <option value="">-- Vyberte pokoj --</option>
+                                  {availableRooms.map(room => {
+                                    const roomOccupancy = selectedAccommodation?.roomOccupancies?.find(r => r.roomId === room.id)
+                                    const isOccupied = roomOccupancy?.isOccupied || false
+                                    const occupiedBy = roomOccupancy?.occupiedBy?.guestName
+
+                                    return (
+                                      <option key={room.id} value={room.id}>
+                                        {isOccupied ? '🔴' : '🟢'} {room.name} - {room.capacity} osob
+                                        {room.pricePerNight && ` (${room.pricePerNight.toLocaleString()} Kč/noc)`}
+                                        {isOccupied && occupiedBy ? ` - Obsazeno: ${occupiedBy}` : ''}
+                                      </option>
+                                    )
+                                  })}
+                                </select>
+
+                                {/* Legend */}
+                                <div className="flex items-center gap-4 text-xs text-gray-600">
+                                  <div className="flex items-center gap-1">
+                                    <span>🟢</span>
+                                    <span>Volný</span>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <span>🔴</span>
+                                    <span>Obsazený</span>
+                                  </div>
+                                </div>
+                              </div>
                             )
                           })()}
                         </div>
