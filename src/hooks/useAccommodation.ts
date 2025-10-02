@@ -136,7 +136,7 @@ export function useAccommodation(): UseAccommodationReturn {
       where('weddingId', '==', wedding.id)
     )
 
-    const unsubscribe = onSnapshot(q, 
+    const unsubscribe = onSnapshot(q,
       (snapshot) => {
         const accommodationData = snapshot.docs.map(doc => ({
           id: doc.id,
@@ -149,6 +149,11 @@ export function useAccommodation(): UseAccommodationReturn {
         const sortedData = accommodationData.sort((a, b) =>
           b.createdAt.getTime() - a.createdAt.getTime()
         )
+
+        console.log('🔄 Firestore data updated:', sortedData.length, 'accommodations')
+        sortedData.forEach(acc => {
+          console.log(`🏨 ${acc.name}: ${acc.rooms.length} rooms`, acc.rooms.map(r => r.name))
+        })
 
         setAccommodations(sortedData)
         setLoading(false)
@@ -260,13 +265,17 @@ export function useAccommodation(): UseAccommodationReturn {
       }
 
       const updatedRooms = [...accommodation.rooms, newRoom]
-      
+
+      console.log(`🔄 Updating accommodation ${accommodationId} with ${updatedRooms.length} rooms`)
+      console.log('📋 Room names:', updatedRooms.map(r => r.name))
+
       const accommodationRef = doc(db, 'accommodations', accommodationId)
       await updateDoc(accommodationRef, {
         rooms: updatedRooms,
         updatedAt: Timestamp.now()
       })
 
+      console.log(`✅ Firestore updated successfully for accommodation ${accommodationId}`)
       return newRoom
     } catch (err: any) {
       console.error('Error adding room:', err)
@@ -336,9 +345,30 @@ export function useAccommodation(): UseAccommodationReturn {
   }, [user, wedding, accommodations])
 
   const deleteRoom = useCallback(async (accommodationId: string, roomId: string) => {
-    // TODO: Implement room deletion
-    throw new Error('Not implemented yet')
-  }, [])
+    if (!user || !wedding?.id) throw new Error('User or wedding not found')
+
+    try {
+      setLoading(true)
+      const accommodation = accommodations.find(acc => acc.id === accommodationId)
+      if (!accommodation) throw new Error('Accommodation not found')
+
+      const updatedRooms = accommodation.rooms.filter(room => room.id !== roomId)
+
+      const accommodationRef = doc(db, 'accommodations', accommodationId)
+      await updateDoc(accommodationRef, {
+        rooms: updatedRooms,
+        updatedAt: Timestamp.now()
+      })
+
+      console.log(`✅ Room ${roomId} deleted successfully`)
+    } catch (err: any) {
+      console.error('Error deleting room:', err)
+      setError('Chyba při mazání pokoje')
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }, [user, wedding, accommodations])
 
   const createReservation = useCallback(async (roomId: string, reservationData: Omit<RoomReservation, 'id' | 'roomId' | 'createdAt' | 'updatedAt'>) => {
     // TODO: Implement reservation creation
