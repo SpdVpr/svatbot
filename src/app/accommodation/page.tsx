@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { 
   Building2, 
   Plus, 
@@ -18,7 +19,7 @@ import {
   Eye,
   ArrowLeft
 } from 'lucide-react'
-import { useAccommodationWithGuests } from '@/hooks/useAccommodationWithGuests'
+import { useAccommodationWithGuests, type AccommodationStatsWithGuests } from '@/hooks/useAccommodationWithGuests'
 import type { Accommodation } from '@/types'
 
 export default function AccommodationPage() {

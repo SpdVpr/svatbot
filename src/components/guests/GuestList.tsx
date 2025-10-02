@@ -205,6 +205,8 @@ export default function GuestList({
 
   // Handle RSVP status change
   const handleRSVPChange = async (guestId: string, status: Guest['rsvpStatus']) => {
+    if (!updateGuest) return
+
     try {
       console.log('🔄 RSVP change:', guestId, status)
       await updateGuest(guestId, {
@@ -760,7 +762,7 @@ export default function GuestList({
                             {guest.accommodationId && guest.roomId && getAccommodationById && (
                               (() => {
                                 const accommodation = getAccommodationById(guest.accommodationId)
-                                const room = accommodation?.rooms.find(r => r.id === guest.roomId)
+                                const room = accommodation?.rooms.find((r: any) => r.id === guest.roomId)
                                 return room ? (
                                   <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 flex items-center space-x-1 flex-shrink-0">
                                     <Bed className="w-3 h-3" />

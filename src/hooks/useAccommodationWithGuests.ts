@@ -37,7 +37,7 @@ export interface AccommodationStatsWithGuests {
 }
 
 export function useAccommodationWithGuests() {
-  const { accommodations, loading: accommodationLoading, ...accommodationMethods } = useAccommodation()
+  const { accommodations, loading: accommodationLoading, stats: originalStats, ...accommodationMethods } = useAccommodation()
   const { guests, loading: guestsLoading } = useRobustGuests()
 
   // Calculate room occupancies based on guest assignments
@@ -143,7 +143,6 @@ export function useAccommodationWithGuests() {
     getRoomOccupancy,
     getAccommodationWithOccupancy,
     getOccupiedRooms,
-    getAvailableRooms,
     
     // Original accommodation methods
     ...accommodationMethods

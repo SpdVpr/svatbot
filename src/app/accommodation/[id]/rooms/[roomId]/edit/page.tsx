@@ -69,8 +69,8 @@ export default function EditRoomPage({ params }: EditRoomPageProps) {
     { value: 'double', label: 'Manželská postel' },
     { value: 'queen', label: 'Queen size' },
     { value: 'king', label: 'King size' },
-    { value: 'sofa', label: 'Rozkládací pohovka' },
-    { value: 'bunk', label: 'Patrová postel' }
+    { value: 'sofa-bed', label: 'Rozkládací pohovka' },
+    { value: 'bunk-bed', label: 'Patrová postel' }
   ]
 
   const handleInputChange = (field: keyof RoomFormData, value: any) => {

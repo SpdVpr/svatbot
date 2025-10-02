@@ -203,7 +203,7 @@ export default function GuestCard({
               {guest.accommodationId && guest.roomId && (
                 (() => {
                   const accommodation = getAccommodationById(guest.accommodationId)
-                  const room = accommodation?.rooms.find(r => r.id === guest.roomId)
+                  const room = accommodation?.rooms.find((r: any) => r.id === guest.roomId)
                   return room ? (
                     <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 flex items-center space-x-1 flex-shrink-0">
                       <Bed className="w-3 h-3" />
@@ -296,7 +296,7 @@ export default function GuestCard({
               {guest.accommodationId && guest.roomId ? (
                 (() => {
                   const accommodation = getAccommodationById(guest.accommodationId)
-                  const room = accommodation?.rooms.find(r => r.id === guest.roomId)
+                  const room = accommodation?.rooms.find((r: any) => r.id === guest.roomId)
                   return (
                     <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 flex items-center space-x-1">
                       <Building2 className="w-3 h-3" />
