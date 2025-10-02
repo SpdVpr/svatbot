@@ -1,18 +1,19 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { 
-  collection, 
-  doc, 
-  getDocs, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  query, 
-  where, 
+import {
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
   orderBy,
   onSnapshot,
-  Timestamp 
+  Timestamp
 } from 'firebase/firestore'
 import { db } from '@/config/firebase'
 import { useAuth } from './useAuth'
@@ -250,8 +251,17 @@ export function useAccommodation(): UseAccommodationReturn {
 
     try {
       setLoading(true)
-      const accommodation = accommodations.find(acc => acc.id === accommodationId)
-      if (!accommodation) throw new Error('Accommodation not found')
+
+      // Get fresh data from Firestore to avoid stale closure data
+      const accommodationRef = doc(db, 'accommodations', accommodationId)
+      const accommodationDoc = await getDoc(accommodationRef)
+
+      if (!accommodationDoc.exists()) {
+        throw new Error('Accommodation not found')
+      }
+
+      const accommodationData = accommodationDoc.data()
+      const currentRooms = accommodationData?.rooms || []
 
       const newRoom: Room = {
         id: `room_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -264,12 +274,11 @@ export function useAccommodation(): UseAccommodationReturn {
         updatedAt: new Date()
       }
 
-      const updatedRooms = [...accommodation.rooms, newRoom]
+      const updatedRooms = [...currentRooms, newRoom]
 
-      console.log(`🔄 Updating accommodation ${accommodationId} with ${updatedRooms.length} rooms`)
+      console.log(`🔄 Updating accommodation ${accommodationId} with ${updatedRooms.length} rooms (was ${currentRooms.length})`)
       console.log('📋 Room names:', updatedRooms.map(r => r.name))
 
-      const accommodationRef = doc(db, 'accommodations', accommodationId)
       await updateDoc(accommodationRef, {
         rooms: updatedRooms,
         updatedAt: Timestamp.now()
@@ -349,12 +358,22 @@ export function useAccommodation(): UseAccommodationReturn {
 
     try {
       setLoading(true)
-      const accommodation = accommodations.find(acc => acc.id === accommodationId)
-      if (!accommodation) throw new Error('Accommodation not found')
 
-      const updatedRooms = accommodation.rooms.filter(room => room.id !== roomId)
-
+      // Get fresh data from Firestore to avoid stale closure data
       const accommodationRef = doc(db, 'accommodations', accommodationId)
+      const accommodationDoc = await getDoc(accommodationRef)
+
+      if (!accommodationDoc.exists()) {
+        throw new Error('Accommodation not found')
+      }
+
+      const accommodationData = accommodationDoc.data()
+      const currentRooms = accommodationData?.rooms || []
+      const updatedRooms = currentRooms.filter((room: any) => room.id !== roomId)
+
+      console.log(`🗑️ Deleting room ${roomId} from accommodation ${accommodationId}`)
+      console.log(`📊 Rooms before: ${currentRooms.length}, after: ${updatedRooms.length}`)
+
       await updateDoc(accommodationRef, {
         rooms: updatedRooms,
         updatedAt: Timestamp.now()
@@ -368,7 +387,7 @@ export function useAccommodation(): UseAccommodationReturn {
     } finally {
       setLoading(false)
     }
-  }, [user, wedding, accommodations])
+  }, [user, wedding])
 
   const createReservation = useCallback(async (roomId: string, reservationData: Omit<RoomReservation, 'id' | 'roomId' | 'createdAt' | 'updatedAt'>) => {
     // TODO: Implement reservation creation

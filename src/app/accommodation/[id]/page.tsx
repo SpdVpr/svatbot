@@ -20,6 +20,7 @@ import {
   Coffee
 } from 'lucide-react'
 import { useAccommodationWithGuests } from '@/hooks/useAccommodationWithGuests'
+import { useAccommodation } from '@/hooks/useAccommodation'
 import type { Room } from '@/types'
 import RoomImageGallery, { useRoomImageGallery } from '@/components/accommodation/RoomImageGallery'
 
@@ -32,10 +33,26 @@ interface AccommodationDetailPageProps {
 export default function AccommodationDetailPage({ params }: AccommodationDetailPageProps) {
   const router = useRouter()
   const { getAccommodationWithOccupancy, loading } = useAccommodationWithGuests()
+  const { deleteRoom } = useAccommodation()
   const [activeTab, setActiveTab] = useState<'overview' | 'rooms' | 'reservations'>('overview')
   const { isOpen, images, roomName, initialIndex, openGallery, closeGallery } = useRoomImageGallery()
 
   const accommodation = getAccommodationWithOccupancy(params.id)
+
+  const handleDeleteRoom = async (roomId: string, roomName: string) => {
+    if (!accommodation) return
+
+    const confirmed = confirm(`Opravdu chcete smazat pokoj "${roomName}"? Tato akce je nevratná.`)
+    if (!confirmed) return
+
+    try {
+      await deleteRoom(accommodation.id, roomId)
+      // Success message is handled by the hook
+    } catch (error) {
+      console.error('Error deleting room:', error)
+      alert('Chyba při mazání pokoje')
+    }
+  }
 
   if (loading) {
     return (
@@ -414,7 +431,11 @@ export default function AccommodationDetailPage({ params }: AccommodationDetailP
                           <Edit className="w-3 h-3" />
                           Upravit
                         </button>
-                        <button className="px-3 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors">
+                        <button
+                          onClick={() => handleDeleteRoom(room.id, room.name)}
+                          className="px-3 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                          title="Smazat pokoj"
+                        >
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
