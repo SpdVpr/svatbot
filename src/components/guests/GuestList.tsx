@@ -23,6 +23,13 @@ import {
   HelpCircle,
   Bed
 } from 'lucide-react'
+import {
+  getGuestCategoryLabel,
+  getInvitationTypeLabel,
+  getInvitationTypeColor,
+  getInvitationTypeIcon,
+  getDietaryRestrictionLabel
+} from '@/utils/guestCategories'
 
 interface GuestListProps {
   guests?: Guest[]
@@ -794,6 +801,13 @@ export default function GuestList({
                               {guest.children.length} {guest.children.length === 1 ? 'dítě' : 'děti'}
                             </span>
                           )}
+
+                          {/* Invitation type indicator */}
+                          {guest.invitationType && guest.invitationType !== 'ceremony-reception' && (
+                            <span className={`text-xs px-2 py-1 rounded-full ${getInvitationTypeColor(guest.invitationType)}`}>
+                              {getInvitationTypeIcon(guest.invitationType)} {getInvitationTypeLabel(guest.invitationType)}
+                            </span>
+                          )}
                         </div>
 
                         {/* Contact info */}
@@ -839,7 +853,7 @@ export default function GuestList({
                                 key={restriction}
                                 className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full"
                               >
-                                {restriction}
+                                {getDietaryRestrictionLabel(restriction)}
                               </span>
                             ))}
                           </div>

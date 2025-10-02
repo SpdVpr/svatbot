@@ -21,6 +21,12 @@ import {
   Bed
 } from 'lucide-react'
 import { useState } from 'react'
+import {
+  getInvitationTypeLabel,
+  getInvitationTypeColor,
+  getInvitationTypeIcon,
+  getDietaryRestrictionLabel
+} from '@/utils/guestCategories'
 
 interface GuestCardProps {
   guest: Guest
@@ -230,8 +236,8 @@ export default function GuestCard({
           </div>
         </div>
 
-        {/* Category */}
-        <div className="flex items-center space-x-2">
+        {/* Category and Invitation Type */}
+        <div className="flex items-center space-x-2 flex-wrap gap-1">
           <span className={`
             inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium
             ${categoryDisplay.color}
@@ -239,6 +245,14 @@ export default function GuestCard({
             <span>{categoryDisplay.icon}</span>
             <span>{categoryDisplay.label}</span>
           </span>
+
+          {/* Invitation type indicator */}
+          {guest.invitationType && guest.invitationType !== 'ceremony-reception' && (
+            <span className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium ${getInvitationTypeColor(guest.invitationType)}`}>
+              <span>{getInvitationTypeIcon(guest.invitationType)}</span>
+              <span>{getInvitationTypeLabel(guest.invitationType)}</span>
+            </span>
+          )}
         </div>
 
         {/* Contact info */}
@@ -267,7 +281,7 @@ export default function GuestCard({
                 key={restriction}
                 className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full"
               >
-                {restriction}
+                {getDietaryRestrictionLabel(restriction)}
               </span>
             ))}
             {guest.dietaryRestrictions.length > 3 && (
