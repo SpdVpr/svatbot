@@ -162,6 +162,8 @@ export default function EditRoomPage({ params }: EditRoomPageProps) {
       return
     }
 
+    console.log('🔄 Starting room copy process:', { copyCount, roomName: formData.name })
+
     try {
       setSaving(true)
 
@@ -171,21 +173,33 @@ export default function EditRoomPage({ params }: EditRoomPageProps) {
         images: roomImages
       }
 
-      // Create multiple copies of the room
-      const promises = []
+      console.log('📋 Base room data:', roomDataWithImages)
+
+      // Create multiple copies of the room sequentially to avoid race conditions
+      const results = []
       for (let i = 1; i <= copyCount; i++) {
         const copyRoomData = {
           ...roomDataWithImages,
           name: `${formData.name} - kopie ${i}`
         }
-        promises.push(addRoom(accommodation.id, copyRoomData))
+        console.log(`🏠 Creating copy ${i}:`, copyRoomData.name)
+
+        try {
+          const result = await addRoom(accommodation.id, copyRoomData)
+          results.push(result)
+          console.log(`✅ Copy ${i} created successfully:`, result.id)
+        } catch (error) {
+          console.error(`❌ Error creating copy ${i}:`, error)
+          throw error
+        }
       }
 
-      await Promise.all(promises)
+      console.log('✅ All copies created:', results)
+
       alert(`Úspěšně vytvořeno ${copyCount} kopií pokoje`)
       router.push(`/accommodation/${accommodation.id}?tab=rooms`)
     } catch (error) {
-      console.error('Error copying room:', error)
+      console.error('❌ Error copying room:', error)
       alert('Chyba při kopírování pokoje')
     } finally {
       setSaving(false)

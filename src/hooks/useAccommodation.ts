@@ -249,7 +249,7 @@ export function useAccommodation(): UseAccommodationReturn {
       if (!accommodation) throw new Error('Accommodation not found')
 
       const newRoom: Room = {
-        id: `room_${Date.now()}`,
+        id: `room_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         accommodationId,
         ...roomData,
         images: roomData.images || [],

@@ -120,15 +120,15 @@ export default function NewRoomPage({ params }: NewRoomPageProps) {
 
       // Create multiple rooms if copyCount > 1
       if (copyCount > 1) {
-        const promises = []
+        console.log('🔄 Creating multiple rooms:', copyCount)
         for (let i = 1; i <= copyCount; i++) {
           const copyRoomData = {
             ...roomDataWithImages,
             name: `${formData.name} ${i}`
           }
-          promises.push(addRoom(accommodation.id, copyRoomData))
+          console.log(`🏠 Creating room ${i}:`, copyRoomData.name)
+          await addRoom(accommodation.id, copyRoomData)
         }
-        await Promise.all(promises)
       } else {
         await addRoom(accommodation.id, roomDataWithImages)
       }
