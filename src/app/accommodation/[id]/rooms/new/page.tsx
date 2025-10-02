@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Bed, Save, Users, DollarSign, Plus, X } from 'lucide-react'
+import { ArrowLeft, Bed, Save, Users, DollarSign, Plus, X, Copy } from 'lucide-react'
 import { useAccommodation, type RoomFormData } from '@/hooks/useAccommodation'
 import type { RoomType, BedType } from '@/types'
 import SimpleRoomImageUpload from '@/components/accommodation/SimpleRoomImageUpload'
@@ -32,6 +32,8 @@ export default function NewRoomPage({ params }: NewRoomPageProps) {
 
   const [newAmenity, setNewAmenity] = useState('')
   const [roomImages, setRoomImages] = useState<string[]>([])
+  const [copyCount, setCopyCount] = useState(1)
+  const [showCopyOptions, setShowCopyOptions] = useState(false)
 
   const roomTypes: { value: RoomType; label: string }[] = [
     { value: 'single', label: 'Jednolůžkový' },
@@ -103,7 +105,7 @@ export default function NewRoomPage({ params }: NewRoomPageProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!accommodation) {
       alert('Ubytování nenalezeno')
       return
@@ -116,11 +118,25 @@ export default function NewRoomPage({ params }: NewRoomPageProps) {
         images: roomImages
       }
 
-      await addRoom(accommodation.id, roomDataWithImages)
+      // Create multiple rooms if copyCount > 1
+      if (copyCount > 1) {
+        const promises = []
+        for (let i = 1; i <= copyCount; i++) {
+          const roomData = {
+            ...roomDataWithImages,
+            name: `${formData.name} ${i}`
+          }
+          promises.push(addRoom(accommodation.id, roomData))
+        }
+        await Promise.all(promises)
+      } else {
+        await addRoom(accommodation.id, roomDataWithImages)
+      }
+
       router.push(`/accommodation/${accommodation.id}?tab=rooms`)
     } catch (error) {
-      console.error('Error creating room:', error)
-      alert('Chyba při vytváření pokoje')
+      console.error('Error creating room(s):', error)
+      alert('Chyba při vytváření pokoje/pokojů')
     }
   }
 
@@ -384,6 +400,55 @@ export default function NewRoomPage({ params }: NewRoomPageProps) {
             />
           </div>
 
+          {/* Copy Options */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">Kopírování pokojů</h2>
+              <button
+                type="button"
+                onClick={() => setShowCopyOptions(!showCopyOptions)}
+                className="inline-flex items-center gap-2 px-3 py-1 text-sm bg-primary-100 text-primary-700 rounded-lg hover:bg-primary-200 transition-colors"
+              >
+                <Copy className="w-4 h-4" />
+                {showCopyOptions ? 'Skrýt možnosti' : 'Zobrazit možnosti'}
+              </button>
+            </div>
+
+            {showCopyOptions && (
+              <div className="space-y-4">
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-800 mb-3">
+                    <strong>Tip:</strong> Pokud hotel nabízí více stejných pokojů (např. 5 dvoulůžkových pokojů ve stejné kategorii),
+                    můžete je vytvořit najednou. Pokoje budou automaticky očíslovány.
+                  </p>
+
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm font-medium text-gray-700">
+                        Počet pokojů k vytvoření:
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="20"
+                        value={copyCount}
+                        onChange={(e) => setCopyCount(parseInt(e.target.value) || 1)}
+                        className="w-20 px-3 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-center"
+                      />
+                    </div>
+
+                    {copyCount > 1 && (
+                      <div className="text-sm text-gray-600">
+                        Vytvoří se pokoje: <strong>{formData.name} 1</strong>, <strong>{formData.name} 2</strong>
+                        {copyCount > 2 && <span>, ... <strong>{formData.name} {copyCount}</strong></span>}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Submit Button */}
           <div className="flex items-center justify-end gap-4">
             <button
@@ -403,7 +468,7 @@ export default function NewRoomPage({ params }: NewRoomPageProps) {
               ) : (
                 <Save className="w-4 h-4" />
               )}
-              Vytvořit pokoj
+              {copyCount > 1 ? `Vytvořit ${copyCount} pokojů` : 'Vytvořit pokoj'}
             </button>
           </div>
         </form>

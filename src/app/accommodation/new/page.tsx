@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, Building2, Save, MapPin, Phone, Mail, Globe, Plus, X } from 'lucide-react'
 import { useAccommodation } from '@/hooks/useAccommodation'
 import type { AccommodationFormData } from '@/hooks/useAccommodation'
+import AccommodationImageUpload from '@/components/accommodation/AccommodationImageUpload'
 
 export default function NewAccommodationPage() {
   const router = useRouter()
@@ -39,6 +40,7 @@ export default function NewAccommodationPage() {
 
   const [newAmenity, setNewAmenity] = useState('')
   const [newFee, setNewFee] = useState('')
+  const [accommodationImages, setAccommodationImages] = useState<string[]>([])
 
   const handleInputChange = (field: string, value: any) => {
     if (field.includes('.')) {
@@ -100,9 +102,15 @@ export default function NewAccommodationPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     try {
-      const accommodation = await createAccommodation(formData)
+      // Include accommodation images in form data
+      const accommodationDataWithImages = {
+        ...formData,
+        images: accommodationImages
+      }
+
+      const accommodation = await createAccommodation(accommodationDataWithImages)
       router.push(`/accommodation/${accommodation.id}`)
     } catch (error) {
       console.error('Error creating accommodation:', error)
@@ -320,6 +328,16 @@ export default function NewAccommodationPage() {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Accommodation Images */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">Fotky ubytování</h2>
+            <AccommodationImageUpload
+              images={accommodationImages}
+              onImagesChange={setAccommodationImages}
+              maxImages={20}
+            />
           </div>
 
           {/* Submit Button */}
