@@ -535,12 +535,56 @@ export function useRobustGuests() {
     return total + (guest.children?.length || 0)
   }, 0)
 
+  // Calculate attending people (including +1 and children)
+  const attendingPeople = guests.reduce((total, guest) => {
+    let count = 0
+    if (guest.rsvpStatus === 'attending') {
+      count += 1 // Main guest
+      if (guest.hasPlusOne) count += 1 // +1 automatically attends
+      if (guest.hasChildren && guest.children) count += guest.children.length // Children attend
+    }
+    return total + count
+  }, 0)
+
+  // Calculate declined people (including +1 and children)
+  const declinedPeople = guests.reduce((total, guest) => {
+    let count = 0
+    if (guest.rsvpStatus === 'declined') {
+      count += 1 // Main guest
+      if (guest.hasPlusOne) count += 1 // +1 automatically declines
+      if (guest.hasChildren && guest.children) count += guest.children.length // Children decline
+    }
+    return total + count
+  }, 0)
+
+  // Calculate maybe people (including +1 and children)
+  const maybePeople = guests.reduce((total, guest) => {
+    let count = 0
+    if (guest.rsvpStatus === 'maybe') {
+      count += 1 // Main guest
+      if (guest.hasPlusOne) count += 1 // +1 automatically maybe
+      if (guest.hasChildren && guest.children) count += guest.children.length // Children maybe
+    }
+    return total + count
+  }, 0)
+
+  // Calculate pending people (including +1 and children)
+  const pendingPeople = guests.reduce((total, guest) => {
+    let count = 0
+    if (guest.rsvpStatus === 'pending') {
+      count += 1 // Main guest
+      if (guest.hasPlusOne) count += 1 // +1 automatically pending
+      if (guest.hasChildren && guest.children) count += guest.children.length // Children pending
+    }
+    return total + count
+  }, 0)
+
   const stats = {
     total: totalAttendees,
-    attending: guests.filter(g => g.rsvpStatus === 'attending').length,
-    declined: guests.filter(g => g.rsvpStatus === 'declined').length,
-    pending: guests.filter(g => g.rsvpStatus === 'pending').length,
-    maybe: guests.filter(g => g.rsvpStatus === 'maybe').length,
+    attending: attendingPeople, // Now includes +1 and children
+    declined: declinedPeople, // Now includes +1 and children
+    pending: pendingPeople, // Now includes +1 and children
+    maybe: maybePeople, // Now includes +1 and children
     totalWithPlusOnes: guests.filter(g => g.hasPlusOne).length,
     plusOnesAttending: guests.filter(g => g.hasPlusOne && g.plusOneRsvpStatus === 'attending').length,
     plusOnes: guests.filter(g => g.hasPlusOne).length,

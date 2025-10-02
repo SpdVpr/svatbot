@@ -52,8 +52,8 @@ export default function GuestStats({
     // Count the guest if they responded
     if (guest.rsvpStatus !== 'pending') {
       count += 1
-      // Count +1 if they have one and it responded
-      if (guest.hasPlusOne && guest.plusOneRsvpStatus && guest.plusOneRsvpStatus !== 'pending') {
+      // Count +1 if they have one - they automatically follow main guest's response
+      if (guest.hasPlusOne) {
         count += 1
       }
       // Count children (they follow main guest's RSVP)
@@ -69,8 +69,8 @@ export default function GuestStats({
     // Count the guest if they're attending
     if (guest.rsvpStatus === 'attending') {
       count += 1
-      // Count +1 if they have one and it's attending
-      if (guest.hasPlusOne && guest.plusOneRsvpStatus === 'attending') {
+      // Count +1 if they have one - they automatically attend with main guest
+      if (guest.hasPlusOne) {
         count += 1
       }
       // Count children (they follow main guest's RSVP)
