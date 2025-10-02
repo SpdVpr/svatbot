@@ -18,7 +18,7 @@ service firebase.storage {
                       request.resource.contentType.matches('image/.*');
     }
 
-    // Wedding photos and documents
+    // Wedding photos and documents (including accommodation room photos)
     match /weddings/{weddingId}/{allPaths=**} {
       allow read: if isAuthenticated() &&
                      firestore.exists(/databases/(default)/documents/weddings/$(weddingId)) &&
@@ -26,7 +26,11 @@ service firebase.storage {
       allow write: if isAuthenticated() &&
                       firestore.exists(/databases/(default)/documents/weddings/$(weddingId)) &&
                       firestore.get(/databases/(default)/documents/weddings/$(weddingId)).data.userId == request.auth.uid &&
-                      request.resource.size < 10 * 1024 * 1024; // 10MB limit
+                      request.resource.size < 10 * 1024 * 1024 && // 10MB limit
+                      request.resource.contentType.matches('image/.*');
+      allow delete: if isAuthenticated() &&
+                       firestore.exists(/databases/(default)/documents/weddings/$(weddingId)) &&
+                       firestore.get(/databases/(default)/documents/weddings/$(weddingId)).data.userId == request.auth.uid;
     }
 
     // Moodboard images (including thumbnails subfolder)

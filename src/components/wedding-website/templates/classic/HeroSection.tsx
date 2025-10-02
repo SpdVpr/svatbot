@@ -3,6 +3,7 @@
 import { Calendar, Heart } from 'lucide-react'
 import type { HeroContent } from '@/types/wedding-website'
 import { Timestamp } from 'firebase/firestore'
+import WeddingCountdown from '../../WeddingCountdown'
 
 // Helper funkce pro formátování data
 const formatDate = (date: any): string => {
@@ -55,35 +56,7 @@ interface HeroSectionProps {
 export default function HeroSection({ content }: HeroSectionProps) {
   const { bride, groom, weddingDate, tagline, mainImage } = content
 
-  // Výpočet odpočtu do svatby
-  const getTimeUntilWedding = () => {
-    if (!weddingDate) return null
 
-    const now = new Date()
-    const wedding = toDate(weddingDate)
-    if (!wedding) return null
-
-    const diffTime = wedding.getTime() - now.getTime()
-    
-    if (diffTime <= 0) {
-      return { passed: true, message: 'Svatba se již konala!' }
-    }
-    
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    
-    if (diffDays === 1) {
-      return { passed: false, message: 'Svatba je zítra!' }
-    } else if (diffDays <= 7) {
-      return { passed: false, message: `Svatba za ${diffDays} dní` }
-    } else if (diffDays <= 30) {
-      return { passed: false, message: `Svatba za ${diffDays} dní` }
-    } else {
-      const diffMonths = Math.floor(diffDays / 30)
-      return { passed: false, message: `Svatba za ${diffMonths} ${diffMonths === 1 ? 'měsíc' : 'měsíce'}` }
-    }
-  }
-
-  const countdown = getTimeUntilWedding()
 
   return (
     <section 
@@ -175,13 +148,13 @@ export default function HeroSection({ content }: HeroSectionProps) {
         )}
 
         {/* Countdown */}
-        {countdown && (
-          <div className="mb-8">
-            <p className={`text-lg font-medium ${
-              mainImage ? 'text-amber-200' : 'text-amber-600'
-            }`}>
-              {countdown.message}
-            </p>
+        {weddingDate && (
+          <div className="mb-12">
+            <WeddingCountdown
+              weddingDate={weddingDate}
+              style="classic"
+              className="max-w-4xl mx-auto"
+            />
           </div>
         )}
 

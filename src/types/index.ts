@@ -71,6 +71,8 @@ export interface Guest {
   guestCount: number // including +1s
   dietaryRestrictions?: string[]
   accommodationNeeded: boolean
+  accommodationId?: string // ID of selected accommodation
+  roomId?: string // ID of selected room
   transportationNeeded: boolean
   tableNumber?: number
   seatNumber?: number
@@ -417,6 +419,105 @@ export interface PaginatedResponse<T> {
   limit: number
   hasMore: boolean
 }
+
+// Accommodation Types
+export interface Accommodation {
+  id: string
+  weddingId: string
+  name: string
+  description?: string
+  address: Address
+  coordinates?: {
+    lat: number
+    lng: number
+  }
+  contactInfo: ContactInfo
+  website?: string
+  images: string[]
+  amenities: string[]
+  rooms: Room[]
+  policies?: AccommodationPolicies
+  isActive: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface Room {
+  id: string
+  accommodationId: string
+  name: string
+  description?: string
+  type: RoomType
+  capacity: number // number of beds/people
+  bedConfiguration: BedConfiguration[]
+  pricePerNight: number
+  totalPrice?: number // for entire stay
+  amenities: string[]
+  images: string[]
+  isAvailable: boolean
+  maxOccupancy: number
+  reservations: RoomReservation[]
+  createdAt: Date
+  updatedAt: Date
+}
+
+export type RoomType =
+  | 'single'
+  | 'double'
+  | 'twin'
+  | 'suite'
+  | 'family'
+  | 'apartment'
+  | 'other'
+
+export interface BedConfiguration {
+  type: BedType
+  count: number
+}
+
+export type BedType =
+  | 'single'
+  | 'double'
+  | 'queen'
+  | 'king'
+  | 'sofa-bed'
+  | 'bunk-bed'
+
+export interface AccommodationPolicies {
+  checkIn: string // e.g., "15:00"
+  checkOut: string // e.g., "11:00"
+  cancellationPolicy?: string
+  petPolicy?: string
+  smokingPolicy?: string
+  childrenPolicy?: string
+  additionalFees?: string[]
+}
+
+export interface RoomReservation {
+  id: string
+  roomId: string
+  guestId: string
+  guestName: string
+  guestEmail?: string
+  guestPhone?: string
+  checkIn: Date
+  checkOut: Date
+  numberOfGuests: number
+  totalPrice: number
+  status: ReservationStatus
+  specialRequests?: string
+  notes?: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export type ReservationStatus =
+  | 'pending'
+  | 'confirmed'
+  | 'checked-in'
+  | 'checked-out'
+  | 'cancelled'
+  | 'no-show'
 
 // Form Types
 export interface OnboardingData {

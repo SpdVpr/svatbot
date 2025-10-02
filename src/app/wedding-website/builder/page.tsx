@@ -9,6 +9,7 @@ import { ArrowLeft, ArrowRight, Save, Eye, Rocket, Home } from 'lucide-react'
 import TemplateSelector from '@/components/wedding-website/builder/TemplateSelector'
 import UrlConfigurator from '@/components/wedding-website/builder/UrlConfigurator'
 import ContentEditor from '@/components/wedding-website/builder/ContentEditor'
+import DomainStatus from '@/components/wedding-website/DomainStatus'
 import ClassicEleganceTemplate from '@/components/wedding-website/templates/ClassicEleganceTemplate'
 import ModernMinimalistTemplate from '@/components/wedding-website/templates/ModernMinimalistTemplate'
 import type { TemplateType, WebsiteContent, WeddingWebsite } from '@/types/wedding-website'
@@ -38,7 +39,11 @@ export default function WeddingWebsiteBuilderPage() {
     info: { enabled: true },
     schedule: { enabled: false, items: [] },
     rsvp: { enabled: true, mealSelection: false, plusOneAllowed: true, songRequests: false },
-    accommodation: { enabled: false },
+    accommodation: {
+      enabled: false,
+      showPrices: true,
+      showAvailability: true
+    },
     gift: { enabled: false },
     gallery: { enabled: false, images: [], allowGuestUploads: false },
     contact: { enabled: true },
@@ -127,13 +132,19 @@ export default function WeddingWebsiteBuilderPage() {
       return
     }
 
+    console.log('🚀 Starting website publication process...')
+    console.log('📄 Website data:', website)
+    console.log('🔗 Custom URL:', customUrl)
+
     setIsPublishing(true)
     try {
+      console.log('📞 Calling publishWebsite hook...')
       await publishWebsite()
+      console.log('✅ Website published successfully!')
       alert('Web byl úspěšně publikován! Nyní je dostupný na adrese: ' + customUrl + '.svatbot.cz')
       // Zůstaneme v builderu, aby uživatel mohl dále editovat
     } catch (error) {
-      console.error('Error publishing website:', error)
+      console.error('❌ Error publishing website:', error)
       alert('Chyba při publikování webu')
     } finally {
       setIsPublishing(false)
@@ -233,6 +244,16 @@ export default function WeddingWebsiteBuilderPage() {
               </div>
             ))}
           </div>
+
+          {/* Domain Status */}
+          {website && website.customUrl && (
+            <div className="mt-6 max-w-2xl mx-auto">
+              <DomainStatus
+                subdomain={website.customUrl}
+                isPublished={website.isPublished || false}
+              />
+            </div>
+          )}
         </div>
       </div>
 

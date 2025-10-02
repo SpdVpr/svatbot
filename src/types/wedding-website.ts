@@ -75,6 +75,7 @@ export interface InfoContent {
   reception?: VenueInfo
   dressCode?: string
   dressCodeDetails?: string
+  colorPalette?: string[] // Array of hex color codes for wedding color palette
   parking?: string
   accessibility?: string
   customInfo?: CustomInfo[]
@@ -115,26 +116,18 @@ export interface RSVPContent {
 }
 
 // Accommodation Section
-export interface HotelInfo {
-  name: string
-  address: string
-  phone?: string
-  website?: string
-  distance?: string
-  priceRange?: string
-  bookingLink?: string
-}
-
-export interface TransportationInfo {
-  parking?: string
-  shuttle?: string
-  taxi?: string
-}
-
 export interface AccommodationContent {
   enabled: boolean
-  hotels?: HotelInfo[]
-  transportation?: TransportationInfo
+  title?: string
+  description?: string
+  showPrices: boolean
+  showAvailability: boolean
+  contactInfo?: {
+    name: string
+    phone?: string
+    email?: string
+    message?: string
+  }
 }
 
 // Gift Section

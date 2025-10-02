@@ -20,13 +20,16 @@ import {
   Trash2,
   Send,
   GripVertical,
-  HelpCircle
+  HelpCircle,
+  Bed
 } from 'lucide-react'
 
 interface GuestListProps {
   guests?: Guest[]
   stats?: any
   updateGuest?: (guestId: string, updates: Partial<Guest>) => Promise<void>
+  updateRSVP?: (guestId: string, rsvpStatus: Guest['rsvpStatus']) => Promise<void>
+  deleteGuest?: (guestId: string) => Promise<void>
   showHeader?: boolean
   showFilters?: boolean
   maxHeight?: string
@@ -35,12 +38,15 @@ interface GuestListProps {
   onCreateGuest?: () => void
   onEditGuest?: (guest: Guest) => void
   onGuestReorder?: (guests: Guest[]) => void
+  getAccommodationById?: (id: string) => any
 }
 
 export default function GuestList({
   guests: propGuests,
   stats: propStats,
   updateGuest: propUpdateGuest,
+  updateRSVP: propUpdateRSVP,
+  deleteGuest: propDeleteGuest,
   showHeader = true,
   showFilters = true,
   maxHeight = '600px',
@@ -48,15 +54,20 @@ export default function GuestList({
   viewMode = 'list',
   onCreateGuest,
   onEditGuest,
-  onGuestReorder
+  onGuestReorder,
+  getAccommodationById
 }: GuestListProps) {
 
   // Use props if provided, otherwise fallback to hook
-  const hookData = useGuest()
-  const guests = propGuests || hookData.guests
-  const stats = propStats || hookData.stats
-  const updateGuest = propUpdateGuest || hookData.updateGuest
-  const { loading, error, updateRSVP, deleteGuest, clearError } = hookData
+  const hookData = (propGuests && propStats && propUpdateGuest) ? null : useGuest()
+  const guests = propGuests || hookData?.guests || []
+  const stats = propStats || hookData?.stats || {}
+  const updateGuest = propUpdateGuest || hookData?.updateGuest
+  const updateRSVP = propUpdateRSVP || hookData?.updateRSVP
+  const deleteGuest = propDeleteGuest || hookData?.deleteGuest
+  const loading = hookData?.loading || false
+  const error = hookData?.error || null
+  const clearError = hookData?.clearError
 
   console.log('🔧 GuestList render:', {
     viewMode,
@@ -702,6 +713,8 @@ export default function GuestList({
                       guest={guest}
                       showContactInfo={viewOptions.showContactInfo}
                       onEdit={onEditGuest}
+                      updateGuest={updateGuest}
+                      getAccommodationById={getAccommodationById}
                     />
                   )
                 }
@@ -744,6 +757,18 @@ export default function GuestList({
                             <h4 className="font-medium text-gray-900">
                               {guest.firstName} {guest.lastName}
                             </h4>
+                            {guest.accommodationId && guest.roomId && getAccommodationById && (
+                              (() => {
+                                const accommodation = getAccommodationById(guest.accommodationId)
+                                const room = accommodation?.rooms.find(r => r.id === guest.roomId)
+                                return room ? (
+                                  <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 flex items-center space-x-1 flex-shrink-0">
+                                    <Bed className="w-3 h-3" />
+                                    <span>{room.name}</span>
+                                  </span>
+                                ) : null
+                              })()
+                            )}
                           </div>
 
                           {/* RSVP Status */}

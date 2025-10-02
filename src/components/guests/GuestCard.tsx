@@ -2,10 +2,12 @@
 
 import { Guest } from '@/types/guest'
 import { useGuest } from '@/hooks/useGuest'
-import { 
-  CheckCircle2, 
-  X, 
-  Clock, 
+import { useAccommodation } from '@/hooks/useAccommodation'
+import AccommodationSelector from './AccommodationSelector'
+import {
+  CheckCircle2,
+  X,
+  Clock,
   AlertTriangle,
   Mail,
   Phone,
@@ -14,7 +16,9 @@ import {
   Edit,
   Trash2,
   Send,
-  UserPlus
+  UserPlus,
+  Building2,
+  Bed
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -24,6 +28,8 @@ interface GuestCardProps {
   showContactInfo?: boolean
   onEdit?: (guest: Guest) => void
   onClick?: () => void
+  updateGuest?: (guestId: string, updates: Partial<Guest>) => Promise<void>
+  getAccommodationById?: (id: string) => any
 }
 
 export default function GuestCard({
@@ -31,11 +37,17 @@ export default function GuestCard({
   compact = false,
   showContactInfo = true,
   onEdit,
-  onClick
+  onClick,
+  updateGuest: propUpdateGuest,
+  getAccommodationById: propGetAccommodationById
 }: GuestCardProps) {
-  const { updateRSVP, deleteGuest } = useGuest()
+  const { updateRSVP, deleteGuest, updateGuest: hookUpdateGuest } = useGuest()
+  const updateGuest = propUpdateGuest || hookUpdateGuest
+  const { getAccommodationById: hookGetAccommodationById } = useAccommodation()
+  const getAccommodationById = propGetAccommodationById || hookGetAccommodationById
   const [showActions, setShowActions] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false)
+  const [showAccommodationSelector, setShowAccommodationSelector] = useState(false)
 
   // Get RSVP status display
   const getRSVPDisplay = () => {
@@ -184,9 +196,23 @@ export default function GuestCard({
         {/* Guest name and status */}
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
-            <h4 className="font-medium text-gray-900 truncate">
-              {guest.firstName} {guest.lastName}
-            </h4>
+            <div className="flex items-center space-x-2">
+              <h4 className="font-medium text-gray-900 truncate">
+                {guest.firstName} {guest.lastName}
+              </h4>
+              {guest.accommodationId && guest.roomId && (
+                (() => {
+                  const accommodation = getAccommodationById(guest.accommodationId)
+                  const room = accommodation?.rooms.find(r => r.id === guest.roomId)
+                  return room ? (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 flex items-center space-x-1 flex-shrink-0">
+                      <Bed className="w-3 h-3" />
+                      <span>{room.name}</span>
+                    </span>
+                  ) : null
+                })()
+              )}
+            </div>
             {guest.hasPlusOne && (
               <p className="text-sm text-gray-600 flex items-center space-x-1">
                 <UserPlus className="w-3 h-3" />
@@ -265,10 +291,33 @@ export default function GuestCard({
               {guest.invitationMethod === 'sent' ? 'Pozvánka odeslána' : 'Pozvánka předána'}
             </span>
           )}
-          {guest.accommodationInterest === 'interested' && guest.accommodationType && (
-            <span className="text-xs px-2 py-1 rounded-full bg-orange-100 text-orange-700">
-              🏨 {guest.accommodationType}
-            </span>
+          {guest.accommodationInterest === 'interested' && (
+            <>
+              {guest.accommodationId && guest.roomId ? (
+                (() => {
+                  const accommodation = getAccommodationById(guest.accommodationId)
+                  const room = accommodation?.rooms.find(r => r.id === guest.roomId)
+                  return (
+                    <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 flex items-center space-x-1">
+                      <Building2 className="w-3 h-3" />
+                      <span>{accommodation?.name}</span>
+                      <Bed className="w-3 h-3" />
+                      <span>{room?.name}</span>
+                    </span>
+                  )
+                })()
+              ) : guest.accommodationType ? (
+                <span className="text-xs px-2 py-1 rounded-full bg-orange-100 text-orange-700 flex items-center space-x-1">
+                  <Building2 className="w-3 h-3" />
+                  <span>{guest.accommodationType}</span>
+                </span>
+              ) : (
+                <span className="text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-700 flex items-center space-x-1">
+                  <Building2 className="w-3 h-3" />
+                  <span>Má zájem o ubytování</span>
+                </span>
+              )}
+            </>
           )}
         </div>
 
@@ -314,14 +363,29 @@ export default function GuestCard({
               }}
               disabled={isUpdating}
               className={`p-1 rounded transition-colors ${
-                guest.rsvpStatus === 'maybe' 
-                  ? 'bg-yellow-100 text-yellow-600' 
+                guest.rsvpStatus === 'maybe'
+                  ? 'bg-yellow-100 text-yellow-600'
                   : 'text-gray-400 hover:text-yellow-600 hover:bg-yellow-50'
               }`}
               title="Označit jako možná"
             >
               <AlertTriangle className="w-4 h-4" />
             </button>
+
+            {/* Accommodation quick action */}
+            {guest.accommodationInterest === 'interested' && !guest.accommodationId && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowAccommodationSelector(true)
+                }}
+                disabled={isUpdating}
+                className="p-1 rounded transition-colors text-gray-400 hover:text-blue-600 hover:bg-blue-50"
+                title="Přiřadit ubytování"
+              >
+                <Building2 className="w-4 h-4" />
+              </button>
+            )}
           </div>
 
           {/* Invitation status */}
@@ -340,6 +404,15 @@ export default function GuestCard({
         <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center rounded-lg">
           <div className="w-4 h-4 loading-spinner" />
         </div>
+      )}
+
+      {/* Accommodation Selector Modal */}
+      {showAccommodationSelector && (
+        <AccommodationSelector
+          guest={guest}
+          onUpdate={updateGuest}
+          onClose={() => setShowAccommodationSelector(false)}
+        />
       )}
     </div>
   )

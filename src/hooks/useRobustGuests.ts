@@ -164,7 +164,8 @@ export function useRobustGuests() {
   }>({ weddingId: null, initialized: false })
   
   const guestsRef = useRef<Guest[]>([])
-  
+  const isSavingRef = useRef(false)
+
   // Update ref when guests change (but don't cause re-renders)
   guestsRef.current = guests
 
@@ -268,6 +269,12 @@ export function useRobustGuests() {
           )
 
           const unsubscribe = onSnapshot(guestsQuery, (snapshot) => {
+            // Skip updates during saving to prevent overwriting local changes
+            if (isSavingRef.current) {
+              console.log('🔥 Skipping Firestore update during save operation')
+              return
+            }
+
             const loadedGuests = snapshot.docs.map(doc => {
               const data = doc.data()
               return {
@@ -297,6 +304,8 @@ export function useRobustGuests() {
                 accommodationInterest: data.accommodationInterest || 'not_interested',
                 accommodationType: data.accommodationType,
                 accommodationPayment: data.accommodationPayment,
+                accommodationId: data.accommodationId,
+                roomId: data.roomId,
                 invitationSent: data.invitationSent,
                 invitationMethod: data.invitationMethod,
                 invitationSentDate: data.invitationSentDate ? data.invitationSentDate.toDate() : undefined,
@@ -366,20 +375,24 @@ export function useRobustGuests() {
 
   // Update guest function
   const updateGuest = useCallback(async (guestId: string, updates: Partial<Guest>): Promise<void> => {
-    console.log('✏️ Updating guest:', guestId, updates)
+    console.log('✏️ useRobustGuests: Updating guest:', guestId)
+
+    isSavingRef.current = true
     
     // Get current guests from ref to avoid stale closure
     const currentGuests = guestsRef.current
     const currentGuest = currentGuests.find(g => g.id === guestId)
     
     if (!currentGuest) {
-      console.error('❌ Guest not found:', guestId)
+      console.error('❌ useRobustGuests: Guest not found:', guestId)
       return
     }
+
+
     
     // Clean updates for Firestore (remove undefined values)
     const cleanedUpdates = cleanForFirestore(updates)
-    
+
     // Create updated guest
     const updatedGuest = { ...currentGuest, ...cleanedUpdates, updatedAt: new Date() }
     
@@ -388,13 +401,14 @@ export function useRobustGuests() {
       guest.id === guestId ? updatedGuest : guest
     )
     
-    console.log('🔄 Setting updated guests:', updatedGuests.length)
+    console.log('🔄 useRobustGuests: Guest updated locally')
     setGuests(updatedGuests)
+    guestsRef.current = updatedGuests
 
     // Save to localStorage immediately (use compatible keys)
     const storageKey = isDemoUser ? 'simple-demo-guests' : `guests_${wedding?.id}`
     localStorage.setItem(storageKey, JSON.stringify(updatedGuests))
-    console.log('✅ Guest saved to localStorage with key:', storageKey)
+    console.log('✅ useRobustGuests: Guest saved to localStorage')
 
     // For real users, try Firestore sync in background (don't block UI)
     if (!isDemoUser) {
@@ -404,18 +418,29 @@ export function useRobustGuests() {
           const guestRef = doc(db, 'guests', guestId)
           updateDoc(guestRef, cleanedUpdates).then(() => {
             console.log('✅ Guest synced to Firestore')
+            // Wait a bit before allowing Firestore updates to prevent race conditions
+            setTimeout(() => {
+              isSavingRef.current = false
+            }, 1000)
           }).catch((error) => {
             console.warn('⚠️ Firestore sync failed:', error.message)
+            isSavingRef.current = false
           })
         })
       }).catch((error) => {
         console.warn('⚠️ Failed to load Firestore modules:', error)
+        isSavingRef.current = false
       })
+    } else {
+      // Demo user - no Firestore sync needed
+      isSavingRef.current = false
     }
   }, [isDemoUser, wedding?.id])
 
   // Create guest function
   const createGuest = useCallback(async (data: GuestFormData): Promise<Guest> => {
+    isSavingRef.current = true
+
     // Generate unique ID
     const guestId = isDemoUser
       ? `demo-guest-${Date.now()}`
@@ -446,6 +471,8 @@ export function useRobustGuests() {
       accommodationInterest: data.accommodationInterest || 'not_interested',
       accommodationType: data.accommodationType,
       accommodationPayment: data.accommodationPayment,
+      accommodationId: data.accommodationId,
+      roomId: data.roomId,
       invitationSent: data.invitationSent || false,
       invitationMethod: data.invitationMethod,
       reminderSent: false,
@@ -474,13 +501,21 @@ export function useRobustGuests() {
           const cleanedGuest = cleanForFirestore(newGuest)
           setDoc(guestRef, cleanedGuest).then(() => {
             console.log('✅ New guest synced to Firestore')
+            setTimeout(() => {
+              isSavingRef.current = false
+            }, 1000)
           }).catch((error) => {
             console.warn('⚠️ Firestore sync failed for new guest:', error.message)
+            isSavingRef.current = false
           })
         })
       }).catch((error) => {
         console.warn('⚠️ Failed to load Firestore modules:', error)
+        isSavingRef.current = false
       })
+    } else {
+      // Demo user - no Firestore sync needed
+      isSavingRef.current = false
     }
 
     return newGuest
@@ -524,6 +559,56 @@ export function useRobustGuests() {
     invited: guests.filter(g => g.invitationSent).length
   }
 
+  // Update RSVP status
+  const updateRSVP = useCallback(async (guestId: string, rsvpStatus: Guest['rsvpStatus']): Promise<void> => {
+    await updateGuest(guestId, {
+      rsvpStatus,
+      rsvpDate: new Date()
+    })
+  }, [updateGuest])
+
+  // Delete guest
+  const deleteGuest = useCallback(async (guestId: string): Promise<void> => {
+    console.log('🗑️ useRobustGuests: Deleting guest:', guestId)
+    isSavingRef.current = true
+
+    const currentGuest = guestsRef.current.find(g => g.id === guestId)
+    if (!currentGuest) {
+      console.error('❌ useRobustGuests: Guest not found for deletion:', guestId)
+      return
+    }
+
+    // Remove from local state
+    const updatedGuests = guestsRef.current.filter(g => g.id !== guestId)
+    console.log('🔄 useRobustGuests: Removing guest, new count:', updatedGuests.length)
+    setGuests(updatedGuests)
+    guestsRef.current = updatedGuests
+
+    // Save to localStorage immediately
+    const storageKey = isDemoUser ? 'simple-demo-guests' : `guests_${wedding?.id}`
+    localStorage.setItem(storageKey, JSON.stringify(updatedGuests))
+    console.log('✅ useRobustGuests: Guest deleted from localStorage')
+
+    // Sync to Firestore if not demo user
+    if (!isDemoUser && user && wedding) {
+      try {
+        const { deleteDoc, doc } = await import('firebase/firestore')
+        const { db } = await import('@/config/firebase')
+        await deleteDoc(doc(db, 'guests', guestId))
+        console.log('✅ useRobustGuests: Guest deleted from Firestore')
+        setTimeout(() => {
+          isSavingRef.current = false
+        }, 1000)
+      } catch (error) {
+        console.error('❌ useRobustGuests: Error deleting from Firestore:', error)
+        isSavingRef.current = false
+      }
+    } else {
+      // Demo user or no Firestore sync needed
+      isSavingRef.current = false
+    }
+  }, [user, wedding, isDemoUser])
+
   return {
     guests,
     loading,
@@ -531,9 +616,8 @@ export function useRobustGuests() {
     stats,
     createGuest,
     updateGuest,
-    // Dummy functions for compatibility
-    deleteGuest: async () => {},
-    updateRSVP: async () => {},
+    deleteGuest,
+    updateRSVP,
     bulkOperation: async () => {},
     importGuests: async () => {},
     exportGuests: async () => {},

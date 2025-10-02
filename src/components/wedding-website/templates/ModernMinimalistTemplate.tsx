@@ -5,6 +5,7 @@ import type { WeddingWebsite } from '@/types/wedding-website'
 import ModernHeroSection from './modern/HeroSection'
 import ModernInfoSection from './modern/InfoSection'
 import ModernRSVPSection from './modern/RSVPSection'
+import AccommodationSection from './modern/AccommodationSection'
 import { Timestamp } from 'firebase/firestore'
 
 // Helper funkce pro formátování data
@@ -126,23 +127,7 @@ export default function ModernMinimalistTemplate({ website }: ModernMinimalistTe
 
       {/* Accommodation Section */}
       {content.accommodation?.enabled && (
-        <section className="py-24 bg-gray-50">
-          <div className="max-w-4xl mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-light text-gray-900 mb-4">
-                Ubytování
-              </h2>
-              <div className="w-12 h-px bg-gray-900 mx-auto"></div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-4xl mb-4">🏨</div>
-              <p className="text-gray-600">
-                Informace o ubytování budou brzy k dispozici.
-              </p>
-            </div>
-          </div>
-        </section>
+        <AccommodationSection content={content.accommodation} />
       )}
 
       {/* Gift Section */}

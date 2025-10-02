@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useWedding } from '@/hooks/useWedding'
 import { useRobustGuests } from '@/hooks/useRobustGuests'
+import { useAccommodation } from '@/hooks/useAccommodation'
 import GuestList from '@/components/guests/GuestList'
 import GuestStats from '@/components/guests/GuestStats'
 import GuestForm from '@/components/guests/GuestForm'
@@ -31,7 +32,8 @@ export default function GuestsPage() {
   const { wedding } = useWedding()
 
   // Use robust hook
-  const { guests, loading, createGuest, updateGuest, error, stats, reorderGuests } = useRobustGuests()
+  const { guests, loading, createGuest, updateGuest, deleteGuest, updateRSVP, error, stats, reorderGuests } = useRobustGuests()
+  const { getAccommodationById } = useAccommodation()
 
   console.log('🏠 Using ROBUST hook')
   console.log('🏠 useGuest result:', { reorderGuests: !!reorderGuests, type: typeof reorderGuests })
@@ -96,9 +98,12 @@ export default function GuestsPage() {
   const handleUpdateGuest = async (data: GuestFormData) => {
     if (!editingGuest) return
 
+
+
     try {
       setGuestFormLoading(true)
       await updateGuest(editingGuest.id, data)
+
       setShowGuestForm(false)
       setEditingGuest(null)
     } catch (error) {
@@ -348,8 +353,11 @@ export default function GuestsPage() {
               guests={guests}
               stats={stats}
               updateGuest={updateGuest}
+              updateRSVP={updateRSVP}
+              deleteGuest={deleteGuest}
               onCreateGuest={() => setShowGuestForm(true)}
               onEditGuest={handleEditGuest}
+              getAccommodationById={getAccommodationById}
             />
           </div>
         )}
@@ -372,6 +380,8 @@ export default function GuestsPage() {
             invitationType: editingGuest.invitationType,
             hasPlusOne: editingGuest.hasPlusOne,
             plusOneName: editingGuest.plusOneName,
+            hasChildren: editingGuest.hasChildren,
+            children: editingGuest.children,
             dietaryRestrictions: editingGuest.dietaryRestrictions,
             dietaryNotes: editingGuest.dietaryNotes,
             accessibilityNeeds: editingGuest.accessibilityNeeds,
@@ -379,6 +389,11 @@ export default function GuestsPage() {
             preferredContactMethod: editingGuest.preferredContactMethod,
             language: editingGuest.language,
             notes: editingGuest.notes,
+            accommodationInterest: editingGuest.accommodationInterest,
+            accommodationType: editingGuest.accommodationType,
+            accommodationPayment: editingGuest.accommodationPayment,
+            accommodationId: editingGuest.accommodationId,
+            roomId: editingGuest.roomId,
             invitationSent: editingGuest.invitationSent,
             invitationMethod: editingGuest.invitationMethod
           } : undefined}

@@ -1,6 +1,6 @@
 export interface DashboardModule {
   id: string
-  type: 'wedding-countdown' | 'quick-actions' | 'main-features' | 'upcoming-tasks' | 'marketplace' | 'coming-soon' | 'task-management' | 'guest-management' | 'budget-tracking' | 'timeline-planning' | 'vendor-management' | 'seating-plan' | 'ai-timeline' | 'moodboard' | 'wedding-checklist' | 'music-playlist' | 'food-drinks' | 'wedding-website'
+  type: 'wedding-countdown' | 'quick-actions' | 'main-features' | 'upcoming-tasks' | 'marketplace' | 'coming-soon' | 'task-management' | 'guest-management' | 'budget-tracking' | 'timeline-planning' | 'vendor-management' | 'seating-plan' | 'ai-timeline' | 'moodboard' | 'wedding-checklist' | 'music-playlist' | 'food-drinks' | 'wedding-website' | 'accommodation-management'
   title: string
   size: 'small' | 'medium' | 'large' | 'full'
   position: {
@@ -117,6 +117,16 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     isVisible: true,
     isLocked: false,
     order: 8
+  },
+  {
+    id: 'accommodation-management',
+    type: 'accommodation-management',
+    title: 'Ubytování',
+    size: 'medium',
+    position: { row: 4, column: 1 },
+    isVisible: true,
+    isLocked: false,
+    order: 13
   },
   {
     id: 'seating-plan',

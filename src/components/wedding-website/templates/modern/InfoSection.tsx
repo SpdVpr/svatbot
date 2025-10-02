@@ -1,14 +1,15 @@
 'use client'
 
-import { MapPin, Clock, Shirt, Car, Info } from 'lucide-react'
+import { MapPin, Clock, Shirt, Car, Info, Palette } from 'lucide-react'
 import type { InfoContent } from '@/types/wedding-website'
+import GoogleMapsEmbed from '../../GoogleMapsEmbed'
 
 interface InfoSectionProps {
   content: InfoContent
 }
 
 export default function ModernInfoSection({ content }: InfoSectionProps) {
-  const { ceremony, reception, dressCode, dressCodeDetails, parking, customInfo } = content
+  const { ceremony, reception, dressCode, dressCodeDetails, colorPalette, parking, customInfo } = content
 
   const getDressCodeText = (code: string) => {
     switch (code) {
@@ -29,6 +30,19 @@ export default function ModernInfoSection({ content }: InfoSectionProps) {
     }
   }
 
+  // Check which venue sections are filled
+  const hasCeremony = ceremony && (ceremony.venue || ceremony.time || ceremony.address)
+  const hasReception = reception && (reception.venue || reception.time || reception.address)
+  const venueCount = (hasCeremony ? 1 : 0) + (hasReception ? 1 : 0)
+
+  // Dynamic grid classes based on number of filled venues
+  const getGridClasses = () => {
+    if (venueCount === 1) {
+      return "grid grid-cols-1 gap-16 mb-16" // Single column for one venue
+    }
+    return "grid grid-cols-1 lg:grid-cols-2 gap-16 mb-16" // Two columns for two venues
+  }
+
   return (
     <section className="py-24 bg-gray-50">
       <div className="max-w-6xl mx-auto px-4">
@@ -43,9 +57,9 @@ export default function ModernInfoSection({ content }: InfoSectionProps) {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-16">
+        <div className={getGridClasses()}>
           {/* Ceremony */}
-          {ceremony && (ceremony.venue || ceremony.time || ceremony.address) && (
+          {hasCeremony && (
             <div className="bg-white p-12 shadow-sm border border-gray-200">
               <div className="flex items-center gap-4 mb-8">
                 <div className="w-12 h-12 bg-gray-100 flex items-center justify-center">
@@ -75,7 +89,16 @@ export default function ModernInfoSection({ content }: InfoSectionProps) {
                 {ceremony.address && (
                   <div>
                     <h4 className="font-medium text-gray-900 mb-2 tracking-wide">ADRESA</h4>
-                    <p className="text-gray-700 font-light">{ceremony.address}</p>
+                    <p className="text-gray-700 font-light mb-4">{ceremony.address}</p>
+
+                    {/* Google Maps Embed */}
+                    <div className="mt-4">
+                      <GoogleMapsEmbed
+                        address={ceremony.address}
+                        className="w-full border border-gray-200"
+                        height="200px"
+                      />
+                    </div>
                   </div>
                 )}
               </div>
@@ -93,7 +116,7 @@ export default function ModernInfoSection({ content }: InfoSectionProps) {
           )}
 
           {/* Reception */}
-          {reception && (reception.venue || reception.time || reception.address) && (
+          {hasReception && (
             <div className="bg-white p-12 shadow-sm border border-gray-200">
               <div className="flex items-center gap-4 mb-8">
                 <div className="w-12 h-12 bg-gray-100 flex items-center justify-center">
@@ -123,7 +146,16 @@ export default function ModernInfoSection({ content }: InfoSectionProps) {
                 {reception.address && (
                   <div>
                     <h4 className="font-medium text-gray-900 mb-2 tracking-wide">ADRESA</h4>
-                    <p className="text-gray-700 font-light">{reception.address}</p>
+                    <p className="text-gray-700 font-light mb-4">{reception.address}</p>
+
+                    {/* Google Maps Embed */}
+                    <div className="mt-4">
+                      <GoogleMapsEmbed
+                        address={reception.address}
+                        className="w-full border border-gray-200"
+                        height="200px"
+                      />
+                    </div>
                   </div>
                 )}
               </div>
@@ -152,9 +184,29 @@ export default function ModernInfoSection({ content }: InfoSectionProps) {
                 </div>
                 <h4 className="font-medium text-gray-900 tracking-wide">DRESS CODE</h4>
               </div>
-              <p className="text-gray-700 font-light">
+              <p className="text-gray-700 font-light mb-6">
                 {getDressCodeText(dressCode)}
               </p>
+
+              {/* Color Palette */}
+              {colorPalette && colorPalette.length > 0 && (
+                <div className="pt-6 border-t border-gray-200">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Palette className="w-4 h-4 text-gray-900" />
+                    <span className="text-sm font-medium text-gray-900 tracking-wide">BAREVNÁ PALETA</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {colorPalette.map((color, index) => (
+                      <div
+                        key={index}
+                        className="w-8 h-8 border border-gray-200"
+                        style={{ backgroundColor: color }}
+                        title={color}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

@@ -176,13 +176,21 @@ export function useWeddingWebsite(customUrl?: string) {
         const doc = querySnapshot.docs[0]
         const data = doc.data()
 
-        setWebsite({
+        const loadedWebsite = {
           id: doc.id,
           ...data,
           createdAt: data.createdAt?.toDate() || new Date(),
           updatedAt: data.updatedAt?.toDate() || new Date(),
           publishedAt: data.publishedAt?.toDate() || undefined,
-        } as WeddingWebsite)
+        } as WeddingWebsite
+
+        console.log('📄 Website loaded for builder:', {
+          id: loadedWebsite.id,
+          isPublished: loadedWebsite.isPublished,
+          isDraft: loadedWebsite.isDraft
+        })
+
+        setWebsite(loadedWebsite)
 
       } catch (err: any) {
         console.error('Error loading website by wedding ID:', err)
@@ -376,6 +384,12 @@ export function useWeddingWebsite(customUrl?: string) {
         updatedAt: now.toDate(),
       } as WeddingWebsite
 
+      console.log('✅ Website created successfully:', {
+        id: newWebsite.id,
+        isPublished: newWebsite.isPublished,
+        isDraft: newWebsite.isDraft
+      })
+
       setWebsite(newWebsite)
       return newWebsite
     } catch (err: any) {
@@ -413,8 +427,42 @@ export function useWeddingWebsite(customUrl?: string) {
     }
 
     try {
+      // 1. Nejdříve přidáme subdoménu do Vercel projektu
+      if (website.customUrl) {
+        console.log('🚀 Starting domain registration for:', website.customUrl)
+        try {
+          console.log('📡 Calling Vercel API endpoint: /api/vercel/add-domain')
+          const domainResponse = await fetch('/api/vercel/add-domain', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              subdomain: website.customUrl,
+            }),
+          })
+          console.log('📡 Vercel API response status:', domainResponse.status)
+
+          const domainData = await domainResponse.json()
+          console.log('📡 Vercel API response data:', domainData)
+
+          if (!domainResponse.ok) {
+            console.error('❌ Failed to add domain to Vercel:', domainData)
+            // Pokračujeme i když se nepodaří přidat doménu - web bude dostupný na hlavní doméně
+            console.warn('⚠️ Domain addition failed, but continuing with publication')
+          } else {
+            console.log('✅ Domain successfully added to Vercel:', domainData)
+          }
+        } catch (domainError) {
+          console.error('Error adding domain to Vercel:', domainError)
+          // Pokračujeme i když se nepodaří přidat doménu
+          console.warn('Domain addition failed, but continuing with publication')
+        }
+      }
+
+      // 2. Publikujeme web v databázi
       const docRef = doc(db, 'weddingWebsites', website.id)
-      
+
       await updateDoc(docRef, {
         isPublished: true,
         isDraft: false,
@@ -434,8 +482,38 @@ export function useWeddingWebsite(customUrl?: string) {
     }
 
     try {
+      // 1. Nejdříve odebereme subdoménu z Vercel projektu
+      if (website.customUrl) {
+        try {
+          const domainResponse = await fetch('/api/vercel/remove-domain', {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              subdomain: website.customUrl,
+            }),
+          })
+
+          const domainData = await domainResponse.json()
+
+          if (!domainResponse.ok) {
+            console.error('Failed to remove domain from Vercel:', domainData)
+            // Pokračujeme i když se nepodaří odebrat doménu
+            console.warn('Domain removal failed, but continuing with unpublication')
+          } else {
+            console.log('Domain successfully removed from Vercel:', domainData)
+          }
+        } catch (domainError) {
+          console.error('Error removing domain from Vercel:', domainError)
+          // Pokračujeme i když se nepodaří odebrat doménu
+          console.warn('Domain removal failed, but continuing with unpublication')
+        }
+      }
+
+      // 2. Zrušíme publikování v databázi
       const docRef = doc(db, 'weddingWebsites', website.id)
-      
+
       await updateDoc(docRef, {
         isPublished: false,
         isDraft: true,

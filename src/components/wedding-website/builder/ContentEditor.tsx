@@ -1,13 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronDown, ChevronRight, Image, Calendar, MapPin, Users, MessageSquare, Gift, Camera, Phone, HelpCircle } from 'lucide-react'
+import { ChevronDown, ChevronRight, Image, Calendar, MapPin, Users, MessageSquare, Gift, Camera, Phone, HelpCircle, Building2 } from 'lucide-react'
 import HeroSectionEditor from './sections/HeroSectionEditor'
 import InfoSectionEditor from './sections/InfoSectionEditor'
 import RSVPSectionEditor from './sections/RSVPSectionEditor'
 import StorySectionEditor from './sections/StorySectionEditor'
 import ScheduleSectionEditor from './sections/ScheduleSectionEditor'
 import GallerySectionEditor from './sections/GallerySectionEditor'
+import AccommodationSectionEditor from './sections/AccommodationSectionEditor'
 import type { WebsiteContent } from '@/types/wedding-website'
 
 interface ContentEditorProps {
@@ -74,7 +75,7 @@ export default function ContentEditor({ content, onContentChange }: ContentEdito
       id: 'accommodation',
       title: 'Ubytování',
       description: 'Doporučené hotely a ubytování',
-      icon: MapPin,
+      icon: Building2,
       required: false,
       enabled: content.accommodation?.enabled || false
     },
@@ -204,6 +205,13 @@ export default function ContentEditor({ content, onContentChange }: ContentEdito
           <GallerySectionEditor
             content={content.gallery}
             onChange={(galleryContent) => updateSectionContent('gallery', galleryContent)}
+          />
+        )
+      case 'accommodation':
+        return (
+          <AccommodationSectionEditor
+            content={content.accommodation}
+            onChange={(accommodationContent) => updateSectionContent('accommodation', accommodationContent)}
           />
         )
       default:

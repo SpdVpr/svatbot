@@ -80,6 +80,8 @@ export interface Guest {
   accommodationInterest?: 'interested' | 'not_interested' // Zájem o ubytování
   accommodationType?: string // Volný text pro typ ubytování
   accommodationPayment?: 'paid_by_guest' | 'paid_by_couple' // Způsob platby
+  accommodationId?: string // ID vybraného ubytování
+  roomId?: string // ID vybraného pokoje
 
   // Tracking
   invitationSent: boolean
@@ -217,6 +219,9 @@ export interface GuestFormData {
   accommodationInterest?: 'interested' | 'not_interested'
   accommodationType?: string
   accommodationPayment?: 'paid_by_guest' | 'paid_by_couple'
+  accommodationNeeded?: boolean
+  accommodationId?: string
+  roomId?: string
   invitationSent?: boolean
   invitationMethod?: 'sent' | 'delivered_personally'
 }

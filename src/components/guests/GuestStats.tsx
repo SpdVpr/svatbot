@@ -22,22 +22,28 @@ interface GuestStatsProps {
   guests: Guest[]
   stats: any
   updateGuest: (guestId: string, updates: Partial<Guest>) => Promise<void>
+  updateRSVP?: (guestId: string, rsvpStatus: Guest['rsvpStatus']) => Promise<void>
+  deleteGuest?: (guestId: string) => Promise<void>
   compact?: boolean
   showProgress?: boolean
   showGuestList?: boolean
   onCreateGuest?: () => void
   onEditGuest?: (guest: Guest) => void
+  getAccommodationById?: (id: string) => any
 }
 
 export default function GuestStats({
   guests,
   stats,
   updateGuest,
+  updateRSVP,
+  deleteGuest,
   compact = false,
   showProgress = true,
   showGuestList = true,
   onCreateGuest,
-  onEditGuest
+  onEditGuest,
+  getAccommodationById
 }: GuestStatsProps) {
 
   // Calculate additional stats
@@ -410,6 +416,8 @@ export default function GuestStats({
             guests={guests}
             stats={stats}
             updateGuest={updateGuest}
+            updateRSVP={updateRSVP}
+            deleteGuest={deleteGuest}
             showHeader={false}
             showFilters={true}
             maxHeight="800px"
@@ -417,6 +425,7 @@ export default function GuestStats({
             viewMode="list"
             onCreateGuest={onCreateGuest}
             onEditGuest={onEditGuest}
+            getAccommodationById={getAccommodationById}
           />
         </div>
       )}

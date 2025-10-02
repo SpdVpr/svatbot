@@ -25,6 +25,7 @@ import WeddingChecklistModule from './modules/WeddingChecklistModule'
 import MusicPlaylistModule from './modules/MusicPlaylistModule'
 import FoodDrinksModule from './modules/FoodDrinksModule'
 import WeddingWebsiteModule from './modules/WeddingWebsiteModule'
+import AccommodationManagementModule from './modules/AccommodationManagementModule'
 
 interface FixedGridDragDropProps {
   onWeddingSettingsClick: () => void
@@ -237,6 +238,8 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridD
         return <FoodDrinksModule />
       case 'wedding-website':
         return <WeddingWebsiteModule />
+      case 'accommodation-management':
+        return <AccommodationManagementModule />
       default:
         return (
           <div className="wedding-card">
