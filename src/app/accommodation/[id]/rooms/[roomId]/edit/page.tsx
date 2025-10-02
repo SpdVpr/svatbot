@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Bed, Save, Users, DollarSign, Plus, X } from 'lucide-react'
+import { ArrowLeft, Bed, Save, Users, DollarSign, Plus, X, Copy } from 'lucide-react'
 import { useAccommodation, type RoomFormData } from '@/hooks/useAccommodation'
 import type { RoomType, BedType } from '@/types'
 import SimpleRoomImageUpload from '@/components/accommodation/SimpleRoomImageUpload'
@@ -16,7 +16,7 @@ interface EditRoomPageProps {
 
 export default function EditRoomPage({ params }: EditRoomPageProps) {
   const router = useRouter()
-  const { getAccommodationById, updateRoom, loading } = useAccommodation()
+  const { getAccommodationById, updateRoom, addRoom, loading } = useAccommodation()
   
   const accommodation = getAccommodationById(params.id)
   const room = accommodation?.rooms.find(r => r.id === params.roomId)
@@ -36,6 +36,8 @@ export default function EditRoomPage({ params }: EditRoomPageProps) {
   const [newAmenity, setNewAmenity] = useState('')
   const [roomImages, setRoomImages] = useState<string[]>([])
   const [saving, setSaving] = useState(false)
+  const [copyCount, setCopyCount] = useState(1)
+  const [showCopyOptions, setShowCopyOptions] = useState(false)
 
   // Initialize form data when room is loaded
   useEffect(() => {
@@ -124,7 +126,7 @@ export default function EditRoomPage({ params }: EditRoomPageProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!accommodation || !room) {
       alert('Pokoj nenalezen')
       return
@@ -132,18 +134,59 @@ export default function EditRoomPage({ params }: EditRoomPageProps) {
 
     try {
       setSaving(true)
-      
+
       // Include room images in form data
       const roomDataWithImages = {
         ...formData,
         images: roomImages
       }
-      
+
       await updateRoom(accommodation.id, room.id, roomDataWithImages)
       router.push(`/accommodation/${accommodation.id}?tab=rooms`)
     } catch (error) {
       console.error('Error updating room:', error)
       alert('Chyba při aktualizaci pokoje')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleCopyRoom = async () => {
+    if (!accommodation || !room) {
+      alert('Pokoj nenalezen')
+      return
+    }
+
+    if (copyCount < 1 || copyCount > 20) {
+      alert('Počet kopií musí být mezi 1 a 20')
+      return
+    }
+
+    try {
+      setSaving(true)
+
+      // Include room images in form data
+      const roomDataWithImages = {
+        ...formData,
+        images: roomImages
+      }
+
+      // Create multiple copies of the room
+      const promises = []
+      for (let i = 1; i <= copyCount; i++) {
+        const roomData = {
+          ...roomDataWithImages,
+          name: `${formData.name} - kopie ${i}`
+        }
+        promises.push(addRoom(accommodation.id, roomData))
+      }
+
+      await Promise.all(promises)
+      alert(`Úspěšně vytvořeno ${copyCount} kopií pokoje`)
+      router.push(`/accommodation/${accommodation.id}?tab=rooms`)
+    } catch (error) {
+      console.error('Error copying room:', error)
+      alert('Chyba při kopírování pokoje')
     } finally {
       setSaving(false)
     }
@@ -174,9 +217,9 @@ export default function EditRoomPage({ params }: EditRoomPageProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
-                onClick={() => router.push('/dashboard')}
+                onClick={() => router.push('/accommodation')}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                title="Zpět na dashboard"
+                title="Zpět na ubytování"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
@@ -403,6 +446,70 @@ export default function EditRoomPage({ params }: EditRoomPageProps) {
               maxImages={10}
               disabled={saving}
             />
+          </div>
+
+          {/* Copy Options */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">Kopírování pokoje</h2>
+              <button
+                type="button"
+                onClick={() => setShowCopyOptions(!showCopyOptions)}
+                className="inline-flex items-center gap-2 px-3 py-1 text-sm bg-primary-100 text-primary-700 rounded-lg hover:bg-primary-200 transition-colors"
+              >
+                <Copy className="w-4 h-4" />
+                {showCopyOptions ? 'Skrýt možnosti' : 'Zobrazit možnosti'}
+              </button>
+            </div>
+
+            {showCopyOptions && (
+              <div className="space-y-4">
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-800 mb-3">
+                    <strong>Tip:</strong> Můžete vytvořit kopie tohoto pokoje s aktuálním nastavením.
+                    Kopie budou automaticky pojmenovány a můžete je později upravit individuálně.
+                  </p>
+
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm font-medium text-gray-700">
+                        Počet kopií k vytvoření:
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="20"
+                        value={copyCount}
+                        onChange={(e) => setCopyCount(parseInt(e.target.value) || 1)}
+                        className="w-20 px-3 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-center"
+                      />
+                    </div>
+
+                    {copyCount > 0 && (
+                      <div className="text-sm text-gray-600">
+                        Vytvoří se: <strong>{formData.name} - kopie 1</strong>
+                        {copyCount > 1 && <span>, <strong>{formData.name} - kopie 2</strong></span>}
+                        {copyCount > 2 && <span>, ... <strong>{formData.name} - kopie {copyCount}</strong></span>}
+                      </div>
+                    )}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleCopyRoom}
+                    disabled={saving || copyCount < 1}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                  >
+                    {saving ? (
+                      <div className="loading-spinner w-4 h-4" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                    {copyCount > 1 ? `Vytvořit ${copyCount} kopií` : 'Vytvořit kopii'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Submit Button */}
