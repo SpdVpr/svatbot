@@ -87,7 +87,7 @@ export default function GuestStats({
   const attendanceRate = stats.total > 0 ?
     Math.round((totalAttendingPeople / stats.total) * 100) : 0
 
-  const guestsWithContact = guests.filter(g => g.email || g.phone).length
+  const guestsWithChildren = guests.filter(g => g.hasChildren && g.children && g.children.length > 0).length
   const guestsWithDietaryRestrictions = guests.filter(g => g.dietaryRestrictions.length > 0).length
 
   // Invitation statistics
@@ -380,10 +380,10 @@ export default function GuestStats({
 
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <Mail className="w-4 h-4 text-green-500" />
-                <span className="text-gray-700">S kontaktem</span>
+                <Users className="w-4 h-4 text-green-500" />
+                <span className="text-gray-700">S dětmi</span>
               </div>
-              <span className="font-medium">{guestsWithContact}</span>
+              <span className="font-medium">{guestsWithChildren}</span>
             </div>
 
             <div className="flex items-center justify-between">
@@ -404,44 +404,7 @@ export default function GuestStats({
 
 
 
-      {/* Quick insights */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Today's insights */}
-        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-          <div className="flex items-center space-x-2 mb-2">
-            <TrendingUp className="w-5 h-5 text-blue-600" />
-            <h4 className="font-medium text-blue-900">Účast</h4>
-          </div>
-          <p className="text-2xl font-bold text-blue-600">{attendanceRate}%</p>
-          <p className="text-sm text-blue-700">
-            {totalAttendingPeople} z {stats.total} lidí přijde
-          </p>
-        </div>
 
-        {/* Response rate */}
-        <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-          <div className="flex items-center space-x-2 mb-2">
-            <CheckCircle2 className="w-5 h-5 text-green-600" />
-            <h4 className="font-medium text-green-900">Odpovědi</h4>
-          </div>
-          <p className="text-2xl font-bold text-green-600">{responseRate}%</p>
-          <p className="text-sm text-green-700">
-            {totalRespondedPeople} z {stats.total} odpovědělo
-          </p>
-        </div>
-
-        {/* Action needed */}
-        <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
-          <div className="flex items-center space-x-2 mb-2">
-            <AlertTriangle className="w-5 h-5 text-orange-600" />
-            <h4 className="font-medium text-orange-900">Akce</h4>
-          </div>
-          <p className="text-2xl font-bold text-orange-600">{stats.pending}</p>
-          <p className="text-sm text-orange-700">
-            {stats.pending > 0 ? 'hostů čeká na připomenutí' : 'všichni odpověděli'}
-          </p>
-        </div>
-      </div>
 
       {/* Guest List */}
       {showGuestList && (
