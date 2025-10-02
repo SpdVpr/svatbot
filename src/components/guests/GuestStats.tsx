@@ -46,12 +46,46 @@ export default function GuestStats({
   getAccommodationById
 }: GuestStatsProps) {
 
-  // Calculate additional stats
-  const responseRate = stats.total > 0 ? 
-    Math.round(((stats.attending + stats.declined + stats.maybe) / stats.total) * 100) : 0
+  // Calculate additional stats with proper +1 handling
+  const totalRespondedPeople = guests.reduce((total, guest) => {
+    let count = 0
+    // Count the guest if they responded
+    if (guest.rsvpStatus !== 'pending') {
+      count += 1
+      // Count +1 if they have one and it responded
+      if (guest.hasPlusOne && guest.plusOneRsvpStatus && guest.plusOneRsvpStatus !== 'pending') {
+        count += 1
+      }
+      // Count children (they follow main guest's RSVP)
+      if (guest.hasChildren && guest.children) {
+        count += guest.children.length
+      }
+    }
+    return total + count
+  }, 0)
 
-  const attendanceRate = stats.total > 0 ? 
-    Math.round((stats.attending / stats.total) * 100) : 0
+  const totalAttendingPeople = guests.reduce((total, guest) => {
+    let count = 0
+    // Count the guest if they're attending
+    if (guest.rsvpStatus === 'attending') {
+      count += 1
+      // Count +1 if they have one and it's attending
+      if (guest.hasPlusOne && guest.plusOneRsvpStatus === 'attending') {
+        count += 1
+      }
+      // Count children (they follow main guest's RSVP)
+      if (guest.hasChildren && guest.children) {
+        count += guest.children.length
+      }
+    }
+    return total + count
+  }, 0)
+
+  const responseRate = stats.total > 0 ?
+    Math.round((totalRespondedPeople / stats.total) * 100) : 0
+
+  const attendanceRate = stats.total > 0 ?
+    Math.round((totalAttendingPeople / stats.total) * 100) : 0
 
   const guestsWithContact = guests.filter(g => g.email || g.phone).length
   const guestsWithDietaryRestrictions = guests.filter(g => g.dietaryRestrictions.length > 0).length
@@ -380,7 +414,7 @@ export default function GuestStats({
           </div>
           <p className="text-2xl font-bold text-blue-600">{attendanceRate}%</p>
           <p className="text-sm text-blue-700">
-            {stats.attending} z {stats.total} hostů
+            {totalAttendingPeople} z {stats.total} lidí přijde
           </p>
         </div>
 
@@ -392,7 +426,7 @@ export default function GuestStats({
           </div>
           <p className="text-2xl font-bold text-green-600">{responseRate}%</p>
           <p className="text-sm text-green-700">
-            {stats.total - stats.pending} odpovědělo
+            {totalRespondedPeople} z {stats.total} odpovědělo
           </p>
         </div>
 

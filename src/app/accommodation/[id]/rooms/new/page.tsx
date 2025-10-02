@@ -122,11 +122,11 @@ export default function NewRoomPage({ params }: NewRoomPageProps) {
       if (copyCount > 1) {
         const promises = []
         for (let i = 1; i <= copyCount; i++) {
-          const roomData = {
+          const copyRoomData = {
             ...roomDataWithImages,
             name: `${formData.name} ${i}`
           }
-          promises.push(addRoom(accommodation.id, roomData))
+          promises.push(addRoom(accommodation.id, copyRoomData))
         }
         await Promise.all(promises)
       } else {

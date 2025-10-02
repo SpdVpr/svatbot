@@ -174,11 +174,11 @@ export default function EditRoomPage({ params }: EditRoomPageProps) {
       // Create multiple copies of the room
       const promises = []
       for (let i = 1; i <= copyCount; i++) {
-        const roomData = {
+        const copyRoomData = {
           ...roomDataWithImages,
           name: `${formData.name} - kopie ${i}`
         }
-        promises.push(addRoom(accommodation.id, roomData))
+        promises.push(addRoom(accommodation.id, copyRoomData))
       }
 
       await Promise.all(promises)
@@ -452,17 +452,9 @@ export default function EditRoomPage({ params }: EditRoomPageProps) {
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900">Kopírování pokoje</h2>
-              <button
-                type="button"
-                onClick={() => setShowCopyOptions(!showCopyOptions)}
-                className="inline-flex items-center gap-2 px-3 py-1 text-sm bg-primary-100 text-primary-700 rounded-lg hover:bg-primary-200 transition-colors"
-              >
-                <Copy className="w-4 h-4" />
-                {showCopyOptions ? 'Skrýt možnosti' : 'Zobrazit možnosti'}
-              </button>
             </div>
 
-            {showCopyOptions && (
+            <div className="space-y-4">
               <div className="space-y-4">
                 <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                   <p className="text-sm text-blue-800 mb-3">
@@ -509,7 +501,7 @@ export default function EditRoomPage({ params }: EditRoomPageProps) {
                   </button>
                 </div>
               </div>
-            )}
+            </div>
           </div>
 
           {/* Submit Button */}
