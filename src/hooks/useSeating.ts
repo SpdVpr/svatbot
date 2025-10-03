@@ -329,7 +329,6 @@ export function useSeating(): UseSeatingReturn {
       const newTable: Table = {
         id: localId,
         weddingId: wedding.id,
-        seatingPlanId: activePlan.id,
         name: data.name,
         shape: data.shape,
         size: data.size,
