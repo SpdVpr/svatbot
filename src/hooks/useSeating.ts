@@ -7,6 +7,7 @@ import {
   addDoc,
   updateDoc,
   deleteDoc,
+  setDoc,
   query,
   where,
   orderBy,
@@ -227,8 +228,21 @@ export function useSeating(): UseSeatingReturn {
 
       console.log('✅ Seating plan created locally:', newPlan)
 
-      // Skip Firestore sync for now due to connection issues
-      console.log('🪑 Skipping Firestore sync, plan saved locally only')
+      // Save to Firebase in background
+      try {
+        const planRef = doc(db, 'seatingPlans', localId)
+        const firestoreData = {
+          ...planData,
+          createdAt: Timestamp.now(),
+          updatedAt: Timestamp.now()
+        }
+        await setDoc(planRef, firestoreData)
+        console.log('✅ Seating plan synced to Firebase:', localId)
+      } catch (firebaseError) {
+        console.warn('⚠️ Firebase sync failed for seating plan:', firebaseError)
+        // Continue with local-only plan
+      }
+
       return newPlan
     } catch (error: any) {
       console.error('❌ Error creating seating plan:', error)

@@ -75,28 +75,54 @@ export function useNotes() {
     }
 
     try {
-      const notesRef = collection(db, 'notes')
-      const newNote = {
+      const noteId = `note_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      const newNote: Note = {
+        id: noteId,
         ...noteData,
         weddingId: wedding.id,
-        userId: user.id, // This should match request.auth.uid in Firebase rules
-        createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now(),
+        userId: user.id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
         tags: noteData.tags || [],
         color: noteData.color || 'yellow',
         isPinned: noteData.isPinned || false
       }
 
-      const docRef = await addDoc(notesRef, newNote)
-      
-      const createdNote: Note = {
-        id: docRef.id,
-        ...newNote,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }
+      // Update local state immediately
+      setNotes(prev => [newNote, ...prev])
 
-      return createdNote
+      // Save to Firebase in background (don't block UI)
+      import('@/config/firebase').then(({ db }) => {
+        import('firebase/firestore').then(({ collection, addDoc, Timestamp }) => {
+          const notesRef = collection(db, 'notes')
+          const firestoreNote = {
+            ...noteData,
+            weddingId: wedding.id,
+            userId: user.id,
+            createdAt: Timestamp.now(),
+            updatedAt: Timestamp.now(),
+            tags: noteData.tags || [],
+            color: noteData.color || 'yellow',
+            isPinned: noteData.isPinned || false
+          }
+
+          addDoc(notesRef, firestoreNote).then((docRef) => {
+            console.log('✅ Note synced to Firestore with ID:', docRef.id)
+            // Update local state with real Firebase ID
+            setNotes(prev => prev.map(note =>
+              note.id === noteId ? { ...note, id: docRef.id } : note
+            ))
+          }).catch((error) => {
+            console.warn('⚠️ Firestore sync failed for note:', error.message)
+            setError('Poznámka byla uložena lokálně, ale nepodařilo se synchronizovat s cloudem')
+          })
+        })
+      }).catch((error) => {
+        console.warn('⚠️ Failed to load Firestore modules:', error)
+        setError('Poznámka byla uložena lokálně')
+      })
+
+      return newNote
     } catch (err: any) {
       console.error('Error creating note:', err)
       setError('Chyba při vytváření poznámky')
