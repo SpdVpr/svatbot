@@ -304,6 +304,22 @@ service cloud.firestore {
       allow get: if true;
     }
 
+    // Notes collection
+    match /notes/{noteId} {
+      // Owner can read/write their own notes
+      allow read, write: if isAuthenticated() &&
+                            resource.data.userId == request.auth.uid;
+
+      // Owner can create notes
+      allow create: if isAuthenticated() &&
+                       request.resource.data.keys().hasAll(['title', 'content', 'weddingId', 'userId', 'createdAt', 'updatedAt']) &&
+                       request.auth.uid == request.resource.data.userId;
+
+      // Allow list/query for owner (to find notes by weddingId)
+      allow list: if isAuthenticated() &&
+                     request.auth.uid != null;
+    }
+
     // RSVPs collection
     match /rsvps/{rsvpId} {
       // Owner can read all RSVPs for their wedding

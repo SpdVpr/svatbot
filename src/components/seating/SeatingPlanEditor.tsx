@@ -15,9 +15,14 @@ import {
   ZoomOut,
   Grid,
   Eye,
-  EyeOff
+  EyeOff,
+  MousePointer2,
+  Edit3,
+  Trash2,
+  X
 } from 'lucide-react'
 import { Table, Seat, SeatingViewOptions, SeatingPlan, TableShape, TableSize } from '@/types/seating'
+import { GUEST_CATEGORY_LABELS, GUEST_CATEGORY_COLORS } from '@/utils/guestCategories'
 
 interface SeatingPlanEditorProps {
   className?: string
@@ -31,6 +36,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     stats,
     createTable,
     updateTable,
+    deleteTable,
     updateSeatingPlan,
     moveTable,
     assignGuestToSeat,
@@ -63,6 +69,10 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     width: currentPlan.venueLayout.width,
     height: currentPlan.venueLayout.height
   })
+  const [isRotating, setIsRotating] = useState(false)
+  const [rotatingTable, setRotatingTable] = useState<string | null>(null)
+  const [rotationStartAngle, setRotationStartAngle] = useState(0)
+  const [showTableMenu, setShowTableMenu] = useState<string | null>(null)
 
   // Mobile long press detection
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null)
@@ -143,6 +153,20 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
       }
     }
   }, [longPressTimer])
+
+  // Close table menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showTableMenu && !(event.target as Element).closest('.table-menu')) {
+        setShowTableMenu(null)
+      }
+    }
+
+    if (showTableMenu) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showTableMenu])
 
   // Mobile long press handlers
   const handleTouchStart = (tableId: string) => {
@@ -247,6 +271,80 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
       alert('Chyba při úpravě stolu: ' + (error as Error).message)
     }
   }
+
+  // Table rotation handlers
+  const handleRotationStart = (tableId: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setIsRotating(true)
+    setRotatingTable(tableId)
+
+    const table = tables.find(t => t.id === tableId)
+    if (table) {
+      setRotationStartAngle(table.rotation)
+    }
+  }
+
+  const handleRotationMove = useCallback((e: MouseEvent) => {
+    if (!isRotating || !rotatingTable) return
+
+    const table = tables.find(t => t.id === rotatingTable)
+    if (!table) return
+
+    // Calculate angle from table center to mouse position
+    const tableElement = document.querySelector(`[data-table-id="${rotatingTable}"]`)
+    if (!tableElement) return
+
+    const rect = tableElement.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+
+    const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI) + 90
+    const normalizedAngle = ((angle % 360) + 360) % 360
+
+    // Update table rotation
+    updateTable(rotatingTable, { rotation: normalizedAngle })
+  }, [isRotating, rotatingTable, tables, updateTable])
+
+  const handleRotationEnd = useCallback(() => {
+    setIsRotating(false)
+    setRotatingTable(null)
+    setRotationStartAngle(0)
+  }, [])
+
+  // Rotate table by specific degrees
+  const rotateTable = async (tableId: string, degrees: number) => {
+    const table = tables.find(t => t.id === tableId)
+    if (!table) return
+
+    const newRotation = ((table.rotation + degrees) % 360 + 360) % 360
+    await updateTable(tableId, { rotation: newRotation })
+  }
+
+  // Delete table
+  const handleDeleteTable = async (tableId: string) => {
+    if (confirm('Opravdu chcete smazat tento stůl?')) {
+      try {
+        await deleteTable(tableId)
+        setShowTableMenu(null)
+      } catch (error) {
+        console.error('Error deleting table:', error)
+        alert('Chyba při mazání stolu: ' + (error as Error).message)
+      }
+    }
+  }
+
+  // Rotation event listeners
+  useEffect(() => {
+    if (isRotating) {
+      document.addEventListener('mousemove', handleRotationMove)
+      document.addEventListener('mouseup', handleRotationEnd)
+
+      return () => {
+        document.removeEventListener('mousemove', handleRotationMove)
+        document.removeEventListener('mouseup', handleRotationEnd)
+      }
+    }
+  }, [isRotating, handleRotationMove, handleRotationEnd])
 
   // Edit dance floor
   const handleEditDanceFloor = () => {
@@ -415,6 +513,41 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     if (!seat.guestId) return null
     const guest = guests.find(g => g.id === seat.guestId)
     return guest ? `${guest.firstName} ${guest.lastName}` : null
+  }
+
+  // Group unassigned guests by category
+  const getGroupedUnassignedGuests = () => {
+    const grouped: Record<string, typeof unassignedGuests> = {}
+
+    unassignedGuests.forEach(guest => {
+      const category = guest.category || 'other'
+      if (!grouped[category]) {
+        grouped[category] = []
+      }
+      grouped[category].push(guest)
+    })
+
+    // Sort categories by priority
+    const categoryOrder = [
+      'family-bride',
+      'family-groom',
+      'friends-bride',
+      'friends-groom',
+      'colleagues-bride',
+      'colleagues-groom',
+      'other'
+    ]
+
+    const sortedGrouped: Record<string, typeof unassignedGuests> = {}
+    categoryOrder.forEach(category => {
+      if (grouped[category] && grouped[category].length > 0) {
+        sortedGrouped[category] = grouped[category].sort((a, b) =>
+          `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`)
+        )
+      }
+    })
+
+    return sortedGrouped
   }
 
   console.log('🪑 SeatingPlanEditor: Rendering with plan:', currentPlan.name)
@@ -586,25 +719,32 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                 return (
                   <div
                     key={table.id}
-                    className={`absolute cursor-move ${
+                    data-table-id={table.id}
+                    className={`absolute group ${
                       isSelected ? 'z-10 scale-105' : 'z-0'
                     } ${!isDraggedTable ? 'transition-all duration-200' : ''}`}
                     style={{
                       left: position.x,
                       top: position.y,
-                      transform: `rotate(${table.rotation}deg)`
                     }}
-                    onMouseDown={(e) => handleTableDragStart(table.id, e)}
-                    onDoubleClick={() => handleEditTable(table)}
-                    onTouchStart={() => handleTouchStart(table.id)}
-                    onTouchEnd={handleTouchEnd}
-                    onTouchMove={handleTouchMove}
-                    title={
-                      typeof window !== 'undefined' && 'ontouchstart' in window
-                        ? `${table.name} - Dlouhé stisknutí pro úpravu, táhněte pro přesun`
-                        : `${table.name} - Dvojklik pro úpravu, táhněte pro přesun`
-                    }
                   >
+                    {/* Table container with rotation */}
+                    <div
+                      className="relative cursor-move"
+                      style={{
+                        transform: `rotate(${table.rotation}deg)`
+                      }}
+                      onMouseDown={(e) => handleTableDragStart(table.id, e)}
+                      onDoubleClick={() => handleEditTable(table)}
+                      onTouchStart={() => handleTouchStart(table.id)}
+                      onTouchEnd={handleTouchEnd}
+                      onTouchMove={handleTouchMove}
+                      title={
+                        typeof window !== 'undefined' && 'ontouchstart' in window
+                          ? `${table.name} - Dlouhé stisknutí pro úpravu, táhněte pro přesun`
+                          : `${table.name} - Dvojklik pro úpravu, táhněte pro přesun`
+                      }
+                    >
                     {/* Table shape */}
                     <div
                       className={`relative border-2 transition-colors ${
@@ -668,13 +808,84 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                       })}
                     </div>
 
-                    {/* Guest names */}
+                    {/* Rotation handles - visible on hover */}
+                    <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors"
+                        onMouseDown={(e) => handleRotationStart(table.id, e)}
+                        onClick={(e) => e.stopPropagation()}
+                        title="Táhněte pro rotaci"
+                      >
+                        <RotateCw className="w-3 h-3" />
+                      </button>
+                    </div>
+
+                    {/* Table menu button */}
+                    <div className="absolute -top-2 -left-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        className="w-6 h-6 bg-gray-500 text-white rounded-full flex items-center justify-center hover:bg-gray-600 transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setShowTableMenu(showTableMenu === table.id ? null : table.id)
+                        }}
+                        title="Menu stolu"
+                      >
+                        <MousePointer2 className="w-3 h-3" />
+                      </button>
+
+                      {/* Table menu */}
+                      {showTableMenu === table.id && (
+                        <div className="table-menu absolute top-8 left-0 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50 min-w-32">
+                          <button
+                            className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-2"
+                            onClick={() => {
+                              handleEditTable(table)
+                              setShowTableMenu(null)
+                            }}
+                          >
+                            <Edit3 className="w-3 h-3" />
+                            <span>Upravit</span>
+                          </button>
+                          <button
+                            className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-2"
+                            onClick={() => {
+                              rotateTable(table.id, 45)
+                              setShowTableMenu(null)
+                            }}
+                          >
+                            <RotateCw className="w-3 h-3" />
+                            <span>Otočit 45°</span>
+                          </button>
+                          <button
+                            className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-2"
+                            onClick={() => {
+                              rotateTable(table.id, 90)
+                              setShowTableMenu(null)
+                            }}
+                          >
+                            <RotateCw className="w-3 h-3" />
+                            <span>Otočit 90°</span>
+                          </button>
+                          <hr className="my-1" />
+                          <button
+                            className="w-full px-3 py-2 text-left text-sm hover:bg-red-50 text-red-600 flex items-center space-x-2"
+                            onClick={() => handleDeleteTable(table.id)}
+                          >
+                            <Trash2 className="w-3 h-3" />
+                            <span>Smazat</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    </div>
+
+                    {/* Guest names outside table - not rotated */}
                     {viewOptions.showGuestNames && (
-                      <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs text-center">
+                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 text-xs text-center space-y-1">
                         {tableSeats.filter(s => s.guestId).map(seat => {
                           const guestName = getGuestName(seat)
                           return guestName ? (
-                            <div key={seat.id} className="text-gray-600 truncate max-w-20">
+                            <div key={seat.id} className="bg-white px-2 py-1 rounded border text-gray-700 shadow-sm whitespace-nowrap">
                               {guestName}
                             </div>
                           ) : null
@@ -729,33 +940,58 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
             </div>
           )}
 
-          {/* Unassigned guests */}
+          {/* Unassigned guests grouped by category */}
           <div className="bg-white rounded-xl border border-gray-200 p-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Nepřiřazení hosté ({unassignedGuests.length})
             </h3>
 
-            <div className="space-y-2 max-h-60 overflow-y-auto">
-              {unassignedGuests.map(guest => (
-                <div
-                  key={guest.id}
-                  className="flex items-center justify-between p-2 bg-gray-50 rounded-lg cursor-move hover:bg-primary-50 transition-colors"
-                  draggable
-                  onDragStart={(e) => handleGuestDragStart(e, guest.id)}
-                >
-                  <span className="text-sm font-medium">
-                    {guest.firstName} {guest.lastName}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    {guest.category}
-                  </span>
+            <div className="space-y-4 max-h-96 overflow-y-auto">
+              {Object.entries(getGroupedUnassignedGuests()).map(([category, guests]) => (
+                <div key={category} className="space-y-2">
+                  {/* Category header */}
+                  <div className="flex items-center space-x-2">
+                    <div className={`px-2 py-1 rounded-full text-xs font-medium ${GUEST_CATEGORY_COLORS[category as keyof typeof GUEST_CATEGORY_COLORS] || 'bg-gray-100 text-gray-700'}`}>
+                      {GUEST_CATEGORY_LABELS[category as keyof typeof GUEST_CATEGORY_LABELS] || category}
+                    </div>
+                    <span className="text-xs text-gray-500">({guests.length})</span>
+                  </div>
+
+                  {/* Guests in category */}
+                  <div className="space-y-1 ml-2">
+                    {guests.map(guest => (
+                      <div
+                        key={guest.id}
+                        className="flex items-center justify-between p-2 bg-gray-50 rounded-lg cursor-move hover:bg-primary-50 transition-colors"
+                        draggable
+                        onDragStart={(e) => handleGuestDragStart(e, guest.id)}
+                      >
+                        <span className="text-sm font-medium">
+                          {guest.firstName} {guest.lastName}
+                        </span>
+                        {guest.hasPlusOne && (
+                          <span className="text-xs text-blue-600 bg-blue-100 px-2 py-0.5 rounded">
+                            +1
+                          </span>
+                        )}
+                        {guest.hasChildren && guest.children && guest.children.length > 0 && (
+                          <span className="text-xs text-green-600 bg-green-100 px-2 py-0.5 rounded">
+                            +{guest.children.length}
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))}
 
               {unassignedGuests.length === 0 && (
-                <p className="text-sm text-gray-500 text-center py-4">
-                  Všichni hosté jsou přiřazeni
-                </p>
+                <div className="text-center py-8">
+                  <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-sm text-gray-500">
+                    Všichni hosté jsou přiřazeni
+                  </p>
+                </div>
               )}
             </div>
           </div>

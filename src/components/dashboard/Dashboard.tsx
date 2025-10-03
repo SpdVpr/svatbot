@@ -10,11 +10,13 @@ import {
   Heart,
   LogOut,
   Settings,
-  Edit
+  Edit,
+  StickyNote
 } from 'lucide-react'
 import Link from 'next/link'
 import WeddingSettings from '@/components/wedding/WeddingSettings'
 import AIAssistant from '@/components/ai/AIAssistant'
+import NotesModal from '@/components/notes/NotesModal'
 import LiveNotifications, { LiveToastNotifications } from '@/components/notifications/LiveNotifications'
 import SimpleToastContainer, { showSimpleToast } from '@/components/notifications/SimpleToast'
 // import { useNotificationTriggers } from '@/hooks/useNotificationTriggers'
@@ -26,6 +28,7 @@ function DashboardContent() {
   const { logout, user } = useAuth()
   const { getCanvasMaxWidth } = useCanvas()
   const [showWeddingSettings, setShowWeddingSettings] = useState(false)
+  const [showNotesModal, setShowNotesModal] = useState(false)
 
   // Initialize notification triggers - DISABLED to prevent spam
   // useNotificationTriggers()
@@ -141,6 +144,13 @@ function DashboardContent() {
             <div className="flex items-center space-x-2">
               <LiveNotifications />
               <button
+                onClick={() => setShowNotesModal(true)}
+                className="mobile-nav-button text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                title="Poznámky"
+              >
+                <StickyNote className="w-4 h-4" />
+              </button>
+              <button
                 onClick={() => setShowWeddingSettings(true)}
                 className="mobile-nav-button text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 title="Nastavení"
@@ -207,6 +217,14 @@ function DashboardContent() {
                 <p className="body-small font-medium">{user?.displayName || user?.email}</p>
               </div>
               <LiveNotifications />
+              <button
+                onClick={() => setShowNotesModal(true)}
+                className="btn-outline flex items-center space-x-2"
+                title="Poznámky"
+              >
+                <StickyNote className="w-4 h-4" />
+                <span className="hidden sm:inline">Poznámky</span>
+              </button>
               <button
                 onClick={() => setShowWeddingSettings(true)}
                 className="btn-outline flex items-center space-x-2"
@@ -277,6 +295,12 @@ function DashboardContent() {
 
       {/* Simple Toast Container */}
       <SimpleToastContainer />
+
+      {/* Notes Modal */}
+      <NotesModal
+        isOpen={showNotesModal}
+        onClose={() => setShowNotesModal(false)}
+      />
     </div>
   )
 }
