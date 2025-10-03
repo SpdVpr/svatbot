@@ -102,13 +102,28 @@ service cloud.firestore {
 
     // Seating plans collection
     match /seatingPlans/{planId} {
-      allow read, write: if isAuthenticated() &&
-                            exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
-                            get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid;
+      // Allow read if authenticated and user owns the wedding
+      allow read: if isAuthenticated() &&
+                     (exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                      get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid);
+
+      // Allow create if authenticated and user owns the wedding
       allow create: if isAuthenticated() &&
-                       request.resource.data.keys().hasAll(['weddingId', 'name', 'layout']) &&
+                       request.resource.data.keys().hasAll(['weddingId', 'name']) &&
                        exists(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)) &&
                        get(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)).data.userId == request.auth.uid;
+
+      // Allow update if authenticated and user owns the wedding (check both old and new data)
+      allow update: if isAuthenticated() &&
+                       ((exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                         get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid) ||
+                        (exists(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)) &&
+                         get(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)).data.userId == request.auth.uid));
+
+      // Allow delete if authenticated and user owns the wedding
+      allow delete: if isAuthenticated() &&
+                       exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                       get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid;
     }
 
     // Moodboard collection
@@ -304,10 +319,19 @@ service cloud.firestore {
       allow get: if true;
     }
 
-    // Notes collection - allow all operations for authenticated users
+    // Notes collection - allow all operations for authenticated users on their own notes
     match /notes/{noteId} {
-      // Allow all operations for authenticated users
-      allow read, write: if isAuthenticated();
+      // Allow read for authenticated users (they can only query their own notes via userId filter)
+      allow read: if isAuthenticated();
+
+      // Allow create if authenticated and userId matches
+      allow create: if isAuthenticated() &&
+                       request.resource.data.keys().hasAll(['weddingId', 'userId', 'title', 'content']) &&
+                       request.auth.uid == request.resource.data.userId;
+
+      // Allow update/delete if authenticated and userId matches
+      allow update, delete: if isAuthenticated() &&
+                               resource.data.userId == request.auth.uid;
     }
 
     // RSVPs collection

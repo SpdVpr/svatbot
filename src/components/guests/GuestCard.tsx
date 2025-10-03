@@ -55,6 +55,14 @@ export default function GuestCard({
   const [isUpdating, setIsUpdating] = useState(false)
   const [showAccommodationSelector, setShowAccommodationSelector] = useState(false)
 
+  // Debug log
+  console.log('👤 GuestCard:', guest.firstName, {
+    notes: guest.notes,
+    accommodationPayment: guest.accommodationPayment,
+    hasNotes: !!guest.notes?.trim(),
+    hasPayment: !!guest.accommodationPayment
+  })
+
   // Get RSVP status display
   const getRSVPDisplay = () => {
     switch (guest.rsvpStatus) {
@@ -292,15 +300,31 @@ export default function GuestCard({
           </div>
         )}
 
-        {/* Notes tag */}
-        {guest.notes && guest.notes.trim() && (
+        {/* Tags section - Notes and Accommodation Payment */}
+        {(guest.notes?.trim() || guest.accommodationPayment) && (
           <div className="flex flex-wrap gap-1 mb-2">
-            <span
-              className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full flex items-center gap-1"
-              title={guest.notes}
-            >
-              📝 Poznámka
-            </span>
+            {/* Notes tag */}
+            {guest.notes && guest.notes.trim() && (
+              <span
+                className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full flex items-center gap-1"
+                title={guest.notes}
+              >
+                📝 {guest.notes.length > 30 ? guest.notes.substring(0, 30) + '...' : guest.notes}
+              </span>
+            )}
+
+            {/* Accommodation payment tag */}
+            {guest.accommodationPayment && (
+              <span
+                className={`text-xs px-2 py-1 rounded-full flex items-center gap-1 ${
+                  guest.accommodationPayment === 'paid_by_couple'
+                    ? 'bg-purple-100 text-purple-700'
+                    : 'bg-gray-100 text-gray-700'
+                }`}
+              >
+                💰 {guest.accommodationPayment === 'paid_by_couple' ? 'Platíme my' : 'Platí host'}
+              </span>
+            )}
           </div>
         )}
 

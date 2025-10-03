@@ -37,23 +37,33 @@ export function useNotes() {
     setError(null)
 
     const notesRef = collection(db, 'notes')
+    // Simplified query - only order by updatedAt to avoid composite index requirement
     const q = query(
       notesRef,
       where('weddingId', '==', wedding.id),
       where('userId', '==', user.id),
-      orderBy('isPinned', 'desc'),
       orderBy('updatedAt', 'desc')
     )
 
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        const notesData = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-          createdAt: doc.data().createdAt?.toDate() || new Date(),
-          updatedAt: doc.data().updatedAt?.toDate() || new Date(),
-        })) as Note[]
+        const notesData = snapshot.docs.map(doc => {
+          const data = doc.data()
+          return {
+            id: doc.id,
+            ...data,
+            createdAt: data.createdAt?.toDate() || new Date(),
+            updatedAt: data.updatedAt?.toDate() || new Date(),
+          }
+        }) as Note[]
+
+        // Sort by pinned status in memory (pinned first)
+        notesData.sort((a, b) => {
+          if (a.isPinned && !b.isPinned) return -1
+          if (!a.isPinned && b.isPinned) return 1
+          return 0
+        })
 
         setNotes(notesData)
         setLoading(false)
@@ -107,18 +117,17 @@ export function useNotes() {
           }
 
           addDoc(notesRef, firestoreNote).then((docRef) => {
-            console.log('✅ Note synced to Firestore with ID:', docRef.id)
             // Update local state with real Firebase ID
             setNotes(prev => prev.map(note =>
               note.id === noteId ? { ...note, id: docRef.id } : note
             ))
           }).catch((error) => {
-            console.warn('⚠️ Firestore sync failed for note:', error.message)
+            console.error('Firestore sync failed for note:', error)
             setError('Poznámka byla uložena lokálně, ale nepodařilo se synchronizovat s cloudem')
           })
         })
       }).catch((error) => {
-        console.warn('⚠️ Failed to load Firestore modules:', error)
+        console.error('Failed to load Firestore modules:', error)
         setError('Poznámka byla uložena lokálně')
       })
 
@@ -137,11 +146,21 @@ export function useNotes() {
     }
 
     try {
+      // Update local state immediately for better UX
+      setNotes(prev => prev.map(note =>
+        note.id === noteId
+          ? { ...note, ...updates, updatedAt: new Date() }
+          : note
+      ))
+
+      // Then update Firestore
       const noteRef = doc(db, 'notes', noteId)
       await updateDoc(noteRef, {
         ...updates,
         updatedAt: Timestamp.now()
       })
+
+      console.log('✅ Note updated successfully:', noteId)
     } catch (err: any) {
       console.error('Error updating note:', err)
       setError('Chyba při aktualizaci poznámky')

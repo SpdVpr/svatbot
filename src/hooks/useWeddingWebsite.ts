@@ -184,12 +184,6 @@ export function useWeddingWebsite(customUrl?: string) {
           publishedAt: data.publishedAt?.toDate() || undefined,
         } as WeddingWebsite
 
-        console.log('📄 Website loaded for builder:', {
-          id: loadedWebsite.id,
-          isPublished: loadedWebsite.isPublished,
-          isDraft: loadedWebsite.isDraft
-        })
-
         setWebsite(loadedWebsite)
 
       } catch (err: any) {
@@ -310,13 +304,7 @@ export function useWeddingWebsite(customUrl?: string) {
       // Použijeme customUrl jako document ID
       const docRef = doc(db, 'weddingWebsites', data.customUrl)
 
-      // Debug document ID
-      console.log('📄 Document ID:', data.customUrl)
-      console.log('📄 Document ID length:', data.customUrl.length)
-      console.log('📄 Document ID valid chars:', /^[a-zA-Z0-9_-]+$/.test(data.customUrl))
-
       // Vyčistíme data pro Firestore (převedeme Date na Timestamp)
-      console.log('🧹 Starting cleanForFirestore for website data...')
       const cleanedData = cleanForFirestore(websiteData, 0, 'websiteData')
 
       // Debug logging

@@ -30,8 +30,12 @@ export default function NotesModal({ isOpen, onClose }: NotesModalProps) {
       const mainNote = notes[0]
       setContent(mainNote.content)
       setSelectedColor(mainNote.color || 'yellow')
+    } else if (isOpen && notes.length === 0 && !loading) {
+      // Clear content if no notes exist
+      setContent('')
+      setSelectedColor('yellow')
     }
-  }, [isOpen, notes])
+  }, [isOpen, notes, loading])
 
   const handleSave = async () => {
     if (isSaving) return

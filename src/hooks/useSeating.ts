@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   collection,
   doc,
@@ -86,84 +86,148 @@ export function useSeating(): UseSeatingReturn {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Debug currentPlan changes
+  // Track if we've already set the initial current plan
+  const hasSetInitialPlan = useRef(false)
+
+  // Update tables and seats when currentPlan changes
   useEffect(() => {
-    console.log('🪑 useSeating currentPlan changed:', currentPlan?.name || 'null')
-  }, [currentPlan])
-
-  // Load seating plans when wedding changes
-  useEffect(() => {
-    if (!wedding) return
-
-    setLoading(true)
-    console.log('🪑 Loading seating plans for wedding:', wedding.id)
-
-    // Load from localStorage
-    const savedPlans = localStorage.getItem(`seatingPlans_${wedding.id}`) || '[]'
-    try {
-      const existingPlans = JSON.parse(savedPlans)
-      console.log('🪑 Loaded from localStorage:', existingPlans)
-      setSeatingPlans(existingPlans)
-
-      // Automatically set first plan as current if none is set
-      if (existingPlans.length > 0 && !currentPlan) {
-        console.log('🪑 Auto-setting first plan as current:', existingPlans[0].name)
-        setCurrentPlanState(existingPlans[0])
-      }
-
-      // Load tables and seats for the wedding
-      loadTablesAndSeats(wedding.id)
-
-      setLoading(false)
-    } catch (parseError) {
-      console.error('Error parsing localStorage seating plans:', parseError)
-      setSeatingPlans([])
-      setLoading(false)
-    }
-
-    // Skip Firestore sync for now due to connection issues
-    console.log('🪑 Skipping Firestore sync, using localStorage only')
-  }, [wedding])
-
-  // Load tables and seats from localStorage
-  const loadTablesAndSeats = (weddingId: string) => {
-    try {
-      // Load tables
-      const savedTables = localStorage.getItem(`tables_${weddingId}`) || '[]'
-      const existingTables = JSON.parse(savedTables)
-      console.log('🪑 Loaded tables from localStorage:', existingTables)
-      setTables(existingTables)
-
-      // Load seats
-      const savedSeats = localStorage.getItem(`seats_${weddingId}`) || '[]'
-      const existingSeats = JSON.parse(savedSeats)
-      console.log('🪑 Loaded seats from localStorage:', existingSeats)
-      setSeats(existingSeats)
-    } catch (error) {
-      console.error('Error loading tables and seats:', error)
+    if (currentPlan) {
+      setTables(currentPlan.tables || [])
+      setSeats(currentPlan.seats || [])
+    } else {
       setTables([])
       setSeats([])
     }
-  }
+  }, [currentPlan])
+
+  // Update currentPlan when seatingPlans change (to reflect Firestore updates)
+  useEffect(() => {
+    if (currentPlan && seatingPlans.length > 0) {
+      const updatedPlan = seatingPlans.find(p => p.id === currentPlan.id)
+      if (updatedPlan) {
+        // Only update if the data has actually changed (compare tables/seats length)
+        const currentTablesCount = currentPlan.tables?.length || 0
+        const updatedTablesCount = updatedPlan.tables?.length || 0
+        const currentSeatsCount = currentPlan.seats?.length || 0
+        const updatedSeatsCount = updatedPlan.seats?.length || 0
+
+        if (currentTablesCount !== updatedTablesCount || currentSeatsCount !== updatedSeatsCount) {
+          setCurrentPlanState(updatedPlan)
+        }
+      }
+    }
+  }, [seatingPlans, currentPlan?.id, currentPlan?.tables?.length, currentPlan?.seats?.length])
+
+  // Load seating plans when wedding changes
+  useEffect(() => {
+    if (!wedding) {
+      hasSetInitialPlan.current = false
+      return
+    }
+
+    setLoading(true)
+    hasSetInitialPlan.current = false
+
+    // Set up Firestore real-time listener
+    try {
+      const plansQuery = query(
+        collection(db, 'seatingPlans'),
+        where('weddingId', '==', wedding.id),
+        orderBy('createdAt', 'desc')
+      )
+
+      const unsubscribe = onSnapshot(
+        plansQuery,
+        (snapshot) => {
+          const plansData = snapshot.docs.map(doc => {
+            const data = doc.data()
+            return convertFirestoreSeatingPlan(doc.id, data)
+          })
+
+          setSeatingPlans(plansData)
+
+          // Automatically set first plan as current if none is set (only once)
+          if (plansData.length > 0 && !hasSetInitialPlan.current) {
+            setCurrentPlanState(plansData[0])
+            hasSetInitialPlan.current = true
+          }
+
+          // Save to localStorage as backup
+          localStorage.setItem(`seatingPlans_${wedding.id}`, JSON.stringify(plansData))
+
+          setLoading(false)
+        },
+        (error) => {
+          console.error('Firestore listener error, using localStorage fallback:', error)
+
+          // Fallback to localStorage
+          const savedPlans = localStorage.getItem(`seatingPlans_${wedding.id}`) || '[]'
+          try {
+            const existingPlans = JSON.parse(savedPlans)
+            setSeatingPlans(existingPlans)
+
+            if (existingPlans.length > 0 && !hasSetInitialPlan.current) {
+              setCurrentPlanState(existingPlans[0])
+              hasSetInitialPlan.current = true
+            }
+          } catch (parseError) {
+            console.error('Error parsing localStorage seating plans:', parseError)
+            setSeatingPlans([])
+          }
+
+          setLoading(false)
+        }
+      )
+
+      return () => unsubscribe()
+    } catch (error) {
+      console.error('Error setting up Firestore listener:', error)
+
+      // Fallback to localStorage
+      const savedPlans = localStorage.getItem(`seatingPlans_${wedding.id}`) || '[]'
+      try {
+        const existingPlans = JSON.parse(savedPlans)
+        setSeatingPlans(existingPlans)
+
+        if (existingPlans.length > 0 && !hasSetInitialPlan.current) {
+          setCurrentPlanState(existingPlans[0])
+          hasSetInitialPlan.current = true
+        }
+      } catch (parseError) {
+        console.error('Error parsing localStorage seating plans:', parseError)
+        setSeatingPlans([])
+      }
+
+      setLoading(false)
+    }
+  }, [wedding?.id])
 
   // Convert Firestore data
-  const convertFirestoreSeatingPlan = (id: string, data: any): SeatingPlan => ({
-    id,
-    weddingId: data.weddingId,
-    name: data.name,
-    description: data.description,
-    venueLayout: data.venueLayout,
-    tables: data.tables || [],
-    seats: data.seats || [],
-    isActive: data.isActive,
-    isPublished: data.isPublished,
-    totalSeats: data.totalSeats,
-    assignedSeats: data.assignedSeats,
-    availableSeats: data.availableSeats,
-    createdAt: data.createdAt?.toDate() || new Date(),
-    updatedAt: data.updatedAt?.toDate() || new Date(),
-    createdBy: data.createdBy
-  })
+  const convertFirestoreSeatingPlan = (id: string, data: any): SeatingPlan => {
+    // Handle both Firestore Timestamp and Date objects
+    const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() :
+                      data.createdAt ? new Date(data.createdAt) : new Date()
+    const updatedAt = data.updatedAt?.toDate ? data.updatedAt.toDate() :
+                      data.updatedAt ? new Date(data.updatedAt) : new Date()
+
+    return {
+      id,
+      weddingId: data.weddingId,
+      name: data.name,
+      description: data.description,
+      venueLayout: data.venueLayout,
+      tables: data.tables || [],
+      seats: data.seats || [],
+      isActive: data.isActive,
+      isPublished: data.isPublished,
+      totalSeats: data.totalSeats,
+      assignedSeats: data.assignedSeats,
+      availableSeats: data.availableSeats,
+      createdAt,
+      updatedAt,
+      createdBy: data.createdBy
+    }
+  }
 
   const convertFirestoreTable = (id: string, data: any): Table => ({
     id,
@@ -186,8 +250,6 @@ export function useSeating(): UseSeatingReturn {
     if (!wedding || !user) {
       throw new Error('Žádná svatba nebo uživatel není vybrán')
     }
-
-    console.log('🪑 Creating seating plan:', data)
 
     try {
       setError(null)
@@ -226,8 +288,6 @@ export function useSeating(): UseSeatingReturn {
       // Set as current plan immediately
       setCurrentPlanState(newPlan)
 
-      console.log('✅ Seating plan created locally:', newPlan)
-
       // Save to Firebase in background
       try {
         const planRef = doc(db, 'seatingPlans', localId)
@@ -237,9 +297,8 @@ export function useSeating(): UseSeatingReturn {
           updatedAt: Timestamp.now()
         }
         await setDoc(planRef, firestoreData)
-        console.log('✅ Seating plan synced to Firebase:', localId)
       } catch (firebaseError) {
-        console.warn('⚠️ Firebase sync failed for seating plan:', firebaseError)
+        console.error('Firebase sync failed for seating plan:', firebaseError)
         // Continue with local-only plan
       }
 
@@ -257,11 +316,6 @@ export function useSeating(): UseSeatingReturn {
   const createTable = async (data: TableFormData, planId?: string): Promise<Table> => {
     const activePlan = planId ? seatingPlans.find(p => p.id === planId) : currentPlan
 
-    console.log('🪑 Creating table:', data.name, 'for plan:', planId || 'current')
-    console.log('🪑 Active plan found:', activePlan?.name || 'none')
-    console.log('🪑 Wedding:', wedding?.id || 'none')
-    console.log('🪑 User:', user?.id || 'none')
-
     if (!wedding || !user || !activePlan) {
       throw new Error('Žádná svatba, uživatel nebo plán není vybrán')
     }
@@ -269,7 +323,11 @@ export function useSeating(): UseSeatingReturn {
     try {
       setError(null)
 
-      const tableData = {
+      // Create table with local ID
+      const localId = `table_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+
+      const newTable: Table = {
+        id: localId,
         weddingId: wedding.id,
         seatingPlanId: activePlan.id,
         name: data.name,
@@ -281,40 +339,23 @@ export function useSeating(): UseSeatingReturn {
         color: data.color,
         isHighlighted: false,
         notes: data.notes,
-        createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now()
+        createdAt: new Date(),
+        updatedAt: new Date()
       }
 
-      try {
-        // Try to save to Firestore
-        const docRef = await addDoc(collection(db, 'tables'), tableData)
-        const newTable = convertFirestoreTable(docRef.id, tableData)
-        setTables(prev => [...prev, newTable])
+      // Add table to the seating plan
+      const updatedTables = [...activePlan.tables, newTable]
 
-        // Create seats for the table
-        await createSeatsForTable(newTable)
+      // Update the seating plan with the new table
+      await updateSeatingPlan(activePlan.id, {
+        tables: updatedTables,
+        totalSeats: updatedTables.reduce((sum, t) => sum + t.capacity, 0)
+      })
 
-        return newTable
-      } catch (firestoreError) {
-        console.warn('⚠️ Firestore not available, using localStorage fallback')
-        // Create table with local ID
-        const localId = `table_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-        const newTable: Table = { id: localId, ...tableData, createdAt: new Date(), updatedAt: new Date() }
+      // Create seats for the table
+      await createSeatsForTable(newTable)
 
-        // Save to localStorage
-        const savedTables = localStorage.getItem(`tables_${wedding.id}`) || '[]'
-        const existingTables = JSON.parse(savedTables)
-        existingTables.push(newTable)
-        localStorage.setItem(`tables_${wedding.id}`, JSON.stringify(existingTables))
-
-        setTables(prev => [...prev, newTable])
-
-        // Create seats for the table
-        await createSeatsForTable(newTable)
-
-        console.log('✅ Table created successfully:', newTable.name, newTable.id)
-        return newTable
-      }
+      return newTable
     } catch (error: any) {
       console.error('Error creating table:', error)
       setError('Chyba při vytváření stolu')
@@ -324,7 +365,7 @@ export function useSeating(): UseSeatingReturn {
 
   // Create seats for table
   const createSeatsForTable = async (table: Table) => {
-    if (!wedding) return
+    if (!wedding || !currentPlan) return
 
     const newSeats: Seat[] = []
 
@@ -340,14 +381,11 @@ export function useSeating(): UseSeatingReturn {
       newSeats.push(seat)
     }
 
-    // Save seats to localStorage
-    const savedSeats = localStorage.getItem(`seats_${wedding.id}`) || '[]'
-    const existingSeats = JSON.parse(savedSeats)
-    const updatedSeats = [...existingSeats, ...newSeats]
-    localStorage.setItem(`seats_${wedding.id}`, JSON.stringify(updatedSeats))
-
-    setSeats(prev => [...prev, ...newSeats])
-    console.log('🪑 Created seats for table:', table.name, newSeats.length)
+    // Update the seating plan with the new seats
+    const updatedSeats = [...currentPlan.seats, ...newSeats]
+    await updateSeatingPlan(currentPlan.id, {
+      seats: updatedSeats
+    })
   }
 
   // Calculate statistics
@@ -373,10 +411,9 @@ export function useSeating(): UseSeatingReturn {
   const setCurrentPlan = (planId: string) => {
     const plan = seatingPlans.find(p => p.id === planId)
     if (plan) {
-      console.log('🪑 Setting current plan:', plan.name)
       setCurrentPlanState(plan)
     } else {
-      console.warn('🪑 Plan not found:', planId)
+      console.warn('Plan not found:', planId)
     }
   }
 
@@ -385,8 +422,6 @@ export function useSeating(): UseSeatingReturn {
     if (!wedding) return
 
     try {
-      console.log('🪑 Updating seating plan:', planId, updates)
-
       // Update plan in state first (for immediate UI feedback)
       setSeatingPlans(prev => prev.map(plan =>
         plan.id === planId
@@ -401,14 +436,7 @@ export function useSeating(): UseSeatingReturn {
           : prev
       )
 
-      // Update in Firebase
-      const planRef = doc(db, 'seatingPlans', planId)
-      await updateDoc(planRef, {
-        ...updates,
-        updatedAt: Timestamp.now()
-      })
-
-      // Also update in localStorage as backup
+      // Update in localStorage as backup
       const savedPlans = localStorage.getItem(`seatingPlans_${wedding.id}`) || '[]'
       const existingPlans = JSON.parse(savedPlans)
       const updatedPlans = existingPlans.map((plan: SeatingPlan) =>
@@ -418,7 +446,54 @@ export function useSeating(): UseSeatingReturn {
       )
       localStorage.setItem(`seatingPlans_${wedding.id}`, JSON.stringify(updatedPlans))
 
-      console.log('✅ Seating plan updated successfully in Firebase and localStorage')
+      // Update in Firebase - use setDoc with merge to create if doesn't exist
+      try {
+        const planRef = doc(db, 'seatingPlans', planId)
+
+        // Prepare data for Firestore (remove id field and undefined values)
+        const { id, createdAt, updatedAt, ...restUpdates } = updates as any
+
+        // Deep clean undefined values from the data
+        const cleanForFirestore = (obj: any): any => {
+          if (obj === undefined || obj === null) {
+            return null
+          }
+
+          if (Array.isArray(obj)) {
+            return obj.map(item => cleanForFirestore(item)).filter(item => item !== null)
+          }
+
+          if (obj instanceof Date) {
+            return Timestamp.fromDate(obj)
+          }
+
+          if (typeof obj === 'object') {
+            const cleaned: any = {}
+            for (const [key, value] of Object.entries(obj)) {
+              if (value !== undefined) {
+                const cleanedValue = cleanForFirestore(value)
+                if (cleanedValue !== null || typeof cleanedValue === 'boolean' || typeof cleanedValue === 'number') {
+                  cleaned[key] = cleanedValue
+                }
+              }
+            }
+            return cleaned
+          }
+
+          return obj
+        }
+
+        const firestoreData = {
+          ...cleanForFirestore(restUpdates),
+          updatedAt: Timestamp.now()
+        }
+
+        await setDoc(planRef, firestoreData, { merge: true })
+      } catch (firebaseError) {
+        console.error('Firebase sync failed for seating plan update:', firebaseError)
+        console.error('Updates that failed:', updates)
+        // Continue with local-only update
+      }
     } catch (error) {
       console.error('Error updating seating plan:', error)
       throw error
@@ -430,37 +505,28 @@ export function useSeating(): UseSeatingReturn {
   }
 
   const updateTable = async (tableId: string, updates: Partial<Table>) => {
-    if (!wedding) return
+    if (!wedding || !currentPlan) return
 
     try {
-      console.log('🪑 Updating table:', tableId, updates)
-
-      // Update table in state
-      setTables(prev => prev.map(table =>
-        table.id === tableId
-          ? { ...table, ...updates, updatedAt: new Date() }
-          : table
-      ))
-
-      // Update in localStorage
-      const savedTables = localStorage.getItem(`tables_${wedding.id}`) || '[]'
-      const existingTables = JSON.parse(savedTables)
-      const updatedTables = existingTables.map((table: Table) =>
+      // Update table in the seating plan
+      const updatedTables = currentPlan.tables.map(table =>
         table.id === tableId
           ? { ...table, ...updates, updatedAt: new Date() }
           : table
       )
-      localStorage.setItem(`tables_${wedding.id}`, JSON.stringify(updatedTables))
 
       // If capacity changed, update seats
       if (updates.capacity !== undefined) {
-        const table = tables.find(t => t.id === tableId)
+        const table = currentPlan.tables.find(t => t.id === tableId)
         if (table && table.capacity !== updates.capacity) {
           await updateSeatsForTable(tableId, updates.capacity)
         }
       }
 
-      console.log('✅ Table updated successfully')
+      await updateSeatingPlan(currentPlan.id, {
+        tables: updatedTables,
+        totalSeats: updatedTables.reduce((sum, t) => sum + t.capacity, 0)
+      })
     } catch (error) {
       console.error('Error updating table:', error)
       throw error
@@ -495,8 +561,6 @@ export function useSeating(): UseSeatingReturn {
       // Update localStorage
       const allSeats = [...updatedSeats, ...newSeats]
       localStorage.setItem(`seats_${wedding.id}`, JSON.stringify(allSeats))
-
-      console.log('🪑 Updated seats for table:', tableId, newSeats.length)
     } catch (error) {
       console.error('Error updating seats for table:', error)
     }
@@ -506,23 +570,18 @@ export function useSeating(): UseSeatingReturn {
     if (!wedding || !currentPlan) return
 
     try {
-      console.log('🗑️ Deleting table:', tableId)
-
       // Remove table from current plan
       const updatedTables = currentPlan.tables.filter(table => table.id !== tableId)
 
       // Remove seats associated with this table
       const updatedSeats = currentPlan.seats.filter(seat => seat.tableId !== tableId)
 
-      // Update the seating plan
-      const updatedPlan = {
-        ...currentPlan,
+      // Update the seating plan with only the changed fields
+      await updateSeatingPlan(currentPlan.id, {
         tables: updatedTables,
-        seats: updatedSeats
-      }
-
-      await updateSeatingPlan(currentPlan.id, updatedPlan)
-      console.log('✅ Table deleted successfully')
+        seats: updatedSeats,
+        totalSeats: updatedTables.reduce((sum, t) => sum + t.capacity, 0)
+      })
     } catch (error) {
       console.error('Error deleting table:', error)
       throw error
@@ -530,58 +589,39 @@ export function useSeating(): UseSeatingReturn {
   }
 
   const moveTable = async (tableId: string, position: { x: number; y: number }) => {
-    if (!wedding) return
+    if (!wedding || !currentPlan) return
 
     try {
-      console.log('🪑 Moving table:', tableId, 'to position:', position)
-
-      // Update table position in state
-      setTables(prev => prev.map(table =>
-        table.id === tableId
-          ? { ...table, position, updatedAt: new Date() }
-          : table
-      ))
-
-      // Update in localStorage
-      const savedTables = localStorage.getItem(`tables_${wedding.id}`) || '[]'
-      const existingTables = JSON.parse(savedTables)
-      const updatedTables = existingTables.map((table: Table) =>
+      // Update table position in the seating plan
+      const updatedTables = currentPlan.tables.map(table =>
         table.id === tableId
           ? { ...table, position, updatedAt: new Date() }
           : table
       )
-      localStorage.setItem(`tables_${wedding.id}`, JSON.stringify(updatedTables))
 
-      console.log('✅ Table moved successfully')
+      await updateSeatingPlan(currentPlan.id, {
+        tables: updatedTables
+      })
     } catch (error) {
       console.error('Error moving table:', error)
     }
   }
 
   const assignGuestToSeat = async (guestId: string, seatId: string) => {
-    if (!wedding) return
+    if (!wedding || !currentPlan) return
 
     try {
-      console.log('🪑 Assigning guest:', guestId, 'to seat:', seatId)
-
-      // Update seat in state
-      setSeats(prev => prev.map(seat =>
-        seat.id === seatId
-          ? { ...seat, guestId, updatedAt: new Date() }
-          : seat
-      ))
-
-      // Update in localStorage
-      const savedSeats = localStorage.getItem(`seats_${wedding.id}`) || '[]'
-      const existingSeats = JSON.parse(savedSeats)
-      const updatedSeats = existingSeats.map((seat: Seat) =>
+      // Update seat in the seating plan
+      const updatedSeats = currentPlan.seats.map(seat =>
         seat.id === seatId
           ? { ...seat, guestId, updatedAt: new Date() }
           : seat
       )
-      localStorage.setItem(`seats_${wedding.id}`, JSON.stringify(updatedSeats))
 
-      console.log('✅ Guest assigned successfully')
+      await updateSeatingPlan(currentPlan.id, {
+        seats: updatedSeats,
+        assignedSeats: updatedSeats.filter(s => s.guestId).length
+      })
     } catch (error) {
       console.error('Error assigning guest to seat:', error)
       throw error
@@ -589,29 +629,20 @@ export function useSeating(): UseSeatingReturn {
   }
 
   const unassignGuestFromSeat = async (seatId: string) => {
-    if (!wedding) return
+    if (!wedding || !currentPlan) return
 
     try {
-      console.log('🪑 Unassigning guest from seat:', seatId)
-
-      // Update seat in state
-      setSeats(prev => prev.map(seat =>
-        seat.id === seatId
-          ? { ...seat, guestId: undefined, updatedAt: new Date() }
-          : seat
-      ))
-
-      // Update in localStorage
-      const savedSeats = localStorage.getItem(`seats_${wedding.id}`) || '[]'
-      const existingSeats = JSON.parse(savedSeats)
-      const updatedSeats = existingSeats.map((seat: Seat) =>
+      // Update seat in the seating plan
+      const updatedSeats = currentPlan.seats.map(seat =>
         seat.id === seatId
           ? { ...seat, guestId: undefined, updatedAt: new Date() }
           : seat
       )
-      localStorage.setItem(`seats_${wedding.id}`, JSON.stringify(updatedSeats))
 
-      console.log('✅ Guest unassigned successfully')
+      await updateSeatingPlan(currentPlan.id, {
+        seats: updatedSeats,
+        assignedSeats: updatedSeats.filter(s => s.guestId).length
+      })
     } catch (error) {
       console.error('Error unassigning guest from seat:', error)
       throw error

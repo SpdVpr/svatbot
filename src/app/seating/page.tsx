@@ -31,24 +31,15 @@ export default function SeatingPage() {
   // Auto-select first plan if none is selected
   React.useEffect(() => {
     if (seatingPlans.length > 0 && !currentPlan) {
-      console.log('🪑 Auto-selecting first plan:', seatingPlans[0].name)
       setCurrentPlan(seatingPlans[0].id)
     }
   }, [seatingPlans, currentPlan, setCurrentPlan])
-
-  // Debug currentPlan changes
-  React.useEffect(() => {
-    console.log('🪑 Current plan changed:', currentPlan?.name || 'null')
-    console.log('🪑 Seating plans count:', seatingPlans.length)
-    console.log('🪑 Loading state:', loading)
-  }, [currentPlan?.name, seatingPlans.length, loading])
 
   // Handle create seating plan
   const handleCreatePlan = async (e: React.FormEvent) => {
     e.preventDefault()
 
     try {
-      console.log('🪑 Creating new seating plan:', formData.name)
       const newPlan = await createSeatingPlan({
         name: formData.name,
         description: formData.description,
@@ -63,8 +54,6 @@ export default function SeatingPage() {
           }
         }
       })
-
-      console.log('🪑 Plan created successfully:', newPlan)
 
       setShowCreateForm(false)
       setFormData({ name: '', description: '' })
@@ -147,10 +136,7 @@ export default function SeatingPage() {
               {seatingPlans.length > 0 && (
                 <select
                   value={currentPlan?.id || ''}
-                  onChange={(e) => {
-                    console.log('🪑 Plan selector changed to:', e.target.value)
-                    setCurrentPlan(e.target.value)
-                  }}
+                  onChange={(e) => setCurrentPlan(e.target.value)}
                   className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 >
                   <option value="">Vyberte plán</option>
@@ -269,10 +255,7 @@ export default function SeatingPage() {
           </div>
         ) : currentPlan ? (
           /* Seating plan editor */
-          <>
-            {console.log('🪑 Passing currentPlan to SeatingPlanEditor:', currentPlan.name)}
-            <SeatingPlanEditor currentPlan={currentPlan} />
-          </>
+          <SeatingPlanEditor currentPlan={currentPlan} />
         ) : (
           /* Plan selection */
           <div className="text-center py-12">

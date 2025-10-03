@@ -201,7 +201,6 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
   // Add new table
   const handleAddTable = async () => {
     try {
-      console.log('🪑 Adding table to plan:', currentPlan?.id || 'none')
       if (!currentPlan) {
         alert('Nejdříve vyberte nebo vytvořte plán usazení')
         return
@@ -249,7 +248,6 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     if (!editingTable) return
 
     try {
-      console.log('🪑 Updating table:', editingTable.id, tableFormData)
       await updateTable(editingTable.id, {
         name: tableFormData.name,
         shape: tableFormData.shape,
@@ -277,7 +275,6 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     e.preventDefault()
     e.stopPropagation()
 
-    console.log('🔄 Starting rotation for table:', tableId)
     setIsRotating(true)
     setRotatingTable(tableId)
 
@@ -305,7 +302,6 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     }
 
     const handleMouseUp = () => {
-      console.log('🔄 Ending rotation')
       setIsRotating(false)
       setRotatingTable(null)
       setRotationStartAngle(0)
@@ -362,7 +358,6 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
           danceFloor: danceFloorData
         }
       })
-      console.log('🪑 Dance floor updated successfully')
       setEditingDanceFloor(false)
     } catch (error) {
       console.error('Error updating dance floor:', error)
@@ -384,7 +379,6 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
           height: venueData.height
         }
       })
-      console.log('🪑 Venue layout updated successfully')
       setShowVenueSettings(false)
     } catch (error) {
       console.error('Error updating venue layout:', error)
@@ -495,7 +489,6 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
             danceFloor: newDanceFloorData
           }
         })
-        console.log('🪑 Dance floor moved and saved:', draggedDanceFloorPosition)
       } catch (error) {
         console.error('Error saving dance floor position:', error)
       }
@@ -551,10 +544,6 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
     return sortedGrouped
   }
-
-  console.log('🪑 SeatingPlanEditor: Rendering with plan:', currentPlan.name)
-  console.log('🪑 Tables count:', tables.length)
-  console.log('🪑 Seats count:', seats.length)
 
   // Sync dance floor data with current plan
   useEffect(() => {
@@ -871,7 +860,10 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                           <hr className="my-1" />
                           <button
                             className="w-full px-3 py-2 text-left text-sm hover:bg-red-50 text-red-600 flex items-center space-x-2"
-                            onClick={() => handleDeleteTable(table.id)}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleDeleteTable(table.id)
+                            }}
                           >
                             <Trash2 className="w-3 h-3" />
                             <span>Smazat</span>

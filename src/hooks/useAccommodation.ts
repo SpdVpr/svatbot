@@ -151,11 +151,6 @@ export function useAccommodation(): UseAccommodationReturn {
           b.createdAt.getTime() - a.createdAt.getTime()
         )
 
-        console.log('🔄 Firestore data updated:', sortedData.length, 'accommodations')
-        sortedData.forEach(acc => {
-          console.log(`🏨 ${acc.name}: ${acc.rooms.length} rooms`, acc.rooms.map(r => r.name))
-        })
-
         setAccommodations(sortedData)
         setLoading(false)
         setError(null)
@@ -275,9 +270,6 @@ export function useAccommodation(): UseAccommodationReturn {
       }
 
       const updatedRooms = [...currentRooms, newRoom]
-
-      console.log(`🔄 Updating accommodation ${accommodationId} with ${updatedRooms.length} rooms (was ${currentRooms.length})`)
-      console.log('📋 Room names:', updatedRooms.map(r => r.name))
 
       await updateDoc(accommodationRef, {
         rooms: updatedRooms,

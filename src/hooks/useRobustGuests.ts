@@ -149,8 +149,6 @@ const cleanForFirestore = (obj: any): any => {
 }
 
 export function useRobustGuests() {
-  console.log('🚀 useRobustGuests hook called!')
-  
   const { user } = useAuth()
   const { wedding } = useWedding()
   const [guests, setGuests] = useState<Guest[]>([])
@@ -171,15 +169,6 @@ export function useRobustGuests() {
 
   // Determine if this is a demo user (stable calculation)
   const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding?.id === 'demo-wedding'
-
-  console.log('🔍 RobustGuests state:', {
-    user: user?.email,
-    wedding: wedding?.id,
-    isDemoUser,
-    loading,
-    guestsCount: guests.length,
-    initRef: initializationRef.current
-  })
 
   // Initialize data - ONLY ONCE per wedding
   useEffect(() => {

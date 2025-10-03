@@ -697,7 +697,18 @@ export default function GuestList({
         className="space-y-4 overflow-y-auto"
         style={{ maxHeight }}
       >
-        {Object.entries(groupedGuests).map(([groupKey, groupGuests]) => (
+        {Object.entries(groupedGuests).map(([groupKey, groupGuests]) => {
+          // Calculate total people in this group (including +1 and children)
+          const totalPeopleInGroup = groupGuests.reduce((total, guest) => {
+            let count = 1 // The guest themselves
+            if (guest.hasPlusOne) count += 1 // Add plus one
+            if (guest.hasChildren && guest.children) {
+              count += guest.children.length // Add children
+            }
+            return total + count
+          }, 0)
+
+          return (
           <div key={groupKey} className="space-y-2">
             {/* Group header */}
             <div className="flex items-center justify-between py-2 border-b border-gray-200">
@@ -705,7 +716,7 @@ export default function GuestList({
                 {viewOptions.groupBy === 'category' ? getCategoryName(groupKey) : groupKey}
               </h3>
               <span className="text-sm text-text-muted">
-                {groupGuests.length} hostů
+                {totalPeopleInGroup} {totalPeopleInGroup === 1 ? 'host' : 'hostů'}
               </span>
             </div>
 
@@ -879,6 +890,33 @@ export default function GuestList({
                           )}
                         </div>
 
+                        {/* Notes and Accommodation Payment tags */}
+                        {(guest.notes?.trim() || guest.accommodationPayment) && (
+                          <div className="flex flex-wrap gap-1 mb-2">
+                            {/* Notes tag */}
+                            {guest.notes && guest.notes.trim() && (
+                              <span
+                                className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full flex items-center gap-1"
+                                title={guest.notes}
+                              >
+                                📝 {guest.notes.length > 30 ? guest.notes.substring(0, 30) + '...' : guest.notes}
+                              </span>
+                            )}
+
+                            {/* Accommodation payment tag */}
+                            {guest.accommodationPayment && (
+                              <span
+                                className={`text-xs px-2 py-1 rounded-full flex items-center gap-1 ${
+                                  guest.accommodationPayment === 'paid_by_couple'
+                                    ? 'bg-purple-100 text-purple-700'
+                                    : 'bg-gray-100 text-gray-700'
+                                }`}
+                              >
+                                💰 {guest.accommodationPayment === 'paid_by_couple' ? 'Platíme my' : 'Platí host'}
+                              </span>
+                            )}
+                          </div>
+                        )}
 
                       </div>
 
@@ -926,7 +964,8 @@ export default function GuestList({
               })}
             </div>
           </div>
-        ))}
+          )
+        })}
 
         {filteredGuests.length === 0 && (
           <div className="text-center py-8">
