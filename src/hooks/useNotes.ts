@@ -79,7 +79,7 @@ export function useNotes() {
       const newNote = {
         ...noteData,
         weddingId: wedding.id,
-        userId: user.id,
+        userId: user.id, // This should match request.auth.uid in Firebase rules
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
         tags: noteData.tags || [],

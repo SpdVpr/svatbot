@@ -288,17 +288,27 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
   }
 
   const handleRotationMove = useCallback((e: MouseEvent) => {
-    if (!isRotating || !rotatingTable) return
+    // Early return if not rotating
+    if (!isRotating || !rotatingTable) {
+      console.log('🔄 Rotation move called but not rotating:', { isRotating, rotatingTable })
+      return
+    }
 
     e.preventDefault()
     e.stopPropagation()
 
     const table = tables.find(t => t.id === rotatingTable)
-    if (!table) return
+    if (!table) {
+      console.log('🔄 Table not found for rotation:', rotatingTable)
+      return
+    }
 
     // Calculate angle from table center to mouse position
     const tableElement = document.querySelector(`[data-table-id="${rotatingTable}"]`)
-    if (!tableElement) return
+    if (!tableElement) {
+      console.log('🔄 Table element not found:', rotatingTable)
+      return
+    }
 
     const rect = tableElement.getBoundingClientRect()
     const centerX = rect.left + rect.width / 2
