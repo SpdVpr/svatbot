@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   collection,
   doc,
@@ -22,6 +22,7 @@ export function useWedding() {
   const { user } = useAuthStore()
   const { currentWedding, setCurrentWedding, setLoading } = useWeddingStore()
   const [error, setError] = useState<string | null>(null)
+  const loadingRef = useRef(false)
 
   // Convert Firestore data to Wedding type
   const convertFirestoreWedding = (id: string, data: any): Wedding => {
@@ -204,64 +205,53 @@ export function useWedding() {
 
   // Load user's wedding
   const loadUserWedding = async (): Promise<void> => {
-    if (!user) return
+    if (!user || loadingRef.current) return
+
+    loadingRef.current = true
 
     try {
       setError(null)
       setLoading(true)
 
-      // Check if this is a demo user
-      const isDemoUser = user.id === 'demo-user-id' || user.email === 'demo@svatbot.cz'
-
-      if (isDemoUser) {
-        // Create demo wedding immediately
-        const demoWedding: Wedding = {
-          id: 'demo-wedding',
-          userId: user.id,
-          brideName: 'Jana',
-          groomName: 'Petr',
-          weddingDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000), // 180 days from now
-          estimatedGuestCount: 85,
-          budget: 450000,
-          style: 'classic',
-          region: 'Praha',
-          status: 'planning',
-          progress: {
-            overall: 73,
-            foundation: 100,
-            venue: 85,
-            guests: 80,
-            budget: 65,
-            design: 45,
-            organization: 30,
-            final: 0
-          },
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }
-
-        console.log('🎭 Created demo wedding for demo user:', demoWedding)
-        setCurrentWedding(demoWedding)
-        return
-      }
-
+      // Load wedding from Firestore for all users (including demo)
       try {
-        // Try to load from Firestore
-        const weddingsQuery = query(
-          collection(db, 'weddings'),
-          where('userId', '==', user.id)
-        )
+        // For demo user, load the most recent wedding
+        if (user.email === 'demo@svatbot.cz') {
+          const weddingsQuery = query(
+            collection(db, 'weddings'),
+            where('userId', '==', user.id)
+          )
+          const querySnapshot = await getDocs(weddingsQuery)
 
-        const querySnapshot = await getDocs(weddingsQuery)
-
-        if (!querySnapshot.empty) {
-          const weddingDoc = querySnapshot.docs[0]
-          const wedding = convertFirestoreWedding(weddingDoc.id, weddingDoc.data())
-          setCurrentWedding(wedding)
+          if (!querySnapshot.empty) {
+            // Get the most recent wedding (last one created)
+            const weddingDoc = querySnapshot.docs[querySnapshot.docs.length - 1]
+            const wedding = convertFirestoreWedding(weddingDoc.id, weddingDoc.data())
+            console.log('✅ Demo wedding loaded from Firestore:', wedding)
+            setCurrentWedding(wedding)
+          } else {
+            console.error('❌ No demo wedding found in Firestore')
+            setCurrentWedding(null)
+          }
         } else {
-          setCurrentWedding(null)
+          // For regular users, query by userId
+          const weddingsQuery = query(
+            collection(db, 'weddings'),
+            where('userId', '==', user.id)
+          )
+
+          const querySnapshot = await getDocs(weddingsQuery)
+
+          if (!querySnapshot.empty) {
+            const weddingDoc = querySnapshot.docs[0]
+            const wedding = convertFirestoreWedding(weddingDoc.id, weddingDoc.data())
+            setCurrentWedding(wedding)
+          } else {
+            setCurrentWedding(null)
+          }
         }
       } catch (firestoreError) {
+        console.error('❌ Error loading wedding from Firestore:', firestoreError)
         console.warn('⚠️ Firestore not available, checking localStorage fallback')
 
         // Try to load from localStorage
@@ -284,6 +274,7 @@ export function useWedding() {
       setError('Chyba při načítání svatby')
     } finally {
       setLoading(false)
+      loadingRef.current = false
     }
   }
 
@@ -291,20 +282,18 @@ export function useWedding() {
   useEffect(() => {
     if (!user || !currentWedding) return
 
-    // Skip Firestore for demo users
-    const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || currentWedding?.id === 'demo-wedding'
-    if (isDemoUser) {
-      console.log('🎭 Demo user - skipping Firestore wedding updates')
-      return
-    }
-
     try {
       const weddingRef = doc(db, 'weddings', currentWedding.id)
 
       const unsubscribe = onSnapshot(weddingRef, (doc) => {
         if (doc.exists()) {
           const wedding = convertFirestoreWedding(doc.id, doc.data())
-          setCurrentWedding(wedding)
+          // Only update if data actually changed (check updatedAt timestamp)
+          if (!currentWedding.updatedAt ||
+              wedding.updatedAt.getTime() !== currentWedding.updatedAt.getTime()) {
+            console.log('📡 Wedding updated from Firestore snapshot')
+            setCurrentWedding(wedding)
+          }
         }
       }, (error) => {
         console.warn('Wedding snapshot error (Firestore not available):', error)
@@ -315,16 +304,17 @@ export function useWedding() {
       console.warn('Real-time updates not available (Firestore not configured)')
       return () => {} // Return empty cleanup function
     }
-  }, [user, currentWedding?.id, setCurrentWedding])
+  }, [user, currentWedding?.id])
 
   // Load wedding when user changes
   useEffect(() => {
-    if (user && !currentWedding) {
+    if (user && !currentWedding && !loadingRef.current) {
       loadUserWedding()
     } else if (!user) {
       setCurrentWedding(null)
+      loadingRef.current = false
     }
-  }, [user])
+  }, [user, currentWedding])
 
   // Clear error
   const clearError = () => setError(null)

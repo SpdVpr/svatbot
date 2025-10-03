@@ -47,7 +47,7 @@ export default function TasksPage() {
   const hasTasks = tasks.length > 0
 
   // Check if this is a demo user
-  const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding?.id === 'demo-wedding'
+  const isDemoUser = user?.email === 'demo@svatbot.cz' || wedding?.id === 'demo-wedding'
 
   // Debug logging for tasks state
   console.log('🔍 TasksPage render - user:', user?.id, user?.email)

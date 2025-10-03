@@ -168,7 +168,7 @@ export function useRobustGuests() {
   guestsRef.current = guests
 
   // Determine if this is a demo user (stable calculation)
-  const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding?.id === 'demo-wedding'
+  const isDemoUser = user?.email === 'demo@svatbot.cz' || wedding?.id === 'demo-wedding'
 
   // Initialize data - ONLY ONCE per wedding
   useEffect(() => {
@@ -208,49 +208,11 @@ export function useRobustGuests() {
     // Store cleanup function for Firebase listener
     let cleanup: (() => void) | null = null
 
-    if (isDemoUserInEffect) {
-      // Demo user - try original demo key first, then robust key
-      const originalDemoKey = 'simple-demo-guests'
-      const robustDemoKey = 'robust-demo-guests'
+    // All users (including demo) load from Firestore with real-time listener
+    console.log('🔥 Setting up Firebase listener for wedding:', currentWeddingId)
 
-      let saved = localStorage.getItem(originalDemoKey)
-      let keyUsed = originalDemoKey
-
-      if (!saved) {
-        saved = localStorage.getItem(robustDemoKey)
-        keyUsed = robustDemoKey
-      }
-
-      if (saved) {
-        try {
-          const parsedGuests = JSON.parse(saved)
-          console.log('📦 Loaded demo guests from localStorage:', parsedGuests.length, 'using key:', keyUsed)
-          setGuests(parsedGuests)
-
-          // Migrate to robust key if using original
-          if (keyUsed === originalDemoKey) {
-            localStorage.setItem(robustDemoKey, saved)
-            console.log('📦 Migrated demo data to robust key')
-          }
-        } catch {
-          console.log('🎭 Invalid demo data, using defaults')
-          const defaultGuests = getDemoGuests()
-          setGuests(defaultGuests)
-          localStorage.setItem(robustDemoKey, JSON.stringify(defaultGuests))
-        }
-      } else {
-        console.log('🎭 Creating initial demo guests')
-        const defaultGuests = getDemoGuests()
-        setGuests(defaultGuests)
-        localStorage.setItem(robustDemoKey, JSON.stringify(defaultGuests))
-      }
-      setLoading(false)
-    } else {
-      // Real user - load from Firestore with real-time listener
-      console.log('🔥 Setting up Firebase listener for real user')
-
-      // Import Firebase modules dynamically
-      import('@/config/firebase').then(({ db }) => {
+    // Import Firebase modules dynamically
+    import('@/config/firebase').then(({ db }) => {
         import('firebase/firestore').then(({ collection, query, where, onSnapshot }) => {
           const guestsQuery = query(
             collection(db, 'guests'),
@@ -314,29 +276,9 @@ export function useRobustGuests() {
             guestsRef.current = loadedGuests
             setLoading(false)
           }, (error) => {
-            console.warn('🔥 Firestore snapshot error, using localStorage fallback:', error)
-            // Fallback to localStorage
-            const originalKey = `guests_${currentWeddingId}`
-            const robustKey = `robust-guests_${currentWeddingId}`
-
-            let saved = localStorage.getItem(originalKey) || localStorage.getItem(robustKey)
-
-            if (saved) {
-              try {
-                const parsedGuests = JSON.parse(saved)
-                console.log('📦 Loaded guests from localStorage fallback:', parsedGuests.length)
-                setGuests(parsedGuests)
-                guestsRef.current = parsedGuests
-              } catch {
-                console.log('📦 Invalid localStorage fallback data')
-                setGuests([])
-                guestsRef.current = []
-              }
-            } else {
-              console.log('📦 No fallback data available')
-              setGuests([])
-              guestsRef.current = []
-            }
+            console.error('❌ Firestore snapshot error:', error)
+            setGuests([])
+            guestsRef.current = []
             setLoading(false)
           })
 
@@ -352,7 +294,6 @@ export function useRobustGuests() {
         setGuests([])
         setLoading(false)
       })
-    }
 
     // Return cleanup function
     return () => {

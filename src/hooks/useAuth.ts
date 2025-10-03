@@ -138,25 +138,7 @@ export function useAuth() {
       setError(null)
       setLoading(true)
 
-      // Special handling for demo account
-      if (data.email === 'demo@svatbot.cz' && data.password === 'demo123') {
-        // Create mock demo user
-        const demoUser: User = {
-          id: 'demo-user-id',
-          email: 'demo@svatbot.cz',
-          displayName: 'Demo Uživatel',
-          photoURL: '',
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }
-
-        setUser(demoUser)
-        // Save demo user to localStorage so it persists
-        localStorage.setItem('auth_user', JSON.stringify(demoUser))
-        console.log('🎭 Demo user logged in successfully')
-        return
-      }
-
+      // Login with Firebase Authentication (including demo account)
       const { user: firebaseUser } = await signInWithEmailAndPassword(
         auth,
         data.email,
@@ -252,14 +234,6 @@ export function useAuth() {
           setUser(user)
           previousUserId = newUserId
         } else {
-          // Don't log out demo users when Firebase auth state changes
-          const currentUser = JSON.parse(localStorage.getItem('auth_user') || 'null')
-          if (currentUser?.id === 'demo-user-id' || currentUser?.email === 'demo@svatbot.cz') {
-            console.log('🎭 Preserving demo user session despite Firebase auth change')
-            // Keep demo user logged in
-            return
-          }
-
           setUser(null)
           previousUserId = null
         }

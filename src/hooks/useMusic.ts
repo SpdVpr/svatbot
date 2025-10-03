@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { doc, getDoc, setDoc, updateDoc, collection, query, where, onSnapshot } from 'firebase/firestore'
 import { db } from '@/config/firebase'
 import { useAuth } from './useAuth'
+import { useWedding } from './useWedding'
 
 export interface Song {
   id: string
@@ -136,6 +137,7 @@ const DEFAULT_CATEGORIES: MusicCategory[] = [
 
 export function useMusic() {
   const { user } = useAuth()
+  const { wedding } = useWedding()
   const [vendor, setVendor] = useState({
     name: '',
     contact: '',
@@ -144,33 +146,60 @@ export function useMusic() {
   const [categories, setCategories] = useState<MusicCategory[]>(DEFAULT_CATEGORIES)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [musicId, setMusicId] = useState<string | null>(null)
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Load music data from Firebase
+  // Debug: Log when wedding changes
   useEffect(() => {
-    if (!user?.id) {
+    console.log('🎵 Wedding changed in useMusic:', {
+      hasWedding: !!wedding?.id,
+      weddingId: wedding?.id
+    })
+  }, [wedding?.id])
+
+  // Load music data from Firestore with real-time updates
+  useEffect(() => {
+    console.log('🎵 useMusic load effect:', {
+      hasWedding: !!wedding?.id,
+      weddingId: wedding?.id,
+      hasUser: !!user?.id
+    })
+
+    if (!wedding?.id) {
+      console.log('🎵 No wedding yet, skipping music load')
       setLoading(false)
       return
     }
 
-    const loadMusicData = async () => {
-      try {
-        const musicRef = doc(db, 'users', user.id, 'wedding', 'music')
-        const musicSnap = await getDoc(musicRef)
+    console.log('🎵 Loading music data for wedding:', wedding.id)
 
-        if (musicSnap.exists()) {
-          const data = musicSnap.data() as MusicData
-          setVendor(data.vendor || { name: '', contact: '', email: '' })
-          setCategories(data.categories || DEFAULT_CATEGORIES)
-        }
-      } catch (error) {
-        console.error('Error loading music data:', error)
-      } finally {
-        setLoading(false)
+    const musicQuery = query(
+      collection(db, 'music'),
+      where('weddingId', '==', wedding.id)
+    )
+
+    const unsubscribe = onSnapshot(musicQuery, (snapshot) => {
+      if (!snapshot.empty) {
+        const musicDoc = snapshot.docs[0]
+        const data = musicDoc.data()
+        setMusicId(musicDoc.id)
+        setVendor(data.vendor || { name: '', contact: '', email: '' })
+        setCategories(data.categories || DEFAULT_CATEGORIES)
+        console.log('🎵 Loaded music data from Firestore:', data)
+      } else {
+        console.log('🎵 No music data found, using defaults')
+        setMusicId(null)
+        setVendor({ name: '', contact: '', email: '' })
+        setCategories(DEFAULT_CATEGORIES)
       }
-    }
+      setLoading(false)
+    }, (error) => {
+      console.error('❌ Error loading music data:', error)
+      setLoading(false)
+    })
 
-    loadMusicData()
-  }, [user?.id])
+    return () => unsubscribe()
+  }, [wedding?.id])
 
   // Clean data - convert undefined to null (Firebase doesn't support undefined)
   const cleanData = (obj: any): any => {
@@ -187,41 +216,131 @@ export function useMusic() {
     return obj
   }
 
-  // Save music data to Firebase
-  const saveMusicData = async () => {
-    if (!user?.id) return
+  // Save music data to Firestore
+  const saveMusicData = useCallback(async () => {
+    if (!wedding?.id || !user?.id) return
 
     setSaving(true)
     try {
-      const musicRef = doc(db, 'users', user.id, 'wedding', 'music')
-
       // Clean data to remove undefined values
       const cleanedData = {
+        weddingId: wedding.id,
+        userId: user.id,
         vendor: cleanData(vendor),
         categories: cleanData(categories),
         updatedAt: new Date()
       }
 
-      await setDoc(musicRef, cleanedData, { merge: true })
-      console.log('✅ Music data saved to Firebase')
+      if (musicId) {
+        // Update existing document
+        const musicRef = doc(db, 'music', musicId)
+        await setDoc(musicRef, cleanedData, { merge: true })
+      } else {
+        // Create new document
+        const musicRef = doc(collection(db, 'music'))
+        await setDoc(musicRef, cleanedData)
+        setMusicId(musicRef.id)
+      }
+
+      console.log('✅ Music data saved to Firestore')
     } catch (error) {
       console.error('Error saving music data:', error)
       throw error
     } finally {
       setSaving(false)
     }
-  }
+  }, [wedding?.id, user?.id, vendor, categories, musicId])
 
   // Auto-save when data changes (debounced)
   useEffect(() => {
-    if (!user?.id || loading) return
+    console.log('🎵 Auto-save effect triggered:', {
+      hasWedding: !!wedding?.id,
+      weddingId: wedding?.id,
+      hasUser: !!user?.id,
+      userId: user?.id,
+      loading,
+      categoriesLength: categories.length,
+      vendorName: vendor.name,
+      musicId
+    })
 
-    const timeoutId = setTimeout(() => {
-      saveMusicData()
+    if (!wedding?.id || !user?.id || loading) {
+      console.log('🎵 Auto-save skipped - conditions not met:', {
+        hasWedding: !!wedding?.id,
+        hasUser: !!user?.id,
+        loading
+      })
+      return
+    }
+
+    // Clear previous timeout
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current)
+    }
+
+    console.log('🎵 Setting up auto-save timeout...')
+    saveTimeoutRef.current = setTimeout(async () => {
+      console.log('🎵 Auto-saving music data...', {
+        weddingId: wedding.id,
+        userId: user.id,
+        musicId
+      })
+
+      setSaving(true)
+      try {
+        // Clean data to remove undefined values
+        const cleanData = (obj: any): any => {
+          if (obj === undefined) return null
+          if (obj === null) return null
+          if (Array.isArray(obj)) return obj.map(cleanData)
+          if (typeof obj === 'object') {
+            const cleaned: any = {}
+            for (const key in obj) {
+              cleaned[key] = cleanData(obj[key])
+            }
+            return cleaned
+          }
+          return obj
+        }
+
+        const cleanedData = {
+          weddingId: wedding.id,
+          userId: user.id,
+          vendor: cleanData(vendor),
+          categories: cleanData(categories),
+          updatedAt: new Date()
+        }
+
+        console.log('🎵 Saving to Firestore:', { musicId, weddingId: wedding.id })
+
+        if (musicId) {
+          // Update existing document
+          const musicRef = doc(db, 'music', musicId)
+          await setDoc(musicRef, cleanedData, { merge: true })
+          console.log('✅ Updated existing music document:', musicId)
+        } else {
+          // Create new document
+          const musicRef = doc(collection(db, 'music'))
+          await setDoc(musicRef, cleanedData)
+          setMusicId(musicRef.id)
+          console.log('✅ Created new music document:', musicRef.id)
+        }
+
+        console.log('✅ Music data saved to Firestore')
+      } catch (error) {
+        console.error('❌ Error saving music data:', error)
+      } finally {
+        setSaving(false)
+      }
     }, 2000) // Auto-save after 2 seconds of inactivity
 
-    return () => clearTimeout(timeoutId)
-  }, [vendor, categories, user?.id, loading])
+    return () => {
+      if (saveTimeoutRef.current) {
+        console.log('🎵 Clearing auto-save timeout')
+        clearTimeout(saveTimeoutRef.current)
+      }
+    }
+  }, [vendor, categories, wedding, user, loading, musicId])
 
   const updateVendor = (newVendor: typeof vendor) => {
     setVendor(newVendor)

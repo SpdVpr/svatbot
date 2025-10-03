@@ -19,7 +19,7 @@ export function useDashboard() {
   useEffect(() => {
     if (user) {
       // Check if user is demo user
-      const isDemoUser = user.id === 'demo-user-id' || user.email === 'demo@svatbot.cz'
+      const isDemoUser = user.email === 'demo@svatbot.cz'
 
       const savedLayout = localStorage.getItem(`${DASHBOARD_STORAGE_KEY}-${user.id}`)
       if (savedLayout) {

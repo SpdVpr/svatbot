@@ -84,34 +84,8 @@ function DashboardContent() {
     }
   }
 
-  // Create mock wedding if none exists (for demo purposes or demo user)
-  const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || currentWedding?.id === 'demo-wedding'
-
-  // For demo users, always provide demo wedding immediately
-  const wedding = isDemoUser ? {
-    id: 'demo-wedding',
-    userId: user?.id || 'demo-user-id',
-    brideName: 'Jana',
-    groomName: 'Petr',
-    weddingDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000), // 180 days from now
-    estimatedGuestCount: 85,
-    budget: 450000,
-    style: 'classic' as const,
-    region: 'Praha',
-    status: 'planning' as const,
-    progress: {
-      overall: 73,
-      foundation: 100,
-      venue: 85,
-      guests: 80,
-      budget: 65,
-      design: 45,
-      organization: 30,
-      final: 0
-    },
-    createdAt: new Date(),
-    updatedAt: new Date()
-  } : currentWedding
+  // Use wedding from store (loaded from Firestore for all users including demo)
+  const wedding = currentWedding
 
 
 

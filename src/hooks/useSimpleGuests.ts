@@ -146,7 +146,7 @@ export function useSimpleGuests() {
   const [error, setError] = useState<string | null>(null)
 
   // Determine if this is a demo user
-  const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding?.id === 'demo-wedding'
+  const isDemoUser = user?.email === 'demo@svatbot.cz' || wedding?.id === 'demo-wedding'
 
   // Debug current state
   console.log('🔍 SimpleGuests state:', {

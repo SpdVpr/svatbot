@@ -179,27 +179,7 @@ export function useGuest(isActive: boolean = true): UseGuestReturn {
         createdBy: user.id
       }
 
-      // Check if this is demo mode
-      if (isDemoMode) {
-        // Demo user - use only localStorage
-        console.log('🎭 Demo user - creating guest in localStorage only')
-        const localId = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-        const newGuest: Guest = { id: localId, ...guestData }
-
-        // Save to localStorage
-        const savedGuests = localStorage.getItem(`guests_${wedding.id}`) || '[]'
-        const existingGuests = JSON.parse(savedGuests)
-        existingGuests.push(newGuest)
-        localStorage.setItem(`guests_${wedding.id}`, JSON.stringify(existingGuests))
-
-        // Update local state
-        setGuests(prev => [...prev, newGuest])
-        console.log('✅ Demo guest created in localStorage')
-
-        return newGuest
-      }
-
-      // Regular user - try Firestore first, fallback to localStorage
+      // Try Firestore first, fallback to localStorage
       try {
         const docRef = await addDoc(collection(db, 'guests'), convertToFirestoreData(guestData))
         const newGuest: Guest = { id: docRef.id, ...guestData }
@@ -242,6 +222,7 @@ export function useGuest(isActive: boolean = true): UseGuestReturn {
 
   // Update guest
   const updateGuest = async (guestId: string, updates: Partial<Guest>): Promise<void> => {
+
     try {
       setError(null)
 
@@ -305,6 +286,7 @@ export function useGuest(isActive: boolean = true): UseGuestReturn {
 
   // Delete guest
   const deleteGuest = async (guestId: string): Promise<void> => {
+
     try {
       setError(null)
 
@@ -584,146 +566,7 @@ export function useGuest(isActive: boolean = true): UseGuestReturn {
         setLoading(true)
         setError(null)
 
-        // Check if this is a demo user (check wedding ID first to avoid user dependency)
-        const isDemoUser = wedding.id === 'demo-wedding' || user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz'
-
-        if (isDemoUser) {
-          setIsDemoMode(true)
-
-          // Check if demo guests already exist in localStorage (edited data)
-          const savedDemoGuests = localStorage.getItem(`guests_${wedding.id}`)
-          if (savedDemoGuests) {
-            console.log('🎭 Loading existing demo guests from localStorage - FINAL TIME')
-            const existingGuests = JSON.parse(savedDemoGuests)
-            setGuests(existingGuests)
-            return
-          }
-
-          // Load fresh demo guests only if none exist
-          console.log('🎭 Creating fresh demo guests')
-          const demoGuests: Guest[] = [
-            {
-              id: 'demo-guest-1',
-              weddingId: wedding.id,
-              firstName: 'Marie',
-              lastName: 'Nováková',
-              email: 'marie.novakova@email.cz',
-              phone: '+420 777 123 456',
-              category: 'family-bride',
-              invitationType: 'ceremony-reception',
-              rsvpStatus: 'attending',
-              rsvpDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
-              hasPlusOne: false,
-              hasChildren: false,
-              children: [],
-              dietaryRestrictions: [],
-              preferredContactMethod: 'email',
-              language: 'cs',
-              accommodationInterest: 'interested',
-              accommodationType: 'dvoulůžkový pokoj',
-              accommodationPayment: 'paid_by_guest',
-              invitationSent: true,
-              invitationMethod: 'sent',
-              invitationSentDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-              reminderSent: false,
-              createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
-              updatedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
-              createdBy: user?.id || 'demo-user-id'
-            },
-            {
-              id: 'demo-guest-2',
-              weddingId: wedding.id,
-              firstName: 'Pavel',
-              lastName: 'Svoboda',
-              email: 'pavel.svoboda@email.cz',
-              phone: '+420 777 234 567',
-              category: 'friends-groom',
-              invitationType: 'ceremony-reception',
-              rsvpStatus: 'attending',
-              rsvpDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-              hasPlusOne: true,
-              plusOneName: 'Tereza Svobodová',
-              plusOneRsvpStatus: 'attending',
-              hasChildren: true,
-              children: [
-                { name: 'Jakub Svoboda', age: 6 }
-              ],
-              dietaryRestrictions: ['vegetarian'],
-              preferredContactMethod: 'email',
-              language: 'cs',
-              accommodationInterest: 'not_interested',
-              invitationSent: true,
-              invitationMethod: 'delivered_personally',
-              invitationSentDate: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
-              reminderSent: false,
-              createdAt: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000),
-              updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-              createdBy: user?.id || 'demo-user-id'
-            },
-            {
-              id: 'demo-guest-3',
-              weddingId: wedding.id,
-              firstName: 'Anna',
-              lastName: 'Procházková',
-              email: 'anna.prochazka@email.cz',
-              category: 'family-bride',
-              invitationType: 'ceremony-reception',
-              rsvpStatus: 'pending',
-              hasPlusOne: false,
-              hasChildren: false,
-              children: [],
-              dietaryRestrictions: [],
-              preferredContactMethod: 'email',
-              language: 'cs',
-              accommodationInterest: 'interested',
-              accommodationType: 'apartmán s výhledem',
-              accommodationPayment: 'paid_by_couple',
-              invitationSent: true,
-              invitationMethod: 'sent',
-              invitationSentDate: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
-              reminderSent: false,
-              createdAt: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000),
-              updatedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
-              createdBy: user?.id || 'demo-user-id'
-            },
-            {
-              id: 'demo-guest-4',
-              weddingId: wedding.id,
-              firstName: 'Tomáš',
-              lastName: 'Dvořák',
-              email: 'tomas.dvorak@email.cz',
-              phone: '+420 777 345 678',
-              category: 'colleagues-groom',
-              invitationType: 'ceremony-reception',
-              rsvpStatus: 'declined',
-              rsvpDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
-              hasPlusOne: false,
-              hasChildren: false,
-              children: [],
-              dietaryRestrictions: [],
-              preferredContactMethod: 'phone',
-              language: 'cs',
-              accommodationInterest: 'not_interested',
-              invitationSent: true,
-              invitationMethod: 'sent',
-              invitationSentDate: new Date(Date.now() - 28 * 24 * 60 * 60 * 1000),
-              reminderSent: true,
-              reminderSentDate: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
-              createdAt: new Date(Date.now() - 42 * 24 * 60 * 60 * 1000),
-              updatedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
-              createdBy: user?.id || 'demo-user-id'
-            }
-          ]
-
-          console.log('🎭 Loaded demo guests:', demoGuests.length, demoGuests)
-
-          // Save demo guests to localStorage for editing
-          localStorage.setItem(`guests_${wedding.id}`, JSON.stringify(demoGuests))
-
-          setGuests(demoGuests)
-          return
-        }
-
+        // Load guests from Firestore for all users (including demo)
         try {
           // Try to load from Firestore
           const guestsQuery = query(
@@ -740,45 +583,14 @@ export function useGuest(isActive: boolean = true): UseGuestReturn {
             console.log('👥 Loaded guests from Firestore:', loadedGuests.length, loadedGuests)
             setGuests(loadedGuests)
           }, (error) => {
-            console.warn('Firestore snapshot error, using localStorage fallback:', error)
-            // Load from localStorage fallback
-            const savedGuests = localStorage.getItem(`guests_${wedding.id}`)
-            if (savedGuests) {
-              const parsedGuests = JSON.parse(savedGuests).map((guest: any) => ({
-                ...guest,
-                rsvpDate: guest.rsvpDate ? new Date(guest.rsvpDate) : undefined,
-                invitationSentDate: guest.invitationSentDate ? new Date(guest.invitationSentDate) : undefined,
-                reminderSentDate: guest.reminderSentDate ? new Date(guest.reminderSentDate) : undefined,
-                createdAt: new Date(guest.createdAt),
-                updatedAt: new Date(guest.updatedAt)
-              }))
-              console.log('📦 Loaded guests from localStorage:', parsedGuests.length, parsedGuests)
-              setGuests(parsedGuests)
-            } else {
-              console.log('📦 No guests in localStorage for wedding:', wedding.id)
-              setGuests([])
-            }
+            console.error('❌ Firestore snapshot error:', error)
+            setGuests([])
           })
 
           return unsubscribe
         } catch (firestoreError) {
-          console.warn('⚠️ Firestore not available, loading from localStorage')
-          const savedGuests = localStorage.getItem(`guests_${wedding.id}`)
-          if (savedGuests) {
-            const parsedGuests = JSON.parse(savedGuests).map((guest: any) => ({
-              ...guest,
-              rsvpDate: guest.rsvpDate ? new Date(guest.rsvpDate) : undefined,
-              invitationSentDate: guest.invitationSentDate ? new Date(guest.invitationSentDate) : undefined,
-              reminderSentDate: guest.reminderSentDate ? new Date(guest.reminderSentDate) : undefined,
-              createdAt: new Date(guest.createdAt),
-              updatedAt: new Date(guest.updatedAt)
-            }))
-            console.log('📦 Loaded guests from localStorage (catch):', parsedGuests.length, parsedGuests)
-            setGuests(parsedGuests)
-          } else {
-            console.log('📦 No guests in localStorage (catch) for wedding:', wedding.id)
-            setGuests([])
-          }
+          console.error('❌ Firestore error:', firestoreError)
+          setGuests([])
         }
       } catch (error: any) {
         console.error('Error loading guests:', error)

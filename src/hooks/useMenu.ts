@@ -152,22 +152,7 @@ export function useMenu(): UseMenuReturn {
         }
       }
 
-      // Demo mode - use localStorage
-      const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding?.id === 'demo-wedding'
-      if (isDemoUser) {
-        console.log('🎭 Demo mode - updating menu item in localStorage')
-        const stored = localStorage.getItem(MENU_ITEMS_KEY)
-        const items = stored ? JSON.parse(stored) : []
-        const index = items.findIndex((i: MenuItem) => i.id === itemId)
-        if (index !== -1) {
-          items[index] = { ...items[index], ...updates, updatedAt: new Date() }
-          localStorage.setItem(MENU_ITEMS_KEY, JSON.stringify(items))
-          setMenuItems(items)
-        }
-        return
-      }
-
-      // Real user - use Firestore
+      // Use Firestore for all users
       const itemRef = doc(db, 'menuItems', itemId)
       await updateDoc(itemRef, {
         ...updates,
@@ -182,19 +167,7 @@ export function useMenu(): UseMenuReturn {
   // Delete menu item
   const deleteMenuItem = async (itemId: string): Promise<void> => {
     try {
-      // Demo mode - use localStorage
-      const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding?.id === 'demo-wedding'
-      if (isDemoUser) {
-        console.log('🎭 Demo mode - deleting menu item from localStorage')
-        const stored = localStorage.getItem(MENU_ITEMS_KEY)
-        const items = stored ? JSON.parse(stored) : []
-        const filtered = items.filter((i: MenuItem) => i.id !== itemId)
-        localStorage.setItem(MENU_ITEMS_KEY, JSON.stringify(filtered))
-        setMenuItems(filtered)
-        return
-      }
-
-      // Real user - use Firestore
+      // Use Firestore for all users
       await deleteDoc(doc(db, 'menuItems', itemId))
     } catch (err: any) {
       console.error('Error deleting menu item:', err)
@@ -271,22 +244,7 @@ export function useMenu(): UseMenuReturn {
         }
       }
 
-      // Demo mode - use localStorage
-      const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding?.id === 'demo-wedding'
-      if (isDemoUser) {
-        console.log('🎭 Demo mode - updating drink item in localStorage')
-        const stored = localStorage.getItem(DRINK_ITEMS_KEY)
-        const items = stored ? JSON.parse(stored) : []
-        const index = items.findIndex((i: DrinkItem) => i.id === itemId)
-        if (index !== -1) {
-          items[index] = { ...items[index], ...updates, updatedAt: new Date() }
-          localStorage.setItem(DRINK_ITEMS_KEY, JSON.stringify(items))
-          setDrinkItems(items)
-        }
-        return
-      }
-
-      // Real user - use Firestore
+      // Use Firestore for all users
       const itemRef = doc(db, 'drinkItems', itemId)
       await updateDoc(itemRef, {
         ...updates,
@@ -301,19 +259,7 @@ export function useMenu(): UseMenuReturn {
   // Delete drink item
   const deleteDrinkItem = async (itemId: string): Promise<void> => {
     try {
-      // Demo mode - use localStorage
-      const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding?.id === 'demo-wedding'
-      if (isDemoUser) {
-        console.log('🎭 Demo mode - deleting drink item from localStorage')
-        const stored = localStorage.getItem(DRINK_ITEMS_KEY)
-        const items = stored ? JSON.parse(stored) : []
-        const filtered = items.filter((i: DrinkItem) => i.id !== itemId)
-        localStorage.setItem(DRINK_ITEMS_KEY, JSON.stringify(filtered))
-        setDrinkItems(filtered)
-        return
-      }
-
-      // Real user - use Firestore
+      // Use Firestore for all users
       await deleteDoc(doc(db, 'drinkItems', itemId))
     } catch (err: any) {
       console.error('Error deleting drink item:', err)
@@ -379,36 +325,9 @@ export function useMenu(): UseMenuReturn {
       try {
         setLoading(true)
 
-        // Demo mode - use localStorage
-        const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding.id === 'demo-wedding'
+        console.log('✅ Loading menu from Firestore for wedding:', wedding.id)
 
-        if (isDemoUser) {
-          console.log('🎭 Demo mode - loading menu from localStorage')
-
-          const storedMenu = localStorage.getItem(MENU_ITEMS_KEY)
-          const storedDrinks = localStorage.getItem(DRINK_ITEMS_KEY)
-
-          const menuItems = storedMenu ? JSON.parse(storedMenu).map((item: any) => ({
-            ...item,
-            createdAt: new Date(item.createdAt),
-            updatedAt: new Date(item.updatedAt)
-          })) : []
-
-          const drinkItems = storedDrinks ? JSON.parse(storedDrinks).map((item: any) => ({
-            ...item,
-            createdAt: new Date(item.createdAt),
-            updatedAt: new Date(item.updatedAt)
-          })) : []
-
-          setMenuItems(menuItems)
-          setDrinkItems(drinkItems)
-          setLoading(false)
-          return
-        }
-
-        console.log('✅ Real user - loading menu from Firestore for wedding:', wedding.id)
-
-        // Real user - use Firestore
+        // Use Firestore for all users
         try {
           // Subscribe to menu items
           const menuQuery = query(

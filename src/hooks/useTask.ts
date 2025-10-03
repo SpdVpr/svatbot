@@ -103,9 +103,6 @@ export function useTask(): UseTaskReturn {
       throw new Error('Žádná svatba není vybrána')
     }
 
-    // Check if this is a demo user - use sessionStorage instead of Firestore
-    const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding.id === 'demo-wedding'
-
     try {
       setError(null)
       setLoading(true)
@@ -124,35 +121,6 @@ export function useTask(): UseTaskReturn {
         order: tasks.filter(t => t.category === data.category).length,
         createdAt: new Date(),
         updatedAt: new Date()
-      }
-
-      if (isDemoUser) {
-        console.log('🎭 Demo user detected - using sessionStorage for task creation')
-
-        // Create task with local ID for demo user
-        const localId = `demo-task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-        const newTask: Task = { id: localId, ...taskData }
-
-        // Save to sessionStorage for demo user
-        const sessionKey = `demo_tasks_${wedding.id}`
-        const savedTasks = sessionStorage.getItem(sessionKey) || '[]'
-        const existingTasks = JSON.parse(savedTasks)
-        existingTasks.push(newTask)
-        sessionStorage.setItem(sessionKey, JSON.stringify(existingTasks))
-
-        console.log('✅ Demo task created in sessionStorage:', newTask)
-
-        // Update local state immediately
-        setTasks(prev => {
-          const updated = [...prev, newTask]
-          console.log('📝 Updated demo tasks state:', updated.length, updated)
-          console.log('📝 Previous tasks:', prev.length, prev.map(t => t.title))
-          console.log('📝 New task added:', newTask.title)
-          console.log('📝 Updated tasks:', updated.map(t => t.title))
-          return updated
-        })
-
-        return newTask
       }
 
       try {
@@ -201,9 +169,6 @@ export function useTask(): UseTaskReturn {
   const updateTask = async (taskId: string, updates: Partial<Task>): Promise<void> => {
     if (!wedding) return
 
-    // Check if this is a demo user - use sessionStorage instead of Firestore
-    const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding.id === 'demo-wedding'
-
     try {
       setError(null)
 
@@ -212,21 +177,7 @@ export function useTask(): UseTaskReturn {
         updatedAt: new Date()
       }
 
-      if (isDemoUser) {
-        console.log('🎭 Demo user detected - updating task in sessionStorage:', taskId, updatedData)
-
-        // Update in sessionStorage for demo user
-        const sessionKey = `demo_tasks_${wedding.id}`
-        const savedTasks = sessionStorage.getItem(sessionKey) || '[]'
-        const existingTasks = JSON.parse(savedTasks)
-        const taskIndex = existingTasks.findIndex((t: Task) => t.id === taskId)
-        if (taskIndex !== -1) {
-          existingTasks[taskIndex] = { ...existingTasks[taskIndex], ...updatedData }
-          sessionStorage.setItem(sessionKey, JSON.stringify(existingTasks))
-          console.log('✅ Demo task updated in sessionStorage')
-        }
-      } else {
-        try {
+      try {
           // Try to update in Firestore for real users
           const taskRef = doc(db, 'tasks', taskId)
 
@@ -283,14 +234,6 @@ export function useTask(): UseTaskReturn {
             task.id === taskId ? { ...task, ...updatedData } : task
           ))
         }
-      }
-
-      // Update local state for demo users
-      if (isDemoUser) {
-        setTasks(prev => prev.map(task =>
-          task.id === taskId ? { ...task, ...updatedData } : task
-        ))
-      }
     } catch (error: any) {
       console.error('Error updating task:', error)
       setError('Chyba při aktualizaci úkolu')
@@ -302,43 +245,23 @@ export function useTask(): UseTaskReturn {
   const deleteTask = async (taskId: string): Promise<void> => {
     if (!wedding) return
 
-    // Check if this is a demo user - use sessionStorage instead of Firestore
-    const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding.id === 'demo-wedding'
-
     try {
       setError(null)
 
-      if (isDemoUser) {
-        console.log('🎭 Demo user detected - deleting task from sessionStorage:', taskId)
-
-        // Delete from sessionStorage for demo user
-        const sessionKey = `demo_tasks_${wedding.id}`
-        const savedTasks = sessionStorage.getItem(sessionKey) || '[]'
+      try {
+        // Try to delete from Firestore
+        await deleteDoc(doc(db, 'tasks', taskId))
+        console.log('✅ Task deleted from Firestore:', taskId)
+        // Don't update state here - let Firestore listener handle it
+        return
+      } catch (firestoreError) {
+        console.warn('⚠️ Firestore not available, deleting from localStorage fallback')
+        const savedTasks = localStorage.getItem(`tasks_${wedding.id}`) || '[]'
         const existingTasks = JSON.parse(savedTasks)
         const filteredTasks = existingTasks.filter((t: Task) => t.id !== taskId)
-        sessionStorage.setItem(sessionKey, JSON.stringify(filteredTasks))
-        console.log('✅ Demo task deleted from sessionStorage')
-      } else {
-        try {
-          // Try to delete from Firestore for real users
-          await deleteDoc(doc(db, 'tasks', taskId))
-          console.log('✅ Task deleted from Firestore:', taskId)
-          // Don't update state here - let Firestore listener handle it
-          return
-        } catch (firestoreError) {
-          console.warn('⚠️ Firestore not available, deleting from localStorage fallback')
-          const savedTasks = localStorage.getItem(`tasks_${wedding.id}`) || '[]'
-          const existingTasks = JSON.parse(savedTasks)
-          const filteredTasks = existingTasks.filter((t: Task) => t.id !== taskId)
-          localStorage.setItem(`tasks_${wedding.id}`, JSON.stringify(filteredTasks))
-          console.log('💾 Task deleted from localStorage (fallback)')
-          // Update local state only for localStorage fallback
-          setTasks(prev => prev.filter(task => task.id !== taskId))
-        }
-      }
-
-      // Update local state for demo users
-      if (isDemoUser) {
+        localStorage.setItem(`tasks_${wedding.id}`, JSON.stringify(filteredTasks))
+        console.log('💾 Task deleted from localStorage (fallback)')
+        // Update local state only for localStorage fallback
         setTasks(prev => prev.filter(task => task.id !== taskId))
       }
     } catch (error: any) {
@@ -509,114 +432,8 @@ export function useTask(): UseTaskReturn {
         setLoading(true)
         setError(null)
 
-        // Check if this is a demo user
-        const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding.id === 'demo-wedding'
-
-        // Only log once per wedding change
-        if (process.env.NODE_ENV === 'development') {
-          console.log('🔍 Loading tasks for wedding:', wedding.id, 'isDemoUser:', isDemoUser)
-        }
-
-        if (isDemoUser) {
-          // Try to load existing demo tasks from sessionStorage first
-          const sessionKey = `demo_tasks_${wedding.id}`
-          const savedDemoTasks = sessionStorage.getItem(sessionKey)
-
-          if (savedDemoTasks) {
-            const parsedTasks = JSON.parse(savedDemoTasks).map((task: any) => ({
-              ...task,
-              dueDate: task.dueDate ? new Date(task.dueDate) : undefined,
-              completedAt: task.completedAt ? new Date(task.completedAt) : undefined,
-              createdAt: new Date(task.createdAt),
-              updatedAt: new Date(task.updatedAt)
-            }))
-            setTasks(parsedTasks)
-            return
-          }
-
-          // If no session data exists, create fresh demo tasks
-          const demoTasks: Task[] = [
-            {
-              id: 'demo-task-1',
-              weddingId: wedding.id,
-              title: 'Rezervovat místo konání',
-              description: 'Najít a rezervovat místo pro svatební obřad a hostinu',
-              category: 'venue',
-              priority: 'high',
-              status: 'completed',
-              dueDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
-              completedAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
-              isTemplate: false,
-              order: 1,
-              createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
-              updatedAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000)
-            },
-            {
-              id: 'demo-task-2',
-              weddingId: wedding.id,
-              title: 'Objednat svatební fotografa',
-              description: 'Najít a objednat profesionálního svatebního fotografa',
-              category: 'organization',
-              priority: 'high',
-              status: 'in-progress',
-              dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
-              isTemplate: false,
-              order: 1,
-              createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
-              updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
-            },
-            {
-              id: 'demo-task-3',
-              weddingId: wedding.id,
-              title: 'Vybrat svatební šaty',
-              description: 'Najít a objednat svatební šaty včetně úprav',
-              category: 'design',
-              priority: 'medium',
-              status: 'pending',
-              dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
-              isTemplate: false,
-              order: 1,
-              createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-              updatedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-            },
-            {
-              id: 'demo-task-4',
-              weddingId: wedding.id,
-              title: 'Rezervovat hudbu/DJ',
-              description: 'Zajistit hudební doprovod pro obřad a hostinu',
-              category: 'organization',
-              priority: 'high',
-              status: 'pending',
-              dueDate: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000), // 45 days from now
-              isTemplate: false,
-              order: 1,
-              createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
-              updatedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000)
-            },
-            {
-              id: 'demo-task-5',
-              weddingId: wedding.id,
-              title: 'Objednat svatební dort',
-              description: 'Vybrat a objednat svatební dort podle počtu hostů',
-              category: 'budget',
-              priority: 'medium',
-              status: 'completed',
-              dueDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
-              completedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
-              isTemplate: false,
-              order: 1,
-              createdAt: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000),
-              updatedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000)
-            }
-          ]
-
-          // Save fresh demo tasks to sessionStorage
-          sessionStorage.setItem(sessionKey, JSON.stringify(demoTasks))
-          setTasks(demoTasks)
-          return
-        }
-
-        try {
+        // Load tasks from Firestore for all users (including demo)
+        try{
           // Try to load from Firestore first for normal users
           const tasksQuery = query(
             collection(db, 'tasks'),

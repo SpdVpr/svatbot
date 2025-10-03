@@ -2,24 +2,22 @@
 
 import { Music, ArrowRight, CheckCircle2, Circle } from 'lucide-react'
 import Link from 'next/link'
+import { useMusic } from '@/hooks/useMusic'
 
 export default function MusicPlaylistModule() {
-  // Mock data - v produkci by se načítalo z Firebase
-  const vendor = {
-    name: '',
-    contact: ''
-  }
+  const { vendor, categories, loading, totalSongs, requiredCategories, completedRequired } = useMusic()
 
-  const requiredCategories = [
-    { id: 'groom-entrance', name: 'Nástup ženicha', completed: false, icon: '🤵' },
-    { id: 'bride-entrance', name: 'Nástup nevěsty', completed: false, icon: '💍' },
-    { id: 'first-dance', name: 'První tanec', completed: false, icon: '💃' },
-    { id: 'party-songs', name: 'Párty písně', completed: false, icon: '🎵' }
-  ]
-
-  const completedCount = requiredCategories.filter(c => c.completed).length
+  const completedCount = completedRequired
   const totalCount = requiredCategories.length
-  const progress = (completedCount / totalCount) * 100
+  const progress = totalCount > 0 ? (completedCount / totalCount) * 100 : 0
+
+  // Map categories to display format
+  const displayCategories = requiredCategories.map(cat => ({
+    id: cat.id,
+    name: cat.name,
+    completed: cat.songs.length > 0,
+    icon: cat.icon
+  }))
 
   return (
     <div className="wedding-card h-full flex flex-col">
@@ -73,19 +71,29 @@ export default function MusicPlaylistModule() {
 
       {/* Quick Status */}
       <div className="space-y-2 mb-4 flex-1">
-        {requiredCategories.map(category => (
-          <div key={category.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
-            <span className="text-lg">{category.icon}</span>
-            {category.completed ? (
-              <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
-            ) : (
-              <Circle className="w-4 h-4 text-gray-300 flex-shrink-0" />
-            )}
-            <span className={`text-sm flex-1 ${category.completed ? 'text-gray-900' : 'text-gray-600'}`}>
-              {category.name}
-            </span>
+        {loading ? (
+          <div className="text-center py-4">
+            <p className="text-sm text-gray-500">Načítání...</p>
           </div>
-        ))}
+        ) : displayCategories.length > 0 ? (
+          displayCategories.map(category => (
+            <div key={category.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
+              <span className="text-lg">{category.icon}</span>
+              {category.completed ? (
+                <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+              ) : (
+                <Circle className="w-4 h-4 text-gray-300 flex-shrink-0" />
+              )}
+              <span className={`text-sm flex-1 ${category.completed ? 'text-gray-900' : 'text-gray-600'}`}>
+                {category.name}
+              </span>
+            </div>
+          ))
+        ) : (
+          <div className="text-center py-4">
+            <p className="text-sm text-gray-500">Žádné kategorie</p>
+          </div>
+        )}
       </div>
 
       {/* CTA Button */}

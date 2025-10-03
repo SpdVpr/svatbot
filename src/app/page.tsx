@@ -22,7 +22,7 @@ export default function HomePage() {
   }
 
   // Check if this is a demo user
-  const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz'
+  const isDemoUser = user?.email === 'demo@svatbot.cz'
 
   // For demo users, always show dashboard immediately
   if (isDemoUser) {

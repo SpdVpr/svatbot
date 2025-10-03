@@ -16,9 +16,11 @@ export interface DemoSessionConfig {
  * Check if user is in demo mode
  */
 export function isDemoUser(userId?: string, userEmail?: string, weddingId?: string): boolean {
-  return userId === 'demo-user-id' || 
-         userEmail === 'demo@svatbot.cz' || 
-         weddingId === 'demo-wedding'
+  return userEmail === 'demo@svatbot.cz'
+}
+
+export function isReadOnlyUser(userEmail?: string): boolean {
+  return userEmail === 'demo@svatbot.cz'
 }
 
 /**

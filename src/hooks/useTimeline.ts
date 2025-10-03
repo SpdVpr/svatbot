@@ -639,24 +639,8 @@ export function useTimeline(): UseTimelineReturn {
         setLoading(true)
         setError(null)
 
-        // Check if this is a demo user
-        const isDemo = isDemoUser(user?.id, user?.email, wedding.id)
-        console.log('🎭 Demo user check:', {
-          isDemo,
-          userId: user?.id,
-          userEmail: user?.email,
-          weddingId: wedding.id,
-          isDemoUserId: user?.id === 'demo-user-id',
-          isDemoEmail: user?.email === 'demo@svatbot.cz',
-          isDemoWedding: wedding.id === 'demo-wedding'
-        })
-
-        // Special handling for demo users - wait for demo wedding to be created
-        if ((user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz') && wedding.id !== 'demo-wedding') {
-          console.log('🎭 Demo user detected but demo wedding not ready yet, waiting...')
-          setLoading(false)
-          return
-        }
+        // Load from Firestore for all users
+        const isDemo = false // Removed demo detection - all users use Firestore
 
         if (isDemo) {
           // Load demo milestones using utility function
