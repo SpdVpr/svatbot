@@ -274,7 +274,10 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
   // Table rotation handlers
   const handleRotationStart = (tableId: string, e: React.MouseEvent) => {
+    e.preventDefault()
     e.stopPropagation()
+
+    console.log('🔄 Starting rotation for table:', tableId)
     setIsRotating(true)
     setRotatingTable(tableId)
 
@@ -313,6 +316,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
       e.preventDefault()
       e.stopPropagation()
     }
+    console.log('🔄 Ending rotation')
     setIsRotating(false)
     setRotatingTable(null)
     setRotationStartAngle(0)
@@ -886,15 +890,22 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                     </div>
                     </div>
 
-                    {/* Guest names positioned around table - not rotated */}
+                    {/* Guest names positioned around table - rotated with table but never upside down */}
                     {viewOptions.showGuestNames && tableSeats.filter(s => s.guestId).map((seat, index) => {
                       const guestName = getGuestName(seat)
                       if (!guestName) return null
 
-                      const angle = (360 / tableSeats.length) * index
+                      const seatAngle = (360 / tableSeats.length) * index
+                      const totalAngle = seatAngle + table.rotation
                       const nameRadius = table.size === 'small' ? 80 : table.size === 'medium' ? 100 : table.size === 'large' ? 120 : 140
-                      const nameX = Math.cos((angle - 90) * Math.PI / 180) * nameRadius
-                      const nameY = Math.sin((angle - 90) * Math.PI / 180) * nameRadius
+                      const nameX = Math.cos((totalAngle - 90) * Math.PI / 180) * nameRadius
+                      const nameY = Math.sin((totalAngle - 90) * Math.PI / 180) * nameRadius
+
+                      // Calculate text rotation - keep text readable (never upside down)
+                      let textRotation = totalAngle
+                      if (textRotation > 90 && textRotation < 270) {
+                        textRotation += 180 // Flip text if it would be upside down
+                      }
 
                       return (
                         <div
@@ -903,7 +914,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                           style={{
                             left: `calc(50% + ${nameX}px)`,
                             top: `calc(50% + ${nameY}px)`,
-                            transform: 'translate(-50%, -50%)',
+                            transform: `translate(-50%, -50%) rotate(${textRotation}deg)`,
                             zIndex: 5
                           }}
                         >

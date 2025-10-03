@@ -482,7 +482,30 @@ export function useSeating(): UseSeatingReturn {
   }
 
   const deleteTable = async (tableId: string) => {
-    // TODO: Implement
+    if (!wedding || !currentPlan) return
+
+    try {
+      console.log('🗑️ Deleting table:', tableId)
+
+      // Remove table from current plan
+      const updatedTables = currentPlan.tables.filter(table => table.id !== tableId)
+
+      // Remove seats associated with this table
+      const updatedSeats = currentPlan.seats.filter(seat => seat.tableId !== tableId)
+
+      // Update the seating plan
+      const updatedPlan = {
+        ...currentPlan,
+        tables: updatedTables,
+        seats: updatedSeats
+      }
+
+      await updateSeatingPlan(currentPlan.id, updatedPlan)
+      console.log('✅ Table deleted successfully')
+    } catch (error) {
+      console.error('Error deleting table:', error)
+      throw error
+    }
   }
 
   const moveTable = async (tableId: string, position: { x: number; y: number }) => {

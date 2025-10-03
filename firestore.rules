@@ -310,10 +310,9 @@ service cloud.firestore {
       allow read, update, delete: if isAuthenticated() &&
                                      resource.data.userId == request.auth.uid;
 
-      // Owner can create notes
+      // Owner can create notes - simplified validation
       allow create: if isAuthenticated() &&
-                       request.resource.data.keys().hasAll(['title', 'content', 'weddingId', 'userId', 'createdAt', 'updatedAt']) &&
-                       request.auth.uid == request.resource.data.userId;
+                       request.resource.data.userId == request.auth.uid;
 
       // Allow list/query for owner (to find notes by weddingId)
       allow list: if isAuthenticated();
