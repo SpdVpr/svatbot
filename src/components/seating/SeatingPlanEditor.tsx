@@ -272,7 +272,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     }
   }
 
-  // Table rotation handlers
+  // Table rotation handlers - NOVÁ LOGIKA jako drag & drop
   const handleRotationStart = (tableId: string, e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -285,52 +285,44 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     if (table) {
       setRotationStartAngle(table.rotation)
     }
+
+    // Přidat event listenery přímo zde
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      if (!tableId) return
+
+      const tableElement = document.querySelector(`[data-table-id="${tableId}"]`)
+      if (!tableElement) return
+
+      const rect = tableElement.getBoundingClientRect()
+      const centerX = rect.left + rect.width / 2
+      const centerY = rect.top + rect.height / 2
+
+      const angle = Math.atan2(moveEvent.clientY - centerY, moveEvent.clientX - centerX) * (180 / Math.PI) + 90
+      const normalizedAngle = ((angle % 360) + 360) % 360
+
+      // Update table rotation
+      updateTable(tableId, { rotation: normalizedAngle })
+    }
+
+    const handleMouseUp = () => {
+      console.log('🔄 Ending rotation')
+      setIsRotating(false)
+      setRotatingTable(null)
+      setRotationStartAngle(0)
+
+      // Odstranit event listenery
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+
+    // Přidat event listenery
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
   }
 
-  const handleRotationMove = useCallback((e: MouseEvent) => {
-    // Early return if not rotating
-    if (!isRotating || !rotatingTable) {
-      console.log('🔄 Rotation move called but not rotating:', { isRotating, rotatingTable })
-      return
-    }
-
-    e.preventDefault()
-    e.stopPropagation()
-
-    const table = tables.find(t => t.id === rotatingTable)
-    if (!table) {
-      console.log('🔄 Table not found for rotation:', rotatingTable)
-      return
-    }
-
-    // Calculate angle from table center to mouse position
-    const tableElement = document.querySelector(`[data-table-id="${rotatingTable}"]`)
-    if (!tableElement) {
-      console.log('🔄 Table element not found:', rotatingTable)
-      return
-    }
-
-    const rect = tableElement.getBoundingClientRect()
-    const centerX = rect.left + rect.width / 2
-    const centerY = rect.top + rect.height / 2
-
-    const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI) + 90
-    const normalizedAngle = ((angle % 360) + 360) % 360
-
-    // Update table rotation
-    updateTable(rotatingTable, { rotation: normalizedAngle })
-  }, [isRotating, rotatingTable, tables, updateTable])
-
-  const handleRotationEnd = useCallback((e?: MouseEvent) => {
-    if (e) {
-      e.preventDefault()
-      e.stopPropagation()
-    }
-    console.log('🔄 Ending rotation')
-    setIsRotating(false)
-    setRotatingTable(null)
-    setRotationStartAngle(0)
-  }, [])
+  // Tyto funkce už nepotřebujeme - vše je v handleRotationStart
+  const handleRotationMove = useCallback(() => {}, [])
+  const handleRotationEnd = useCallback(() => {}, [])
 
   // Rotate table by specific degrees
   const rotateTable = async (tableId: string, degrees: number) => {
@@ -354,18 +346,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     }
   }
 
-  // Rotation event listeners
-  useEffect(() => {
-    if (isRotating) {
-      document.addEventListener('mousemove', handleRotationMove)
-      document.addEventListener('mouseup', handleRotationEnd)
-
-      return () => {
-        document.removeEventListener('mousemove', handleRotationMove)
-        document.removeEventListener('mouseup', handleRotationEnd)
-      }
-    }
-  }, [isRotating, handleRotationMove, handleRotationEnd])
+  // Rotation event listeners - ODSTRANĚNO, nyní se používá přímá logika v handleRotationStart
 
   // Edit dance floor
   const handleEditDanceFloor = () => {
