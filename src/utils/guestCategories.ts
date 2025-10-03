@@ -100,6 +100,7 @@ export const DIETARY_RESTRICTION_LABELS = {
   'kosher': 'Košer',
   'halal': 'Halal',
   'diabetic': 'Diabetická',
+  'allergies': 'Alergie',
   'nut-allergy': 'Alergie na ořechy',
   'seafood-allergy': 'Alergie na mořské plody',
   'other': 'Jiné'

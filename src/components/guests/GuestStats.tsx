@@ -14,7 +14,8 @@ import {
   Utensils,
   TrendingUp,
   PieChart,
-  Send
+  Send,
+  Building2
 } from 'lucide-react'
 import { getGuestCategoryLabel } from '@/utils/guestCategories'
 
@@ -89,6 +90,9 @@ export default function GuestStats({
 
   const guestsWithChildren = guests.filter(g => g.hasChildren && g.children && g.children.length > 0).length
   const guestsWithDietaryRestrictions = guests.filter(g => g.dietaryRestrictions.length > 0).length
+  const guestsWithAccommodationPaidByCouple = guests.filter(g =>
+    g.accommodationInterest === 'interested' && g.accommodationPayment === 'paid_by_couple'
+  ).length
 
   // Invitation statistics
   const invitationsSent = guests.filter(g => g.invitationSent && g.invitationMethod === 'sent').length
@@ -171,7 +175,7 @@ export default function GuestStats({
         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-text-muted">Celkem hostů</p>
+              <p className="text-sm font-medium text-text-muted">Celkem lidí</p>
               <p className="text-3xl font-bold text-gray-900 mt-1">{stats.total}</p>
             </div>
             <div className="p-3 bg-gray-100 rounded-full">
@@ -179,6 +183,11 @@ export default function GuestStats({
             </div>
           </div>
           <div className="mt-4 space-y-1">
+            <div className="flex items-center text-sm">
+              <span className="text-text-muted">
+                {guests.length} hlavních hostů
+              </span>
+            </div>
             <div className="flex items-center text-sm">
               <span className="text-text-muted">
                 {stats.totalWithPlusOnes} s doprovodem
@@ -393,6 +402,16 @@ export default function GuestStats({
               </div>
               <span className="font-medium">{guestsWithDietaryRestrictions}</span>
             </div>
+
+            {guestsWithAccommodationPaidByCouple > 0 && (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Building2 className="w-4 h-4 text-purple-500" />
+                  <span className="text-gray-700">Ubytování platí novomanželé</span>
+                </div>
+                <span className="font-medium">{guestsWithAccommodationPaidByCouple}</span>
+              </div>
+            )}
           </div>
         </div>
       </div>

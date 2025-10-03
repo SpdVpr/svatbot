@@ -642,6 +642,39 @@ export default function GuestForm({
                         </div>
                       )}
 
+                      {/* Payment method */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Kdo platí ubytování?
+                        </label>
+                        <div className="space-y-2">
+                          <label className="flex items-center">
+                            <input
+                              type="radio"
+                              name="accommodationPayment"
+                              value="paid_by_guest"
+                              checked={formData.accommodationPayment === 'paid_by_guest'}
+                              onChange={(e) => handleChange('accommodationPayment', e.target.value)}
+                              className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500 focus:ring-2"
+                              disabled={loading}
+                            />
+                            <span className="ml-2 text-sm text-gray-700">Platí host</span>
+                          </label>
+                          <label className="flex items-center">
+                            <input
+                              type="radio"
+                              name="accommodationPayment"
+                              value="paid_by_couple"
+                              checked={formData.accommodationPayment === 'paid_by_couple'}
+                              onChange={(e) => handleChange('accommodationPayment', e.target.value)}
+                              className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500 focus:ring-2"
+                              disabled={loading}
+                            />
+                            <span className="ml-2 text-sm text-gray-700">Platí novomanželé</span>
+                          </label>
+                        </div>
+                      </div>
+
                       {/* Room Info */}
                       {formData.roomId && (
                         <div className="bg-green-50 border border-green-200 rounded-lg p-3">

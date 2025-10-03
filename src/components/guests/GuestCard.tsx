@@ -292,6 +292,18 @@ export default function GuestCard({
           </div>
         )}
 
+        {/* Notes tag */}
+        {guest.notes && guest.notes.trim() && (
+          <div className="flex flex-wrap gap-1 mb-2">
+            <span
+              className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full flex items-center gap-1"
+              title={guest.notes}
+            >
+              📝 Poznámka
+            </span>
+          </div>
+        )}
+
         {/* Invitation status */}
         <div className="flex flex-wrap gap-1">
           {guest.invitationSent && (
