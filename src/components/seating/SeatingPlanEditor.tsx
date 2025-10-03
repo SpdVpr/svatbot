@@ -287,6 +287,9 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
   const handleRotationMove = useCallback((e: MouseEvent) => {
     if (!isRotating || !rotatingTable) return
 
+    e.preventDefault()
+    e.stopPropagation()
+
     const table = tables.find(t => t.id === rotatingTable)
     if (!table) return
 
@@ -305,7 +308,11 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     updateTable(rotatingTable, { rotation: normalizedAngle })
   }, [isRotating, rotatingTable, tables, updateTable])
 
-  const handleRotationEnd = useCallback(() => {
+  const handleRotationEnd = useCallback((e?: MouseEvent) => {
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
     setIsRotating(false)
     setRotatingTable(null)
     setRotationStartAngle(0)
@@ -879,19 +886,31 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                     </div>
                     </div>
 
-                    {/* Guest names outside table - not rotated */}
-                    {viewOptions.showGuestNames && (
-                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 text-xs text-center space-y-1">
-                        {tableSeats.filter(s => s.guestId).map(seat => {
-                          const guestName = getGuestName(seat)
-                          return guestName ? (
-                            <div key={seat.id} className="bg-white px-2 py-1 rounded border text-gray-700 shadow-sm whitespace-nowrap">
-                              {guestName}
-                            </div>
-                          ) : null
-                        })}
-                      </div>
-                    )}
+                    {/* Guest names positioned around table - not rotated */}
+                    {viewOptions.showGuestNames && tableSeats.filter(s => s.guestId).map((seat, index) => {
+                      const guestName = getGuestName(seat)
+                      if (!guestName) return null
+
+                      const angle = (360 / tableSeats.length) * index
+                      const nameRadius = table.size === 'small' ? 80 : table.size === 'medium' ? 100 : table.size === 'large' ? 120 : 140
+                      const nameX = Math.cos((angle - 90) * Math.PI / 180) * nameRadius
+                      const nameY = Math.sin((angle - 90) * Math.PI / 180) * nameRadius
+
+                      return (
+                        <div
+                          key={`name-${seat.id}`}
+                          className="absolute text-xs bg-white px-2 py-1 rounded border text-gray-700 shadow-sm whitespace-nowrap pointer-events-none"
+                          style={{
+                            left: `calc(50% + ${nameX}px)`,
+                            top: `calc(50% + ${nameY}px)`,
+                            transform: 'translate(-50%, -50%)',
+                            zIndex: 5
+                          }}
+                        >
+                          {guestName}
+                        </div>
+                      )
+                    })}
                   </div>
                 )
               })}
