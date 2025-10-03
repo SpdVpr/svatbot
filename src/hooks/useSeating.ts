@@ -373,7 +373,7 @@ export function useSeating(): UseSeatingReturn {
     try {
       console.log('🪑 Updating seating plan:', planId, updates)
 
-      // Update plan in state
+      // Update plan in state first (for immediate UI feedback)
       setSeatingPlans(prev => prev.map(plan =>
         plan.id === planId
           ? { ...plan, ...updates, updatedAt: new Date() }
@@ -387,7 +387,14 @@ export function useSeating(): UseSeatingReturn {
           : prev
       )
 
-      // Update in localStorage
+      // Update in Firebase
+      const planRef = doc(db, 'seatingPlans', planId)
+      await updateDoc(planRef, {
+        ...updates,
+        updatedAt: Timestamp.now()
+      })
+
+      // Also update in localStorage as backup
       const savedPlans = localStorage.getItem(`seatingPlans_${wedding.id}`) || '[]'
       const existingPlans = JSON.parse(savedPlans)
       const updatedPlans = existingPlans.map((plan: SeatingPlan) =>
@@ -397,7 +404,7 @@ export function useSeating(): UseSeatingReturn {
       )
       localStorage.setItem(`seatingPlans_${wedding.id}`, JSON.stringify(updatedPlans))
 
-      console.log('✅ Seating plan updated successfully')
+      console.log('✅ Seating plan updated successfully in Firebase and localStorage')
     } catch (error) {
       console.error('Error updating seating plan:', error)
       throw error
