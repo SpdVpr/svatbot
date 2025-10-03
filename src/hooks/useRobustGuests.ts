@@ -289,7 +289,7 @@ export function useRobustGuests() {
                 invitationType: data.invitationType,
                 rsvpStatus: data.rsvpStatus,
                 rsvpDate: data.rsvpDate ? data.rsvpDate.toDate() : undefined,
-                hasPlusOne: data.hasPlusOne,
+                hasPlusOne: data.hasPlusOne || false,
                 plusOneName: data.plusOneName,
                 plusOneRsvpStatus: data.plusOneRsvpStatus,
                 hasChildren: data.hasChildren || false,
