@@ -62,7 +62,8 @@ export default function EditRoomPage({ params }: EditRoomPageProps) {
     { value: 'suite', label: 'Apartmá' },
     { value: 'double', label: 'Dvoulůžkový' },
     { value: 'single', label: 'Jednolůžkový' },
-    { value: 'family', label: 'Rodinný' },
+    { value: 'other', label: 'Jiný' },
+    { value: 'family', label: 'Rodinný pokoj' },
     { value: 'twin', label: 'Twin (2 postele)' }
   ].sort((a, b) => a.label.localeCompare(b.label, 'cs'))
 
