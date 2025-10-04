@@ -2,14 +2,16 @@
 
 import Link from 'next/link'
 import { Briefcase, Users, CheckCircle, Clock, ArrowRight } from 'lucide-react'
+import { useVendor } from '@/hooks/useVendor'
 
 export default function VendorManagementModule() {
-  // Mock data - replace with real vendor hook when implemented
+  const { stats, vendors } = useVendor()
+
   const vendorStats = {
-    total: 0,
-    confirmed: 0,
-    pending: 0,
-    contacted: 0
+    total: stats.totalVendors,
+    confirmed: stats.byStatus.contracted || 0,
+    pending: stats.byStatus.contacted || 0,
+    contacted: stats.byStatus.potential || 0
   }
 
   return (
