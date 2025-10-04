@@ -34,27 +34,11 @@ export function useDashboard() {
             validModuleTypes.includes(m.type)
           )
 
-          // For demo users, hide AI modules
-          if (isDemoUser) {
-            validModules = validModules.map((m: DashboardModule) => {
-              if (m.type === 'ai-timeline' || m.type === 'moodboard') {
-                return { ...m, isVisible: false }
-              }
-              return m
-            })
-          }
-
           // Check if we need to add new modules (like ai-timeline)
           const existingModuleTypes = validModules.map((m: DashboardModule) => m.type)
           const newModules = DEFAULT_DASHBOARD_MODULES.filter(
             defaultModule => !existingModuleTypes.includes(defaultModule.type)
-          ).map(module => {
-            // For demo users, ensure new AI modules are hidden
-            if (isDemoUser && (module.type === 'ai-timeline' || module.type === 'moodboard')) {
-              return { ...module, isVisible: false }
-            }
-            return module
-          })
+          )
 
           // If there are new modules or we filtered out invalid ones, update the layout
           if (newModules.length > 0 || validModules.length !== parsedLayout.modules.length) {
@@ -83,20 +67,8 @@ export function useDashboard() {
         }
       } else {
         // No saved layout, use default
-        let defaultModules = DEFAULT_DASHBOARD_MODULES
-
-        // For demo users, hide AI modules in default layout
-        if (isDemoUser) {
-          defaultModules = DEFAULT_DASHBOARD_MODULES.map(m => {
-            if (m.type === 'ai-timeline' || m.type === 'moodboard') {
-              return { ...m, isVisible: false }
-            }
-            return m
-          })
-        }
-
         setLayout({
-          modules: defaultModules,
+          modules: DEFAULT_DASHBOARD_MODULES,
           isEditMode: false,
           isLocked: false
         })
