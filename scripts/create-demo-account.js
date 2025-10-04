@@ -46,6 +46,7 @@ async function cleanupOldDemoData(userId) {
     'vendors',
     'music',
     'notes',
+    'weddingDayTimeline',
     'userProfiles'
   ];
 
@@ -1807,6 +1808,169 @@ async function createDemoAccount() {
     });
     await milestoneBatch.commit();
     console.log('✅ Demo timeline milestones created');
+
+    // Create wedding day timeline items
+    console.log('\n📅 Creating wedding day timeline items...');
+    const weddingDayTimelineItems = [
+      {
+        weddingId: weddingRef.id,
+        time: '08:00',
+        activity: 'Příjezd vizážistky a kadeřnice',
+        duration: '30 min',
+        category: 'preparation',
+        location: 'Hotel Château Mcely - pokoj nevěsty',
+        participants: ['Vizážistka', 'Kadeřnice'],
+        notes: 'Příprava vybavení a materiálů',
+        order: 0,
+        isCompleted: false,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdBy: demoUser.uid
+      },
+      {
+        weddingId: weddingRef.id,
+        time: '08:30',
+        activity: 'Příprava nevěsty - líčení a účes',
+        duration: '3 hod',
+        category: 'preparation',
+        location: 'Hotel Château Mcely - pokoj nevěsty',
+        participants: ['Nevěsta', 'Kadeřnice', 'Vizážistka', 'Družičky'],
+        notes: 'Začít včas, rezervovat dostatek času. Salon Krása.',
+        order: 1,
+        isCompleted: false,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdBy: demoUser.uid
+      },
+      {
+        weddingId: weddingRef.id,
+        time: '10:00',
+        activity: 'Příprava ženicha',
+        duration: '1 hod',
+        category: 'preparation',
+        location: 'Hotel Château Mcely - pokoj ženicha',
+        participants: ['Ženich', 'Svědek'],
+        notes: 'Oblékání a příprava',
+        order: 2,
+        isCompleted: false,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdBy: demoUser.uid
+      },
+      {
+        weddingId: weddingRef.id,
+        time: '11:30',
+        activity: 'Fotografie příprav',
+        duration: '1 hod',
+        category: 'photography',
+        location: 'Hotel Château Mcely',
+        participants: ['Nevěsta', 'Ženich', 'Fotograf'],
+        notes: 'Fotky příprav, detaily, šperky. Photo Nejedlí.',
+        order: 3,
+        isCompleted: false,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdBy: demoUser.uid
+      },
+      {
+        weddingId: weddingRef.id,
+        time: '12:30',
+        activity: 'První setkání nevěsty a ženicha (First Look)',
+        duration: '30 min',
+        category: 'photography',
+        location: 'Château Mcely - zahrada',
+        participants: ['Nevěsta', 'Ženich', 'Fotograf'],
+        notes: 'First look - intimní moment před obřadem',
+        order: 4,
+        isCompleted: false,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdBy: demoUser.uid
+      },
+      {
+        weddingId: weddingRef.id,
+        time: '13:00',
+        activity: 'Příjezd hostů',
+        duration: '45 min',
+        category: 'ceremony',
+        location: 'Château Mcely - parkoviště',
+        participants: ['Hosté'],
+        notes: 'Uvítání hostů, welcome drink',
+        order: 5,
+        isCompleted: false,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdBy: demoUser.uid
+      },
+      {
+        weddingId: weddingRef.id,
+        time: '14:00',
+        activity: 'Svatební obřad',
+        duration: '45 min',
+        category: 'ceremony',
+        location: 'Château Mcely - zahrada',
+        participants: ['Nevěsta', 'Ženich', 'Oddávající', 'Hosté'],
+        notes: 'Hlavní část svatby - venkovní obřad',
+        order: 6,
+        isCompleted: false,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdBy: demoUser.uid
+      },
+      {
+        weddingId: weddingRef.id,
+        time: '14:45',
+        activity: 'Gratulace a házení kytice',
+        duration: '30 min',
+        category: 'ceremony',
+        location: 'Château Mcely - zahrada',
+        participants: ['Nevěsta', 'Ženich', 'Hosté'],
+        notes: 'Gratulace od hostů, házení kytice',
+        order: 7,
+        isCompleted: false,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdBy: demoUser.uid
+      },
+      {
+        weddingId: weddingRef.id,
+        time: '15:15',
+        activity: 'Skupinové fotografie',
+        duration: '45 min',
+        category: 'photography',
+        location: 'Château Mcely - zahrada',
+        participants: ['Nevěsta', 'Ženich', 'Fotograf', 'Hosté'],
+        notes: 'Skupinové fotky s hosty, rodinou. Photo Nejedlí.',
+        order: 8,
+        isCompleted: false,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdBy: demoUser.uid
+      },
+      {
+        weddingId: weddingRef.id,
+        time: '16:00',
+        activity: 'Kreativní focení novomanželů',
+        duration: '1 hod',
+        category: 'photography',
+        location: 'Château Mcely - park',
+        participants: ['Nevěsta', 'Ženich', 'Fotograf'],
+        notes: 'Kreativní portréty v parku',
+        order: 9,
+        isCompleted: false,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdBy: demoUser.uid
+      }
+    ];
+
+    const timelineBatch = db.batch();
+    weddingDayTimelineItems.forEach(item => {
+      const itemRef = db.collection('weddingDayTimeline').doc();
+      timelineBatch.set(itemRef, item);
+    });
+    await timelineBatch.commit();
+    console.log('✅ Wedding day timeline items created');
 
     console.log('\n🎉 Demo account setup complete!');
     console.log('📧 Email: demo@svatbot.cz');

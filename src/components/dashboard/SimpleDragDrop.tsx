@@ -19,6 +19,7 @@ import TimelinePlanningModule from './modules/TimelinePlanningModule'
 import VendorManagementModule from './modules/VendorManagementModule'
 import SeatingPlanModule from './modules/SeatingPlanModule'
 import WeddingChecklistModule from './modules/WeddingChecklistModule'
+import WeddingDayTimelineModule from './modules/WeddingDayTimelineModule'
 import MoodboardModule from './modules/MoodboardModule'
 import MusicPlaylistModule from './modules/MusicPlaylistModule'
 import FoodDrinksModule from './modules/FoodDrinksModule'
@@ -201,6 +202,8 @@ export default function SimpleDragDrop({ onWeddingSettingsClick }: SimpleDragDro
         return <SeatingPlanModule />
       case 'wedding-checklist':
         return <WeddingChecklistModule />
+      case 'wedding-day-timeline':
+        return <WeddingDayTimelineModule />
       case 'moodboard':
         return <MoodboardModule />
       case 'music-playlist':
