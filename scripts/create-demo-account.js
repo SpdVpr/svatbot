@@ -1091,7 +1091,7 @@ async function createDemoAccount() {
             price: 127500,
             priceType: 'per-person',
             included: ['Předkrm', 'Hlavní chod', 'Dezert', 'Nápoje'],
-            duration: undefined
+            duration: null
           }
         ],
         priceRange: {
@@ -1268,7 +1268,7 @@ async function createDemoAccount() {
             price: 25000,
             priceType: 'fixed',
             included: ['Svatební kytice', 'Korsáže', 'Stolní výzdoba', 'Obřadní výzdoba'],
-            duration: undefined
+            duration: null
           }
         ],
         priceRange: {
