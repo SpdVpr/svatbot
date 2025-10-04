@@ -15,7 +15,7 @@ export default function SeatingPlanModule() {
   return (
     <div className="wedding-card">
       <Link href="/seating" className="block mb-4">
-        <h3 className="text-lg font-semibold flex items-center space-x-2 hover:text-primary-600 transition-colors">
+        <h3 className="text-lg font-semibold flex items-center justify-center space-x-2 hover:text-primary-600 transition-colors">
           <Grid3X3 className="w-5 h-5 text-indigo-600" />
           <span>Rozmístění hostů</span>
         </h3>
@@ -62,24 +62,6 @@ export default function SeatingPlanModule() {
               <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
               <span>Export plánů</span>
             </div>
-          </div>
-        </div>
-
-        {/* Status */}
-        <div className="text-center">
-          <div className={`text-sm px-3 py-1 rounded-full inline-block ${
-            seatingStats.totalTables === 0
-              ? 'bg-gray-100 text-gray-600'
-              : seatingStats.isComplete
-                ? 'bg-green-100 text-green-700'
-                : 'bg-yellow-100 text-yellow-700'
-          }`}>
-            {seatingStats.totalTables === 0
-              ? 'Nevytvořeno'
-              : seatingStats.isComplete
-                ? 'Dokončeno'
-                : 'Rozpracováno'
-            }
           </div>
         </div>
       </div>

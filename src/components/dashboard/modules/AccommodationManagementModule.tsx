@@ -20,7 +20,7 @@ export default function AccommodationManagementModule() {
   return (
     <div className="wedding-card">
       <Link href="/accommodation" className="block mb-4">
-        <h3 className="text-lg font-semibold flex items-center space-x-2 hover:text-primary-600 transition-colors">
+        <h3 className="text-lg font-semibold flex items-center justify-center space-x-2 hover:text-primary-600 transition-colors">
           <Building2 className="w-5 h-5 text-primary-600" />
           <span>Ubytování</span>
         </h3>

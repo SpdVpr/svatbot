@@ -11,7 +11,7 @@ export default function BudgetTrackingModule() {
   return (
     <div className="wedding-card">
       <Link href="/budget" className="block mb-4">
-        <h3 className="text-lg font-semibold flex items-center space-x-2 hover:text-primary-600 transition-colors">
+        <h3 className="text-lg font-semibold flex items-center justify-center space-x-2 hover:text-primary-600 transition-colors">
           <DollarSign className="w-5 h-5 text-green-600" />
           <span>Rozpočet</span>
         </h3>
@@ -61,28 +61,6 @@ export default function BudgetTrackingModule() {
               {currencyUtils.formatShort(stats.totalBudget - stats.totalPaid)}
             </div>
             <div className="text-xs text-gray-500">Zbývá</div>
-          </div>
-        </div>
-
-        {/* Budget Status */}
-        <div className="text-center">
-          <div className={`text-sm px-3 py-1 rounded-full inline-block ${
-            stats.totalBudget === 0
-              ? 'bg-gray-100 text-gray-600'
-              : stats.budgetUsed > 90
-                ? 'bg-red-100 text-red-700'
-                : stats.budgetUsed > 75
-                  ? 'bg-yellow-100 text-yellow-700'
-                  : 'bg-green-100 text-green-700'
-          }`}>
-            {stats.totalBudget === 0
-              ? 'Nenastaveno'
-              : stats.budgetUsed > 90
-                ? 'Pozor na limit!'
-                : stats.budgetUsed > 75
-                  ? 'Blížíte se limitu'
-                  : 'V pořádku'
-            }
           </div>
         </div>
       </div>

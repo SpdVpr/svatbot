@@ -10,7 +10,7 @@ export default function TimelinePlanningModule() {
   return (
     <div className="wedding-card">
       <Link href="/timeline" className="block mb-4">
-        <h3 className="text-lg font-semibold flex items-center space-x-2 hover:text-primary-600 transition-colors">
+        <h3 className="text-lg font-semibold flex items-center justify-center space-x-2 hover:text-primary-600 transition-colors">
           <Calendar className="w-5 h-5 text-purple-600" />
           <span>Časový plán</span>
         </h3>
@@ -65,28 +65,6 @@ export default function TimelinePlanningModule() {
                   : stats.overallProgress < 80
                     ? 'Finální detaily'
                     : 'Dokončování'
-            }
-          </div>
-        </div>
-
-        {/* Status */}
-        <div className="text-center">
-          <div className={`text-sm px-3 py-1 rounded-full inline-block ${
-            stats.totalMilestones === 0
-              ? 'bg-gray-100 text-gray-600'
-              : stats.overallProgress < 30
-                ? 'bg-red-100 text-red-700'
-                : stats.overallProgress < 70
-                  ? 'bg-yellow-100 text-yellow-700'
-                  : 'bg-green-100 text-green-700'
-          }`}>
-            {stats.totalMilestones === 0
-              ? 'Naplánováno'
-              : stats.overallProgress < 30
-                ? 'Začínáme'
-                : stats.overallProgress < 70
-                  ? 'Pokračujeme'
-                  : 'Téměř hotovo'
             }
           </div>
         </div>

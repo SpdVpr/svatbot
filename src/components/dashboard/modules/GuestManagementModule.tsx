@@ -15,7 +15,7 @@ export default function GuestManagementModule() {
   return (
     <div className="wedding-card">
       <Link href="/guests" className="block mb-4">
-        <h3 className="text-lg font-semibold flex items-center space-x-2 hover:text-primary-600 transition-colors">
+        <h3 className="text-lg font-semibold flex items-center justify-center space-x-2 hover:text-primary-600 transition-colors">
           <Users className="w-5 h-5 text-primary-600" />
           <span>Správa hostů</span>
         </h3>
@@ -71,24 +71,6 @@ export default function GuestManagementModule() {
             </div>
           </div>
         )}
-
-        {/* Status */}
-        <div className="text-center">
-          <div className={`text-sm px-3 py-1 rounded-full inline-block ${
-            stats.total === 0
-              ? 'bg-gray-100 text-gray-600'
-              : responseRate < 50
-                ? 'bg-yellow-100 text-yellow-700'
-                : 'bg-green-100 text-green-700'
-          }`}>
-            {stats.total === 0
-              ? 'Žádní hosté'
-              : responseRate < 50
-                ? 'Čekáme na odpovědi'
-                : 'Dobré odpovědi'
-            }
-          </div>
-        </div>
       </div>
 
       <div className="mt-4 pt-4 border-t border-gray-200">

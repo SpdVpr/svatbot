@@ -10,7 +10,7 @@ export default function TaskManagementModule() {
   return (
     <div className="wedding-card">
       <Link href="/tasks" className="block mb-4">
-        <h3 className="text-lg font-semibold flex items-center space-x-2 hover:text-primary-600 transition-colors">
+        <h3 className="text-lg font-semibold flex items-center justify-center space-x-2 hover:text-primary-600 transition-colors">
           <List className="w-5 h-5 text-blue-600" />
           <span>Správa úkolů</span>
         </h3>
@@ -56,28 +56,6 @@ export default function TaskManagementModule() {
             </div>
             <div className="text-lg font-bold text-gray-900">{stats.overdue}</div>
             <div className="text-xs text-gray-500">Po termínu</div>
-          </div>
-        </div>
-
-        {/* Status */}
-        <div className="text-center">
-          <div className={`text-sm px-3 py-1 rounded-full inline-block ${
-            stats.total === 0
-              ? 'bg-gray-100 text-gray-600'
-              : stats.completionRate < 30
-                ? 'bg-red-100 text-red-700'
-                : stats.completionRate < 70
-                  ? 'bg-yellow-100 text-yellow-700'
-                  : 'bg-green-100 text-green-700'
-          }`}>
-            {stats.total === 0
-              ? 'Žádné úkoly'
-              : stats.completionRate < 30
-                ? 'Začínáme'
-                : stats.completionRate < 70
-                  ? 'V pokroku'
-                  : 'Téměř hotovo'
-            }
           </div>
         </div>
       </div>

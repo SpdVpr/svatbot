@@ -46,7 +46,7 @@ export default function MarketplaceModule() {
   return (
     <div className="wedding-card">
       <Link href="/marketplace" className="block mb-4">
-        <h3 className="text-lg font-semibold flex items-center space-x-2 hover:text-primary-600 transition-colors">
+        <h3 className="text-lg font-semibold flex items-center justify-center space-x-2 hover:text-primary-600 transition-colors">
           <Search className="w-5 h-5 text-primary-600" />
           <span>Najít dodavatele</span>
         </h3>
