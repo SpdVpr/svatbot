@@ -1,6 +1,6 @@
 export interface DashboardModule {
   id: string
-  type: 'wedding-countdown' | 'quick-actions' | 'main-features' | 'upcoming-tasks' | 'marketplace' | 'coming-soon' | 'task-management' | 'guest-management' | 'budget-tracking' | 'timeline-planning' | 'vendor-management' | 'seating-plan' | 'ai-timeline' | 'moodboard' | 'wedding-checklist' | 'music-playlist' | 'food-drinks' | 'wedding-website' | 'accommodation-management'
+  type: 'wedding-countdown' | 'quick-actions' | 'main-features' | 'upcoming-tasks' | 'marketplace' | 'coming-soon' | 'task-management' | 'guest-management' | 'budget-tracking' | 'timeline-planning' | 'vendor-management' | 'seating-plan' | 'moodboard' | 'wedding-checklist' | 'music-playlist' | 'food-drinks' | 'wedding-website' | 'accommodation-management'
   title: string
   size: 'small' | 'medium' | 'large' | 'full'
   position: {
@@ -139,16 +139,6 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     order: 9
   },
   {
-    id: 'ai-timeline',
-    type: 'ai-timeline',
-    title: 'AI Timeline',
-    size: 'large',
-    position: { row: 5, column: 0 },
-    isVisible: true,
-    isLocked: false,
-    order: 10
-  },
-  {
     id: 'moodboard',
     type: 'moodboard',
     title: 'Moodboard',
@@ -156,7 +146,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     position: { row: 5, column: 2 },
     isVisible: true,
     isLocked: false,
-    order: 11
+    order: 10
   },
   {
     id: 'wedding-checklist',
@@ -166,7 +156,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     position: { row: 4, column: 0 },
     isVisible: true,
     isLocked: false,
-    order: 12
+    order: 11
   },
   {
     id: 'music-playlist',
@@ -176,7 +166,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     position: { row: 4, column: 1 },
     isVisible: true,
     isLocked: false,
-    order: 13
+    order: 12
   },
   {
     id: 'food-drinks',
@@ -186,7 +176,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     position: { row: 3, column: 3 },
     isVisible: true,
     isLocked: false,
-    order: 14
+    order: 13
   },
   {
     id: 'wedding-website',
@@ -196,7 +186,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     position: { row: 4, column: 2 },
     isVisible: true,
     isLocked: false,
-    order: 15
+    order: 14
   },
   {
     id: 'coming-soon',
@@ -206,6 +196,6 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     position: { row: 6, column: 0 },
     isVisible: false,
     isLocked: false,
-    order: 16
+    order: 15
   }
 ]
