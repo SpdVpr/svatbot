@@ -14,15 +14,12 @@ export default function SeatingPlanModule() {
 
   return (
     <div className="wedding-card">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold flex items-center space-x-2">
+      <Link href="/seating" className="block mb-4">
+        <h3 className="text-lg font-semibold flex items-center space-x-2 hover:text-primary-600 transition-colors">
           <Grid3X3 className="w-5 h-5 text-indigo-600" />
           <span>Rozmístění hostů</span>
         </h3>
-        <Link href="/seating" className="text-sm text-primary-600 hover:underline">
-          Otevřít
-        </Link>
-      </div>
+      </Link>
 
       <div className="space-y-4">
         {/* Seating Overview */}

@@ -14,15 +14,12 @@ export default function VendorManagementModule() {
 
   return (
     <div className="wedding-card">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold flex items-center space-x-2">
+      <Link href="/vendors" className="block mb-4">
+        <h3 className="text-lg font-semibold flex items-center space-x-2 hover:text-primary-600 transition-colors">
           <Briefcase className="w-5 h-5 text-orange-600" />
           <span>Dodavatelé</span>
         </h3>
-        <Link href="/vendors" className="text-sm text-primary-600 hover:underline">
-          Otevřít
-        </Link>
-      </div>
+      </Link>
 
       <div className="space-y-4">
         {/* Vendor Count */}

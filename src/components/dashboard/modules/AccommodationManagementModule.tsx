@@ -19,15 +19,12 @@ export default function AccommodationManagementModule() {
 
   return (
     <div className="wedding-card">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold flex items-center space-x-2">
+      <Link href="/accommodation" className="block mb-4">
+        <h3 className="text-lg font-semibold flex items-center space-x-2 hover:text-primary-600 transition-colors">
           <Building2 className="w-5 h-5 text-primary-600" />
           <span>Ubytování</span>
         </h3>
-        <Link href="/accommodation" className="text-sm text-primary-600 hover:underline">
-          Otevřít
-        </Link>
-      </div>
+      </Link>
 
       {accommodations.length === 0 ? (
         // Empty state

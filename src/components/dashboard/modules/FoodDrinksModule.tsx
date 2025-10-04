@@ -10,15 +10,12 @@ export default function FoodDrinksModule() {
 
   return (
     <div className="wedding-card">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold flex items-center space-x-2">
+      <Link href="/menu" className="block mb-4">
+        <h3 className="text-lg font-semibold flex items-center space-x-2 hover:text-primary-600 transition-colors">
           <UtensilsCrossed className="w-5 h-5 text-pink-600" />
           <span>Jídlo a Pití</span>
         </h3>
-        <Link href="/menu" className="text-sm text-primary-600 hover:underline">
-          Otevřít
-        </Link>
-      </div>
+      </Link>
 
       <div className="space-y-4">
         {/* Cost Overview */}

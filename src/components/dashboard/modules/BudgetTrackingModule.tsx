@@ -10,15 +10,12 @@ export default function BudgetTrackingModule() {
 
   return (
     <div className="wedding-card">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold flex items-center space-x-2">
+      <Link href="/budget" className="block mb-4">
+        <h3 className="text-lg font-semibold flex items-center space-x-2 hover:text-primary-600 transition-colors">
           <DollarSign className="w-5 h-5 text-green-600" />
           <span>Rozpočet</span>
         </h3>
-        <Link href="/budget" className="text-sm text-primary-600 hover:underline">
-          Otevřít
-        </Link>
-      </div>
+      </Link>
 
       <div className="space-y-4">
         {/* Budget Overview */}

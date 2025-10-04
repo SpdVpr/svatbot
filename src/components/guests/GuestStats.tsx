@@ -392,9 +392,17 @@ export default function GuestStats({
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Users className="w-4 h-4 text-green-500" />
-                <span className="text-gray-700">S dětmi</span>
+                <span className="text-gray-700">Hostů s dětmi</span>
               </div>
               <span className="font-medium">{guestsWithChildren}</span>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Users className="w-4 h-4 text-pink-500" />
+                <span className="text-gray-700">Celkem dětí</span>
+              </div>
+              <span className="font-medium">{stats.totalChildren}</span>
             </div>
 
             <div className="flex items-center justify-between">
