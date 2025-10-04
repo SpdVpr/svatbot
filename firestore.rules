@@ -216,6 +216,14 @@ service cloud.firestore {
                                       get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid));
     }
 
+    // Wedding Day Timeline collection
+    match /weddingDayTimeline/{itemId} {
+      allow read, write, create: if isAuthenticated() &&
+                                    (isDemoUser() ||
+                                     (exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                                      get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid));
+    }
+
     // Wedding Websites collection
     match /weddingWebsites/{websiteId} {
       allow read, write, create: if isAuthenticated() &&
