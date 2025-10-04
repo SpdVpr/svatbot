@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Clock, Calendar, ArrowLeft, Plus, Edit3, Trash2, Save, X, CheckCircle, Circle, Loader2 } from 'lucide-react'
+import { Clock, Calendar, ArrowLeft, Plus, Edit3, Trash2, Save, X, CheckCircle, Circle, Loader2, BarChart3, List } from 'lucide-react'
 import Link from 'next/link'
 import { useWeddingDayTimeline, WeddingDayTimelineItem } from '@/hooks/useWeddingDayTimeline'
+import TimelineGraphView from '@/components/timeline/TimelineGraphView'
 
 const categoryColors = {
   preparation: 'bg-blue-100 text-blue-600 border-blue-200',
@@ -25,6 +26,7 @@ export default function SvatebniDenPage() {
   const { timeline, stats, loading, createTimelineItem, updateTimelineItem, deleteTimelineItem, toggleComplete } = useWeddingDayTimeline()
   const [editingId, setEditingId] = useState<string | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
+  const [viewMode, setViewMode] = useState<'list' | 'graph'>('list')
   const [formData, setFormData] = useState({
     time: '',
     activity: '',
@@ -97,13 +99,40 @@ export default function SvatebniDenPage() {
                 <span>Harmonogram svatebního dne</span>
               </h1>
             </div>
-            <button
-              onClick={() => setShowAddForm(true)}
-              className="btn-primary flex items-center space-x-2"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Přidat aktivitu</span>
-            </button>
+            <div className="flex items-center space-x-3">
+              {/* View mode toggle */}
+              <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors ${
+                    viewMode === 'list'
+                      ? 'bg-white text-purple-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <List className="w-4 h-4" />
+                  <span className="text-sm font-medium">Seznam</span>
+                </button>
+                <button
+                  onClick={() => setViewMode('graph')}
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors ${
+                    viewMode === 'graph'
+                      ? 'bg-white text-purple-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <BarChart3 className="w-4 h-4" />
+                  <span className="text-sm font-medium">Graf</span>
+                </button>
+              </div>
+              <button
+                onClick={() => setShowAddForm(true)}
+                className="btn-primary flex items-center space-x-2"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Přidat aktivitu</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -251,8 +280,13 @@ export default function SvatebniDenPage() {
           </div>
         )}
 
-        {/* Timeline */}
-        {timeline.length > 0 ? (
+        {/* Graph View */}
+        {viewMode === 'graph' && timeline.length > 0 && (
+          <TimelineGraphView timeline={timeline} />
+        )}
+
+        {/* List View */}
+        {viewMode === 'list' && timeline.length > 0 && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
             <div className="p-6">
               <div className="space-y-4">
@@ -317,7 +351,10 @@ export default function SvatebniDenPage() {
               </div>
             </div>
           </div>
-        ) : (
+        )}
+
+        {/* Empty State */}
+        {timeline.length === 0 && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
             <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
