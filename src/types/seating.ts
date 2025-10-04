@@ -17,11 +17,14 @@ export interface Table {
   capacity: number // Maximum number of seats
   position: TablePosition
   rotation: number // Rotation in degrees (0-360)
-  
+
+  // Seating configuration for rectangular/square tables
+  headSeats?: number // Number of seats at the head (short sides) - 0, 1, or 2 per side
+
   // Visual properties
   color?: string
   isHighlighted?: boolean
-  
+
   // Metadata
   notes?: string
   createdAt: Date
@@ -163,6 +166,7 @@ export interface TableFormData {
   position: TablePosition
   rotation: number
   color?: string
+  headSeats?: number
   notes?: string
 }
 

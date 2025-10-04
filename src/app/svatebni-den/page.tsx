@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Clock, Calendar, ArrowLeft, Plus, Edit3, Trash2, Save, X, CheckCircle, Circle, Loader2, BarChart3, List } from 'lucide-react'
+import { Clock, Calendar, ArrowLeft, Plus, Trash2, X, CheckCircle, Circle, Loader2, List } from 'lucide-react'
 import Link from 'next/link'
 import { useWeddingDayTimeline, WeddingDayTimelineItem } from '@/hooks/useWeddingDayTimeline'
 import TimelineGraphView from '@/components/timeline/TimelineGraphView'
@@ -26,7 +26,6 @@ export default function SvatebniDenPage() {
   const { timeline, stats, loading, createTimelineItem, updateTimelineItem, deleteTimelineItem, toggleComplete } = useWeddingDayTimeline()
   const [editingId, setEditingId] = useState<string | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
-  const [viewMode, setViewMode] = useState<'list' | 'graph'>('list')
   const [formData, setFormData] = useState({
     time: '',
     activity: '',
@@ -99,40 +98,13 @@ export default function SvatebniDenPage() {
                 <span>Harmonogram svatebního dne</span>
               </h1>
             </div>
-            <div className="flex items-center space-x-3">
-              {/* View mode toggle */}
-              <div className="flex items-center bg-gray-100 rounded-lg p-1">
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors ${
-                    viewMode === 'list'
-                      ? 'bg-white text-purple-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <List className="w-4 h-4" />
-                  <span className="text-sm font-medium">Seznam</span>
-                </button>
-                <button
-                  onClick={() => setViewMode('graph')}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors ${
-                    viewMode === 'graph'
-                      ? 'bg-white text-purple-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <BarChart3 className="w-4 h-4" />
-                  <span className="text-sm font-medium">Graf</span>
-                </button>
-              </div>
-              <button
-                onClick={() => setShowAddForm(true)}
-                className="btn-primary flex items-center space-x-2"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Přidat aktivitu</span>
-              </button>
-            </div>
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="btn-primary flex items-center space-x-2"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Přidat aktivitu</span>
+            </button>
           </div>
         </div>
       </div>
@@ -280,15 +252,21 @@ export default function SvatebniDenPage() {
           </div>
         )}
 
-        {/* Graph View */}
-        {viewMode === 'graph' && timeline.length > 0 && (
-          <TimelineGraphView timeline={timeline} />
+        {/* Graph View - Always show at top if there are items */}
+        {timeline.length > 0 && (
+          <div className="mb-8">
+            <TimelineGraphView timeline={timeline} />
+          </div>
         )}
 
-        {/* List View */}
-        {viewMode === 'list' && timeline.length > 0 && (
+        {/* List View - Always show below graph if there are items */}
+        {timeline.length > 0 && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
             <div className="p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center space-x-2">
+                <List className="w-5 h-5 text-purple-600" />
+                <span>Seznam aktivit</span>
+              </h2>
               <div className="space-y-4">
                 {timeline.map((item) => (
                   <div

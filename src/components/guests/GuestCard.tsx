@@ -306,7 +306,7 @@ export default function GuestCard({
             {/* Notes tag */}
             {guest.notes && guest.notes.trim() && (
               <span
-                className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full flex items-center gap-1"
+                className="text-xs bg-lime-100 text-lime-700 px-2 py-1 rounded-full flex items-center gap-1"
                 title={guest.notes}
               >
                 📝 {guest.notes.length > 30 ? guest.notes.substring(0, 30) + '...' : guest.notes}
@@ -335,7 +335,7 @@ export default function GuestCard({
               className={`text-xs px-2 py-1 rounded-full ${
                 guest.invitationMethod === 'sent'
                   ? 'bg-cyan-100 text-cyan-700'
-                  : 'bg-green-100 text-green-700'
+                  : 'bg-amber-100 text-amber-700'
               }`}
             >
               {guest.invitationMethod === 'sent' ? 'Pozvánka odeslána' : 'Pozvánka předána'}

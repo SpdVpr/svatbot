@@ -107,7 +107,7 @@ export default function SeatingPage() {
               Dashboard
             </Link>
             <span>/</span>
-            <span className="text-gray-900 font-medium">Rozmístění hostů</span>
+            <span className="text-gray-900 font-medium">Zasedací pořádek</span>
           </div>
         </div>
 
@@ -123,9 +123,9 @@ export default function SeatingPage() {
                 <span className="hidden sm:inline">Zpět na dashboard</span>
               </Link>
               <div className="border-l border-gray-300 pl-4">
-                <h1 className="text-2xl font-bold text-gray-900">Rozmístění hostů</h1>
+                <h1 className="text-2xl font-bold text-gray-900">Zasedací pořádek</h1>
                 <p className="text-sm text-text-muted">
-                  Plánování rozmístění pro svatbu {wedding.brideName} & {wedding.groomName}
+                  Plánování zasedacího pořádku pro svatbu {wedding.brideName} & {wedding.groomName}
                 </p>
               </div>
             </div>

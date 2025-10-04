@@ -61,40 +61,6 @@ export default function WeddingDayTimelineModule() {
               </div>
             </div>
 
-            {/* Category Stats */}
-            <div className="grid grid-cols-2 gap-2">
-              {Object.entries(categoryLabels).map(([key, label]) => {
-                const count = stats.byCategory[key] || 0
-                if (count === 0) return null
-                return (
-                  <div 
-                    key={key}
-                    className={`p-2 rounded-lg text-center ${categoryColors[key as keyof typeof categoryColors]}`}
-                  >
-                    <div className="text-lg font-bold">{count}</div>
-                    <div className="text-xs">{label}</div>
-                  </div>
-                )
-              })}
-            </div>
-
-            {/* Progress */}
-            <div className="bg-gray-50 p-3 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-gray-700">Pokrok</span>
-                <span className="text-sm font-bold text-gray-900">{stats.completionRate}%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-purple-600 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${stats.completionRate}%` }}
-                />
-              </div>
-              <div className="text-xs text-gray-600 mt-2 text-center">
-                {stats.completed} z {stats.total} dokončeno
-              </div>
-            </div>
-
             {/* Next Items */}
             <div className="bg-white border border-gray-200 rounded-lg p-3">
               <div className="text-sm font-medium text-gray-700 mb-2">Nadcházející aktivity</div>

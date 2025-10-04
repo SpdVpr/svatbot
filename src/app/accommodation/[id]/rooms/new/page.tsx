@@ -42,7 +42,7 @@ export default function NewRoomPage({ params }: NewRoomPageProps) {
     { value: 'other', label: 'Jiný' },
     { value: 'family', label: 'Rodinný pokoj' },
     { value: 'twin', label: 'Twin (2 postele)' }
-  ]
+  ].sort((a, b) => a.label.localeCompare(b.label, 'cs'))
 
   const bedTypes: { value: BedType; label: string }[] = [
     { value: 'crib', label: 'Dětská postýlka' },

@@ -17,7 +17,7 @@ export default function SeatingPlanModule() {
       <Link href="/seating" className="block mb-4">
         <h3 className="text-lg font-semibold flex items-center justify-center space-x-2 hover:text-primary-600 transition-colors">
           <Grid3X3 className="w-5 h-5 text-indigo-600" />
-          <span>Rozmístění hostů</span>
+          <span>Zasedací pořádek</span>
         </h3>
       </Link>
 

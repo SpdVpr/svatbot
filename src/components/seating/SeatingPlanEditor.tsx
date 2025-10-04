@@ -72,7 +72,6 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
   const [isRotating, setIsRotating] = useState(false)
   const [rotatingTable, setRotatingTable] = useState<string | null>(null)
   const [rotationStartAngle, setRotationStartAngle] = useState(0)
-  const [showTableMenu, setShowTableMenu] = useState<string | null>(null)
 
   // Mobile long press detection
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null)
@@ -83,12 +82,14 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     size: TableSize
     capacity: number
     color: string
+    headSeats: number
   }>({
     name: '',
     shape: 'round',
     size: 'medium',
     capacity: 8,
-    color: '#F8BBD9'
+    color: '#F8BBD9',
+    headSeats: 0
   })
   const [viewOptions, setViewOptions] = useState<SeatingViewOptions>({
     showGuestNames: true,
@@ -154,19 +155,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     }
   }, [longPressTimer])
 
-  // Close table menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (showTableMenu && !(event.target as Element).closest('.table-menu')) {
-        setShowTableMenu(null)
-      }
-    }
 
-    if (showTableMenu) {
-      document.addEventListener('mousedown', handleClickOutside)
-      return () => document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [showTableMenu])
 
   // Mobile long press handlers
   const handleTouchStart = (tableId: string) => {
@@ -213,7 +202,8 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
         capacity: tableFormData.capacity,
         position: { x: 200, y: 200 },
         rotation: 0,
-        color: tableFormData.color
+        color: tableFormData.color,
+        headSeats: tableFormData.headSeats
       }, currentPlan.id) // Explicitly pass planId
 
       setShowTableForm(false)
@@ -222,7 +212,8 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
         shape: 'round',
         size: 'medium',
         capacity: 8,
-        color: '#F8BBD9'
+        color: '#F8BBD9',
+        headSeats: 0
       })
     } catch (error) {
       console.error('Error adding table:', error)
@@ -238,7 +229,8 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
       shape: table.shape,
       size: table.size,
       capacity: table.capacity,
-      color: table.color || '#F8BBD9'
+      color: table.color || '#F8BBD9',
+      headSeats: table.headSeats || 0
     })
     setShowTableForm(true)
   }
@@ -253,7 +245,8 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
         shape: tableFormData.shape,
         size: tableFormData.size,
         capacity: tableFormData.capacity,
-        color: tableFormData.color
+        color: tableFormData.color,
+        headSeats: tableFormData.headSeats
       })
       setShowTableForm(false)
       setEditingTable(null)
@@ -262,7 +255,8 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
         shape: 'round',
         size: 'medium',
         capacity: 8,
-        color: '#F8BBD9'
+        color: '#F8BBD9',
+        headSeats: 0
       })
     } catch (error) {
       console.error('Error updating table:', error)
@@ -334,7 +328,6 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     if (confirm('Opravdu chcete smazat tento stůl?')) {
       try {
         await deleteTable(tableId)
-        setShowTableMenu(null)
       } catch (error) {
         console.error('Error deleting table:', error)
         alert('Chyba při mazání stolu: ' + (error as Error).message)
@@ -668,6 +661,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                 handleTableDragEnd()
                 handleDanceFloorDragEnd()
               }}
+
             >
               {/* Venue features */}
               {currentPlan.venueLayout.danceFloor && (() => {
@@ -745,7 +739,11 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                       }`}
                       style={{
                         width: table.size === 'small' ? 80 : table.size === 'medium' ? 120 : table.size === 'large' ? 160 : 200,
-                        height: table.shape === 'round' ? (table.size === 'small' ? 80 : table.size === 'medium' ? 120 : table.size === 'large' ? 160 : 200) : 80,
+                        height: table.shape === 'round' || table.shape === 'square'
+                          ? (table.size === 'small' ? 80 : table.size === 'medium' ? 120 : table.size === 'large' ? 160 : 200)
+                          : table.shape === 'oval'
+                            ? (table.size === 'small' ? 60 : table.size === 'medium' ? 90 : table.size === 'large' ? 120 : 150)
+                            : (table.size === 'small' ? 60 : table.size === 'medium' ? 80 : table.size === 'large' ? 100 : 120), // rectangular
                         borderRadius: table.shape === 'round' ? '50%' : table.shape === 'oval' ? '50%' : '8px',
                         backgroundColor: table.color || '#ffffff'
                       }}
@@ -759,12 +757,61 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                         </div>
                       )}
 
-                      {/* Seats around table */}
+                      {/* Seats around table - positioned based on table shape */}
                       {tableSeats.map((seat, index) => {
-                        const angle = (360 / tableSeats.length) * index
-                        const radius = table.size === 'small' ? 50 : table.size === 'medium' ? 70 : table.size === 'large' ? 90 : 110
-                        const seatX = Math.cos((angle - 90) * Math.PI / 180) * radius
-                        const seatY = Math.sin((angle - 90) * Math.PI / 180) * radius
+                        let seatX = 0
+                        let seatY = 0
+
+                        if (table.shape === 'round' || table.shape === 'oval') {
+                          // Circular positioning for round/oval tables
+                          const angle = (360 / tableSeats.length) * index
+                          const radius = table.size === 'small' ? 50 : table.size === 'medium' ? 70 : table.size === 'large' ? 90 : 110
+                          seatX = Math.cos((angle - 90) * Math.PI / 180) * radius
+                          seatY = Math.sin((angle - 90) * Math.PI / 180) * radius
+                        } else {
+                          // Rectangular/square positioning with optional head seats
+                          const tableWidth = table.size === 'small' ? 100 : table.size === 'medium' ? 140 : table.size === 'large' ? 180 : 220
+                          const tableHeight = table.shape === 'square'
+                            ? tableWidth
+                            : (table.size === 'small' ? 60 : table.size === 'medium' ? 80 : table.size === 'large' ? 100 : 120)
+
+                          const seatOffset = 10 // Distance from table edge
+                          const totalSeats = tableSeats.length
+                          const headSeats = table.headSeats || 0
+                          const seatsPerHead = headSeats // seats per short side
+                          const totalHeadSeats = seatsPerHead * 2 // both short sides
+                          const longSideSeats = totalSeats - totalHeadSeats
+
+                          // Distribute: half on top long side, half on bottom long side, plus head seats on short sides
+                          const seatsOnTop = Math.ceil(longSideSeats / 2)
+                          const seatsOnBottom = longSideSeats - seatsOnTop
+
+                          if (index < seatsOnTop) {
+                            // Top long side
+                            const spacing = tableWidth / (seatsOnTop + 1)
+                            seatX = spacing * (index + 1) - tableWidth / 2
+                            seatY = -tableHeight / 2 - seatOffset
+                          } else if (index < seatsOnTop + seatsPerHead) {
+                            // Right short side (head)
+                            const headIndex = index - seatsOnTop
+                            const spacing = tableHeight / (seatsPerHead + 1)
+                            seatX = tableWidth / 2 + seatOffset
+                            seatY = spacing * (headIndex + 1) - tableHeight / 2
+                          } else if (index < seatsOnTop + seatsPerHead + seatsOnBottom) {
+                            // Bottom long side
+                            const bottomIndex = index - seatsOnTop - seatsPerHead
+                            const spacing = tableWidth / (seatsOnBottom + 1)
+                            seatX = tableWidth / 2 - spacing * (bottomIndex + 1)
+                            seatY = tableHeight / 2 + seatOffset
+                          } else {
+                            // Left short side (head)
+                            const headIndex = index - seatsOnTop - seatsPerHead - seatsOnBottom
+                            const spacing = tableHeight / (seatsPerHead + 1)
+                            seatX = -tableWidth / 2 - seatOffset
+                            seatY = tableHeight / 2 - spacing * (headIndex + 1)
+                          }
+                        }
+
                         const guestName = getGuestName(seat)
 
                         return (
@@ -811,83 +858,85 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                       </button>
                     </div>
 
-                    {/* Table menu button */}
-                    <div className="absolute -top-2 -left-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        className="w-6 h-6 bg-gray-500 text-white rounded-full flex items-center justify-center hover:bg-gray-600 transition-colors"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setShowTableMenu(showTableMenu === table.id ? null : table.id)
-                        }}
-                        title="Menu stolu"
-                      >
-                        <MousePointer2 className="w-3 h-3" />
-                      </button>
-
-                      {/* Table menu */}
-                      {showTableMenu === table.id && (
-                        <div className="table-menu absolute top-8 left-0 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50 min-w-32">
-                          <button
-                            className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-2"
-                            onClick={() => {
-                              handleEditTable(table)
-                              setShowTableMenu(null)
-                            }}
-                          >
-                            <Edit3 className="w-3 h-3" />
-                            <span>Upravit</span>
-                          </button>
-                          <button
-                            className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-2"
-                            onClick={() => {
-                              rotateTable(table.id, 45)
-                              setShowTableMenu(null)
-                            }}
-                          >
-                            <RotateCw className="w-3 h-3" />
-                            <span>Otočit 45°</span>
-                          </button>
-                          <button
-                            className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-2"
-                            onClick={() => {
-                              rotateTable(table.id, 90)
-                              setShowTableMenu(null)
-                            }}
-                          >
-                            <RotateCw className="w-3 h-3" />
-                            <span>Otočit 90°</span>
-                          </button>
-                          <hr className="my-1" />
-                          <button
-                            className="w-full px-3 py-2 text-left text-sm hover:bg-red-50 text-red-600 flex items-center space-x-2"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleDeleteTable(table.id)
-                            }}
-                          >
-                            <Trash2 className="w-3 h-3" />
-                            <span>Smazat</span>
-                          </button>
-                        </div>
-                      )}
+                    {/* Table info on hover - centered in table */}
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-20 pointer-events-none">
+                      <div className="bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                        Dvojklik pro úpravu
+                      </div>
                     </div>
                     </div>
 
-                    {/* Guest names positioned around table - rotated with table but never upside down */}
-                    {viewOptions.showGuestNames && tableSeats.filter(s => s.guestId).map((seat, index) => {
+                    {/* Guest names positioned around table - adapted to table shape */}
+                    {viewOptions.showGuestNames && tableSeats.filter(s => s.guestId).map((seat) => {
                       const guestName = getGuestName(seat)
                       if (!guestName) return null
 
-                      const seatAngle = (360 / tableSeats.length) * index
-                      const totalAngle = seatAngle + table.rotation
-                      const nameRadius = table.size === 'small' ? 80 : table.size === 'medium' ? 100 : table.size === 'large' ? 120 : 140
-                      const nameX = Math.cos((totalAngle - 90) * Math.PI / 180) * nameRadius
-                      const nameY = Math.sin((totalAngle - 90) * Math.PI / 180) * nameRadius
+                      // Find the actual index of this seat in the full tableSeats array
+                      const seatIndex = tableSeats.findIndex(s => s.id === seat.id)
+                      if (seatIndex === -1) return null
 
-                      // Calculate text rotation - keep text readable (never upside down)
-                      let textRotation = totalAngle
-                      if (textRotation > 90 && textRotation < 270) {
-                        textRotation += 180 // Flip text if it would be upside down
+                      let nameX = 0
+                      let nameY = 0
+                      let textRotation = 0
+
+                      if (table.shape === 'round' || table.shape === 'oval') {
+                        // Circular positioning for round/oval tables
+                        const seatAngle = (360 / tableSeats.length) * seatIndex
+                        const totalAngle = seatAngle + table.rotation
+                        const nameRadius = table.size === 'small' ? 80 : table.size === 'medium' ? 100 : table.size === 'large' ? 120 : 140
+                        nameX = Math.cos((totalAngle - 90) * Math.PI / 180) * nameRadius
+                        nameY = Math.sin((totalAngle - 90) * Math.PI / 180) * nameRadius
+
+                        // Calculate text rotation - keep text readable (never upside down)
+                        textRotation = totalAngle
+                        if (textRotation > 90 && textRotation < 270) {
+                          textRotation += 180 // Flip text if it would be upside down
+                        }
+                      } else {
+                        // Rectangular/square positioning with optional head seats
+                        const tableWidth = table.size === 'small' ? 100 : table.size === 'medium' ? 140 : table.size === 'large' ? 180 : 220
+                        const tableHeight = table.shape === 'square'
+                          ? tableWidth
+                          : (table.size === 'small' ? 60 : table.size === 'medium' ? 80 : table.size === 'large' ? 100 : 120)
+
+                        const nameOffset = 40 // Distance from table edge
+                        const totalSeats = tableSeats.length
+                        const headSeats = table.headSeats || 0
+                        const seatsPerHead = headSeats
+                        const totalHeadSeats = seatsPerHead * 2
+                        const longSideSeats = totalSeats - totalHeadSeats
+
+                        const seatsOnTop = Math.ceil(longSideSeats / 2)
+                        const seatsOnBottom = longSideSeats - seatsOnTop
+
+                        if (seatIndex < seatsOnTop) {
+                          // Top long side
+                          const spacing = tableWidth / (seatsOnTop + 1)
+                          nameX = spacing * (seatIndex + 1) - tableWidth / 2
+                          nameY = -tableHeight / 2 - nameOffset
+                          textRotation = 0
+                        } else if (seatIndex < seatsOnTop + seatsPerHead) {
+                          // Right short side (head)
+                          const headIndex = seatIndex - seatsOnTop
+                          const spacing = tableHeight / (seatsPerHead + 1)
+                          nameX = tableWidth / 2 + nameOffset
+                          nameY = spacing * (headIndex + 1) - tableHeight / 2
+                          textRotation = 90
+                        } else if (seatIndex < seatsOnTop + seatsPerHead + seatsOnBottom) {
+                          // Bottom long side
+                          const bottomIndex = seatIndex - seatsOnTop - seatsPerHead
+                          const spacing = tableWidth / (seatsOnBottom + 1)
+                          nameX = tableWidth / 2 - spacing * (bottomIndex + 1)
+                          nameY = tableHeight / 2 + nameOffset
+                          textRotation = 0
+                        } else {
+                          // Left short side (head)
+                          const headIndex = seatIndex - seatsOnTop - seatsPerHead - seatsOnBottom
+                          const spacing = tableHeight / (seatsPerHead + 1)
+                          nameX = -tableWidth / 2 - nameOffset
+                          nameY = tableHeight / 2 - spacing * (headIndex + 1)
+                          textRotation = 270
+                        }
                       }
 
                       return (
@@ -908,6 +957,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                   </div>
                 )
               })}
+
             </div>
           </div>
         </div>
@@ -1097,11 +1147,51 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                   type="number"
                   min="2"
                   max="20"
-                  value={tableFormData.capacity}
-                  onChange={(e) => setTableFormData(prev => ({ ...prev, capacity: parseInt(e.target.value) || 8 }))}
+                  value={tableFormData.capacity || ''}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    if (value === '') {
+                      setTableFormData(prev => ({ ...prev, capacity: '' as any }))
+                    } else {
+                      const numValue = parseInt(value)
+                      if (!isNaN(numValue)) {
+                        setTableFormData(prev => ({
+                          ...prev,
+                          capacity: Math.max(2, Math.min(20, numValue))
+                        }))
+                      }
+                    }
+                  }}
+                  onBlur={(e) => {
+                    // On blur, if empty, set to minimum value
+                    if (e.target.value === '') {
+                      setTableFormData(prev => ({ ...prev, capacity: 2 }))
+                    }
+                  }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
+
+              {/* Head seats - only for rectangular/square tables */}
+              {(tableFormData.shape === 'rectangular' || tableFormData.shape === 'square') && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Místa v čele stolu
+                  </label>
+                  <select
+                    value={tableFormData.headSeats}
+                    onChange={(e) => setTableFormData(prev => ({ ...prev, headSeats: parseInt(e.target.value) }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  >
+                    <option value="0">Žádná místa v čele</option>
+                    <option value="1">1 místo na každé straně (2 celkem)</option>
+                    <option value="2">2 místa na každé straně (4 celkem)</option>
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Počet míst na kratších stranách stolu
+                  </p>
+                </div>
+              )}
 
               {/* Table color */}
               <div>
@@ -1126,31 +1216,50 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
               </div>
             </div>
 
-            <div className="flex space-x-3 pt-6">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowTableForm(false)
-                  setEditingTable(null)
-                  setTableFormData({
-                    name: '',
-                    shape: 'round',
-                    size: 'medium',
-                    capacity: 8,
-                    color: '#F8BBD9'
-                  })
-                }}
-                className="flex-1 btn-outline"
-              >
-                Zrušit
-              </button>
-              <button
-                type="button"
-                onClick={editingTable ? handleSaveTable : handleAddTable}
-                className="flex-1 btn-primary"
-              >
-                {editingTable ? 'Uložit změny' : 'Přidat stůl'}
-              </button>
+            <div className="space-y-3 pt-6">
+              {editingTable && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (editingTable) {
+                      handleDeleteTable(editingTable.id)
+                      setShowTableForm(false)
+                      setEditingTable(null)
+                    }
+                  }}
+                  className="w-full btn-outline text-red-600 border-red-300 hover:bg-red-50 flex items-center justify-center space-x-2"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span>Smazat stůl</span>
+                </button>
+              )}
+              <div className="flex space-x-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowTableForm(false)
+                    setEditingTable(null)
+                    setTableFormData({
+                      name: '',
+                      shape: 'round',
+                      size: 'medium',
+                      capacity: 8,
+                      color: '#F8BBD9',
+                      headSeats: 0
+                    })
+                  }}
+                  className="flex-1 btn-outline"
+                >
+                  Zrušit
+                </button>
+                <button
+                  type="button"
+                  onClick={editingTable ? handleSaveTable : handleAddTable}
+                  className="flex-1 btn-primary"
+                >
+                  {editingTable ? 'Uložit změny' : 'Přidat stůl'}
+                </button>
+              </div>
             </div>
           </div>
         </div>

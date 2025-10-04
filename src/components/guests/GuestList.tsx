@@ -808,7 +808,7 @@ export default function GuestList({
 
                           {/* Children indicator */}
                           {guest.hasChildren && guest.children && guest.children.length > 0 && (
-                            <span className="text-xs bg-pink-100 text-pink-700 px-2 py-1 rounded-full">
+                            <span className="text-xs bg-rose-100 text-rose-700 px-2 py-1 rounded-full">
                               {guest.children.length} {guest.children.length === 1 ? 'dítě' : 'děti'}
                             </span>
                           )}
@@ -877,7 +877,7 @@ export default function GuestList({
                               className={`text-xs px-2 py-1 rounded-full ${
                                 guest.invitationMethod === 'sent'
                                   ? 'bg-cyan-100 text-cyan-700'
-                                  : 'bg-green-100 text-green-700'
+                                  : 'bg-amber-100 text-amber-700'
                               }`}
                             >
                               {guest.invitationMethod === 'sent' ? 'Pozvánka odeslána' : 'Pozvánka předána'}

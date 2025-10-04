@@ -77,7 +77,7 @@ export default function MainFeaturesModule() {
     {
       icon: Grid3X3,
       title: 'Seating Plan',
-      subtitle: 'Rozmístění hostů',
+      subtitle: 'Zasedací pořádek',
       description: 'Uspořádejte stoly a přiřaďte hosty',
       value: 'Vytvořit',
       color: 'text-indigo-600 bg-indigo-100',

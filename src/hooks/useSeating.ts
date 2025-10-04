@@ -101,22 +101,23 @@ export function useSeating(): UseSeatingReturn {
   }, [currentPlan])
 
   // Update currentPlan when seatingPlans change (to reflect Firestore updates)
-  useEffect(() => {
-    if (currentPlan && seatingPlans.length > 0) {
-      const updatedPlan = seatingPlans.find(p => p.id === currentPlan.id)
-      if (updatedPlan) {
-        // Only update if the data has actually changed (compare tables/seats length)
-        const currentTablesCount = currentPlan.tables?.length || 0
-        const updatedTablesCount = updatedPlan.tables?.length || 0
-        const currentSeatsCount = currentPlan.seats?.length || 0
-        const updatedSeatsCount = updatedPlan.seats?.length || 0
-
-        if (currentTablesCount !== updatedTablesCount || currentSeatsCount !== updatedSeatsCount) {
-          setCurrentPlanState(updatedPlan)
-        }
-      }
-    }
-  }, [seatingPlans, currentPlan?.id, currentPlan?.tables?.length, currentPlan?.seats?.length])
+  // Disabled to prevent infinite loop - state updates are handled directly in updateSeatingPlan
+  // useEffect(() => {
+  //   if (currentPlan && seatingPlans.length > 0) {
+  //     const updatedPlan = seatingPlans.find(p => p.id === currentPlan.id)
+  //     if (updatedPlan) {
+  //       // Only update if the data has actually changed (compare tables/seats length)
+  //       const currentTablesCount = currentPlan.tables?.length || 0
+  //       const updatedTablesCount = updatedPlan.tables?.length || 0
+  //       const currentSeatsCount = currentPlan.seats?.length || 0
+  //       const updatedSeatsCount = updatedPlan.seats?.length || 0
+  //
+  //       if (currentTablesCount !== updatedTablesCount || currentSeatsCount !== updatedSeatsCount) {
+  //         setCurrentPlanState(updatedPlan)
+  //       }
+  //     }
+  //   }
+  // }, [seatingPlans, currentPlan?.id, currentPlan?.tables?.length, currentPlan?.seats?.length])
 
   // Load seating plans when wedding changes
   useEffect(() => {
@@ -239,6 +240,7 @@ export function useSeating(): UseSeatingReturn {
     position: data.position,
     rotation: data.rotation,
     color: data.color,
+    headSeats: data.headSeats || 0,
     isHighlighted: data.isHighlighted,
     notes: data.notes,
     createdAt: data.createdAt?.toDate() || new Date(),
@@ -336,6 +338,7 @@ export function useSeating(): UseSeatingReturn {
         position: data.position,
         rotation: data.rotation,
         color: data.color,
+        headSeats: data.headSeats || 0,
         isHighlighted: false,
         notes: data.notes,
         createdAt: new Date(),
@@ -515,15 +518,17 @@ export function useSeating(): UseSeatingReturn {
       )
 
       // If capacity changed, update seats
+      let updatedSeats = currentPlan.seats
       if (updates.capacity !== undefined) {
         const table = currentPlan.tables.find(t => t.id === tableId)
         if (table && table.capacity !== updates.capacity) {
-          await updateSeatsForTable(tableId, updates.capacity)
+          updatedSeats = await updateSeatsForTable(tableId, updates.capacity)
         }
       }
 
       await updateSeatingPlan(currentPlan.id, {
         tables: updatedTables,
+        seats: updatedSeats,
         totalSeats: updatedTables.reduce((sum, t) => sum + t.capacity, 0)
       })
     } catch (error) {
@@ -533,35 +538,43 @@ export function useSeating(): UseSeatingReturn {
   }
 
   // Update seats when table capacity changes
-  const updateSeatsForTable = async (tableId: string, newCapacity: number) => {
-    if (!wedding) return
+  const updateSeatsForTable = async (tableId: string, newCapacity: number): Promise<Seat[]> => {
+    if (!wedding || !currentPlan) return []
 
     try {
-      // Remove existing seats for this table
-      const updatedSeats = seats.filter(seat => seat.tableId !== tableId)
+      // Remove existing seats for this table and preserve guest assignments
+      const existingSeats = currentPlan.seats.filter(seat => seat.tableId === tableId)
+      const otherSeats = currentPlan.seats.filter(seat => seat.tableId !== tableId)
 
-      // Create new seats
+      // Create new seats, preserving guest assignments where possible
       const newSeats: Seat[] = []
       for (let i = 1; i <= newCapacity; i++) {
+        const existingSeat = existingSeats.find(s => s.position === i)
         const seat: Seat = {
           id: `seat_${tableId}_${i}`,
           tableId: tableId,
           position: i,
-          isReserved: false,
-          createdAt: new Date(),
+          guestId: existingSeat?.guestId, // Preserve guest assignment if exists
+          isReserved: existingSeat?.isReserved || false,
+          createdAt: existingSeat?.createdAt || new Date(),
           updatedAt: new Date()
         }
         newSeats.push(seat)
       }
 
+      // Combine with other seats
+      const allSeats = [...otherSeats, ...newSeats]
+
       // Update state
-      setSeats([...updatedSeats, ...newSeats])
+      setSeats(allSeats)
 
       // Update localStorage
-      const allSeats = [...updatedSeats, ...newSeats]
       localStorage.setItem(`seats_${wedding.id}`, JSON.stringify(allSeats))
+
+      return allSeats
     } catch (error) {
       console.error('Error updating seats for table:', error)
+      return currentPlan.seats
     }
   }
 

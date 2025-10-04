@@ -64,7 +64,7 @@ export default function EditRoomPage({ params }: EditRoomPageProps) {
     { value: 'single', label: 'Jednolůžkový' },
     { value: 'family', label: 'Rodinný' },
     { value: 'twin', label: 'Twin (2 postele)' }
-  ]
+  ].sort((a, b) => a.label.localeCompare(b.label, 'cs'))
 
   const bedTypes: { value: BedType; label: string }[] = [
     { value: 'crib', label: 'Dětská postýlka' },

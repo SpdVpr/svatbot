@@ -412,16 +412,6 @@ export default function GuestStats({
               </div>
               <span className="font-medium">{guestsWithDietaryRestrictions}</span>
             </div>
-
-            {guestsWithAccommodationPaidByCouple > 0 && (
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Building2 className="w-4 h-4 text-purple-500" />
-                  <span className="text-gray-700">Ubytování platí novomanželé</span>
-                </div>
-                <span className="font-medium">{guestsWithAccommodationPaidByCouple}</span>
-              </div>
-            )}
           </div>
         </div>
       </div>

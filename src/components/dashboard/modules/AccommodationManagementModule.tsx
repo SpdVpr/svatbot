@@ -87,28 +87,6 @@ export default function AccommodationManagementModule() {
               <div className="text-xs text-gray-500">Obsazené</div>
             </div>
           </div>
-
-          {/* Status Badge */}
-          <div className="text-center">
-            <div className={`text-sm px-3 py-1 rounded-full inline-block ${
-              stats.totalRooms === 0
-                ? 'bg-gray-100 text-gray-600'
-                : stats.occupancyRate < 30
-                  ? 'bg-green-100 text-green-700'
-                  : stats.occupancyRate < 70
-                    ? 'bg-yellow-100 text-yellow-700'
-                    : 'bg-red-100 text-red-700'
-            }`}>
-              {stats.totalRooms === 0
-                ? 'Žádné pokoje'
-                : stats.occupancyRate < 30
-                  ? 'Nízká obsazenost'
-                  : stats.occupancyRate < 70
-                    ? 'Střední obsazenost'
-                    : 'Vysoká obsazenost'
-              }
-            </div>
-          </div>
         </div>
       )}
 
