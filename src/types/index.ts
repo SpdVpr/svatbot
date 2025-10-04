@@ -482,6 +482,7 @@ export type BedType =
   | 'king'
   | 'sofa-bed'
   | 'bunk-bed'
+  | 'crib'
 
 export interface AccommodationPolicies {
   checkIn: string // e.g., "15:00"

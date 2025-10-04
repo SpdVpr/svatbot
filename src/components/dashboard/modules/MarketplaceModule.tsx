@@ -45,15 +45,12 @@ export default function MarketplaceModule() {
 
   return (
     <div className="wedding-card">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold flex items-center space-x-2">
+      <Link href="/marketplace" className="block mb-4">
+        <h3 className="text-lg font-semibold flex items-center space-x-2 hover:text-primary-600 transition-colors">
           <Search className="w-5 h-5 text-primary-600" />
           <span>Najít dodavatele</span>
         </h3>
-        <Link href="/marketplace" className="text-sm text-primary-600 hover:underline">
-          Zobrazit všechny
-        </Link>
-      </div>
+      </Link>
 
       <div className="grid grid-cols-2 gap-3 mb-4">
         {marketplaceCategories.map((category, index) => (
