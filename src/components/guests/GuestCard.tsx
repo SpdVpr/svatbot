@@ -306,7 +306,7 @@ export default function GuestCard({
             {/* Notes tag */}
             {guest.notes && guest.notes.trim() && (
               <span
-                className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full flex items-center gap-1"
+                className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full flex items-center gap-1"
                 title={guest.notes}
               >
                 📝 {guest.notes.length > 30 ? guest.notes.substring(0, 30) + '...' : guest.notes}
@@ -318,8 +318,8 @@ export default function GuestCard({
               <span
                 className={`text-xs px-2 py-1 rounded-full flex items-center gap-1 ${
                   guest.accommodationPayment === 'paid_by_couple'
-                    ? 'bg-purple-100 text-purple-700'
-                    : 'bg-gray-100 text-gray-700'
+                    ? 'bg-indigo-100 text-indigo-700'
+                    : 'bg-slate-100 text-slate-700'
                 }`}
               >
                 💰 {guest.accommodationPayment === 'paid_by_couple' ? 'Platíme my' : 'Platí host'}
@@ -334,7 +334,7 @@ export default function GuestCard({
             <span
               className={`text-xs px-2 py-1 rounded-full ${
                 guest.invitationMethod === 'sent'
-                  ? 'bg-blue-100 text-blue-700'
+                  ? 'bg-cyan-100 text-cyan-700'
                   : 'bg-green-100 text-green-700'
               }`}
             >
@@ -357,7 +357,7 @@ export default function GuestCard({
                   )
                 })()
               ) : guest.accommodationType ? (
-                <span className="text-xs px-2 py-1 rounded-full bg-orange-100 text-orange-700 flex items-center space-x-1">
+                <span className="text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-700 flex items-center space-x-1">
                   <Building2 className="w-3 h-3" />
                   <span>{guest.accommodationType}</span>
                 </span>

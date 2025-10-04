@@ -94,10 +94,12 @@ export default function GuestStats({
     g.accommodationInterest === 'interested' && g.accommodationPayment === 'paid_by_couple'
   ).length
 
-  // Invitation statistics
+  // Invitation statistics (count only main guests, not +1 or children)
+  const totalMainGuests = guests.length // Total number of main guests
   const invitationsSent = guests.filter(g => g.invitationSent && g.invitationMethod === 'sent').length
   const invitationsDeliveredPersonally = guests.filter(g => g.invitationSent && g.invitationMethod === 'delivered_personally').length
   const totalInvitationsSent = invitationsSent + invitationsDeliveredPersonally
+  const invitationsRemaining = totalMainGuests - totalInvitationsSent
 
   // Accommodation statistics
   const guestsInterestedInAccommodation = guests.filter(g => g.accommodationInterest === 'interested').length
@@ -369,7 +371,7 @@ export default function GuestStats({
             </div>
             <div className="flex items-center justify-between">
               <span className="text-gray-700">Zbývá doručit</span>
-              <span className="font-medium">{stats.total - totalInvitationsSent}</span>
+              <span className="font-medium">{invitationsRemaining}</span>
             </div>
           </div>
         </div>
