@@ -6,6 +6,7 @@ const nextConfig = {
       'lh3.googleusercontent.com',
       'platform-lookaside.fbsbx.com',
       'i.scdn.co', // Spotify album covers
+      'images.unsplash.com', // Unsplash images for moodboard
     ],
   },
   env: {
