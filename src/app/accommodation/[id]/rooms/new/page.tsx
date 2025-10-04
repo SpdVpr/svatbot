@@ -34,14 +34,14 @@ export default function NewRoomPage({ params }: NewRoomPageProps) {
   const [roomImages, setRoomImages] = useState<string[]>([])
   const [copyCount, setCopyCount] = useState(1)
 
-  const roomTypes: { value: RoomType; label: string }[] = [
-    { value: 'apartment', label: 'Apartmán' },
-    { value: 'suite', label: 'Apartmá' },
-    { value: 'double', label: 'Dvoulůžkový' },
-    { value: 'single', label: 'Jednolůžkový' },
-    { value: 'other', label: 'Jiný' },
-    { value: 'family', label: 'Rodinný pokoj' },
-    { value: 'twin', label: 'Twin (2 postele)' }
+  const roomTypes = [
+    { value: 'apartment' as RoomType, label: 'Apartmán' },
+    { value: 'suite' as RoomType, label: 'Apartmá' },
+    { value: 'double' as RoomType, label: 'Dvoulůžkový' },
+    { value: 'single' as RoomType, label: 'Jednolůžkový' },
+    { value: 'other' as RoomType, label: 'Jiný' },
+    { value: 'family' as RoomType, label: 'Rodinný pokoj' },
+    { value: 'twin' as RoomType, label: 'Twin (2 postele)' }
   ].sort((a, b) => a.label.localeCompare(b.label, 'cs'))
 
   const bedTypes: { value: BedType; label: string }[] = [
