@@ -7,6 +7,8 @@ import { useVendor } from '@/hooks/useVendor'
 export default function VendorManagementModule() {
   const { stats, vendors } = useVendor()
 
+  console.log('🏢 VendorManagementModule - vendors:', vendors.length, 'stats:', stats)
+
   const vendorStats = {
     total: stats.totalVendors,
     confirmed: stats.byStatus.contracted || 0,
