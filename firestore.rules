@@ -12,7 +12,7 @@ service cloud.firestore {
 
     function isDemoUser() {
       // Demo user has specific UID
-      return request.auth != null && request.auth.uid == '9oDkh1TdOLXhqXrnJQ7H1r2UYDk2';
+      return request.auth != null && request.auth.uid == '1QyfaI0JWugRDw6SP0XtlL1cRUf2';
     }
 
 

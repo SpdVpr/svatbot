@@ -8,6 +8,7 @@
 const admin = require('firebase-admin');
 const path = require('path');
 const { createDemoGuests } = require('./guests-data');
+const { createDemoTasks, createDemoBudget } = require('./tasks-budget-data');
 
 // Initialize Firebase Admin SDK
 const serviceAccountPath = path.join(__dirname, '../firebase-service-account.json');
@@ -178,55 +179,18 @@ async function createDemoAccount() {
     await db.collection('users').doc(demoUser.uid).set(demoUserData);
     console.log('✅ Demo user profile created');
 
-    // Create some demo tasks
-    const demoTasks = [
-      {
-        id: 'demo-task-1',
-        weddingId: weddingRef.id,
-        title: 'Rezervovat místo konání',
-        description: 'Najít a rezervovat místo pro svatební obřad a hostinu',
-        category: 'venue',
-        priority: 'high',
-        status: 'completed',
-        dueDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
-        completedAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp()
-      },
-      {
-        id: 'demo-task-2',
-        weddingId: weddingRef.id,
-        title: 'Objednat svatební fotografa',
-        description: 'Najít a objednat profesionálního svatebního fotografa',
-        category: 'photography',
-        priority: 'high',
-        status: 'in_progress',
-        dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp()
-      },
-      {
-        id: 'demo-task-3',
-        weddingId: weddingRef.id,
-        title: 'Vybrat svatební šaty',
-        description: 'Najít a objednat svatební šaty včetně úprav',
-        category: 'design',
-        priority: 'medium',
-        status: 'pending',
-        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp()
-      }
-    ];
+    // Create demo tasks - realistic wedding planning tasks
+    console.log('📋 Creating demo tasks...');
+    const demoTasks = createDemoTasks(weddingRef.id);
 
     // Save demo tasks
-    const batch = db.batch();
+    const taskBatch = db.batch();
     demoTasks.forEach(task => {
       const taskRef = db.collection('tasks').doc();
-      batch.set(taskRef, task);
+      taskBatch.set(taskRef, task);
     });
-    await batch.commit();
-    console.log('✅ Demo tasks created');
+    await taskBatch.commit();
+    console.log(`✅ Demo tasks created (${demoTasks.length} tasks)`);
 
     // Create demo guests - 40 guests for a small wedding
     console.log('👥 Creating demo guests...');
@@ -1021,106 +985,9 @@ async function createDemoAccount() {
     await drinkBatch.commit();
     console.log('✅ Demo drink items created');
 
-    // Create demo budget items
+    // Create demo budget items - realistic wedding budget
     console.log('💰 Creating demo budget items...');
-    const demoBudgetItems = [
-      {
-        weddingId: weddingRef.id,
-        name: 'Místo konání',
-        category: 'venue',
-        budgetedAmount: 150000,
-        actualAmount: 145000,
-        paidAmount: 145000,
-        currency: 'CZK',
-        paymentStatus: 'paid',
-        priority: 'critical',
-        dueDate: admin.firestore.Timestamp.fromDate(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)),
-        paidDate: admin.firestore.Timestamp.fromDate(new Date(Date.now() - 25 * 24 * 60 * 60 * 1000)),
-        vendorName: 'Château Mcely',
-        notes: 'Záloha zaplacena, zbytek při akci',
-        tags: [],
-        isEstimate: false,
-        isRecurring: false,
-        payments: [
-          {
-            id: 'demo-payment-1-1',
-            amount: 75000,
-            currency: 'CZK',
-            method: 'transfer',
-            date: admin.firestore.Timestamp.fromDate(new Date(Date.now() - 50 * 24 * 60 * 60 * 1000)),
-            description: 'Záloha 50%',
-            status: 'completed',
-            createdAt: admin.firestore.Timestamp.fromDate(new Date(Date.now() - 50 * 24 * 60 * 60 * 1000))
-          },
-          {
-            id: 'demo-payment-1-2',
-            amount: 70000,
-            currency: 'CZK',
-            method: 'transfer',
-            date: admin.firestore.Timestamp.fromDate(new Date(Date.now() - 25 * 24 * 60 * 60 * 1000)),
-            description: 'Doplatek',
-            status: 'completed',
-            createdAt: admin.firestore.Timestamp.fromDate(new Date(Date.now() - 25 * 24 * 60 * 60 * 1000))
-          }
-        ],
-        createdAt: admin.firestore.Timestamp.fromDate(new Date(Date.now() - 60 * 24 * 60 * 60 * 1000)),
-        updatedAt: admin.firestore.Timestamp.fromDate(new Date(Date.now() - 25 * 24 * 60 * 60 * 1000)),
-        createdBy: demoUser.uid
-      },
-      {
-        weddingId: weddingRef.id,
-        name: 'Svatební fotograf',
-        category: 'photography',
-        budgetedAmount: 35000,
-        actualAmount: 32000,
-        paidAmount: 16000,
-        currency: 'CZK',
-        paymentStatus: 'partial',
-        priority: 'high',
-        dueDate: admin.firestore.Timestamp.fromDate(new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)),
-        vendorName: 'Photo Nejedlí',
-        notes: 'Záloha zaplacena, zbytek po svatbě',
-        tags: [],
-        isEstimate: false,
-        isRecurring: false,
-        payments: [
-          {
-            id: 'demo-payment-2-1',
-            amount: 16000,
-            currency: 'CZK',
-            method: 'card',
-            date: admin.firestore.Timestamp.fromDate(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)),
-            description: 'Záloha 50%',
-            status: 'completed',
-            createdAt: admin.firestore.Timestamp.fromDate(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
-          }
-        ],
-        createdAt: admin.firestore.Timestamp.fromDate(new Date(Date.now() - 45 * 24 * 60 * 60 * 1000)),
-        updatedAt: admin.firestore.Timestamp.fromDate(new Date(Date.now() - 10 * 24 * 60 * 60 * 1000)),
-        createdBy: demoUser.uid
-      },
-      {
-        weddingId: weddingRef.id,
-        name: 'Catering',
-        category: 'catering',
-        budgetedAmount: 120000,
-        actualAmount: 115000,
-        paidAmount: 0,
-        currency: 'CZK',
-        paymentStatus: 'pending',
-        priority: 'critical',
-        dueDate: admin.firestore.Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)),
-        vendorName: 'Gourmet Catering',
-        notes: 'Menu potvrzeno, platba při akci',
-        tags: [],
-        isEstimate: false,
-        isRecurring: false,
-        payments: [],
-        createdAt: admin.firestore.Timestamp.fromDate(new Date(Date.now() - 40 * 24 * 60 * 60 * 1000)),
-        updatedAt: admin.firestore.Timestamp.fromDate(new Date(Date.now() - 15 * 24 * 60 * 60 * 1000)),
-        createdBy: demoUser.uid
-      }
-    ];
+    const demoBudgetItems = createDemoBudget(weddingRef.id, demoUser.uid);
 
     const budgetBatch = db.batch();
     demoBudgetItems.forEach((item) => {
@@ -1128,7 +995,7 @@ async function createDemoAccount() {
       budgetBatch.set(budgetRef, item);
     });
     await budgetBatch.commit();
-    console.log('✅ Demo budget items created');
+    console.log(`✅ Demo budget items created (${demoBudgetItems.length} items)`);
 
     // Create demo vendors
     console.log('👔 Creating demo vendors...');
