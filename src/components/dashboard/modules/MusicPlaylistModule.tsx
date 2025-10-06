@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useMusic } from '@/hooks/useMusic'
 
 export default function MusicPlaylistModule() {
-  const { vendor, categories, loading, totalSongs, requiredCategories, completedRequired } = useMusic()
+  const { vendors, categories, loading, totalSongs, requiredCategories, completedRequired } = useMusic()
 
   const completedCount = completedRequired
   const totalCount = requiredCategories.length
@@ -29,26 +29,33 @@ export default function MusicPlaylistModule() {
           </div>
           <div>
             <h3 className="text-lg font-semibold text-gray-900">Svatební hudba</h3>
-            <p className="text-sm text-gray-600">Playlist a dodavatel</p>
+            <p className="text-sm text-gray-600">Playlist a dodavatelé</p>
           </div>
         </div>
       </div>
 
-      {/* Vendor Info or CTA */}
-      {vendor.name ? (
-        <div className="bg-purple-50 rounded-lg p-4 mb-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-900">{vendor.name}</p>
-              <p className="text-xs text-gray-600">{vendor.contact}</p>
+      {/* Vendors Info or CTA */}
+      {vendors.length > 0 ? (
+        <div className="bg-purple-50 rounded-lg p-4 mb-4 space-y-2">
+          {vendors.slice(0, 2).map((vendor) => (
+            <div key={vendor.id} className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-900">{vendor.name}</p>
+                {vendor.type && <p className="text-xs text-purple-600">{vendor.type}</p>}
+              </div>
+              <CheckCircle2 className="w-4 h-4 text-green-500" />
             </div>
-            <CheckCircle2 className="w-5 h-5 text-green-500" />
-          </div>
+          ))}
+          {vendors.length > 2 && (
+            <p className="text-xs text-gray-600 text-center pt-1">
+              +{vendors.length - 2} další
+            </p>
+          )}
         </div>
       ) : (
         <div className="bg-gray-50 rounded-lg p-4 mb-4 border-2 border-dashed border-gray-300">
           <p className="text-sm text-gray-600 text-center">
-            Zatím nemáte vybraného dodavatele hudby
+            Zatím nemáte žádného dodavatele hudby
           </p>
         </div>
       )}
