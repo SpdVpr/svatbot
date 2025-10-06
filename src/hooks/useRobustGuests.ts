@@ -168,13 +168,13 @@ export function useRobustGuests() {
   guestsRef.current = guests
 
   // Determine if this is a demo user (stable calculation)
-  const isDemoUser = user?.email === 'demo@svatbot.cz' || wedding?.id === 'demo-wedding'
+  const isDemoUser = user?.email === 'demo@svatbot.cz' || user?.id === '1QyfaI0JWugRDw6SP0XtlL1cRUf2' || wedding?.id === 'demo-wedding'
 
   // Initialize data - ONLY ONCE per wedding
   useEffect(() => {
     const currentWeddingId = wedding?.id || null
     // Calculate isDemoUser inside useEffect to avoid dependency issues
-    const isDemoUserInEffect = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding?.id === 'demo-wedding'
+    const isDemoUserInEffect = user?.email === 'demo@svatbot.cz' || user?.id === '1QyfaI0JWugRDw6SP0XtlL1cRUf2' || wedding?.id === 'demo-wedding'
 
     console.log('🔄 RobustGuests useEffect triggered:', {
       currentWeddingId,
