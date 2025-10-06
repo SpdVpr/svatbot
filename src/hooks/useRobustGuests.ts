@@ -167,20 +167,14 @@ export function useRobustGuests() {
   // Update ref when guests change (but don't cause re-renders)
   guestsRef.current = guests
 
-  // Determine if this is a demo user (stable calculation)
-  const isDemoUser = user?.email === 'demo@svatbot.cz' || user?.id === '1QyfaI0JWugRDw6SP0XtlL1cRUf2' || wedding?.id === 'demo-wedding'
-
   // Initialize data - ONLY ONCE per wedding
   useEffect(() => {
     const currentWeddingId = wedding?.id || null
-    // Calculate isDemoUser inside useEffect to avoid dependency issues
-    const isDemoUserInEffect = user?.email === 'demo@svatbot.cz' || user?.id === '1QyfaI0JWugRDw6SP0XtlL1cRUf2' || wedding?.id === 'demo-wedding'
 
     console.log('🔄 RobustGuests useEffect triggered:', {
       currentWeddingId,
       refWeddingId: initializationRef.current.weddingId,
       initialized: initializationRef.current.initialized,
-      isDemoUser: isDemoUserInEffect,
       loading
     })
 
@@ -199,7 +193,7 @@ export function useRobustGuests() {
       return
     }
 
-    console.log('🔄 Initializing guests for:', isDemoUserInEffect ? 'DEMO' : 'REAL', 'user')
+    console.log('🔄 Initializing guests from Firestore for wedding:', currentWeddingId)
 
     // Mark as initialized for this wedding IMMEDIATELY to prevent re-runs
     initializationRef.current = { weddingId: currentWeddingId, initialized: true }
@@ -349,37 +343,27 @@ export function useRobustGuests() {
     setGuests(updatedGuests)
     guestsRef.current = updatedGuests
 
-    // Save to localStorage immediately (use compatible keys)
-    const storageKey = isDemoUser ? 'simple-demo-guests' : `guests_${wedding?.id}`
-    localStorage.setItem(storageKey, JSON.stringify(updatedGuests))
-    console.log('✅ useRobustGuests: Guest saved to localStorage with key:', storageKey)
-
-    // For real users, try Firestore sync in background (don't block UI)
-    if (!isDemoUser) {
-      // Import Firestore dynamically to avoid blocking
-      import('@/config/firebase').then(({ db }) => {
-        import('firebase/firestore').then(({ doc, updateDoc }) => {
-          const guestRef = doc(db, 'guests', guestId)
-          updateDoc(guestRef, cleanedUpdates).then(() => {
-            console.log('✅ Guest synced to Firestore')
-            // Wait a bit before allowing Firestore updates to prevent race conditions
-            setTimeout(() => {
-              isSavingRef.current = false
-            }, 1000)
-          }).catch((error) => {
-            console.warn('⚠️ Firestore sync failed:', error.message)
+    // Save to Firestore for ALL users (including demo)
+    // Import Firestore dynamically to avoid blocking
+    import('@/config/firebase').then(({ db }) => {
+      import('firebase/firestore').then(({ doc, updateDoc }) => {
+        const guestRef = doc(db, 'guests', guestId)
+        updateDoc(guestRef, cleanedUpdates).then(() => {
+          console.log('✅ Guest synced to Firestore')
+          // Wait a bit before allowing Firestore updates to prevent race conditions
+          setTimeout(() => {
             isSavingRef.current = false
-          })
+          }, 1000)
+        }).catch((error) => {
+          console.warn('⚠️ Firestore sync failed:', error.message)
+          isSavingRef.current = false
         })
-      }).catch((error) => {
-        console.warn('⚠️ Failed to load Firestore modules:', error)
-        isSavingRef.current = false
       })
-    } else {
-      // Demo user - no Firestore sync needed
+    }).catch((error) => {
+      console.warn('⚠️ Failed to load Firestore modules:', error)
       isSavingRef.current = false
-    }
-  }, [isDemoUser, wedding?.id])
+    })
+  }, [wedding?.id])
 
   // Create guest function
   const createGuest = useCallback(async (data: GuestFormData): Promise<Guest> => {
