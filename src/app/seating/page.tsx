@@ -189,11 +189,6 @@ export default function SeatingPage() {
                 <Plus className="w-4 h-4" />
                 <span>Vytvořit první plán</span>
               </button>
-
-              <button className="btn-outline flex items-center space-x-2">
-                <Upload className="w-4 h-4" />
-                <span>Importovat plán</span>
-              </button>
             </div>
 
             {/* Quick navigation */}
