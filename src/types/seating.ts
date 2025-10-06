@@ -20,6 +20,7 @@ export interface Table {
 
   // Seating configuration for rectangular/square tables
   headSeats?: number // Number of seats at the head (short sides) - 0, 1, or 2 per side
+  seatSides?: 'all' | 'one' | 'two-opposite' // Which sides have seats: all sides, one side only, or two opposite sides
 
   // Visual properties
   color?: string
@@ -171,6 +172,7 @@ export interface TableFormData {
   rotation: number
   color?: string
   headSeats?: number
+  seatSides?: 'all' | 'one' | 'two-opposite'
   notes?: string
 }
 

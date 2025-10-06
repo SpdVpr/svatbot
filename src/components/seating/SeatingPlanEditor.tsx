@@ -83,13 +83,15 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     capacity: number
     color: string
     headSeats: number
+    seatSides: 'all' | 'one' | 'two-opposite'
   }>({
     name: '',
     shape: 'round',
     size: 'medium',
     capacity: 8,
     color: '#F8BBD9',
-    headSeats: 0
+    headSeats: 0,
+    seatSides: 'all'
   })
   const [viewOptions, setViewOptions] = useState<SeatingViewOptions>({
     showGuestNames: true,
@@ -224,7 +226,8 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
         position: { x: 200, y: 200 },
         rotation: 0,
         color: tableFormData.color,
-        headSeats: tableFormData.headSeats
+        headSeats: tableFormData.headSeats,
+        seatSides: tableFormData.seatSides
       }, currentPlan.id) // Explicitly pass planId
 
       setShowTableForm(false)
@@ -234,7 +237,8 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
         size: 'medium',
         capacity: 8,
         color: '#F8BBD9',
-        headSeats: 0
+        headSeats: 0,
+        seatSides: 'all'
       })
     } catch (error) {
       console.error('Error adding table:', error)
@@ -1133,16 +1137,71 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     return table ? { tableName: table.name, seatPosition: seat.position } : null
   }
 
-  // Group unassigned guests by category
-  const getGroupedUnassignedGuests = () => {
-    const grouped: Record<string, typeof unassignedGuests> = {}
+  // Create extended list of people to seat (guests + plus ones + children)
+  type PersonToSeat = {
+    id: string
+    displayName: string
+    type: 'guest' | 'plusOne' | 'child'
+    parentGuestId?: string
+    category: string
+    childAge?: number
+  }
 
-    unassignedGuests.forEach(guest => {
-      const category = guest.category || 'other'
+  const getAllPeopleToSeat = (): PersonToSeat[] => {
+    const people: PersonToSeat[] = []
+
+    guests.forEach(guest => {
+      // Add main guest
+      people.push({
+        id: guest.id,
+        displayName: `${guest.firstName} ${guest.lastName}`,
+        type: 'guest',
+        category: guest.category || 'other'
+      })
+
+      // Add plus one if exists
+      if (guest.hasPlusOne && guest.plusOneName) {
+        people.push({
+          id: `${guest.id}_plusone`,
+          displayName: guest.plusOneName,
+          type: 'plusOne',
+          parentGuestId: guest.id,
+          category: guest.category || 'other'
+        })
+      }
+
+      // Add children if exist
+      if (guest.hasChildren && guest.children) {
+        guest.children.forEach((child, index) => {
+          people.push({
+            id: `${guest.id}_child_${index}`,
+            displayName: child.name,
+            type: 'child',
+            parentGuestId: guest.id,
+            category: guest.category || 'other',
+            childAge: child.age
+          })
+        })
+      }
+    })
+
+    return people
+  }
+
+  // Group unassigned people by category
+  const getGroupedUnassignedGuests = () => {
+    const allPeople = getAllPeopleToSeat()
+    const assignedIds = new Set(seats.filter(s => s.guestId).map(s => s.guestId))
+    const unassignedPeople = allPeople.filter(person => !assignedIds.has(person.id))
+
+    const grouped: Record<string, PersonToSeat[]> = {}
+
+    unassignedPeople.forEach(person => {
+      const category = person.category || 'other'
       if (!grouped[category]) {
         grouped[category] = []
       }
-      grouped[category].push(guest)
+      grouped[category].push(person)
     })
 
     // Sort categories by priority
@@ -1156,11 +1215,11 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
       'other'
     ]
 
-    const sortedGrouped: Record<string, typeof unassignedGuests> = {}
+    const sortedGrouped: Record<string, PersonToSeat[]> = {}
     categoryOrder.forEach(category => {
       if (grouped[category] && grouped[category].length > 0) {
         sortedGrouped[category] = grouped[category].sort((a, b) =>
-          `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`)
+          a.displayName.localeCompare(b.displayName)
         )
       }
     })
@@ -1168,16 +1227,17 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     return sortedGrouped
   }
 
-  // Group all guests by category (for assignment dialog)
+  // Group all people by category (for assignment dialog)
   const getGroupedAllGuests = () => {
-    const grouped: Record<string, typeof guests> = {}
+    const allPeople = getAllPeopleToSeat()
+    const grouped: Record<string, PersonToSeat[]> = {}
 
-    guests.forEach(guest => {
-      const category = guest.category || 'other'
+    allPeople.forEach(person => {
+      const category = person.category || 'other'
       if (!grouped[category]) {
         grouped[category] = []
       }
-      grouped[category].push(guest)
+      grouped[category].push(person)
     })
 
     // Sort categories by priority
@@ -1191,11 +1251,11 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
       'other'
     ]
 
-    const sortedGrouped: Record<string, typeof guests> = {}
+    const sortedGrouped: Record<string, PersonToSeat[]> = {}
     categoryOrder.forEach(category => {
       if (grouped[category] && grouped[category].length > 0) {
         sortedGrouped[category] = grouped[category].sort((a, b) =>
-          `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`)
+          a.displayName.localeCompare(b.displayName)
         )
       }
     })
@@ -1768,47 +1828,39 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                     <span className="text-xs text-gray-500">({categoryPeopleCount})</span>
                   </div>
 
-                  {/* Guests in category */}
+                  {/* People in category */}
                   <div className="space-y-1 ml-2">
-                    {guests.map(guest => (
-                      <div key={guest.id} className="space-y-1">
-                        {/* Main guest */}
+                    {guests.map(person => {
+                      const bgColor = person.type === 'guest' ? 'bg-gray-50' : person.type === 'plusOne' ? 'bg-blue-50' : 'bg-green-50'
+                      const textColor = person.type === 'guest' ? 'text-gray-900' : person.type === 'plusOne' ? 'text-blue-700' : 'text-green-700'
+                      const badgeColor = person.type === 'plusOne' ? 'text-blue-600 bg-blue-100' : 'text-green-600 bg-green-100'
+                      const borderClass = person.type !== 'guest' ? 'ml-4 border-l-2 ' + (person.type === 'plusOne' ? 'border-blue-300' : 'border-green-300') : ''
+
+                      return (
                         <div
-                          className="flex items-center justify-between p-2 bg-gray-50 rounded-lg cursor-move hover:bg-primary-50 transition-colors"
+                          key={person.id}
+                          className={`flex items-center justify-between p-2 rounded-lg cursor-move hover:bg-primary-50 transition-colors ${bgColor} ${borderClass}`}
                           draggable
-                          onDragStart={(e) => handleGuestDragStart(e, guest.id)}
+                          onDragStart={(e) => handleGuestDragStart(e, person.id)}
                         >
                           <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium">
-                              {guest.firstName} {guest.lastName}
+                            <span className={`text-sm font-medium ${textColor}`}>
+                              {person.displayName}
                             </span>
-                            {guest.hasChildren && guest.children && guest.children.length > 0 && (
-                              <span className="text-xs text-green-600 bg-green-100 px-2 py-0.5 rounded">
-                                +{guest.children.length} dítě
+                            {person.type === 'plusOne' && (
+                              <span className={`text-xs px-2 py-0.5 rounded ${badgeColor}`}>
+                                doprovod
+                              </span>
+                            )}
+                            {person.type === 'child' && (
+                              <span className={`text-xs px-2 py-0.5 rounded ${badgeColor}`}>
+                                dítě ({person.childAge} let)
                               </span>
                             )}
                           </div>
                         </div>
-
-                        {/* Plus one - shown as separate entry */}
-                        {guest.hasPlusOne && guest.plusOneName && (
-                          <div
-                            className="flex items-center justify-between p-2 bg-blue-50 rounded-lg cursor-move hover:bg-primary-50 transition-colors ml-4 border-l-2 border-blue-300"
-                            draggable
-                            onDragStart={(e) => handleGuestDragStart(e, guest.id)}
-                          >
-                            <div className="flex items-center space-x-2">
-                              <span className="text-sm font-medium text-blue-700">
-                                {guest.plusOneName}
-                              </span>
-                              <span className="text-xs text-blue-600 bg-blue-100 px-2 py-0.5 rounded">
-                                doprovod
-                              </span>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 </div>
                 )
@@ -1938,25 +1990,47 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                 />
               </div>
 
-              {/* Head seats - only for rectangular/square tables */}
+              {/* Seat sides - only for rectangular/square tables */}
               {(tableFormData.shape === 'rectangular' || tableFormData.shape === 'square') && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Místa v čele stolu
-                  </label>
-                  <select
-                    value={tableFormData.headSeats}
-                    onChange={(e) => setTableFormData(prev => ({ ...prev, headSeats: parseInt(e.target.value) }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  >
-                    <option value="0">Žádná místa v čele</option>
-                    <option value="1">1 místo na každé straně (2 celkem)</option>
-                    <option value="2">2 místa na každé straně (4 celkem)</option>
-                  </select>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Počet míst na kratších stranách stolu
-                  </p>
-                </div>
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Rozmístění míst
+                    </label>
+                    <select
+                      value={tableFormData.seatSides}
+                      onChange={(e) => setTableFormData(prev => ({ ...prev, seatSides: e.target.value as 'all' | 'one' | 'two-opposite' }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    >
+                      <option value="all">Všechny strany</option>
+                      <option value="one">Pouze jedna strana</option>
+                      <option value="two-opposite">Dvě protilehlé strany</option>
+                    </select>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Na kterých stranách stolu budou místa k sezení
+                    </p>
+                  </div>
+
+                  {tableFormData.seatSides === 'all' && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Místa v čele stolu
+                      </label>
+                      <select
+                        value={tableFormData.headSeats}
+                        onChange={(e) => setTableFormData(prev => ({ ...prev, headSeats: parseInt(e.target.value) }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      >
+                        <option value="0">Žádná místa v čele</option>
+                        <option value="1">1 místo na každé straně (2 celkem)</option>
+                        <option value="2">2 místa na každé straně (4 celkem)</option>
+                      </select>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Počet míst na kratších stranách stolu
+                      </p>
+                    </div>
+                  )}
+                </>
               )}
 
               {/* Table color */}
@@ -2119,13 +2193,9 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
             </h3>
 
             <div className="space-y-4 overflow-y-auto flex-1">
-              {Object.entries(getGroupedAllGuests()).map(([category, categoryGuests]) => {
-                // Calculate total people in this category (guests + plus ones)
-                const categoryPeopleCount = categoryGuests.reduce((total, guest) => {
-                  let count = 1
-                  if (guest.hasPlusOne && guest.plusOneName) count += 1
-                  return total + count
-                }, 0)
+              {Object.entries(getGroupedAllGuests()).map(([category, categoryPeople]) => {
+                // Count total people in this category
+                const categoryPeopleCount = categoryPeople.length
 
                 return (
                 <div key={category} className="space-y-2">
@@ -2137,30 +2207,41 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                     <span className="text-xs text-gray-500">({categoryPeopleCount})</span>
                   </div>
 
-                  {/* Guests in category */}
+                  {/* People in category */}
                   <div className="space-y-1 ml-2">
-                    {categoryGuests.map(guest => {
-                      const isAssigned = isGuestAssigned(guest.id)
-                      const seatInfo = getGuestSeatInfo(guest.id)
+                    {categoryPeople.map(person => {
+                      const isAssigned = isGuestAssigned(person.id)
+                      const seatInfo = getGuestSeatInfo(person.id)
+
+                      const bgColor = isAssigned ? 'bg-green-50 border border-green-200 hover:bg-green-100' :
+                                      person.type === 'guest' ? 'bg-gray-50 hover:bg-primary-50' :
+                                      person.type === 'plusOne' ? 'bg-blue-50 hover:bg-primary-50' :
+                                      'bg-green-50 hover:bg-primary-50'
+                      const textColor = isAssigned ? 'text-green-800' :
+                                       person.type === 'guest' ? 'text-gray-900' :
+                                       person.type === 'plusOne' ? 'text-blue-700' :
+                                       'text-green-700'
+                      const badgeColor = person.type === 'plusOne' ? 'text-blue-600 bg-blue-100' : 'text-green-600 bg-green-100'
+                      const borderClass = person.type !== 'guest' ? 'ml-4 border-l-2 ' + (person.type === 'plusOne' ? 'border-blue-300' : 'border-green-300') : ''
 
                       return (
-                      <div key={guest.id} className="space-y-1">
-                        {/* Main guest */}
                         <div
-                          className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ${
-                            isAssigned
-                              ? 'bg-green-50 border border-green-200 hover:bg-green-100'
-                              : 'bg-gray-50 hover:bg-primary-50'
-                          }`}
-                          onClick={() => handleAssignGuest(guest.id)}
+                          key={person.id}
+                          className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ${bgColor} ${borderClass}`}
+                          onClick={() => handleAssignGuest(person.id)}
                         >
                           <div className="flex items-center space-x-2 flex-1">
-                            <span className={`text-sm font-medium ${isAssigned ? 'text-green-800' : ''}`}>
-                              {guest.firstName} {guest.lastName}
+                            <span className={`text-sm font-medium ${textColor}`}>
+                              {person.displayName}
                             </span>
-                            {guest.hasChildren && guest.children && guest.children.length > 0 && (
-                              <span className="text-xs text-green-600 bg-green-100 px-2 py-0.5 rounded">
-                                +{guest.children.length} dítě
+                            {person.type === 'plusOne' && (
+                              <span className={`text-xs px-2 py-0.5 rounded ${isAssigned ? 'text-green-600 bg-green-100' : badgeColor}`}>
+                                doprovod
+                              </span>
+                            )}
+                            {person.type === 'child' && (
+                              <span className={`text-xs px-2 py-0.5 rounded ${isAssigned ? 'text-green-600 bg-green-100' : badgeColor}`}>
+                                dítě ({person.childAge} let)
                               </span>
                             )}
                             {isAssigned && seatInfo && (
@@ -2173,33 +2254,6 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                             {isAssigned ? 'Přesunout' : 'Přiřadit'}
                           </span>
                         </div>
-
-                        {/* Plus one - shown as separate entry */}
-                        {guest.hasPlusOne && guest.plusOneName && (
-                          <div
-                            className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ml-4 border-l-2 ${
-                              isAssigned
-                                ? 'bg-green-50 border-green-300 hover:bg-green-100'
-                                : 'bg-blue-50 border-blue-300 hover:bg-primary-50'
-                            }`}
-                            onClick={() => handleAssignGuest(guest.id)}
-                          >
-                            <div className="flex items-center space-x-2 flex-1">
-                              <span className={`text-sm font-medium ${isAssigned ? 'text-green-800' : 'text-blue-700'}`}>
-                                {guest.plusOneName}
-                              </span>
-                              <span className={`text-xs px-2 py-0.5 rounded ${
-                                isAssigned ? 'text-green-600 bg-green-100' : 'text-blue-600 bg-blue-100'
-                              }`}>
-                                doprovod
-                              </span>
-                            </div>
-                            <span className="text-xs text-gray-400">
-                              {isAssigned ? 'Přesunout' : 'Přiřadit'}
-                            </span>
-                          </div>
-                        )}
-                      </div>
                       )
                     })}
                   </div>

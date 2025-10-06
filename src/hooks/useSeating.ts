@@ -347,6 +347,7 @@ export function useSeating(): UseSeatingReturn {
         rotation: data.rotation,
         color: data.color,
         headSeats: data.headSeats || 0,
+        seatSides: data.seatSides || 'all',
         isHighlighted: false,
         notes: data.notes,
         createdAt: new Date(),
@@ -658,31 +659,12 @@ export function useSeating(): UseSeatingReturn {
       const targetSeat = currentPlan.seats.find(s => s.id === seatId)
       if (!targetSeat) return
 
-      // Update the main guest's seat
-      let updatedSeats = currentPlan.seats.map(seat =>
+      // Update the guest's seat - NO automatic plus one assignment
+      const updatedSeats = currentPlan.seats.map(seat =>
         seat.id === seatId
           ? { ...seat, guestId, isPlusOne: false, plusOneOf: undefined, updatedAt: new Date() }
           : seat
       )
-
-      // If guest has a plus one, automatically assign them to the next available seat at the same table
-      if (guest.hasPlusOne && guest.plusOneName) {
-        // Find next available seat at the same table
-        const nextAvailableSeat = updatedSeats.find(
-          s => s.tableId === targetSeat.tableId &&
-               !s.guestId &&
-               s.id !== seatId &&
-               s.position > targetSeat.position
-        )
-
-        if (nextAvailableSeat) {
-          updatedSeats = updatedSeats.map(seat =>
-            seat.id === nextAvailableSeat.id
-              ? { ...seat, guestId, isPlusOne: true, plusOneOf: guestId, updatedAt: new Date() }
-              : seat
-          )
-        }
-      }
 
       await updateSeatingPlan(currentPlan.id, {
         seats: updatedSeats,
