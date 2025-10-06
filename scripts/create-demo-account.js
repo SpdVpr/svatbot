@@ -482,13 +482,18 @@ async function createDemoAccount() {
           }
         ];
 
-        const roomBatch = db.batch();
-        rooms.forEach(room => {
-          const roomRef = db.collection('rooms').doc();
-          roomBatch.set(roomRef, room);
+        // Update accommodation document with rooms array
+        const now = new Date();
+        await accommodationRef.update({
+          rooms: rooms.map(room => ({
+            ...room,
+            accommodationId: accommodationRef.id,
+            weddingId: weddingRef.id,
+            createdAt: now,
+            updatedAt: now
+          }))
         });
-        await roomBatch.commit();
-        console.log(`✅ Added rooms to ${accommodation.name}`);
+        console.log(`✅ Added ${rooms.length} rooms to ${accommodation.name}`);
       }
 
       // Add rooms to second accommodation
@@ -693,13 +698,18 @@ async function createDemoAccount() {
           }
         ];
 
-        const roomBatch2 = db.batch();
-        rooms.forEach(room => {
-          const roomRef = db.collection('rooms').doc();
-          roomBatch2.set(roomRef, room);
+        // Update accommodation document with rooms array
+        const now = new Date();
+        await accommodationRef.update({
+          rooms: rooms.map(room => ({
+            ...room,
+            accommodationId: accommodationRef.id,
+            weddingId: weddingRef.id,
+            createdAt: now,
+            updatedAt: now
+          }))
         });
-        await roomBatch2.commit();
-        console.log(`✅ Added rooms to ${accommodation.name}`);
+        console.log(`✅ Added ${rooms.length} rooms to ${accommodation.name}`);
       }
     }
 
