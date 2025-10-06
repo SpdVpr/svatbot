@@ -62,8 +62,8 @@ module.exports.createDemoGuests = (weddingId, demoUserId) => {
   const allGuestGroups = [
     { guests: brideFamily, category: 'family-bride' },
     { guests: groomFamily, category: 'family-groom' },
-    { guests: friends, category: 'friends' },
-    { guests: colleagues, category: 'colleagues' }
+    { guests: friends, category: 'friends-bride' },
+    { guests: colleagues, category: 'colleagues-bride' }
   ];
 
   allGuestGroups.forEach(group => {

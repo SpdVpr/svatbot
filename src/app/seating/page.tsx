@@ -10,9 +10,6 @@ import {
   Plus,
   Grid3X3,
   Users,
-  Settings,
-  Download,
-  Upload,
   BarChart3,
   Home
 } from 'lucide-react'
@@ -149,16 +146,6 @@ export default function SeatingPage() {
               )}
 
               {/* Action buttons */}
-              <button className="btn-outline flex items-center space-x-2">
-                <Upload className="w-4 h-4" />
-                <span>Import</span>
-              </button>
-
-              <button className="btn-outline flex items-center space-x-2">
-                <Download className="w-4 h-4" />
-                <span>Export</span>
-              </button>
-
               <button
                 onClick={() => setShowCreateForm(true)}
                 className="btn-primary flex items-center space-x-2"

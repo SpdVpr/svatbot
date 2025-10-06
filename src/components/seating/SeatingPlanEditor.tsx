@@ -9,7 +9,6 @@ import {
   RotateCw,
   Users,
   Settings,
-  Save,
   Download,
   ZoomIn,
   ZoomOut,
@@ -19,7 +18,8 @@ import {
   MousePointer2,
   Edit3,
   Trash2,
-  X
+  X,
+  Printer
 } from 'lucide-react'
 import { Table, Seat, SeatingViewOptions, SeatingPlan, TableShape, TableSize } from '@/types/seating'
 import { GUEST_CATEGORY_LABELS, GUEST_CATEGORY_COLORS } from '@/utils/guestCategories'
@@ -103,6 +103,15 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
   const unassignedGuests = getUnassignedGuests()
 
+  // Calculate total unassigned people (guests + plus ones)
+  const totalUnassignedPeople = unassignedGuests.reduce((total, guest) => {
+    let count = 1 // The guest themselves
+    if (guest.hasPlusOne && guest.plusOneName) {
+      count += 1 // Plus one
+    }
+    return total + count
+  }, 0)
+
   // Handle table drag start
   const handleTableDragStart = useCallback((tableId: string, event: React.MouseEvent) => {
     event.preventDefault()
@@ -112,12 +121,18 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     const table = tables.find(t => t.id === tableId)
     if (table && canvasRef.current) {
       const rect = canvasRef.current.getBoundingClientRect()
+
+      // Account for zoom when calculating offset
+      const zoom = viewOptions.zoom
+      const mouseX = (event.clientX - rect.left) / zoom
+      const mouseY = (event.clientY - rect.top) / zoom
+
       setDragOffset({
-        x: event.clientX - rect.left - table.position.x,
-        y: event.clientY - rect.top - table.position.y
+        x: mouseX - table.position.x,
+        y: mouseY - table.position.y
       })
     }
-  }, [tables])
+  }, [tables, viewOptions.zoom])
 
   // Handle table drag
   const handleTableDrag = useCallback((event: React.MouseEvent) => {
@@ -125,14 +140,20 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
     event.preventDefault()
     const rect = canvasRef.current.getBoundingClientRect()
+
+    // Account for zoom when calculating position
+    const zoom = viewOptions.zoom
+    const mouseX = (event.clientX - rect.left) / zoom
+    const mouseY = (event.clientY - rect.top) / zoom
+
     const newPosition = {
-      x: Math.max(0, Math.min(currentPlan.venueLayout.width - 120, event.clientX - rect.left - dragOffset.x)),
-      y: Math.max(0, Math.min(currentPlan.venueLayout.height - 120, event.clientY - rect.top - dragOffset.y))
+      x: Math.max(0, Math.min(currentPlan.venueLayout.width - 120, mouseX - dragOffset.x)),
+      y: Math.max(0, Math.min(currentPlan.venueLayout.height - 120, mouseY - dragOffset.y))
     }
 
     // Update position immediately for smooth dragging
     setDraggedTablePosition(newPosition)
-  }, [isDragging, selectedTable, dragOffset, currentPlan.venueLayout])
+  }, [isDragging, selectedTable, dragOffset, currentPlan.venueLayout, viewOptions.zoom])
 
   // Handle table drag end
   const handleTableDragEnd = useCallback(() => {
@@ -365,6 +386,9 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
   const handleSaveVenue = async () => {
     try {
+      console.log('Saving venue layout:', venueData)
+      console.log('Current plan before update:', currentPlan.venueLayout)
+
       await updateSeatingPlan(currentPlan.id, {
         venueLayout: {
           ...currentPlan.venueLayout,
@@ -372,7 +396,14 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
           height: venueData.height
         }
       })
+
+      console.log('Venue layout saved successfully')
       setShowVenueSettings(false)
+
+      // Force a small delay to ensure state updates
+      setTimeout(() => {
+        console.log('Current plan after update:', currentPlan.venueLayout)
+      }, 100)
     } catch (error) {
       console.error('Error updating venue layout:', error)
       alert('Chyba při úpravě plochy: ' + (error as Error).message)
@@ -388,6 +419,465 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
       xl: { width: 2400, height: 2000 }
     }
     setVenueData(presets[preset])
+  }
+
+  // Handle print
+  const handlePrint = () => {
+    // Create a print-friendly version of the seating plan
+    const printWindow = window.open('', '_blank')
+    if (!printWindow) {
+      alert('Prosím povolte vyskakovací okna pro tisk')
+      return
+    }
+
+    // Helper function to get guest name for a seat
+    const getGuestNameForSeat = (seat: Seat) => {
+      if (seat.isPlusOne && seat.plusOneOf) {
+        const mainSeat = seats.find(s => s.id === seat.plusOneOf)
+        const mainGuest = guests.find(g => g.id === mainSeat?.guestId)
+        const name = mainGuest?.plusOneName || 'Doprovod'
+        const parts = name.split(' ')
+        return { firstName: parts[0] || '', lastName: parts.slice(1).join(' ') || '', fullName: name }
+      } else {
+        const guest = guests.find(g => g.id === seat.guestId)
+        if (guest) {
+          const firstName = guest.firstName || ''
+          const lastName = guest.lastName || ''
+          const fullName = `${firstName} ${lastName}`.trim()
+          return { firstName, lastName, fullName }
+        }
+        return { firstName: '', lastName: '', fullName: '' }
+      }
+    }
+
+    // Generate SVG for the entire canvas
+    const generateCanvasSVG = () => {
+      let svgContent = ''
+
+      // Add dance floor if exists
+      if (currentPlan.venueLayout.danceFloor) {
+        const df = currentPlan.venueLayout.danceFloor
+        svgContent += `
+          <rect
+            x="${df.x}"
+            y="${df.y}"
+            width="${df.width}"
+            height="${df.height}"
+            fill="rgba(251, 191, 36, 0.1)"
+            stroke="#f59e0b"
+            stroke-width="2"
+            stroke-dasharray="5,5"
+            rx="8"
+          />
+          <text
+            x="${df.x + df.width / 2}"
+            y="${df.y + df.height / 2}"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            font-size="16"
+            font-weight="bold"
+            fill="#f59e0b"
+            opacity="0.5"
+          >
+            Taneční parket
+          </text>
+        `
+      }
+
+      // Add all tables
+      tables.forEach(table => {
+        const tableSeats = seats.filter(s => s.tableId === table.id)
+
+        // Table shape
+        if (table.shape === 'round' || table.shape === 'oval') {
+          const radius = table.size === 'small' ? 40 : table.size === 'medium' ? 50 : table.size === 'large' ? 60 : 70
+          svgContent += `
+            <circle
+              cx="${table.position.x}"
+              cy="${table.position.y}"
+              r="${radius}"
+              fill="white"
+              stroke="#2563eb"
+              stroke-width="2"
+            />
+          `
+        } else {
+          const width = table.size === 'small' ? 100 : table.size === 'medium' ? 140 : table.size === 'large' ? 180 : 220
+          const height = table.shape === 'square' ? width : (table.size === 'small' ? 60 : table.size === 'medium' ? 80 : table.size === 'large' ? 100 : 120)
+
+          svgContent += `
+            <rect
+              x="${table.position.x - width/2}"
+              y="${table.position.y - height/2}"
+              width="${width}"
+              height="${height}"
+              fill="white"
+              stroke="#2563eb"
+              stroke-width="2"
+              rx="8"
+              transform="rotate(${table.rotation} ${table.position.x} ${table.position.y})"
+            />
+          `
+        }
+
+        // Table number
+        svgContent += `
+          <text
+            x="${table.position.x}"
+            y="${table.position.y}"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            font-size="20"
+            font-weight="bold"
+            fill="#2563eb"
+          >
+            ${table.number || table.name || '?'}
+          </text>
+        `
+
+        // Seats and guest names
+        tableSeats.forEach((seat, seatIndex) => {
+          let seatX = table.position.x
+          let seatY = table.position.y
+
+          if (table.shape === 'round' || table.shape === 'oval') {
+            const radius = table.size === 'small' ? 40 : table.size === 'medium' ? 50 : table.size === 'large' ? 60 : 70
+            const baseRadius = radius
+            const extraRadius = Math.max(0, (tableSeats.length - 6) * 5)
+            const seatRadius = baseRadius + extraRadius + 15
+
+            const seatAngle = (360 / tableSeats.length) * seatIndex
+            const totalAngle = seatAngle + table.rotation
+            const rad = ((totalAngle - 90) * Math.PI) / 180
+
+            seatX = table.position.x + Math.cos(rad) * seatRadius
+            seatY = table.position.y + Math.sin(rad) * seatRadius
+          } else {
+            const width = table.size === 'small' ? 100 : table.size === 'medium' ? 140 : table.size === 'large' ? 180 : 220
+            const height = table.shape === 'square' ? width : (table.size === 'small' ? 60 : table.size === 'medium' ? 80 : table.size === 'large' ? 100 : 120)
+
+            const seatsPerHead = Math.max(1, Math.floor(tableSeats.length / 4))
+            const seatsOnTop = Math.ceil((tableSeats.length - seatsPerHead * 2) / 2)
+            const seatsOnBottom = tableSeats.length - seatsOnTop - seatsPerHead * 2
+
+            let localX = 0
+            let localY = 0
+
+            if (seatIndex < seatsOnTop) {
+              const spacing = width / (seatsOnTop + 1)
+              localX = spacing * (seatIndex + 1) - width / 2
+              localY = -height / 2 - 25
+            } else if (seatIndex < seatsOnTop + seatsPerHead) {
+              const headIndex = seatIndex - seatsOnTop
+              const spacing = height / (seatsPerHead + 1)
+              localX = width / 2 + 25
+              localY = spacing * (headIndex + 1) - height / 2
+            } else if (seatIndex < seatsOnTop + seatsPerHead + seatsOnBottom) {
+              const bottomIndex = seatIndex - seatsOnTop - seatsPerHead
+              const spacing = width / (seatsOnBottom + 1)
+              localX = width / 2 - spacing * (bottomIndex + 1)
+              localY = height / 2 + 25
+            } else {
+              const headIndex = seatIndex - seatsOnTop - seatsPerHead - seatsOnBottom
+              const spacing = height / (seatsPerHead + 1)
+              localX = -width / 2 - 25
+              localY = height / 2 - spacing * (headIndex + 1)
+            }
+
+            const rotRad = (table.rotation * Math.PI) / 180
+            const rotatedX = localX * Math.cos(rotRad) - localY * Math.sin(rotRad)
+            const rotatedY = localX * Math.sin(rotRad) + localY * Math.cos(rotRad)
+
+            seatX = table.position.x + rotatedX
+            seatY = table.position.y + rotatedY
+          }
+
+          // Draw seat circle
+          svgContent += `
+            <circle
+              cx="${seatX}"
+              cy="${seatY}"
+              r="6"
+              fill="${seat.guestId || seat.isPlusOne ? '#2563eb' : '#e5e7eb'}"
+              stroke="#1e40af"
+              stroke-width="1"
+            />
+          `
+
+          // Draw seat number
+          svgContent += `
+            <text
+              x="${seatX}"
+              y="${seatY - 12}"
+              text-anchor="middle"
+              font-size="10"
+              font-weight="bold"
+              fill="#2563eb"
+            >
+              ${seat.position || seat.number || '?'}
+            </text>
+          `
+
+          // Draw guest name if assigned
+          if (seat.guestId || seat.isPlusOne) {
+            const guestName = getGuestNameForSeat(seat)
+            if (guestName.fullName) {
+              const nameY = seatY + 20
+
+              // First name (always show if exists)
+              if (guestName.firstName) {
+                svgContent += `
+                  <text
+                    x="${seatX}"
+                    y="${nameY}"
+                    text-anchor="middle"
+                    font-size="10"
+                    font-weight="600"
+                    fill="#1f2937"
+                  >
+                    ${guestName.firstName}
+                  </text>
+                `
+              }
+
+              // Last name (only show if exists)
+              if (guestName.lastName) {
+                svgContent += `
+                  <text
+                    x="${seatX}"
+                    y="${nameY + 12}"
+                    text-anchor="middle"
+                    font-size="10"
+                    fill="#1f2937"
+                  >
+                    ${guestName.lastName}
+                  </text>
+                `
+              }
+            }
+          }
+        })
+      })
+
+      return svgContent
+    }
+
+    // Calculate scale to fit on page
+    const venueWidth = currentPlan.venueLayout.width
+    const venueHeight = currentPlan.venueLayout.height
+
+    // A4 landscape: ~297mm x 210mm = ~1122px x 794px at 96dpi
+    // Leave margins for header and footer
+    const maxPrintWidth = 1000
+    const maxPrintHeight = 650
+
+    const scaleX = maxPrintWidth / venueWidth
+    const scaleY = maxPrintHeight / venueHeight
+    const scale = Math.min(scaleX, scaleY, 1) // Don't scale up, only down
+
+    const scaledWidth = venueWidth * scale
+    const scaledHeight = venueHeight * scale
+
+    // Calculate statistics
+    const totalAssignedGuests = seats.filter(s => s.guestId || s.isPlusOne).length
+    const totalSeats = seats.length
+    const occupancyRate = totalSeats > 0 ? Math.round((totalAssignedGuests / totalSeats) * 100) : 0
+
+    // Generate guest list by table
+    const generateGuestList = () => {
+      const tablesList = tables.map(table => {
+        const tableSeats = seats.filter(s => s.tableId === table.id && (s.guestId || s.isPlusOne))
+        if (tableSeats.length === 0) return null
+
+        const guestNames = tableSeats.map(seat => {
+          const guestName = getGuestNameForSeat(seat)
+          return guestName.fullName ? `${seat.position || seat.number || '?'}. ${guestName.fullName}` : null
+        }).filter(Boolean)
+
+        if (guestNames.length === 0) return null
+
+        return `
+          <div style="margin-bottom: 20px; page-break-inside: avoid;">
+            <h3 style="color: #2563eb; margin: 0 0 10px 0; font-size: 14px;">
+              Stůl ${table.number || table.name || '?'} (${guestNames.length} ${guestNames.length === 1 ? 'host' : guestNames.length < 5 ? 'hosté' : 'hostů'})
+            </h3>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; font-size: 12px;">
+              ${guestNames.map(name => `
+                <div style="padding: 4px 8px; background: #f3f4f6; border-left: 3px solid #2563eb; border-radius: 3px;">
+                  ${name}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `
+      }).filter(Boolean).join('')
+
+      return tablesList
+    }
+
+    // Generate HTML for print
+    const printHTML = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Zasedací pořádek - ${currentPlan.name}</title>
+          <style>
+            @media print {
+              @page {
+                size: A4 portrait;
+                margin: 1.5cm;
+              }
+              body {
+                margin: 0;
+                padding: 0;
+              }
+              .page-break {
+                page-break-after: always;
+              }
+            }
+
+            body {
+              font-family: Arial, sans-serif;
+              color: #333;
+              margin: 0;
+              padding: 0;
+            }
+
+            .page {
+              padding: 20px;
+            }
+
+            h1 {
+              color: #2563eb;
+              font-size: 24px;
+              margin: 0 0 10px 0;
+              text-align: center;
+              border-bottom: 3px solid #2563eb;
+              padding-bottom: 10px;
+            }
+
+            h2 {
+              color: #2563eb;
+              font-size: 18px;
+              margin: 20px 0 15px 0;
+            }
+
+            .summary {
+              background: #f3f4f6;
+              padding: 12px 20px;
+              border-radius: 8px;
+              margin-bottom: 25px;
+              text-align: center;
+              font-size: 13px;
+            }
+
+            .summary-item {
+              display: inline-block;
+              margin: 0 20px;
+            }
+
+            .summary-label {
+              font-weight: bold;
+              color: #6b7280;
+            }
+
+            .summary-value {
+              color: #2563eb;
+              font-weight: bold;
+              font-size: 1.1em;
+            }
+
+            .guest-list-container {
+              column-count: 2;
+              column-gap: 30px;
+            }
+
+            .canvas-container {
+              border: 2px solid #2563eb;
+              background: #f9fafb;
+              display: inline-block;
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+              margin: 20px auto;
+            }
+
+            .canvas-page {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+            }
+
+            .footer {
+              margin-top: 20px;
+              text-align: center;
+              color: #6b7280;
+              font-size: 11px;
+              border-top: 1px solid #e5e7eb;
+              padding-top: 10px;
+            }
+          </style>
+        </head>
+        <body>
+          <!-- Page 1: Guest List -->
+          <div class="page page-break">
+            <h1>Zasedací pořádek - ${currentPlan.name}</h1>
+
+            <div class="summary">
+              <div class="summary-item">
+                <span class="summary-label">Počet stolů:</span>
+                <span class="summary-value">${tables.length}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Celkem hostů:</span>
+                <span class="summary-value">${totalAssignedGuests}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Obsazenost:</span>
+                <span class="summary-value">${occupancyRate}%</span>
+              </div>
+            </div>
+
+            <h2>Seznam hostů podle stolů</h2>
+            <div class="guest-list-container">
+              ${generateGuestList()}
+            </div>
+
+            <div class="footer">
+              Vytištěno: ${new Date().toLocaleDateString('cs-CZ', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              })}
+            </div>
+          </div>
+
+          <!-- Page 2: Visual Layout -->
+          <div class="page canvas-page">
+            <h1>Vizuální rozmístění</h1>
+
+            <div class="canvas-container">
+              <svg width="${scaledWidth}" height="${scaledHeight}" viewBox="0 0 ${venueWidth} ${venueHeight}">
+                ${generateCanvasSVG()}
+              </svg>
+            </div>
+
+            <div class="footer">
+              Rozměry plochy: ${venueWidth} × ${venueHeight} px
+            </div>
+          </div>
+        </body>
+      </html>
+    `
+
+    printWindow.document.write(printHTML)
+    printWindow.document.close()
+
+    // Wait for content to load, then print
+    printWindow.onload = () => {
+      printWindow.print()
+    }
   }
 
   // Handle seat click for guest assignment
@@ -443,26 +933,38 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     setIsDraggingDanceFloor(true)
 
     const rect = canvasRef.current.getBoundingClientRect()
+
+    // Account for zoom when calculating offset
+    const zoom = viewOptions.zoom
+    const mouseX = (event.clientX - rect.left) / zoom
+    const mouseY = (event.clientY - rect.top) / zoom
+
     setDanceFloorDragOffset({
-      x: event.clientX - rect.left - danceFloorData.x,
-      y: event.clientY - rect.top - danceFloorData.y
+      x: mouseX - danceFloorData.x,
+      y: mouseY - danceFloorData.y
     })
-  }, [currentPlan.venueLayout.danceFloor, danceFloorData])
+  }, [currentPlan.venueLayout.danceFloor, danceFloorData, viewOptions.zoom])
 
   const handleDanceFloorDrag = useCallback((event: React.MouseEvent) => {
     if (!isDraggingDanceFloor || !currentPlan.venueLayout.danceFloor || !canvasRef.current) return
 
     event.preventDefault()
     const rect = canvasRef.current.getBoundingClientRect()
+
+    // Account for zoom when calculating position
+    const zoom = viewOptions.zoom
+    const mouseX = (event.clientX - rect.left) / zoom
+    const mouseY = (event.clientY - rect.top) / zoom
+
     const newPosition = {
       x: Math.max(0, Math.min(currentPlan.venueLayout.width - danceFloorData.width,
-          event.clientX - rect.left - danceFloorDragOffset.x)),
+          mouseX - danceFloorDragOffset.x)),
       y: Math.max(0, Math.min(currentPlan.venueLayout.height - danceFloorData.height,
-          event.clientY - rect.top - danceFloorDragOffset.y))
+          mouseY - danceFloorDragOffset.y))
     }
 
     setDraggedDanceFloorPosition(newPosition)
-  }, [isDraggingDanceFloor, currentPlan.venueLayout, danceFloorDragOffset, danceFloorData])
+  }, [isDraggingDanceFloor, currentPlan.venueLayout, danceFloorDragOffset, danceFloorData, viewOptions.zoom])
 
   const handleDanceFloorDragEnd = useCallback(async () => {
     if (isDraggingDanceFloor && draggedDanceFloorPosition) {
@@ -496,11 +998,139 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     return seats.filter(seat => seat.tableId === tableId)
   }
 
-  // Get guest name for seat
+  // Calculate label dimensions (approximate) - for two-line labels
+  const getLabelDimensions = (firstName: string, lastName: string, rotation: number) => {
+    // Approximate character width and height
+    const charWidth = 7 // pixels per character
+    const lineHeight = 16 // pixels per line
+    const padding = 16 // 2 * (px-2 py-1)
+
+    // Width is based on the longer of the two names
+    const maxNameLength = Math.max(firstName.length, lastName.length)
+    const textWidth = maxNameLength * charWidth + padding
+
+    // Height is for two lines
+    const textHeight = lineHeight * 2 + padding
+
+    // If rotated 90 or 270 degrees, swap width and height
+    if (Math.abs(rotation % 180 - 90) < 45) {
+      return { width: textHeight, height: textWidth }
+    }
+
+    return { width: textWidth, height: textHeight }
+  }
+
+  // Check if two rectangles overlap
+  const checkCollision = (
+    x1: number, y1: number, w1: number, h1: number,
+    x2: number, y2: number, w2: number, h2: number
+  ) => {
+    return !(
+      x1 + w1 / 2 < x2 - w2 / 2 ||
+      x1 - w1 / 2 > x2 + w2 / 2 ||
+      y1 + h1 / 2 < y2 - h2 / 2 ||
+      y1 - h1 / 2 > y2 + h2 / 2
+    )
+  }
+
+  // Adjust label positions to prevent collisions
+  const adjustLabelPositions = (
+    labels: Array<{
+      x: number
+      y: number
+      width: number
+      height: number
+      angle: number
+      index: number
+    }>
+  ) => {
+    const adjusted = labels.map(label => ({ ...label }))
+    const maxIterations = 50
+    const pushDistance = 5 // pixels to push apart on collision
+
+    for (let iteration = 0; iteration < maxIterations; iteration++) {
+      let hasCollision = false
+
+      for (let i = 0; i < adjusted.length; i++) {
+        for (let j = i + 1; j < adjusted.length; j++) {
+          const label1 = adjusted[i]
+          const label2 = adjusted[j]
+
+          if (checkCollision(
+            label1.x, label1.y, label1.width, label1.height,
+            label2.x, label2.y, label2.width, label2.height
+          )) {
+            hasCollision = true
+
+            // Calculate direction to push labels apart
+            const dx = label2.x - label1.x
+            const dy = label2.y - label1.y
+            const distance = Math.sqrt(dx * dx + dy * dy) || 1
+
+            // Normalize and push apart
+            const pushX = (dx / distance) * pushDistance
+            const pushY = (dy / distance) * pushDistance
+
+            // Push both labels away from each other
+            label1.x -= pushX / 2
+            label1.y -= pushY / 2
+            label2.x += pushX / 2
+            label2.y += pushY / 2
+          }
+        }
+      }
+
+      // If no collisions detected, we're done
+      if (!hasCollision) break
+    }
+
+    return adjusted
+  }
+
+  // Get guest name for seat - returns object with first and last name
   const getGuestName = (seat: Seat) => {
     if (!seat.guestId) return null
+
+    // If this is a plus one seat, show the plus one's name
+    if (seat.isPlusOne && seat.plusOneOf) {
+      const mainGuest = guests.find(g => g.id === seat.plusOneOf)
+      if (mainGuest && mainGuest.plusOneName) {
+        // Split plus one name into first and last
+        const parts = mainGuest.plusOneName.split(' ')
+        return {
+          firstName: parts[0] || '',
+          lastName: parts.slice(1).join(' ') || '',
+          fullName: mainGuest.plusOneName
+        }
+      }
+    }
+
+    // Otherwise show the main guest's name
     const guest = guests.find(g => g.id === seat.guestId)
-    return guest ? `${guest.firstName} ${guest.lastName}` : null
+    if (!guest) return null
+
+    const firstName = guest.firstName || ''
+    const lastName = guest.lastName || ''
+    const fullName = `${firstName} ${lastName}`.trim()
+
+    return {
+      firstName,
+      lastName,
+      fullName
+    }
+  }
+
+  // Check if guest has assigned seat
+  const isGuestAssigned = (guestId: string) => {
+    return seats.some(seat => seat.guestId === guestId)
+  }
+
+  // Get assigned seat info for guest
+  const getGuestSeatInfo = (guestId: string) => {
+    const seat = seats.find(s => s.guestId === guestId)
+    if (!seat) return null
+    const table = tables.find(t => t.id === seat.tableId)
+    return table ? { tableName: table.name, seatPosition: seat.position } : null
   }
 
   // Group unassigned guests by category
@@ -538,25 +1168,75 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     return sortedGrouped
   }
 
-  // Sync dance floor data with current plan
+  // Group all guests by category (for assignment dialog)
+  const getGroupedAllGuests = () => {
+    const grouped: Record<string, typeof guests> = {}
+
+    guests.forEach(guest => {
+      const category = guest.category || 'other'
+      if (!grouped[category]) {
+        grouped[category] = []
+      }
+      grouped[category].push(guest)
+    })
+
+    // Sort categories by priority
+    const categoryOrder = [
+      'family-bride',
+      'family-groom',
+      'friends-bride',
+      'friends-groom',
+      'colleagues-bride',
+      'colleagues-groom',
+      'other'
+    ]
+
+    const sortedGrouped: Record<string, typeof guests> = {}
+    categoryOrder.forEach(category => {
+      if (grouped[category] && grouped[category].length > 0) {
+        sortedGrouped[category] = grouped[category].sort((a, b) =>
+          `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`)
+        )
+      }
+    })
+
+    return sortedGrouped
+  }
+
+  // Sync dance floor data with current plan - only when plan ID changes
   useEffect(() => {
     if (currentPlan.venueLayout.danceFloor) {
-      setDanceFloorData({
-        x: currentPlan.venueLayout.danceFloor.x,
-        y: currentPlan.venueLayout.danceFloor.y,
-        width: currentPlan.venueLayout.danceFloor.width,
-        height: currentPlan.venueLayout.danceFloor.height
+      setDanceFloorData(prev => {
+        const newData = {
+          x: currentPlan.venueLayout.danceFloor!.x,
+          y: currentPlan.venueLayout.danceFloor!.y,
+          width: currentPlan.venueLayout.danceFloor!.width,
+          height: currentPlan.venueLayout.danceFloor!.height
+        }
+        // Only update if values actually changed
+        if (prev.x === newData.x && prev.y === newData.y &&
+            prev.width === newData.width && prev.height === newData.height) {
+          return prev
+        }
+        return newData
       })
     }
-  }, [currentPlan.id]) // Only sync when plan changes, not on every render
+  }, [currentPlan.id, currentPlan.venueLayout.danceFloor])
 
-  // Sync venue data with current plan
+  // Sync venue data with current plan - only when values actually change
   useEffect(() => {
-    setVenueData({
-      width: currentPlan.venueLayout.width,
-      height: currentPlan.venueLayout.height
+    setVenueData(prev => {
+      // Only update if values actually changed
+      if (prev.width === currentPlan.venueLayout.width &&
+          prev.height === currentPlan.venueLayout.height) {
+        return prev
+      }
+      return {
+        width: currentPlan.venueLayout.width,
+        height: currentPlan.venueLayout.height
+      }
     })
-  }, [currentPlan.id])
+  }, [currentPlan.id, currentPlan.venueLayout.width, currentPlan.venueLayout.height])
 
   return (
     <div className={`space-y-6 ${className}`}>
@@ -575,11 +1255,6 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
               >
                 <Plus className="w-4 h-4" />
                 <span>Přidat stůl</span>
-              </button>
-
-              <button className="btn-outline flex items-center space-x-2">
-                <Users className="w-4 h-4" />
-                <span>Auto-rozmístění</span>
               </button>
 
               <button
@@ -623,14 +1298,13 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
               {viewOptions.showGuestNames ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
             </button>
 
-            <button className="btn-outline flex items-center space-x-2">
-              <Save className="w-4 h-4" />
-              <span>Uložit</span>
-            </button>
-
-            <button className="btn-outline flex items-center space-x-2">
-              <Download className="w-4 h-4" />
-              <span>Export</span>
+            <button
+              onClick={handlePrint}
+              className="btn-primary flex items-center space-x-2"
+              title="Vytisknout zasedací pořádek"
+            >
+              <Printer className="w-4 h-4" />
+              <span>Tisk</span>
             </button>
           </div>
         </div>
@@ -639,15 +1313,18 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Canvas */}
         <div className="lg:col-span-3">
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="bg-white rounded-xl border border-gray-200 overflow-auto">
             <div
               ref={canvasRef}
-              className="relative bg-gray-50 min-h-[600px] cursor-crosshair"
+              className="relative bg-gray-50 cursor-crosshair border-4 border-dashed border-blue-300"
               style={{
                 transform: `scale(${viewOptions.zoom})`,
                 transformOrigin: 'top left',
                 width: currentPlan.venueLayout.width,
-                height: currentPlan.venueLayout.height
+                height: currentPlan.venueLayout.height,
+                minWidth: currentPlan.venueLayout.width,
+                minHeight: currentPlan.venueLayout.height,
+                boxShadow: 'inset 0 0 0 1px rgba(59, 130, 246, 0.3)'
               }}
               onMouseMove={(e) => {
                 handleTableDrag(e)
@@ -663,6 +1340,10 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
               }}
 
             >
+              {/* Canvas size indicator */}
+              <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded shadow-md pointer-events-none z-50">
+                {currentPlan.venueLayout.width} × {currentPlan.venueLayout.height} px
+              </div>
               {/* Venue features */}
               {currentPlan.venueLayout.danceFloor && (() => {
                 const isDraggedDanceFloor = isDraggingDanceFloor && draggedDanceFloorPosition
@@ -812,7 +1493,8 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                           }
                         }
 
-                        const guestName = getGuestName(seat)
+                        const guestNameData = getGuestName(seat)
+                        const guestNameTooltip = guestNameData?.fullName || null
 
                         return (
                           <div
@@ -828,7 +1510,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                               left: `calc(50% + ${seatX}px - 12px)`,
                               top: `calc(50% + ${seatY}px - 12px)`
                             }}
-                            title={guestName || `Místo ${seat.position} - klikněte pro přiřazení hosta`}
+                            title={guestNameTooltip || `Místo ${seat.position} - klikněte pro přiřazení hosta`}
                             onClick={(e) => {
                               e.stopPropagation()
                               if (seat.guestId) {
@@ -867,93 +1549,151 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                     </div>
 
                     {/* Guest names positioned around table - adapted to table shape */}
-                    {viewOptions.showGuestNames && tableSeats.filter(s => s.guestId).map((seat) => {
-                      const guestName = getGuestName(seat)
-                      if (!guestName) return null
+                    {viewOptions.showGuestNames && (() => {
+                      // First pass: calculate initial positions for all labels
+                      const labelData = tableSeats
+                        .filter(s => s.guestId)
+                        .map((seat) => {
+                          const guestName = getGuestName(seat)
+                          if (!guestName) return null
 
-                      // Find the actual index of this seat in the full tableSeats array
-                      const seatIndex = tableSeats.findIndex(s => s.id === seat.id)
-                      if (seatIndex === -1) return null
+                          const seatIndex = tableSeats.findIndex(s => s.id === seat.id)
+                          if (seatIndex === -1) return null
 
-                      let nameX = 0
-                      let nameY = 0
-                      let textRotation = 0
+                          let nameX = 0
+                          let nameY = 0
+                          let textRotation = 0
 
-                      if (table.shape === 'round' || table.shape === 'oval') {
-                        // Circular positioning for round/oval tables
-                        const seatAngle = (360 / tableSeats.length) * seatIndex
-                        const totalAngle = seatAngle + table.rotation
-                        const nameRadius = table.size === 'small' ? 80 : table.size === 'medium' ? 100 : table.size === 'large' ? 120 : 140
-                        nameX = Math.cos((totalAngle - 90) * Math.PI / 180) * nameRadius
-                        nameY = Math.sin((totalAngle - 90) * Math.PI / 180) * nameRadius
+                          if (table.shape === 'round' || table.shape === 'oval') {
+                            // Circular positioning for round/oval tables
+                            const seatAngle = (360 / tableSeats.length) * seatIndex
+                            const totalAngle = seatAngle + table.rotation
+                            const baseRadius = table.size === 'small' ? 90 : table.size === 'medium' ? 110 : table.size === 'large' ? 130 : 150
+                            const extraRadius = Math.max(0, (tableSeats.length - 6) * 5)
+                            const nameRadius = baseRadius + extraRadius
+                            nameX = Math.cos((totalAngle - 90) * Math.PI / 180) * nameRadius
+                            nameY = Math.sin((totalAngle - 90) * Math.PI / 180) * nameRadius
 
-                        // Calculate text rotation - keep text readable (never upside down)
-                        textRotation = totalAngle
-                        if (textRotation > 90 && textRotation < 270) {
-                          textRotation += 180 // Flip text if it would be upside down
-                        }
-                      } else {
-                        // Rectangular/square positioning with optional head seats
-                        const tableWidth = table.size === 'small' ? 100 : table.size === 'medium' ? 140 : table.size === 'large' ? 180 : 220
-                        const tableHeight = table.shape === 'square'
-                          ? tableWidth
-                          : (table.size === 'small' ? 60 : table.size === 'medium' ? 80 : table.size === 'large' ? 100 : 120)
+                            // Keep text horizontal (no rotation)
+                            textRotation = 0
+                          } else {
+                            // Rectangular/square positioning
+                            const tableWidth = table.size === 'small' ? 100 : table.size === 'medium' ? 140 : table.size === 'large' ? 180 : 220
+                            const tableHeight = table.shape === 'square'
+                              ? tableWidth
+                              : (table.size === 'small' ? 60 : table.size === 'medium' ? 80 : table.size === 'large' ? 100 : 120)
 
-                        const nameOffset = 40 // Distance from table edge
-                        const totalSeats = tableSeats.length
-                        const headSeats = table.headSeats || 0
-                        const seatsPerHead = headSeats
-                        const totalHeadSeats = seatsPerHead * 2
-                        const longSideSeats = totalSeats - totalHeadSeats
+                            const baseOffset = 45
+                            const extraOffset = Math.max(0, (tableSeats.length - 6) * 3)
+                            const nameOffset = baseOffset + extraOffset
+                            const totalSeats = tableSeats.length
+                            const headSeats = table.headSeats || 0
+                            const seatsPerHead = headSeats
+                            const totalHeadSeats = seatsPerHead * 2
+                            const longSideSeats = totalSeats - totalHeadSeats
 
-                        const seatsOnTop = Math.ceil(longSideSeats / 2)
-                        const seatsOnBottom = longSideSeats - seatsOnTop
+                            const seatsOnTop = Math.ceil(longSideSeats / 2)
+                            const seatsOnBottom = longSideSeats - seatsOnTop
 
-                        if (seatIndex < seatsOnTop) {
-                          // Top long side
-                          const spacing = tableWidth / (seatsOnTop + 1)
-                          nameX = spacing * (seatIndex + 1) - tableWidth / 2
-                          nameY = -tableHeight / 2 - nameOffset
-                          textRotation = 0
-                        } else if (seatIndex < seatsOnTop + seatsPerHead) {
-                          // Right short side (head)
-                          const headIndex = seatIndex - seatsOnTop
-                          const spacing = tableHeight / (seatsPerHead + 1)
-                          nameX = tableWidth / 2 + nameOffset
-                          nameY = spacing * (headIndex + 1) - tableHeight / 2
-                          textRotation = 90
-                        } else if (seatIndex < seatsOnTop + seatsPerHead + seatsOnBottom) {
-                          // Bottom long side
-                          const bottomIndex = seatIndex - seatsOnTop - seatsPerHead
-                          const spacing = tableWidth / (seatsOnBottom + 1)
-                          nameX = tableWidth / 2 - spacing * (bottomIndex + 1)
-                          nameY = tableHeight / 2 + nameOffset
-                          textRotation = 0
-                        } else {
-                          // Left short side (head)
-                          const headIndex = seatIndex - seatsOnTop - seatsPerHead - seatsOnBottom
-                          const spacing = tableHeight / (seatsPerHead + 1)
-                          nameX = -tableWidth / 2 - nameOffset
-                          nameY = tableHeight / 2 - spacing * (headIndex + 1)
-                          textRotation = 270
-                        }
-                      }
+                            // Calculate position in non-rotated space
+                            let localX = 0
+                            let localY = 0
 
-                      return (
-                        <div
-                          key={`name-${seat.id}`}
-                          className="absolute text-xs bg-white px-2 py-1 rounded border text-gray-700 shadow-sm whitespace-nowrap pointer-events-none"
-                          style={{
-                            left: `calc(50% + ${nameX}px)`,
-                            top: `calc(50% + ${nameY}px)`,
-                            transform: `translate(-50%, -50%) rotate(${textRotation}deg)`,
-                            zIndex: 5
-                          }}
-                        >
-                          {guestName}
-                        </div>
+                            if (seatIndex < seatsOnTop) {
+                              const spacing = tableWidth / (seatsOnTop + 1)
+                              localX = spacing * (seatIndex + 1) - tableWidth / 2
+                              localY = -tableHeight / 2 - nameOffset
+                            } else if (seatIndex < seatsOnTop + seatsPerHead) {
+                              const headIndex = seatIndex - seatsOnTop
+                              const spacing = tableHeight / (seatsPerHead + 1)
+                              localX = tableWidth / 2 + nameOffset
+                              localY = spacing * (headIndex + 1) - tableHeight / 2
+                            } else if (seatIndex < seatsOnTop + seatsPerHead + seatsOnBottom) {
+                              const bottomIndex = seatIndex - seatsOnTop - seatsPerHead
+                              const spacing = tableWidth / (seatsOnBottom + 1)
+                              localX = tableWidth / 2 - spacing * (bottomIndex + 1)
+                              localY = tableHeight / 2 + nameOffset
+                            } else {
+                              const headIndex = seatIndex - seatsOnTop - seatsPerHead - seatsOnBottom
+                              const spacing = tableHeight / (seatsPerHead + 1)
+                              localX = -tableWidth / 2 - nameOffset
+                              localY = tableHeight / 2 - spacing * (headIndex + 1)
+                            }
+
+                            // Apply table rotation to position
+                            const rotRad = (table.rotation * Math.PI) / 180
+                            nameX = localX * Math.cos(rotRad) - localY * Math.sin(rotRad)
+                            nameY = localX * Math.sin(rotRad) + localY * Math.cos(rotRad)
+
+                            // Keep text horizontal (no rotation)
+                            textRotation = 0
+                          }
+
+                          const dimensions = getLabelDimensions(guestName.firstName, guestName.lastName, textRotation)
+
+                          return {
+                            seat,
+                            firstName: guestName.firstName,
+                            lastName: guestName.lastName,
+                            fullName: guestName.fullName,
+                            x: nameX,
+                            y: nameY,
+                            rotation: textRotation,
+                            width: dimensions.width,
+                            height: dimensions.height,
+                            seatIndex
+                          }
+                        })
+                        .filter(Boolean) as Array<{
+                          seat: Seat
+                          firstName: string
+                          lastName: string
+                          fullName: string
+                          x: number
+                          y: number
+                          rotation: number
+                          width: number
+                          height: number
+                          seatIndex: number
+                        }>
+
+                      // Second pass: adjust positions to prevent collisions
+                      const adjustedLabels = adjustLabelPositions(
+                        labelData.map((label, index) => ({
+                          x: label.x,
+                          y: label.y,
+                          width: label.width,
+                          height: label.height,
+                          angle: label.rotation,
+                          index
+                        }))
                       )
-                    })}
+
+                      // Third pass: render with adjusted positions
+                      return labelData.map((label, index) => {
+                        const adjusted = adjustedLabels[index]
+
+                        return (
+                          <div
+                            key={`name-${label.seat.id}`}
+                            className={`absolute text-[10px] px-2 py-1 rounded border shadow-md pointer-events-none text-center leading-tight ${
+                              label.seat.isPlusOne
+                                ? 'bg-blue-50 border-blue-300 text-blue-800'
+                                : 'bg-white border-gray-300 text-gray-700'
+                            }`}
+                            style={{
+                              left: `calc(50% + ${adjusted.x}px)`,
+                              top: `calc(50% + ${adjusted.y}px)`,
+                              transform: `translate(-50%, -50%) rotate(${label.rotation}deg)`,
+                              zIndex: 10 + label.seatIndex
+                            }}
+                          >
+                            <div className="font-medium">{label.firstName}</div>
+                            <div>{label.lastName}</div>
+                          </div>
+                        )
+                      })
+                    })()}
                   </div>
                 )
               })}
@@ -1006,47 +1746,73 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
           {/* Unassigned guests grouped by category */}
           <div className="bg-white rounded-xl border border-gray-200 p-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Nepřiřazení hosté ({unassignedGuests.length})
+              Nepřiřazení hosté ({totalUnassignedPeople})
             </h3>
 
             <div className="space-y-4 max-h-96 overflow-y-auto">
-              {Object.entries(getGroupedUnassignedGuests()).map(([category, guests]) => (
+              {Object.entries(getGroupedUnassignedGuests()).map(([category, guests]) => {
+                // Calculate total people in this category (guests + plus ones)
+                const categoryPeopleCount = guests.reduce((total, guest) => {
+                  let count = 1
+                  if (guest.hasPlusOne && guest.plusOneName) count += 1
+                  return total + count
+                }, 0)
+
+                return (
                 <div key={category} className="space-y-2">
                   {/* Category header */}
                   <div className="flex items-center space-x-2">
                     <div className={`px-2 py-1 rounded-full text-xs font-medium ${GUEST_CATEGORY_COLORS[category as keyof typeof GUEST_CATEGORY_COLORS] || 'bg-gray-100 text-gray-700'}`}>
                       {GUEST_CATEGORY_LABELS[category as keyof typeof GUEST_CATEGORY_LABELS] || category}
                     </div>
-                    <span className="text-xs text-gray-500">({guests.length})</span>
+                    <span className="text-xs text-gray-500">({categoryPeopleCount})</span>
                   </div>
 
                   {/* Guests in category */}
                   <div className="space-y-1 ml-2">
                     {guests.map(guest => (
-                      <div
-                        key={guest.id}
-                        className="flex items-center justify-between p-2 bg-gray-50 rounded-lg cursor-move hover:bg-primary-50 transition-colors"
-                        draggable
-                        onDragStart={(e) => handleGuestDragStart(e, guest.id)}
-                      >
-                        <span className="text-sm font-medium">
-                          {guest.firstName} {guest.lastName}
-                        </span>
-                        {guest.hasPlusOne && (
-                          <span className="text-xs text-blue-600 bg-blue-100 px-2 py-0.5 rounded">
-                            +1
-                          </span>
-                        )}
-                        {guest.hasChildren && guest.children && guest.children.length > 0 && (
-                          <span className="text-xs text-green-600 bg-green-100 px-2 py-0.5 rounded">
-                            +{guest.children.length}
-                          </span>
+                      <div key={guest.id} className="space-y-1">
+                        {/* Main guest */}
+                        <div
+                          className="flex items-center justify-between p-2 bg-gray-50 rounded-lg cursor-move hover:bg-primary-50 transition-colors"
+                          draggable
+                          onDragStart={(e) => handleGuestDragStart(e, guest.id)}
+                        >
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm font-medium">
+                              {guest.firstName} {guest.lastName}
+                            </span>
+                            {guest.hasChildren && guest.children && guest.children.length > 0 && (
+                              <span className="text-xs text-green-600 bg-green-100 px-2 py-0.5 rounded">
+                                +{guest.children.length} dítě
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Plus one - shown as separate entry */}
+                        {guest.hasPlusOne && guest.plusOneName && (
+                          <div
+                            className="flex items-center justify-between p-2 bg-blue-50 rounded-lg cursor-move hover:bg-primary-50 transition-colors ml-4 border-l-2 border-blue-300"
+                            draggable
+                            onDragStart={(e) => handleGuestDragStart(e, guest.id)}
+                          >
+                            <div className="flex items-center space-x-2">
+                              <span className="text-sm font-medium text-blue-700">
+                                {guest.plusOneName}
+                              </span>
+                              <span className="text-xs text-blue-600 bg-blue-100 px-2 py-0.5 rounded">
+                                doprovod
+                              </span>
+                            </div>
+                          </div>
                         )}
                       </div>
                     ))}
                   </div>
                 </div>
-              ))}
+                )
+              })}
 
               {unassignedGuests.length === 0 && (
                 <div className="text-center py-8">
@@ -1347,36 +2113,108 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
       {/* Guest assignment modal */}
       {showGuestAssignment && selectedSeat && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+          <div className="bg-white rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[80vh] flex flex-col">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Přiřadit hosta k místu
             </h3>
 
-            <div className="space-y-4 max-h-60 overflow-y-auto">
-              {unassignedGuests.map(guest => (
-                <div
-                  key={guest.id}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-primary-50 cursor-pointer transition-colors"
-                  onClick={() => handleAssignGuest(guest.id)}
-                >
-                  <div>
-                    <span className="text-sm font-medium">
-                      {guest.firstName} {guest.lastName}
-                    </span>
-                    <p className="text-xs text-gray-500">{guest.category}</p>
-                  </div>
-                  <span className="text-xs text-gray-400">Klikněte pro přiřazení</span>
-                </div>
-              ))}
+            <div className="space-y-4 overflow-y-auto flex-1">
+              {Object.entries(getGroupedAllGuests()).map(([category, categoryGuests]) => {
+                // Calculate total people in this category (guests + plus ones)
+                const categoryPeopleCount = categoryGuests.reduce((total, guest) => {
+                  let count = 1
+                  if (guest.hasPlusOne && guest.plusOneName) count += 1
+                  return total + count
+                }, 0)
 
-              {unassignedGuests.length === 0 && (
+                return (
+                <div key={category} className="space-y-2">
+                  {/* Category header */}
+                  <div className="flex items-center space-x-2">
+                    <div className={`px-2 py-1 rounded-full text-xs font-medium ${GUEST_CATEGORY_COLORS[category as keyof typeof GUEST_CATEGORY_COLORS] || 'bg-gray-100 text-gray-700'}`}>
+                      {GUEST_CATEGORY_LABELS[category as keyof typeof GUEST_CATEGORY_LABELS] || category}
+                    </div>
+                    <span className="text-xs text-gray-500">({categoryPeopleCount})</span>
+                  </div>
+
+                  {/* Guests in category */}
+                  <div className="space-y-1 ml-2">
+                    {categoryGuests.map(guest => {
+                      const isAssigned = isGuestAssigned(guest.id)
+                      const seatInfo = getGuestSeatInfo(guest.id)
+
+                      return (
+                      <div key={guest.id} className="space-y-1">
+                        {/* Main guest */}
+                        <div
+                          className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ${
+                            isAssigned
+                              ? 'bg-green-50 border border-green-200 hover:bg-green-100'
+                              : 'bg-gray-50 hover:bg-primary-50'
+                          }`}
+                          onClick={() => handleAssignGuest(guest.id)}
+                        >
+                          <div className="flex items-center space-x-2 flex-1">
+                            <span className={`text-sm font-medium ${isAssigned ? 'text-green-800' : ''}`}>
+                              {guest.firstName} {guest.lastName}
+                            </span>
+                            {guest.hasChildren && guest.children && guest.children.length > 0 && (
+                              <span className="text-xs text-green-600 bg-green-100 px-2 py-0.5 rounded">
+                                +{guest.children.length} dítě
+                              </span>
+                            )}
+                            {isAssigned && seatInfo && (
+                              <span className="text-xs text-green-700 bg-green-100 px-2 py-0.5 rounded">
+                                {seatInfo.tableName} - místo {seatInfo.seatPosition}
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-xs text-gray-400">
+                            {isAssigned ? 'Přesunout' : 'Přiřadit'}
+                          </span>
+                        </div>
+
+                        {/* Plus one - shown as separate entry */}
+                        {guest.hasPlusOne && guest.plusOneName && (
+                          <div
+                            className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ml-4 border-l-2 ${
+                              isAssigned
+                                ? 'bg-green-50 border-green-300 hover:bg-green-100'
+                                : 'bg-blue-50 border-blue-300 hover:bg-primary-50'
+                            }`}
+                            onClick={() => handleAssignGuest(guest.id)}
+                          >
+                            <div className="flex items-center space-x-2 flex-1">
+                              <span className={`text-sm font-medium ${isAssigned ? 'text-green-800' : 'text-blue-700'}`}>
+                                {guest.plusOneName}
+                              </span>
+                              <span className={`text-xs px-2 py-0.5 rounded ${
+                                isAssigned ? 'text-green-600 bg-green-100' : 'text-blue-600 bg-blue-100'
+                              }`}>
+                                doprovod
+                              </span>
+                            </div>
+                            <span className="text-xs text-gray-400">
+                              {isAssigned ? 'Přesunout' : 'Přiřadit'}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      )
+                    })}
+                  </div>
+                </div>
+                )
+              })}
+
+              {guests.length === 0 && (
                 <p className="text-sm text-gray-500 text-center py-4">
-                  Všichni hosté jsou již přiřazeni
+                  Žádní hosté k dispozici
                 </p>
               )}
             </div>
 
-            <div className="flex space-x-3 pt-6">
+            <div className="flex space-x-3 pt-6 border-t border-gray-200 mt-4">
               <button
                 type="button"
                 onClick={() => {

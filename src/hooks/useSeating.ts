@@ -100,24 +100,32 @@ export function useSeating(): UseSeatingReturn {
     }
   }, [currentPlan])
 
-  // Update currentPlan when seatingPlans change (to reflect Firestore updates)
-  // Disabled to prevent infinite loop - state updates are handled directly in updateSeatingPlan
-  // useEffect(() => {
-  //   if (currentPlan && seatingPlans.length > 0) {
-  //     const updatedPlan = seatingPlans.find(p => p.id === currentPlan.id)
-  //     if (updatedPlan) {
-  //       // Only update if the data has actually changed (compare tables/seats length)
-  //       const currentTablesCount = currentPlan.tables?.length || 0
-  //       const updatedTablesCount = updatedPlan.tables?.length || 0
-  //       const currentSeatsCount = currentPlan.seats?.length || 0
-  //       const updatedSeatsCount = updatedPlan.seats?.length || 0
-  //
-  //       if (currentTablesCount !== updatedTablesCount || currentSeatsCount !== updatedSeatsCount) {
-  //         setCurrentPlanState(updatedPlan)
-  //       }
-  //     }
-  //   }
-  // }, [seatingPlans, currentPlan?.id, currentPlan?.tables?.length, currentPlan?.seats?.length])
+  // Update currentPlan when seatingPlans change (to reflect updates)
+  useEffect(() => {
+    if (currentPlan && seatingPlans.length > 0) {
+      const updatedPlan = seatingPlans.find(p => p.id === currentPlan.id)
+      if (updatedPlan) {
+        // Check if venueLayout has changed
+        const venueLayoutChanged =
+          currentPlan.venueLayout.width !== updatedPlan.venueLayout.width ||
+          currentPlan.venueLayout.height !== updatedPlan.venueLayout.height
+
+        // Check if tables/seats have changed
+        const tablesChanged = (currentPlan.tables?.length || 0) !== (updatedPlan.tables?.length || 0)
+        const seatsChanged = (currentPlan.seats?.length || 0) !== (updatedPlan.seats?.length || 0)
+
+        if (venueLayoutChanged || tablesChanged || seatsChanged) {
+          console.log('Syncing currentPlan from seatingPlans:', {
+            venueLayoutChanged,
+            tablesChanged,
+            seatsChanged,
+            newVenueLayout: updatedPlan.venueLayout
+          })
+          setCurrentPlanState(updatedPlan)
+        }
+      }
+    }
+  }, [seatingPlans, currentPlan?.id])
 
   // Load seating plans when wedding changes
   useEffect(() => {
@@ -424,19 +432,39 @@ export function useSeating(): UseSeatingReturn {
     if (!wedding) return
 
     try {
+      // Deep merge function for nested objects
+      const deepMerge = (target: any, source: any): any => {
+        const output = { ...target }
+        for (const key in source) {
+          if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key]) && !(source[key] instanceof Date)) {
+            output[key] = deepMerge(target[key] || {}, source[key])
+          } else {
+            output[key] = source[key]
+          }
+        }
+        return output
+      }
+
       // Update plan in state first (for immediate UI feedback)
       setSeatingPlans(prev => prev.map(plan =>
         plan.id === planId
-          ? { ...plan, ...updates, updatedAt: new Date() }
+          ? deepMerge(plan, { ...updates, updatedAt: new Date() })
           : plan
       ))
 
       // Update current plan if it's the one being updated
-      setCurrentPlanState(prev =>
-        prev?.id === planId
-          ? { ...prev, ...updates, updatedAt: new Date() }
-          : prev
-      )
+      setCurrentPlanState(prev => {
+        if (prev?.id === planId) {
+          const updated = deepMerge(prev, { ...updates, updatedAt: new Date() })
+          console.log('Updating currentPlan state:', {
+            before: prev.venueLayout,
+            updates: updates.venueLayout,
+            after: updated.venueLayout
+          })
+          return updated
+        }
+        return prev
+      })
 
       // Update in localStorage as backup
       const savedPlans = localStorage.getItem(`seatingPlans_${wedding.id}`) || '[]'
@@ -623,12 +651,38 @@ export function useSeating(): UseSeatingReturn {
     if (!wedding || !currentPlan) return
 
     try {
-      // Update seat in the seating plan
-      const updatedSeats = currentPlan.seats.map(seat =>
+      const guest = guests.find(g => g.id === guestId)
+      if (!guest) return
+
+      // Find the seat being assigned
+      const targetSeat = currentPlan.seats.find(s => s.id === seatId)
+      if (!targetSeat) return
+
+      // Update the main guest's seat
+      let updatedSeats = currentPlan.seats.map(seat =>
         seat.id === seatId
-          ? { ...seat, guestId, updatedAt: new Date() }
+          ? { ...seat, guestId, isPlusOne: false, plusOneOf: undefined, updatedAt: new Date() }
           : seat
       )
+
+      // If guest has a plus one, automatically assign them to the next available seat at the same table
+      if (guest.hasPlusOne && guest.plusOneName) {
+        // Find next available seat at the same table
+        const nextAvailableSeat = updatedSeats.find(
+          s => s.tableId === targetSeat.tableId &&
+               !s.guestId &&
+               s.id !== seatId &&
+               s.position > targetSeat.position
+        )
+
+        if (nextAvailableSeat) {
+          updatedSeats = updatedSeats.map(seat =>
+            seat.id === nextAvailableSeat.id
+              ? { ...seat, guestId, isPlusOne: true, plusOneOf: guestId, updatedAt: new Date() }
+              : seat
+          )
+        }
+      }
 
       await updateSeatingPlan(currentPlan.id, {
         seats: updatedSeats,
@@ -644,12 +698,25 @@ export function useSeating(): UseSeatingReturn {
     if (!wedding || !currentPlan) return
 
     try {
+      // Find the seat being unassigned
+      const targetSeat = currentPlan.seats.find(s => s.id === seatId)
+      if (!targetSeat || !targetSeat.guestId) return
+
       // Update seat in the seating plan
-      const updatedSeats = currentPlan.seats.map(seat =>
+      let updatedSeats = currentPlan.seats.map(seat =>
         seat.id === seatId
-          ? { ...seat, guestId: undefined, updatedAt: new Date() }
+          ? { ...seat, guestId: undefined, isPlusOne: false, plusOneOf: undefined, updatedAt: new Date() }
           : seat
       )
+
+      // If this was a main guest seat, also unassign their plus one
+      if (!targetSeat.isPlusOne) {
+        updatedSeats = updatedSeats.map(seat =>
+          seat.plusOneOf === targetSeat.guestId
+            ? { ...seat, guestId: undefined, isPlusOne: false, plusOneOf: undefined, updatedAt: new Date() }
+            : seat
+        )
+      }
 
       await updateSeatingPlan(currentPlan.id, {
         seats: updatedSeats,

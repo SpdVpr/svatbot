@@ -37,11 +37,15 @@ export interface Seat {
   position: number // Position around table (1-N)
   guestId?: string // Assigned guest
   isReserved: boolean
-  
+
+  // Plus one information
+  isPlusOne?: boolean // Is this seat for a plus one?
+  plusOneOf?: string // Guest ID of the main guest (if this is a plus one)
+
   // Special seats
   isHostSeat?: boolean // For bride/groom
   isVipSeat?: boolean // For special guests
-  
+
   // Metadata
   notes?: string
   createdAt: Date

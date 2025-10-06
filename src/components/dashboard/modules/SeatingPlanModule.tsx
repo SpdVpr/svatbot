@@ -2,14 +2,16 @@
 
 import Link from 'next/link'
 import { Grid3X3, Users, Table, ArrowRight } from 'lucide-react'
+import { useSeating } from '@/hooks/useSeating'
 
 export default function SeatingPlanModule() {
-  // Mock data - replace with real seating hook when implemented
+  const { tables, seats, stats } = useSeating()
+
   const seatingStats = {
-    totalTables: 0,
-    assignedGuests: 0,
-    unassignedGuests: 0,
-    isComplete: false
+    totalTables: tables.length,
+    assignedGuests: stats.assignedGuests,
+    unassignedGuests: stats.unassignedGuests,
+    isComplete: stats.assignedGuests > 0 && stats.unassignedGuests === 0
   }
 
   return (
