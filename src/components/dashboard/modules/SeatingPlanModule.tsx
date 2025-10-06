@@ -3,15 +3,22 @@
 import Link from 'next/link'
 import { Grid3X3, Users, Table, ArrowRight } from 'lucide-react'
 import { useSeating } from '@/hooks/useSeating'
+import { useGuest } from '@/hooks/useGuest'
 
 export default function SeatingPlanModule() {
   const { tables, seats, stats } = useSeating()
+  const { guests } = useGuest()
+
+  // Calculate assigned and unassigned guests
+  const assignedGuestIds = new Set(seats.filter(s => s.guestId).map(s => s.guestId))
+  const assignedGuests = assignedGuestIds.size
+  const unassignedGuests = guests.filter(g => !assignedGuestIds.has(g.id)).length
 
   const seatingStats = {
     totalTables: tables.length,
-    assignedGuests: stats.assignedGuests,
-    unassignedGuests: stats.unassignedGuests,
-    isComplete: stats.assignedGuests > 0 && stats.unassignedGuests === 0
+    assignedGuests,
+    unassignedGuests,
+    isComplete: assignedGuests > 0 && unassignedGuests === 0
   }
 
   return (

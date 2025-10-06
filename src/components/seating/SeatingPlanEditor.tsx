@@ -531,7 +531,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
             font-weight="bold"
             fill="#2563eb"
           >
-            ${table.number || table.name || '?'}
+            ${table.name || '?'}
           </text>
         `
 
@@ -614,7 +614,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
               font-weight="bold"
               fill="#2563eb"
             >
-              ${seat.position || seat.number || '?'}
+              ${seat.position || '?'}
             </text>
           `
 
@@ -691,7 +691,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
         const guestNames = tableSeats.map(seat => {
           const guestName = getGuestNameForSeat(seat)
-          return guestName.fullName ? `${seat.position || seat.number || '?'}. ${guestName.fullName}` : null
+          return guestName.fullName ? `${seat.position || '?'}. ${guestName.fullName}` : null
         }).filter(Boolean)
 
         if (guestNames.length === 0) return null
@@ -699,7 +699,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
         return `
           <div style="margin-bottom: 20px; page-break-inside: avoid;">
             <h3 style="color: #2563eb; margin: 0 0 10px 0; font-size: 14px;">
-              Stůl ${table.number || table.name || '?'} (${guestNames.length} ${guestNames.length === 1 ? 'host' : guestNames.length < 5 ? 'hosté' : 'hostů'})
+              ${table.name || 'Stůl'} (${guestNames.length} ${guestNames.length === 1 ? 'host' : guestNames.length < 5 ? 'hosté' : 'hostů'})
             </h3>
             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; font-size: 12px;">
               ${guestNames.map(name => `
