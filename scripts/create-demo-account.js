@@ -485,7 +485,8 @@ async function createDemoAccount() {
         // Update accommodation document with rooms array
         const now = new Date();
         await accommodationRef.update({
-          rooms: rooms.map(room => ({
+          rooms: rooms.map((room, index) => ({
+            id: `room_${accommodationRef.id}_${index + 1}`,
             ...room,
             accommodationId: accommodationRef.id,
             weddingId: weddingRef.id,
@@ -701,7 +702,8 @@ async function createDemoAccount() {
         // Update accommodation document with rooms array
         const now = new Date();
         await accommodationRef.update({
-          rooms: rooms.map(room => ({
+          rooms: rooms.map((room, index) => ({
+            id: `room_${accommodationRef.id}_${index + 1}`,
             ...room,
             accommodationId: accommodationRef.id,
             weddingId: weddingRef.id,
