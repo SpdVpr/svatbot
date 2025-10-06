@@ -1680,11 +1680,22 @@ async function createDemoAccount() {
     const demoMusicData = {
       weddingId: weddingRef.id,
       userId: demoUser.uid,
-      vendor: {
-        name: 'DJ Martin',
-        contact: '+420 777 345 678',
-        email: 'martin@djmartin.cz'
-      },
+      vendors: [
+        {
+          id: 'vendor-1',
+          name: 'DJ Martin',
+          type: 'DJ',
+          contact: '+420 777 345 678',
+          email: 'martin@djmartin.cz'
+        },
+        {
+          id: 'vendor-2',
+          name: 'Smyčcový kvartet Harmonie',
+          type: 'Smyčcový kvartet',
+          contact: '+420 606 123 456',
+          email: 'info@kvartetharmonie.cz'
+        }
+      ],
       categories: [
         {
           id: 'groom-entrance',
@@ -1706,7 +1717,7 @@ async function createDemoAccount() {
           name: 'Nástup družiček',
           description: 'Hudba při příchodu družiček',
           icon: '👰‍♀️',
-          required: true,
+          required: false,
           songs: []
         },
         {

@@ -13,11 +13,13 @@ function MusicPageContent() {
   const router = useRouter()
   const { currentSong, isPlaying, toggle } = useMusicPlayer()
   const {
-    vendor,
+    vendors,
     categories,
     loading,
     saving,
+    addVendor,
     updateVendor,
+    removeVendor,
     addSong,
     removeSong,
     toggleCategoryVisibility,
@@ -26,7 +28,8 @@ function MusicPageContent() {
     completedRequired
   } = useMusic()
 
-  const [editingVendor, setEditingVendor] = useState(false)
+  const [editingVendorId, setEditingVendorId] = useState<string | null>(null)
+  const [showAddVendor, setShowAddVendor] = useState(false)
   const [showAddSong, setShowAddSong] = useState<string | null>(null)
   const [showHidden, setShowHidden] = useState(false)
 
@@ -54,8 +57,16 @@ function MusicPageContent() {
     setShowAddSong(null)
   }
 
-  const handleSaveVendor = () => {
-    setEditingVendor(false)
+  const handleAddVendor = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    addVendor({
+      name: formData.get('name') as string,
+      contact: formData.get('contact') as string,
+      email: formData.get('email') as string,
+      type: formData.get('type') as string
+    })
+    setShowAddVendor(false)
   }
 
   if (loading) {
@@ -108,95 +119,116 @@ function MusicPageContent() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Vendor & Progress */}
           <div className="space-y-6">
-            {/* Vendor Card */}
+            {/* Vendors Card */}
             <div className="wedding-card">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900">Dodavatel hudby</h2>
-                {!editingVendor && (
-                  <button
-                    onClick={() => setEditingVendor(true)}
-                    className="text-purple-600 hover:text-purple-700"
-                  >
-                    <Edit2 className="w-4 h-4" />
-                  </button>
-                )}
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Dodavatelé hudby
+                  {vendors.length > 0 && (
+                    <span className="ml-2 text-sm font-normal text-gray-500">
+                      ({vendors.length})
+                    </span>
+                  )}
+                </h2>
+                <button
+                  onClick={() => setShowAddVendor(true)}
+                  className="text-purple-600 hover:text-purple-700 flex items-center space-x-1"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="text-sm">Přidat</span>
+                </button>
               </div>
 
-              {editingVendor ? (
+              {vendors.length > 0 ? (
                 <div className="space-y-3">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      <User className="w-4 h-4 inline mr-1" />
-                      Jméno / Název
-                    </label>
-                    <input
-                      type="text"
-                      value={vendor.name}
-                      onChange={(e) => updateVendor({ ...vendor, name: e.target.value })}
-                      placeholder="DJ Martin Hudba"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      <Phone className="w-4 h-4 inline mr-1" />
-                      Telefon
-                    </label>
-                    <input
-                      type="tel"
-                      value={vendor.contact}
-                      onChange={(e) => updateVendor({ ...vendor, contact: e.target.value })}
-                      placeholder="+420 777 888 999"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      <Mail className="w-4 h-4 inline mr-1" />
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      value={vendor.email}
-                      onChange={(e) => updateVendor({ ...vendor, email: e.target.value })}
-                      placeholder="martin@djhudba.cz"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    />
-                  </div>
-                  <button
-                    onClick={handleSaveVendor}
-                    className="w-full btn-primary"
-                  >
-                    Uložit
-                  </button>
-                </div>
-              ) : vendor.name ? (
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2 text-gray-700">
-                    <User className="w-4 h-4 text-gray-400" />
-                    <span>{vendor.name}</span>
-                  </div>
-                  {vendor.contact && (
-                    <div className="flex items-center space-x-2 text-gray-700">
-                      <Phone className="w-4 h-4 text-gray-400" />
-                      <span>{vendor.contact}</span>
+                  {vendors.map((vendor) => (
+                    <div key={vendor.id} className="p-3 bg-gray-50 rounded-lg">
+                      {editingVendorId === vendor.id ? (
+                        <div className="space-y-2">
+                          <input
+                            type="text"
+                            value={vendor.name}
+                            onChange={(e) => updateVendor(vendor.id, { name: e.target.value })}
+                            placeholder="Název"
+                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          />
+                          <input
+                            type="text"
+                            value={vendor.type || ''}
+                            onChange={(e) => updateVendor(vendor.id, { type: e.target.value })}
+                            placeholder="Typ (DJ, Smyčcový kvartet...)"
+                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          />
+                          <input
+                            type="tel"
+                            value={vendor.contact}
+                            onChange={(e) => updateVendor(vendor.id, { contact: e.target.value })}
+                            placeholder="Telefon"
+                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          />
+                          <input
+                            type="email"
+                            value={vendor.email}
+                            onChange={(e) => updateVendor(vendor.id, { email: e.target.value })}
+                            placeholder="Email"
+                            className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          />
+                          <button
+                            onClick={() => setEditingVendorId(null)}
+                            className="w-full btn-primary text-sm py-1"
+                          >
+                            Uložit
+                          </button>
+                        </div>
+                      ) : (
+                        <div>
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex-1">
+                              <div className="font-medium text-gray-900">{vendor.name}</div>
+                              {vendor.type && (
+                                <div className="text-xs text-purple-600 mt-0.5">{vendor.type}</div>
+                              )}
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <button
+                                onClick={() => setEditingVendorId(vendor.id)}
+                                className="p-1 hover:bg-gray-200 rounded"
+                              >
+                                <Edit2 className="w-3 h-3 text-gray-600" />
+                              </button>
+                              <button
+                                onClick={() => removeVendor(vendor.id)}
+                                className="p-1 hover:bg-red-100 rounded"
+                              >
+                                <span className="text-red-600 text-xs">×</span>
+                              </button>
+                            </div>
+                          </div>
+                          {vendor.contact && (
+                            <div className="flex items-center space-x-1 text-xs text-gray-600">
+                              <Phone className="w-3 h-3" />
+                              <span>{vendor.contact}</span>
+                            </div>
+                          )}
+                          {vendor.email && (
+                            <div className="flex items-center space-x-1 text-xs text-gray-600 mt-1">
+                              <Mail className="w-3 h-3" />
+                              <span>{vendor.email}</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  )}
-                  {vendor.email && (
-                    <div className="flex items-center space-x-2 text-gray-700">
-                      <Mail className="w-4 h-4 text-gray-400" />
-                      <span>{vendor.email}</span>
-                    </div>
-                  )}
+                  ))}
                 </div>
               ) : (
                 <div className="text-center py-8">
                   <Music className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                   <p className="text-sm text-gray-600 mb-4">
-                    Zatím nemáte vybraného dodavatele hudby
+                    Zatím nemáte žádného dodavatele hudby
                   </p>
                   <button
-                    onClick={() => setEditingVendor(true)}
+                    onClick={() => setShowAddVendor(true)}
                     className="btn-outline text-sm"
                   >
                     Přidat dodavatele
@@ -397,6 +429,77 @@ function MusicPageContent() {
           </div>
         </div>
       </div>
+
+      {/* Add Vendor Modal */}
+      {showAddVendor && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Přidat dodavatele hudby</h3>
+            <form onSubmit={handleAddVendor} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Název / Jméno *
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  placeholder="DJ Martin Hudba"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Typ
+                </label>
+                <input
+                  type="text"
+                  name="type"
+                  placeholder="DJ, Smyčcový kvartet, Živá kapela..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Telefon
+                </label>
+                <input
+                  type="tel"
+                  name="contact"
+                  placeholder="+420 777 888 999"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="martin@djhudba.cz"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                />
+              </div>
+              <div className="flex space-x-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddVendor(false)}
+                  className="flex-1 btn-outline"
+                >
+                  Zrušit
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 btn-primary"
+                >
+                  Přidat
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

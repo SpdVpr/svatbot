@@ -28,12 +28,16 @@ export interface MusicCategory {
   hidden?: boolean
 }
 
+export interface MusicVendor {
+  id: string
+  name: string
+  contact: string
+  email: string
+  type?: string // např. "DJ", "Smyčcový kvartet", "Živá kapela"
+}
+
 export interface MusicData {
-  vendor: {
-    name: string
-    contact: string
-    email: string
-  }
+  vendors: MusicVendor[]
   categories: MusicCategory[]
   updatedAt: Date
 }
@@ -53,7 +57,7 @@ const DEFAULT_CATEGORIES: MusicCategory[] = [
     description: 'Hudba při příchodu družiček',
     icon: '👰‍♀️',
     songs: [],
-    required: true
+    required: false
   },
   {
     id: 'bride-entrance',
@@ -139,11 +143,7 @@ const DEFAULT_CATEGORIES: MusicCategory[] = [
 export function useMusic() {
   const { user } = useAuth()
   const { wedding } = useWedding()
-  const [vendor, setVendor] = useState({
-    name: '',
-    contact: '',
-    email: ''
-  })
+  const [vendors, setVendors] = useState<MusicVendor[]>([])
   const [categories, setCategories] = useState<MusicCategory[]>(DEFAULT_CATEGORIES)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -184,13 +184,26 @@ export function useMusic() {
         const musicDoc = snapshot.docs[0]
         const data = musicDoc.data()
         setMusicId(musicDoc.id)
-        setVendor(data.vendor || { name: '', contact: '', email: '' })
+
+        // Backward compatibility: convert old vendor format to vendors array
+        if (data.vendor && !data.vendors) {
+          setVendors([{
+            id: 'vendor-1',
+            name: data.vendor.name || '',
+            contact: data.vendor.contact || '',
+            email: data.vendor.email || '',
+            type: 'DJ'
+          }])
+        } else {
+          setVendors(data.vendors || [])
+        }
+
         setCategories(data.categories || DEFAULT_CATEGORIES)
         console.log('🎵 Loaded music data from Firestore:', data)
       } else {
         console.log('🎵 No music data found, using defaults')
         setMusicId(null)
-        setVendor({ name: '', contact: '', email: '' })
+        setVendors([])
         setCategories(DEFAULT_CATEGORIES)
       }
       setLoading(false)
@@ -227,7 +240,7 @@ export function useMusic() {
       const cleanedData = {
         weddingId: wedding.id,
         userId: user.id,
-        vendor: cleanData(vendor),
+        vendors: cleanData(vendors),
         categories: cleanData(categories),
         updatedAt: new Date()
       }
@@ -250,7 +263,7 @@ export function useMusic() {
     } finally {
       setSaving(false)
     }
-  }, [wedding?.id, user?.id, vendor, categories, musicId])
+  }, [wedding?.id, user?.id, vendors, categories, musicId])
 
   // Auto-save when data changes (debounced)
   useEffect(() => {
@@ -341,10 +354,22 @@ export function useMusic() {
         clearTimeout(saveTimeoutRef.current)
       }
     }
-  }, [vendor, categories, wedding, user, loading, musicId])
+  }, [vendors, categories, wedding, user, loading, musicId])
 
-  const updateVendor = (newVendor: typeof vendor) => {
-    setVendor(newVendor)
+  const addVendor = (vendor: Omit<MusicVendor, 'id'>) => {
+    const newVendor: MusicVendor = {
+      ...vendor,
+      id: `vendor-${Date.now()}`
+    }
+    setVendors(prev => [...prev, newVendor])
+  }
+
+  const updateVendor = (vendorId: string, updates: Partial<MusicVendor>) => {
+    setVendors(prev => prev.map(v => v.id === vendorId ? { ...v, ...updates } : v))
+  }
+
+  const removeVendor = (vendorId: string) => {
+    setVendors(prev => prev.filter(v => v.id !== vendorId))
   }
 
   const addSong = (categoryId: string, song: Song) => {
@@ -400,11 +425,13 @@ export function useMusic() {
   const completedRequired = requiredCategories.filter(c => c.songs.length > 0).length
 
   return {
-    vendor,
+    vendors,
     categories,
     loading,
     saving,
+    addVendor,
     updateVendor,
+    removeVendor,
     addSong,
     removeSong,
     updateSong,
