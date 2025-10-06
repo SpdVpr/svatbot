@@ -255,7 +255,8 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
       size: table.size,
       capacity: table.capacity,
       color: table.color || '#F8BBD9',
-      headSeats: table.headSeats || 0
+      headSeats: table.headSeats || 0,
+      seatSides: table.seatSides || 'all'
     })
     setShowTableForm(true)
   }
@@ -271,7 +272,8 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
         size: tableFormData.size,
         capacity: tableFormData.capacity,
         color: tableFormData.color,
-        headSeats: tableFormData.headSeats
+        headSeats: tableFormData.headSeats,
+        seatSides: tableFormData.seatSides
       })
       setShowTableForm(false)
       setEditingTable(null)
@@ -281,7 +283,8 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
         size: 'medium',
         capacity: 8,
         color: '#F8BBD9',
-        headSeats: 0
+        headSeats: 0,
+        seatSides: 'all'
       })
     } catch (error) {
       console.error('Error updating table:', error)
@@ -560,32 +563,60 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
             const width = table.size === 'small' ? 100 : table.size === 'medium' ? 140 : table.size === 'large' ? 180 : 220
             const height = table.shape === 'square' ? width : (table.size === 'small' ? 60 : table.size === 'medium' ? 80 : table.size === 'large' ? 100 : 120)
 
-            const seatsPerHead = Math.max(1, Math.floor(tableSeats.length / 4))
-            const seatsOnTop = Math.ceil((tableSeats.length - seatsPerHead * 2) / 2)
-            const seatsOnBottom = tableSeats.length - seatsOnTop - seatsPerHead * 2
-
+            const seatSides = table.seatSides || 'all'
             let localX = 0
             let localY = 0
 
-            if (seatIndex < seatsOnTop) {
-              const spacing = width / (seatsOnTop + 1)
+            if (seatSides === 'one') {
+              // All seats on one side (bottom)
+              const spacing = width / (tableSeats.length + 1)
               localX = spacing * (seatIndex + 1) - width / 2
-              localY = -height / 2 - 25
-            } else if (seatIndex < seatsOnTop + seatsPerHead) {
-              const headIndex = seatIndex - seatsOnTop
-              const spacing = height / (seatsPerHead + 1)
-              localX = width / 2 + 25
-              localY = spacing * (headIndex + 1) - height / 2
-            } else if (seatIndex < seatsOnTop + seatsPerHead + seatsOnBottom) {
-              const bottomIndex = seatIndex - seatsOnTop - seatsPerHead
-              const spacing = width / (seatsOnBottom + 1)
-              localX = width / 2 - spacing * (bottomIndex + 1)
               localY = height / 2 + 25
+            } else if (seatSides === 'two-opposite') {
+              // Seats on two opposite sides (top and bottom)
+              const seatsPerSide = Math.ceil(tableSeats.length / 2)
+              if (seatIndex < seatsPerSide) {
+                // Top side
+                const spacing = width / (seatsPerSide + 1)
+                localX = spacing * (seatIndex + 1) - width / 2
+                localY = -height / 2 - 25
+              } else {
+                // Bottom side
+                const bottomIndex = seatIndex - seatsPerSide
+                const seatsOnBottom = tableSeats.length - seatsPerSide
+                const spacing = width / (seatsOnBottom + 1)
+                localX = spacing * (bottomIndex + 1) - width / 2
+                localY = height / 2 + 25
+              }
             } else {
-              const headIndex = seatIndex - seatsOnTop - seatsPerHead - seatsOnBottom
-              const spacing = height / (seatsPerHead + 1)
-              localX = -width / 2 - 25
-              localY = height / 2 - spacing * (headIndex + 1)
+              // All sides (default)
+              const headSeats = table.headSeats || 0
+              const seatsPerHead = headSeats
+              const totalHeadSeats = seatsPerHead * 2
+              const longSideSeats = tableSeats.length - totalHeadSeats
+              const seatsOnTop = Math.ceil(longSideSeats / 2)
+              const seatsOnBottom = longSideSeats - seatsOnTop
+
+              if (seatIndex < seatsOnTop) {
+                const spacing = width / (seatsOnTop + 1)
+                localX = spacing * (seatIndex + 1) - width / 2
+                localY = -height / 2 - 25
+              } else if (seatIndex < seatsOnTop + seatsPerHead) {
+                const headIndex = seatIndex - seatsOnTop
+                const spacing = height / (seatsPerHead + 1)
+                localX = width / 2 + 25
+                localY = spacing * (headIndex + 1) - height / 2
+              } else if (seatIndex < seatsOnTop + seatsPerHead + seatsOnBottom) {
+                const bottomIndex = seatIndex - seatsOnTop - seatsPerHead
+                const spacing = width / (seatsOnBottom + 1)
+                localX = width / 2 - spacing * (bottomIndex + 1)
+                localY = height / 2 + 25
+              } else {
+                const headIndex = seatIndex - seatsOnTop - seatsPerHead - seatsOnBottom
+                const spacing = height / (seatsPerHead + 1)
+                localX = -width / 2 - 25
+                localY = height / 2 - spacing * (headIndex + 1)
+              }
             }
 
             const rotRad = (table.rotation * Math.PI) / 180
@@ -1531,7 +1562,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                           seatX = Math.cos((angle - 90) * Math.PI / 180) * radius
                           seatY = Math.sin((angle - 90) * Math.PI / 180) * radius
                         } else {
-                          // Rectangular/square positioning with optional head seats
+                          // Rectangular/square positioning with optional head seats and seat sides
                           const tableWidth = table.size === 'small' ? 100 : table.size === 'medium' ? 140 : table.size === 'large' ? 180 : 220
                           const tableHeight = table.shape === 'square'
                             ? tableWidth
@@ -1539,38 +1570,64 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
                           const seatOffset = 10 // Distance from table edge
                           const totalSeats = tableSeats.length
-                          const headSeats = table.headSeats || 0
-                          const seatsPerHead = headSeats // seats per short side
-                          const totalHeadSeats = seatsPerHead * 2 // both short sides
-                          const longSideSeats = totalSeats - totalHeadSeats
+                          const seatSides = table.seatSides || 'all'
 
-                          // Distribute: half on top long side, half on bottom long side, plus head seats on short sides
-                          const seatsOnTop = Math.ceil(longSideSeats / 2)
-                          const seatsOnBottom = longSideSeats - seatsOnTop
-
-                          if (index < seatsOnTop) {
-                            // Top long side
-                            const spacing = tableWidth / (seatsOnTop + 1)
+                          if (seatSides === 'one') {
+                            // All seats on one side (bottom)
+                            const spacing = tableWidth / (totalSeats + 1)
                             seatX = spacing * (index + 1) - tableWidth / 2
-                            seatY = -tableHeight / 2 - seatOffset
-                          } else if (index < seatsOnTop + seatsPerHead) {
-                            // Right short side (head)
-                            const headIndex = index - seatsOnTop
-                            const spacing = tableHeight / (seatsPerHead + 1)
-                            seatX = tableWidth / 2 + seatOffset
-                            seatY = spacing * (headIndex + 1) - tableHeight / 2
-                          } else if (index < seatsOnTop + seatsPerHead + seatsOnBottom) {
-                            // Bottom long side
-                            const bottomIndex = index - seatsOnTop - seatsPerHead
-                            const spacing = tableWidth / (seatsOnBottom + 1)
-                            seatX = tableWidth / 2 - spacing * (bottomIndex + 1)
                             seatY = tableHeight / 2 + seatOffset
+                          } else if (seatSides === 'two-opposite') {
+                            // Seats on two opposite sides (top and bottom)
+                            const seatsPerSide = Math.ceil(totalSeats / 2)
+                            if (index < seatsPerSide) {
+                              // Top side
+                              const spacing = tableWidth / (seatsPerSide + 1)
+                              seatX = spacing * (index + 1) - tableWidth / 2
+                              seatY = -tableHeight / 2 - seatOffset
+                            } else {
+                              // Bottom side
+                              const bottomIndex = index - seatsPerSide
+                              const seatsOnBottom = totalSeats - seatsPerSide
+                              const spacing = tableWidth / (seatsOnBottom + 1)
+                              seatX = spacing * (bottomIndex + 1) - tableWidth / 2
+                              seatY = tableHeight / 2 + seatOffset
+                            }
                           } else {
-                            // Left short side (head)
-                            const headIndex = index - seatsOnTop - seatsPerHead - seatsOnBottom
-                            const spacing = tableHeight / (seatsPerHead + 1)
-                            seatX = -tableWidth / 2 - seatOffset
-                            seatY = tableHeight / 2 - spacing * (headIndex + 1)
+                            // All sides (default)
+                            const headSeats = table.headSeats || 0
+                            const seatsPerHead = headSeats // seats per short side
+                            const totalHeadSeats = seatsPerHead * 2 // both short sides
+                            const longSideSeats = totalSeats - totalHeadSeats
+
+                            // Distribute: half on top long side, half on bottom long side, plus head seats on short sides
+                            const seatsOnTop = Math.ceil(longSideSeats / 2)
+                            const seatsOnBottom = longSideSeats - seatsOnTop
+
+                            if (index < seatsOnTop) {
+                              // Top long side
+                              const spacing = tableWidth / (seatsOnTop + 1)
+                              seatX = spacing * (index + 1) - tableWidth / 2
+                              seatY = -tableHeight / 2 - seatOffset
+                            } else if (index < seatsOnTop + seatsPerHead) {
+                              // Right short side (head)
+                              const headIndex = index - seatsOnTop
+                              const spacing = tableHeight / (seatsPerHead + 1)
+                              seatX = tableWidth / 2 + seatOffset
+                              seatY = spacing * (headIndex + 1) - tableHeight / 2
+                            } else if (index < seatsOnTop + seatsPerHead + seatsOnBottom) {
+                              // Bottom long side
+                              const bottomIndex = index - seatsOnTop - seatsPerHead
+                              const spacing = tableWidth / (seatsOnBottom + 1)
+                              seatX = tableWidth / 2 - spacing * (bottomIndex + 1)
+                              seatY = tableHeight / 2 + seatOffset
+                            } else {
+                              // Left short side (head)
+                              const headIndex = index - seatsOnTop - seatsPerHead - seatsOnBottom
+                              const spacing = tableHeight / (seatsPerHead + 1)
+                              seatX = -tableWidth / 2 - seatOffset
+                              seatY = tableHeight / 2 - spacing * (headIndex + 1)
+                            }
                           }
                         }
 
@@ -1658,7 +1715,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                             // Keep text horizontal (no rotation)
                             textRotation = 0
                           } else {
-                            // Rectangular/square positioning
+                            // Rectangular/square positioning with seat sides support
                             const tableWidth = table.size === 'small' ? 100 : table.size === 'medium' ? 140 : table.size === 'large' ? 180 : 220
                             const tableHeight = table.shape === 'square'
                               ? tableWidth
@@ -1668,37 +1725,63 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                             const extraOffset = Math.max(0, (tableSeats.length - 6) * 3)
                             const nameOffset = baseOffset + extraOffset
                             const totalSeats = tableSeats.length
-                            const headSeats = table.headSeats || 0
-                            const seatsPerHead = headSeats
-                            const totalHeadSeats = seatsPerHead * 2
-                            const longSideSeats = totalSeats - totalHeadSeats
-
-                            const seatsOnTop = Math.ceil(longSideSeats / 2)
-                            const seatsOnBottom = longSideSeats - seatsOnTop
+                            const seatSides = table.seatSides || 'all'
 
                             // Calculate position in non-rotated space
                             let localX = 0
                             let localY = 0
 
-                            if (seatIndex < seatsOnTop) {
-                              const spacing = tableWidth / (seatsOnTop + 1)
+                            if (seatSides === 'one') {
+                              // All seats on one side (bottom)
+                              const spacing = tableWidth / (totalSeats + 1)
                               localX = spacing * (seatIndex + 1) - tableWidth / 2
-                              localY = -tableHeight / 2 - nameOffset
-                            } else if (seatIndex < seatsOnTop + seatsPerHead) {
-                              const headIndex = seatIndex - seatsOnTop
-                              const spacing = tableHeight / (seatsPerHead + 1)
-                              localX = tableWidth / 2 + nameOffset
-                              localY = spacing * (headIndex + 1) - tableHeight / 2
-                            } else if (seatIndex < seatsOnTop + seatsPerHead + seatsOnBottom) {
-                              const bottomIndex = seatIndex - seatsOnTop - seatsPerHead
-                              const spacing = tableWidth / (seatsOnBottom + 1)
-                              localX = tableWidth / 2 - spacing * (bottomIndex + 1)
                               localY = tableHeight / 2 + nameOffset
+                            } else if (seatSides === 'two-opposite') {
+                              // Seats on two opposite sides (top and bottom)
+                              const seatsPerSide = Math.ceil(totalSeats / 2)
+                              if (seatIndex < seatsPerSide) {
+                                // Top side
+                                const spacing = tableWidth / (seatsPerSide + 1)
+                                localX = spacing * (seatIndex + 1) - tableWidth / 2
+                                localY = -tableHeight / 2 - nameOffset
+                              } else {
+                                // Bottom side
+                                const bottomIndex = seatIndex - seatsPerSide
+                                const seatsOnBottom = totalSeats - seatsPerSide
+                                const spacing = tableWidth / (seatsOnBottom + 1)
+                                localX = spacing * (bottomIndex + 1) - tableWidth / 2
+                                localY = tableHeight / 2 + nameOffset
+                              }
                             } else {
-                              const headIndex = seatIndex - seatsOnTop - seatsPerHead - seatsOnBottom
-                              const spacing = tableHeight / (seatsPerHead + 1)
-                              localX = -tableWidth / 2 - nameOffset
-                              localY = tableHeight / 2 - spacing * (headIndex + 1)
+                              // All sides (default)
+                              const headSeats = table.headSeats || 0
+                              const seatsPerHead = headSeats
+                              const totalHeadSeats = seatsPerHead * 2
+                              const longSideSeats = totalSeats - totalHeadSeats
+
+                              const seatsOnTop = Math.ceil(longSideSeats / 2)
+                              const seatsOnBottom = longSideSeats - seatsOnTop
+
+                              if (seatIndex < seatsOnTop) {
+                                const spacing = tableWidth / (seatsOnTop + 1)
+                                localX = spacing * (seatIndex + 1) - tableWidth / 2
+                                localY = -tableHeight / 2 - nameOffset
+                              } else if (seatIndex < seatsOnTop + seatsPerHead) {
+                                const headIndex = seatIndex - seatsOnTop
+                                const spacing = tableHeight / (seatsPerHead + 1)
+                                localX = tableWidth / 2 + nameOffset
+                                localY = spacing * (headIndex + 1) - tableHeight / 2
+                              } else if (seatIndex < seatsOnTop + seatsPerHead + seatsOnBottom) {
+                                const bottomIndex = seatIndex - seatsOnTop - seatsPerHead
+                                const spacing = tableWidth / (seatsOnBottom + 1)
+                                localX = tableWidth / 2 - spacing * (bottomIndex + 1)
+                                localY = tableHeight / 2 + nameOffset
+                              } else {
+                                const headIndex = seatIndex - seatsOnTop - seatsPerHead - seatsOnBottom
+                                const spacing = tableHeight / (seatsPerHead + 1)
+                                localX = -tableWidth / 2 - nameOffset
+                                localY = tableHeight / 2 - spacing * (headIndex + 1)
+                              }
                             }
 
                             // Apply table rotation to position
@@ -1831,13 +1914,9 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
             </h3>
 
             <div className="space-y-4 max-h-96 overflow-y-auto">
-              {Object.entries(getGroupedUnassignedGuests()).map(([category, guests]) => {
-                // Calculate total people in this category (guests + plus ones)
-                const categoryPeopleCount = guests.reduce((total, guest) => {
-                  let count = 1
-                  if (guest.hasPlusOne && guest.plusOneName) count += 1
-                  return total + count
-                }, 0)
+              {Object.entries(getGroupedUnassignedGuests()).map(([category, people]) => {
+                // Count total people in this category
+                const categoryPeopleCount = people.length
 
                 return (
                 <div key={category} className="space-y-2">
@@ -1851,7 +1930,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
                   {/* People in category */}
                   <div className="space-y-1 ml-2">
-                    {guests.map(person => {
+                    {people.map(person => {
                       const bgColor = person.type === 'guest' ? 'bg-gray-50' : person.type === 'plusOne' ? 'bg-blue-50' : 'bg-green-50'
                       const textColor = person.type === 'guest' ? 'text-gray-900' : person.type === 'plusOne' ? 'text-blue-700' : 'text-green-700'
                       const badgeColor = person.type === 'plusOne' ? 'text-blue-600 bg-blue-100' : 'text-green-600 bg-green-100'
@@ -2106,7 +2185,8 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                       size: 'medium',
                       capacity: 8,
                       color: '#F8BBD9',
-                      headSeats: 0
+                      headSeats: 0,
+                      seatSides: 'all'
                     })
                   }}
                   className="flex-1 btn-outline"
