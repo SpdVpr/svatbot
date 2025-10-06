@@ -71,14 +71,14 @@ const DEFAULT_CATEGORIES: MusicCategory[] = [
   },
   {
     id: 'congratulations',
-    name: 'Gratulace',
+    name: 'Písně pro gratulace',
     description: 'Hudba při gratulacích hostů',
     icon: '🎉',
     songs: []
   },
   {
     id: 'guard-of-honor',
-    name: 'Špalír',
+    name: 'Šplalíř',
     description: 'Hudba při odchodu novomanželů špalírem',
     icon: '🎊',
     songs: []
