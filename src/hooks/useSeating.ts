@@ -457,11 +457,6 @@ export function useSeating(): UseSeatingReturn {
       setCurrentPlanState(prev => {
         if (prev?.id === planId) {
           const updated = deepMerge(prev, { ...updates, updatedAt: new Date() })
-          console.log('Updating currentPlan state:', {
-            before: prev.venueLayout,
-            updates: updates.venueLayout,
-            after: updated.venueLayout
-          })
           return updated
         }
         return prev
@@ -648,21 +643,21 @@ export function useSeating(): UseSeatingReturn {
     }
   }
 
-  const assignGuestToSeat = async (guestId: string, seatId: string) => {
+  const assignGuestToSeat = async (personId: string, seatId: string) => {
     if (!wedding || !currentPlan) return
 
     try {
-      const guest = guests.find(g => g.id === guestId)
-      if (!guest) return
+      // PersonId can be: "guest_id", "guest_id_plusone", or "guest_id_child_0"
+      // We accept any ID and store it directly in the seat
 
       // Find the seat being assigned
       const targetSeat = currentPlan.seats.find(s => s.id === seatId)
       if (!targetSeat) return
 
-      // Update the guest's seat - NO automatic plus one assignment
+      // Update the seat with the person ID
       const updatedSeats = currentPlan.seats.map(seat =>
         seat.id === seatId
-          ? { ...seat, guestId, isPlusOne: false, plusOneOf: undefined, updatedAt: new Date() }
+          ? { ...seat, guestId: personId, isPlusOne: false, plusOneOf: undefined, updatedAt: new Date() }
           : seat
       )
 
@@ -671,7 +666,7 @@ export function useSeating(): UseSeatingReturn {
         assignedSeats: updatedSeats.filter(s => s.guestId).length
       })
     } catch (error) {
-      console.error('Error assigning guest to seat:', error)
+      console.error('Error assigning person to seat:', error)
       throw error
     }
   }

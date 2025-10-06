@@ -890,17 +890,19 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     setShowGuestAssignment(true)
   }
 
-  // Assign guest to seat
-  const handleAssignGuest = async (guestId: string) => {
+  // Assign person (guest/plusOne/child) to seat
+  const handleAssignGuest = async (personId: string) => {
     if (!selectedSeat) return
 
     try {
-      await assignGuestToSeat(guestId, selectedSeat)
+      // PersonId can be: "guest_id", "guest_id_plusone", or "guest_id_child_0"
+      // We store the full personId in the seat's guestId field
+      await assignGuestToSeat(personId, selectedSeat)
       setShowGuestAssignment(false)
       setSelectedSeat(null)
     } catch (error) {
-      console.error('Error assigning guest:', error)
-      alert('Chyba při přiřazování hosta: ' + (error as Error).message)
+      console.error('Error assigning person:', error)
+      alert('Chyba při přiřazování osoby: ' + (error as Error).message)
     }
   }
 
@@ -1091,15 +1093,17 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     return adjusted
   }
 
-  // Get guest name for seat - returns object with first and last name
+  // Get person name for seat - handles guests, plus ones, and children
   const getGuestName = (seat: Seat) => {
     if (!seat.guestId) return null
 
-    // If this is a plus one seat, show the plus one's name
-    if (seat.isPlusOne && seat.plusOneOf) {
-      const mainGuest = guests.find(g => g.id === seat.plusOneOf)
+    const personId = seat.guestId
+
+    // Check if it's a plus one (format: "guestId_plusone")
+    if (personId.includes('_plusone')) {
+      const mainGuestId = personId.replace('_plusone', '')
+      const mainGuest = guests.find(g => g.id === mainGuestId)
       if (mainGuest && mainGuest.plusOneName) {
-        // Split plus one name into first and last
         const parts = mainGuest.plusOneName.split(' ')
         return {
           firstName: parts[0] || '',
@@ -1109,8 +1113,25 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
       }
     }
 
-    // Otherwise show the main guest's name
-    const guest = guests.find(g => g.id === seat.guestId)
+    // Check if it's a child (format: "guestId_child_0")
+    if (personId.includes('_child_')) {
+      const parts = personId.split('_child_')
+      const mainGuestId = parts[0]
+      const childIndex = parseInt(parts[1])
+      const mainGuest = guests.find(g => g.id === mainGuestId)
+      if (mainGuest && mainGuest.children && mainGuest.children[childIndex]) {
+        const child = mainGuest.children[childIndex]
+        const nameParts = child.name.split(' ')
+        return {
+          firstName: nameParts[0] || '',
+          lastName: nameParts.slice(1).join(' ') || '',
+          fullName: child.name
+        }
+      }
+    }
+
+    // Otherwise it's a main guest
+    const guest = guests.find(g => g.id === personId)
     if (!guest) return null
 
     const firstName = guest.firstName || ''
