@@ -305,32 +305,46 @@ export function useRobustGuests() {
 
   // Update guest function
   const updateGuest = useCallback(async (guestId: string, updates: Partial<Guest>): Promise<void> => {
-    console.log('✏️ useRobustGuests: Updating guest:', guestId)
+    console.log('✏️ useRobustGuests: Updating guest:', guestId, 'with updates:', updates)
 
     isSavingRef.current = true
-    
+
     // Get current guests from ref to avoid stale closure
     const currentGuests = guestsRef.current
     const currentGuest = currentGuests.find(g => g.id === guestId)
-    
+
     if (!currentGuest) {
       console.error('❌ useRobustGuests: Guest not found:', guestId)
       return
     }
 
+    console.log('📝 Current guest before update:', {
+      id: currentGuest.id,
+      name: `${currentGuest.firstName} ${currentGuest.lastName}`,
+      accommodationId: currentGuest.accommodationId,
+      roomId: currentGuest.roomId
+    })
 
-    
     // Clean updates for Firestore (remove undefined values)
     const cleanedUpdates = cleanForFirestore(updates)
 
+    console.log('🧹 Cleaned updates:', cleanedUpdates)
+
     // Create updated guest
     const updatedGuest = { ...currentGuest, ...cleanedUpdates, updatedAt: new Date() }
-    
+
+    console.log('✨ Updated guest:', {
+      id: updatedGuest.id,
+      name: `${updatedGuest.firstName} ${updatedGuest.lastName}`,
+      accommodationId: updatedGuest.accommodationId,
+      roomId: updatedGuest.roomId
+    })
+
     // Update local state immediately
     const updatedGuests = currentGuests.map(guest =>
       guest.id === guestId ? updatedGuest : guest
     )
-    
+
     console.log('🔄 useRobustGuests: Guest updated locally')
     setGuests(updatedGuests)
     guestsRef.current = updatedGuests
@@ -338,7 +352,7 @@ export function useRobustGuests() {
     // Save to localStorage immediately (use compatible keys)
     const storageKey = isDemoUser ? 'simple-demo-guests' : `guests_${wedding?.id}`
     localStorage.setItem(storageKey, JSON.stringify(updatedGuests))
-    console.log('✅ useRobustGuests: Guest saved to localStorage')
+    console.log('✅ useRobustGuests: Guest saved to localStorage with key:', storageKey)
 
     // For real users, try Firestore sync in background (don't block UI)
     if (!isDemoUser) {
