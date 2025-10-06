@@ -84,6 +84,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     color: string
     headSeats: number
     seatSides: 'all' | 'one' | 'two-opposite'
+    oneSidePosition: 'top' | 'bottom' | 'left' | 'right'
   }>({
     name: '',
     shape: 'round',
@@ -91,7 +92,8 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     capacity: 8,
     color: '#F8BBD9',
     headSeats: 0,
-    seatSides: 'all'
+    seatSides: 'all',
+    oneSidePosition: 'bottom'
   })
   const [viewOptions, setViewOptions] = useState<SeatingViewOptions>({
     showGuestNames: true,
@@ -227,7 +229,8 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
         rotation: 0,
         color: tableFormData.color,
         headSeats: tableFormData.headSeats,
-        seatSides: tableFormData.seatSides
+        seatSides: tableFormData.seatSides,
+        oneSidePosition: tableFormData.oneSidePosition
       }, currentPlan.id) // Explicitly pass planId
 
       setShowTableForm(false)
@@ -238,7 +241,8 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
         capacity: 8,
         color: '#F8BBD9',
         headSeats: 0,
-        seatSides: 'all'
+        seatSides: 'all',
+        oneSidePosition: 'bottom'
       })
     } catch (error) {
       console.error('Error adding table:', error)
@@ -256,7 +260,8 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
       capacity: table.capacity,
       color: table.color || '#F8BBD9',
       headSeats: table.headSeats || 0,
-      seatSides: table.seatSides || 'all'
+      seatSides: table.seatSides || 'all',
+      oneSidePosition: table.oneSidePosition || 'bottom'
     })
     setShowTableForm(true)
   }
@@ -273,7 +278,8 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
         capacity: tableFormData.capacity,
         color: tableFormData.color,
         headSeats: tableFormData.headSeats,
-        seatSides: tableFormData.seatSides
+        seatSides: tableFormData.seatSides,
+        oneSidePosition: tableFormData.oneSidePosition
       })
       setShowTableForm(false)
       setEditingTable(null)
@@ -284,7 +290,8 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
         capacity: 8,
         color: '#F8BBD9',
         headSeats: 0,
-        seatSides: 'all'
+        seatSides: 'all',
+        oneSidePosition: 'bottom'
       })
     } catch (error) {
       console.error('Error updating table:', error)
@@ -564,14 +571,29 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
             const height = table.shape === 'square' ? width : (table.size === 'small' ? 60 : table.size === 'medium' ? 80 : table.size === 'large' ? 100 : 120)
 
             const seatSides = table.seatSides || 'all'
+            const oneSidePosition = table.oneSidePosition || 'bottom'
             let localX = 0
             let localY = 0
 
             if (seatSides === 'one') {
-              // All seats on one side (bottom)
-              const spacing = width / (tableSeats.length + 1)
-              localX = spacing * (seatIndex + 1) - width / 2
-              localY = height / 2 + 25
+              // All seats on one side - position depends on oneSidePosition
+              if (oneSidePosition === 'bottom') {
+                const spacing = width / (tableSeats.length + 1)
+                localX = spacing * (seatIndex + 1) - width / 2
+                localY = height / 2 + 25
+              } else if (oneSidePosition === 'top') {
+                const spacing = width / (tableSeats.length + 1)
+                localX = spacing * (seatIndex + 1) - width / 2
+                localY = -height / 2 - 25
+              } else if (oneSidePosition === 'left') {
+                const spacing = height / (tableSeats.length + 1)
+                localX = -width / 2 - 25
+                localY = spacing * (seatIndex + 1) - height / 2
+              } else { // right
+                const spacing = height / (tableSeats.length + 1)
+                localX = width / 2 + 25
+                localY = spacing * (seatIndex + 1) - height / 2
+              }
             } else if (seatSides === 'two-opposite') {
               // Seats on two opposite sides (top and bottom)
               const seatsPerSide = Math.ceil(tableSeats.length / 2)
@@ -1571,12 +1593,27 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                           const seatOffset = 10 // Distance from table edge
                           const totalSeats = tableSeats.length
                           const seatSides = table.seatSides || 'all'
+                          const oneSidePosition = table.oneSidePosition || 'bottom'
 
                           if (seatSides === 'one') {
-                            // All seats on one side (bottom)
-                            const spacing = tableWidth / (totalSeats + 1)
-                            seatX = spacing * (index + 1) - tableWidth / 2
-                            seatY = tableHeight / 2 + seatOffset
+                            // All seats on one side - position depends on oneSidePosition
+                            if (oneSidePosition === 'bottom') {
+                              const spacing = tableWidth / (totalSeats + 1)
+                              seatX = spacing * (index + 1) - tableWidth / 2
+                              seatY = tableHeight / 2 + seatOffset
+                            } else if (oneSidePosition === 'top') {
+                              const spacing = tableWidth / (totalSeats + 1)
+                              seatX = spacing * (index + 1) - tableWidth / 2
+                              seatY = -tableHeight / 2 - seatOffset
+                            } else if (oneSidePosition === 'left') {
+                              const spacing = tableHeight / (totalSeats + 1)
+                              seatX = -tableWidth / 2 - seatOffset
+                              seatY = spacing * (index + 1) - tableHeight / 2
+                            } else { // right
+                              const spacing = tableHeight / (totalSeats + 1)
+                              seatX = tableWidth / 2 + seatOffset
+                              seatY = spacing * (index + 1) - tableHeight / 2
+                            }
                           } else if (seatSides === 'two-opposite') {
                             // Seats on two opposite sides (top and bottom)
                             const seatsPerSide = Math.ceil(totalSeats / 2)
@@ -1726,16 +1763,31 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                             const nameOffset = baseOffset + extraOffset
                             const totalSeats = tableSeats.length
                             const seatSides = table.seatSides || 'all'
+                            const oneSidePosition = table.oneSidePosition || 'bottom'
 
                             // Calculate position in non-rotated space
                             let localX = 0
                             let localY = 0
 
                             if (seatSides === 'one') {
-                              // All seats on one side (bottom)
-                              const spacing = tableWidth / (totalSeats + 1)
-                              localX = spacing * (seatIndex + 1) - tableWidth / 2
-                              localY = tableHeight / 2 + nameOffset
+                              // All seats on one side - position depends on oneSidePosition
+                              if (oneSidePosition === 'bottom') {
+                                const spacing = tableWidth / (totalSeats + 1)
+                                localX = spacing * (seatIndex + 1) - tableWidth / 2
+                                localY = tableHeight / 2 + nameOffset
+                              } else if (oneSidePosition === 'top') {
+                                const spacing = tableWidth / (totalSeats + 1)
+                                localX = spacing * (seatIndex + 1) - tableWidth / 2
+                                localY = -tableHeight / 2 - nameOffset
+                              } else if (oneSidePosition === 'left') {
+                                const spacing = tableHeight / (totalSeats + 1)
+                                localX = -tableWidth / 2 - nameOffset
+                                localY = spacing * (seatIndex + 1) - tableHeight / 2
+                              } else { // right
+                                const spacing = tableHeight / (totalSeats + 1)
+                                localX = tableWidth / 2 + nameOffset
+                                localY = spacing * (seatIndex + 1) - tableHeight / 2
+                              }
                             } else if (seatSides === 'two-opposite') {
                               // Seats on two opposite sides (top and bottom)
                               const seatsPerSide = Math.ceil(totalSeats / 2)
@@ -1931,10 +1983,10 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                   {/* People in category */}
                   <div className="space-y-1 ml-2">
                     {people.map(person => {
-                      const bgColor = person.type === 'guest' ? 'bg-gray-50' : person.type === 'plusOne' ? 'bg-blue-50' : 'bg-green-50'
-                      const textColor = person.type === 'guest' ? 'text-gray-900' : person.type === 'plusOne' ? 'text-blue-700' : 'text-green-700'
-                      const badgeColor = person.type === 'plusOne' ? 'text-blue-600 bg-blue-100' : 'text-green-600 bg-green-100'
-                      const borderClass = person.type !== 'guest' ? 'ml-4 border-l-2 ' + (person.type === 'plusOne' ? 'border-blue-300' : 'border-green-300') : ''
+                      const bgColor = person.type === 'guest' ? 'bg-gray-50' : person.type === 'plusOne' ? 'bg-blue-50' : 'bg-purple-50'
+                      const textColor = person.type === 'guest' ? 'text-gray-900' : person.type === 'plusOne' ? 'text-blue-700' : 'text-purple-700'
+                      const badgeColor = person.type === 'plusOne' ? 'text-blue-600 bg-blue-100' : 'text-purple-600 bg-purple-100'
+                      const borderClass = person.type !== 'guest' ? 'ml-4 border-l-2 ' + (person.type === 'plusOne' ? 'border-blue-300' : 'border-purple-300') : ''
 
                       return (
                         <div
@@ -2111,6 +2163,27 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                     </p>
                   </div>
 
+                  {tableFormData.seatSides === 'one' && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Strana stolu
+                      </label>
+                      <select
+                        value={tableFormData.oneSidePosition}
+                        onChange={(e) => setTableFormData(prev => ({ ...prev, oneSidePosition: e.target.value as 'top' | 'bottom' | 'left' | 'right' }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      >
+                        <option value="bottom">Spodní strana</option>
+                        <option value="top">Horní strana</option>
+                        <option value="left">Levá strana</option>
+                        <option value="right">Pravá strana</option>
+                      </select>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Na které straně stolu budou místa
+                      </p>
+                    </div>
+                  )}
+
                   {tableFormData.seatSides === 'all' && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -2186,7 +2259,8 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                       capacity: 8,
                       color: '#F8BBD9',
                       headSeats: 0,
-                      seatSides: 'all'
+                      seatSides: 'all',
+                      oneSidePosition: 'bottom'
                     })
                   }}
                   className="flex-1 btn-outline"
@@ -2317,13 +2391,13 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                       const bgColor = isAssigned ? 'bg-green-50 border border-green-200 hover:bg-green-100' :
                                       person.type === 'guest' ? 'bg-gray-50 hover:bg-primary-50' :
                                       person.type === 'plusOne' ? 'bg-blue-50 hover:bg-primary-50' :
-                                      'bg-green-50 hover:bg-primary-50'
+                                      'bg-purple-50 hover:bg-primary-50'
                       const textColor = isAssigned ? 'text-green-800' :
                                        person.type === 'guest' ? 'text-gray-900' :
                                        person.type === 'plusOne' ? 'text-blue-700' :
-                                       'text-green-700'
-                      const badgeColor = person.type === 'plusOne' ? 'text-blue-600 bg-blue-100' : 'text-green-600 bg-green-100'
-                      const borderClass = person.type !== 'guest' ? 'ml-4 border-l-2 ' + (person.type === 'plusOne' ? 'border-blue-300' : 'border-green-300') : ''
+                                       'text-purple-700'
+                      const badgeColor = person.type === 'plusOne' ? 'text-blue-600 bg-blue-100' : 'text-purple-600 bg-purple-100'
+                      const borderClass = person.type !== 'guest' ? 'ml-4 border-l-2 ' + (person.type === 'plusOne' ? 'border-blue-300' : 'border-purple-300') : ''
 
                       return (
                         <div

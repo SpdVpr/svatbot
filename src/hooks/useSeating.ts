@@ -348,6 +348,7 @@ export function useSeating(): UseSeatingReturn {
         color: data.color,
         headSeats: data.headSeats || 0,
         seatSides: data.seatSides || 'all',
+        oneSidePosition: data.oneSidePosition || 'bottom',
         isHighlighted: false,
         notes: data.notes,
         createdAt: new Date(),
