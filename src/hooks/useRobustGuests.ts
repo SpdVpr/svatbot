@@ -295,7 +295,7 @@ export function useRobustGuests() {
         cleanup()
       }
     }
-  }, [wedding?.id]) // Only depend on wedding ID - isDemoUser is calculated inside
+  }, [wedding?.id])
 
   // Update guest function
   const updateGuest = useCallback(async (guestId: string, updates: Partial<Guest>): Promise<void> => {
@@ -370,9 +370,7 @@ export function useRobustGuests() {
     isSavingRef.current = true
 
     // Generate unique ID
-    const guestId = isDemoUser
-      ? `demo-guest-${Date.now()}`
-      : `guest-${user?.id || 'unknown'}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    const guestId = `guest-${user?.id || 'unknown'}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 
     const newGuest: Guest = {
       id: guestId,
@@ -415,13 +413,8 @@ export function useRobustGuests() {
     setGuests(updatedGuests)
     guestsRef.current = updatedGuests
 
-    // Save to localStorage (use compatible keys)
-    const storageKey = isDemoUser ? 'simple-demo-guests' : `guests_${wedding?.id}`
-    localStorage.setItem(storageKey, JSON.stringify(updatedGuests))
-    console.log('✅ Guest created and saved to localStorage with key:', storageKey)
-
-    // For real users, save to Firestore
-    if (!isDemoUser && user && wedding?.id) {
+    // Save to Firestore for ALL users
+    if (user && wedding?.id) {
       // Import Firestore dynamically to avoid blocking
       import('@/config/firebase').then(({ db }) => {
         import('firebase/firestore').then(({ doc, setDoc }) => {
@@ -442,12 +435,11 @@ export function useRobustGuests() {
         isSavingRef.current = false
       })
     } else {
-      // Demo user - no Firestore sync needed
       isSavingRef.current = false
     }
 
     return newGuest
-  }, [isDemoUser, wedding?.id, user?.id])
+  }, [wedding?.id, user?.id])
 
   // Calculate stats
   const totalAttendees = guests.reduce((total, guest) => {
@@ -556,13 +548,8 @@ export function useRobustGuests() {
     setGuests(updatedGuests)
     guestsRef.current = updatedGuests
 
-    // Save to localStorage immediately
-    const storageKey = isDemoUser ? 'simple-demo-guests' : `guests_${wedding?.id}`
-    localStorage.setItem(storageKey, JSON.stringify(updatedGuests))
-    console.log('✅ useRobustGuests: Guest deleted from localStorage')
-
-    // Sync to Firestore if not demo user
-    if (!isDemoUser && user && wedding) {
+    // Sync to Firestore for ALL users
+    if (user && wedding) {
       try {
         const { deleteDoc, doc } = await import('firebase/firestore')
         const { db } = await import('@/config/firebase')
@@ -576,10 +563,9 @@ export function useRobustGuests() {
         isSavingRef.current = false
       }
     } else {
-      // Demo user or no Firestore sync needed
       isSavingRef.current = false
     }
-  }, [user, wedding, isDemoUser])
+  }, [user, wedding])
 
   return {
     guests,
@@ -602,12 +588,8 @@ export function useRobustGuests() {
       setGuests(reorderedGuests)
       guestsRef.current = reorderedGuests
 
-      // Save to storage
-      if (isDemoUser) {
-        const storageKey = 'simple-demo-guests'
-        localStorage.setItem(storageKey, JSON.stringify(reorderedGuests))
-        console.log('✅ Demo guests reordered and saved to localStorage')
-      } else if (user && wedding?.id) {
+      // Save to Firestore for ALL users
+      if (user && wedding?.id) {
         try {
           const { doc, setDoc } = await import('firebase/firestore')
           const { db } = await import('@/config/firebase')
