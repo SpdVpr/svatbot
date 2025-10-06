@@ -104,6 +104,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     highlightViolations: false,
     zoom: 1.0
   })
+  const [guestSearchQuery, setGuestSearchQuery] = useState('')
 
   const unassignedGuests = getUnassignedGuests()
 
@@ -1334,9 +1335,17 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
   // Group all people by category (for assignment dialog)
   const getGroupedAllGuests = () => {
     const allPeople = getAllPeopleToSeat()
+
+    // Filter by search query
+    const filteredPeople = guestSearchQuery.trim()
+      ? allPeople.filter(person =>
+          person.displayName.toLowerCase().includes(guestSearchQuery.toLowerCase())
+        )
+      : allPeople
+
     const grouped: Record<string, PersonToSeat[]> = {}
 
-    allPeople.forEach(person => {
+    filteredPeople.forEach(person => {
       const category = person.category || 'other'
       if (!grouped[category]) {
         grouped[category] = []
@@ -2403,6 +2412,28 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
               Přiřadit hosta k místu
             </h3>
 
+            {/* Search input */}
+            <div className="mb-4">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Vyhledat hosta..."
+                  value={guestSearchQuery}
+                  onChange={(e) => setGuestSearchQuery(e.target.value)}
+                  className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+                <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                {guestSearchQuery && (
+                  <button
+                    onClick={() => setGuestSearchQuery('')}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+
             <div className="space-y-4 overflow-y-auto flex-1">
               {Object.entries(getGroupedAllGuests()).map(([category, categoryPeople]) => {
                 // Count total people in this category
@@ -2472,10 +2503,25 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                 )
               })}
 
-              {guests.length === 0 && (
+              {guests.length === 0 && !guestSearchQuery && (
                 <p className="text-sm text-gray-500 text-center py-4">
                   Žádní hosté k dispozici
                 </p>
+              )}
+
+              {guests.length > 0 && guestSearchQuery && Object.keys(getGroupedAllGuests()).length === 0 && (
+                <div className="text-center py-8">
+                  <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-sm text-gray-500">
+                    Žádní hosté nenalezeni pro "{guestSearchQuery}"
+                  </p>
+                  <button
+                    onClick={() => setGuestSearchQuery('')}
+                    className="mt-3 text-sm text-primary-600 hover:text-primary-700"
+                  >
+                    Vymazat vyhledávání
+                  </button>
+                </div>
               )}
             </div>
 
@@ -2485,6 +2531,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                 onClick={() => {
                   setShowGuestAssignment(false)
                   setSelectedSeat(null)
+                  setGuestSearchQuery('')
                 }}
                 className="flex-1 btn-outline"
               >
