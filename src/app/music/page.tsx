@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Music, ArrowLeft, Save, User, Phone, Mail, Sparkles, Edit2, Plus, Loader2 } from 'lucide-react'
+import { Music, ArrowLeft, Save, User, Phone, Mail, Sparkles, Edit2, Plus, Loader2, Eye, EyeOff } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import SpotifySearch from '@/components/music/SpotifySearch'
 import SongCard from '@/components/music/SongCard'
@@ -20,6 +20,7 @@ function MusicPageContent() {
     updateVendor,
     addSong,
     removeSong,
+    toggleCategoryVisibility,
     totalSongs,
     requiredCategories,
     completedRequired
@@ -27,6 +28,7 @@ function MusicPageContent() {
 
   const [editingVendor, setEditingVendor] = useState(false)
   const [showAddSong, setShowAddSong] = useState<string | null>(null)
+  const [showHidden, setShowHidden] = useState(false)
 
   const handleAddSpotifyTrack = (categoryId: string, track: SpotifyTrack) => {
     console.log('🎵 Adding Spotify track:', {
@@ -256,7 +258,27 @@ function MusicPageContent() {
 
           {/* Right Column - Categories */}
           <div className="lg:col-span-2 space-y-4">
-            {categories.map(category => (
+            {/* Show/Hide Hidden Categories Toggle */}
+            {categories.some(cat => cat.hidden) && (
+              <div className="wedding-card bg-gray-50">
+                <button
+                  onClick={() => setShowHidden(!showHidden)}
+                  className="w-full flex items-center justify-between text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  <span className="flex items-center space-x-2">
+                    {showHidden ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    <span>
+                      {showHidden ? 'Skrýt' : 'Zobrazit'} skryté kategorie ({categories.filter(c => c.hidden).length})
+                    </span>
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    {showHidden ? 'Klikněte pro skrytí' : 'Klikněte pro zobrazení'}
+                  </span>
+                </button>
+              </div>
+            )}
+
+            {categories.filter(cat => showHidden || !cat.hidden).map(category => (
               <div key={category.id} className="wedding-card">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-3 flex-1">
@@ -289,13 +311,28 @@ function MusicPageContent() {
                       <p className="text-sm text-gray-600">{category.description}</p>
                     </div>
                   </div>
-                  <button
-                    onClick={() => setShowAddSong(category.id)}
-                    className="btn-outline text-sm flex items-center space-x-1 ml-4"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>Přidat</span>
-                  </button>
+                  <div className="flex items-center space-x-2 ml-4">
+                    {!category.required && (
+                      <button
+                        onClick={() => toggleCategoryVisibility(category.id)}
+                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                        title={category.hidden ? 'Zobrazit kategorii' : 'Skrýt kategorii'}
+                      >
+                        {category.hidden ? (
+                          <Eye className="w-4 h-4 text-gray-400" />
+                        ) : (
+                          <EyeOff className="w-4 h-4 text-gray-600" />
+                        )}
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setShowAddSong(category.id)}
+                      className="btn-outline text-sm flex items-center space-x-1"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Přidat</span>
+                    </button>
+                  </div>
                 </div>
 
                 {/* Songs */}

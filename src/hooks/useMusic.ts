@@ -25,6 +25,7 @@ export interface MusicCategory {
   icon: string
   songs: Song[]
   required?: boolean
+  hidden?: boolean
 }
 
 export interface MusicData {
@@ -382,6 +383,18 @@ export function useMusic() {
     }))
   }
 
+  const toggleCategoryVisibility = (categoryId: string) => {
+    setCategories(prev => prev.map(cat => {
+      if (cat.id === categoryId) {
+        return {
+          ...cat,
+          hidden: !cat.hidden
+        }
+      }
+      return cat
+    }))
+  }
+
   const totalSongs = categories.reduce((sum, cat) => sum + cat.songs.length, 0)
   const requiredCategories = categories.filter(c => c.required)
   const completedRequired = requiredCategories.filter(c => c.songs.length > 0).length
@@ -395,6 +408,7 @@ export function useMusic() {
     addSong,
     removeSong,
     updateSong,
+    toggleCategoryVisibility,
     saveMusicData,
     totalSongs,
     requiredCategories,
