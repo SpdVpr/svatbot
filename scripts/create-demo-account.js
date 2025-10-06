@@ -1702,6 +1702,14 @@ async function createDemoAccount() {
           ]
         },
         {
+          id: 'bridesmaids-entrance',
+          name: 'Nástup družiček',
+          description: 'Hudba při příchodu družiček',
+          icon: '👰‍♀️',
+          required: true,
+          songs: []
+        },
+        {
           id: 'bride-entrance',
           name: 'Nástup nevěsty',
           description: 'Nejdůležitější okamžik - příchod nevěsty',
@@ -1715,6 +1723,30 @@ async function createDemoAccount() {
               notes: 'Romantická klasika'
             }
           ]
+        },
+        {
+          id: 'signing',
+          name: 'Podpis oddacího listu',
+          description: 'Hudba během podpisu dokumentů',
+          icon: '✍️',
+          required: false,
+          songs: []
+        },
+        {
+          id: 'congratulations',
+          name: 'Písně pro gratulace',
+          description: 'Hudba při gratulacích hostů',
+          icon: '🎉',
+          required: false,
+          songs: []
+        },
+        {
+          id: 'guard-of-honor',
+          name: 'Šplalíř',
+          description: 'Hudba při odchodu novomanželů špalírem',
+          icon: '🎊',
+          required: false,
+          songs: []
         },
         {
           id: 'first-dance',
@@ -1732,11 +1764,27 @@ async function createDemoAccount() {
           ]
         },
         {
-          id: 'party-songs',
-          name: 'Párty písně',
-          description: 'Písně na rozjetí večírku',
+          id: 'parent-dance',
+          name: 'Tanec s rodiči',
+          description: 'Tanec nevěsty s otcem a ženicha s matkou',
+          icon: '👨‍👩‍👧',
+          required: false,
+          songs: []
+        },
+        {
+          id: 'cake-cutting',
+          name: 'Krájení dortu',
+          description: 'Hudba při krájení svatebního dortu',
+          icon: '🎂',
+          required: false,
+          songs: []
+        },
+        {
+          id: 'party-must-have',
+          name: 'Párty - nesmí chybět',
+          description: 'Písně, které rozproudí zábavu',
           icon: '🎵',
-          required: true,
+          required: false,
           songs: [
             {
               id: 'song-party-1',
@@ -1759,6 +1807,14 @@ async function createDemoAccount() {
           ]
         },
         {
+          id: 'party-favorites',
+          name: 'Oblíbené písně',
+          description: 'Vaše oblíbené písně na večírek',
+          icon: '🎶',
+          required: false,
+          songs: []
+        },
+        {
           id: 'slow-songs',
           name: 'Pomalé písně',
           description: 'Romantické písně pro pomalé tance',
@@ -1778,6 +1834,14 @@ async function createDemoAccount() {
               notes: 'Krásný text'
             }
           ]
+        },
+        {
+          id: 'do-not-play',
+          name: 'Nehrát!',
+          description: 'Písně, které určitě nechcete slyšet',
+          icon: '🚫',
+          required: false,
+          songs: []
         }
       ],
       updatedAt: admin.firestore.FieldValue.serverTimestamp()
