@@ -274,7 +274,7 @@ export function useMusic() {
       userId: user?.id,
       loading,
       categoriesLength: categories.length,
-      vendorName: vendor.name,
+      vendorsCount: vendors.length,
       musicId
     })
 
@@ -320,7 +320,7 @@ export function useMusic() {
         const cleanedData = {
           weddingId: wedding.id,
           userId: user.id,
-          vendor: cleanData(vendor),
+          vendors: cleanData(vendors),
           categories: cleanData(categories),
           updatedAt: new Date()
         }
