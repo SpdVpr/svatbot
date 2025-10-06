@@ -33,6 +33,7 @@ export default function BudgetPage() {
   // Removed viewMode - using stats view as default (most informative)
   const [showBudgetForm, setShowBudgetForm] = useState(false)
   const [showTemplates, setShowTemplates] = useState(false)
+  const [showCalculator, setShowCalculator] = useState(false)
   const [editingItem, setEditingItem] = useState<BudgetItem | null>(null)
   const [budgetFormLoading, setBudgetFormLoading] = useState(false)
   const [templateLoading, setTemplateLoading] = useState(false)
@@ -237,7 +238,10 @@ export default function BudgetPage() {
 
 
               {/* Action buttons */}
-              <button className="btn-outline flex items-center space-x-2">
+              <button
+                onClick={() => setShowCalculator(true)}
+                className="btn-outline flex items-center space-x-2"
+              >
                 <Calculator className="w-4 h-4" />
                 <span className="hidden lg:inline">Kalkulačka</span>
               </button>
@@ -393,6 +397,71 @@ export default function BudgetPage() {
           loading={templateLoading}
           error={error || undefined}
         />
+      )}
+
+      {/* Budget Calculator Modal */}
+      {showCalculator && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Rozpočtová kalkulačka</h2>
+                <button
+                  onClick={() => setShowCalculator(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <span className="text-2xl">&times;</span>
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <p className="text-gray-600">
+                  Rychlá kalkulačka pro výpočet rozpočtu na svatbu.
+                </p>
+
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    💡 Tip: Průměrná svatba v ČR stojí 300 000 - 600 000 Kč
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                    <span className="text-gray-700">Počet hostů</span>
+                    <input
+                      type="number"
+                      placeholder="80"
+                      className="w-24 px-3 py-1 border border-gray-300 rounded text-right"
+                    />
+                  </div>
+
+                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                    <span className="text-gray-700">Cena na hosta</span>
+                    <input
+                      type="number"
+                      placeholder="2000"
+                      className="w-24 px-3 py-1 border border-gray-300 rounded text-right"
+                    />
+                  </div>
+
+                  <div className="border-t pt-3">
+                    <div className="flex justify-between items-center p-3 bg-primary-50 rounded-lg">
+                      <span className="font-semibold text-gray-900">Odhadovaný rozpočet</span>
+                      <span className="font-bold text-primary-600 text-lg">0 Kč</span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setShowCalculator(false)}
+                  className="w-full btn-primary mt-6"
+                >
+                  Zavřít
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

@@ -440,16 +440,17 @@ export default function BudgetForm({
             </div>
 
             {/* Estimate checkbox */}
-            <div className="mt-4">
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={formData.isEstimate}
-                  onChange={(e) => handleChange('isEstimate', e.target.checked)}
-                  className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                  disabled={loading}
-                />
-                <span className="text-sm text-gray-700">Toto je pouze odhad</span>
+            <div className="mt-4 flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="isEstimate"
+                checked={formData.isEstimate}
+                onChange={(e) => handleChange('isEstimate', e.target.checked)}
+                className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                disabled={loading}
+              />
+              <label htmlFor="isEstimate" className="text-sm text-gray-700 cursor-pointer">
+                Toto je pouze odhad
               </label>
             </div>
           </div>
