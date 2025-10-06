@@ -149,8 +149,8 @@ export default function BudgetStats({
                 {formatCurrency(budgetItems.reduce((sum, item) => sum + item.budgetedAmount, 0))}
               </p>
             </div>
-            <div className="p-3 bg-blue-50 rounded-full">
-              <DollarSign className="w-6 h-6 text-blue-600" />
+            <div className="p-3 bg-blue-50 rounded-full flex items-center justify-center">
+              <span className="text-xl font-bold text-blue-600">Kč</span>
             </div>
           </div>
           <div className="mt-4 flex items-center text-sm">

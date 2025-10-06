@@ -242,11 +242,6 @@ export default function BudgetPage() {
                 <span className="hidden lg:inline">Kalkulačka</span>
               </button>
 
-              <button className="btn-outline flex items-center space-x-2">
-                <Download className="w-4 h-4" />
-                <span className="hidden lg:inline">Export</span>
-              </button>
-
               <button
                 onClick={() => setShowBudgetForm(true)}
                 className="btn-primary flex items-center space-x-2"

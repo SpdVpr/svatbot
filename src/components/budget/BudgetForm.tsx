@@ -77,6 +77,8 @@ export default function BudgetForm({
     { value: 'card', label: 'Karta', icon: '💳' },
     { value: 'transfer', label: 'Převod', icon: '🏦' },
     { value: 'check', label: 'Šek', icon: '📝' },
+    { value: 'after_wedding', label: 'Platba po svatbě', icon: '💒' },
+    { value: 'at_wedding', label: 'Platba na svatbě', icon: '🎉' },
     { value: 'other', label: 'Jiné', icon: '💰' }
   ]
 
@@ -260,7 +262,7 @@ export default function BudgetForm({
           {/* Basic Information */}
           <div>
             <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center space-x-2">
-              <DollarSign className="w-5 h-5" />
+              <span className="text-primary-600 font-bold">Kč</span>
               <span>Základní informace</span>
             </h3>
             
@@ -382,7 +384,7 @@ export default function BudgetForm({
                   value={formData.budgetedAmount}
                   onChange={(e) => handleChange('budgetedAmount', parseFloat(e.target.value) || 0)}
                   min="0"
-                  step="100"
+                  step="1"
                   className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
                     errors.budgetedAmount ? 'border-red-300' : 'border-gray-300'
                   }`}
@@ -403,7 +405,7 @@ export default function BudgetForm({
                   value={formData.actualAmount}
                   onChange={(e) => handleChange('actualAmount', parseFloat(e.target.value) || 0)}
                   min="0"
-                  step="100"
+                  step="1"
                   className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
                     errors.actualAmount ? 'border-red-300' : 'border-gray-300'
                   }`}
@@ -859,7 +861,7 @@ function PaymentModal({ payment, currency, onSave, onCancel }: PaymentModalProps
                 Částka *
               </label>
               <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-400 font-medium">Kč</span>
                 <input
                   type="number"
                   value={paymentData.amount}

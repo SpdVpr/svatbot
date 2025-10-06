@@ -44,38 +44,9 @@ export default function WeddingSettings({ onClose, onSave }: WeddingSettingsProp
     })() : '',
     location: typeof wedding?.venue === 'string' ? wedding.venue : wedding?.venue?.name || '',
     budget: wedding?.budget || 0,
-    guestCount: wedding?.estimatedGuestCount || 0,
-    style: wedding?.style || 'classic',
-    region: wedding?.region || 'Praha'
+    guestCount: wedding?.estimatedGuestCount || 0
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
-
-  // Wedding style options
-  const weddingStyles = [
-    { value: 'classic', label: 'Klasická' },
-    { value: 'modern', label: 'Moderní' },
-    { value: 'rustic', label: 'Rustikální' },
-    { value: 'bohemian', label: 'Bohémská' },
-    { value: 'vintage', label: 'Vintage' },
-    { value: 'minimalist', label: 'Minimalistická' },
-    { value: 'garden', label: 'Zahradní' },
-    { value: 'beach', label: 'Plážová' }
-  ]
-
-  // Region options
-  const regions = [
-    'Praha',
-    'Brno',
-    'Ostrava',
-    'Plzeň',
-    'Liberec',
-    'Olomouc',
-    'České Budějovice',
-    'Hradec Králové',
-    'Ústí nad Labem',
-    'Pardubice',
-    'Jiné'
-  ]
 
   // Validate form
   const validateForm = (): boolean => {
@@ -135,14 +106,17 @@ export default function WeddingSettings({ onClose, onSave }: WeddingSettingsProp
 
       console.log('💾 Saving wedding settings:', formData)
 
-      const updates = {
+      const updates: any = {
         brideName: formData.brideName.trim(),
         groomName: formData.groomName.trim(),
         weddingDate: new Date(formData.weddingDate),
         budget: formData.budget,
-        estimatedGuestCount: formData.guestCount,
-        style: formData.style,
-        region: formData.region
+        estimatedGuestCount: formData.guestCount
+      }
+
+      // Only update venue if location is provided
+      if (formData.location.trim()) {
+        updates.venue = formData.location.trim()
       }
 
       console.log('🔄 Calling updateWedding with:', updates)
@@ -293,51 +267,14 @@ export default function WeddingSettings({ onClose, onSave }: WeddingSettingsProp
                 )}
               </div>
 
-              {/* Style and Region */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Styl svatby
-                  </label>
-                  <select
-                    value={formData.style}
-                    onChange={(e) => handleChange('style', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    disabled={loading}
-                  >
-                    {weddingStyles.map((style) => (
-                      <option key={style.value} value={style.value}>
-                        {style.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Region
-                  </label>
-                  <select
-                    value={formData.region}
-                    onChange={(e) => handleChange('region', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    disabled={loading}
-                  >
-                    {regions.map((region) => (
-                      <option key={region} value={region}>
-                        {region}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
             </div>
           </div>
 
           {/* Budget and Guests */}
           <div>
             <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center space-x-2">
-              <DollarSign className="w-5 h-5" />
+              <span className="text-primary-600 font-bold">Kč</span>
               <span>Rozpočet a hosté</span>
             </h3>
 

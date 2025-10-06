@@ -2155,17 +2155,23 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                     } else {
                       const numValue = parseInt(value)
                       if (!isNaN(numValue)) {
+                        setTableFormData(prev => ({ ...prev, capacity: numValue }))
+                      }
+                    }
+                  }}
+                  onBlur={(e) => {
+                    // On blur, validate and clamp to min/max
+                    const value = e.target.value
+                    if (value === '') {
+                      setTableFormData(prev => ({ ...prev, capacity: 2 }))
+                    } else {
+                      const numValue = parseInt(value)
+                      if (!isNaN(numValue)) {
                         setTableFormData(prev => ({
                           ...prev,
                           capacity: Math.max(2, Math.min(20, numValue))
                         }))
                       }
-                    }
-                  }}
-                  onBlur={(e) => {
-                    // On blur, if empty, set to minimum value
-                    if (e.target.value === '') {
-                      setTableFormData(prev => ({ ...prev, capacity: 2 }))
                     }
                   }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
