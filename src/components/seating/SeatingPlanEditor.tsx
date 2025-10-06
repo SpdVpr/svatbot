@@ -444,24 +444,13 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
       return
     }
 
-    // Helper function to get guest name for a seat
+    // Helper function to get guest name for a seat - uses the main getGuestName function
     const getGuestNameForSeat = (seat: Seat) => {
-      if (seat.isPlusOne && seat.plusOneOf) {
-        const mainSeat = seats.find(s => s.id === seat.plusOneOf)
-        const mainGuest = guests.find(g => g.id === mainSeat?.guestId)
-        const name = mainGuest?.plusOneName || 'Doprovod'
-        const parts = name.split(' ')
-        return { firstName: parts[0] || '', lastName: parts.slice(1).join(' ') || '', fullName: name }
-      } else {
-        const guest = guests.find(g => g.id === seat.guestId)
-        if (guest) {
-          const firstName = guest.firstName || ''
-          const lastName = guest.lastName || ''
-          const fullName = `${firstName} ${lastName}`.trim()
-          return { firstName, lastName, fullName }
-        }
-        return { firstName: '', lastName: '', fullName: '' }
+      const guestNameData = getGuestName(seat)
+      if (guestNameData) {
+        return guestNameData
       }
+      return { firstName: '', lastName: '', fullName: '' }
     }
 
     // Generate SVG for the entire canvas
@@ -675,17 +664,58 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
             </text>
           `
 
-          // Draw guest name if assigned
-          if (seat.guestId || seat.isPlusOne) {
+          // Draw guest name if assigned - position based on seat location
+          if (seat.guestId) {
             const guestName = getGuestNameForSeat(seat)
             if (guestName.fullName) {
-              const nameY = seatY + 20
+              // Calculate name position based on seat sides configuration
+              let nameX = seatX
+              let nameY = seatY
+              const nameOffset = 25
+
+              if (table.shape === 'round' || table.shape === 'oval') {
+                // For round tables, names go outward from center
+                const angle = (360 / tableSeats.length) * seatIndex
+                const totalAngle = angle + table.rotation
+                const rad = ((totalAngle - 90) * Math.PI) / 180
+                nameX = seatX + Math.cos(rad) * nameOffset
+                nameY = seatY + Math.sin(rad) * nameOffset
+              } else {
+                // For rectangular tables, position based on which side the seat is on
+                const seatSides = table.seatSides || 'all'
+                const oneSidePosition = table.oneSidePosition || 'bottom'
+
+                if (seatSides === 'one') {
+                  if (oneSidePosition === 'bottom') {
+                    nameY = seatY + nameOffset
+                  } else if (oneSidePosition === 'top') {
+                    nameY = seatY - nameOffset
+                  } else if (oneSidePosition === 'left') {
+                    nameX = seatX - nameOffset
+                  } else { // right
+                    nameX = seatX + nameOffset
+                  }
+                } else {
+                  // For 'all' or 'two-opposite', determine which side this seat is on
+                  // by comparing its position relative to table center
+                  const dx = seatX - table.position.x
+                  const dy = seatY - table.position.y
+
+                  if (Math.abs(dx) > Math.abs(dy)) {
+                    // Seat is on left or right side
+                    nameX = seatX + (dx > 0 ? nameOffset : -nameOffset)
+                  } else {
+                    // Seat is on top or bottom side
+                    nameY = seatY + (dy > 0 ? nameOffset : -nameOffset)
+                  }
+                }
+              }
 
               // First name (always show if exists)
               if (guestName.firstName) {
                 svgContent += `
                   <text
-                    x="${seatX}"
+                    x="${nameX}"
                     y="${nameY}"
                     text-anchor="middle"
                     font-size="10"
@@ -701,7 +731,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
               if (guestName.lastName) {
                 svgContent += `
                   <text
-                    x="${seatX}"
+                    x="${nameX}"
                     y="${nameY + 12}"
                     text-anchor="middle"
                     font-size="10"
@@ -736,14 +766,14 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     const scaledHeight = venueHeight * scale
 
     // Calculate statistics
-    const totalAssignedGuests = seats.filter(s => s.guestId || s.isPlusOne).length
+    const totalAssignedGuests = seats.filter(s => s.guestId).length
     const totalSeats = seats.length
     const occupancyRate = totalSeats > 0 ? Math.round((totalAssignedGuests / totalSeats) * 100) : 0
 
     // Generate guest list by table
     const generateGuestList = () => {
       const tablesList = tables.map(table => {
-        const tableSeats = seats.filter(s => s.tableId === table.id && (s.guestId || s.isPlusOne))
+        const tableSeats = seats.filter(s => s.tableId === table.id && s.guestId)
         if (tableSeats.length === 0) return null
 
         const guestNames = tableSeats.map(seat => {
