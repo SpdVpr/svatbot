@@ -26,11 +26,11 @@ export type PaymentStatus =
   | 'overdue'         // Po splatnosti
   | 'cancelled'       // Zrušeno
 
-export type PaymentMethod = 
+export type PaymentMethod =
   | 'cash'            // Hotovost
   | 'card'            // Karta
   | 'transfer'        // Převod
-  | 'check'           // Šek
+  | 'invoice'         // Faktura
   | 'other'           // Jiné
 
 export type VendorStatus = 
@@ -68,9 +68,12 @@ export interface BudgetItem {
   payments: BudgetItemPayment[]
   
   // Priority and notes
-  priority: 'low' | 'medium' | 'high' | 'critical'
+  priority?: 'low' | 'medium' | 'high' | 'critical'
   notes?: string
   tags: string[]
+
+  // Sub-items for complex budget items
+  subItems?: BudgetSubItem[]
   
   // Tracking
   isEstimate: boolean
@@ -179,6 +182,15 @@ export interface BudgetItemPayment {
   createdAt: Date
 }
 
+export interface BudgetSubItem {
+  id: string
+  name: string
+  description?: string
+  amount: number
+  currency: string
+  notes?: string
+}
+
 export interface BudgetStats {
   // Overall budget
   totalBudget: number
@@ -249,11 +261,12 @@ export interface BudgetFormData {
   paymentMethod?: PaymentMethod
   dueDate?: Date
   paidDate?: Date
-  priority: 'low' | 'medium' | 'high' | 'critical'
+  priority?: 'low' | 'medium' | 'high' | 'critical'
   notes?: string
   tags: string[]
   isEstimate: boolean
   payments?: BudgetItemPayment[]
+  subItems?: BudgetSubItem[]
 }
 
 export interface VendorFormData {

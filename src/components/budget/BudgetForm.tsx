@@ -1,18 +1,19 @@
 'use client'
 
-import { useState } from 'react'
-import { BudgetFormData, BudgetCategory, PaymentStatus, PaymentMethod, BudgetItemPayment, BUDGET_CATEGORIES } from '@/types/budget'
+import { useState, useEffect } from 'react'
+import { BudgetFormData, BudgetCategory, PaymentStatus, PaymentMethod, BudgetItemPayment, BudgetSubItem, BUDGET_CATEGORIES } from '@/types/budget'
+import { useVendor } from '@/hooks/useVendor'
 import {
   X,
   DollarSign,
   Calendar,
-  Tag,
   AlertCircle,
   Plus,
   Minus,
   Building,
   CreditCard,
-  Edit
+  Edit,
+  Coins
 } from 'lucide-react'
 
 interface BudgetFormProps {
@@ -23,13 +24,14 @@ interface BudgetFormProps {
   initialData?: Partial<BudgetFormData>
 }
 
-export default function BudgetForm({ 
-  onSubmit, 
-  onCancel, 
-  loading = false, 
+export default function BudgetForm({
+  onSubmit,
+  onCancel,
+  loading = false,
   error,
-  initialData 
+  initialData
 }: BudgetFormProps) {
+  const { vendors } = useVendor()
   const [formData, setFormData] = useState<BudgetFormData>({
     name: initialData?.name || '',
     description: initialData?.description || '',
@@ -43,17 +45,18 @@ export default function BudgetForm({
     paymentMethod: initialData?.paymentMethod || undefined,
     dueDate: initialData?.dueDate || undefined,
     paidDate: initialData?.paidDate || undefined,
-    priority: initialData?.priority || 'medium',
+    priority: initialData?.priority || undefined,
     notes: initialData?.notes || '',
     tags: initialData?.tags || [],
     isEstimate: initialData?.isEstimate || false,
-    payments: initialData?.payments || []
+    payments: initialData?.payments || [],
+    subItems: initialData?.subItems || []
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const [newTag, setNewTag] = useState('')
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [editingPayment, setEditingPayment] = useState<BudgetItemPayment | null>(null)
+  const [showSubItemsSection, setShowSubItemsSection] = useState(false)
 
   // Currency options
   const currencyOptions = [
@@ -76,7 +79,7 @@ export default function BudgetForm({
     { value: 'cash', label: 'Hotovost', icon: '💵' },
     { value: 'card', label: 'Karta', icon: '💳' },
     { value: 'transfer', label: 'Převod', icon: '🏦' },
-    { value: 'check', label: 'Šek', icon: '📝' },
+    { value: 'invoice', label: 'Faktura', icon: '📝' },
     { value: 'after_wedding', label: 'Platba po svatbě', icon: '💒' },
     { value: 'at_wedding', label: 'Platba na svatbě', icon: '🎉' },
     { value: 'other', label: 'Jiné', icon: '💰' }
@@ -84,11 +87,20 @@ export default function BudgetForm({
 
   // Priority options
   const priorityOptions = [
+    { value: '', label: 'Bez priority', color: 'text-gray-400' },
     { value: 'low', label: 'Nízká', color: 'text-gray-600' },
     { value: 'medium', label: 'Střední', color: 'text-blue-600' },
     { value: 'high', label: 'Vysoká', color: 'text-orange-600' },
     { value: 'critical', label: 'Kritická', color: 'text-red-600' }
   ]
+
+  // Format currency
+  const formatCurrency = (amount: number, currency: string = 'CZK') => {
+    return new Intl.NumberFormat('cs-CZ', {
+      style: 'currency',
+      currency: currency
+    }).format(amount)
+  }
 
   // Validate form
   const validateForm = (): boolean => {
@@ -141,27 +153,6 @@ export default function BudgetForm({
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }))
     }
-  }
-
-  // Add tag
-  const addTag = () => {
-    if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
-      handleChange('tags', [...formData.tags, newTag.trim()])
-      setNewTag('')
-    }
-  }
-
-  // Remove tag
-  const removeTag = (tagToRemove: string) => {
-    handleChange('tags', formData.tags.filter(tag => tag !== tagToRemove))
-  }
-
-  // Format currency
-  const formatCurrency = (amount: number, currency: string = 'CZK') => {
-    return new Intl.NumberFormat('cs-CZ', {
-      style: 'currency',
-      currency: currency
-    }).format(amount)
   }
 
   // Add payment
@@ -230,6 +221,51 @@ export default function BudgetForm({
     setEditingPayment(null)
   }
 
+  // Add sub-item
+  const addSubItem = () => {
+    const subItems = formData.subItems || []
+    const newSubItem = {
+      id: `subitem_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      name: '',
+      description: '',
+      amount: 0,
+      currency: formData.currency,
+      notes: ''
+    }
+    handleChange('subItems', [...subItems, newSubItem])
+  }
+
+  // Update sub-item
+  const updateSubItem = (id: string, field: string, value: any) => {
+    const subItems = formData.subItems || []
+    const updatedSubItems = subItems.map(item =>
+      item.id === id ? { ...item, [field]: value } : item
+    )
+    handleChange('subItems', updatedSubItems)
+
+    // Update actualAmount automatically
+    const totalSubItemsAmount = updatedSubItems.reduce((sum, item) => sum + item.amount, 0)
+    if (totalSubItemsAmount > 0) {
+      handleChange('actualAmount', totalSubItemsAmount)
+    }
+  }
+
+  // Remove sub-item
+  const removeSubItem = (id: string) => {
+    const subItems = formData.subItems || []
+    const updatedSubItems = subItems.filter(item => item.id !== id)
+    handleChange('subItems', updatedSubItems)
+
+    // Update actualAmount automatically
+    const totalSubItemsAmount = updatedSubItems.reduce((sum, item) => sum + item.amount, 0)
+    if (totalSubItemsAmount > 0) {
+      handleChange('actualAmount', totalSubItemsAmount)
+    } else if (updatedSubItems.length === 0) {
+      // Reset to budgeted amount if no sub-items
+      handleChange('actualAmount', formData.budgetedAmount)
+    }
+  }
+
   // Get category info
   const selectedCategory = BUDGET_CATEGORIES[formData.category as keyof typeof BUDGET_CATEGORIES]
 
@@ -262,7 +298,7 @@ export default function BudgetForm({
           {/* Basic Information */}
           <div>
             <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center space-x-2">
-              <span className="text-primary-600 font-bold">Kč</span>
+              <Coins className="w-5 h-5 text-primary-600" />
               <span>Základní informace</span>
             </h3>
             
@@ -455,6 +491,54 @@ export default function BudgetForm({
             </div>
           </div>
 
+          {/* Vendor Information */}
+          <div>
+            <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center space-x-2">
+              <Building className="w-5 h-5" />
+              <span>Dodavatel</span>
+            </h3>
+
+            <div className="space-y-4">
+              {/* Vendor Selection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Vybrat dodavatele
+                </label>
+                <select
+                  value={formData.vendorName || ''}
+                  onChange={(e) => handleChange('vendorName', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  disabled={loading}
+                >
+                  <option value="">Žádný dodavatel</option>
+                  {vendors.map((vendor) => (
+                    <option key={vendor.id} value={vendor.name}>
+                      {vendor.name} - {vendor.category}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-1 text-xs text-gray-500">
+                  Vyberte dodavatele ze seznamu nebo zadejte vlastní název níže
+                </p>
+              </div>
+
+              {/* Custom Vendor Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Nebo zadejte vlastní název
+                </label>
+                <input
+                  type="text"
+                  value={formData.vendorName}
+                  onChange={(e) => handleChange('vendorName', e.target.value)}
+                  placeholder="např. Hotel Grandhotel, Květinářství Růže..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  disabled={loading}
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Payment Information */}
           <div>
             <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center space-x-2">
@@ -535,68 +619,117 @@ export default function BudgetForm({
             </div>
           </div>
 
-          {/* Quick Add Payment */}
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="text-sm font-medium text-blue-900">Správa plateb</h4>
-                <p className="text-xs text-blue-700 mt-1">
-                  Přidejte zálohy, splátky nebo dokončené platby
-                </p>
-              </div>
+
+
+          {/* Sub-items Section */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium text-gray-900 flex items-center space-x-2">
+                <Coins className="w-5 h-5" />
+                <span>Rozdělení položky</span>
+              </h3>
               <button
                 type="button"
-                onClick={addPayment}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors flex items-center space-x-2"
+                onClick={() => setShowSubItemsSection(!showSubItemsSection)}
+                className="text-sm text-primary-600 hover:text-primary-700"
               >
-                <Plus className="w-4 h-4" />
-                <span>Přidat platbu</span>
+                {showSubItemsSection ? 'Skrýt' : 'Zobrazit'}
               </button>
             </div>
 
-            {/* Payment summary */}
-            {formData.payments && formData.payments.length > 0 && (
-              <div className="mt-3 pt-3 border-t border-blue-200">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-blue-700">
-                    {formData.payments.length} plateb celkem
-                  </span>
-                  <span className="font-medium text-blue-900">
-                    {formatCurrency(formData.payments.reduce((sum, p) => sum + p.amount, 0))}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-xs text-blue-600 mt-1">
-                  <span>
-                    Dokončeno: {formData.payments.filter(p => p.status === 'completed').length}
-                  </span>
-                  <span>
-                    Zaplaceno: {formatCurrency(calculatePaidAmount())}
-                  </span>
-                </div>
+            {showSubItemsSection && (
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600">
+                  Rozdělte tuto položku na dílčí části s vlastními cenami. Celková částka bude automaticky vypočítána.
+                </p>
+
+                {formData.subItems && formData.subItems.length > 0 && (
+                  <div className="space-y-3">
+                    {formData.subItems.map((subItem, index) => (
+                      <div key={subItem.id} className="bg-gray-50 p-4 rounded-lg border">
+                        <div className="flex items-start justify-between mb-3">
+                          <span className="text-sm font-medium text-gray-700">
+                            Dílčí položka #{index + 1}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => removeSubItem(subItem.id)}
+                            className="text-red-500 hover:text-red-700"
+                            title="Odstranit dílčí položku"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">
+                              Název *
+                            </label>
+                            <input
+                              type="text"
+                              value={subItem.name}
+                              onChange={(e) => updateSubItem(subItem.id, 'name', e.target.value)}
+                              placeholder="např. Záloha, Doplatek..."
+                              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">
+                              Částka *
+                            </label>
+                            <input
+                              type="number"
+                              value={subItem.amount}
+                              onChange={(e) => updateSubItem(subItem.id, 'amount', parseFloat(e.target.value) || 0)}
+                              min="0"
+                              step="1"
+                              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            />
+                          </div>
+
+                          <div className="md:col-span-2">
+                            <label className="block text-xs font-medium text-gray-600 mb-1">
+                              Popis
+                            </label>
+                            <input
+                              type="text"
+                              value={subItem.description || ''}
+                              onChange={(e) => updateSubItem(subItem.id, 'description', e.target.value)}
+                              placeholder="Dodatečné informace..."
+                              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={addSubItem}
+                  className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-primary-500 hover:text-primary-600 transition-colors flex items-center justify-center space-x-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Přidat dílčí položku</span>
+                </button>
+
+                {formData.subItems && formData.subItems.length > 0 && (
+                  <div className="bg-primary-50 p-3 rounded-lg border border-primary-200">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-primary-900">
+                        Celková částka z dílčích položek:
+                      </span>
+                      <span className="text-lg font-bold text-primary-600">
+                        {formatCurrency(formData.subItems.reduce((sum, item) => sum + item.amount, 0))}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
-          </div>
-
-          {/* Vendor Information */}
-          <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center space-x-2">
-              <Building className="w-5 h-5" />
-              <span>Dodavatel</span>
-            </h3>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Název dodavatele
-              </label>
-              <input
-                type="text"
-                value={formData.vendorName}
-                onChange={(e) => handleChange('vendorName', e.target.value)}
-                placeholder="např. Hotel Grandhotel, Květinářství Růže..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                disabled={loading}
-              />
-            </div>
           </div>
 
           {/* Payments */}
@@ -685,67 +818,6 @@ export default function BudgetForm({
             </button>
           </div>
 
-          {/* Tags */}
-          <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center space-x-2">
-              <Tag className="w-5 h-5" />
-              <span>Štítky</span>
-            </h3>
-            
-            <div className="flex flex-wrap gap-2 mb-3">
-              {formData.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-primary-100 text-primary-700"
-                >
-                  {tag}
-                  <button
-                    type="button"
-                    onClick={() => removeTag(tag)}
-                    className="ml-2 hover:text-primary-900"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              ))}
-            </div>
-
-            <div className="flex space-x-2">
-              <input
-                type="text"
-                value={newTag}
-                onChange={(e) => setNewTag(e.target.value)}
-                placeholder="Přidat štítek..."
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                disabled={loading}
-              />
-              <button
-                type="button"
-                onClick={addTag}
-                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-500 transition-colors"
-                disabled={loading}
-              >
-                <Plus className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Notes */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Poznámky
-            </label>
-            <textarea
-              value={formData.notes}
-              onChange={(e) => handleChange('notes', e.target.value)}
-              placeholder="Dodatečné poznámky k rozpočtové položce..."
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              disabled={loading}
-            />
-          </div>
-
           {/* Actions */}
           <div className="flex space-x-3 pt-4 border-t border-gray-200">
             <button
@@ -819,24 +891,37 @@ function PaymentModal({ payment, currency, onSave, onCancel }: PaymentModalProps
   const formatDate = (date: Date | any) => {
     // Handle Firestore Timestamp
     if (date && typeof date.toDate === 'function') {
-      return date.toDate().toISOString().split('T')[0]
+      const d = date.toDate()
+      const year = d.getFullYear()
+      const month = String(d.getMonth() + 1).padStart(2, '0')
+      const day = String(d.getDate()).padStart(2, '0')
+      return `${year}-${month}-${day}`
     }
 
     // Handle Date object
     if (date instanceof Date) {
-      return date.toISOString().split('T')[0]
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      return `${year}-${month}-${day}`
     }
 
     // Handle string dates
     if (typeof date === 'string') {
-      return new Date(date).toISOString().split('T')[0]
+      const d = new Date(date)
+      const year = d.getFullYear()
+      const month = String(d.getMonth() + 1).padStart(2, '0')
+      const day = String(d.getDate()).padStart(2, '0')
+      return `${year}-${month}-${day}`
     }
 
     return ''
   }
 
   const parseDate = (dateString: string) => {
-    return new Date(dateString + 'T00:00:00')
+    // Parse date in local timezone to avoid timezone issues
+    const [year, month, day] = dateString.split('-').map(Number)
+    return new Date(year, month - 1, day)
   }
 
   return (
@@ -862,7 +947,7 @@ function PaymentModal({ payment, currency, onSave, onCancel }: PaymentModalProps
                 Částka *
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-400 font-medium">Kč</span>
+                <Coins className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="number"
                   value={paymentData.amount}
@@ -906,7 +991,7 @@ function PaymentModal({ payment, currency, onSave, onCancel }: PaymentModalProps
                 <option value="card">Karta</option>
                 <option value="transfer">Bankovní převod</option>
                 <option value="cash">Hotovost</option>
-                <option value="check">Šek</option>
+                <option value="invoice">Faktura</option>
                 <option value="other">Jiné</option>
               </select>
             </div>

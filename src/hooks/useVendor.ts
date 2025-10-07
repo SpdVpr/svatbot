@@ -84,20 +84,55 @@ export function useVendor(): UseVendorReturn {
     }
   }
 
+  // Helper function to remove undefined values from object
+  const removeUndefined = (obj: any): any => {
+    if (obj === null || obj === undefined) {
+      return null
+    }
+
+    // Handle arrays
+    if (Array.isArray(obj)) {
+      return obj.map(item => removeUndefined(item)).filter(item => item !== undefined)
+    }
+
+    // Handle Timestamp and other special objects
+    if (obj instanceof Timestamp || obj instanceof Date) {
+      return obj
+    }
+
+    // Handle plain objects
+    if (typeof obj === 'object') {
+      const cleaned: any = {}
+      Object.keys(obj).forEach(key => {
+        const value = obj[key]
+        if (value !== undefined) {
+          const cleanedValue = removeUndefined(value)
+          if (cleanedValue !== undefined) {
+            cleaned[key] = cleanedValue
+          }
+        }
+      })
+      return cleaned
+    }
+
+    // Return primitive values as-is
+    return obj
+  }
+
   // Convert Vendor to Firestore data
   const convertToFirestoreData = (vendor: Omit<Vendor, 'id'>): any => {
-    return {
+    const data = {
       weddingId: vendor.weddingId,
       name: vendor.name,
       category: vendor.category,
       description: vendor.description || null,
       website: vendor.website || null,
-      contacts: vendor.contacts,
+      contacts: vendor.contacts || [],
       address: vendor.address || null,
       businessName: vendor.businessName || null,
       businessId: vendor.businessId || null,
       vatNumber: vendor.vatNumber || null,
-      services: vendor.services,
+      services: vendor.services || [],
       priceRange: vendor.priceRange || null,
       availability: vendor.availability || null,
       status: vendor.status,
@@ -107,13 +142,16 @@ export function useVendor(): UseVendorReturn {
       lastContactDate: vendor.lastContactDate ? Timestamp.fromDate(vendor.lastContactDate) : null,
       nextFollowUpDate: vendor.nextFollowUpDate ? Timestamp.fromDate(vendor.nextFollowUpDate) : null,
       notes: vendor.notes || null,
-      tags: vendor.tags,
-      portfolio: vendor.portfolio,
-      testimonials: vendor.testimonials,
+      tags: vendor.tags || [],
+      portfolio: vendor.portfolio || [],
+      testimonials: vendor.testimonials || [],
       createdAt: Timestamp.fromDate(vendor.createdAt),
       updatedAt: Timestamp.fromDate(vendor.updatedAt),
       createdBy: vendor.createdBy
     }
+
+    // Remove any undefined values that might have slipped through
+    return removeUndefined(data)
   }
 
   // Create new vendor
@@ -177,7 +215,36 @@ export function useVendor(): UseVendorReturn {
 
       try {
         // Try to save to Firestore
-        const docRef = await addDoc(collection(db, 'vendors'), convertToFirestoreData(vendorData))
+        const firestoreData = convertToFirestoreData(vendorData)
+        console.log('📝 Attempting to save vendor to Firestore:', firestoreData)
+        console.log('📝 Firestore data as JSON:', JSON.stringify(firestoreData, null, 2))
+
+        // Check for undefined values
+        const checkForUndefined = (obj: any, path = ''): string[] => {
+          const issues: string[] = []
+          if (obj === undefined) {
+            issues.push(path || 'root')
+            return issues
+          }
+          if (Array.isArray(obj)) {
+            obj.forEach((item, index) => {
+              issues.push(...checkForUndefined(item, `${path}[${index}]`))
+            })
+          } else if (obj && typeof obj === 'object' && !(obj instanceof Timestamp) && !(obj instanceof Date)) {
+            Object.keys(obj).forEach(key => {
+              issues.push(...checkForUndefined(obj[key], path ? `${path}.${key}` : key))
+            })
+          }
+          return issues
+        }
+
+        const undefinedPaths = checkForUndefined(firestoreData)
+        if (undefinedPaths.length > 0) {
+          console.error('❌ Found undefined values at paths:', undefinedPaths)
+          throw new Error(`Data contains undefined values at: ${undefinedPaths.join(', ')}`)
+        }
+
+        const docRef = await addDoc(collection(db, 'vendors'), firestoreData)
         const newVendor: Vendor = { id: docRef.id, ...vendorData }
 
         console.log('✅ Vendor created in Firestore:', newVendor)
@@ -189,9 +256,19 @@ export function useVendor(): UseVendorReturn {
           return updated
         })
 
+        // Also save to localStorage for offline access
+        const savedVendors = localStorage.getItem(`vendors_${wedding.id}`) || '[]'
+        const existingVendors = JSON.parse(savedVendors)
+        existingVendors.push(newVendor)
+        localStorage.setItem(`vendors_${wedding.id}`, JSON.stringify(existingVendors))
+
         return newVendor
-      } catch (firestoreError) {
+      } catch (firestoreError: any) {
+        console.error('❌ Firestore error details:', firestoreError)
+        console.error('Error code:', firestoreError.code)
+        console.error('Error message:', firestoreError.message)
         console.warn('⚠️ Firestore not available, using localStorage fallback')
+
         // Create vendor with local ID
         const localId = `vendor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
         const newVendor: Vendor = { id: localId, ...vendorData }
@@ -446,7 +523,14 @@ export function useVendor(): UseVendorReturn {
             where('weddingId', '==', wedding.id)
           )
 
+          console.log('🔍 Setting up Firestore listener for weddingId:', wedding.id)
+
           const unsubscribe = onSnapshot(vendorsQuery, (snapshot) => {
+            console.log('📡 Firestore snapshot received:', snapshot.size, 'documents')
+            snapshot.docs.forEach(doc => {
+              console.log('📄 Document:', doc.id, doc.data())
+            })
+
             const loadedVendors = snapshot.docs.map(doc =>
               convertFirestoreVendor(doc.id, doc.data())
             ).sort((a, b) => a.name.localeCompare(b.name))
@@ -457,15 +541,21 @@ export function useVendor(): UseVendorReturn {
             if (loadedVendors.length > 0) {
               localStorage.setItem(`vendors_${wedding.id}`, JSON.stringify(loadedVendors))
               console.log('📦 Updated localStorage with Firestore data')
+            } else {
+              console.log('📦 No vendors to save to localStorage')
             }
           }, (error) => {
-            console.warn('Firestore snapshot error, keeping localStorage data:', error)
+            console.error('❌ Firestore snapshot error:', error)
+            console.error('Error code:', error.code)
+            console.error('Error message:', error.message)
             // Don't clear localStorage data on Firestore error
           })
 
           return unsubscribe
-        } catch (firestoreError) {
-          console.warn('⚠️ Firestore not available, using localStorage only:', firestoreError)
+        } catch (firestoreError: any) {
+          console.error('⚠️ Firestore not available:', firestoreError)
+          console.error('Error code:', firestoreError.code)
+          console.error('Error message:', firestoreError.message)
           // localStorage data is already loaded above
         }
       } catch (error: any) {

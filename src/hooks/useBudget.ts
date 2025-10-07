@@ -92,13 +92,14 @@ export function useBudget(): UseBudgetReturn {
       paymentMethod: data.paymentMethod,
       dueDate: data.dueDate?.toDate(),
       paidDate: data.paidDate?.toDate(),
-      priority: data.priority || 'medium',
+      priority: data.priority,
       notes: data.notes,
       tags: data.tags || [],
       isEstimate: data.isEstimate || false,
       isRecurring: data.isRecurring || false,
       recurringFrequency: data.recurringFrequency,
       payments: payments,
+      subItems: data.subItems || [],
       createdAt: data.createdAt?.toDate() || new Date(),
       updatedAt: data.updatedAt?.toDate() || new Date(),
       createdBy: data.createdBy
@@ -136,6 +137,7 @@ export function useBudget(): UseBudgetReturn {
         createdAt: payment.createdAt instanceof Date ? Timestamp.fromDate(payment.createdAt) : payment.createdAt
       }))
     }
+    if (item.subItems !== undefined) result.subItems = item.subItems || []
     if (item.createdAt !== undefined) result.createdAt = Timestamp.fromDate(item.createdAt)
     if (item.updatedAt !== undefined) result.updatedAt = Timestamp.fromDate(item.updatedAt)
     if (item.createdBy !== undefined) result.createdBy = item.createdBy

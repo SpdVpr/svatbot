@@ -14,7 +14,8 @@ import {
   PieChart,
   BarChart3,
   Target,
-  CreditCard
+  CreditCard,
+  Coins
 } from 'lucide-react'
 
 interface BudgetStatsProps {
@@ -139,8 +140,8 @@ export default function BudgetStats({
         {/* Total budgeted */}
         <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
           <div className="flex items-start space-x-3">
-            <div className="p-2 bg-blue-50 rounded-lg flex-shrink-0 flex items-center justify-center">
-              <span className="text-lg font-bold text-blue-600">Kč</span>
+            <div className="p-2 bg-blue-50 rounded-lg flex-shrink-0">
+              <Coins className="w-5 h-5 text-blue-600" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-text-muted mb-1">Předběžné náklady</p>

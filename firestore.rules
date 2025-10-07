@@ -242,10 +242,24 @@ service cloud.firestore {
 
     // Vendors collection (user's personal vendors list)
     match /vendors/{vendorId} {
-      allow read, write, create: if isAuthenticated() &&
-                                    (isDemoUser() ||
-                                     (exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
-                                      get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid));
+      // Allow read if authenticated and user owns the wedding
+      allow read: if isAuthenticated() &&
+                     (isDemoUser() ||
+                      (exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                       get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid));
+
+      // Allow create if authenticated and user owns the wedding (use request.resource for new documents)
+      allow create: if isAuthenticated() &&
+                       (isDemoUser() ||
+                        (request.resource.data.keys().hasAll(['weddingId', 'name', 'category']) &&
+                         exists(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)) &&
+                         get(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)).data.userId == request.auth.uid));
+
+      // Allow update/delete if authenticated and user owns the wedding
+      allow update, delete: if isAuthenticated() &&
+                               (isDemoUser() ||
+                                (exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                                 get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid));
     }
 
     // Services collection

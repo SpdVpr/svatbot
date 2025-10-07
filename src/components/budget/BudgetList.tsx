@@ -3,9 +3,9 @@
 import { useState } from 'react'
 import { BudgetItem, BudgetFilters, BudgetViewOptions, BUDGET_CATEGORIES } from '@/types/budget'
 import { useBudget } from '@/hooks/useBudget'
-import { 
-  Search, 
-  Filter, 
+import {
+  Search,
+  Filter,
   Plus,
   DollarSign,
   Calendar,
@@ -18,7 +18,8 @@ import {
   Trash2,
   CreditCard,
   TrendingUp,
-  TrendingDown
+  TrendingDown,
+  Coins
 } from 'lucide-react'
 
 interface BudgetListProps {
@@ -129,7 +130,7 @@ export default function BudgetList({
   }
 
   // Get priority display
-  const getPriorityDisplay = (priority: string) => {
+  const getPriorityDisplay = (priority?: string) => {
     switch (priority) {
       case 'critical':
         return { color: 'text-red-600', bg: 'bg-red-100', label: 'Kritická' }
@@ -140,7 +141,25 @@ export default function BudgetList({
       case 'low':
         return { color: 'text-gray-600', bg: 'bg-gray-100', label: 'Nízká' }
       default:
-        return { color: 'text-gray-600', bg: 'bg-gray-100', label: 'Střední' }
+        return null
+    }
+  }
+
+  // Get payment method display
+  const getPaymentMethodDisplay = (method?: string) => {
+    switch (method) {
+      case 'cash':
+        return { icon: '💵', label: 'Hotovost', color: 'text-green-600', bg: 'bg-green-50' }
+      case 'card':
+        return { icon: '💳', label: 'Karta', color: 'text-blue-600', bg: 'bg-blue-50' }
+      case 'transfer':
+        return { icon: '🏦', label: 'Převod', color: 'text-purple-600', bg: 'bg-purple-50' }
+      case 'invoice':
+        return { icon: '📝', label: 'Faktura', color: 'text-orange-600', bg: 'bg-orange-50' }
+      case 'other':
+        return { icon: '💰', label: 'Jiné', color: 'text-gray-600', bg: 'bg-gray-50' }
+      default:
+        return null
     }
   }
 
@@ -429,12 +448,24 @@ export default function BudgetList({
                             </span>
                           </div>
 
+                          {/* Payment Method */}
+                          {item.paymentMethod && getPaymentMethodDisplay(item.paymentMethod) && (
+                            <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${getPaymentMethodDisplay(item.paymentMethod)!.bg}`}>
+                              <span>{getPaymentMethodDisplay(item.paymentMethod)!.icon}</span>
+                              <span className={`text-xs font-medium ${getPaymentMethodDisplay(item.paymentMethod)!.color}`}>
+                                {getPaymentMethodDisplay(item.paymentMethod)!.label}
+                              </span>
+                            </div>
+                          )}
+
                           {/* Priority */}
-                          <div className={`flex items-center px-2 py-1 rounded-full ${priorityDisplay.bg}`}>
-                            <span className={`text-xs font-medium ${priorityDisplay.color}`}>
-                              {priorityDisplay.label}
-                            </span>
-                          </div>
+                          {priorityDisplay && (
+                            <div className={`flex items-center px-2 py-1 rounded-full ${priorityDisplay.bg}`}>
+                              <span className={`text-xs font-medium ${priorityDisplay.color}`}>
+                                {priorityDisplay.label}
+                              </span>
+                            </div>
+                          )}
                         </div>
 
                         {/* Financial info */}
@@ -511,7 +542,9 @@ export default function BudgetList({
                                     </span>
                                   </div>
                                   <span className="text-gray-500">
-                                    {payment.method || 'Neurčeno'}
+                                    {payment.method ? (
+                                      getPaymentMethodDisplay(payment.method)?.label || payment.method
+                                    ) : 'Neurčeno'}
                                   </span>
                                 </div>
                               ))}
