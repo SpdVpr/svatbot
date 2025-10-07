@@ -6,7 +6,7 @@ import { MapPin } from 'lucide-react'
 // Declare google namespace for TypeScript
 declare global {
   interface Window {
-    google: typeof google
+    google: any
   }
 }
 
