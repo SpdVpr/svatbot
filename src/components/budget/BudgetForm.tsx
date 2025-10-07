@@ -382,114 +382,6 @@ export default function BudgetForm({
             </div>
           </div>
 
-          {/* Financial Information */}
-          <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center space-x-2">
-              <CreditCard className="w-5 h-5" />
-              <span>Finanční údaje</span>
-            </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Currency */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Měna
-                </label>
-                <select
-                  value={formData.currency}
-                  onChange={(e) => handleChange('currency', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  disabled={loading}
-                >
-                  {currencyOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Budgeted Amount */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Předběžná částka *
-                </label>
-                <input
-                  type="number"
-                  value={formData.budgetedAmount}
-                  onChange={(e) => handleChange('budgetedAmount', parseFloat(e.target.value) || 0)}
-                  min="0"
-                  step="1"
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
-                    errors.budgetedAmount ? 'border-red-300' : 'border-gray-300'
-                  }`}
-                  disabled={loading}
-                />
-                {errors.budgetedAmount && (
-                  <p className="mt-1 text-sm text-red-600">{errors.budgetedAmount}</p>
-                )}
-              </div>
-
-              {/* Actual Amount */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Skutečná částka
-                </label>
-                <input
-                  type="number"
-                  value={formData.actualAmount}
-                  onChange={(e) => handleChange('actualAmount', parseFloat(e.target.value) || 0)}
-                  min="0"
-                  step="1"
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
-                    errors.actualAmount ? 'border-red-300' : 'border-gray-300'
-                  }`}
-                  disabled={loading}
-                />
-                {errors.actualAmount && (
-                  <p className="mt-1 text-sm text-red-600">{errors.actualAmount}</p>
-                )}
-              </div>
-
-              {/* Paid Amount - Read Only */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Částečně zaplaceno
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={formatCurrency(calculatePaidAmount())}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"
-                    disabled
-                    readOnly
-                  />
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                    <span className="text-xs text-gray-500">Auto</span>
-                  </div>
-                </div>
-                <p className="mt-1 text-xs text-gray-500">
-                  Automaticky počítáno z plateb
-                </p>
-              </div>
-            </div>
-
-            {/* Estimate checkbox */}
-            <div className="mt-4 flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="isEstimate"
-                checked={formData.isEstimate}
-                onChange={(e) => handleChange('isEstimate', e.target.checked)}
-                className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                disabled={loading}
-              />
-              <label htmlFor="isEstimate" className="text-sm text-gray-700 cursor-pointer">
-                Toto je pouze odhad
-              </label>
-            </div>
-          </div>
-
           {/* Sub-items Section */}
           <div>
             <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center space-x-2">
@@ -612,7 +504,7 @@ export default function BudgetForm({
                   <option value="">Žádný dodavatel</option>
                   {vendors.map((vendor) => (
                     <option key={vendor.id} value={vendor.name}>
-                      {vendor.name} - {vendor.category}
+                      {vendor.name} - {BUDGET_CATEGORIES[vendor.category as keyof typeof BUDGET_CATEGORIES]?.name || vendor.category}
                     </option>
                   ))}
                 </select>
@@ -635,6 +527,114 @@ export default function BudgetForm({
                   disabled={loading}
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Financial Information */}
+          <div>
+            <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center space-x-2">
+              <CreditCard className="w-5 h-5" />
+              <span>Finanční údaje</span>
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Currency */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Měna
+                </label>
+                <select
+                  value={formData.currency}
+                  onChange={(e) => handleChange('currency', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  disabled={loading}
+                >
+                  {currencyOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Budgeted Amount */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Předběžná částka *
+                </label>
+                <input
+                  type="number"
+                  value={formData.budgetedAmount}
+                  onChange={(e) => handleChange('budgetedAmount', parseFloat(e.target.value) || 0)}
+                  min="0"
+                  step="1"
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                    errors.budgetedAmount ? 'border-red-300' : 'border-gray-300'
+                  }`}
+                  disabled={loading}
+                />
+                {errors.budgetedAmount && (
+                  <p className="mt-1 text-sm text-red-600">{errors.budgetedAmount}</p>
+                )}
+              </div>
+
+              {/* Actual Amount */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Skutečná částka
+                </label>
+                <input
+                  type="number"
+                  value={formData.actualAmount}
+                  onChange={(e) => handleChange('actualAmount', parseFloat(e.target.value) || 0)}
+                  min="0"
+                  step="1"
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                    errors.actualAmount ? 'border-red-300' : 'border-gray-300'
+                  }`}
+                  disabled={loading}
+                />
+                {errors.actualAmount && (
+                  <p className="mt-1 text-sm text-red-600">{errors.actualAmount}</p>
+                )}
+              </div>
+
+              {/* Paid Amount - Read Only */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Částečně zaplaceno
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={formatCurrency(calculatePaidAmount())}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"
+                    disabled
+                    readOnly
+                  />
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                    <span className="text-xs text-gray-500">Auto</span>
+                  </div>
+                </div>
+                <p className="mt-1 text-xs text-gray-500">
+                  Automaticky počítáno z plateb
+                </p>
+              </div>
+            </div>
+
+            {/* Estimate checkbox */}
+            <div className="mt-4 flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="isEstimate"
+                checked={formData.isEstimate}
+                onChange={(e) => handleChange('isEstimate', e.target.checked)}
+                className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                disabled={loading}
+              />
+              <label htmlFor="isEstimate" className="text-sm text-gray-700 cursor-pointer">
+                Toto je pouze odhad
+              </label>
             </div>
           </div>
 

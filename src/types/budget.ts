@@ -362,7 +362,7 @@ export const BUDGET_CATEGORIES = {
     priority: 'critical'
   },
   photography: {
-    name: 'Fotografie',
+    name: 'Záznam',
     icon: '📸',
     color: 'bg-purple-100 text-purple-700',
     defaultPercentage: 8,
@@ -390,21 +390,21 @@ export const BUDGET_CATEGORIES = {
     priority: 'medium'
   },
   decoration: {
-    name: 'Dekorace',
-    icon: '🎨',
+    name: 'Výzdoba',
+    icon: '🎀',
     color: 'bg-orange-100 text-orange-700',
     defaultPercentage: 3,
     priority: 'low'
   },
   dress: {
-    name: 'Šaty',
-    icon: '👗',
+    name: 'Nevěsta',
+    icon: '👰',
     color: 'bg-rose-100 text-rose-700',
     defaultPercentage: 4,
     priority: 'high'
   },
   suit: {
-    name: 'Oblek',
+    name: 'Ženich',
     icon: '🤵',
     color: 'bg-gray-100 text-gray-700',
     defaultPercentage: 2,
@@ -418,7 +418,7 @@ export const BUDGET_CATEGORIES = {
     priority: 'high'
   },
   invitations: {
-    name: 'Pozvánky',
+    name: 'Tiskoviny',
     icon: '💌',
     color: 'bg-teal-100 text-teal-700',
     defaultPercentage: 1,
@@ -439,7 +439,7 @@ export const BUDGET_CATEGORIES = {
     priority: 'low'
   },
   beauty: {
-    name: 'Kosmetika',
+    name: 'Vizáž',
     icon: '💄',
     color: 'bg-fuchsia-100 text-fuchsia-700',
     defaultPercentage: 1,
