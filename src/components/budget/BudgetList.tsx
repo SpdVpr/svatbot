@@ -91,7 +91,7 @@ export default function BudgetList({
     }
     
     // Priority filter
-    if (filters.priority && !filters.priority.includes(item.priority)) {
+    if (filters.priority && item.priority && !filters.priority.includes(item.priority)) {
       return false
     }
     
