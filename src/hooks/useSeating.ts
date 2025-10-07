@@ -721,25 +721,9 @@ export function useSeating(): UseSeatingReturn {
         throw new Error('Table not found')
       }
 
-      // Remove the seat from the plan
-      let updatedSeats = currentPlan.seats.filter(s => s.id !== seatId)
-
-      // Renumber remaining seats for this table
-      const tableSeats = updatedSeats
-        .filter(s => s.tableId === seatToDelete.tableId)
-        .sort((a, b) => (a.position || 0) - (b.position || 0))
-
-      // Update positions to be sequential
-      tableSeats.forEach((seat, index) => {
-        const seatIndex = updatedSeats.findIndex(s => s.id === seat.id)
-        if (seatIndex !== -1) {
-          updatedSeats[seatIndex] = {
-            ...updatedSeats[seatIndex],
-            position: index + 1,
-            updatedAt: new Date()
-          }
-        }
-      })
+      // Simply remove the seat from the plan without renumbering
+      // This keeps all other seats at their original positions
+      const updatedSeats = currentPlan.seats.filter(s => s.id !== seatId)
 
       // Update table capacity
       const updatedTables = currentPlan.tables.map(t =>

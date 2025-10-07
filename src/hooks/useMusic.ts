@@ -150,29 +150,12 @@ export function useMusic() {
   const [musicId, setMusicId] = useState<string | null>(null)
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Debug: Log when wedding changes
-  useEffect(() => {
-    console.log('🎵 Wedding changed in useMusic:', {
-      hasWedding: !!wedding?.id,
-      weddingId: wedding?.id
-    })
-  }, [wedding?.id])
-
   // Load music data from Firestore with real-time updates
   useEffect(() => {
-    console.log('🎵 useMusic load effect:', {
-      hasWedding: !!wedding?.id,
-      weddingId: wedding?.id,
-      hasUser: !!user?.id
-    })
-
     if (!wedding?.id) {
-      console.log('🎵 No wedding yet, skipping music load')
       setLoading(false)
       return
     }
-
-    console.log('🎵 Loading music data for wedding:', wedding.id)
 
     const musicQuery = query(
       collection(db, 'music'),
@@ -199,16 +182,14 @@ export function useMusic() {
         }
 
         setCategories(data.categories || DEFAULT_CATEGORIES)
-        console.log('🎵 Loaded music data from Firestore:', data)
       } else {
-        console.log('🎵 No music data found, using defaults')
         setMusicId(null)
         setVendors([])
         setCategories(DEFAULT_CATEGORIES)
       }
       setLoading(false)
     }, (error) => {
-      console.error('❌ Error loading music data:', error)
+      console.error('Error loading music data:', error)
       setLoading(false)
     })
 
@@ -255,8 +236,6 @@ export function useMusic() {
         await setDoc(musicRef, cleanedData)
         setMusicId(musicRef.id)
       }
-
-      console.log('✅ Music data saved to Firestore')
     } catch (error) {
       console.error('Error saving music data:', error)
       throw error
@@ -267,23 +246,7 @@ export function useMusic() {
 
   // Auto-save when data changes (debounced)
   useEffect(() => {
-    console.log('🎵 Auto-save effect triggered:', {
-      hasWedding: !!wedding?.id,
-      weddingId: wedding?.id,
-      hasUser: !!user?.id,
-      userId: user?.id,
-      loading,
-      categoriesLength: categories.length,
-      vendorsCount: vendors.length,
-      musicId
-    })
-
     if (!wedding?.id || !user?.id || loading) {
-      console.log('🎵 Auto-save skipped - conditions not met:', {
-        hasWedding: !!wedding?.id,
-        hasUser: !!user?.id,
-        loading
-      })
       return
     }
 
@@ -292,13 +255,7 @@ export function useMusic() {
       clearTimeout(saveTimeoutRef.current)
     }
 
-    console.log('🎵 Setting up auto-save timeout...')
     saveTimeoutRef.current = setTimeout(async () => {
-      console.log('🎵 Auto-saving music data...', {
-        weddingId: wedding.id,
-        userId: user.id,
-        musicId
-      })
 
       setSaving(true)
       try {
@@ -325,24 +282,18 @@ export function useMusic() {
           updatedAt: new Date()
         }
 
-        console.log('🎵 Saving to Firestore:', { musicId, weddingId: wedding.id })
-
         if (musicId) {
           // Update existing document
           const musicRef = doc(db, 'music', musicId)
           await setDoc(musicRef, cleanedData, { merge: true })
-          console.log('✅ Updated existing music document:', musicId)
         } else {
           // Create new document
           const musicRef = doc(collection(db, 'music'))
           await setDoc(musicRef, cleanedData)
           setMusicId(musicRef.id)
-          console.log('✅ Created new music document:', musicRef.id)
         }
-
-        console.log('✅ Music data saved to Firestore')
       } catch (error) {
-        console.error('❌ Error saving music data:', error)
+        console.error('Error saving music data:', error)
       } finally {
         setSaving(false)
       }
@@ -350,7 +301,6 @@ export function useMusic() {
 
     return () => {
       if (saveTimeoutRef.current) {
-        console.log('🎵 Clearing auto-save timeout')
         clearTimeout(saveTimeoutRef.current)
       }
     }
