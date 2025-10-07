@@ -3,6 +3,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { MapPin } from 'lucide-react'
 
+// Declare google namespace for TypeScript
+declare global {
+  interface Window {
+    google: typeof google
+  }
+}
+
 interface GooglePlacesAutocompleteProps {
   value: string
   onChange: (value: string) => void
@@ -21,12 +28,12 @@ export default function GooglePlacesAutocomplete({
   error = false
 }: GooglePlacesAutocompleteProps) {
   const inputRef = useRef<HTMLInputElement>(null)
-  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null)
+  const autocompleteRef = useRef<any>(null)
   const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
     // Check if Google Maps API is already loaded
-    if (typeof window !== 'undefined' && typeof google !== 'undefined' && google.maps && google.maps.places) {
+    if (typeof window !== 'undefined' && typeof (window as any).google !== 'undefined' && (window as any).google.maps && (window as any).google.maps.places) {
       console.log('✅ Google Maps API already loaded')
       setIsLoaded(true)
       return
@@ -47,7 +54,7 @@ export default function GooglePlacesAutocomplete({
       console.log('⏳ Google Maps script already exists, waiting for load...')
       // Wait for it to load
       const checkLoaded = setInterval(() => {
-        if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+        if (typeof (window as any).google !== 'undefined' && (window as any).google.maps && (window as any).google.maps.places) {
           console.log('✅ Google Maps API loaded (from existing script)')
           setIsLoaded(true)
           clearInterval(checkLoaded)
@@ -91,8 +98,10 @@ export default function GooglePlacesAutocomplete({
     try {
       console.log('🔧 Initializing Google Places Autocomplete...')
 
+      const googleMaps = (window as any).google.maps
+
       // Initialize autocomplete
-      autocompleteRef.current = new google.maps.places.Autocomplete(inputRef.current, {
+      autocompleteRef.current = new googleMaps.places.Autocomplete(inputRef.current, {
         types: ['establishment', 'geocode'],
         componentRestrictions: { country: 'cz' },
         fields: ['formatted_address', 'name', 'address_components']
@@ -120,8 +129,8 @@ export default function GooglePlacesAutocomplete({
     }
 
     return () => {
-      if (autocompleteRef.current) {
-        google.maps.event.clearInstanceListeners(autocompleteRef.current)
+      if (autocompleteRef.current && typeof (window as any).google !== 'undefined') {
+        (window as any).google.maps.event.clearInstanceListeners(autocompleteRef.current)
       }
     }
   }, [isLoaded, onChange])
