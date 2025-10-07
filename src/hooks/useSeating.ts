@@ -115,7 +115,6 @@ export function useSeating(): UseSeatingReturn {
           : new Date(updatedPlan.updatedAt).getTime()
 
         if (newUpdatedAt > currentUpdatedAt) {
-          console.log('Syncing currentPlan from seatingPlans (newer version detected)')
           setCurrentPlanState(updatedPlan)
         }
       }
@@ -709,33 +708,12 @@ export function useSeating(): UseSeatingReturn {
     if (!wedding || !currentPlan) return
 
     try {
-      // Find the seat to delete
-      const seatToDelete = currentPlan.seats.find(s => s.id === seatId)
-      if (!seatToDelete) {
-        throw new Error('Seat not found')
-      }
-
-      // Find the table this seat belongs to
-      const table = currentPlan.tables.find(t => t.id === seatToDelete.tableId)
-      if (!table) {
-        throw new Error('Table not found')
-      }
-
-      // Simply remove the seat from the plan without renumbering
-      // This keeps all other seats at their original positions
+      // Simply remove the seat - nothing else changes
       const updatedSeats = currentPlan.seats.filter(s => s.id !== seatId)
 
-      // Update table capacity
-      const updatedTables = currentPlan.tables.map(t =>
-        t.id === table.id
-          ? { ...t, capacity: t.capacity - 1, updatedAt: new Date() }
-          : t
-      )
-
-      // Update the seating plan
+      // Update the seating plan - keep tables unchanged
       await updateSeatingPlan(currentPlan.id, {
         seats: updatedSeats,
-        tables: updatedTables,
         totalSeats: updatedSeats.length,
         assignedSeats: updatedSeats.filter(s => s.guestId).length
       })

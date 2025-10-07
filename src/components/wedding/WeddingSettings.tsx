@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useWedding } from '@/hooks/useWedding'
-import GooglePlacesAutocomplete from '@/components/common/GooglePlacesAutocomplete'
+import VenueLocationMap from '@/components/wedding/VenueLocationMap'
 import {
   X,
   Calendar,
@@ -248,20 +248,14 @@ export default function WeddingSettings({ onClose, onSave }: WeddingSettingsProp
                 )}
               </div>
 
-              {/* Location */}
+              {/* Location with Map */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Místo konání *
-                </label>
-                <GooglePlacesAutocomplete
-                  value={formData.location}
-                  onChange={(value) => handleChange('location', value)}
-                  placeholder="např. Zámek Dobříš"
-                  error={!!errors.location}
-                  disabled={loading}
+                <VenueLocationMap
+                  address={formData.location}
+                  onAddressChange={(value) => handleChange('location', value)}
                 />
                 {errors.location && (
-                  <p className="mt-1 text-sm text-red-600">{errors.location}</p>
+                  <p className="mt-2 text-sm text-red-600">{errors.location}</p>
                 )}
               </div>
 
