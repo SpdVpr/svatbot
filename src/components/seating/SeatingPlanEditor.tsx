@@ -1792,8 +1792,9 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                           const guestName = getGuestName(seat)
                           if (!guestName) return null
 
-                          const seatIndex = tableSeats.findIndex(s => s.id === seat.id)
-                          if (seatIndex === -1) return null
+                          // Use seat.position instead of array index to maintain consistent positioning
+                          const seatIndex = (seat.position || 1) - 1
+                          if (seatIndex < 0) return null
 
                           let nameX = 0
                           let nameY = 0
@@ -1801,10 +1802,10 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
                           if (table.shape === 'round' || table.shape === 'oval') {
                             // Circular positioning for round/oval tables
-                            const seatAngle = (360 / tableSeats.length) * seatIndex
+                            const seatAngle = (360 / table.capacity) * seatIndex
                             const totalAngle = seatAngle + table.rotation
                             const baseRadius = table.size === 'small' ? 90 : table.size === 'medium' ? 110 : table.size === 'large' ? 130 : 150
-                            const extraRadius = Math.max(0, (tableSeats.length - 6) * 5)
+                            const extraRadius = Math.max(0, (table.capacity - 6) * 5)
                             const nameRadius = baseRadius + extraRadius
                             nameX = Math.cos((totalAngle - 90) * Math.PI / 180) * nameRadius
                             nameY = Math.sin((totalAngle - 90) * Math.PI / 180) * nameRadius
@@ -1819,9 +1820,9 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                               : (table.size === 'small' ? 60 : table.size === 'medium' ? 80 : table.size === 'large' ? 100 : 120)
 
                             const baseOffset = 45
-                            const extraOffset = Math.max(0, (tableSeats.length - 6) * 3)
+                            const extraOffset = Math.max(0, (table.capacity - 6) * 3)
                             const nameOffset = baseOffset + extraOffset
-                            const totalSeats = tableSeats.length
+                            const totalSeats = table.capacity
                             const seatSides = table.seatSides || 'all'
                             const oneSidePosition = table.oneSidePosition || 'bottom'
 

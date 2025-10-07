@@ -88,7 +88,7 @@ export default function SimpleCalculator({ onClose }: SimpleCalculatorProps) {
     ['7', '8', '9', '/'],
     ['4', '5', '6', '*'],
     ['1', '2', '3', '-'],
-    ['0', '.', '=', '+'],
+    ['C', '0', '.', '+'],
   ]
 
   return (
@@ -122,28 +122,21 @@ export default function SimpleCalculator({ onClose }: SimpleCalculatorProps) {
 
           {/* Buttons */}
           <div className="space-y-2">
-            {/* Clear button */}
-            <button
-              onClick={clear}
-              className="w-full py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium flex items-center justify-center space-x-2"
-            >
-              <Delete className="w-4 h-4" />
-              <span>Vymazat (C)</span>
-            </button>
-
             {/* Number and operation buttons */}
             {buttons.map((row, rowIndex) => (
               <div key={rowIndex} className="grid grid-cols-4 gap-2">
                 {row.map((btn) => {
                   const isOperation = ['+', '-', '*', '/', '='].includes(btn)
                   const isEquals = btn === '='
-                  const isZero = btn === '0'
+                  const isClear = btn === 'C'
 
                   return (
                     <button
                       key={btn}
                       onClick={() => {
-                        if (btn === '=') {
+                        if (btn === 'C') {
+                          clear()
+                        } else if (btn === '=') {
                           handleEquals()
                         } else if (btn === '.') {
                           inputDecimal()
@@ -155,13 +148,14 @@ export default function SimpleCalculator({ onClose }: SimpleCalculatorProps) {
                       }}
                       className={`
                         py-4 rounded-lg font-semibold text-lg transition-colors
-                        ${isEquals
+                        ${isClear
+                          ? 'bg-red-500 text-white hover:bg-red-600'
+                          : isEquals
                           ? 'bg-primary-600 text-white hover:bg-primary-700'
                           : isOperation
                           ? 'bg-orange-500 text-white hover:bg-orange-600'
                           : 'bg-gray-200 text-gray-900 hover:bg-gray-300'
                         }
-                        ${isZero ? 'col-span-2' : ''}
                       `}
                     >
                       {btn}
@@ -171,13 +165,21 @@ export default function SimpleCalculator({ onClose }: SimpleCalculatorProps) {
               </div>
             ))}
 
-            {/* Percentage button */}
-            <button
-              onClick={() => performOperation('%')}
-              className="w-full py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
-            >
-              % (Modulo)
-            </button>
+            {/* Equals and Percentage buttons */}
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={handleEquals}
+                className="py-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-semibold text-lg"
+              >
+                =
+              </button>
+              <button
+                onClick={() => performOperation('%')}
+                className="py-4 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-semibold text-lg"
+              >
+                %
+              </button>
+            </div>
           </div>
 
           {/* Info */}

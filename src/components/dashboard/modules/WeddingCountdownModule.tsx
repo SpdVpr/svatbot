@@ -113,9 +113,6 @@ export default function WeddingCountdownModule({ onWeddingSettingsClick }: Weddi
           <div className="text-center">
             <div className="text-xl sm:text-2xl font-bold text-primary-600">{guestStats.total}</div>
             <div className="text-xs sm:text-sm text-text-muted">Hostů</div>
-            {guestStats.totalChildren > 0 && (
-              <div className="text-xs text-gray-400">{guestStats.totalChildren} dětí</div>
-            )}
           </div>
           <div className="text-center">
             <div className="text-xl sm:text-2xl font-bold text-green-600">{Math.round(budgetStats.totalBudget / 1000)}k</div>
