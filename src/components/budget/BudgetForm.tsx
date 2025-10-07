@@ -56,7 +56,6 @@ export default function BudgetForm({
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [editingPayment, setEditingPayment] = useState<BudgetItemPayment | null>(null)
-  const [showSubItemsSection, setShowSubItemsSection] = useState(false)
 
   // Currency options
   const currencyOptions = [
@@ -80,8 +79,8 @@ export default function BudgetForm({
     { value: 'card', label: 'Karta', icon: '💳' },
     { value: 'transfer', label: 'Převod', icon: '🏦' },
     { value: 'invoice', label: 'Faktura', icon: '📝' },
-    { value: 'after_wedding', label: 'Platba po svatbě', icon: '💒' },
-    { value: 'at_wedding', label: 'Platba na svatbě', icon: '🎉' },
+    { value: 'after_wedding', label: 'Po svatbě', icon: '💒' },
+    { value: 'at_wedding', label: 'Na svatbě', icon: '🎉' },
     { value: 'other', label: 'Jiné', icon: '💰' }
   ]
 
@@ -491,6 +490,106 @@ export default function BudgetForm({
             </div>
           </div>
 
+          {/* Sub-items Section */}
+          <div>
+            <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center space-x-2">
+              <Coins className="w-5 h-5" />
+              <span>Rozdělení položky</span>
+            </h3>
+
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">
+                Rozdělte tuto položku na dílčí části s vlastními cenami. Celková částka bude automaticky vypočítána.
+              </p>
+
+              {formData.subItems && formData.subItems.length > 0 && (
+                <div className="space-y-3">
+                  {formData.subItems.map((subItem, index) => (
+                    <div key={subItem.id} className="bg-gray-50 p-4 rounded-lg border">
+                      <div className="flex items-start justify-between mb-3">
+                        <span className="text-sm font-medium text-gray-700">
+                          Dílčí položka #{index + 1}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => removeSubItem(subItem.id)}
+                          className="text-red-500 hover:text-red-700"
+                          title="Odstranit dílčí položku"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">
+                            Název *
+                          </label>
+                          <input
+                            type="text"
+                            value={subItem.name}
+                            onChange={(e) => updateSubItem(subItem.id, 'name', e.target.value)}
+                            placeholder="např. Záloha, Doplatek..."
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">
+                            Částka *
+                          </label>
+                          <input
+                            type="number"
+                            value={subItem.amount}
+                            onChange={(e) => updateSubItem(subItem.id, 'amount', parseFloat(e.target.value) || 0)}
+                            min="0"
+                            step="1"
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          />
+                        </div>
+
+                        <div className="md:col-span-2">
+                          <label className="block text-xs font-medium text-gray-600 mb-1">
+                            Popis
+                          </label>
+                          <input
+                            type="text"
+                            value={subItem.description || ''}
+                            onChange={(e) => updateSubItem(subItem.id, 'description', e.target.value)}
+                            placeholder="Dodatečné informace..."
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={addSubItem}
+                className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-primary-300 hover:text-primary-600 transition-colors flex items-center justify-center space-x-2"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Přidat dílčí položku</span>
+              </button>
+
+              {formData.subItems && formData.subItems.length > 0 && (
+                <div className="bg-primary-50 p-3 rounded-lg border border-primary-200">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-primary-900">
+                      Celková částka z dílčích položek:
+                    </span>
+                    <span className="text-lg font-bold text-primary-600">
+                      {formatCurrency(formData.subItems.reduce((sum, item) => sum + item.amount, 0))}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Vendor Information */}
           <div>
             <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center space-x-2">
@@ -617,119 +716,6 @@ export default function BudgetForm({
                 </p>
               </div>
             </div>
-          </div>
-
-
-
-          {/* Sub-items Section */}
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900 flex items-center space-x-2">
-                <Coins className="w-5 h-5" />
-                <span>Rozdělení položky</span>
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowSubItemsSection(!showSubItemsSection)}
-                className="text-sm text-primary-600 hover:text-primary-700"
-              >
-                {showSubItemsSection ? 'Skrýt' : 'Zobrazit'}
-              </button>
-            </div>
-
-            {showSubItemsSection && (
-              <div className="space-y-4">
-                <p className="text-sm text-gray-600">
-                  Rozdělte tuto položku na dílčí části s vlastními cenami. Celková částka bude automaticky vypočítána.
-                </p>
-
-                {formData.subItems && formData.subItems.length > 0 && (
-                  <div className="space-y-3">
-                    {formData.subItems.map((subItem, index) => (
-                      <div key={subItem.id} className="bg-gray-50 p-4 rounded-lg border">
-                        <div className="flex items-start justify-between mb-3">
-                          <span className="text-sm font-medium text-gray-700">
-                            Dílčí položka #{index + 1}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => removeSubItem(subItem.id)}
-                            className="text-red-500 hover:text-red-700"
-                            title="Odstranit dílčí položku"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          <div>
-                            <label className="block text-xs font-medium text-gray-600 mb-1">
-                              Název *
-                            </label>
-                            <input
-                              type="text"
-                              value={subItem.name}
-                              onChange={(e) => updateSubItem(subItem.id, 'name', e.target.value)}
-                              placeholder="např. Záloha, Doplatek..."
-                              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-xs font-medium text-gray-600 mb-1">
-                              Částka *
-                            </label>
-                            <input
-                              type="number"
-                              value={subItem.amount}
-                              onChange={(e) => updateSubItem(subItem.id, 'amount', parseFloat(e.target.value) || 0)}
-                              min="0"
-                              step="1"
-                              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                            />
-                          </div>
-
-                          <div className="md:col-span-2">
-                            <label className="block text-xs font-medium text-gray-600 mb-1">
-                              Popis
-                            </label>
-                            <input
-                              type="text"
-                              value={subItem.description || ''}
-                              onChange={(e) => updateSubItem(subItem.id, 'description', e.target.value)}
-                              placeholder="Dodatečné informace..."
-                              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <button
-                  type="button"
-                  onClick={addSubItem}
-                  className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-primary-500 hover:text-primary-600 transition-colors flex items-center justify-center space-x-2"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Přidat dílčí položku</span>
-                </button>
-
-                {formData.subItems && formData.subItems.length > 0 && (
-                  <div className="bg-primary-50 p-3 rounded-lg border border-primary-200">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-primary-900">
-                        Celková částka z dílčích položek:
-                      </span>
-                      <span className="text-lg font-bold text-primary-600">
-                        {formatCurrency(formData.subItems.reduce((sum, item) => sum + item.amount, 0))}
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
           </div>
 
           {/* Payments */}
