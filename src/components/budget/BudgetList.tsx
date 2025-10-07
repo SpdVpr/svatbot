@@ -704,7 +704,7 @@ function groupItemsBy(items: BudgetItem[], groupBy: string): Record<string, Budg
         key = item.paymentStatus
         break
       case 'priority':
-        key = item.priority
+        key = item.priority || 'Bez priority'
         break
       case 'vendor':
         key = item.vendorName || 'Bez dodavatele'
