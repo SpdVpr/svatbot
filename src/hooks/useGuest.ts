@@ -580,10 +580,9 @@ export function useGuest(isActive: boolean = true): UseGuestReturn {
             )
             // Sort by sortOrder on client side
             loadedGuests.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
-            console.log('👥 Loaded guests from Firestore:', loadedGuests.length, loadedGuests)
             setGuests(loadedGuests)
           }, (error) => {
-            console.error('❌ Firestore snapshot error:', error)
+            console.error('Firestore snapshot error:', error)
             setGuests([])
           })
 

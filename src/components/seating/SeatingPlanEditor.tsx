@@ -1625,13 +1625,16 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                       )}
 
                       {/* Seats around table - positioned based on table shape */}
-                      {tableSeats.map((seat, index) => {
+                      {tableSeats.map((seat) => {
                         let seatX = 0
                         let seatY = 0
 
+                        // Use seat.position instead of index to maintain consistent positioning
+                        const seatIndex = (seat.position || 1) - 1
+
                         if (table.shape === 'round' || table.shape === 'oval') {
                           // Circular positioning for round/oval tables
-                          const angle = (360 / tableSeats.length) * index
+                          const angle = (360 / table.capacity) * seatIndex
                           const radius = table.size === 'small' ? 50 : table.size === 'medium' ? 70 : table.size === 'large' ? 90 : 110
                           seatX = Math.cos((angle - 90) * Math.PI / 180) * radius
                           seatY = Math.sin((angle - 90) * Math.PI / 180) * radius
@@ -1643,7 +1646,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                             : (table.size === 'small' ? 60 : table.size === 'medium' ? 80 : table.size === 'large' ? 100 : 120)
 
                           const seatOffset = 10 // Distance from table edge
-                          const totalSeats = tableSeats.length
+                          const totalSeats = table.capacity // Use table capacity for consistent positioning
                           const seatSides = table.seatSides || 'all'
                           const oneSidePosition = table.oneSidePosition || 'bottom'
 
@@ -1651,32 +1654,32 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                             // All seats on one side - position depends on oneSidePosition
                             if (oneSidePosition === 'bottom') {
                               const spacing = tableWidth / (totalSeats + 1)
-                              seatX = spacing * (index + 1) - tableWidth / 2
+                              seatX = spacing * (seatIndex + 1) - tableWidth / 2
                               seatY = tableHeight / 2 + seatOffset
                             } else if (oneSidePosition === 'top') {
                               const spacing = tableWidth / (totalSeats + 1)
-                              seatX = spacing * (index + 1) - tableWidth / 2
+                              seatX = spacing * (seatIndex + 1) - tableWidth / 2
                               seatY = -tableHeight / 2 - seatOffset
                             } else if (oneSidePosition === 'left') {
                               const spacing = tableHeight / (totalSeats + 1)
                               seatX = -tableWidth / 2 - seatOffset
-                              seatY = spacing * (index + 1) - tableHeight / 2
+                              seatY = spacing * (seatIndex + 1) - tableHeight / 2
                             } else { // right
                               const spacing = tableHeight / (totalSeats + 1)
                               seatX = tableWidth / 2 + seatOffset
-                              seatY = spacing * (index + 1) - tableHeight / 2
+                              seatY = spacing * (seatIndex + 1) - tableHeight / 2
                             }
                           } else if (seatSides === 'two-opposite') {
                             // Seats on two opposite sides (top and bottom)
                             const seatsPerSide = Math.ceil(totalSeats / 2)
-                            if (index < seatsPerSide) {
+                            if (seatIndex < seatsPerSide) {
                               // Top side
                               const spacing = tableWidth / (seatsPerSide + 1)
-                              seatX = spacing * (index + 1) - tableWidth / 2
+                              seatX = spacing * (seatIndex + 1) - tableWidth / 2
                               seatY = -tableHeight / 2 - seatOffset
                             } else {
                               // Bottom side
-                              const bottomIndex = index - seatsPerSide
+                              const bottomIndex = seatIndex - seatsPerSide
                               const seatsOnBottom = totalSeats - seatsPerSide
                               const spacing = tableWidth / (seatsOnBottom + 1)
                               seatX = spacing * (bottomIndex + 1) - tableWidth / 2
@@ -1693,26 +1696,26 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                             const seatsOnTop = Math.ceil(longSideSeats / 2)
                             const seatsOnBottom = longSideSeats - seatsOnTop
 
-                            if (index < seatsOnTop) {
+                            if (seatIndex < seatsOnTop) {
                               // Top long side
                               const spacing = tableWidth / (seatsOnTop + 1)
-                              seatX = spacing * (index + 1) - tableWidth / 2
+                              seatX = spacing * (seatIndex + 1) - tableWidth / 2
                               seatY = -tableHeight / 2 - seatOffset
-                            } else if (index < seatsOnTop + seatsPerHead) {
+                            } else if (seatIndex < seatsOnTop + seatsPerHead) {
                               // Right short side (head)
-                              const headIndex = index - seatsOnTop
+                              const headIndex = seatIndex - seatsOnTop
                               const spacing = tableHeight / (seatsPerHead + 1)
                               seatX = tableWidth / 2 + seatOffset
                               seatY = spacing * (headIndex + 1) - tableHeight / 2
-                            } else if (index < seatsOnTop + seatsPerHead + seatsOnBottom) {
+                            } else if (seatIndex < seatsOnTop + seatsPerHead + seatsOnBottom) {
                               // Bottom long side
-                              const bottomIndex = index - seatsOnTop - seatsPerHead
+                              const bottomIndex = seatIndex - seatsOnTop - seatsPerHead
                               const spacing = tableWidth / (seatsOnBottom + 1)
                               seatX = tableWidth / 2 - spacing * (bottomIndex + 1)
                               seatY = tableHeight / 2 + seatOffset
                             } else {
                               // Left short side (head)
-                              const headIndex = index - seatsOnTop - seatsPerHead - seatsOnBottom
+                              const headIndex = seatIndex - seatsOnTop - seatsPerHead - seatsOnBottom
                               const spacing = tableHeight / (seatsPerHead + 1)
                               seatX = -tableWidth / 2 - seatOffset
                               seatY = tableHeight / 2 - spacing * (headIndex + 1)
