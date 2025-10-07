@@ -26,9 +26,6 @@ export default function GuestManagementModule() {
         <div className="bg-primary-50 p-4 rounded-lg text-center">
           <div className="text-2xl font-bold text-primary-600 mb-1">{stats.total}</div>
           <div className="text-sm text-primary-700">Celkem hostů</div>
-          {stats.totalChildren > 0 && (
-            <div className="text-xs text-primary-600 mt-1">{stats.totalChildren} dětí</div>
-          )}
         </div>
 
         {/* RSVP Stats */}
@@ -55,22 +52,6 @@ export default function GuestManagementModule() {
             <div className="text-xs text-gray-500">Čeká</div>
           </div>
         </div>
-
-        {/* Response Rate */}
-        {stats.total > 0 && (
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-gray-600">Míra odpovědí</span>
-              <span className="text-sm font-semibold">{responseRate}%</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div
-                className="bg-primary-500 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${responseRate}%` }}
-              />
-            </div>
-          </div>
-        )}
       </div>
 
       <div className="mt-4 pt-4 border-t border-gray-200">

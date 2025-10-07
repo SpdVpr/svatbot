@@ -41,6 +41,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     moveTable,
     assignGuestToSeat,
     unassignGuestFromSeat,
+    deleteSeat,
     getUnassignedGuests
   } = useSeating()
   const { guests } = useGuest()
@@ -1000,6 +1001,18 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     }
   }
 
+  // Delete seat
+  const handleDeleteSeat = async (seatId: string) => {
+    if (confirm('Opravdu chcete smazat tuto židli? Tato akce je nevratná.')) {
+      try {
+        await deleteSeat(seatId)
+      } catch (error) {
+        console.error('Error deleting seat:', error)
+        alert('Chyba při mazání židle: ' + (error as Error).message)
+      }
+    }
+  }
+
   // Handle drag and drop for guest assignment
   const handleGuestDrop = (event: React.DragEvent, seatId: string) => {
     event.preventDefault()
@@ -1724,7 +1737,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                               left: `calc(50% + ${seatX}px - 12px)`,
                               top: `calc(50% + ${seatY}px - 12px)`
                             }}
-                            title={guestNameTooltip || `Místo ${seat.position} - klikněte pro přiřazení hosta`}
+                            title={guestNameTooltip || `Místo ${seat.position} - levé tlačítko: přiřadit hosta, pravé tlačítko: smazat židli`}
                             onClick={(e) => {
                               e.stopPropagation()
                               if (seat.guestId) {
@@ -1732,6 +1745,11 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                               } else {
                                 handleSeatClick(seat.id)
                               }
+                            }}
+                            onContextMenu={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              handleDeleteSeat(seat.id)
                             }}
                             onDrop={(e) => handleGuestDrop(e, seat.id)}
                             onDragOver={(e) => e.preventDefault()}

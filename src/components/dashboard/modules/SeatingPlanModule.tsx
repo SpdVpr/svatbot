@@ -54,25 +54,6 @@ export default function SeatingPlanModule() {
             <div className="text-xs text-gray-500">Nepřiřazeno</div>
           </div>
         </div>
-
-        {/* Features */}
-        <div className="bg-gray-50 p-3 rounded-lg">
-          <div className="text-sm font-medium text-gray-900 mb-2">Funkce</div>
-          <div className="space-y-1">
-            <div className="flex items-center space-x-2 text-xs text-gray-600">
-              <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-              <span>Drag & drop editor</span>
-            </div>
-            <div className="flex items-center space-x-2 text-xs text-gray-600">
-              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-              <span>Automatické rozmístění</span>
-            </div>
-            <div className="flex items-center space-x-2 text-xs text-gray-600">
-              <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-              <span>Export plánů</span>
-            </div>
-          </div>
-        </div>
       </div>
 
       <div className="mt-4 pt-4 border-t border-gray-200">

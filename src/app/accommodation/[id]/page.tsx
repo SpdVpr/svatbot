@@ -161,7 +161,9 @@ export default function AccommodationDetailPage({ params }: AccommodationDetailP
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {accommodation.rooms.map((room) => {
+                {accommodation.rooms
+                  .sort((a, b) => a.name.localeCompare(b.name, 'cs'))
+                  .map((room) => {
                   const roomOccupancy = accommodation.roomOccupancies.find(r => r.roomId === room.id)
                   return (
                   <div key={room.id} className="bg-white rounded-lg shadow-sm overflow-hidden">

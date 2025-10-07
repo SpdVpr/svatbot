@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useWedding } from '@/hooks/useWedding'
+import GooglePlacesAutocomplete from '@/components/common/GooglePlacesAutocomplete'
 import {
   X,
   Calendar,
@@ -9,10 +10,10 @@ import {
   MapPin,
   DollarSign,
   Users,
-  Save,
   AlertCircle,
   Edit,
-  Check
+  Check,
+  Coins
 } from 'lucide-react'
 
 interface WeddingSettingsProps {
@@ -252,14 +253,11 @@ export default function WeddingSettings({ onClose, onSave }: WeddingSettingsProp
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Místo konání *
                 </label>
-                <input
-                  type="text"
+                <GooglePlacesAutocomplete
                   value={formData.location}
-                  onChange={(e) => handleChange('location', e.target.value)}
+                  onChange={(value) => handleChange('location', value)}
                   placeholder="např. Zámek Dobříš"
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
-                    errors.location ? 'border-red-300' : 'border-gray-300'
-                  }`}
+                  error={!!errors.location}
                   disabled={loading}
                 />
                 {errors.location && (
@@ -274,7 +272,7 @@ export default function WeddingSettings({ onClose, onSave }: WeddingSettingsProp
           {/* Budget and Guests */}
           <div>
             <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center space-x-2">
-              <span className="text-primary-600 font-bold">Kč</span>
+              <Coins className="w-5 h-5 text-primary-600" />
               <span>Rozpočet a hosté</span>
             </h3>
 
@@ -345,10 +343,7 @@ export default function WeddingSettings({ onClose, onSave }: WeddingSettingsProp
                   <span>Ukládání...</span>
                 </div>
               ) : (
-                <>
-                  <Save className="w-4 h-4 mr-2" />
-                  Uložit změny
-                </>
+                <span>Uložit změny</span>
               )}
             </button>
           </div>
