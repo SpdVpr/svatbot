@@ -106,22 +106,16 @@ export function useSeating(): UseSeatingReturn {
     if (currentPlan && seatingPlans.length > 0) {
       const updatedPlan = seatingPlans.find(p => p.id === currentPlan.id)
       if (updatedPlan) {
-        // Check if venueLayout has changed
-        const venueLayoutChanged =
-          currentPlan.venueLayout.width !== updatedPlan.venueLayout.width ||
-          currentPlan.venueLayout.height !== updatedPlan.venueLayout.height
+        // Only update if the updatedAt timestamp is newer
+        const currentUpdatedAt = currentPlan.updatedAt instanceof Date
+          ? currentPlan.updatedAt.getTime()
+          : new Date(currentPlan.updatedAt).getTime()
+        const newUpdatedAt = updatedPlan.updatedAt instanceof Date
+          ? updatedPlan.updatedAt.getTime()
+          : new Date(updatedPlan.updatedAt).getTime()
 
-        // Check if tables/seats have changed
-        const tablesChanged = (currentPlan.tables?.length || 0) !== (updatedPlan.tables?.length || 0)
-        const seatsChanged = (currentPlan.seats?.length || 0) !== (updatedPlan.seats?.length || 0)
-
-        if (venueLayoutChanged || tablesChanged || seatsChanged) {
-          console.log('Syncing currentPlan from seatingPlans:', {
-            venueLayoutChanged,
-            tablesChanged,
-            seatsChanged,
-            newVenueLayout: updatedPlan.venueLayout
-          })
+        if (newUpdatedAt > currentUpdatedAt) {
+          console.log('Syncing currentPlan from seatingPlans (newer version detected)')
           setCurrentPlanState(updatedPlan)
         }
       }
