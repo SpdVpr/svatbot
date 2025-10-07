@@ -331,7 +331,7 @@ export function useBudget(): UseBudgetReturn {
       if (filters.search && !item.name.toLowerCase().includes(filters.search.toLowerCase())) return false
       if (filters.category && !filters.category.includes(item.category)) return false
       if (filters.paymentStatus && !filters.paymentStatus.includes(item.paymentStatus)) return false
-      if (filters.priority && !filters.priority.includes(item.priority)) return false
+      if (filters.priority && item.priority && !filters.priority.includes(item.priority)) return false
       return true
     })
   }
