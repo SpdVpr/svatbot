@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Heart, Plus, X, Calendar, MapPin } from 'lucide-react'
+import { Heart, Plus, X, Calendar, MapPin, Upload, User } from 'lucide-react'
 import { useWeddingStore } from '@/stores/weddingStore'
-import type { StoryContent } from '@/types/wedding-website'
+import { useWeddingImageUpload } from '@/hooks/useWeddingImageUpload'
+import type { StoryContent, PersonProfile } from '@/types/wedding-website'
 
 interface StorySectionEditorProps {
   content: StoryContent
@@ -12,12 +13,42 @@ interface StorySectionEditorProps {
 
 export default function StorySectionEditor({ content, onChange }: StorySectionEditorProps) {
   const { currentWedding: wedding } = useWeddingStore()
+  const { uploadImage, uploading, progress } = useWeddingImageUpload()
 
   const handleInputChange = (field: keyof StoryContent, value: any) => {
     onChange({
       ...content,
       [field]: value
     })
+  }
+
+  // Handle person profile changes
+  const handlePersonChange = (person: 'bride' | 'groom', field: keyof PersonProfile, value: any) => {
+    const currentPerson = content[person] || { name: '', description: '' }
+    handleInputChange(person, {
+      ...currentPerson,
+      [field]: value
+    })
+  }
+
+  // Handle person image upload
+  const handlePersonImageUpload = async (person: 'bride' | 'groom', file: File) => {
+    try {
+      const result = await uploadImage(file, 'wedding-websites')
+      handlePersonChange(person, 'image', result.url)
+    } catch (error) {
+      console.error('Error uploading person image:', error)
+    }
+  }
+
+  // Handle timeline image upload
+  const handleTimelineImageUpload = async (itemId: string, file: File) => {
+    try {
+      const result = await uploadImage(file, 'wedding-websites')
+      updateTimelineItem(itemId, 'image', result.url)
+    } catch (error) {
+      console.error('Error uploading timeline image:', error)
+    }
   }
 
   const addTimelineItem = () => {
@@ -33,12 +64,12 @@ export default function StorySectionEditor({ content, onChange }: StorySectionEd
     handleInputChange('timeline', [...timeline, newItem])
   }
 
-  const updateTimelineItem = (id: string, field: string, value: string) => {
+  const updateTimelineItem = (id: string, field: string, value: string | undefined) => {
     const timeline = content.timeline || []
-    const updatedTimeline = timeline.map(item => 
+    const updatedTimeline = timeline.map(item =>
       item.id === id ? { ...item, [field]: value } : item
     )
-    
+
     handleInputChange('timeline', updatedTimeline)
   }
 
@@ -56,8 +87,8 @@ export default function StorySectionEditor({ content, onChange }: StorySectionEd
     const updatedContent: StoryContent = {
       ...content,
       enabled: true,
-      title: 'Náš příběh',
-      subtitle: 'Jak to všechno začalo...',
+      title: 'Snoubenci a jejich příběh',
+      subtitle: 'Poznejte nás a náš příběh lásky',
       // Můžeme přidat základní timeline pokud neexistuje
       timeline: content.timeline && content.timeline.length > 0 ? content.timeline : [
         {
@@ -127,7 +158,7 @@ export default function StorySectionEditor({ content, onChange }: StorySectionEd
               type="text"
               value={content.title || ''}
               onChange={(e) => handleInputChange('title', e.target.value)}
-              placeholder="Náš příběh"
+              placeholder="Snoubenci a jejich příběh"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
             />
           </div>
@@ -140,22 +171,153 @@ export default function StorySectionEditor({ content, onChange }: StorySectionEd
               type="text"
               value={content.subtitle || ''}
               onChange={(e) => handleInputChange('subtitle', e.target.value)}
-              placeholder="Jak to všechno začalo..."
+              placeholder="Poznejte nás a náš příběh lásky"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
             />
           </div>
+        </div>
+      </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Úvodní text
-            </label>
-            <textarea
-              value={content.description || ''}
-              onChange={(e) => handleInputChange('description', e.target.value)}
-              placeholder="Napište krátký úvod k vašemu příběhu..."
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-            />
+      {/* Medailonky snoubců */}
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <User className="w-5 h-5 text-pink-600" />
+          <h3 className="text-lg font-semibold text-gray-900">Medailonky snoubců</h3>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Nevěsta */}
+          <div className="space-y-4">
+            <h4 className="font-semibold text-gray-900">Nevěsta</h4>
+
+            {/* Fotka nevěsty */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Fotka
+              </label>
+              {content.bride?.image ? (
+                <div className="relative w-32 h-32 mx-auto">
+                  <img
+                    src={content.bride.image}
+                    alt="Nevěsta"
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                  <button
+                    onClick={() => handlePersonChange('bride', 'image', undefined)}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <label className="flex flex-col items-center justify-center w-32 h-32 mx-auto border-2 border-dashed border-gray-300 rounded-full cursor-pointer hover:border-pink-500 transition-colors">
+                  <Upload className="w-8 h-8 text-gray-400" />
+                  <span className="text-xs text-gray-500 mt-2">Nahrát</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (file) handlePersonImageUpload('bride', file)
+                    }}
+                    className="hidden"
+                  />
+                </label>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Jméno
+              </label>
+              <input
+                type="text"
+                value={content.bride?.name || ''}
+                onChange={(e) => handlePersonChange('bride', 'name', e.target.value)}
+                placeholder="Jméno nevěsty"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Popis
+              </label>
+              <textarea
+                value={content.bride?.description || ''}
+                onChange={(e) => handlePersonChange('bride', 'description', e.target.value)}
+                placeholder="Krátký popis nevěsty..."
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+
+          {/* Ženich */}
+          <div className="space-y-4">
+            <h4 className="font-semibold text-gray-900">Ženich</h4>
+
+            {/* Fotka ženicha */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Fotka
+              </label>
+              {content.groom?.image ? (
+                <div className="relative w-32 h-32 mx-auto">
+                  <img
+                    src={content.groom.image}
+                    alt="Ženich"
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                  <button
+                    onClick={() => handlePersonChange('groom', 'image', undefined)}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <label className="flex flex-col items-center justify-center w-32 h-32 mx-auto border-2 border-dashed border-gray-300 rounded-full cursor-pointer hover:border-pink-500 transition-colors">
+                  <Upload className="w-8 h-8 text-gray-400" />
+                  <span className="text-xs text-gray-500 mt-2">Nahrát</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (file) handlePersonImageUpload('groom', file)
+                    }}
+                    className="hidden"
+                  />
+                </label>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Jméno
+              </label>
+              <input
+                type="text"
+                value={content.groom?.name || ''}
+                onChange={(e) => handlePersonChange('groom', 'name', e.target.value)}
+                placeholder="Jméno ženicha"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Popis
+              </label>
+              <textarea
+                value={content.groom?.description || ''}
+                onChange={(e) => handlePersonChange('groom', 'description', e.target.value)}
+                placeholder="Krátký popis ženicha..."
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -209,9 +371,48 @@ export default function StorySectionEditor({ content, onChange }: StorySectionEd
                     rows={2}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                   />
-                  
+
+                  {/* Fotka nebo ikona */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      Fotka (pokud není, zobrazí se ikona):
+                    </label>
+                    {item.image ? (
+                      <div className="flex items-center gap-3">
+                        <div className="w-20 h-20 rounded-full overflow-hidden">
+                          <img
+                            src={item.image}
+                            alt={item.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <button
+                          onClick={() => updateTimelineItem(item.id, 'image', undefined)}
+                          className="text-red-500 hover:text-red-700 text-sm"
+                        >
+                          Odstranit fotku
+                        </button>
+                      </div>
+                    ) : (
+                      <label className="inline-flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-pink-500 transition-colors">
+                        <Upload className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm text-gray-600">Nahrát fotku</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0]
+                            if (file) handleTimelineImageUpload(item.id, file)
+                          }}
+                          className="hidden"
+                          disabled={uploading}
+                        />
+                      </label>
+                    )}
+                  </div>
+
                   <div className="flex items-center gap-3">
-                    <label className="text-sm font-medium text-gray-700">Ikona:</label>
+                    <label className="text-sm font-medium text-gray-700">Ikona (fallback):</label>
                     <div className="flex gap-2">
                       {['👫', '💕', '💍', '🌹', '❤️', '💒', '🥂', '✨'].map((emoji) => (
                         <button

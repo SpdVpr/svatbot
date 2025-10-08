@@ -31,11 +31,21 @@ export interface StoryTimelineItem {
   image?: string
 }
 
+export interface PersonProfile {
+  name: string
+  description: string
+  image?: string
+  hobbies?: string
+  favoriteThings?: string
+}
+
 export interface StoryContent {
   enabled: boolean
   title?: string
   subtitle?: string
   description?: string
+  bride?: PersonProfile
+  groom?: PersonProfile
   howWeMet?: {
     title: string
     text: string
