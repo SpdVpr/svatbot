@@ -58,6 +58,17 @@ export function useMenu(): UseMenuReturn {
   const { user } = useAuth()
   const { wedding } = useWedding()
 
+  // Helper function to remove undefined values from object
+  const removeUndefined = (obj: any): any => {
+    const cleaned: any = {}
+    Object.keys(obj).forEach(key => {
+      if (obj[key] !== undefined) {
+        cleaned[key] = obj[key]
+      }
+    })
+    return cleaned
+  }
+
   // Calculate stats
   const stats: MenuStats = {
     totalMenuItems: menuItems.length,
@@ -92,15 +103,14 @@ export function useMenu(): UseMenuReturn {
       const now = new Date()
 
       // Save to Firestore for all users
-      const menuItemData = {
+      const menuItemData = removeUndefined({
         weddingId: wedding.id,
         ...data,
         totalCost,
-        actualQuantity: undefined,
         currency: 'CZK',
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now()
-      }
+      })
 
       const docRef = await addDoc(collection(db, 'menuItems'), menuItemData)
 
@@ -131,10 +141,10 @@ export function useMenu(): UseMenuReturn {
 
       // Use Firestore for all users
       const itemRef = doc(db, 'menuItems', itemId)
-      await updateDoc(itemRef, {
+      await updateDoc(itemRef, removeUndefined({
         ...updates,
         updatedAt: Timestamp.now()
-      })
+      }))
     } catch (err: any) {
       console.error('Error updating menu item:', err)
       throw new Error('Chyba při aktualizaci položky menu')
@@ -161,15 +171,14 @@ export function useMenu(): UseMenuReturn {
       const now = new Date()
 
       // Save to Firestore for all users
-      const drinkItemData = {
+      const drinkItemData = removeUndefined({
         weddingId: wedding.id,
         ...data,
         totalCost,
-        actualQuantity: undefined,
         currency: 'CZK',
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now()
-      }
+      })
 
       const docRef = await addDoc(collection(db, 'drinkItems'), drinkItemData)
 
@@ -200,10 +209,10 @@ export function useMenu(): UseMenuReturn {
 
       // Use Firestore for all users
       const itemRef = doc(db, 'drinkItems', itemId)
-      await updateDoc(itemRef, {
+      await updateDoc(itemRef, removeUndefined({
         ...updates,
         updatedAt: Timestamp.now()
-      })
+      }))
     } catch (err: any) {
       console.error('Error updating drink item:', err)
       throw new Error('Chyba při aktualizaci nápoje')

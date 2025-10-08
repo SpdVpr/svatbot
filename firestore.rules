@@ -202,10 +202,21 @@ service cloud.firestore {
 
     // Music collection
     match /music/{musicId} {
-      allow read, write, create: if isAuthenticated() &&
-                                    (isDemoUser() ||
-                                     (exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
-                                      get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid));
+      allow read: if isAuthenticated() &&
+                     (isDemoUser() ||
+                      (exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                       get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid));
+
+      allow create: if isAuthenticated() &&
+                       (isDemoUser() ||
+                        (request.resource.data.keys().hasAll(['weddingId']) &&
+                         exists(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)) &&
+                         get(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)).data.userId == request.auth.uid));
+
+      allow update, delete: if isAuthenticated() &&
+                               (isDemoUser() ||
+                                (exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                                 get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid));
     }
 
     // AI Timeline Items collection
