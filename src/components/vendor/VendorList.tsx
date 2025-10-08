@@ -103,6 +103,18 @@ export default function VendorList({
     }
   }
 
+  // Get price type label
+  const getPriceTypeLabel = (priceType: string) => {
+    switch (priceType) {
+      case 'fixed': return 'za službu'
+      case 'hourly': return 'za hodinu'
+      case 'per-person': return 'za osobu'
+      case 'package': return 'balíček'
+      case 'negotiable': return 'dohodou'
+      default: return ''
+    }
+  }
+
   // Get primary contact
   const getPrimaryContact = (vendor: Vendor) => {
     return vendor.contacts.find(contact => contact.isPrimary) || vendor.contacts[0]
@@ -435,17 +447,31 @@ export default function VendorList({
                                               <span>{currencyUtils.formatShort(vendor.priceRange.min)} - {currencyUtils.formatShort(vendor.priceRange.max)}</span>
                                             )}
                                           </div>
+                                          {/* Price type */}
+                                          {serviceWithDiscount.priceType && (
+                                            <div className="text-xs text-gray-500 mt-0.5">
+                                              {getPriceTypeLabel(serviceWithDiscount.priceType)}
+                                            </div>
+                                          )}
                                         </div>
                                       )
                                     }
                                     return null
                                   })() : (
                                     /* No discount - show regular price */
-                                    <div className="text-sm font-medium text-gray-900">
-                                      {vendor.priceRange.min === vendor.priceRange.max ? (
-                                        <span>{currencyUtils.formatShort(vendor.priceRange.min)}</span>
-                                      ) : (
-                                        <span>{currencyUtils.formatShort(vendor.priceRange.min)} - {currencyUtils.formatShort(vendor.priceRange.max)}</span>
+                                    <div>
+                                      <div className="text-sm font-medium text-gray-900">
+                                        {vendor.priceRange.min === vendor.priceRange.max ? (
+                                          <span>{currencyUtils.formatShort(vendor.priceRange.min)}</span>
+                                        ) : (
+                                          <span>{currencyUtils.formatShort(vendor.priceRange.min)} - {currencyUtils.formatShort(vendor.priceRange.max)}</span>
+                                        )}
+                                      </div>
+                                      {/* Price type */}
+                                      {vendor.services.length > 0 && vendor.services[0].priceType && (
+                                        <div className="text-xs text-gray-500 mt-0.5">
+                                          {getPriceTypeLabel(vendor.services[0].priceType)}
+                                        </div>
                                       )}
                                     </div>
                                   )}

@@ -172,7 +172,10 @@ export function useVendor(): UseVendorReturn {
     if (updates.priceRange !== undefined) data.priceRange = updates.priceRange || null
     if (updates.availability !== undefined) data.availability = updates.availability || null
     if (updates.status !== undefined) data.status = updates.status
-    if (updates.priority !== undefined) data.priority = updates.priority || null
+    if (updates.priority !== undefined) {
+      data.priority = updates.priority || null
+      console.log('🔧 Priority update:', { original: updates.priority, converted: data.priority })
+    }
     if (updates.rating !== undefined) data.rating = updates.rating || null
     if (updates.contractId !== undefined) data.contractId = updates.contractId || null
     if (updates.lastContactDate !== undefined) {
@@ -187,8 +190,11 @@ export function useVendor(): UseVendorReturn {
     if (updates.testimonials !== undefined) data.testimonials = updates.testimonials || []
     if (updates.updatedAt !== undefined) data.updatedAt = Timestamp.fromDate(updates.updatedAt)
 
+    console.log('📦 Firestore data before removeUndefined:', data)
     // Remove any undefined values that might have slipped through
-    return removeUndefined(data)
+    const cleaned = removeUndefined(data)
+    console.log('📦 Firestore data after removeUndefined:', cleaned)
+    return cleaned
   }
 
   // Create new vendor
