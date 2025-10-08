@@ -300,11 +300,11 @@ export default function EditAccommodationPage({ params }: EditAccommodationPageP
                   Webové stránky
                 </label>
                 <input
-                  type="url"
+                  type="text"
                   value={formData.contactInfo.website}
                   onChange={(e) => handleInputChange('contactInfo.website', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  placeholder="https://www.hotel.cz"
+                  placeholder="www.hotel.cz"
                 />
               </div>
             </div>

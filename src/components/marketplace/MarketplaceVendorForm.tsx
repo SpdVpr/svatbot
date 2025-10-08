@@ -502,10 +502,10 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData 
                   <div className="relative">
                     <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
-                      type="url"
+                      type="text"
                       value={formData.website}
                       onChange={(e) => handleChange('website', e.target.value)}
-                      placeholder="https://www.vase-stranky.cz"
+                      placeholder="www.vase-stranky.cz"
                       className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     />
                   </div>
@@ -960,10 +960,10 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData 
                       Odkaz na YouTube nebo Vimeo video prezentující vaši práci
                     </p>
                     <input
-                      type="url"
+                      type="text"
                       value={formData.videoUrl}
                       onChange={(e) => handleChange('videoUrl', e.target.value)}
-                      placeholder="https://www.youtube.com/watch?v=..."
+                      placeholder="www.youtube.com/watch?v=..."
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     />
                   </div>

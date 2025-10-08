@@ -368,11 +368,11 @@ function ContactTab({
           Webové stránky
         </label>
         <input
-          type="url"
+          type="text"
           value={formData.website}
           onChange={(e) => onUpdate({ website: e.target.value })}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          placeholder="https://www.firma.cz"
+          placeholder="www.firma.cz"
         />
       </div>
 
