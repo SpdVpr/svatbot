@@ -1714,9 +1714,9 @@ async function createDemoAccount() {
         },
         {
           id: 'bridesmaids-entrance',
-          name: 'Nástup družiček',
-          description: 'Hudba při příchodu družiček',
-          icon: '👰‍♀️',
+          name: 'Nástup svědků/družiček',
+          description: 'Hudba při příchodu svědků a družiček',
+          icon: '🤍',
           required: false,
           songs: []
         },
@@ -1724,8 +1724,8 @@ async function createDemoAccount() {
           id: 'bride-entrance',
           name: 'Nástup nevěsty',
           description: 'Nejdůležitější okamžik - příchod nevěsty',
-          icon: '💍',
-          required: true,
+          icon: '👰‍♀️',
+          required: false,
           songs: [
             {
               id: 'song-1',
@@ -1734,6 +1734,14 @@ async function createDemoAccount() {
               notes: 'Romantická klasika'
             }
           ]
+        },
+        {
+          id: 'ring-exchange',
+          name: 'Nasazování prstýnků',
+          description: 'Hudba při výměně prstenů',
+          icon: '💍',
+          required: false,
+          songs: []
         },
         {
           id: 'signing',
@@ -1745,7 +1753,7 @@ async function createDemoAccount() {
         },
         {
           id: 'congratulations',
-          name: 'Písně pro gratulace',
+          name: 'Gratulace',
           description: 'Hudba při gratulacích hostů',
           icon: '🎉',
           required: false,
@@ -1753,7 +1761,7 @@ async function createDemoAccount() {
         },
         {
           id: 'guard-of-honor',
-          name: 'Šplalíř',
+          name: 'Špalír',
           description: 'Hudba při odchodu novomanželů špalírem',
           icon: '🎊',
           required: false,
@@ -1764,7 +1772,7 @@ async function createDemoAccount() {
           name: 'První tanec',
           description: 'Váš první tanec jako manželé',
           icon: '💃',
-          required: true,
+          required: false,
           songs: [
             {
               id: 'song-2',
@@ -1792,7 +1800,7 @@ async function createDemoAccount() {
         },
         {
           id: 'party-must-have',
-          name: 'Párty - nesmí chybět',
+          name: 'Party písně',
           description: 'Písně, které rozproudí zábavu',
           icon: '🎵',
           required: false,

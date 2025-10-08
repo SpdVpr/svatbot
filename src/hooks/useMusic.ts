@@ -53,9 +53,9 @@ const DEFAULT_CATEGORIES: MusicCategory[] = [
   },
   {
     id: 'bridesmaids-entrance',
-    name: 'Nástup družiček',
-    description: 'Hudba při příchodu družiček',
-    icon: '👰‍♀️',
+    name: 'Nástup svědků/družiček',
+    description: 'Hudba při příchodu svědků a družiček',
+    icon: '🤍',
     songs: [],
     required: false
   },
@@ -63,9 +63,17 @@ const DEFAULT_CATEGORIES: MusicCategory[] = [
     id: 'bride-entrance',
     name: 'Nástup nevěsty',
     description: 'Nejdůležitější okamžik - příchod nevěsty',
+    icon: '👰‍♀️',
+    songs: [],
+    required: false
+  },
+  {
+    id: 'ring-exchange',
+    name: 'Nasazování prstýnků',
+    description: 'Hudba při výměně prstenů',
     icon: '💍',
     songs: [],
-    required: true
+    required: false
   },
   {
     id: 'signing',
@@ -76,14 +84,14 @@ const DEFAULT_CATEGORIES: MusicCategory[] = [
   },
   {
     id: 'congratulations',
-    name: 'Písně pro gratulace',
+    name: 'Gratulace',
     description: 'Hudba při gratulacích hostů',
     icon: '🎉',
     songs: []
   },
   {
     id: 'guard-of-honor',
-    name: 'Šplalíř',
+    name: 'Špalír',
     description: 'Hudba při odchodu novomanželů špalírem',
     icon: '🎊',
     songs: []
@@ -94,7 +102,7 @@ const DEFAULT_CATEGORIES: MusicCategory[] = [
     description: 'Váš první tanec jako manželé',
     icon: '💃',
     songs: [],
-    required: true
+    required: false
   },
   {
     id: 'parent-dance',
@@ -112,7 +120,7 @@ const DEFAULT_CATEGORIES: MusicCategory[] = [
   },
   {
     id: 'party-must-have',
-    name: 'Párty - nesmí chybět',
+    name: 'Party písně',
     description: 'Písně, které rozproudí zábavu',
     icon: '🎵',
     songs: []

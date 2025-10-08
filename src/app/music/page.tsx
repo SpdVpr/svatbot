@@ -101,14 +101,9 @@ function MusicPageContent() {
                   <h1 className="text-2xl font-bold text-gray-900">Svatební hudba</h1>
                   <p className="text-sm text-gray-600">
                     {totalSongs} písní v playlistu
-                    {saving && <span className="ml-2 text-purple-600">• Ukládání...</span>}
                   </p>
                 </div>
               </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              {saving && <Loader2 className="w-4 h-4 text-purple-500 animate-spin" />}
-              <span className="text-sm text-gray-600">Auto-save zapnuto</span>
             </div>
           </div>
         </div>
@@ -235,33 +230,6 @@ function MusicPageContent() {
                   </button>
                 </div>
               )}
-            </div>
-
-            {/* Progress Card */}
-            <div className="wedding-card">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Průběh</h2>
-              <div className="space-y-4">
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gray-600">Povinné kategorie</span>
-                    <span className="text-sm font-medium text-gray-900">
-                      {completedRequired}/{requiredCategories.length}
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2.5">
-                    <div
-                      className="bg-gradient-to-r from-purple-500 to-pink-500 h-2.5 rounded-full transition-all"
-                      style={{ width: `${(completedRequired / requiredCategories.length) * 100}%` }}
-                    />
-                  </div>
-                </div>
-                <div className="pt-4 border-t border-gray-200">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Celkem písní</span>
-                    <span className="font-semibold text-gray-900">{totalSongs}</span>
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* Spotify Tip */}

@@ -39,30 +39,6 @@ export default function FoodDrinksModule() {
           </div>
         </div>
 
-        {/* Food & Drink Stats */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="text-center">
-            <div className="text-sm font-bold text-gray-900">{stats.vegetarianOptions}</div>
-            <div className="text-xs text-gray-500">Vegetariánské</div>
-          </div>
-          <div className="text-center">
-            <div className="text-sm font-bold text-gray-900">{stats.glutenFreeOptions}</div>
-            <div className="text-xs text-gray-500">Bezlepkové</div>
-          </div>
-        </div>
-
-        {/* Drinks Stats */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="text-center">
-            <div className="text-sm font-bold text-gray-900">{stats.alcoholicDrinks}</div>
-            <div className="text-xs text-gray-500">Alkoholické</div>
-          </div>
-          <div className="text-center">
-            <div className="text-sm font-bold text-gray-900">{stats.nonAlcoholicDrinks}</div>
-            <div className="text-xs text-gray-500">Nealko</div>
-          </div>
-        </div>
-
         {/* Status Overview */}
         <div className="bg-gray-50 p-3 rounded-lg">
           <div className="text-sm font-medium text-gray-900 mb-2">Stav příprav</div>
