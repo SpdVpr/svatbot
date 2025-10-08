@@ -404,26 +404,51 @@ export default function VendorList({
                             <div className="text-right">
                               {vendor.priceRange ? (
                                 <div>
-                                  <div className="text-sm font-medium text-gray-900">
-                                    {vendor.priceRange.min === vendor.priceRange.max ? (
-                                      <span>{currencyUtils.formatShort(vendor.priceRange.min)}</span>
-                                    ) : (
-                                      <span>{currencyUtils.formatShort(vendor.priceRange.min)} - {currencyUtils.formatShort(vendor.priceRange.max)}</span>
-                                    )}
-                                  </div>
-                                  {/* Show discount if any service has discountedPrice */}
-                                  {vendor.services.some(s => s.discountedPrice && s.price) && (() => {
+                                  {/* Check if any service has discount */}
+                                  {vendor.services.some(s => s.discountedPrice && s.price) ? (() => {
                                     const serviceWithDiscount = vendor.services.find(s => s.discountedPrice && s.price)
                                     if (serviceWithDiscount && serviceWithDiscount.price && serviceWithDiscount.discountedPrice) {
                                       const discountPercent = Math.round(((serviceWithDiscount.price - serviceWithDiscount.discountedPrice) / serviceWithDiscount.price) * 100)
+                                      // Calculate original price range
+                                      const originalPrices = vendor.services
+                                        .filter(s => s.price && s.price > 0)
+                                        .map(s => s.price!)
+                                      const originalMin = Math.min(...originalPrices)
+                                      const originalMax = Math.max(...originalPrices)
+
                                       return (
-                                        <div className="text-xs text-green-600 font-medium mt-1">
-                                          Sleva {discountPercent}%
+                                        <div>
+                                          {/* Original price (crossed out) with discount percentage */}
+                                          <div className="text-xs text-gray-500 line-through">
+                                            {originalMin === originalMax ? (
+                                              <span>{currencyUtils.formatShort(originalMin)}</span>
+                                            ) : (
+                                              <span>{currencyUtils.formatShort(originalMin)} - {currencyUtils.formatShort(originalMax)}</span>
+                                            )}
+                                            <span className="text-green-600 font-medium ml-1 no-underline">-{discountPercent}%</span>
+                                          </div>
+                                          {/* Discounted price (larger, main) */}
+                                          <div className="text-base font-bold text-gray-900 mt-1">
+                                            {vendor.priceRange.min === vendor.priceRange.max ? (
+                                              <span>{currencyUtils.formatShort(vendor.priceRange.min)}</span>
+                                            ) : (
+                                              <span>{currencyUtils.formatShort(vendor.priceRange.min)} - {currencyUtils.formatShort(vendor.priceRange.max)}</span>
+                                            )}
+                                          </div>
                                         </div>
                                       )
                                     }
                                     return null
-                                  })()}
+                                  })() : (
+                                    /* No discount - show regular price */
+                                    <div className="text-sm font-medium text-gray-900">
+                                      {vendor.priceRange.min === vendor.priceRange.max ? (
+                                        <span>{currencyUtils.formatShort(vendor.priceRange.min)}</span>
+                                      ) : (
+                                        <span>{currencyUtils.formatShort(vendor.priceRange.min)} - {currencyUtils.formatShort(vendor.priceRange.max)}</span>
+                                      )}
+                                    </div>
+                                  )}
                                 </div>
                               ) : vendor.services.some(s => s.priceType === 'negotiable') ? (
                                 <div className="text-sm text-gray-600">Dohodou</div>

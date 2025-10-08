@@ -69,7 +69,7 @@ export function useVendor(): UseVendorReturn {
       priceRange: data.priceRange,
       availability: data.availability,
       status: data.status || 'potential',
-      priority: data.priority || 'medium',
+      priority: (data.priority === 'none' || data.priority === null) ? undefined : data.priority,
       rating: data.rating,
       contractId: data.contractId,
       lastContactDate: data.lastContactDate?.toDate(),
@@ -136,7 +136,7 @@ export function useVendor(): UseVendorReturn {
       priceRange: vendor.priceRange || null,
       availability: vendor.availability || null,
       status: vendor.status,
-      priority: vendor.priority,
+      priority: vendor.priority || null,
       rating: vendor.rating || null,
       contractId: vendor.contractId || null,
       lastContactDate: vendor.lastContactDate ? Timestamp.fromDate(vendor.lastContactDate) : null,
@@ -172,7 +172,7 @@ export function useVendor(): UseVendorReturn {
     if (updates.priceRange !== undefined) data.priceRange = updates.priceRange || null
     if (updates.availability !== undefined) data.availability = updates.availability || null
     if (updates.status !== undefined) data.status = updates.status
-    if (updates.priority !== undefined) data.priority = updates.priority
+    if (updates.priority !== undefined) data.priority = updates.priority || null
     if (updates.rating !== undefined) data.rating = updates.rating || null
     if (updates.contractId !== undefined) data.contractId = updates.contractId || null
     if (updates.lastContactDate !== undefined) {
