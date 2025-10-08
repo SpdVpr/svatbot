@@ -15,6 +15,7 @@ interface WeddingCountdownProps {
   weddingDate: any
   className?: string
   style?: 'modern' | 'classic'
+  compact?: boolean
 }
 
 // Helper funkce pro konverzi data
@@ -35,7 +36,7 @@ const toDate = (date: any): Date | null => {
   return null
 }
 
-export default function WeddingCountdown({ weddingDate, className = '', style = 'modern' }: WeddingCountdownProps) {
+export default function WeddingCountdown({ weddingDate, className = '', style = 'modern', compact = false }: WeddingCountdownProps) {
   const [countdown, setCountdown] = useState<CountdownData | null>(null)
 
   useEffect(() => {
@@ -101,28 +102,42 @@ export default function WeddingCountdown({ weddingDate, className = '', style = 
   return (
     <div className={`text-center ${className}`}>
       {/* Hlavní text */}
-      <div className="mb-6">
-        <h3 className={`text-lg md:text-xl font-semibold mb-2 ${
-          modernStyle ? 'text-gray-700' : 'text-gray-800'
-        }`}>
-          DO SVATBY ZBÝVÁ
-        </h3>
-      </div>
+      {!compact && (
+        <div className="mb-6">
+          <h3 className={`text-lg md:text-xl font-semibold mb-2 ${
+            modernStyle ? 'text-gray-700' : 'text-gray-800'
+          }`}>
+            DO SVATBY ZBÝVÁ
+          </h3>
+        </div>
+      )}
+
+      {compact && (
+        <div className="mb-3">
+          <p className={`text-sm font-medium ${
+            modernStyle ? 'text-gray-600' : 'text-gray-700'
+          }`}>
+            Do svatby zbývá
+          </p>
+        </div>
+      )}
 
       {/* Countdown čísla */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-2xl mx-auto">
+      <div className={`grid grid-cols-2 md:grid-cols-4 ${
+        compact ? 'gap-2 md:gap-3' : 'gap-4 md:gap-6'
+      } max-w-2xl mx-auto`}>
         {/* Dny */}
         <div className={`${
-          modernStyle 
-            ? 'bg-white bg-opacity-90 backdrop-blur-sm border border-gray-200' 
+          modernStyle
+            ? 'bg-white bg-opacity-90 backdrop-blur-sm border border-gray-200'
             : 'bg-gradient-to-br from-pink-50 to-rose-50 border border-pink-200'
-        } rounded-lg p-4 md:p-6 shadow-sm`}>
-          <div className={`text-3xl md:text-4xl font-bold mb-1 ${
+        } rounded-lg ${compact ? 'p-3 md:p-4' : 'p-4 md:p-6'} shadow-sm`}>
+          <div className={`${compact ? 'text-2xl md:text-3xl' : 'text-3xl md:text-4xl'} font-bold mb-1 ${
             modernStyle ? 'text-gray-900' : 'text-pink-600'
           }`}>
             {countdown.days}
           </div>
-          <div className={`text-sm md:text-base font-medium ${
+          <div className={`text-xs md:text-sm font-medium ${
             modernStyle ? 'text-gray-600' : 'text-pink-700'
           }`}>
             DNÍ
@@ -131,16 +146,16 @@ export default function WeddingCountdown({ weddingDate, className = '', style = 
 
         {/* Hodiny */}
         <div className={`${
-          modernStyle 
-            ? 'bg-white bg-opacity-90 backdrop-blur-sm border border-gray-200' 
+          modernStyle
+            ? 'bg-white bg-opacity-90 backdrop-blur-sm border border-gray-200'
             : 'bg-gradient-to-br from-pink-50 to-rose-50 border border-pink-200'
-        } rounded-lg p-4 md:p-6 shadow-sm`}>
-          <div className={`text-3xl md:text-4xl font-bold mb-1 ${
+        } rounded-lg ${compact ? 'p-3 md:p-4' : 'p-4 md:p-6'} shadow-sm`}>
+          <div className={`${compact ? 'text-2xl md:text-3xl' : 'text-3xl md:text-4xl'} font-bold mb-1 ${
             modernStyle ? 'text-gray-900' : 'text-pink-600'
           }`}>
             {countdown.hours}
           </div>
-          <div className={`text-sm md:text-base font-medium ${
+          <div className={`text-xs md:text-sm font-medium ${
             modernStyle ? 'text-gray-600' : 'text-pink-700'
           }`}>
             HODIN
@@ -149,16 +164,16 @@ export default function WeddingCountdown({ weddingDate, className = '', style = 
 
         {/* Minuty */}
         <div className={`${
-          modernStyle 
-            ? 'bg-white bg-opacity-90 backdrop-blur-sm border border-gray-200' 
+          modernStyle
+            ? 'bg-white bg-opacity-90 backdrop-blur-sm border border-gray-200'
             : 'bg-gradient-to-br from-pink-50 to-rose-50 border border-pink-200'
-        } rounded-lg p-4 md:p-6 shadow-sm`}>
-          <div className={`text-3xl md:text-4xl font-bold mb-1 ${
+        } rounded-lg ${compact ? 'p-3 md:p-4' : 'p-4 md:p-6'} shadow-sm`}>
+          <div className={`${compact ? 'text-2xl md:text-3xl' : 'text-3xl md:text-4xl'} font-bold mb-1 ${
             modernStyle ? 'text-gray-900' : 'text-pink-600'
           }`}>
             {countdown.minutes}
           </div>
-          <div className={`text-sm md:text-base font-medium ${
+          <div className={`text-xs md:text-sm font-medium ${
             modernStyle ? 'text-gray-600' : 'text-pink-700'
           }`}>
             MINUT
@@ -167,16 +182,16 @@ export default function WeddingCountdown({ weddingDate, className = '', style = 
 
         {/* Sekundy */}
         <div className={`${
-          modernStyle 
-            ? 'bg-white bg-opacity-90 backdrop-blur-sm border border-gray-200' 
+          modernStyle
+            ? 'bg-white bg-opacity-90 backdrop-blur-sm border border-gray-200'
             : 'bg-gradient-to-br from-pink-50 to-rose-50 border border-pink-200'
-        } rounded-lg p-4 md:p-6 shadow-sm`}>
-          <div className={`text-3xl md:text-4xl font-bold mb-1 ${
+        } rounded-lg ${compact ? 'p-3 md:p-4' : 'p-4 md:p-6'} shadow-sm`}>
+          <div className={`${compact ? 'text-2xl md:text-3xl' : 'text-3xl md:text-4xl'} font-bold mb-1 ${
             modernStyle ? 'text-gray-900' : 'text-pink-600'
           }`}>
             {countdown.seconds}
           </div>
-          <div className={`text-sm md:text-base font-medium ${
+          <div className={`text-xs md:text-sm font-medium ${
             modernStyle ? 'text-gray-600' : 'text-pink-700'
           }`}>
             SEKUND

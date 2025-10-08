@@ -96,16 +96,16 @@ export default function HeroSection({ content }: HeroSectionProps) {
       </div>
 
       {/* Main content */}
-      <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+      <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
         {/* Names */}
-        <div className="mb-8">
-          <h1 className={`text-6xl md:text-8xl font-bold mb-4 font-serif ${
+        <div className="mb-6">
+          <h1 className={`text-5xl md:text-7xl font-bold mb-4 font-serif ${
             mainImage ? 'text-white' : 'text-gray-900'
           }`}>
             {bride && groom ? (
               <>
                 <span className="block">{bride}</span>
-                <span className={`text-4xl md:text-5xl mx-4 ${
+                <span className={`text-3xl md:text-4xl mx-4 ${
                   mainImage ? 'text-amber-200' : 'text-amber-600'
                 }`}>
                   &
@@ -118,14 +118,14 @@ export default function HeroSection({ content }: HeroSectionProps) {
           </h1>
 
           {/* Decorative line */}
-          <div className="flex items-center justify-center my-8">
-            <div className={`h-px w-16 ${
+          <div className="flex items-center justify-center my-6">
+            <div className={`h-px w-12 ${
               mainImage ? 'bg-white' : 'bg-amber-400'
             }`}></div>
-            <Heart className={`w-6 h-6 mx-4 ${
+            <Heart className={`w-5 h-5 mx-3 ${
               mainImage ? 'text-white' : 'text-rose-400'
             }`} />
-            <div className={`h-px w-16 ${
+            <div className={`h-px w-12 ${
               mainImage ? 'bg-white' : 'bg-amber-400'
             }`}></div>
           </div>
@@ -133,14 +133,14 @@ export default function HeroSection({ content }: HeroSectionProps) {
 
         {/* Wedding Date */}
         {weddingDate && (
-          <div className="mb-8">
-            <div className={`inline-flex items-center gap-3 px-6 py-3 rounded-full ${
-              mainImage 
-                ? 'bg-white bg-opacity-20 backdrop-blur-sm text-white' 
+          <div className="mb-6">
+            <div className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full ${
+              mainImage
+                ? 'bg-white bg-opacity-20 backdrop-blur-sm text-white'
                 : 'bg-white shadow-lg text-gray-900'
             }`}>
-              <Calendar className="w-5 h-5" />
-              <span className="text-xl font-semibold">
+              <Calendar className="w-4 h-4" />
+              <span className="text-lg font-semibold">
                 {formatDate(weddingDate)}
               </span>
             </div>
@@ -149,19 +149,20 @@ export default function HeroSection({ content }: HeroSectionProps) {
 
         {/* Countdown */}
         {weddingDate && (
-          <div className="mb-12">
+          <div className="mb-8">
             <WeddingCountdown
               weddingDate={weddingDate}
               style="classic"
-              className="max-w-4xl mx-auto"
+              className="max-w-3xl mx-auto"
+              compact={true}
             />
           </div>
         )}
 
         {/* Tagline */}
         {tagline && (
-          <div className="mb-12">
-            <p className={`text-xl md:text-2xl italic font-light max-w-2xl mx-auto leading-relaxed ${
+          <div className="mb-8">
+            <p className={`text-lg md:text-xl italic font-light max-w-2xl mx-auto leading-relaxed ${
               mainImage ? 'text-white' : 'text-gray-700'
             }`}>
               "{tagline}"

@@ -13,6 +13,13 @@ interface UploadResult {
   size: number
 }
 
+interface CompressionOptions {
+  maxWidth?: number
+  maxHeight?: number
+  quality?: number
+  maxSizeKB?: number
+}
+
 export function useWeddingImageUpload() {
   const [uploading, setUploading] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -22,7 +29,8 @@ export function useWeddingImageUpload() {
 
   const uploadImage = async (
     file: File,
-    folder: string = 'wedding-websites'
+    folder: string = 'wedding-websites',
+    customCompression?: CompressionOptions
   ): Promise<UploadResult> => {
     if (!user) throw new Error('Authentication required')
     if (!wedding) throw new Error('Wedding context required')
@@ -33,11 +41,12 @@ export function useWeddingImageUpload() {
       setProgress(0)
 
       // Compress image before upload
+      // Use custom compression options or defaults
       const compressionOptions = {
-        maxWidth: 1920,
-        maxHeight: 1920,
-        quality: 0.8,
-        maxSizeKB: 1000 // Max 1MB
+        maxWidth: customCompression?.maxWidth ?? 1920,
+        maxHeight: customCompression?.maxHeight ?? 1920,
+        quality: customCompression?.quality ?? 0.8,
+        maxSizeKB: customCompression?.maxSizeKB ?? 1000
       }
 
       console.log(`🖼️ Komprese obrázku: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`)

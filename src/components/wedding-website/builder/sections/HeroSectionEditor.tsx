@@ -70,7 +70,13 @@ export default function HeroSectionEditor({ content, onChange }: HeroSectionEdit
   const handleImageUpload = async (file: File) => {
     try {
       console.log('🖼️ Nahrávání obrázku do Firebase Storage...')
-      const result = await uploadImage(file, 'wedding-websites')
+      // Use higher quality for hero image
+      const result = await uploadImage(file, 'wedding-websites', {
+        maxWidth: 2560,
+        maxHeight: 1440,
+        quality: 0.92,
+        maxSizeKB: 2500 // Max 2.5MB for better quality
+      })
       console.log('✅ Obrázek nahrán:', result.url)
       handleInputChange('mainImage', result.url)
     } catch (error) {
