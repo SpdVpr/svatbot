@@ -493,25 +493,39 @@ export default function VendorForm({ onSubmit, onCancel, initialData, isEditing 
                     </div>
 
                     {/* Price */}
-                    {service.priceType !== 'negotiable' && (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Cena (Kč)
-                        </label>
-                        <input
-                          type="number"
-                          value={service.price || ''}
-                          onChange={(e) => handleServiceChange(index, 'price', parseInt(e.target.value) || undefined)}
-                          placeholder="např. 15000"
-                          min="0"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                          disabled={saving}
-                        />
-                      </div>
-                    )}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Cena (Kč)
+                      </label>
+                      <input
+                        type="number"
+                        value={service.price || ''}
+                        onChange={(e) => handleServiceChange(index, 'price', parseInt(e.target.value) || undefined)}
+                        placeholder="např. 15000"
+                        min="0"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        disabled={saving}
+                      />
+                    </div>
+
+                    {/* Discounted Price */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Po slevě (Kč)
+                      </label>
+                      <input
+                        type="number"
+                        value={service.discountedPrice || ''}
+                        onChange={(e) => handleServiceChange(index, 'discountedPrice', parseInt(e.target.value) || undefined)}
+                        placeholder="např. 12000"
+                        min="0"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        disabled={saving}
+                      />
+                    </div>
 
                     {/* Description */}
-                    <div className={service.priceType === 'negotiable' ? 'md:col-span-2' : ''}>
+                    <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Popis služby
                       </label>

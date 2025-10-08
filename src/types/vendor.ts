@@ -196,6 +196,7 @@ export interface VendorService {
   name: string
   description: string
   price?: number
+  discountedPrice?: number
   priceType: 'fixed' | 'hourly' | 'per-person' | 'package' | 'negotiable'
   duration?: number // minutes
   included: string[]
@@ -439,10 +440,13 @@ export interface VendorFormData {
 
   // Services
   services: {
+    id?: string
     name: string
     description: string
     price?: number
+    discountedPrice?: number
     priceType: 'fixed' | 'hourly' | 'per-person' | 'package' | 'negotiable'
+    included?: string[]
   }[]
 
   // Status
