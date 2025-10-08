@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/stores/authStore'
 import { useWeddingStore } from '@/stores/weddingStore'
 import { useWeddingWebsite } from '@/hooks/useWeddingWebsite'
-import { ArrowLeft, ArrowRight, Save, Eye, Rocket, Home } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Save, Eye, Rocket, Home, ExternalLink } from 'lucide-react'
 import TemplateSelector from '@/components/wedding-website/builder/TemplateSelector'
 import UrlConfigurator from '@/components/wedding-website/builder/UrlConfigurator'
 import ContentEditor from '@/components/wedding-website/builder/ContentEditor'
@@ -63,8 +63,10 @@ export default function WeddingWebsiteBuilderPage() {
       setSelectedTemplate(website.template)
       setCustomUrl(website.customUrl)
       setContent(website.content)
-      // Pokud už web existuje, přejdi na content step
-      setCurrentStep('content')
+      // Pokud už web existuje a jsme na template/url kroku, přejdi na content step
+      if (currentStep === 'template' || currentStep === 'url') {
+        setCurrentStep('content')
+      }
     }
   }, [website])
 
@@ -142,7 +144,8 @@ export default function WeddingWebsiteBuilderPage() {
       await publishWebsite()
       console.log('✅ Website published successfully!')
       alert('Web byl úspěšně publikován! Nyní je dostupný na adrese: ' + customUrl + '.svatbot.cz')
-      // Zůstaneme v builderu, aby uživatel mohl dále editovat
+      // Přejdi na preview krok po publikování
+      setCurrentStep('preview')
     } catch (error) {
       console.error('❌ Error publishing website:', error)
       alert('Chyba při publikování webu')
@@ -284,7 +287,7 @@ export default function WeddingWebsiteBuilderPage() {
           <div className="space-y-6">
             {/* Preview Header */}
             <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-4">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">
                     Náhled webu
@@ -297,10 +300,36 @@ export default function WeddingWebsiteBuilderPage() {
                   <div className="text-sm text-gray-500">
                     Šablona: <span className="font-medium">{selectedTemplate}</span>
                   </div>
-                  <div className="text-sm text-gray-500">
-                    URL: <span className="font-mono text-blue-600">{customUrl}.svatbot.cz</span>
+                </div>
+              </div>
+
+              {/* URL and Open Button */}
+              <div className="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div>
+                  <div className="text-sm font-medium text-blue-900 mb-1">
+                    URL adresa vašeho webu:
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-lg text-blue-600">
+                      https://svatbot.cz/wedding/{customUrl}
+                    </span>
+                    {website?.isPublished && (
+                      <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                        Publikováno
+                      </span>
+                    )}
                   </div>
                 </div>
+                <a
+                  href={`/wedding/${customUrl}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  Otevřít web
+                </a>
               </div>
             </div>
 
