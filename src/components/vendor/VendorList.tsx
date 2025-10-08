@@ -79,7 +79,7 @@ export default function VendorList({
 
   // Get priority color
   const getPriorityColor = (priority?: string) => {
-    if (!priority) return null
+    if (!priority || priority === 'none') return null
 
     switch (priority) {
       case 'critical': return 'bg-red-100 text-red-700'
@@ -92,7 +92,7 @@ export default function VendorList({
 
   // Get priority label
   const getPriorityLabel = (priority?: string) => {
-    if (!priority) return null
+    if (!priority || priority === 'none') return null
 
     switch (priority) {
       case 'critical': return 'Kritická'
@@ -403,12 +403,27 @@ export default function VendorList({
 
                             <div className="text-right">
                               {vendor.priceRange ? (
-                                <div className="text-sm font-medium text-gray-900">
-                                  {vendor.priceRange.min === vendor.priceRange.max ? (
-                                    <span>{currencyUtils.formatShort(vendor.priceRange.min)}</span>
-                                  ) : (
-                                    <span>{currencyUtils.formatShort(vendor.priceRange.min)} - {currencyUtils.formatShort(vendor.priceRange.max)}</span>
-                                  )}
+                                <div>
+                                  <div className="text-sm font-medium text-gray-900">
+                                    {vendor.priceRange.min === vendor.priceRange.max ? (
+                                      <span>{currencyUtils.formatShort(vendor.priceRange.min)}</span>
+                                    ) : (
+                                      <span>{currencyUtils.formatShort(vendor.priceRange.min)} - {currencyUtils.formatShort(vendor.priceRange.max)}</span>
+                                    )}
+                                  </div>
+                                  {/* Show discount if any service has discountedPrice */}
+                                  {vendor.services.some(s => s.discountedPrice && s.price) && (() => {
+                                    const serviceWithDiscount = vendor.services.find(s => s.discountedPrice && s.price)
+                                    if (serviceWithDiscount && serviceWithDiscount.price && serviceWithDiscount.discountedPrice) {
+                                      const discountPercent = Math.round(((serviceWithDiscount.price - serviceWithDiscount.discountedPrice) / serviceWithDiscount.price) * 100)
+                                      return (
+                                        <div className="text-xs text-green-600 font-medium mt-1">
+                                          Sleva {discountPercent}%
+                                        </div>
+                                      )
+                                    }
+                                    return null
+                                  })()}
                                 </div>
                               ) : vendor.services.some(s => s.priceType === 'negotiable') ? (
                                 <div className="text-sm text-gray-600">Dohodou</div>
@@ -419,12 +434,24 @@ export default function VendorList({
                               {/* Show individual service prices if no price range */}
                               {!vendor.priceRange && vendor.services.length > 0 && (
                                 <div className="text-xs text-gray-500 mt-1">
-                                  {vendor.services.slice(0, 2).map((service, idx) => (
-                                    <div key={idx}>
-                                      {service.price ? currencyUtils.formatShort(service.price) :
-                                       service.priceType === 'negotiable' ? 'Dohodou' : 'Bez ceny'}
-                                    </div>
-                                  ))}
+                                  {vendor.services.slice(0, 2).map((service, idx) => {
+                                    const displayPrice = service.discountedPrice || service.price
+                                    const hasDiscount = service.discountedPrice && service.price && service.discountedPrice < service.price
+                                    const discountPercent = hasDiscount && service.price ? Math.round(((service.price - service.discountedPrice!) / service.price) * 100) : 0
+
+                                    return (
+                                      <div key={idx}>
+                                        {displayPrice ? (
+                                          <div>
+                                            <span>{currencyUtils.formatShort(displayPrice)}</span>
+                                            {hasDiscount && (
+                                              <span className="text-green-600 ml-1">(-{discountPercent}%)</span>
+                                            )}
+                                          </div>
+                                        ) : service.priceType === 'negotiable' ? 'Dohodou' : 'Bez ceny'}
+                                      </div>
+                                    )
+                                  })}
                                   {vendor.services.length > 2 && (
                                     <div>+{vendor.services.length - 2} dalších</div>
                                   )}

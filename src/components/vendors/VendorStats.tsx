@@ -42,7 +42,7 @@ export default function VendorStats({
   // Calculate stats from vendors
   const stats = {
     total: vendors.length,
-    confirmed: vendors.filter(v => v.status === 'contracted').length,
+    confirmed: vendors.filter(v => v.status === 'contracted' || v.status === 'confirmed').length,
     booked: vendors.filter(v => v.status === 'booked').length,
     researching: vendors.filter(v => v.status === 'potential').length
   }

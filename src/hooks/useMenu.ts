@@ -103,14 +103,34 @@ export function useMenu(): UseMenuReturn {
       const now = new Date()
 
       // Save to Firestore for all users
-      const menuItemData = removeUndefined({
+      // Build data object without spreading to avoid undefined values
+      const menuItemData: any = {
         weddingId: wedding.id,
-        ...data,
+        name: data.name,
+        category: data.category,
+        estimatedQuantity: data.estimatedQuantity,
+        isVegetarian: data.isVegetarian,
+        isVegan: data.isVegan,
+        isGlutenFree: data.isGlutenFree,
+        isLactoseFree: data.isLactoseFree,
+        allergens: data.allergens,
+        status: data.status,
+        tags: data.tags,
         totalCost,
         currency: 'CZK',
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now()
-      })
+      }
+
+      // Add optional fields only if they are defined
+      if (data.description !== undefined) menuItemData.description = data.description
+      if (data.servingSize !== undefined) menuItemData.servingSize = data.servingSize
+      if (data.pricePerServing !== undefined) menuItemData.pricePerServing = data.pricePerServing
+      if (data.vendorId !== undefined) menuItemData.vendorId = data.vendorId
+      if (data.vendorName !== undefined) menuItemData.vendorName = data.vendorName
+      if (data.servingStyle !== undefined) menuItemData.servingStyle = data.servingStyle
+      if (data.servingTime !== undefined) menuItemData.servingTime = data.servingTime
+      if (data.notes !== undefined) menuItemData.notes = data.notes
 
       const docRef = await addDoc(collection(db, 'menuItems'), menuItemData)
 
@@ -171,14 +191,31 @@ export function useMenu(): UseMenuReturn {
       const now = new Date()
 
       // Save to Firestore for all users
-      const drinkItemData = removeUndefined({
+      // Build data object without spreading to avoid undefined values
+      const drinkItemData: any = {
         weddingId: wedding.id,
-        ...data,
+        name: data.name,
+        category: data.category,
+        estimatedQuantity: data.estimatedQuantity,
+        isAlcoholic: data.isAlcoholic,
+        status: data.status,
+        tags: data.tags,
         totalCost,
         currency: 'CZK',
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now()
-      })
+      }
+
+      // Add optional fields only if they are defined
+      if (data.description !== undefined) drinkItemData.description = data.description
+      if (data.brand !== undefined) drinkItemData.brand = data.brand
+      if (data.volume !== undefined) drinkItemData.volume = data.volume
+      if (data.pricePerUnit !== undefined) drinkItemData.pricePerUnit = data.pricePerUnit
+      if (data.vendorId !== undefined) drinkItemData.vendorId = data.vendorId
+      if (data.vendorName !== undefined) drinkItemData.vendorName = data.vendorName
+      if (data.servingTime !== undefined) drinkItemData.servingTime = data.servingTime
+      if (data.alcoholContent !== undefined) drinkItemData.alcoholContent = data.alcoholContent
+      if (data.notes !== undefined) drinkItemData.notes = data.notes
 
       const docRef = await addDoc(collection(db, 'drinkItems'), drinkItemData)
 

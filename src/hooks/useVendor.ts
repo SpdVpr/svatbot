@@ -201,10 +201,13 @@ export function useVendor(): UseVendorReturn {
       setError(null)
       setLoading(true)
 
-      // Calculate price range from services
+      // Calculate price range from services (use discountedPrice if available)
       const servicePrices = data.services
-        .filter(service => service.price && service.price > 0)
-        .map(service => service.price!)
+        .filter(service => {
+          const price = service.discountedPrice || service.price
+          return price && price > 0
+        })
+        .map(service => service.discountedPrice || service.price!)
 
       const priceRange = servicePrices.length > 0 ? {
         min: Math.min(...servicePrices),
@@ -234,6 +237,7 @@ export function useVendor(): UseVendorReturn {
           name: service.name,
           description: service.description,
           price: service.price,
+          discountedPrice: service.discountedPrice,
           priceType: service.priceType,
           included: [],
           duration: undefined
@@ -335,12 +339,15 @@ export function useVendor(): UseVendorReturn {
     try {
       setError(null)
 
-      // Calculate price range if services are being updated
+      // Calculate price range if services are being updated (use discountedPrice if available)
       let priceRange = updates.priceRange
       if (updates.services) {
         const servicePrices = updates.services
-          .filter(service => service.price && service.price > 0)
-          .map(service => service.price!)
+          .filter(service => {
+            const price = service.discountedPrice || service.price
+            return price && price > 0
+          })
+          .map(service => service.discountedPrice || service.price!)
 
         priceRange = servicePrices.length > 0 ? {
           min: Math.min(...servicePrices),

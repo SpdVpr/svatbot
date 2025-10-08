@@ -144,6 +144,7 @@ export type VendorStatus =
   | 'quote-received'  // Obdržena nabídka
   | 'negotiating'     // Vyjednávání
   | 'booked'          // Rezervován
+  | 'confirmed'       // Potvrzeno
   | 'contracted'      // Smlouva podepsána
   | 'cancelled'       // Zrušeno
   | 'completed'       // Dokončeno
@@ -599,12 +600,17 @@ export const VENDOR_STATUSES = {
   },
   booked: {
     name: 'Rezervován',
-    color: 'bg-green-100 text-green-700',
+    color: 'bg-orange-100 text-orange-700',
     description: 'Rezervován pro svatbu'
+  },
+  confirmed: {
+    name: 'Potvrzeno',
+    color: 'bg-green-100 text-green-700',
+    description: 'Spolupráce potvrzena'
   },
   contracted: {
     name: 'Smlouva podepsána',
-    color: 'bg-emerald-100 text-emerald-700',
+    color: 'bg-green-100 text-green-700',
     description: 'Smlouva je podepsána'
   },
   cancelled: {
