@@ -350,7 +350,7 @@ export function useTask(): UseTaskReturn {
     return tasks.filter(task => {
       if (filters.status && !filters.status.includes(task.status)) return false
       if (filters.category && !filters.category.includes(task.category)) return false
-      if (filters.priority && !filters.priority.includes(task.priority)) return false
+      if (filters.priority && task.priority && !filters.priority.includes(task.priority)) return false
       if (filters.assignedTo && task.assignedTo !== filters.assignedTo) return false
       if (filters.search && !task.title.toLowerCase().includes(filters.search.toLowerCase())) return false
       if (filters.dueDateFrom && task.dueDate && task.dueDate < filters.dueDateFrom) return false

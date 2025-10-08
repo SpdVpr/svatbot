@@ -237,7 +237,10 @@ export default function AccommodationPage() {
             {filteredAccommodations.map((accommodation) => (
               <div key={accommodation.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
                 {/* Image */}
-                <div className="h-48 bg-gray-200 relative">
+                <div
+                  className="h-48 bg-gray-200 relative cursor-pointer hover:opacity-90 transition-opacity"
+                  onClick={() => router.push(`/accommodation/${accommodation.id}`)}
+                >
                   {accommodation.images.length > 0 ? (
                     <img
                       src={accommodation.images[0]}
@@ -251,8 +254,8 @@ export default function AccommodationPage() {
                   )}
                   <div className="absolute top-4 right-4">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      accommodation.isActive 
-                        ? 'bg-green-100 text-green-800' 
+                      accommodation.isActive
+                        ? 'bg-green-100 text-green-800'
                         : 'bg-red-100 text-red-800'
                     }`}>
                       {accommodation.isActive ? 'Aktivní' : 'Neaktivní'}

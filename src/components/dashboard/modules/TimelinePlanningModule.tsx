@@ -51,23 +51,6 @@ export default function TimelinePlanningModule() {
             <div className="text-xs text-gray-500">Zbývá</div>
           </div>
         </div>
-
-        {/* Current Phase */}
-        <div className="bg-gray-50 p-3 rounded-lg">
-          <div className="text-sm font-medium text-gray-900 mb-1">Aktuální fáze</div>
-          <div className="text-xs text-gray-600">
-            {stats.totalMilestones === 0
-              ? 'Žádné milníky'
-              : stats.overallProgress < 20
-                ? 'Základní plánování'
-                : stats.overallProgress < 50
-                  ? 'Hlavní přípravy'
-                  : stats.overallProgress < 80
-                    ? 'Finální detaily'
-                    : 'Dokončování'
-            }
-          </div>
-        </div>
       </div>
 
       <div className="mt-4 pt-4 border-t border-gray-200">

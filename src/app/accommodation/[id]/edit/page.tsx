@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, Building2, Save, MapPin, Phone, Mail, Globe, Plus, X } from 'lucide-react'
 import { useAccommodation, type AccommodationFormData } from '@/hooks/useAccommodation'
 import AccommodationImageUpload from '@/components/accommodation/AccommodationImageUpload'
+import { ensureUrlProtocol } from '@/utils/url'
 
 interface EditAccommodationPageProps {
   params: {
@@ -108,7 +109,7 @@ export default function EditAccommodationPage({ params }: EditAccommodationPageP
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!accommodation) {
       alert('Ubytování nenalezeno')
       return
@@ -116,13 +117,18 @@ export default function EditAccommodationPage({ params }: EditAccommodationPageP
 
     try {
       setSaving(true)
-      
-      // Include accommodation images in form data
+
+      // Include accommodation images in form data and ensure website has protocol
       const accommodationDataWithImages = {
         ...formData,
+        website: formData.website ? ensureUrlProtocol(formData.website) : '',
+        contactInfo: {
+          ...formData.contactInfo,
+          website: formData.contactInfo?.website ? ensureUrlProtocol(formData.contactInfo.website) : ''
+        },
         images: accommodationImages
       }
-      
+
       await updateAccommodation(accommodation.id, accommodationDataWithImages)
       router.push(`/accommodation/${accommodation.id}`)
     } catch (error) {

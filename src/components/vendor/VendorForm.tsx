@@ -17,6 +17,7 @@ import {
   DollarSign
 } from 'lucide-react'
 import { VendorFormData, VendorCategory, VendorStatus, VENDOR_CATEGORIES, VENDOR_STATUSES } from '@/types/vendor'
+import { ensureUrlProtocol } from '@/utils/url'
 
 interface VendorFormProps {
   onSubmit: (data: VendorFormData) => Promise<void>
@@ -48,7 +49,7 @@ export default function VendorForm({ onSubmit, onCancel, initialData, isEditing 
       priceType: 'fixed'
     }],
     status: initialData?.status || 'potential',
-    priority: initialData?.priority || 'medium',
+    priority: initialData?.priority || undefined,
     notes: initialData?.notes || '',
     tags: initialData?.tags || []
   })
@@ -83,9 +84,7 @@ export default function VendorForm({ onSubmit, onCancel, initialData, isEditing 
       newErrors.contactPhone = 'Neplatný formát telefonu'
     }
 
-    if (formData.website && !/^https?:\/\/.+/.test(formData.website)) {
-      newErrors.website = 'Webová stránka musí začínat http:// nebo https://'
-    }
+    // Website validation is now handled by ensureUrlProtocol
 
     // Validate services
     formData.services.forEach((service, index) => {
@@ -108,7 +107,12 @@ export default function VendorForm({ onSubmit, onCancel, initialData, isEditing 
 
     try {
       setSaving(true)
-      await onSubmit(formData)
+      // Ensure website has protocol before submitting
+      const dataToSubmit = {
+        ...formData,
+        website: formData.website ? ensureUrlProtocol(formData.website) : ''
+      }
+      await onSubmit(dataToSubmit)
     } catch (error) {
       console.error('Error saving vendor:', error)
       setErrors({ general: 'Chyba při ukládání dodavatele' })
@@ -264,21 +268,6 @@ export default function VendorForm({ onSubmit, onCancel, initialData, isEditing 
                     </option>
                   ))}
                 </select>
-              </div>
-
-              {/* Business Name */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Obchodní název
-                </label>
-                <input
-                  type="text"
-                  value={formData.businessName}
-                  onChange={(e) => handleChange('businessName', e.target.value)}
-                  placeholder="např. Studio Foto Praha s.r.o."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  disabled={saving}
-                />
               </div>
 
               {/* Website */}
@@ -438,24 +427,6 @@ export default function VendorForm({ onSubmit, onCancel, initialData, isEditing 
                 />
               </div>
             </div>
-
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Region
-              </label>
-              <select
-                value={formData.address?.region || 'Praha'}
-                onChange={(e) => handleNestedChange('address', 'region', e.target.value)}
-                className="w-full md:w-1/3 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                disabled={saving}
-              >
-                {regions.map((region) => (
-                  <option key={region} value={region}>
-                    {region}
-                  </option>
-                ))}
-              </select>
-            </div>
           </div>
 
           {/* Services */}
@@ -603,11 +574,12 @@ export default function VendorForm({ onSubmit, onCancel, initialData, isEditing 
                   Priorita
                 </label>
                 <select
-                  value={formData.priority}
-                  onChange={(e) => handleChange('priority', e.target.value)}
+                  value={formData.priority || 'none'}
+                  onChange={(e) => handleChange('priority', e.target.value === 'none' ? undefined : e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   disabled={saving}
                 >
+                  <option value="none">Bez priority</option>
                   <option value="low">Nízká</option>
                   <option value="medium">Střední</option>
                   <option value="high">Vysoká</option>
@@ -615,74 +587,6 @@ export default function VendorForm({ onSubmit, onCancel, initialData, isEditing 
                 </select>
               </div>
             </div>
-          </div>
-
-          {/* Tags */}
-          <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center space-x-2">
-              <Tag className="w-5 h-5" />
-              <span>Štítky</span>
-            </h3>
-
-            <div className="space-y-3">
-              {/* Existing tags */}
-              {formData.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {formData.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-primary-100 text-primary-700"
-                    >
-                      {tag}
-                      <button
-                        type="button"
-                        onClick={() => removeTag(tag)}
-                        className="ml-2 text-primary-500 hover:text-primary-700"
-                        disabled={saving}
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {/* Add new tag */}
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  value={newTag}
-                  onChange={(e) => setNewTag(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                  placeholder="Přidat štítek..."
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  disabled={saving}
-                />
-                <button
-                  type="button"
-                  onClick={addTag}
-                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-                  disabled={saving || !newTag.trim()}
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Notes */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Poznámky
-            </label>
-            <textarea
-              value={formData.notes}
-              onChange={(e) => handleChange('notes', e.target.value)}
-              placeholder="Dodatečné poznámky o dodavateli..."
-              rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              disabled={saving}
-            />
           </div>
 
           {/* Actions */}

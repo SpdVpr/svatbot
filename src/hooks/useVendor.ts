@@ -379,7 +379,7 @@ export function useVendor(): UseVendorReturn {
       if (filters.search && !vendor.name.toLowerCase().includes(filters.search.toLowerCase())) return false
       if (filters.category && !filters.category.includes(vendor.category)) return false
       if (filters.status && !filters.status.includes(vendor.status)) return false
-      if (filters.priority && !filters.priority.includes(vendor.priority)) return false
+      if (filters.priority && vendor.priority && !filters.priority.includes(vendor.priority)) return false
       if (filters.hasContract !== undefined && (!!vendor.contractId) !== filters.hasContract) return false
       if (filters.showCompleted === false && vendor.status === 'completed') return false
       return true

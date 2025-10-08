@@ -289,7 +289,7 @@ export interface Vendor {
 
   // Status and progress
   status: VendorStatus
-  priority: 'low' | 'medium' | 'high' | 'critical'
+  priority?: 'low' | 'medium' | 'high' | 'critical'
 
   // Ratings and reviews
   rating?: VendorRating
@@ -447,7 +447,7 @@ export interface VendorFormData {
 
   // Status
   status: VendorStatus
-  priority: 'low' | 'medium' | 'high' | 'critical'
+  priority?: 'low' | 'medium' | 'high' | 'critical'
 
   // Notes
   notes?: string

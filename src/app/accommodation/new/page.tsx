@@ -6,6 +6,7 @@ import { ArrowLeft, Building2, Save, MapPin, Phone, Mail, Globe, Plus, X } from 
 import { useAccommodation } from '@/hooks/useAccommodation'
 import type { AccommodationFormData } from '@/hooks/useAccommodation'
 import AccommodationImageUpload from '@/components/accommodation/AccommodationImageUpload'
+import { ensureUrlProtocol } from '@/utils/url'
 
 export default function NewAccommodationPage() {
   const router = useRouter()
@@ -104,9 +105,14 @@ export default function NewAccommodationPage() {
     e.preventDefault()
 
     try {
-      // Include accommodation images in form data
+      // Include accommodation images in form data and ensure website has protocol
       const accommodationDataWithImages = {
         ...formData,
+        website: formData.website ? ensureUrlProtocol(formData.website) : '',
+        contactInfo: {
+          ...formData.contactInfo,
+          website: formData.contactInfo?.website ? ensureUrlProtocol(formData.contactInfo.website) : ''
+        },
         images: accommodationImages
       }
 

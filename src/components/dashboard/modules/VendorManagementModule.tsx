@@ -54,21 +54,6 @@ export default function VendorManagementModule() {
             <div className="text-xs text-gray-500">Kontaktováno</div>
           </div>
         </div>
-
-        {/* Categories Needed */}
-        <div className="bg-gray-50 p-3 rounded-lg">
-          <div className="text-sm font-medium text-gray-900 mb-2">Potřebné kategorie</div>
-          <div className="flex flex-wrap gap-1">
-            {['Fotograf', 'Místo konání', 'Catering', 'Hudba'].map((category, index) => (
-              <span 
-                key={index}
-                className="text-xs px-2 py-1 bg-white border border-gray-200 rounded-full text-gray-600"
-              >
-                {category}
-              </span>
-            ))}
-          </div>
-        </div>
       </div>
 
       <div className="mt-4 pt-4 border-t border-gray-200">

@@ -21,6 +21,7 @@ import {
   Tag,
   Settings
 } from 'lucide-react'
+import { ensureUrlProtocol } from '@/utils/url'
 
 interface VendorEditFormProps {
   formData: VendorFormData
@@ -56,7 +57,12 @@ export default function VendorEditForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const success = await onSave(formData)
+    // Ensure website has protocol before saving
+    const dataToSave = {
+      ...formData,
+      website: formData.website ? ensureUrlProtocol(formData.website) : ''
+    }
+    const success = await onSave(dataToSave)
     if (success && isNew) {
       // Redirect to vendors list or show success message
     }

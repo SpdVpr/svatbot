@@ -148,7 +148,8 @@ class AnalyticsService {
     }, {} as Record<string, number>)
 
     const byPriority = tasks.reduce((acc, task) => {
-      acc[task.priority] = (acc[task.priority] || 0) + 1
+      const priority = task.priority || 'none'
+      acc[priority] = (acc[priority] || 0) + 1
       return acc
     }, {} as Record<string, number>)
 

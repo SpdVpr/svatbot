@@ -21,7 +21,7 @@ export interface Task {
   description?: string
   category: TaskCategory
   status: TaskStatus
-  priority: TaskPriority
+  priority?: TaskPriority
   dueDate?: Date
   completedAt?: Date
   assignedTo?: string // User ID or name
@@ -139,7 +139,7 @@ export interface TaskFormData {
   title: string
   description: string
   category: TaskCategory
-  priority: TaskPriority
+  priority?: TaskPriority
   dueDate?: Date
   assignedTo?: string
   notes?: string

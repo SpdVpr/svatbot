@@ -30,7 +30,7 @@ export default function TaskForm({
     title: initialData?.title || '',
     description: initialData?.description || '',
     category: initialData?.category || 'custom',
-    priority: initialData?.priority || 'medium',
+    priority: initialData?.priority || undefined,
     dueDate: initialData?.dueDate,
     assignedTo: initialData?.assignedTo || '',
     notes: initialData?.notes || ''
@@ -101,6 +101,7 @@ export default function TaskForm({
 
   // Priority options
   const priorityOptions = [
+    { value: 'none', label: 'Bez priority', color: 'text-gray-400', bg: 'bg-gray-50' },
     { value: 'low', label: 'Nízká', color: 'text-gray-600', bg: 'bg-gray-100' },
     { value: 'medium', label: 'Střední', color: 'text-yellow-600', bg: 'bg-yellow-100' },
     { value: 'high', label: 'Vysoká', color: 'text-orange-600', bg: 'bg-orange-100' },
@@ -203,8 +204,8 @@ export default function TaskForm({
                 Priorita
               </label>
               <select
-                value={formData.priority}
-                onChange={(e) => handleChange('priority', e.target.value as TaskPriority)}
+                value={formData.priority || 'none'}
+                onChange={(e) => handleChange('priority', e.target.value === 'none' ? undefined : e.target.value as TaskPriority)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 disabled={loading}
               >
@@ -214,12 +215,14 @@ export default function TaskForm({
                   </option>
                 ))}
               </select>
-              <div className="mt-1 flex items-center space-x-1">
-                <Flag className={`w-3 h-3 ${priorityOptions.find(opt => opt.value === formData.priority)?.color}`} />
-                <span className="text-xs text-gray-500">
-                  {priorityOptions.find(opt => opt.value === formData.priority)?.label} priorita
-                </span>
-              </div>
+              {formData.priority && (
+                <div className="mt-1 flex items-center space-x-1">
+                  <Flag className={`w-3 h-3 ${priorityOptions.find(opt => opt.value === formData.priority)?.color}`} />
+                  <span className="text-xs text-gray-500">
+                    {priorityOptions.find(opt => opt.value === formData.priority)?.label} priorita
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 

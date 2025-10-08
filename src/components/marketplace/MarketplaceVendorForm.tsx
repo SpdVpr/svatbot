@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import { VendorCategory, VENDOR_CATEGORIES } from '@/types/vendor'
 import ImageUploadSection from './ImageUploadSection'
+import { ensureUrlProtocol } from '@/utils/url'
 
 export interface MarketplaceVendorFormData {
   // Basic info
@@ -219,7 +220,13 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData 
 
     try {
       setSaving(true)
-      await onSubmit(formData)
+      // Ensure URLs have protocol before submitting
+      const dataToSubmit = {
+        ...formData,
+        website: formData.website ? ensureUrlProtocol(formData.website) : undefined,
+        videoUrl: formData.videoUrl ? ensureUrlProtocol(formData.videoUrl) : undefined
+      }
+      await onSubmit(dataToSubmit)
     } catch (error) {
       console.error('Error saving vendor:', error)
       setErrors({ general: 'Chyba při ukládání inzerátu' })

@@ -67,6 +67,8 @@ export default function TaskCard({
 
   // Get priority display
   const getPriorityDisplay = () => {
+    if (!task.priority) return null
+
     switch (task.priority) {
       case 'urgent':
         return { color: 'text-red-600', bg: 'bg-red-100', label: 'Urgentní' }
@@ -77,7 +79,7 @@ export default function TaskCard({
       case 'low':
         return { color: 'text-gray-600', bg: 'bg-gray-100', label: 'Nízká' }
       default:
-        return { color: 'text-gray-600', bg: 'bg-gray-100', label: 'Nízká' }
+        return null
     }
   }
 
@@ -224,7 +226,7 @@ export default function TaskCard({
               {task.title}
             </h4>
 
-            {!compact && (
+            {!compact && priorityDisplay && (
               <div className={`
                 flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium ml-2
                 ${priorityDisplay.bg} ${priorityDisplay.color}
@@ -267,7 +269,7 @@ export default function TaskCard({
             </div>
 
             {/* Priority for compact mode */}
-            {compact && (
+            {compact && priorityDisplay && (
               <div className={`
                 flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium
                 ${priorityDisplay.bg} ${priorityDisplay.color}

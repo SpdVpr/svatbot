@@ -93,7 +93,7 @@ export default function TaskList({
     }
 
     // Priority filter
-    if (filters.priority && !filters.priority.includes(task.priority)) {
+    if (filters.priority && task.priority && !filters.priority.includes(task.priority)) {
       return false
     }
 
@@ -129,7 +129,9 @@ export default function TaskList({
   })
 
   // Get priority icon and color
-  const getPriorityDisplay = (priority: string) => {
+  const getPriorityDisplay = (priority?: string) => {
+    if (!priority) return null
+
     switch (priority) {
       case 'urgent':
         return { icon: AlertTriangle, color: 'text-red-500', bg: 'bg-red-50' }
@@ -140,7 +142,7 @@ export default function TaskList({
       case 'low':
         return { icon: Flag, color: 'text-gray-400', bg: 'bg-gray-50' }
       default:
-        return { icon: Flag, color: 'text-gray-400', bg: 'bg-gray-50' }
+        return null
     }
   }
 
@@ -416,12 +418,14 @@ export default function TaskList({
                           </div>
 
                           {/* Priority indicator */}
-                          <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${priorityDisplay.bg}`}>
-                            <priorityDisplay.icon className={`w-3 h-3 ${priorityDisplay.color}`} />
-                            <span className={`text-xs font-medium ${priorityDisplay.color}`}>
-                              {task.priority}
-                            </span>
-                          </div>
+                          {priorityDisplay && (
+                            <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${priorityDisplay.bg}`}>
+                              <priorityDisplay.icon className={`w-3 h-3 ${priorityDisplay.color}`} />
+                              <span className={`text-xs font-medium ${priorityDisplay.color}`}>
+                                {task.priority}
+                              </span>
+                            </div>
+                          )}
                         </div>
 
                         {/* Task metadata */}
@@ -486,7 +490,7 @@ function groupTasksBy(tasks: Task[], groupBy: string): Record<string, Task[]> {
         key = task.status
         break
       case 'priority':
-        key = task.priority
+        key = task.priority || 'Bez priority'
         break
       case 'due-date':
         if (!task.dueDate) {

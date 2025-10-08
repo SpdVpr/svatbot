@@ -51,7 +51,7 @@ export default function VendorList({
     if (filters.search && !vendor.name.toLowerCase().includes(filters.search.toLowerCase())) return false
     if (filters.category && !filters.category.includes(vendor.category)) return false
     if (filters.status && !filters.status.includes(vendor.status)) return false
-    if (filters.priority && !filters.priority.includes(vendor.priority)) return false
+    if (filters.priority && vendor.priority && !filters.priority.includes(vendor.priority)) return false
     if (filters.hasContract !== undefined && (!!vendor.contractId) !== filters.hasContract) return false
     if (filters.showCompleted === false && vendor.status === 'completed') return false
     return true
@@ -78,13 +78,28 @@ export default function VendorList({
   }
 
   // Get priority color
-  const getPriorityColor = (priority: string) => {
+  const getPriorityColor = (priority?: string) => {
+    if (!priority) return null
+
     switch (priority) {
       case 'critical': return 'bg-red-100 text-red-700'
       case 'high': return 'bg-orange-100 text-orange-700'
       case 'medium': return 'bg-yellow-100 text-yellow-700'
       case 'low': return 'bg-green-100 text-green-700'
-      default: return 'bg-gray-100 text-gray-700'
+      default: return null
+    }
+  }
+
+  // Get priority label
+  const getPriorityLabel = (priority?: string) => {
+    if (!priority) return null
+
+    switch (priority) {
+      case 'critical': return 'Kritická'
+      case 'high': return 'Vysoká'
+      case 'medium': return 'Střední'
+      case 'low': return 'Nízká'
+      default: return null
     }
   }
 
@@ -201,6 +216,7 @@ export default function VendorList({
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >
                 <option value="">Všechny priority</option>
+                <option value="none">Bez priority</option>
                 <option value="critical">Kritická</option>
                 <option value="high">Vysoká</option>
                 <option value="medium">Střední</option>
@@ -321,11 +337,11 @@ export default function VendorList({
                           </span>
 
                           {/* Priority Badge */}
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(vendor.priority)}`}>
-                            {vendor.priority === 'critical' ? 'Kritická' :
-                             vendor.priority === 'high' ? 'Vysoká' :
-                             vendor.priority === 'medium' ? 'Střední' : 'Nízká'}
-                          </span>
+                          {getPriorityColor(vendor.priority) && (
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(vendor.priority)}`}>
+                              {getPriorityLabel(vendor.priority)}
+                            </span>
+                          )}
                         </div>
 
                         <p className="text-sm text-gray-600 mb-3">
