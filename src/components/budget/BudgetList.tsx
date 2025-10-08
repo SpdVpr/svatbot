@@ -154,6 +154,10 @@ export default function BudgetList({
         return { icon: '🏦', label: 'Převod', color: 'text-purple-600', bg: 'bg-purple-50' }
       case 'invoice':
         return { icon: '📝', label: 'Faktura', color: 'text-orange-600', bg: 'bg-orange-50' }
+      case 'after_wedding':
+        return { icon: '💒', label: 'Po svatbě', color: 'text-pink-600', bg: 'bg-pink-50' }
+      case 'at_wedding':
+        return { icon: '🎉', label: 'Na svatbě', color: 'text-rose-600', bg: 'bg-rose-50' }
       case 'other':
         return { icon: '💰', label: 'Jiné', color: 'text-gray-600', bg: 'bg-gray-50' }
       default:
@@ -493,6 +497,33 @@ export default function BudgetList({
                             </p>
                           </div>
                         </div>
+
+                        {/* Sub-items breakdown */}
+                        {item.subItems && item.subItems.length > 0 && (
+                          <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-sm font-medium text-blue-900">
+                                Rozdělení položky ({item.subItems.length})
+                              </span>
+                              <span className="text-sm font-bold text-blue-600">
+                                Celkem: {formatCurrency(item.subItems.reduce((sum, sub) => sum + sub.amount, 0), item.currency)}
+                              </span>
+                            </div>
+                            <div className="space-y-1">
+                              {item.subItems.map((subItem, index) => (
+                                <div key={subItem.id} className="flex items-center justify-between text-sm">
+                                  <span className="text-blue-800">
+                                    {index + 1}. {subItem.name}
+                                    {subItem.notes && <span className="text-blue-600 ml-1">({subItem.notes})</span>}
+                                  </span>
+                                  <span className="font-medium text-blue-900">
+                                    {formatCurrency(subItem.amount, subItem.currency)}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
 
                         {/* Vendor and dates */}
                         <div className="flex items-center space-x-4 text-sm text-gray-600">

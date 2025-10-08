@@ -87,7 +87,8 @@ export default function BudgetPage() {
         notes: data.notes,
         tags: data.tags,
         isEstimate: data.isEstimate,
-        payments: data.payments
+        payments: data.payments,
+        subItems: data.subItems
       }
 
       await updateBudgetItem(editingItem.id, updateData)
@@ -385,7 +386,8 @@ export default function BudgetPage() {
             notes: editingItem.notes,
             tags: editingItem.tags,
             isEstimate: editingItem.isEstimate,
-            payments: editingItem.payments
+            payments: editingItem.payments,
+            subItems: editingItem.subItems
           } : undefined}
         />
       )}

@@ -11,7 +11,12 @@ import {
   Grid3X3,
   Users,
   BarChart3,
-  Home
+  Home,
+  MousePointer2,
+  MousePointerClick,
+  Trash2,
+  Info,
+  Move
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -237,7 +242,45 @@ export default function SeatingPage() {
           </div>
         ) : currentPlan ? (
           /* Seating plan editor */
-          <SeatingPlanEditor currentPlan={currentPlan} />
+          <>
+            {/* Legend / Instructions */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <div className="flex items-start space-x-3">
+                <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <h3 className="font-medium text-blue-900 mb-3">Ovládání editoru</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-blue-800">
+                    <div className="flex items-start space-x-2">
+                      <MousePointerClick className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <span className="font-medium">Dvojklik na stůl:</span> Úprava stolu (název, kapacita, tvar)
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-2">
+                      <MousePointer2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <span className="font-medium">Levý klik na číslo židle:</span> Přiřazení hosta na místo
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-2">
+                      <Trash2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <span className="font-medium">Pravý klik na židli:</span> Smazání židle ze stolu
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-2">
+                      <Move className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <span className="font-medium">Tažení stolu:</span> Přesunutí stolu na jiné místo
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <SeatingPlanEditor currentPlan={currentPlan} />
+          </>
         ) : (
           /* Plan selection */
           <div className="text-center py-12">
