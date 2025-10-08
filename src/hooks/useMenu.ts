@@ -91,30 +91,7 @@ export function useMenu(): UseMenuReturn {
       const totalCost = (data.pricePerServing || 0) * data.estimatedQuantity
       const now = new Date()
 
-      const newItem: MenuItem = {
-        id: `menu_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        weddingId: wedding.id,
-        ...data,
-        totalCost,
-        actualQuantity: undefined,
-        currency: 'CZK',
-        createdAt: now,
-        updatedAt: now
-      }
-
-      // Demo mode - use localStorage
-      const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding.id === 'demo-wedding'
-      if (isDemoUser) {
-        console.log('🎭 Demo mode - saving menu item to localStorage')
-        const stored = localStorage.getItem(MENU_ITEMS_KEY)
-        const items = stored ? JSON.parse(stored) : []
-        items.push(newItem)
-        localStorage.setItem(MENU_ITEMS_KEY, JSON.stringify(items))
-        setMenuItems(items)
-        return newItem
-      }
-
-      // Real user - use Firestore
+      // Save to Firestore for all users
       const menuItemData = {
         weddingId: wedding.id,
         ...data,
@@ -183,30 +160,7 @@ export function useMenu(): UseMenuReturn {
       const totalCost = (data.pricePerUnit || 0) * data.estimatedQuantity
       const now = new Date()
 
-      const newItem: DrinkItem = {
-        id: `drink_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        weddingId: wedding.id,
-        ...data,
-        totalCost,
-        actualQuantity: undefined,
-        currency: 'CZK',
-        createdAt: now,
-        updatedAt: now
-      }
-
-      // Demo mode - use localStorage
-      const isDemoUser = user?.id === 'demo-user-id' || user?.email === 'demo@svatbot.cz' || wedding.id === 'demo-wedding'
-      if (isDemoUser) {
-        console.log('🎭 Demo mode - saving drink item to localStorage')
-        const stored = localStorage.getItem(DRINK_ITEMS_KEY)
-        const items = stored ? JSON.parse(stored) : []
-        items.push(newItem)
-        localStorage.setItem(DRINK_ITEMS_KEY, JSON.stringify(items))
-        setDrinkItems(items)
-        return newItem
-      }
-
-      // Real user - use Firestore
+      // Save to Firestore for all users
       const drinkItemData = {
         weddingId: wedding.id,
         ...data,
