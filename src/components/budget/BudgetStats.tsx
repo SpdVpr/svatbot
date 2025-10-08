@@ -384,7 +384,6 @@ export default function BudgetStats({
           <BudgetList
             showHeader={false}
             showFilters={true}
-            maxHeight="800px"
             compact={false}
             viewMode="list"
             onCreateItem={onCreateItem}

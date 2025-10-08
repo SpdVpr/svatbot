@@ -39,7 +39,6 @@ interface GuestListProps {
   deleteGuest?: (guestId: string) => Promise<void>
   showHeader?: boolean
   showFilters?: boolean
-  maxHeight?: string
   compact?: boolean
   viewMode?: 'list' | 'grid'
   onCreateGuest?: () => void
@@ -56,7 +55,6 @@ export default function GuestList({
   deleteGuest: propDeleteGuest,
   showHeader = true,
   showFilters = true,
-  maxHeight = '600px',
   compact = false,
   viewMode = 'list',
   onCreateGuest,
@@ -693,10 +691,7 @@ export default function GuestList({
       )}
 
       {/* Guest list */}
-      <div
-        className="space-y-4 overflow-y-auto"
-        style={{ maxHeight }}
-      >
+      <div className="space-y-4">
         {Object.entries(groupedGuests).map(([groupKey, groupGuests]) => {
           // Calculate total people in this group (including +1 and children)
           const totalPeopleInGroup = groupGuests.reduce((total, guest) => {

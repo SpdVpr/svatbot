@@ -25,21 +25,19 @@ import {
 interface BudgetListProps {
   showHeader?: boolean
   showFilters?: boolean
-  maxHeight?: string
   compact?: boolean
   viewMode?: 'list' | 'grid'
   onCreateItem?: () => void
   onEditItem?: (item: BudgetItem) => void
 }
 
-export default function BudgetList({ 
-  showHeader = true, 
-  showFilters = true, 
-  maxHeight = '600px',
+export default function BudgetList({
+  showHeader = true,
+  showFilters = true,
   compact = false,
   viewMode = 'list',
   onCreateItem,
-  onEditItem 
+  onEditItem
 }: BudgetListProps) {
   const { 
     budgetItems, 
@@ -383,10 +381,7 @@ export default function BudgetList({
       )}
 
       {/* Budget items list */}
-      <div 
-        className="space-y-4 overflow-y-auto"
-        style={{ maxHeight }}
-      >
+      <div className="space-y-4">
         {Object.entries(groupedItems).map(([groupKey, groupItems]) => (
           <div key={groupKey} className="space-y-2">
             {/* Group header */}

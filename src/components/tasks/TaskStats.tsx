@@ -296,7 +296,6 @@ export default function TaskStats({
           <TaskList
             showHeader={false}
             showFilters={true}
-            maxHeight="800px"
             compact={false}
             onCreateTask={onCreateTask}
             tasks={isDemoUser ? tasks : undefined}

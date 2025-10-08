@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import {
   X,
-  Save,
   Plus,
   Trash2,
   AlertCircle,
@@ -610,10 +609,7 @@ export default function VendorForm({ onSubmit, onCancel, initialData, isEditing 
                   <span>Ukládání...</span>
                 </div>
               ) : (
-                <>
-                  <Save className="w-4 h-4 mr-2" />
-                  {isEditing ? 'Uložit změny' : 'Přidat dodavatele'}
-                </>
+                <span>{isEditing ? 'Uložit změny' : 'Přidat dodavatele'}</span>
               )}
             </button>
           </div>

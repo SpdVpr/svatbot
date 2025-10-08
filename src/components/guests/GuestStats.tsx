@@ -436,7 +436,6 @@ export default function GuestStats({
             deleteGuest={deleteGuest}
             showHeader={false}
             showFilters={true}
-            maxHeight="800px"
             compact={false}
             viewMode="list"
             onCreateGuest={onCreateGuest}

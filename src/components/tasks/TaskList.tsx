@@ -19,7 +19,6 @@ import {
 interface TaskListProps {
   showHeader?: boolean
   showFilters?: boolean
-  maxHeight?: string
   compact?: boolean
   onCreateTask?: () => void
   tasks?: Task[] // Optional - if not provided, will use useTask hook
@@ -34,7 +33,6 @@ interface TaskListProps {
 export default function TaskList({
   showHeader = true,
   showFilters = true,
-  maxHeight = '600px',
   compact = false,
   onCreateTask,
   tasks: propTasks,
@@ -357,10 +355,7 @@ export default function TaskList({
       )}
 
       {/* Task list */}
-      <div
-        className="space-y-4 overflow-y-auto"
-        style={{ maxHeight }}
-      >
+      <div className="space-y-4">
         {Object.entries(groupedTasks).map(([groupKey, groupTasks]) => (
           <div key={groupKey} className="space-y-2">
             {/* Group header */}
