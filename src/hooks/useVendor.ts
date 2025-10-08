@@ -172,7 +172,8 @@ export function useVendor(): UseVendorReturn {
     if (updates.priceRange !== undefined) data.priceRange = updates.priceRange || null
     if (updates.availability !== undefined) data.availability = updates.availability || null
     if (updates.status !== undefined) data.status = updates.status
-    if (updates.priority !== undefined) {
+    // Priority: check if key exists in updates object (not just if value is undefined)
+    if ('priority' in updates) {
       data.priority = updates.priority || null
       console.log('🔧 Priority update:', { original: updates.priority, converted: data.priority })
     }
