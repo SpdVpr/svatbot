@@ -9,6 +9,9 @@ import StorySectionEditor from './sections/StorySectionEditor'
 import ScheduleSectionEditor from './sections/ScheduleSectionEditor'
 import GallerySectionEditor from './sections/GallerySectionEditor'
 import AccommodationSectionEditor from './sections/AccommodationSectionEditor'
+import ContactSectionEditor from './sections/ContactSectionEditor'
+import FAQSectionEditor from './sections/FAQSectionEditor'
+import GiftSectionEditor from './sections/GiftSectionEditor'
 import type { WebsiteContent } from '@/types/wedding-website'
 
 interface ContentEditorProps {
@@ -113,7 +116,12 @@ export default function ContentEditor({ content, onContentChange }: ContentEdito
     }
   ]
 
-  const toggleSection = (sectionId: SectionType) => {
+  const toggleSection = (sectionId: SectionType, event?: React.MouseEvent) => {
+    // Prevent default scroll behavior
+    if (event) {
+      event.preventDefault()
+    }
+
     if (expandedSection === sectionId) {
       setExpandedSection('hero') // Always keep hero expanded as fallback
     } else {
@@ -214,6 +222,27 @@ export default function ContentEditor({ content, onContentChange }: ContentEdito
             onChange={(accommodationContent) => updateSectionContent('accommodation', accommodationContent)}
           />
         )
+      case 'contact':
+        return (
+          <ContactSectionEditor
+            content={content.contact}
+            onChange={(contactContent) => updateSectionContent('contact', contactContent)}
+          />
+        )
+      case 'faq':
+        return (
+          <FAQSectionEditor
+            content={content.faq}
+            onChange={(faqContent) => updateSectionContent('faq', faqContent)}
+          />
+        )
+      case 'gift':
+        return (
+          <GiftSectionEditor
+            content={content.gift}
+            onChange={(giftContent) => updateSectionContent('gift', giftContent)}
+          />
+        )
       default:
         return (
           <div className="p-6 text-center">
@@ -247,7 +276,7 @@ export default function ContentEditor({ content, onContentChange }: ContentEdito
             className={`flex items-center justify-between p-4 cursor-pointer transition-colors ${
               expandedSection === section.id ? 'bg-pink-50' : 'hover:bg-gray-50'
             }`}
-            onClick={() => toggleSection(section.id)}
+            onClick={(e) => toggleSection(section.id, e)}
           >
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">

@@ -56,6 +56,7 @@ export interface VenueInfo {
   time: string
   venue: string
   address: string
+  mapUrl?: string
   coordinates?: {
     lat: number
     lng: number

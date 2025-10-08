@@ -138,13 +138,32 @@ export default function InfoSectionEditor({ content, onChange }: InfoSectionEdit
             <input
               type="text"
               value={content.ceremony?.address || ''}
-              onChange={(e) => handleInputChange('ceremony', { 
-                ...content.ceremony, 
-                address: e.target.value 
+              onChange={(e) => handleInputChange('ceremony', {
+                ...content.ceremony,
+                address: e.target.value
               })}
               placeholder="Václavské náměstí 1, Praha 1"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
             />
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Google Maps odkaz
+            </label>
+            <input
+              type="text"
+              value={content.ceremony?.mapUrl || ''}
+              onChange={(e) => handleInputChange('ceremony', {
+                ...content.ceremony,
+                mapUrl: e.target.value
+              })}
+              placeholder="https://maps.google.com/..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Vložte odkaz z Google Maps (Sdílet → Vložit mapu → Zkopírovat odkaz)
+            </p>
           </div>
         </div>
       </div>
@@ -195,13 +214,32 @@ export default function InfoSectionEditor({ content, onChange }: InfoSectionEdit
             <input
               type="text"
               value={content.reception?.address || ''}
-              onChange={(e) => handleInputChange('reception', { 
-                ...content.reception, 
-                address: e.target.value 
+              onChange={(e) => handleInputChange('reception', {
+                ...content.reception,
+                address: e.target.value
               })}
               placeholder="Národní třída 10, Praha 1"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
             />
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Google Maps odkaz
+            </label>
+            <input
+              type="text"
+              value={content.reception?.mapUrl || ''}
+              onChange={(e) => handleInputChange('reception', {
+                ...content.reception,
+                mapUrl: e.target.value
+              })}
+              placeholder="https://maps.google.com/..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Vložte odkaz z Google Maps (Sdílet → Vložit mapu → Zkopírovat odkaz)
+            </p>
           </div>
         </div>
       </div>

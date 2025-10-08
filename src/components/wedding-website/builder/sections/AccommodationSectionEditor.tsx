@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Building2, Phone, Mail, Eye, EyeOff, DollarSign, Users } from 'lucide-react'
+import { Building2, Phone, Mail, Eye, EyeOff, DollarSign, Users, Download } from 'lucide-react'
+import { useAccommodation } from '@/hooks/useAccommodation'
 import type { AccommodationContent } from '@/types/wedding-website'
 
 interface AccommodationSectionEditorProps {
@@ -10,6 +11,8 @@ interface AccommodationSectionEditorProps {
 }
 
 export default function AccommodationSectionEditor({ content, onChange }: AccommodationSectionEditorProps) {
+  const { accommodations, loading } = useAccommodation()
+  const totalRooms = accommodations.reduce((sum, acc) => sum + acc.rooms.length, 0)
   const [localContent, setLocalContent] = useState<AccommodationContent>({
     enabled: content?.enabled || false,
     title: content?.title || 'Ubytování',
@@ -23,6 +26,7 @@ export default function AccommodationSectionEditor({ content, onChange }: Accomm
       message: 'Pro rezervaci kontaktujte přímo ubytování nebo nás.'
     }
   })
+  const [importing, setImporting] = useState(false)
 
   const updateContent = (updates: Partial<AccommodationContent>) => {
     const newContent = { ...localContent, ...updates }
@@ -36,6 +40,17 @@ export default function AccommodationSectionEditor({ content, onChange }: Accomm
       [field]: value
     }
     updateContent({ contactInfo: newContactInfo })
+  }
+
+  const importFromAccommodation = () => {
+    setImporting(true)
+
+    // Import se provede automaticky - data se načítají z useAccommodation hooku
+    // a zobrazují se v template při renderování
+
+    setTimeout(() => {
+      setImporting(false)
+    }, 500)
   }
 
   return (
@@ -64,6 +79,32 @@ export default function AccommodationSectionEditor({ content, onChange }: Accomm
 
       {localContent.enabled && (
         <>
+          {/* Import from Accommodation */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <h4 className="font-semibold text-blue-900 mb-1">
+                  Importovat z modulu Ubytování
+                </h4>
+                <p className="text-sm text-blue-700">
+                  {accommodations.length > 0
+                    ? `Nalezeno ${accommodations.length} ubytování s ${totalRooms} typy pokojů. Data se automaticky zobrazí na webu.`
+                    : 'Zatím nemáte přidané žádné ubytování. Přidejte je v sekci /accommodation.'}
+                </p>
+              </div>
+              {accommodations.length > 0 && (
+                <button
+                  onClick={importFromAccommodation}
+                  disabled={importing || loading}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm whitespace-nowrap ml-4 flex items-center gap-2 disabled:opacity-50"
+                >
+                  <Download className="w-4 h-4" />
+                  {importing ? 'Importováno ✓' : 'Importovat'}
+                </button>
+              )}
+            </div>
+          </div>
+
           {/* Basic Settings */}
           <div className="bg-white border border-gray-200 rounded-lg p-6">
             <h4 className="text-lg font-semibold text-gray-900 mb-4">Základní nastavení</h4>
