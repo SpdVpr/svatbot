@@ -154,6 +154,43 @@ export function useVendor(): UseVendorReturn {
     return removeUndefined(data)
   }
 
+  // Convert partial Vendor updates to Firestore data
+  const convertPartialToFirestoreData = (updates: Partial<Vendor>): any => {
+    const data: any = {}
+
+    // Only include fields that are present in updates
+    if (updates.name !== undefined) data.name = updates.name
+    if (updates.category !== undefined) data.category = updates.category
+    if (updates.description !== undefined) data.description = updates.description || null
+    if (updates.website !== undefined) data.website = updates.website || null
+    if (updates.contacts !== undefined) data.contacts = updates.contacts || []
+    if (updates.address !== undefined) data.address = updates.address || null
+    if (updates.businessName !== undefined) data.businessName = updates.businessName || null
+    if (updates.businessId !== undefined) data.businessId = updates.businessId || null
+    if (updates.vatNumber !== undefined) data.vatNumber = updates.vatNumber || null
+    if (updates.services !== undefined) data.services = updates.services || []
+    if (updates.priceRange !== undefined) data.priceRange = updates.priceRange || null
+    if (updates.availability !== undefined) data.availability = updates.availability || null
+    if (updates.status !== undefined) data.status = updates.status
+    if (updates.priority !== undefined) data.priority = updates.priority
+    if (updates.rating !== undefined) data.rating = updates.rating || null
+    if (updates.contractId !== undefined) data.contractId = updates.contractId || null
+    if (updates.lastContactDate !== undefined) {
+      data.lastContactDate = updates.lastContactDate ? Timestamp.fromDate(updates.lastContactDate) : null
+    }
+    if (updates.nextFollowUpDate !== undefined) {
+      data.nextFollowUpDate = updates.nextFollowUpDate ? Timestamp.fromDate(updates.nextFollowUpDate) : null
+    }
+    if (updates.notes !== undefined) data.notes = updates.notes || null
+    if (updates.tags !== undefined) data.tags = updates.tags || []
+    if (updates.portfolio !== undefined) data.portfolio = updates.portfolio || []
+    if (updates.testimonials !== undefined) data.testimonials = updates.testimonials || []
+    if (updates.updatedAt !== undefined) data.updatedAt = Timestamp.fromDate(updates.updatedAt)
+
+    // Remove any undefined values that might have slipped through
+    return removeUndefined(data)
+  }
+
   // Create new vendor
   const createVendor = async (data: VendorFormData): Promise<Vendor> => {
     if (!wedding || !user) {
@@ -321,8 +358,12 @@ export function useVendor(): UseVendorReturn {
       try {
         // Try to update in Firestore
         const vendorRef = doc(db, 'vendors', vendorId)
-        await updateDoc(vendorRef, convertToFirestoreData(updatedData as any))
+        const firestoreData = convertPartialToFirestoreData(updatedData)
+        console.log('📝 Updating vendor in Firestore:', vendorId, firestoreData)
+        await updateDoc(vendorRef, firestoreData)
+        console.log('✅ Vendor updated successfully in Firestore')
       } catch (firestoreError) {
+        console.error('❌ Firestore update error:', firestoreError)
         console.warn('⚠️ Firestore not available, updating localStorage fallback')
         if (wedding) {
           const savedVendors = localStorage.getItem(`vendors_${wedding.id}`) || '[]'
