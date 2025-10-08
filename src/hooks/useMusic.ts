@@ -158,6 +158,87 @@ export function useMusic() {
   const [musicId, setMusicId] = useState<string | null>(null)
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
+  // Migrate old categories to new format
+  const migrateCategories = (oldCategories: MusicCategory[]): MusicCategory[] => {
+    return oldCategories.map(category => {
+      // Update bridesmaids-entrance
+      if (category.id === 'bridesmaids-entrance') {
+        return {
+          ...category,
+          name: 'Nástup svědků/družiček',
+          description: 'Hudba při příchodu svědků a družiček',
+          icon: '🤍'
+        }
+      }
+      // Update bride-entrance
+      if (category.id === 'bride-entrance') {
+        return {
+          ...category,
+          name: 'Nástup nevěsty',
+          icon: '👰‍♀️',
+          required: false
+        }
+      }
+      // Update congratulations
+      if (category.id === 'congratulations') {
+        return {
+          ...category,
+          name: 'Gratulace'
+        }
+      }
+      // Update guard-of-honor (Šplalíř -> Špalír)
+      if (category.id === 'guard-of-honor') {
+        return {
+          ...category,
+          name: 'Špalír'
+        }
+      }
+      // Update party-must-have
+      if (category.id === 'party-must-have') {
+        return {
+          ...category,
+          name: 'Party písně'
+        }
+      }
+      // Update first-dance to not required
+      if (category.id === 'first-dance') {
+        return {
+          ...category,
+          required: false
+        }
+      }
+      return category
+    })
+  }
+
+  // Add ring-exchange category if missing
+  const ensureRingExchangeCategory = (categories: MusicCategory[]): MusicCategory[] => {
+    const hasRingExchange = categories.some(cat => cat.id === 'ring-exchange')
+    if (!hasRingExchange) {
+      // Find bride-entrance index to insert after it
+      const brideEntranceIndex = categories.findIndex(cat => cat.id === 'bride-entrance')
+      const newCategory: MusicCategory = {
+        id: 'ring-exchange',
+        name: 'Nasazování prstýnků',
+        description: 'Hudba při výměně prstenů',
+        icon: '💍',
+        songs: [],
+        required: false
+      }
+
+      if (brideEntranceIndex >= 0) {
+        // Insert after bride-entrance
+        const newCategories = [...categories]
+        newCategories.splice(brideEntranceIndex + 1, 0, newCategory)
+        return newCategories
+      } else {
+        // Add at the end if bride-entrance not found
+        return [...categories, newCategory]
+      }
+    }
+    return categories
+  }
+
   // Load music data from Firestore with real-time updates
   useEffect(() => {
     if (!wedding?.id) {
@@ -189,7 +270,11 @@ export function useMusic() {
           setVendors(data.vendors || [])
         }
 
-        setCategories(data.categories || DEFAULT_CATEGORIES)
+        // Migrate old categories and ensure ring-exchange exists
+        let loadedCategories = data.categories || DEFAULT_CATEGORIES
+        loadedCategories = migrateCategories(loadedCategories)
+        loadedCategories = ensureRingExchangeCategory(loadedCategories)
+        setCategories(loadedCategories)
       } else {
         setMusicId(null)
         setVendors([])
