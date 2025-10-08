@@ -42,16 +42,10 @@ export default function FoodDrinksModule() {
         {/* Food & Drink Stats */}
         <div className="grid grid-cols-2 gap-3">
           <div className="text-center">
-            <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg mx-auto mb-1">
-              <Leaf className="w-4 h-4 text-green-600" />
-            </div>
             <div className="text-sm font-bold text-gray-900">{stats.vegetarianOptions}</div>
             <div className="text-xs text-gray-500">Vegetariánské</div>
           </div>
           <div className="text-center">
-            <div className="flex items-center justify-center w-8 h-8 bg-amber-100 rounded-lg mx-auto mb-1">
-              <Wheat className="w-4 h-4 text-amber-600" />
-            </div>
             <div className="text-sm font-bold text-gray-900">{stats.glutenFreeOptions}</div>
             <div className="text-xs text-gray-500">Bezlepkové</div>
           </div>
@@ -60,16 +54,10 @@ export default function FoodDrinksModule() {
         {/* Drinks Stats */}
         <div className="grid grid-cols-2 gap-3">
           <div className="text-center">
-            <div className="flex items-center justify-center w-8 h-8 bg-purple-100 rounded-lg mx-auto mb-1">
-              <Wine className="w-4 h-4 text-purple-600" />
-            </div>
             <div className="text-sm font-bold text-gray-900">{stats.alcoholicDrinks}</div>
             <div className="text-xs text-gray-500">Alkoholické</div>
           </div>
           <div className="text-center">
-            <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-lg mx-auto mb-1">
-              <Wine className="w-4 h-4 text-blue-600" />
-            </div>
             <div className="text-sm font-bold text-gray-900">{stats.nonAlcoholicDrinks}</div>
             <div className="text-xs text-gray-500">Nealko</div>
           </div>

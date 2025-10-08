@@ -18,6 +18,7 @@ import {
   Download,
   Upload,
   Edit,
+  List,
   Trash2
 } from 'lucide-react'
 import Link from 'next/link'
@@ -212,7 +213,7 @@ export default function MenuPage() {
                   {stats.totalMenuItems + stats.totalDrinkItems}
                 </p>
               </div>
-              <UtensilsCrossed className="w-8 h-8 text-pink-600" />
+              <List className="w-8 h-8 text-pink-600" />
             </div>
           </div>
 
@@ -364,7 +365,6 @@ export default function MenuPage() {
                         onClick={() => setShowFoodForm(true)}
                         className="btn-primary"
                       >
-                        <Plus className="w-4 h-4 mr-2" />
                         Přidat první jídlo
                       </button>
                     )}
@@ -452,7 +452,6 @@ export default function MenuPage() {
                         onClick={() => setShowDrinkForm(true)}
                         className="btn-primary"
                       >
-                        <Plus className="w-4 h-4 mr-2" />
                         Přidat první nápoj
                       </button>
                     )}

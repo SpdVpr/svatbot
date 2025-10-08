@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { X } from 'lucide-react'
-import { MenuFormData, FOOD_CATEGORY_LABELS, MENU_STATUS_LABELS, SERVING_STYLE_LABELS, COMMON_ALLERGENS } from '@/types/menu'
+import { MenuFormData, FOOD_CATEGORY_LABELS, MENU_STATUS_LABELS, SERVING_STYLE_OPTIONS, COMMON_ALLERGENS } from '@/types/menu'
 
 interface MenuItemFormProps {
   onSubmit: (data: MenuFormData) => Promise<void>
@@ -24,6 +24,7 @@ export default function MenuItemForm({ onSubmit, onCancel, initialData, loading 
     isLactoseFree: initialData?.isLactoseFree || false,
     allergens: initialData?.allergens || [],
     pricePerServing: initialData?.pricePerServing || undefined,
+    totalPrice: initialData?.totalPrice || undefined,
     vendorName: initialData?.vendorName || '',
     status: initialData?.status || 'planned',
     servingStyle: initialData?.servingStyle || undefined,
@@ -154,7 +155,7 @@ export default function MenuItemForm({ onSubmit, onCancel, initialData, loading 
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Cena za porci (Kč)
@@ -170,6 +171,20 @@ export default function MenuItemForm({ onSubmit, onCancel, initialData, loading 
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Celková cena (Kč)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  value={formData.totalPrice || ''}
+                  onChange={(e) => setFormData({ ...formData, totalPrice: e.target.value ? parseFloat(e.target.value) : undefined })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  placeholder="např. u dortu"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Způsob servírování
                 </label>
                 <select
@@ -178,7 +193,7 @@ export default function MenuItemForm({ onSubmit, onCancel, initialData, loading 
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                 >
                   <option value="">Vyberte...</option>
-                  {Object.entries(SERVING_STYLE_LABELS).map(([value, label]) => (
+                  {Object.entries(SERVING_STYLE_OPTIONS).map(([value, label]) => (
                     <option key={value} value={value}>{label}</option>
                   ))}
                 </select>

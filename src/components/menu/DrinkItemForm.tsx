@@ -182,24 +182,6 @@ export default function DrinkItemForm({ onSubmit, onCancel, initialData, loading
               />
               <span className="text-sm font-medium text-gray-700">Alkoholický nápoj</span>
             </label>
-
-            {formData.isAlcoholic && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Obsah alkoholu (%)
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="0.1"
-                  value={formData.alcoholContent || ''}
-                  onChange={(e) => setFormData({ ...formData, alcoholContent: e.target.value ? parseFloat(e.target.value) : undefined })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder="např. 12.5"
-                />
-              </div>
-            )}
           </div>
 
           {/* Additional Info */}

@@ -57,6 +57,7 @@ export interface MenuItem {
   
   // Cost
   pricePerServing?: number
+  totalPrice?: number // Celková cena (např. u dortu)
   totalCost?: number
   currency: string // 'CZK'
   
@@ -131,6 +132,7 @@ export interface MenuFormData {
   isLactoseFree: boolean
   allergens: string[]
   pricePerServing?: number
+  totalPrice?: number
   vendorId?: string
   vendorName?: string
   status: MenuItemStatus
@@ -232,6 +234,12 @@ export const SERVING_STYLE_LABELS: Record<ServingStyle, string> = {
   'cocktail': 'Koktejlový styl'
 }
 
+// Serving styles without family-style and cocktail
+export const SERVING_STYLE_OPTIONS = {
+  'plated': 'Servírované',
+  'buffet': 'Bufet'
+} as const
+
 // Common allergens in Czech
 export const COMMON_ALLERGENS = [
   'Lepek',
@@ -240,13 +248,11 @@ export const COMMON_ALLERGENS = [
   'Ryby',
   'Arašídy',
   'Sója',
-  'Mléko',
+  'Laktóza',
   'Ořechy',
   'Celer',
   'Hořčice',
   'Sezam',
-  'Oxid siřičitý',
-  'Vlčí bob',
   'Měkkýši'
 ]
 

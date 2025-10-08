@@ -99,7 +99,8 @@ export function useMenu(): UseMenuReturn {
     if (!wedding?.id) throw new Error('Není vybrána svatba')
 
     try {
-      const totalCost = (data.pricePerServing || 0) * data.estimatedQuantity
+      // Calculate total cost: use totalPrice if available, otherwise calculate from pricePerServing
+      const totalCost = data.totalPrice || ((data.pricePerServing || 0) * data.estimatedQuantity)
       const now = new Date()
 
       // Save to Firestore for all users
@@ -126,6 +127,7 @@ export function useMenu(): UseMenuReturn {
       if (data.description !== undefined) menuItemData.description = data.description
       if (data.servingSize !== undefined) menuItemData.servingSize = data.servingSize
       if (data.pricePerServing !== undefined) menuItemData.pricePerServing = data.pricePerServing
+      if (data.totalPrice !== undefined) menuItemData.totalPrice = data.totalPrice
       if (data.vendorId !== undefined) menuItemData.vendorId = data.vendorId
       if (data.vendorName !== undefined) menuItemData.vendorName = data.vendorName
       if (data.servingStyle !== undefined) menuItemData.servingStyle = data.servingStyle
@@ -150,12 +152,14 @@ export function useMenu(): UseMenuReturn {
   const updateMenuItem = async (itemId: string, updates: Partial<MenuItem>): Promise<void> => {
     try {
       // Recalculate total cost if relevant fields changed
-      if (updates.pricePerServing !== undefined || updates.estimatedQuantity !== undefined) {
+      if (updates.pricePerServing !== undefined || updates.estimatedQuantity !== undefined || updates.totalPrice !== undefined) {
         const item = menuItems.find(i => i.id === itemId)
         if (item) {
+          const totalPrice = updates.totalPrice ?? item.totalPrice
           const pricePerServing = updates.pricePerServing ?? item.pricePerServing ?? 0
           const estimatedQuantity = updates.estimatedQuantity ?? item.estimatedQuantity
-          updates.totalCost = pricePerServing * estimatedQuantity
+          // Use totalPrice if available, otherwise calculate from pricePerServing
+          updates.totalCost = totalPrice || (pricePerServing * estimatedQuantity)
         }
       }
 
