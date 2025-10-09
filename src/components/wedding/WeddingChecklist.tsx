@@ -393,16 +393,6 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
             <p className="text-gray-700 mb-3">
               Předpřipravené úkoly pro vaši svatbu. Můžete je rychle označit jako hotové nebo přidat do modulu Úkoly pro detailní sledování.
             </p>
-            <div className="space-y-1 text-sm text-gray-600">
-              <div className="flex items-center space-x-2">
-                <Info className="w-4 h-4 flex-shrink-0" />
-                <span><strong>Hotovo:</strong> Rychle označí úkol jako dokončený (zůstane jen v checklistu)</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Info className="w-4 h-4 flex-shrink-0" />
-                <span><strong>Do úkolů:</strong> Přidá úkol do modulu Úkoly s datem a upozorněním</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -488,21 +478,7 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
                               </div>
                             </div>
 
-                            {/* Item details */}
-                            <div className="flex flex-wrap items-center gap-2 ml-11">
-                              <span
-                                className={`text-xs px-2 py-1 rounded-full font-medium ${getPriorityColor(
-                                  item.priority
-                                )}`}
-                              >
-                                {getPriorityLabel(item.priority)}
-                              </span>
-                              {item.estimatedDuration && (
-                                <span className="text-xs text-gray-600 bg-white px-2 py-1 rounded-full border border-gray-200">
-                                  ⏱️ {item.estimatedDuration}
-                                </span>
-                              )}
-                            </div>
+
 
                             {/* Tips */}
                             {item.tips && item.tips.length > 0 && (

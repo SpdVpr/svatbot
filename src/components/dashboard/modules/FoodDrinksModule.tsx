@@ -19,66 +19,28 @@ export default function FoodDrinksModule() {
 
       <div className="space-y-4">
         {/* Cost Overview */}
-        <div className="bg-pink-50 p-4 rounded-lg">
-          <div className="text-center mb-3">
-            <div className="text-2xl font-bold text-pink-600">
-              {currencyUtils.formatShort(stats.totalEstimatedCost)}
-            </div>
-            <div className="text-sm text-pink-700">Odhadované náklady</div>
+        <div className="bg-pink-50 p-4 rounded-lg text-center">
+          <div className="text-2xl font-bold text-pink-600 mb-1">
+            {currencyUtils.formatShort(stats.totalEstimatedCost)}
           </div>
-          
-          <div className="grid grid-cols-2 gap-2 text-center text-sm">
-            <div>
-              <div className="font-bold text-gray-900">{stats.totalMenuItems}</div>
-              <div className="text-xs text-gray-600">Jídel</div>
-            </div>
-            <div>
-              <div className="font-bold text-gray-900">{stats.totalDrinkItems}</div>
-              <div className="text-xs text-gray-600">Nápojů</div>
-            </div>
-          </div>
+          <div className="text-sm text-pink-700">Odhadované náklady</div>
         </div>
 
-        {/* Status Overview */}
-        <div className="bg-gray-50 p-3 rounded-lg">
-          <div className="text-sm font-medium text-gray-900 mb-2">Stav příprav</div>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-gray-600 flex items-center">
-                <CheckCircle className="w-3 h-3 mr-1 text-green-600" />
-                Potvrzeno
-              </span>
-              <span className="font-semibold text-gray-900">{stats.confirmedItems}</span>
+        {/* Items Count */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="text-center">
+            <div className="flex items-center justify-center w-8 h-8 bg-orange-100 rounded-lg mx-auto mb-1">
+              <UtensilsCrossed className="w-4 h-4 text-orange-600" />
             </div>
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-gray-600 flex items-center">
-                <Clock className="w-3 h-3 mr-1 text-yellow-600" />
-                Plánováno
-              </span>
-              <span className="font-semibold text-gray-900">{stats.plannedItems}</span>
-            </div>
+            <div className="text-lg font-bold text-gray-900">{stats.totalMenuItems}</div>
+            <div className="text-xs text-gray-500">Jídel</div>
           </div>
-        </div>
-
-        {/* Status Badge */}
-        <div className="text-center">
-          <div className={`text-sm px-3 py-1 rounded-full inline-block ${
-            stats.totalMenuItems === 0 && stats.totalDrinkItems === 0
-              ? 'bg-gray-100 text-gray-600'
-              : stats.confirmedItems === 0
-                ? 'bg-yellow-100 text-yellow-700'
-                : stats.confirmedItems < (stats.totalMenuItems + stats.totalDrinkItems) / 2
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'bg-green-100 text-green-700'
-          }`}>
-            {stats.totalMenuItems === 0 && stats.totalDrinkItems === 0
-              ? 'Žádné položky'
-              : stats.confirmedItems === 0
-                ? 'Plánování menu'
-                : stats.confirmedItems < (stats.totalMenuItems + stats.totalDrinkItems) / 2
-                  ? 'Probíhá výběr'
-                  : 'Menu připraveno'
-            }
+          <div className="text-center">
+            <div className="flex items-center justify-center w-8 h-8 bg-purple-100 rounded-lg mx-auto mb-1">
+              <Wine className="w-4 h-4 text-purple-600" />
+            </div>
+            <div className="text-lg font-bold text-gray-900">{stats.totalDrinkItems}</div>
+            <div className="text-xs text-gray-500">Nápojů</div>
           </div>
         </div>
       </div>

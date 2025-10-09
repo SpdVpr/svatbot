@@ -49,7 +49,7 @@ const DEFAULT_CATEGORIES: MusicCategory[] = [
     description: 'Hudba při příchodu ženicha k oltáři',
     icon: '🤵',
     songs: [],
-    required: true
+    required: false
   },
   {
     id: 'bridesmaids-entrance',
