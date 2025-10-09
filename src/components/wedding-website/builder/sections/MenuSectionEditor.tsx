@@ -15,20 +15,22 @@ export default function MenuSectionEditor({ content, onChange }: MenuSectionEdit
   const { menuItems, drinkItems, loading, stats } = useMenu()
   const [importing, setImporting] = useState(false)
 
-  // Use content directly from props
-  const currentContent: MenuContent = {
+  // Helper to get current content with defaults
+  const getCurrentContent = (): MenuContent => ({
     enabled: content?.enabled || false,
     title: content?.title || 'Svatební menu',
     description: content?.description || 'Připravili jsme pro vás výběr chutných jídel a nápojů.',
     showCategories: content?.showCategories ?? true,
     showDietaryInfo: content?.showDietaryInfo ?? true,
     showDrinks: content?.showDrinks ?? true
-  }
+  })
 
   const updateContent = (updates: Partial<MenuContent>) => {
-    const newContent = { ...currentContent, ...updates }
+    const newContent = { ...getCurrentContent(), ...updates }
     onChange(newContent)
   }
+
+  const currentContent = getCurrentContent()
 
   const handleImportFromMenu = () => {
     setImporting(true)
