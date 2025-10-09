@@ -14,7 +14,7 @@ import ClassicEleganceTemplate from '@/components/wedding-website/templates/Clas
 import ModernMinimalistTemplate from '@/components/wedding-website/templates/ModernMinimalistTemplate'
 import type { TemplateType, WebsiteContent, WeddingWebsite } from '@/types/wedding-website'
 
-type Step = 'template' | 'url' | 'content' | 'preview'
+type Step = 'url' | 'template' | 'content' | 'preview'
 
 export default function WeddingWebsiteBuilderPage() {
   const router = useRouter()
@@ -22,7 +22,7 @@ export default function WeddingWebsiteBuilderPage() {
   const { currentWedding: wedding } = useWeddingStore()
   const { website, createWebsite, updateWebsite, publishWebsite, loading } = useWeddingWebsite()
 
-  const [currentStep, setCurrentStep] = useState<Step>('template')
+  const [currentStep, setCurrentStep] = useState<Step>('url')
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateType | null>(
     website?.template || null
   )
@@ -71,28 +71,49 @@ export default function WeddingWebsiteBuilderPage() {
       setSelectedTemplate(website.template)
       setCustomUrl(website.customUrl)
       setContent(website.content)
-      // Pokud už web existuje a jsme na template/url kroku, přejdi na content step
-      if (currentStep === 'template' || currentStep === 'url') {
-        setCurrentStep('content')
+      // Pokud už web existuje a jsme na url kroku, přejdi na template step
+      if (currentStep === 'url' && website.customUrl) {
+        setCurrentStep('template')
       }
     }
   }, [website])
 
   const steps: { id: Step; label: string; description: string }[] = [
-    { id: 'template', label: 'Šablona', description: 'Vyberte design' },
     { id: 'url', label: 'URL adresa', description: 'Nastavte URL' },
+    { id: 'template', label: 'Šablona', description: 'Vyberte design' },
     { id: 'content', label: 'Obsah', description: 'Vyplňte informace' },
     { id: 'preview', label: 'Náhled', description: 'Zkontrolujte a publikujte' },
   ]
 
   const currentStepIndex = steps.findIndex((s) => s.id === currentStep)
   const canGoNext = () => {
-    if (currentStep === 'template') return selectedTemplate !== null
     if (currentStep === 'url') return customUrl.length >= 3
+    if (currentStep === 'template') return selectedTemplate !== null
     return true
   }
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    // Pokud jsme na URL kroku a URL je vyplněné, uložíme ho
+    if (currentStep === 'url' && customUrl.length >= 3 && !website) {
+      setIsSaving(true)
+      try {
+        // Vytvoříme základní web s URL a výchozí šablonou
+        await createWebsite({
+          customUrl,
+          template: 'classic-elegance', // Výchozí šablona
+          content,
+        })
+        // Po vytvoření přejdeme na výběr šablony
+        setCurrentStep('template')
+      } catch (error) {
+        console.error('Error creating website:', error)
+        alert('Chyba při vytváření webu')
+      } finally {
+        setIsSaving(false)
+      }
+      return
+    }
+
     const nextIndex = currentStepIndex + 1
     if (nextIndex < steps.length) {
       setCurrentStep(steps[nextIndex].id)
@@ -133,6 +154,29 @@ export default function WeddingWebsiteBuilderPage() {
       alert('Chyba při ukládání webu')
     } finally {
       setIsSaving(false)
+    }
+  }
+
+  // Nová funkce pro změnu šablony
+  const handleTemplateChange = async (template: TemplateType) => {
+    setSelectedTemplate(template)
+
+    // Pokud už web existuje, automaticky uložíme změnu šablony
+    if (website) {
+      setIsSaving(true)
+      try {
+        await updateWebsite({
+          template,
+          customUrl,
+          content,
+        })
+        alert('Šablona byla úspěšně změněna!')
+      } catch (error) {
+        console.error('Error updating template:', error)
+        alert('Chyba při změně šablony')
+      } finally {
+        setIsSaving(false)
+      }
     }
   }
 
@@ -223,37 +267,43 @@ export default function WeddingWebsiteBuilderPage() {
 
           {/* Progress steps */}
           <div className="mt-6 flex items-center justify-center">
-            {steps.map((step, index) => (
-              <div key={step.id} className="flex items-center">
-                <button
-                  onClick={() => setCurrentStep(step.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                    currentStep === step.id
-                      ? 'bg-pink-100 text-pink-700'
-                      : index < currentStepIndex
-                      ? 'text-green-600 hover:bg-green-50'
-                      : 'text-gray-400 hover:bg-gray-50'
-                  }`}
-                >
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
+            {steps.map((step, index) => {
+              // Umožnit kliknutí na kroky, které už byly dokončeny, nebo na template krok pokud už web existuje
+              const isClickable = index <= currentStepIndex || (step.id === 'template' && website)
+
+              return (
+                <div key={step.id} className="flex items-center">
+                  <button
+                    onClick={() => isClickable && setCurrentStep(step.id)}
+                    disabled={!isClickable}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                       currentStep === step.id
-                        ? 'bg-pink-500 text-white'
-                        : index < currentStepIndex
-                        ? 'bg-green-500 text-white'
-                        : 'bg-gray-200 text-gray-600'
+                        ? 'bg-pink-100 text-pink-700'
+                        : index < currentStepIndex || (step.id === 'template' && website)
+                        ? 'text-green-600 hover:bg-green-50 cursor-pointer'
+                        : 'text-gray-400 cursor-not-allowed'
                     }`}
                   >
-                    {index + 1}
-                  </div>
-                  <span className="font-medium">{step.label}</span>
-                </button>
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
+                        currentStep === step.id
+                          ? 'bg-pink-500 text-white'
+                          : index < currentStepIndex || (step.id === 'template' && website)
+                          ? 'bg-green-500 text-white'
+                          : 'bg-gray-200 text-gray-600'
+                      }`}
+                    >
+                      {index + 1}
+                    </div>
+                    <span className="font-medium">{step.label}</span>
+                  </button>
 
-                {index < steps.length - 1 && (
-                  <div className="w-12 h-0.5 bg-gray-200 mx-2" />
-                )}
-              </div>
-            ))}
+                  {index < steps.length - 1 && (
+                    <div className="w-12 h-0.5 bg-gray-200 mx-2" />
+                  )}
+                </div>
+              )
+            })}
           </div>
 
         </div>
@@ -261,18 +311,28 @@ export default function WeddingWebsiteBuilderPage() {
 
       {/* Content */}
       <div className="max-w-5xl mx-auto px-4 py-8">
-        {currentStep === 'template' && (
-          <TemplateSelector
-            selectedTemplate={selectedTemplate}
-            onSelect={setSelectedTemplate}
-          />
-        )}
-
         {currentStep === 'url' && (
           <UrlConfigurator
             customUrl={customUrl}
             onUrlChange={setCustomUrl}
           />
+        )}
+
+        {currentStep === 'template' && (
+          <div className="space-y-6">
+            {website && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-blue-800">
+                  <strong>Tip:</strong> Změna šablony zachová všechna vaše data a nastavení.
+                  Změní se pouze design webu na adrese <strong>{customUrl}.svatbot.cz</strong>
+                </p>
+              </div>
+            )}
+            <TemplateSelector
+              selectedTemplate={selectedTemplate}
+              onSelect={handleTemplateChange}
+            />
+          </div>
         )}
 
         {currentStep === 'content' && (
@@ -416,10 +476,14 @@ export default function WeddingWebsiteBuilderPage() {
           ) : (
             <button
               onClick={handleNext}
-              disabled={!canGoNext()}
+              disabled={!canGoNext() || isSaving}
               className="inline-flex items-center gap-2 bg-pink-500 text-white px-6 py-3 rounded-lg hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Další
+              {currentStep === 'url' && !website ? (
+                isSaving ? 'Ukládání...' : 'Pokračovat'
+              ) : (
+                'Další'
+              )}
               <ArrowRight className="w-5 h-5" />
             </button>
           )}
