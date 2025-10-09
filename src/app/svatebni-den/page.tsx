@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Clock, Calendar, ArrowLeft, Plus, Trash2 } from 'lucide-react'
+import { Clock, Calendar, ArrowLeft, Plus, Trash2, X } from 'lucide-react'
 import Link from 'next/link'
 import { useWeddingDayTimeline } from '@/hooks/useWeddingDayTimeline'
 
@@ -46,6 +46,7 @@ const categoryLabels = {
 export default function SvatebniDenPage() {
   const { timeline, loading, createTimelineItem, deleteTimelineItem } = useWeddingDayTimeline()
   const [showCustomForm, setShowCustomForm] = useState(false)
+  const [selectedActivity, setSelectedActivity] = useState<typeof PREDEFINED_ACTIVITIES[0] | null>(null)
   const [formData, setFormData] = useState({
     time: '',
     activity: '',
@@ -55,18 +56,42 @@ export default function SvatebniDenPage() {
     notes: ''
   })
 
-  const handleAddPredefined = async (activity: typeof PREDEFINED_ACTIVITIES[0]) => {
+  const handleSelectPredefined = (activity: typeof PREDEFINED_ACTIVITIES[0]) => {
+    setSelectedActivity(activity)
+    setFormData({
+      time: '',
+      activity: activity.name,
+      duration: activity.duration,
+      category: activity.category as any,
+      location: '',
+      notes: ''
+    })
+  }
+
+  const handleAddPredefined = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedActivity) return
+
     try {
       await createTimelineItem({
-        time: '',
-        activity: activity.name,
-        duration: activity.duration,
-        category: activity.category as any,
-        location: '',
+        time: formData.time,
+        activity: formData.activity,
+        duration: formData.duration,
+        category: selectedActivity.category as any,
+        location: formData.location,
         participants: [],
-        notes: '',
+        notes: formData.notes,
         order: timeline.length,
         isCompleted: false
+      })
+      setSelectedActivity(null)
+      setFormData({
+        time: '',
+        activity: '',
+        duration: '',
+        category: 'preparation',
+        location: '',
+        notes: ''
       })
     } catch (err) {
       console.error('Error adding activity:', err)
@@ -78,8 +103,13 @@ export default function SvatebniDenPage() {
     e.preventDefault()
     try {
       await createTimelineItem({
-        ...formData,
+        time: formData.time,
+        activity: formData.activity,
+        duration: formData.duration,
+        category: 'preparation' as any,
+        location: formData.location,
         participants: [],
+        notes: formData.notes,
         order: timeline.length,
         isCompleted: false
       })
@@ -154,7 +184,7 @@ export default function SvatebniDenPage() {
             {PREDEFINED_ACTIVITIES.map((activity, index) => (
               <button
                 key={index}
-                onClick={() => handleAddPredefined(activity)}
+                onClick={() => handleSelectPredefined(activity)}
                 className="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-all text-left"
               >
                 <span className="text-2xl">{activity.icon}</span>
@@ -167,6 +197,88 @@ export default function SvatebniDenPage() {
             ))}
           </div>
         </div>
+
+        {/* Predefined Activity Form */}
+        {selectedActivity && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <span className="text-3xl">{selectedActivity.icon}</span>
+                <h3 className="text-lg font-semibold text-gray-900">{selectedActivity.name}</h3>
+              </div>
+              <button
+                onClick={() => setSelectedActivity(null)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleAddPredefined} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Čas začátku *
+                  </label>
+                  <input
+                    type="time"
+                    required
+                    value={formData.time}
+                    onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                    className="input"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Délka trvání
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.duration}
+                    onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                    className="input"
+                    placeholder="např. 1 hod"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Místo
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.location}
+                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                    className="input"
+                    placeholder="např. Zahrada"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Poznámky
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.notes}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    className="input"
+                    placeholder="Volitelné poznámky"
+                  />
+                </div>
+              </div>
+              <div className="flex space-x-3">
+                <button type="submit" className="btn-primary flex-1">
+                  Přidat do harmonogramu
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedActivity(null)}
+                  className="btn-outline flex-1"
+                >
+                  Zrušit
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
 
         <div className="mb-6">
           <button
@@ -198,10 +310,11 @@ export default function SvatebniDenPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Čas
+                    Čas začátku *
                   </label>
                   <input
                     type="time"
+                    required
                     value={formData.time}
                     onChange={(e) => setFormData({ ...formData, time: e.target.value })}
                     className="input"
@@ -221,20 +334,6 @@ export default function SvatebniDenPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Kategorie
-                  </label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
-                    className="input"
-                  >
-                    {Object.entries(categoryLabels).map(([key, label]) => (
-                      <option key={key} value={key}>{label}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     Místo
                   </label>
                   <input
@@ -245,7 +344,7 @@ export default function SvatebniDenPage() {
                     placeholder="např. Zahrada"
                   />
                 </div>
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Poznámky
                   </label>
@@ -277,45 +376,67 @@ export default function SvatebniDenPage() {
         {timeline.length > 0 && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Váš harmonogram ({timeline.length})</h2>
-            <div className="space-y-3">
-              {timeline.map((item) => (
-                <div
-                  key={item.id}
-                  className={`p-4 rounded-lg border-2 ${categoryColors[item.category as keyof typeof categoryColors]}`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <Clock className="w-4 h-4" />
-                        <span className="font-semibold">{item.time || 'Neurčeno'}</span>
-                        <span className="text-sm">•</span>
-                        <span className="font-bold">{item.activity}</span>
-                        {item.duration && (
-                          <>
-                            <span className="text-sm">•</span>
-                            <span className="text-sm">{item.duration}</span>
-                          </>
-                        )}
+            <div className="space-y-2">
+              {[...timeline].sort((a, b) => {
+                if (!a.time) return 1
+                if (!b.time) return -1
+                return a.time.localeCompare(b.time)
+              }).map((item, index, sortedArray) => {
+                const prevItem = index > 0 ? sortedArray[index - 1] : null
+                const showTimeDivider = !prevItem || (prevItem.time && item.time && prevItem.time !== item.time)
+
+                return (
+                  <div key={item.id}>
+                    {showTimeDivider && item.time && (
+                      <div className="flex items-center space-x-3 mt-4 mb-2">
+                        <div className="flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full">
+                          <Clock className="w-8 h-8 text-purple-600" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="text-2xl font-bold text-gray-900">{item.time}</div>
+                        </div>
                       </div>
-                      {item.location && (
-                        <div className="text-sm mb-1">📍 {item.location}</div>
+                    )}
+                    <div className="ml-20 relative">
+                      {index < sortedArray.length - 1 && (
+                        <div className="absolute left-[-52px] top-0 bottom-0 w-0.5 bg-purple-200" />
                       )}
-                      {item.notes && (
-                        <div className="text-sm text-gray-600">💭 {item.notes}</div>
-                      )}
-                    </div>
-                    <div className="flex items-center space-x-2 ml-4">
-                      <button
-                        onClick={() => handleDelete(item.id)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        title="Smazat"
+                      <div
+                        className={`p-4 rounded-lg border-2 ${categoryColors[item.category as keyof typeof categoryColors]} mb-2`}
                       >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-3 mb-2">
+                              <span className="font-bold text-lg">{item.activity}</span>
+                              {item.duration && (
+                                <>
+                                  <span className="text-sm text-gray-400">•</span>
+                                  <span className="text-sm text-gray-600">{item.duration}</span>
+                                </>
+                              )}
+                            </div>
+                            {item.location && (
+                              <div className="text-sm mb-1">📍 {item.location}</div>
+                            )}
+                            {item.notes && (
+                              <div className="text-sm text-gray-600">💭 {item.notes}</div>
+                            )}
+                          </div>
+                          <div className="flex items-center space-x-2 ml-4">
+                            <button
+                              onClick={() => handleDelete(item.id)}
+                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              title="Smazat"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         )}
