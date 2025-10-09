@@ -325,73 +325,71 @@ export function useMenu(): UseMenuReturn {
       return
     }
 
-    const loadMenuData = async () => {
-      try {
-        setLoading(true)
+    setLoading(true)
 
-        console.log('✅ Loading menu from Firestore for wedding:', wedding.id)
+    let unsubscribeMenu: (() => void) | undefined
+    let unsubscribeDrinks: (() => void) | undefined
 
-        // Use Firestore for all users
-        try {
-          // Subscribe to menu items
-          const menuQuery = query(
-            collection(db, 'menuItems'),
-            where('weddingId', '==', wedding.id),
-            orderBy('createdAt', 'desc')
-          )
+    try {
+      // Subscribe to menu items
+      const menuQuery = query(
+        collection(db, 'menuItems'),
+        where('weddingId', '==', wedding.id),
+        orderBy('createdAt', 'desc')
+      )
 
-          const unsubscribeMenu = onSnapshot(menuQuery, (snapshot) => {
-            const items = snapshot.docs.map(doc => ({
-              id: doc.id,
-              ...doc.data(),
-              createdAt: doc.data().createdAt?.toDate() || new Date(),
-              updatedAt: doc.data().updatedAt?.toDate() || new Date()
-            })) as MenuItem[]
-            setMenuItems(items)
-          })
+      unsubscribeMenu = onSnapshot(menuQuery, (snapshot) => {
+        const items = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt?.toDate() || new Date(),
+          updatedAt: doc.data().updatedAt?.toDate() || new Date()
+        })) as MenuItem[]
+        setMenuItems(items)
+      }, (error) => {
+        console.error('Error in menu snapshot:', error)
+        setMenuItems([])
+      })
 
-          // Subscribe to drink items
-          const drinkQuery = query(
-            collection(db, 'drinkItems'),
-            where('weddingId', '==', wedding.id),
-            orderBy('createdAt', 'desc')
-          )
+      // Subscribe to drink items
+      const drinkQuery = query(
+        collection(db, 'drinkItems'),
+        where('weddingId', '==', wedding.id),
+        orderBy('createdAt', 'desc')
+      )
 
-          const unsubscribeDrinks = onSnapshot(drinkQuery, (snapshot) => {
-            const items = snapshot.docs.map(doc => ({
-              id: doc.id,
-              ...doc.data(),
-              createdAt: doc.data().createdAt?.toDate() || new Date(),
-              updatedAt: doc.data().updatedAt?.toDate() || new Date()
-            })) as DrinkItem[]
-            setDrinkItems(items)
-          })
+      unsubscribeDrinks = onSnapshot(drinkQuery, (snapshot) => {
+        const items = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt?.toDate() || new Date(),
+          updatedAt: doc.data().updatedAt?.toDate() || new Date()
+        })) as DrinkItem[]
+        setDrinkItems(items)
+      }, (error) => {
+        console.error('Error in drinks snapshot:', error)
+        setDrinkItems([])
+      })
 
-          setLoading(false)
+      setLoading(false)
+    } catch (err: any) {
+      console.error('Error loading menu data:', err)
+      setError('Chyba při načítání menu')
+      setLoading(false)
 
-          return () => {
-            unsubscribeMenu()
-            unsubscribeDrinks()
-          }
-        } catch (firestoreError) {
-          console.warn('⚠️ Firestore not available, using localStorage only:', firestoreError)
-          // Fallback to localStorage if Firestore fails
-          const storedMenu = localStorage.getItem(MENU_ITEMS_KEY)
-          const storedDrinks = localStorage.getItem(DRINK_ITEMS_KEY)
-
-          setMenuItems(storedMenu ? JSON.parse(storedMenu) : [])
-          setDrinkItems(storedDrinks ? JSON.parse(storedDrinks) : [])
-          setLoading(false)
-        }
-      } catch (err: any) {
-        console.error('Error loading menu data:', err)
-        setError('Chyba při načítání menu')
-        setLoading(false)
-      }
+      // Fallback to localStorage if Firestore fails
+      const storedMenu = localStorage.getItem(MENU_ITEMS_KEY)
+      const storedDrinks = localStorage.getItem(DRINK_ITEMS_KEY)
+      setMenuItems(storedMenu ? JSON.parse(storedMenu) : [])
+      setDrinkItems(storedDrinks ? JSON.parse(storedDrinks) : [])
     }
 
-    loadMenuData()
-  }, [wedding?.id, user?.id, user?.email])
+    // Cleanup function
+    return () => {
+      if (unsubscribeMenu) unsubscribeMenu()
+      if (unsubscribeDrinks) unsubscribeDrinks()
+    }
+  }, [wedding?.id])
 
   const clearError = () => setError(null)
 

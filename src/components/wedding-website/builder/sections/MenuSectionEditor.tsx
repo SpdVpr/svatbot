@@ -1,41 +1,103 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { UtensilsCrossed, Download, Eye, EyeOff, Info } from 'lucide-react'
-import { useMenu } from '@/hooks/useMenu'
 import { FOOD_CATEGORY_LABELS, DRINK_CATEGORY_LABELS } from '@/types/menu'
 import type { MenuContent } from '@/types/wedding-website'
+import type { MenuItem, DrinkItem } from '@/types/menu'
+import { collection, query, where, getDocs } from 'firebase/firestore'
+import { db } from '@/config/firebase'
+import { useWeddingStore } from '@/stores/weddingStore'
 
 interface MenuSectionEditorProps {
-  content: MenuContent
+  content?: MenuContent
   onChange: (content: MenuContent) => void
 }
 
 export default function MenuSectionEditor({ content, onChange }: MenuSectionEditorProps) {
-  const { menuItems, drinkItems, loading, stats } = useMenu()
+  const { currentWedding: wedding } = useWeddingStore()
   const [importing, setImporting] = useState(false)
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([])
+  const [drinkItems, setDrinkItems] = useState<DrinkItem[]>([])
+  const [loading, setLoading] = useState(false)
+  const [dataLoaded, setDataLoaded] = useState(false)
 
-  const updateContent = (updates: Partial<MenuContent>) => {
-    onChange({
-      enabled: content?.enabled || false,
-      title: content?.title || 'Svatební menu',
-      description: content?.description || 'Připravili jsme pro vás výběr chutných jídel a nápojů.',
-      showCategories: content?.showCategories ?? true,
-      showDietaryInfo: content?.showDietaryInfo ?? true,
-      showDrinks: content?.showDrinks ?? true,
-      ...updates
-    })
+  // Use content directly from props, no local state needed
+  const currentContent: MenuContent = {
+    enabled: content?.enabled || false,
+    title: content?.title || 'Svatební menu',
+    description: content?.description || 'Připravili jsme pro vás výběr chutných jídel a nápojů.',
+    showCategories: content?.showCategories ?? true,
+    showDietaryInfo: content?.showDietaryInfo ?? true,
+    showDrinks: content?.showDrinks ?? true
   }
 
-  const handleImportFromMenu = () => {
+  const updateContent = (updates: Partial<MenuContent>) => {
+    const newContent = { ...currentContent, ...updates }
+    onChange(newContent)
+  }
+
+  const loadMenuData = async () => {
+    if (!wedding?.id) return
+
+    try {
+      setLoading(true)
+
+      // Load menu items
+      const menuQuery = query(
+        collection(db, 'menuItems'),
+        where('weddingId', '==', wedding.id)
+      )
+      const menuSnapshot = await getDocs(menuQuery)
+      const items = menuSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+        updatedAt: doc.data().updatedAt?.toDate() || new Date()
+      })) as MenuItem[]
+      setMenuItems(items)
+
+      // Load drink items
+      const drinkQuery = query(
+        collection(db, 'drinkItems'),
+        where('weddingId', '==', wedding.id)
+      )
+      const drinkSnapshot = await getDocs(drinkQuery)
+      const drinks = drinkSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate() || new Date(),
+        updatedAt: doc.data().updatedAt?.toDate() || new Date()
+      })) as DrinkItem[]
+      setDrinkItems(drinks)
+
+      setDataLoaded(true)
+      setLoading(false)
+    } catch (error) {
+      console.error('Error loading menu data:', error)
+      setLoading(false)
+    }
+  }
+
+  // Load data when component mounts
+  useEffect(() => {
+    if (wedding?.id && !dataLoaded) {
+      loadMenuData()
+    }
+  }, [wedding?.id, dataLoaded])
+
+  const handleImportFromMenu = async () => {
     setImporting(true)
-    // Import is automatic - just enable the section
-    // The actual menu data will be loaded from useMenu hook
+    await loadMenuData()
     updateContent({ enabled: true })
-    setTimeout(() => setImporting(false), 500)
+    setImporting(false)
   }
 
   const totalItems = menuItems.length + drinkItems.length
+  const stats = {
+    totalMenuItems: menuItems.length,
+    totalDrinkItems: drinkItems.length
+  }
 
   return (
     <div className="space-y-6">
@@ -264,4 +326,3 @@ export default function MenuSectionEditor({ content, onChange }: MenuSectionEdit
     </div>
   )
 }
-

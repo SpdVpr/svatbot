@@ -113,11 +113,6 @@ export default function MenuSection({ content }: MenuSectionProps) {
                           {item.description && (
                             <p className="text-gray-600 text-sm">{item.description}</p>
                           )}
-                          {content.showDietaryInfo && item.allergens.length > 0 && (
-                            <p className="text-xs text-gray-500 mt-2">
-                              Alergeny: {item.allergens.join(', ')}
-                            </p>
-                          )}
                         </div>
                       ))}
                     </div>
@@ -153,11 +148,6 @@ export default function MenuSection({ content }: MenuSectionProps) {
                     </div>
                     {item.description && (
                       <p className="text-gray-600 text-sm">{item.description}</p>
-                    )}
-                    {content.showDietaryInfo && item.allergens.length > 0 && (
-                      <p className="text-xs text-gray-500 mt-2">
-                        Alergeny: {item.allergens.join(', ')}
-                      </p>
                     )}
                   </div>
                 ))}
