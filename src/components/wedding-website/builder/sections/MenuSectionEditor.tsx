@@ -15,22 +15,17 @@ export default function MenuSectionEditor({ content, onChange }: MenuSectionEdit
   const { menuItems, drinkItems, loading, stats } = useMenu()
   const [importing, setImporting] = useState(false)
 
-  // Helper to get current content with defaults
-  const getCurrentContent = (): MenuContent => ({
-    enabled: content?.enabled || false,
-    title: content?.title || 'Svatební menu',
-    description: content?.description || 'Připravili jsme pro vás výběr chutných jídel a nápojů.',
-    showCategories: content?.showCategories ?? true,
-    showDietaryInfo: content?.showDietaryInfo ?? true,
-    showDrinks: content?.showDrinks ?? true
-  })
-
   const updateContent = (updates: Partial<MenuContent>) => {
-    const newContent = { ...getCurrentContent(), ...updates }
-    onChange(newContent)
+    onChange({
+      enabled: content?.enabled || false,
+      title: content?.title || 'Svatební menu',
+      description: content?.description || 'Připravili jsme pro vás výběr chutných jídel a nápojů.',
+      showCategories: content?.showCategories ?? true,
+      showDietaryInfo: content?.showDietaryInfo ?? true,
+      showDrinks: content?.showDrinks ?? true,
+      ...updates
+    })
   }
-
-  const currentContent = getCurrentContent()
 
   const handleImportFromMenu = () => {
     setImporting(true)
@@ -56,7 +51,7 @@ export default function MenuSectionEditor({ content, onChange }: MenuSectionEdit
         <label className="relative inline-flex items-center cursor-pointer">
           <input
             type="checkbox"
-            checked={currentContent.enabled}
+            checked={content?.enabled || false}
             onChange={(e) => updateContent({ enabled: e.target.checked })}
             className="sr-only peer"
           />
@@ -64,7 +59,7 @@ export default function MenuSectionEditor({ content, onChange }: MenuSectionEdit
         </label>
       </div>
 
-      {currentContent.enabled && (
+      {(content?.enabled || false) && (
         <>
           {/* Import from Menu Module */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -112,7 +107,7 @@ export default function MenuSectionEditor({ content, onChange }: MenuSectionEdit
                 </label>
                 <input
                   type="text"
-                  value={currentContent.title}
+                  value={content?.title || 'Svatební menu'}
                   onChange={(e) => updateContent({ title: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Svatební menu"
@@ -124,7 +119,7 @@ export default function MenuSectionEditor({ content, onChange }: MenuSectionEdit
                   Popis
                 </label>
                 <textarea
-                  value={currentContent.description}
+                  value={content?.description || 'Připravili jsme pro vás výběr chutných jídel a nápojů.'}
                   onChange={(e) => updateContent({ description: e.target.value })}
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -150,7 +145,7 @@ export default function MenuSectionEditor({ content, onChange }: MenuSectionEdit
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={currentContent.showCategories}
+                    checked={content?.showCategories ?? true}
                     onChange={(e) => updateContent({ showCategories: e.target.checked })}
                     className="sr-only peer"
                   />
@@ -169,7 +164,7 @@ export default function MenuSectionEditor({ content, onChange }: MenuSectionEdit
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={currentContent.showDietaryInfo}
+                    checked={content?.showDietaryInfo ?? true}
                     onChange={(e) => updateContent({ showDietaryInfo: e.target.checked })}
                     className="sr-only peer"
                   />
@@ -188,7 +183,7 @@ export default function MenuSectionEditor({ content, onChange }: MenuSectionEdit
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={currentContent.showDrinks}
+                    checked={content?.showDrinks ?? true}
                     onChange={(e) => updateContent({ showDrinks: e.target.checked })}
                     className="sr-only peer"
                   />
@@ -215,7 +210,7 @@ export default function MenuSectionEditor({ content, onChange }: MenuSectionEdit
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-gray-900">{item.name}</p>
                             <p className="text-sm text-gray-600">{FOOD_CATEGORY_LABELS[item.category]}</p>
-                            {currentContent.showDietaryInfo && (
+                            {(content?.showDietaryInfo ?? true) && (
                               <div className="flex gap-2 mt-1">
                                 {item.isVegetarian && (
                                   <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Vegetariánské</span>
@@ -239,7 +234,7 @@ export default function MenuSectionEditor({ content, onChange }: MenuSectionEdit
                 )}
 
                 {/* Drink Items Preview */}
-                {currentContent.showDrinks && drinkItems.length > 0 && (
+                {(content?.showDrinks ?? true) && drinkItems.length > 0 && (
                   <div>
                     <h4 className="text-sm font-medium text-gray-700 mb-2">Nápoje ({drinkItems.length})</h4>
                     <div className="space-y-2">
