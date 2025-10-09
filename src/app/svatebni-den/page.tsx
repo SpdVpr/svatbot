@@ -26,6 +26,7 @@ export default function SvatebniDenPage() {
   const { timeline, stats, loading, createTimelineItem, updateTimelineItem, deleteTimelineItem, toggleComplete } = useWeddingDayTimeline()
   const [editingId, setEditingId] = useState<string | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     time: '',
     activity: '',
@@ -38,6 +39,7 @@ export default function SvatebniDenPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setSubmitting(true)
     try {
       await createTimelineItem({
         ...formData,
@@ -57,6 +59,9 @@ export default function SvatebniDenPage() {
       })
     } catch (err) {
       console.error('Error creating timeline item:', err)
+      alert('Chyba při vytváření aktivity. Zkuste to prosím znovu.')
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -235,13 +240,25 @@ export default function SvatebniDenPage() {
                     />
                   </div>
                   <div className="flex space-x-3">
-                    <button type="submit" className="btn-primary flex-1">
-                      Přidat aktivitu
+                    <button
+                      type="submit"
+                      className="btn-primary flex-1 flex items-center justify-center gap-2"
+                      disabled={submitting}
+                    >
+                      {submitting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>Přidávám...</span>
+                        </>
+                      ) : (
+                        'Přidat aktivitu'
+                      )}
                     </button>
                     <button
                       type="button"
                       onClick={() => setShowAddForm(false)}
                       className="btn-outline flex-1"
+                      disabled={submitting}
                     >
                       Zrušit
                     </button>
@@ -260,7 +277,7 @@ export default function SvatebniDenPage() {
         )}
 
         {/* List View - Always show below graph if there are items */}
-        {timeline.length > 0 && (
+        {timeline.length > 0 ? (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
             <div className="p-6">
               <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center space-x-2">
