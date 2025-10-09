@@ -1,10 +1,31 @@
 'use client'
 
 import { useState } from 'react'
-import { Clock, Calendar, ArrowLeft, Plus, Trash2, X, CheckCircle, Circle, Loader2, List } from 'lucide-react'
+import { Clock, Calendar, ArrowLeft, Plus, Trash2 } from 'lucide-react'
 import Link from 'next/link'
-import { useWeddingDayTimeline, WeddingDayTimelineItem } from '@/hooks/useWeddingDayTimeline'
-import TimelineGraphView from '@/components/timeline/TimelineGraphView'
+import { useWeddingDayTimeline } from '@/hooks/useWeddingDayTimeline'
+
+const PREDEFINED_ACTIVITIES = [
+  { name: 'PŘÍJEZD HOSTŮ', category: 'ceremony', duration: '30 min', icon: '🚗' },
+  { name: 'WELCOME DRINK', category: 'reception', duration: '30 min', icon: '🥂' },
+  { name: 'SVATEBNÍ OBŘAD', category: 'ceremony', duration: '45 min', icon: '💒' },
+  { name: 'GRATULACE', category: 'ceremony', duration: '30 min', icon: '🎉' },
+  { name: 'ŠPALÍR', category: 'ceremony', duration: '15 min', icon: '✨' },
+  { name: 'SKUPINOVÉ FOCENÍ', category: 'photography', duration: '45 min', icon: '📸' },
+  { name: 'PŘÍPITEK', category: 'reception', duration: '15 min', icon: '🍾' },
+  { name: 'PROSLOVY', category: 'reception', duration: '30 min', icon: '🎤' },
+  { name: 'OBĚD', category: 'reception', duration: '2 hod', icon: '🍽️' },
+  { name: 'KRÁJENÍ DORTU', category: 'reception', duration: '15 min', icon: '🎂' },
+  { name: 'FOCENÍ NOVOMANŽELŮ', category: 'photography', duration: '1 hod', icon: '💑' },
+  { name: 'UBYTOVÁNÍ HOSTŮ', category: 'preparation', duration: '30 min', icon: '🏨' },
+  { name: 'HÁZENÍ KYTICÍ', category: 'party', duration: '15 min', icon: '💐' },
+  { name: 'PRVNÍ TANEC', category: 'party', duration: '15 min', icon: '💃' },
+  { name: 'TANEC S RODIČI', category: 'party', duration: '15 min', icon: '👨‍👩‍👧' },
+  { name: 'VEČEŘE', category: 'reception', duration: '1 hod', icon: '🍴' },
+  { name: 'VOLNÁ ZÁBAVA', category: 'party', duration: '3 hod', icon: '🎊' },
+  { name: 'HRY', category: 'party', duration: '1 hod', icon: '🎮' },
+  { name: 'KVÍZY', category: 'party', duration: '30 min', icon: '❓' }
+]
 
 const categoryColors = {
   preparation: 'bg-blue-100 text-blue-600 border-blue-200',
@@ -23,54 +44,67 @@ const categoryLabels = {
 }
 
 export default function SvatebniDenPage() {
-  const { timeline, stats, loading, createTimelineItem, updateTimelineItem, deleteTimelineItem, toggleComplete } = useWeddingDayTimeline()
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [showAddForm, setShowAddForm] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
+  const { timeline, loading, createTimelineItem, deleteTimelineItem } = useWeddingDayTimeline()
+  const [showCustomForm, setShowCustomForm] = useState(false)
   const [formData, setFormData] = useState({
     time: '',
     activity: '',
     duration: '',
     category: 'preparation' as const,
     location: '',
-    participants: '',
     notes: ''
   })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSubmitting(true)
+  const handleAddPredefined = async (activity: typeof PREDEFINED_ACTIVITIES[0]) => {
     try {
       await createTimelineItem({
-        ...formData,
-        participants: formData.participants.split(',').map(p => p.trim()).filter(Boolean),
+        time: '',
+        activity: activity.name,
+        duration: activity.duration,
+        category: activity.category as any,
+        location: '',
+        participants: [],
+        notes: '',
         order: timeline.length,
         isCompleted: false
       })
-      setShowAddForm(false)
+    } catch (err) {
+      console.error('Error adding activity:', err)
+      alert('Chyba při přidávání aktivity')
+    }
+  }
+
+  const handleAddCustom = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      await createTimelineItem({
+        ...formData,
+        participants: [],
+        order: timeline.length,
+        isCompleted: false
+      })
+      setShowCustomForm(false)
       setFormData({
         time: '',
         activity: '',
         duration: '',
         category: 'preparation',
         location: '',
-        participants: '',
         notes: ''
       })
     } catch (err) {
-      console.error('Error creating timeline item:', err)
-      alert('Chyba při vytváření aktivity. Zkuste to prosím znovu.')
-    } finally {
-      setSubmitting(false)
+      console.error('Error adding custom activity:', err)
+      alert('Chyba při přidávání vlastní aktivity')
     }
   }
 
   const handleDelete = async (id: string) => {
-    if (confirm('Opravdu chcete smazat tuto položku?')) {
+    if (confirm('Opravdu chcete smazat tuto aktivitu?')) {
       try {
         await deleteTimelineItem(id)
       } catch (err) {
-        console.error('Error deleting timeline item:', err)
+        console.error('Error deleting activity:', err)
+        alert('Chyba při mazání aktivity')
       }
     }
   }
@@ -78,14 +112,13 @@ export default function SvatebniDenPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
       </div>
     )
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -98,257 +131,195 @@ export default function SvatebniDenPage() {
                 <span>Zpět na dashboard</span>
               </Link>
               <div className="h-6 w-px bg-gray-300" />
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
-                <Calendar className="w-6 h-6 text-purple-600" />
-                <span>Harmonogram svatebního dne</span>
-              </h1>
+              <div className="flex items-center space-x-2">
+                <Calendar className="w-5 h-5 text-purple-600" />
+                <h1 className="text-xl font-bold text-gray-900">Harmonogram svatebního dne</h1>
+              </div>
             </div>
-            <button
-              onClick={() => setShowAddForm(true)}
-              className="btn-primary flex items-center space-x-2"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Přidat aktivitu</span>
-            </button>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-8">
-          <div className="bg-white p-4 rounded-lg border border-gray-200">
-            <div className="text-2xl font-bold text-purple-600">{stats.total}</div>
-            <div className="text-sm text-gray-600">Celkem aktivit</div>
-          </div>
-          {Object.entries(categoryLabels).map(([key, label]) => {
-            const count = stats.byCategory[key] || 0
-            return (
-              <div key={key} className={`p-4 rounded-lg border ${categoryColors[key as keyof typeof categoryColors]}`}>
-                <div className="text-2xl font-bold">{count}</div>
-                <div className="text-sm">{label}</div>
-              </div>
-            )
-          })}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <h2 className="text-lg font-semibold text-blue-900 mb-2">💡 Tip</h2>
+          <p className="text-blue-800">
+            Vyberte si z připravených aktivit níže nebo přidejte vlastní. Můžete upravit čas, místo a další detaily každé aktivity.
+          </p>
         </div>
 
-        {/* Add Form Modal */}
-        {showAddForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-bold text-gray-900">Přidat aktivitu</h2>
-                  <button
-                    onClick={() => setShowAddForm(false)}
-                    className="text-gray-400 hover:text-gray-600"
-                  >
-                    <X className="w-6 h-6" />
-                  </button>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Připravené aktivity</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {PREDEFINED_ACTIVITIES.map((activity, index) => (
+              <button
+                key={index}
+                onClick={() => handleAddPredefined(activity)}
+                className="flex items-center space-x-2 p-3 border-2 border-gray-200 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-all text-left"
+              >
+                <span className="text-2xl">{activity.icon}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium text-gray-900 truncate">{activity.name}</div>
+                  <div className="text-xs text-gray-500">{activity.duration}</div>
                 </div>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Čas *
-                      </label>
-                      <input
-                        type="time"
-                        value={formData.time}
-                        onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                        className="input-field"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Trvání *
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.duration}
-                        onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                        placeholder="např. 30 min, 1 hod"
-                        className="input-field"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Aktivita *
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.activity}
-                      onChange={(e) => setFormData({ ...formData, activity: e.target.value })}
-                      placeholder="např. Příjezd hostů"
-                      className="input-field"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Kategorie *
-                    </label>
-                    <select
-                      value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
-                      className="input-field"
-                      required
-                    >
-                      {Object.entries(categoryLabels).map(([key, label]) => (
-                        <option key={key} value={key}>{label}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Místo
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.location}
-                      onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                      placeholder="např. Château Mcely - zahrada"
-                      className="input-field"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Účastníci (oddělené čárkou)
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.participants}
-                      onChange={(e) => setFormData({ ...formData, participants: e.target.value })}
-                      placeholder="např. Nevěsta, Ženich, Fotograf"
-                      className="input-field"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Poznámky
-                    </label>
-                    <textarea
-                      value={formData.notes}
-                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                      placeholder="Další informace..."
-                      className="input-field"
-                      rows={3}
-                    />
-                  </div>
-                  <div className="flex space-x-3">
-                    <button
-                      type="submit"
-                      className="btn-primary flex-1 flex items-center justify-center gap-2"
-                      disabled={submitting}
-                    >
-                      {submitting ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Přidávám...</span>
-                        </>
-                      ) : (
-                        'Přidat aktivitu'
-                      )}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowAddForm(false)}
-                      className="btn-outline flex-1"
-                      disabled={submitting}
-                    >
-                      Zrušit
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
+                <Plus className="w-4 h-4 text-purple-600 flex-shrink-0" />
+              </button>
+            ))}
           </div>
-        )}
+        </div>
 
-        {/* Graph View - Always show at top if there are items */}
-        {timeline.length > 0 && (
-          <div className="mb-8">
-            <TimelineGraphView timeline={timeline} />
-          </div>
-        )}
+        <div className="mb-6">
+          <button
+            onClick={() => setShowCustomForm(!showCustomForm)}
+            className="btn-outline w-full flex items-center justify-center space-x-2"
+          >
+            <Plus className="w-5 h-5" />
+            <span>Přidat vlastní aktivitu</span>
+          </button>
+        </div>
 
-        {/* List View - Always show below graph if there are items */}
-        {timeline.length > 0 ? (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center space-x-2">
-                <List className="w-5 h-5 text-purple-600" />
-                <span>Seznam aktivit</span>
-              </h2>
-              <div className="space-y-4">
-                {timeline.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-start space-x-4 p-4 rounded-lg border border-gray-200 hover:border-purple-300 transition-colors"
+        {showCustomForm && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Vlastní aktivita</h3>
+            <form onSubmit={handleAddCustom} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Název aktivity *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.activity}
+                    onChange={(e) => setFormData({ ...formData, activity: e.target.value })}
+                    className="input"
+                    placeholder="např. Příjezd fotografa"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Čas
+                  </label>
+                  <input
+                    type="time"
+                    value={formData.time}
+                    onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                    className="input"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Délka trvání
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.duration}
+                    onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                    className="input"
+                    placeholder="např. 1 hod"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Kategorie
+                  </label>
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
+                    className="input"
                   >
-                    {/* Checkbox */}
-                    <button
-                      onClick={() => toggleComplete(item.id)}
-                      className="flex-shrink-0 mt-1"
-                    >
-                      {item.isCompleted ? (
-                        <CheckCircle className="w-5 h-5 text-green-500" />
-                      ) : (
-                        <Circle className="w-5 h-5 text-gray-300 hover:text-gray-400" />
-                      )}
-                    </button>
+                    {Object.entries(categoryLabels).map(([key, label]) => (
+                      <option key={key} value={key}>{label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Místo
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.location}
+                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                    className="input"
+                    placeholder="např. Zahrada"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Poznámky
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.notes}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    className="input"
+                    placeholder="Volitelné poznámky"
+                  />
+                </div>
+              </div>
+              <div className="flex space-x-3">
+                <button type="submit" className="btn-primary flex-1">
+                  Přidat aktivitu
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowCustomForm(false)}
+                  className="btn-outline flex-1"
+                >
+                  Zrušit
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
 
-                    {/* Time */}
-                    <div className="flex-shrink-0 w-20">
-                      <div className="flex items-center space-x-2">
-                        <Clock className="w-4 h-4 text-gray-400" />
-                        <span className="font-semibold text-gray-900">{item.time}</span>
-                      </div>
-                      <div className="text-xs text-gray-500 mt-1">{item.duration}</div>
-                    </div>
-
-                    {/* Content */}
+        {timeline.length > 0 && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Váš harmonogram ({timeline.length})</h2>
+            <div className="space-y-3">
+              {timeline.map((item) => (
+                <div
+                  key={item.id}
+                  className={`p-4 rounded-lg border-2 ${categoryColors[item.category as keyof typeof categoryColors]}`}
+                >
+                  <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <div className="flex items-start justify-between">
-                        <div className={item.isCompleted ? 'opacity-50' : ''}>
-                          <h3 className="font-semibold text-gray-900">{item.activity}</h3>
-                          {item.location && (
-                            <p className="text-sm text-gray-600 mt-1">📍 {item.location}</p>
-                          )}
-                          {item.participants && item.participants.length > 0 && (
-                            <p className="text-sm text-gray-600 mt-1">
-                              👥 {item.participants.join(', ')}
-                            </p>
-                          )}
-                          {item.notes && (
-                            <p className="text-sm text-gray-500 mt-2 italic">{item.notes}</p>
-                          )}
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${categoryColors[item.category]}`}>
-                            {categoryLabels[item.category]}
-                          </span>
-                          <button
-                            onClick={() => handleDelete(item.id)}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
+                      <div className="flex items-center space-x-3 mb-2">
+                        <Clock className="w-4 h-4" />
+                        <span className="font-semibold">{item.time || 'Neurčeno'}</span>
+                        <span className="text-sm">•</span>
+                        <span className="font-bold">{item.activity}</span>
+                        {item.duration && (
+                          <>
+                            <span className="text-sm">•</span>
+                            <span className="text-sm">{item.duration}</span>
+                          </>
+                        )}
                       </div>
+                      {item.location && (
+                        <div className="text-sm mb-1">📍 {item.location}</div>
+                      )}
+                      {item.notes && (
+                        <div className="text-sm text-gray-600">💭 {item.notes}</div>
+                      )}
+                    </div>
+                    <div className="flex items-center space-x-2 ml-4">
+                      <button
+                        onClick={() => handleDelete(item.id)}
+                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Smazat"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
 
-        {/* Empty State */}
         {timeline.length === 0 && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
             <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -356,18 +327,12 @@ export default function SvatebniDenPage() {
               Zatím nemáte naplánovaný harmonogram
             </h3>
             <p className="text-gray-600 mb-6">
-              Vytvořte si detailní časový plán pro váš svatební den
+              Začněte výběrem z připravených aktivit výše nebo přidejte vlastní
             </p>
-            <button
-              onClick={() => setShowAddForm(true)}
-              className="btn-primary inline-flex items-center space-x-2"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Přidat první aktivitu</span>
-            </button>
           </div>
         )}
       </div>
     </div>
   )
 }
+
