@@ -248,15 +248,6 @@ export default function WeddingWebsiteBuilderPage() {
             ))}
           </div>
 
-          {/* Domain Status */}
-          {website && website.customUrl && (
-            <div className="mt-6 max-w-2xl mx-auto">
-              <DomainStatus
-                subdomain={website.customUrl}
-                isPublished={website.isPublished || false}
-              />
-            </div>
-          )}
         </div>
       </div>
 

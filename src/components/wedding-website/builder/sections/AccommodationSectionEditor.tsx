@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Building2, Phone, Mail, Eye, EyeOff, DollarSign, Users, Download } from 'lucide-react'
 import { useAccommodation } from '@/hooks/useAccommodation'
 import type { AccommodationContent } from '@/types/wedding-website'
@@ -27,6 +27,25 @@ export default function AccommodationSectionEditor({ content, onChange }: Accomm
     }
   })
   const [importing, setImporting] = useState(false)
+
+  // Synchronize with parent content changes
+  useEffect(() => {
+    if (content) {
+      setLocalContent({
+        enabled: content.enabled || false,
+        title: content.title || 'Ubytování',
+        description: content.description || 'Doporučujeme následující ubytování pro naše svatební hosty.',
+        showPrices: content.showPrices ?? true,
+        showAvailability: content.showAvailability ?? true,
+        contactInfo: content.contactInfo || {
+          name: '',
+          phone: '',
+          email: '',
+          message: 'Pro rezervaci kontaktujte přímo ubytování nebo nás.'
+        }
+      })
+    }
+  }, [content])
 
   const updateContent = (updates: Partial<AccommodationContent>) => {
     const newContent = { ...localContent, ...updates }

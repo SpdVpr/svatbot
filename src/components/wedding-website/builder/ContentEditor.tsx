@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronDown, ChevronRight, Image, Calendar, MapPin, Users, MessageSquare, Gift, Camera, Phone, HelpCircle, Building2 } from 'lucide-react'
+import { ChevronDown, Image, Calendar, MapPin, Users, MessageSquare, Gift, Camera, Phone, HelpCircle, Building2 } from 'lucide-react'
 import HeroSectionEditor from './sections/HeroSectionEditor'
 import InfoSectionEditor from './sections/InfoSectionEditor'
 import RSVPSectionEditor from './sections/RSVPSectionEditor'
@@ -31,7 +31,7 @@ interface Section {
 }
 
 export default function ContentEditor({ content, onContentChange }: ContentEditorProps) {
-  const [expandedSection, setExpandedSection] = useState<SectionType>('hero')
+  const [expandedSection, setExpandedSection] = useState<SectionType | null>(null)
 
   const sections: Section[] = [
     {
@@ -116,14 +116,9 @@ export default function ContentEditor({ content, onContentChange }: ContentEdito
     }
   ]
 
-  const toggleSection = (sectionId: SectionType, event?: React.MouseEvent) => {
-    // Prevent default scroll behavior
-    if (event) {
-      event.preventDefault()
-    }
-
+  const selectSection = (sectionId: SectionType) => {
     if (expandedSection === sectionId) {
-      setExpandedSection('hero') // Always keep hero expanded as fallback
+      setExpandedSection(null) // Close if clicking the same section
     } else {
       setExpandedSection(sectionId)
     }
@@ -259,81 +254,161 @@ export default function ContentEditor({ content, onContentChange }: ContentEdito
   }
 
   return (
-    <div className="space-y-4">
-      <div className="mb-6">
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
           Upravit obsah webu
         </h2>
         <p className="text-gray-600">
-          Vyplňte informace pro jednotlivé sekce vašeho svatebního webu
+          Vyberte sekci, kterou chcete upravit
         </p>
       </div>
 
-      {sections.map((section) => (
-        <div key={section.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-          {/* Section Header */}
-          <div
-            className={`flex items-center justify-between p-4 cursor-pointer transition-colors ${
-              expandedSection === section.id ? 'bg-pink-50' : 'hover:bg-gray-50'
-            }`}
-            onClick={(e) => toggleSection(section.id, e)}
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                {expandedSection === section.id ? (
-                  <ChevronDown className="w-5 h-5 text-gray-400" />
-                ) : (
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
-                )}
-                <section.icon className="w-5 h-5 text-pink-600" />
-              </div>
-              
-              <div>
-                <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-                  {section.title}
-                  {section.required && (
-                    <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">
-                      Povinné
-                    </span>
-                  )}
-                </h3>
-                <p className="text-sm text-gray-600">{section.description}</p>
-              </div>
-            </div>
+      {/* Section Grid - Only show when no section is expanded */}
+      {!expandedSection && (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {sections.map((section) => (
+            <button
+              key={section.id}
+              onClick={() => selectSection(section.id)}
+              className={`relative p-6 rounded-xl border-2 transition-all duration-200 hover:shadow-lg hover:scale-105 ${
+                section.enabled
+                  ? 'border-pink-200 bg-gradient-to-br from-pink-50 to-purple-50 hover:border-pink-300'
+                  : 'border-gray-200 bg-gray-50 hover:border-gray-300'
+              }`}
+            >
+              {/* Required Badge */}
+              {section.required && (
+                <div className="absolute top-2 right-2">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-600">
+                    Povinné
+                  </span>
+                </div>
+              )}
 
-            {!section.required && (
-              <label className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                <input
-                  type="checkbox"
-                  checked={section.enabled}
-                  onChange={(e) => toggleSectionEnabled(section.id, e.target.checked)}
-                  className="rounded border-gray-300 text-pink-600 focus:ring-pink-500"
-                />
-                <span className="text-sm text-gray-600">Zobrazit</span>
-              </label>
-            )}
+              {/* Enabled Badge */}
+              {!section.required && section.enabled && (
+                <div className="absolute top-2 right-2">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-600">
+                    Aktivní
+                  </span>
+                </div>
+              )}
+
+              {/* Icon */}
+              <div className="flex justify-center mb-3">
+                <div className={`p-4 rounded-full ${
+                  section.enabled
+                    ? 'bg-gradient-to-br from-pink-500 to-purple-500'
+                    : 'bg-gray-300'
+                }`}>
+                  <section.icon className="w-8 h-8 text-white" />
+                </div>
+              </div>
+
+              {/* Title */}
+              <h3 className="font-semibold text-gray-900 text-center mb-1">
+                {section.title}
+              </h3>
+
+              {/* Description */}
+              <p className="text-xs text-gray-600 text-center line-clamp-2">
+                {section.description}
+              </p>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Expanded Section Editor */}
+      {expandedSection && (
+        <div className="bg-white rounded-xl border-2 border-pink-200 shadow-lg overflow-hidden">
+          {/* Section Header */}
+          <div className="bg-gradient-to-r from-pink-500 to-purple-500 p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setExpandedSection(null)}
+                  className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
+                >
+                  <ChevronDown className="w-6 h-6 text-white transform rotate-90" />
+                </button>
+
+                <div className="flex items-center gap-3">
+                  {(() => {
+                    const section = sections.find(s => s.id === expandedSection)
+                    if (!section) return null
+                    return (
+                      <>
+                        <div className="p-3 bg-white/20 rounded-lg">
+                          <section.icon className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                            {section.title}
+                            {section.required && (
+                              <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full">
+                                Povinné
+                              </span>
+                            )}
+                          </h3>
+                          <p className="text-pink-100 text-sm">{section.description}</p>
+                        </div>
+                      </>
+                    )
+                  })()}
+                </div>
+              </div>
+
+              {/* Enable/Disable Toggle */}
+              {(() => {
+                const section = sections.find(s => s.id === expandedSection)
+                if (!section || section.required) return null
+                return (
+                  <label className="flex items-center gap-3 bg-white/20 px-4 py-2 rounded-lg cursor-pointer hover:bg-white/30 transition-colors">
+                    <span className="text-sm font-medium text-white">Zobrazit na webu</span>
+                    <input
+                      type="checkbox"
+                      checked={section.enabled}
+                      onChange={(e) => toggleSectionEnabled(section.id, e.target.checked)}
+                      className="w-5 h-5 rounded border-white text-pink-600 focus:ring-pink-500 focus:ring-offset-0"
+                    />
+                  </label>
+                )
+              })()}
+            </div>
           </div>
 
           {/* Section Content */}
-          {expandedSection === section.id && section.enabled && (
-            <div className="border-t border-gray-200">
-              {renderSectionEditor(section.id)}
-            </div>
-          )}
+          {(() => {
+            const section = sections.find(s => s.id === expandedSection)
+            if (!section) return null
 
-          {/* Disabled State */}
-          {expandedSection === section.id && !section.enabled && !section.required && (
-            <div className="border-t border-gray-200 p-6 text-center bg-gray-50">
-              <div className="text-gray-400 mb-2">
-                <section.icon className="w-8 h-8 mx-auto" />
-              </div>
-              <p className="text-gray-600">
-                Tato sekce je vypnutá. Zapněte ji pomocí přepínače výše.
-              </p>
-            </div>
-          )}
+            if (section.enabled) {
+              return (
+                <div className="p-6">
+                  {renderSectionEditor(section.id)}
+                </div>
+              )
+            } else if (!section.required) {
+              return (
+                <div className="p-12 text-center bg-gray-50">
+                  <div className="text-gray-400 mb-4">
+                    <section.icon className="w-16 h-16 mx-auto" />
+                  </div>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2">
+                    Tato sekce je vypnutá
+                  </h4>
+                  <p className="text-gray-600 mb-4">
+                    Zapněte ji pomocí přepínače výše, aby se zobrazila na vašem svatebním webu.
+                  </p>
+                </div>
+              )
+            }
+          })()}
         </div>
-      ))}
+      )}
     </div>
   )
 }

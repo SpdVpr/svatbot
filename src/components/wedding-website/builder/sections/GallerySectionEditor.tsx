@@ -315,15 +315,15 @@ export default function GallerySectionEditor({ content, onChange }: GallerySecti
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {content.images.map((image) => (
-              <div key={image.id} className="relative group">
-                <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+              <div key={image.id} className="relative">
+                <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden group">
                   <img
                     src={image.thumbnailUrl || image.url}
                     alt={image.alt}
                     className="w-full h-full object-cover"
                   />
-                  
-                  {/* Overlay */}
+
+                  {/* Overlay - only on image, not on caption */}
                   <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
                     <div className="flex gap-2">
                       <button
@@ -341,13 +341,14 @@ export default function GallerySectionEditor({ content, onChange }: GallerySecti
                     </div>
                   </div>
                 </div>
-                
-                {/* Caption */}
+
+                {/* Caption - outside of group hover area */}
                 <div className="mt-2">
                   <input
                     type="text"
                     value={image.caption || ''}
                     onChange={(e) => updateImageCaption(image.id, e.target.value)}
+                    onClick={(e) => e.stopPropagation()}
                     placeholder="Popis fotky..."
                     className="w-full text-sm px-2 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-pink-500 focus:border-transparent"
                   />
