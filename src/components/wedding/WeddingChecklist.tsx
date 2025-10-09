@@ -24,7 +24,7 @@ interface WeddingChecklistProps {
 }
 
 export default function WeddingChecklist({ compact = false }: WeddingChecklistProps) {
-  const { createTask, tasks, updateTask } = useTask()
+  const { createTask, tasks, updateTask, deleteTask } = useTask()
   const { wedding } = useWedding()
   const { user } = useAuth()
   const [expandedPhases, setExpandedPhases] = useState<string[]>(['1-week-before'])
@@ -194,6 +194,30 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
     } catch (error) {
       console.error('Error adding to tasks:', error)
       alert('Chyba při přidávání úkolu')
+    } finally {
+      setAddingToTasks(null)
+    }
+  }
+
+  // Remove checklist item from tasks
+  const handleRemoveFromTasks = async (item: ChecklistItem) => {
+    const taskInList = tasks.find(
+      task =>
+        task.title.toLowerCase() === item.title.toLowerCase() ||
+        task.description?.toLowerCase().includes(item.title.toLowerCase())
+    )
+
+    if (!taskInList) {
+      alert('Úkol nebyl nalezen v seznamu úkolů')
+      return
+    }
+
+    try {
+      setAddingToTasks(item.id) // Reuse the same loading state
+      await deleteTask(taskInList.id)
+    } catch (error) {
+      console.error('Error removing from tasks:', error)
+      alert('Chyba při odstraňování úkolu')
     } finally {
       setAddingToTasks(null)
     }
@@ -517,6 +541,32 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
                                 <Check className="w-4 h-4" />
                                 <span className="text-sm font-medium">Přidáno!</span>
                               </div>
+                            ) : inTasks ? (
+                              <div className="flex items-center space-x-2">
+                                {/* V úkolech badge */}
+                                <div className="flex items-center space-x-2 text-primary-600 bg-primary-100 px-3 py-2 rounded-lg">
+                                  <Check className="w-5 h-5" />
+                                  <span className="text-sm font-medium">V úkolech</span>
+                                </div>
+                                {/* Vrátit zpět button */}
+                                <button
+                                  onClick={() => handleRemoveFromTasks(item)}
+                                  disabled={isAdding}
+                                  className="flex items-center justify-center space-x-1 px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  {isAdding ? (
+                                    <>
+                                      <div className="w-3 h-3 border-2 border-gray-600 border-t-transparent rounded-full animate-spin" />
+                                      <span>Odstraňuji...</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <X className="w-3 h-3" />
+                                      <span>Vrátit zpět</span>
+                                    </>
+                                  )}
+                                </button>
+                              </div>
                             ) : (
                               <div className="flex flex-col space-y-2">
                                 {/* Hotovo button */}
@@ -541,22 +591,13 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
                                 {/* Do úkolů button */}
                                 <button
                                   onClick={() => handleAddToTasks(item)}
-                                  disabled={isAdding || inTasks}
-                                  className={`flex items-center justify-center space-x-2 px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-                                    inTasks
-                                      ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                                      : 'bg-primary-600 text-white hover:bg-primary-700'
-                                  }`}
+                                  disabled={isAdding}
+                                  className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                   {isAdding ? (
                                     <>
                                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                                       <span className="text-sm font-medium">Přidávám...</span>
-                                    </>
-                                  ) : inTasks ? (
-                                    <>
-                                      <Check className="w-4 h-4" />
-                                      <span className="text-sm font-medium">V úkolech</span>
                                     </>
                                   ) : (
                                     <>
