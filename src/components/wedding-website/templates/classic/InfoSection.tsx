@@ -44,207 +44,209 @@ export default function InfoSection({ content }: InfoSectionProps) {
   }
 
   return (
-    <section className="py-20 bg-white">
-      <div className="max-w-6xl mx-auto px-4">
+    <section className="py-20 bg-gradient-to-b from-white to-amber-50/30">
+      <div className="max-w-7xl mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4 font-serif">
-            Informace o svatbě
+          <h2 className="text-5xl font-bold text-gray-900 mb-4 font-serif">
+            {ceremony?.venue || reception?.venue || 'Místo konání'}
           </h2>
           <div className="w-24 h-1 bg-gradient-to-r from-amber-400 to-rose-400 mx-auto mb-6"></div>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Všechny důležité informace o našem velkém dni
+          <p className="text-gray-600 text-lg leading-relaxed max-w-3xl mx-auto">
+            {ceremony?.address || reception?.address || 'Všechny důležité informace o našem velkém dni'}
           </p>
         </div>
 
-        <div className={getGridClasses()}>
-          {/* Ceremony */}
-          {hasCeremony && (
-            <div className="bg-gradient-to-br from-amber-50 to-rose-50 rounded-2xl p-8 shadow-lg">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="p-3 bg-amber-100 rounded-full">
-                  <MapPin className="w-6 h-6 text-amber-600" />
+        {/* Main Venue Info - Full Width with Map */}
+        {(hasCeremony || hasReception) && (
+          <div className="mb-16">
+            <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-amber-100">
+              <div className="grid grid-cols-1 lg:grid-cols-2">
+                {/* Left: Map */}
+                <div className="h-96 lg:h-auto relative">
+                  {(ceremony?.address || reception?.address) && (
+                    <GoogleMapsEmbed
+                      address={ceremony?.address || reception?.address || ''}
+                      className="w-full h-full"
+                      height="100%"
+                    />
+                  )}
+                  {/* Decorative gradient overlay on map edge */}
+                  <div className="absolute top-0 right-0 w-8 h-full bg-gradient-to-l from-white to-transparent pointer-events-none hidden lg:block"></div>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 font-serif">
-                  Obřad
-                </h3>
-              </div>
 
-              <div className="space-y-4">
-                {ceremony.venue && (
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">Místo konání</h4>
-                    <p className="text-gray-700">{ceremony.venue}</p>
+                {/* Right: Info */}
+                <div className="p-12 bg-gradient-to-br from-amber-50/50 to-rose-50/50">
+                  <div className="space-y-8">
+                    {/* Venue Name */}
+                    {(ceremony?.venue || reception?.venue) && (
+                      <div>
+                        <h3 className="text-4xl font-bold text-gray-900 mb-3 font-serif">
+                          {ceremony?.venue || reception?.venue}
+                        </h3>
+                        <p className="text-gray-600 text-lg">
+                          {ceremony?.address || reception?.address}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Time */}
+                    {(ceremony?.time || reception?.time) && (
+                      <div className="flex items-start space-x-4">
+                        <div className="p-3 bg-gradient-to-br from-amber-100 to-rose-100 rounded-full flex-shrink-0">
+                          <Clock className="w-6 h-6 text-amber-600" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-gray-900 mb-2 text-lg">Čas začátku</h4>
+                          <p className="text-3xl font-bold text-gray-900 font-serif">
+                            {ceremony?.time || reception?.time}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Reception info if different from ceremony */}
+                    {ceremony && reception && ceremony.venue !== reception.venue && (
+                      <div className="pt-6 border-t border-amber-200">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="p-2 bg-rose-100 rounded-full">
+                            <MapPin className="w-5 h-5 text-rose-600" />
+                          </div>
+                          <h4 className="font-bold text-gray-900 text-xl font-serif">Hostina</h4>
+                        </div>
+                        <div className="space-y-2 ml-11">
+                          <p className="text-gray-900 font-semibold text-lg">{reception.venue}</p>
+                          {reception.time && (
+                            <p className="text-gray-600">Začátek: {reception.time}</p>
+                          )}
+                          {reception.address && (
+                            <p className="text-sm text-gray-500">{reception.address}</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Map Link */}
+                    {(ceremony?.address || reception?.address) && (
+                      <div>
+                        <a
+                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ceremony?.address || reception?.address || '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-rose-500 text-white rounded-full hover:from-amber-600 hover:to-rose-600 transition-all shadow-md hover:shadow-lg font-semibold"
+                        >
+                          <MapPin className="w-5 h-5" />
+                          <span>Otevřít v Google Maps</span>
+                        </a>
+                      </div>
+                    )}
                   </div>
-                )}
-
-                {ceremony.time && (
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-amber-600" />
-                    <span className="font-semibold text-gray-900">Čas:</span>
-                    <span className="text-gray-700">{ceremony.time}</span>
-                  </div>
-                )}
-
-                {ceremony.address && (
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">Adresa</h4>
-                    <p className="text-gray-700 mb-3">{ceremony.address}</p>
-
-                    {/* Google Maps Embed */}
-                    <div className="mt-3">
-                      <GoogleMapsEmbed
-                        address={ceremony.address}
-                        className="w-full rounded-lg border border-amber-200 shadow-sm"
-                        height="200px"
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Decorative element */}
-              <div className="mt-6 pt-6 border-t border-amber-200">
-                <div className="text-center">
-                  <div className="text-3xl mb-2">⛪</div>
-                  <p className="text-sm text-gray-600 italic">
-                    "Ano" řekneme zde
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Reception */}
-          {hasReception && (
-            <div className="bg-gradient-to-br from-rose-50 to-amber-50 rounded-2xl p-8 shadow-lg">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="p-3 bg-rose-100 rounded-full">
-                  <MapPin className="w-6 h-6 text-rose-600" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 font-serif">
-                  Hostina
-                </h3>
-              </div>
-
-              <div className="space-y-4">
-                {reception.venue && (
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">Místo konání</h4>
-                    <p className="text-gray-700">{reception.venue}</p>
-                  </div>
-                )}
-
-                {reception.time && (
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-rose-600" />
-                    <span className="font-semibold text-gray-900">Čas:</span>
-                    <span className="text-gray-700">{reception.time}</span>
-                  </div>
-                )}
-
-                {reception.address && (
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">Adresa</h4>
-                    <p className="text-gray-700 mb-3">{reception.address}</p>
-
-                    {/* Google Maps Embed */}
-                    <div className="mt-3">
-                      <GoogleMapsEmbed
-                        address={reception.address}
-                        className="w-full rounded-lg border border-rose-200 shadow-sm"
-                        height="200px"
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Decorative element */}
-              <div className="mt-6 pt-6 border-t border-rose-200">
-                <div className="text-center">
-                  <div className="text-3xl mb-2">🥂</div>
-                  <p className="text-sm text-gray-600 italic">
-                    Oslavíme společně zde
-                  </p>
                 </div>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
-        {/* Additional Info Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Dress Code */}
-          {dressCode && (
-            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-purple-100 rounded-full">
-                  <Shirt className="w-5 h-5 text-purple-600" />
-                </div>
-                <h4 className="font-semibold text-gray-900">Dress Code</h4>
-              </div>
-              <p className="text-gray-700 mb-4">
-                {getDressCodeText(dressCode)}
-              </p>
-
-              {/* Color Palette */}
-              {colorPalette && colorPalette.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Palette className="w-4 h-4 text-purple-600" />
-                    <span className="text-sm font-medium text-gray-900">Barevná paleta</span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {colorPalette.map((color, index) => (
-                      <div
-                        key={index}
-                        className="w-8 h-8 rounded-full border-2 border-white shadow-sm"
-                        style={{ backgroundColor: color }}
-                        title={color}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
+        {/* Additional Info - Elegant Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Parking */}
           {parking && (
-            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-blue-100 rounded-full">
-                  <Car className="w-5 h-5 text-blue-600" />
+            <div className="bg-white rounded-2xl p-8 shadow-lg border border-amber-100 hover:shadow-xl transition-shadow">
+              <div className="flex flex-col items-center text-center space-y-4">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center shadow-md">
+                  <Car className="w-10 h-10 text-blue-600" />
                 </div>
-                <h4 className="font-semibold text-gray-900">Parkování</h4>
+                <div>
+                  <h4 className="font-bold text-gray-900 mb-3 text-xl font-serif">Parkování</h4>
+                  <p className="text-gray-600 leading-relaxed">{parking}</p>
+                </div>
               </div>
-              <p className="text-gray-700">{parking}</p>
+            </div>
+          )}
+
+          {/* Dress Code */}
+          {dressCode && (
+            <div className="bg-white rounded-2xl p-8 shadow-lg border border-amber-100 hover:shadow-xl transition-shadow">
+              <div className="flex flex-col items-center text-center space-y-4">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center shadow-md">
+                  <Shirt className="w-10 h-10 text-purple-600" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-gray-900 mb-3 text-xl font-serif">Dress Code</h4>
+                  <p className="text-gray-600 leading-relaxed">
+                    {getDressCodeText(dressCode)}
+                  </p>
+                  {dressCodeDetails && dressCode !== 'custom' && (
+                    <p className="text-sm text-gray-500 mt-2 italic">{dressCodeDetails}</p>
+                  )}
+
+                  {/* Color Palette */}
+                  {colorPalette && colorPalette.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-gray-100">
+                      <div className="flex items-center justify-center gap-2 mb-3">
+                        <Palette className="w-4 h-4 text-purple-600" />
+                        <span className="text-sm font-medium text-gray-900">Barevná paleta</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2 justify-center">
+                        {colorPalette.map((color, index) => (
+                          <div
+                            key={index}
+                            className="w-10 h-10 rounded-full border-2 border-white shadow-md"
+                            style={{ backgroundColor: color }}
+                            title={color}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 
           {/* Custom Info */}
-          {customInfo && customInfo.map((info) => (
-            <div key={info.id} className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-green-100 rounded-full">
-                  <Info className="w-5 h-5 text-green-600" />
+          {customInfo && customInfo.slice(0, 1).map((info) => (
+            <div key={info.id} className="bg-white rounded-2xl p-8 shadow-lg border border-amber-100 hover:shadow-xl transition-shadow">
+              <div className="flex flex-col items-center text-center space-y-4">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center shadow-md">
+                  <Info className="w-10 h-10 text-green-600" />
                 </div>
-                <h4 className="font-semibold text-gray-900">{info.title}</h4>
+                <div>
+                  <h4 className="font-bold text-gray-900 mb-3 text-xl font-serif">{info.title}</h4>
+                  <p className="text-gray-600 leading-relaxed">{info.description}</p>
+                </div>
               </div>
-              <p className="text-gray-700">{info.description}</p>
             </div>
           ))}
         </div>
 
+        {/* Additional Custom Info - if more than 1 */}
+        {customInfo && customInfo.length > 1 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+            {customInfo.slice(1).map((info) => (
+              <div key={info.id} className="bg-white rounded-2xl p-8 shadow-lg border border-amber-100 hover:shadow-xl transition-shadow">
+                <div className="flex flex-col items-center text-center space-y-4">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center shadow-md">
+                    <Info className="w-10 h-10 text-green-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-gray-900 mb-3 text-xl font-serif">{info.title}</h4>
+                    <p className="text-gray-600 leading-relaxed">{info.description}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Decorative bottom section */}
         <div className="mt-16 text-center">
-          <div className="inline-flex items-center gap-4 px-8 py-4 bg-gradient-to-r from-amber-100 to-rose-100 rounded-full">
-            <div className="text-2xl">💒</div>
-            <p className="text-gray-700 font-medium">
+          <div className="inline-flex items-center gap-4 px-10 py-5 bg-gradient-to-r from-amber-100 via-rose-100 to-amber-100 rounded-full shadow-lg">
+            <div className="text-3xl">💒</div>
+            <p className="text-gray-800 font-bold text-lg font-serif">
               Těšíme se na vás!
             </p>
-            <div className="text-2xl">💕</div>
+            <div className="text-3xl">💕</div>
           </div>
         </div>
       </div>
