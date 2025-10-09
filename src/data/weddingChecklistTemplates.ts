@@ -22,18 +22,18 @@ export interface ChecklistPhase {
   items: ChecklistItem[]
 }
 
-// Kompletní svatební checklist podle obrázku
+// Kompletní svatební checklist
 export const WEDDING_CHECKLIST: ChecklistPhase[] = [
   {
     id: '12-months-before',
-    title: '12 měsíců před svatbou',
-    description: 'Orientační plánování - základní kroky',
-    icon: '📋',
+    title: '12+ měsíců před svatbou',
+    description: 'Základní plán a rozhodnutí',
+    icon: '🕛',
     items: [
       {
         id: '12m-001',
         title: 'Oznámení zásnub',
-        description: 'Oznámit zásnuby rodině a přátelům',
+        description: 'Sdělit rodině a přátelům',
         category: 'preparation',
         phase: 'before-wedding',
         priority: 'medium',
@@ -43,19 +43,19 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: '12m-002',
-        title: 'Místo svatby',
-        description: 'Vybrat a rezervovat místo konání svatby',
+        title: 'Stanovit rozpočet',
+        description: 'Nastavit hranici',
         category: 'preparation',
         phase: 'before-wedding',
         priority: 'urgent',
-        estimatedDuration: '2-4 týdny',
-        icon: '🏛️',
+        estimatedDuration: '1 týden',
+        icon: '💰',
         order: 2
       },
       {
         id: '12m-003',
-        title: 'Termín svatby',
-        description: 'Stanovit konkrétní datum svatby',
+        title: 'Stanovit konkrétní datum svatby',
+        description: 'Vybrat termín svatby',
         category: 'preparation',
         phase: 'before-wedding',
         priority: 'urgent',
@@ -65,52 +65,52 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: '12m-004',
-        title: 'Oddávající',
-        description: 'Vybrat a domluvit oddávajícího',
+        title: 'Vybrat a rezervovat místo konání svatby',
+        description: 'Rezervovat místo svatby',
+        category: 'preparation',
+        phase: 'before-wedding',
+        priority: 'urgent',
+        estimatedDuration: '2-4 týdny',
+        icon: '🏛️',
+        order: 4
+      },
+      {
+        id: '12m-005',
+        title: 'Vybrat a domluvit oddávajícího',
+        description: 'Domluvit oddávajícího',
         category: 'legal',
         phase: 'before-wedding',
         priority: 'high',
         estimatedDuration: '1-2 týdny',
         icon: '👔',
-        order: 4
+        order: 5
       },
       {
-        id: '12m-005',
-        title: 'Seznam hostů',
-        description: 'Vytvořit předběžný seznam svatebních hostů',
+        id: '12m-006',
+        title: 'Vytvořit předběžný seznam hostů',
+        description: 'Seznam svatebních hostů',
         category: 'preparation',
         phase: 'before-wedding',
         priority: 'high',
         estimatedDuration: '1-2 týdny',
         icon: '📝',
-        order: 5
+        order: 6
       },
       {
-        id: '12m-006',
-        title: 'Svědci',
-        description: 'Vybrat a požádat svědky',
+        id: '12m-007',
+        title: 'Vybrat a požádat svědky',
+        description: 'Požádat svědky',
         category: 'preparation',
         phase: 'before-wedding',
         priority: 'high',
         estimatedDuration: '1 týden',
         icon: '👥',
-        order: 6
-      },
-      {
-        id: '12m-007',
-        title: 'Rozpočet (nastavení hranice)',
-        description: 'Stanovit celkový rozpočet svatby',
-        category: 'preparation',
-        phase: 'before-wedding',
-        priority: 'urgent',
-        estimatedDuration: '1 týden',
-        icon: '💰',
         order: 7
       },
       {
         id: '12m-008',
-        title: 'Fotograf/ka',
-        description: 'Vybrat a rezervovat svatebního fotografa',
+        title: 'Vybrat a rezervovat fotografa',
+        description: 'Rezervovat svatebního fotografa',
         category: 'preparation',
         phase: 'before-wedding',
         priority: 'urgent',
@@ -120,8 +120,8 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: '12m-009',
-        title: 'Kameraman/ka',
-        description: 'Vybrat a rezervovat svatebního kameramana',
+        title: 'Vybrat a rezervovat kameramana',
+        description: 'Rezervovat svatebního kameramana',
         category: 'preparation',
         phase: 'before-wedding',
         priority: 'high',
@@ -131,8 +131,8 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: '12m-010',
-        title: 'Tisk svatebního oznámení',
-        description: 'Navrhnout a objednat svatební oznámení',
+        title: 'Navrhnout a objednat svatební oznámení',
+        description: 'Objednat svatební oznámení',
         category: 'preparation',
         phase: 'before-wedding',
         priority: 'medium',
@@ -144,14 +144,14 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
   },
   {
     id: '6-9-months-before',
-    title: '6-9 měsíců před svatbou',
-    description: 'Důležité rezervace a přípravy',
-    icon: '📆',
+    title: '6–9 měsíců před svatbou',
+    description: 'Rezervace, klíčoví dodavatelé, outfit',
+    icon: '🕘',
     items: [
       {
         id: '6-9m-001',
-        title: 'Rozeslat svatební oznámení',
-        description: 'Rozeslat oznámení všem pozvaným hostům',
+        title: 'Rozeslat svatební oznámení hostům',
+        description: 'Rozeslat oznámení všem pozvaným',
         category: 'preparation',
         phase: 'before-wedding',
         priority: 'high',
@@ -161,8 +161,8 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: '6-9m-002',
-        title: 'Catering/občerstvení',
-        description: 'Vybrat a rezervovat catering',
+        title: 'Vybrat a rezervovat catering / občerstvení',
+        description: 'Rezervovat catering',
         category: 'preparation',
         phase: 'before-wedding',
         priority: 'urgent',
@@ -172,8 +172,8 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: '6-9m-003',
-        title: 'Svatební šaty',
-        description: 'Vybrat a objednat svatební šaty',
+        title: 'Vybrat a objednat svatební šaty',
+        description: 'Objednat svatební šaty',
         category: 'beauty',
         phase: 'before-wedding',
         priority: 'urgent',
@@ -183,8 +183,8 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: '6-9m-004',
-        title: 'Oděv pro ženicha',
-        description: 'Vybrat a objednat oblek pro ženicha',
+        title: 'Vybrat a objednat oblek pro ženicha',
+        description: 'Objednat oblek pro ženicha',
         category: 'beauty',
         phase: 'before-wedding',
         priority: 'high',
@@ -194,8 +194,8 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: '6-9m-005',
-        title: 'Snubní prstýnky',
-        description: 'Vybrat a objednat snubní prstýnky',
+        title: 'Vybrat a objednat snubní prstýnky',
+        description: 'Objednat snubní prstýnky',
         category: 'preparation',
         phase: 'before-wedding',
         priority: 'high',
@@ -205,8 +205,8 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: '6-9m-006',
-        title: 'Ubytování pro svatebčany',
-        description: 'Zajistit ubytování pro hosty z daleka',
+        title: 'Zajistit ubytování pro hosty z daleka',
+        description: 'Ubytování pro svatebčany',
         category: 'preparation',
         phase: 'before-wedding',
         priority: 'medium',
@@ -216,8 +216,8 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: '6-9m-007',
-        title: 'Svatební dort',
-        description: 'Vybrat a objednat svatební dort',
+        title: 'Vybrat a objednat svatební dort',
+        description: 'Objednat svatební dort',
         category: 'preparation',
         phase: 'before-wedding',
         priority: 'medium',
@@ -227,8 +227,8 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: '6-9m-008',
-        title: 'Hudba (DJ / kapela)',
-        description: 'Vybrat a rezervovat hudební doprovod',
+        title: 'Vybrat a rezervovat DJ / kapelu',
+        description: 'Rezervovat hudební doprovod',
         category: 'preparation',
         phase: 'before-wedding',
         priority: 'high',
@@ -240,14 +240,14 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
   },
   {
     id: '3-5-months-before',
-    title: '3-5 měsíců před svatbou',
-    description: 'Finalizace detailů a přípravy',
+    title: '3–5 měsíců před svatbou',
+    description: 'Detailní plánování a ladění stylu',
     icon: '✨',
     items: [
       {
         id: '3-5m-001',
-        title: 'Makeup a vlasová stylistka',
-        description: 'Vybrat a rezervovat vizážistku a kadeřnici',
+        title: 'Vybrat a rezervovat vizážistku a kadeřnici',
+        description: 'Rezervovat makeup a vlasovou stylistku',
         category: 'beauty',
         phase: 'before-wedding',
         priority: 'high',
@@ -257,35 +257,35 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: '3-5m-002',
-        title: 'Výslužky',
-        description: 'Vybrat a objednat dárky pro hosty',
-        category: 'preparation',
-        phase: 'before-wedding',
-        priority: 'medium',
-        estimatedDuration: '1-2 týdny',
-        icon: '🎁',
-        order: 2
-      },
-      {
-        id: '3-5m-003',
         title: 'Ochutnávka a sestavení menu',
-        description: 'Finální ochutnávka a výběr svatebního menu',
+        description: 'Finální ochutnávka a výběr menu',
         category: 'preparation',
         phase: 'before-wedding',
         priority: 'high',
         estimatedDuration: '1 den',
         icon: '🍴',
-        order: 3
+        order: 2
       },
       {
-        id: '3-5m-004',
-        title: 'Květinová výzdoba',
-        description: 'Finalizovat květinovou výzdobu',
+        id: '3-5m-003',
+        title: 'Finalizovat květinovou výzdobu',
+        description: 'Domluvit květinovou výzdobu',
         category: 'preparation',
         phase: 'before-wedding',
         priority: 'medium',
         estimatedDuration: '1-2 týdny',
         icon: '💐',
+        order: 3
+      },
+      {
+        id: '3-5m-004',
+        title: 'Vybrat a objednat výslužky / dárky pro hosty',
+        description: 'Objednat dárky pro hosty',
+        category: 'preparation',
+        phase: 'before-wedding',
+        priority: 'medium',
+        estimatedDuration: '1-2 týdny',
+        icon: '🎁',
         order: 4
       }
     ]
@@ -293,24 +293,24 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
   {
     id: '2-months-before',
     title: '2 měsíce před svatbou',
-    description: 'Finální přípravy a kontroly',
+    description: 'Finalizace všech rezervací a tiskovin',
     icon: '📋',
     items: [
       {
         id: '2m-001',
-        title: 'Hudba na obřad',
-        description: 'Vybrat hudbu pro svatební obřad',
+        title: 'Potvrdit všechny dodavatele a rezervace',
+        description: 'Potvrdit všechny rezervace',
         category: 'preparation',
         phase: 'before-wedding',
-        priority: 'high',
-        estimatedDuration: '1 týden',
-        icon: '🎼',
+        priority: 'urgent',
+        estimatedDuration: '1 den',
+        icon: '✅',
         order: 1
       },
       {
         id: '2m-002',
-        title: 'Zasedací pořádek',
-        description: 'Vytvořit zasedací pořádek hostů',
+        title: 'Vytvořit zasedací pořádek hostů',
+        description: 'Zasedací pořádek',
         category: 'preparation',
         phase: 'before-wedding',
         priority: 'high',
@@ -320,123 +320,123 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: '2m-003',
-        title: 'Zkouška makeupu',
-        description: 'Zkušební svatební makeup',
-        category: 'beauty',
-        phase: 'before-wedding',
-        priority: 'high',
-        estimatedDuration: '2-3 hodiny',
-        icon: '💋',
-        order: 3
-      },
-      {
-        id: '2m-004',
-        title: 'Zkouška účesu',
-        description: 'Zkušební svatební účes',
-        category: 'beauty',
-        phase: 'before-wedding',
-        priority: 'high',
-        estimatedDuration: '2-3 hodiny',
-        icon: '💇',
-        order: 4
-      },
-      {
-        id: '2m-005',
-        title: 'Sweet bar',
-        description: 'Naplánovat a objednat sweet bar',
-        category: 'preparation',
-        phase: 'before-wedding',
-        priority: 'medium',
-        estimatedDuration: '1 týden',
-        icon: '🍬',
-        order: 5
-      },
-      {
-        id: '2m-006',
-        title: 'Kontrola dokladů (platnost)',
-        description: 'Zkontrolovat platnost všech dokladů',
-        category: 'legal',
-        phase: 'before-wedding',
-        priority: 'urgent',
-        estimatedDuration: '1 hodina',
-        icon: '📄',
-        order: 6
-      },
-      {
-        id: '2m-007',
-        title: 'Dekorace',
-        description: 'Finalizovat svatební dekorace',
+        title: 'Finalizovat svatební dekorace',
+        description: 'Domluvit dekorace',
         category: 'preparation',
         phase: 'before-wedding',
         priority: 'medium',
         estimatedDuration: '1-2 týdny',
         icon: '🎨',
-        order: 7
+        order: 3
       },
       {
-        id: '2m-008',
-        title: 'Potvrdit všechny dodavatele',
-        description: 'Potvrdit všechny rezervace a dodavatele',
+        id: '2m-004',
+        title: 'Naplánovat a objednat sweet bar',
+        description: 'Objednat sweet bar',
         category: 'preparation',
         phase: 'before-wedding',
-        priority: 'urgent',
-        estimatedDuration: '1 den',
-        icon: '✅',
-        order: 8
+        priority: 'medium',
+        estimatedDuration: '1 týden',
+        icon: '🍬',
+        order: 4
       },
       {
-        id: '2m-009',
-        title: 'Tiskoviny na svatbu - Jmenovky',
-        description: 'Vytisknout jmenovky pro hosty',
+        id: '2m-005',
+        title: 'Zkontrolovat platnost všech dokladů',
+        description: 'Kontrola dokladů',
+        category: 'legal',
+        phase: 'before-wedding',
+        priority: 'urgent',
+        estimatedDuration: '1 hodina',
+        icon: '📋',
+        order: 5
+      },
+      {
+        id: '2m-006',
+        title: 'Vybrat hudbu na obřad',
+        description: 'Hudba pro svatební obřad',
+        category: 'preparation',
+        phase: 'before-wedding',
+        priority: 'high',
+        estimatedDuration: '1 týden',
+        icon: '🎼',
+        order: 6
+      },
+      {
+        id: '2m-007',
+        title: 'Vytisknout jmenovky pro hosty',
+        description: 'Tisknout jmenovky',
         category: 'preparation',
         phase: 'before-wedding',
         priority: 'medium',
         estimatedDuration: '1 týden',
         icon: '🏷️',
-        order: 9
+        order: 7
       },
       {
-        id: '2m-010',
-        title: 'Tiskoviny na svatbu - Menu',
-        description: 'Vytisknout svatební menu',
+        id: '2m-008',
+        title: 'Vytisknout svatební menu',
+        description: 'Tisknout menu',
         category: 'preparation',
         phase: 'before-wedding',
         priority: 'medium',
         estimatedDuration: '1 týden',
-        icon: '📋',
-        order: 10
+        icon: '📄',
+        order: 8
       },
       {
-        id: '2m-011',
-        title: 'Tiskoviny na svatbu - Čísla stolů',
-        description: 'Připravit čísla nebo názvy stolů',
+        id: '2m-009',
+        title: 'Připravit čísla / názvy stolů',
+        description: 'Čísla stolů',
         category: 'preparation',
         phase: 'before-wedding',
         priority: 'medium',
         estimatedDuration: '1 týden',
         icon: '🔢',
-        order: 11
+        order: 9
       },
       {
-        id: '2m-012',
-        title: 'Tiskoviny na svatbu - Zasedací pořádek',
-        description: 'Vytisknout zasedací pořádek',
+        id: '2m-010',
+        title: 'Vytisknout zasedací pořádek',
+        description: 'Tisknout zasedací pořádek',
         category: 'preparation',
         phase: 'before-wedding',
         priority: 'high',
         estimatedDuration: '1 týden',
         icon: '📊',
-        order: 12
+        order: 10
       },
       {
-        id: '2m-013',
-        title: 'Doprava pro hosty',
-        description: 'Zajistit dopravu pro hosty',
+        id: '2m-011',
+        title: 'Zajistit dopravu pro hosty',
+        description: 'Doprava pro hosty',
         category: 'preparation',
         phase: 'before-wedding',
         priority: 'medium',
         estimatedDuration: '1-2 týdny',
         icon: '🚌',
+        order: 11
+      },
+      {
+        id: '2m-012',
+        title: 'Zkušební makeup',
+        description: 'Zkouška makeupu',
+        category: 'beauty',
+        phase: 'before-wedding',
+        priority: 'high',
+        estimatedDuration: '2-3 hodiny',
+        icon: '💋',
+        order: 12
+      },
+      {
+        id: '2m-013',
+        title: 'Zkušební účes',
+        description: 'Zkouška účesu',
+        category: 'beauty',
+        phase: 'before-wedding',
+        priority: 'high',
+        estimatedDuration: '2-3 hodiny',
+        icon: '💇',
         order: 13
       }
     ]
@@ -444,7 +444,7 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
   {
     id: '1-month-before',
     title: '1 měsíc před svatbou',
-    description: 'Poslední přípravy',
+    description: 'Poslední doladění a osobní přípravy',
     icon: '⏰',
     items: [
       {
@@ -460,8 +460,8 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: '1m-002',
-        title: 'Hudba (playlist)',
-        description: 'Finalizovat playlist pro svatbu',
+        title: 'Finalizovat svatební playlist',
+        description: 'Finalizovat playlist',
         category: 'preparation',
         phase: '1-week-before',
         priority: 'high',
@@ -471,8 +471,8 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: '1m-003',
-        title: 'Rozlučka se svobodou',
-        description: 'Naplánovat a oslavit rozlučku se svobodou',
+        title: 'Naplánovat rozlučku se svobodou',
+        description: 'Oslavit rozlučku se svobodou',
         category: 'other',
         phase: '1-week-before',
         priority: 'medium',
@@ -482,8 +482,8 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: '1m-004',
-        title: 'Matrika (doklady)',
-        description: 'Dodat všechny potřebné doklady na matriku',
+        title: 'Odevzdat doklady na matriku',
+        description: 'Dodat doklady na matriku',
         category: 'legal',
         phase: '1-week-before',
         priority: 'urgent',
@@ -493,8 +493,8 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: '1m-005',
-        title: 'Kadeřnictví',
-        description: 'Návštěva kadeřnictví pro svatební účes',
+        title: 'Navštívit kadeřnictví (střih, barva)',
+        description: 'Kadeřnictví před svatbou',
         category: 'beauty',
         phase: '1-week-before',
         priority: 'high',
@@ -504,8 +504,8 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: '1m-006',
-        title: 'Kosmetika',
-        description: 'Kosmetické ošetření před svatbou',
+        title: 'Kosmetické ošetření před svatbou',
+        description: 'Kosmetika před svatbou',
         category: 'beauty',
         phase: '1-week-before',
         priority: 'high',
@@ -518,13 +518,13 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
   {
     id: '1-week-before',
     title: '1 týden před svatbou',
-    description: 'Důležité úkoly týden před velkým dnem',
+    description: 'Finální kontrola a příprava svatebního dne',
     icon: '📅',
     items: [
       {
         id: 'week-001',
         title: 'Napsat svatební sliby',
-        description: 'Připravit a napsat osobní svatební sliby',
+        description: 'Připravit osobní svatební sliby',
         category: 'preparation',
         phase: '1-week-before',
         priority: 'high',
@@ -534,8 +534,8 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: 'week-002',
-        title: 'Vyzvednout šaty',
-        description: 'Vyzvednout svatební šaty z salonu',
+        title: 'Vyzvednout svatební šaty',
+        description: 'Vyzvednout šaty z salonu',
         category: 'preparation',
         phase: '1-week-before',
         priority: 'urgent',
@@ -545,8 +545,8 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: 'week-003',
-        title: 'Potvrdit časy dodavatelům',
-        description: 'Potvrdit přesné časy příjezdu všem dodavatelům',
+        title: 'Potvrdit časy všem dodavatelům',
+        description: 'Potvrdit přesné časy příjezdu',
         category: 'preparation',
         phase: '1-week-before',
         priority: 'urgent',
@@ -578,8 +578,8 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: 'week-006',
-        title: 'Projít harmonogram svatebního dne',
-        description: 'Projít a finalizovat časový harmonogram svatebního dne',
+        title: 'Projít a finalizovat harmonogram dne',
+        description: 'Finalizovat časový harmonogram',
         category: 'preparation',
         phase: '1-week-before',
         priority: 'urgent',
@@ -592,13 +592,13 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
   {
     id: 'after-wedding',
     title: 'Po svatbě',
-    description: 'Úkoly po svatebním dni',
+    description: 'Uzavření a líbánky',
     icon: '✅',
     items: [
       {
         id: 'after-001',
-        title: 'Vrátit půjčené šaty',
-        description: 'Vrátit půjčené nebo zapůjčené svatební šaty',
+        title: 'Vrátit půjčené svatební šaty',
+        description: 'Vrátit zapůjčené šaty',
         category: 'post-wedding',
         phase: 'after-wedding',
         priority: 'high',
@@ -608,8 +608,8 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: 'after-002',
-        title: 'Odvoz zapůjčených dekorací/nábytku',
-        description: 'Vrátit všechny zapůjčené dekorace a nábytek',
+        title: 'Vrátit zapůjčené dekorace/nábytek',
+        description: 'Vrátit dekorace a nábytek',
         category: 'post-wedding',
         phase: 'after-wedding',
         priority: 'high',
@@ -619,8 +619,8 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: 'after-003',
-        title: 'Vyzvednout oddací listy (pokud je nezašlou)',
-        description: 'Vyzvednout oficiální oddací list z matričního úřadu',
+        title: 'Vyzvednout oddací list z matriky',
+        description: 'Vyzvednout oddací list',
         category: 'legal',
         phase: 'after-wedding',
         priority: 'high',
@@ -630,8 +630,8 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: 'after-004',
-        title: 'Doplatit faktury',
-        description: 'Uhradit všechny zbývající faktury od dodavatelů',
+        title: 'Doplatit faktury dodavatelům',
+        description: 'Uhradit zbývající faktury',
         category: 'post-wedding',
         phase: 'after-wedding',
         priority: 'urgent',
@@ -652,8 +652,8 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: 'after-006',
-        title: 'Povinnosti pro nevěstu',
-        description: 'Administrativní úkony po svatbě (změna příjmení, dokladů, atd.)',
+        title: 'Vyřídit administrativu (změna příjmení, dokladů atd.)',
+        description: 'Administrativní úkony po svatbě',
         category: 'legal',
         phase: 'after-wedding',
         priority: 'medium',
