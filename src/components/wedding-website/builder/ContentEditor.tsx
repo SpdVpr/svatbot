@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronDown, Image, Calendar, MapPin, Users, MessageSquare, Gift, Camera, Phone, HelpCircle, Building2 } from 'lucide-react'
+import { ChevronDown, Image, Calendar, MapPin, Users, MessageSquare, Gift, Camera, Phone, HelpCircle, Building2, UtensilsCrossed } from 'lucide-react'
 import HeroSectionEditor from './sections/HeroSectionEditor'
 import InfoSectionEditor from './sections/InfoSectionEditor'
 import RSVPSectionEditor from './sections/RSVPSectionEditor'
@@ -12,6 +12,7 @@ import AccommodationSectionEditor from './sections/AccommodationSectionEditor'
 import ContactSectionEditor from './sections/ContactSectionEditor'
 import FAQSectionEditor from './sections/FAQSectionEditor'
 import GiftSectionEditor from './sections/GiftSectionEditor'
+import MenuSectionEditor from './sections/MenuSectionEditor'
 import type { WebsiteContent } from '@/types/wedding-website'
 
 interface ContentEditorProps {
@@ -19,7 +20,7 @@ interface ContentEditorProps {
   onContentChange: (content: WebsiteContent) => void
 }
 
-type SectionType = 'hero' | 'info' | 'rsvp' | 'story' | 'schedule' | 'accommodation' | 'gift' | 'gallery' | 'contact' | 'faq'
+type SectionType = 'hero' | 'info' | 'rsvp' | 'story' | 'schedule' | 'accommodation' | 'gift' | 'gallery' | 'contact' | 'faq' | 'menu'
 
 interface Section {
   id: SectionType
@@ -113,6 +114,14 @@ export default function ContentEditor({ content, onContentChange }: ContentEdito
       icon: HelpCircle,
       required: false,
       enabled: content.faq?.enabled || false
+    },
+    {
+      id: 'menu',
+      title: 'Jídlo a Pití',
+      description: 'Svatební menu a nápoje',
+      icon: UtensilsCrossed,
+      required: false,
+      enabled: content.menu?.enabled || false
     }
   ]
 
@@ -155,8 +164,11 @@ export default function ContentEditor({ content, onContentChange }: ContentEdito
       case 'faq':
         updatedContent.faq = { ...updatedContent.faq, enabled }
         break
+      case 'menu':
+        updatedContent.menu = { ...updatedContent.menu, enabled }
+        break
     }
-    
+
     onContentChange(updatedContent)
   }
 
@@ -236,6 +248,13 @@ export default function ContentEditor({ content, onContentChange }: ContentEdito
           <GiftSectionEditor
             content={content.gift}
             onChange={(giftContent) => updateSectionContent('gift', giftContent)}
+          />
+        )
+      case 'menu':
+        return (
+          <MenuSectionEditor
+            content={content.menu}
+            onChange={(menuContent) => updateSectionContent('menu', menuContent)}
           />
         )
       default:

@@ -10,6 +10,7 @@ import ScheduleSection from './classic/ScheduleSection'
 import GallerySection from './classic/GallerySection'
 import AccommodationSection from './classic/AccommodationSection'
 import FAQSection from './classic/FAQSection'
+import MenuSection from './classic/MenuSection'
 import { Timestamp } from 'firebase/firestore'
 
 // Helper funkce pro formátování data
@@ -103,6 +104,11 @@ export default function ClassicEleganceTemplate({ website }: ClassicEleganceTemp
       {/* Gallery Section */}
       {content.gallery?.enabled && (
         <GallerySection content={content.gallery} />
+      )}
+
+      {/* Menu Section */}
+      {content.menu?.enabled && (
+        <MenuSection content={content.menu} />
       )}
 
       {/* Contact Section */}

@@ -7,6 +7,7 @@ import ModernInfoSection from './modern/InfoSection'
 import ModernRSVPSection from './modern/RSVPSection'
 import AccommodationSection from './modern/AccommodationSection'
 import FAQSection from './modern/FAQSection'
+import MenuSection from './modern/MenuSection'
 import { Timestamp } from 'firebase/firestore'
 
 // Helper funkce pro formátování data
@@ -203,6 +204,11 @@ export default function ModernMinimalistTemplate({ website }: ModernMinimalistTe
             )}
           </div>
         </section>
+      )}
+
+      {/* Menu Section */}
+      {content.menu?.enabled && (
+        <MenuSection content={content.menu} />
       )}
 
       {/* Contact Section */}

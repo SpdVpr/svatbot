@@ -48,6 +48,14 @@ export default function WeddingWebsiteBuilderPage() {
     gallery: { enabled: false, images: [], allowGuestUploads: false },
     contact: { enabled: true },
     faq: { enabled: false, items: [] },
+    menu: {
+      enabled: false,
+      title: 'Svatební menu',
+      description: 'Připravili jsme pro vás výběr chutných jídel a nápojů.',
+      showCategories: true,
+      showDietaryInfo: true,
+      showDrinks: true
+    },
   })
   const [isSaving, setIsSaving] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)

@@ -201,6 +201,16 @@ export interface FAQContent {
   items: FAQItem[]
 }
 
+// Menu Section (Food & Drinks)
+export interface MenuContent {
+  enabled: boolean
+  title?: string
+  description?: string
+  showCategories: boolean
+  showDietaryInfo: boolean
+  showDrinks: boolean
+}
+
 // Website Content
 export interface WebsiteContent {
   hero: HeroContent
@@ -213,6 +223,7 @@ export interface WebsiteContent {
   gallery: GalleryContent
   contact: ContactContent
   faq: FAQContent
+  menu: MenuContent
 }
 
 // Website Style
