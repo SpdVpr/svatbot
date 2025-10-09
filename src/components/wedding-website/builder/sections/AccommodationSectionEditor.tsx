@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Building2, Phone, Mail, Eye, EyeOff, DollarSign, Users, Download } from 'lucide-react'
 import { useAccommodation } from '@/hooks/useAccommodation'
 import type { AccommodationContent } from '@/types/wedding-website'
@@ -13,7 +13,10 @@ interface AccommodationSectionEditorProps {
 export default function AccommodationSectionEditor({ content, onChange }: AccommodationSectionEditorProps) {
   const { accommodations, loading } = useAccommodation()
   const totalRooms = accommodations.reduce((sum, acc) => sum + acc.rooms.length, 0)
-  const [localContent, setLocalContent] = useState<AccommodationContent>({
+  const [importing, setImporting] = useState(false)
+
+  // Use content directly from props, no local state needed
+  const currentContent: AccommodationContent = {
     enabled: content?.enabled || false,
     title: content?.title || 'Ubytování',
     description: content?.description || 'Doporučujeme následující ubytování pro naše svatební hosty.',
@@ -25,37 +28,16 @@ export default function AccommodationSectionEditor({ content, onChange }: Accomm
       email: '',
       message: 'Pro rezervaci kontaktujte přímo ubytování nebo nás.'
     }
-  })
-  const [importing, setImporting] = useState(false)
-
-  // Synchronize with parent content changes
-  useEffect(() => {
-    if (content) {
-      setLocalContent({
-        enabled: content.enabled || false,
-        title: content.title || 'Ubytování',
-        description: content.description || 'Doporučujeme následující ubytování pro naše svatební hosty.',
-        showPrices: content.showPrices ?? true,
-        showAvailability: content.showAvailability ?? true,
-        contactInfo: content.contactInfo || {
-          name: '',
-          phone: '',
-          email: '',
-          message: 'Pro rezervaci kontaktujte přímo ubytování nebo nás.'
-        }
-      })
-    }
-  }, [content])
+  }
 
   const updateContent = (updates: Partial<AccommodationContent>) => {
-    const newContent = { ...localContent, ...updates }
-    setLocalContent(newContent)
+    const newContent = { ...currentContent, ...updates }
     onChange(newContent)
   }
 
   const updateContactInfo = (field: string, value: string) => {
     const newContactInfo = {
-      ...localContent.contactInfo!,
+      ...currentContent.contactInfo!,
       [field]: value
     }
     updateContent({ contactInfo: newContactInfo })
@@ -88,7 +70,7 @@ export default function AccommodationSectionEditor({ content, onChange }: Accomm
         <label className="relative inline-flex items-center cursor-pointer">
           <input
             type="checkbox"
-            checked={localContent.enabled}
+            checked={currentContent.enabled}
             onChange={(e) => updateContent({ enabled: e.target.checked })}
             className="sr-only peer"
           />
@@ -96,7 +78,7 @@ export default function AccommodationSectionEditor({ content, onChange }: Accomm
         </label>
       </div>
 
-      {localContent.enabled && (
+      {currentContent.enabled && (
         <>
           {/* Import from Accommodation */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -135,7 +117,7 @@ export default function AccommodationSectionEditor({ content, onChange }: Accomm
                 </label>
                 <input
                   type="text"
-                  value={localContent.title}
+                  value={currentContent.title}
                   onChange={(e) => updateContent({ title: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Ubytování"
@@ -147,7 +129,7 @@ export default function AccommodationSectionEditor({ content, onChange }: Accomm
                   Popis
                 </label>
                 <textarea
-                  value={localContent.description}
+                  value={currentContent.description}
                   onChange={(e) => updateContent({ description: e.target.value })}
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -173,7 +155,7 @@ export default function AccommodationSectionEditor({ content, onChange }: Accomm
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={localContent.showPrices}
+                    checked={currentContent.showPrices}
                     onChange={(e) => updateContent({ showPrices: e.target.checked })}
                     className="sr-only peer"
                   />
@@ -192,7 +174,7 @@ export default function AccommodationSectionEditor({ content, onChange }: Accomm
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={localContent.showAvailability}
+                    checked={currentContent.showAvailability}
                     onChange={(e) => updateContent({ showAvailability: e.target.checked })}
                     className="sr-only peer"
                   />
@@ -216,7 +198,7 @@ export default function AccommodationSectionEditor({ content, onChange }: Accomm
                 </label>
                 <input
                   type="text"
-                  value={localContent.contactInfo?.name || ''}
+                  value={currentContent.contactInfo?.name || ''}
                   onChange={(e) => updateContactInfo('name', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Jana Nováková"
@@ -229,7 +211,7 @@ export default function AccommodationSectionEditor({ content, onChange }: Accomm
                 </label>
                 <input
                   type="tel"
-                  value={localContent.contactInfo?.phone || ''}
+                  value={currentContent.contactInfo?.phone || ''}
                   onChange={(e) => updateContactInfo('phone', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="+420 123 456 789"
@@ -242,7 +224,7 @@ export default function AccommodationSectionEditor({ content, onChange }: Accomm
                 </label>
                 <input
                   type="email"
-                  value={localContent.contactInfo?.email || ''}
+                  value={currentContent.contactInfo?.email || ''}
                   onChange={(e) => updateContactInfo('email', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="jana@example.com"
@@ -254,7 +236,7 @@ export default function AccommodationSectionEditor({ content, onChange }: Accomm
                   Zpráva pro hosty
                 </label>
                 <textarea
-                  value={localContent.contactInfo?.message || ''}
+                  value={currentContent.contactInfo?.message || ''}
                   onChange={(e) => updateContactInfo('message', e.target.value)}
                   rows={2}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
