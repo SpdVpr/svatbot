@@ -286,74 +286,18 @@ async function createDemoAccount() {
       // Add rooms to first accommodation
       if (accommodation.name === 'Hotel Château Mcely') {
         const rooms = [
-          // Standard pokoje (3 pokoje)
           {
             accommodationId: accommodationRef.id,
             weddingId: weddingRef.id,
-            name: 'Standard pokoj 101',
-            description: 'Útulný pokoj s manželskou postelí',
-            type: 'double',
-            capacity: 2,
-            maxOccupancy: 2,
-            bedConfiguration: [{ type: 'queen', count: 1 }],
-            pricePerNight: 2800,
-            totalPrice: 5600,
-            amenities: ['WiFi', 'TV', 'Koupelna', 'Klimatizace'],
-            images: ['https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800'],
-            isAvailable: true,
-            reservations: [],
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp()
-          },
-          {
-            accommodationId: accommodationRef.id,
-            weddingId: weddingRef.id,
-            name: 'Standard pokoj 102',
-            description: 'Útulný pokoj s manželskou postelí',
-            type: 'double',
-            capacity: 2,
-            maxOccupancy: 2,
-            bedConfiguration: [{ type: 'queen', count: 1 }],
-            pricePerNight: 2800,
-            totalPrice: 5600,
-            amenities: ['WiFi', 'TV', 'Koupelna', 'Klimatizace'],
-            images: ['https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=800'],
-            isAvailable: true,
-            reservations: [],
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp()
-          },
-          {
-            accommodationId: accommodationRef.id,
-            weddingId: weddingRef.id,
-            name: 'Standard pokoj 103',
-            description: 'Útulný pokoj s manželskou postelí',
-            type: 'double',
-            capacity: 2,
-            maxOccupancy: 2,
-            bedConfiguration: [{ type: 'queen', count: 1 }],
-            pricePerNight: 2800,
-            totalPrice: 5600,
-            amenities: ['WiFi', 'TV', 'Koupelna', 'Klimatizace'],
-            images: ['https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800'],
-            isAvailable: true,
-            reservations: [],
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp()
-          },
-          // Deluxe pokoje (4 pokoje)
-          {
-            accommodationId: accommodationRef.id,
-            weddingId: weddingRef.id,
-            name: 'Deluxe pokoj 201',
-            description: 'Prostorný pokoj s king size postelí a výhledem do zahrady',
+            name: 'Deluxe pokoj',
+            description: 'Prostorný pokoj s manželskou postelí a výhledem do zahrady',
             type: 'double',
             capacity: 2,
             maxOccupancy: 2,
             bedConfiguration: [{ type: 'king', count: 1 }],
             pricePerNight: 3500,
             totalPrice: 7000,
-            amenities: ['WiFi', 'TV', 'Minibar', 'Klimatizace', 'Koupelna', 'Výhled do zahrady'],
+            amenities: ['WiFi', 'TV', 'Minibar', 'Klimatizace', 'Koupelna'],
             images: ['https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800'],
             isAvailable: true,
             reservations: [],
@@ -363,32 +307,14 @@ async function createDemoAccount() {
           {
             accommodationId: accommodationRef.id,
             weddingId: weddingRef.id,
-            name: 'Deluxe pokoj 202',
-            description: 'Prostorný pokoj s king size postelí a výhledem do zahrady',
-            type: 'double',
-            capacity: 2,
-            maxOccupancy: 2,
-            bedConfiguration: [{ type: 'king', count: 1 }],
-            pricePerNight: 3500,
-            totalPrice: 7000,
-            amenities: ['WiFi', 'TV', 'Minibar', 'Klimatizace', 'Koupelna', 'Výhled do zahrady'],
-            images: ['https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=800'],
-            isAvailable: true,
-            reservations: [],
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp()
-          },
-          {
-            accommodationId: accommodationRef.id,
-            weddingId: weddingRef.id,
-            name: 'Deluxe pokoj 203',
-            description: 'Prostorný pokoj s king size postelí a balkonem',
+            name: 'Superior pokoj',
+            description: 'Luxusní pokoj s balkonem a výhledem na golf',
             type: 'double',
             capacity: 2,
             maxOccupancy: 3,
             bedConfiguration: [{ type: 'king', count: 1 }],
-            pricePerNight: 3800,
-            totalPrice: 7600,
+            pricePerNight: 4200,
+            totalPrice: 8400,
             amenities: ['WiFi', 'TV', 'Minibar', 'Klimatizace', 'Koupelna', 'Balkon'],
             images: ['https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800'],
             isAvailable: true,
@@ -399,26 +325,7 @@ async function createDemoAccount() {
           {
             accommodationId: accommodationRef.id,
             weddingId: weddingRef.id,
-            name: 'Deluxe pokoj 204',
-            description: 'Prostorný pokoj s king size postelí a balkonem',
-            type: 'double',
-            capacity: 2,
-            maxOccupancy: 3,
-            bedConfiguration: [{ type: 'king', count: 1 }],
-            pricePerNight: 3800,
-            totalPrice: 7600,
-            amenities: ['WiFi', 'TV', 'Minibar', 'Klimatizace', 'Koupelna', 'Balkon'],
-            images: ['https://images.unsplash.com/photo-1595576508898-0ad5c879a061?w=800'],
-            isAvailable: true,
-            reservations: [],
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp()
-          },
-          // Rodinné pokoje (2 pokoje)
-          {
-            accommodationId: accommodationRef.id,
-            weddingId: weddingRef.id,
-            name: 'Rodinný apartmán 301',
+            name: 'Rodinný apartmán',
             description: 'Prostorný apartmán pro rodiny s dětmi',
             type: 'family',
             capacity: 4,
@@ -429,7 +336,7 @@ async function createDemoAccount() {
             ],
             pricePerNight: 5000,
             totalPrice: 10000,
-            amenities: ['WiFi', 'TV', 'Kuchyňka', 'Klimatizace', 'Koupelna', 'Balkon'],
+            amenities: ['WiFi', 'TV', 'Kuchyňka', 'Klimatizace', 'Koupelna'],
             images: ['https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800'],
             isAvailable: true,
             reservations: [],
@@ -439,41 +346,18 @@ async function createDemoAccount() {
           {
             accommodationId: accommodationRef.id,
             weddingId: weddingRef.id,
-            name: 'Rodinný apartmán 302',
-            description: 'Prostorný apartmán pro rodiny s dětmi',
-            type: 'family',
-            capacity: 4,
-            maxOccupancy: 5,
-            bedConfiguration: [
-              { type: 'queen', count: 1 },
-              { type: 'single', count: 2 },
-              { type: 'sofa-bed', count: 1 }
-            ],
-            pricePerNight: 5500,
-            totalPrice: 11000,
-            amenities: ['WiFi', 'TV', 'Kuchyňka', 'Klimatizace', 'Koupelna', 'Balkon', 'Dětská postýlka'],
-            images: ['https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=800'],
-            isAvailable: true,
-            reservations: [],
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp()
-          },
-          // Apartmá (1 pokoj)
-          {
-            accommodationId: accommodationRef.id,
-            weddingId: weddingRef.id,
             name: 'Prezidentské apartmá',
-            description: 'Nejluxusnější apartmá s vlastním wellness a terasou',
+            description: 'Nejluxusnější apartmá s vlastním wellness',
             type: 'suite',
             capacity: 2,
             maxOccupancy: 4,
             bedConfiguration: [
               { type: 'king', count: 1 },
-              { type: 'sofa-bed', count: 1 }
+              { type: 'sofa', count: 1 }
             ],
             pricePerNight: 8000,
             totalPrice: 16000,
-            amenities: ['WiFi', 'TV', 'Minibar', 'Klimatizace', 'Koupelna', 'Terasa', 'Vířivka', 'Sauna', 'Výhled na golf'],
+            amenities: ['WiFi', 'TV', 'Minibar', 'Klimatizace', 'Koupelna', 'Balkon', 'Vířivka', 'Sauna'],
             images: ['https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=800'],
             isAvailable: true,
             reservations: [],
@@ -482,66 +366,22 @@ async function createDemoAccount() {
           }
         ];
 
-        // Update accommodation document with rooms array
-        const now = new Date();
-        await accommodationRef.update({
-          rooms: rooms.map((room, index) => ({
-            id: `room_${accommodationRef.id}_${index + 1}`,
-            ...room,
-            accommodationId: accommodationRef.id,
-            weddingId: weddingRef.id,
-            createdAt: now,
-            updatedAt: now
-          }))
+        const roomBatch = db.batch();
+        rooms.forEach(room => {
+          const roomRef = db.collection('rooms').doc();
+          roomBatch.set(roomRef, room);
         });
-        console.log(`✅ Added ${rooms.length} rooms to ${accommodation.name}`);
+        await roomBatch.commit();
+        console.log(`✅ Added rooms to ${accommodation.name}`);
       }
 
       // Add rooms to second accommodation
       if (accommodation.name === 'Penzion U Lípy') {
         const rooms = [
-          // Jednolůžkové pokoje (2 pokoje)
           {
             accommodationId: accommodationRef.id,
             weddingId: weddingRef.id,
-            name: 'Jednolůžkový pokoj 1',
-            description: 'Útulný pokoj pro jednu osobu',
-            type: 'single',
-            capacity: 1,
-            maxOccupancy: 1,
-            bedConfiguration: [{ type: 'single', count: 1 }],
-            pricePerNight: 1200,
-            totalPrice: 2400,
-            amenities: ['WiFi', 'TV', 'Koupelna'],
-            images: ['https://images.unsplash.com/photo-1540518614846-7eded433c457?w=800'],
-            isAvailable: true,
-            reservations: [],
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp()
-          },
-          {
-            accommodationId: accommodationRef.id,
-            weddingId: weddingRef.id,
-            name: 'Jednolůžkový pokoj 2',
-            description: 'Útulný pokoj pro jednu osobu',
-            type: 'single',
-            capacity: 1,
-            maxOccupancy: 1,
-            bedConfiguration: [{ type: 'single', count: 1 }],
-            pricePerNight: 1200,
-            totalPrice: 2400,
-            amenities: ['WiFi', 'TV', 'Koupelna'],
-            images: ['https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800'],
-            isAvailable: true,
-            reservations: [],
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp()
-          },
-          // Dvoulůžkové pokoje (4 pokoje)
-          {
-            accommodationId: accommodationRef.id,
-            weddingId: weddingRef.id,
-            name: 'Dvoulůžkový pokoj 3',
+            name: 'Dvoulůžkový pokoj',
             description: 'Útulný pokoj s manželskou postelí',
             type: 'double',
             capacity: 2,
@@ -559,33 +399,18 @@ async function createDemoAccount() {
           {
             accommodationId: accommodationRef.id,
             weddingId: weddingRef.id,
-            name: 'Dvoulůžkový pokoj 4',
-            description: 'Útulný pokoj s manželskou postelí',
-            type: 'double',
-            capacity: 2,
-            maxOccupancy: 2,
-            bedConfiguration: [{ type: 'queen', count: 1 }],
-            pricePerNight: 1800,
-            totalPrice: 3600,
+            name: 'Třílůžkový pokoj',
+            description: 'Pokoj pro tři osoby',
+            type: 'triple',
+            capacity: 3,
+            maxOccupancy: 3,
+            bedConfiguration: [
+              { type: 'queen', count: 1 },
+              { type: 'single', count: 1 }
+            ],
+            pricePerNight: 2400,
+            totalPrice: 4800,
             amenities: ['WiFi', 'TV', 'Koupelna'],
-            images: ['https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800'],
-            isAvailable: true,
-            reservations: [],
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp()
-          },
-          {
-            accommodationId: accommodationRef.id,
-            weddingId: weddingRef.id,
-            name: 'Dvoulůžkový pokoj 5',
-            description: 'Pokoj s manželskou postelí a balkonem',
-            type: 'double',
-            capacity: 2,
-            maxOccupancy: 2,
-            bedConfiguration: [{ type: 'queen', count: 1 }],
-            pricePerNight: 2000,
-            totalPrice: 4000,
-            amenities: ['WiFi', 'TV', 'Koupelna', 'Balkon'],
             images: ['https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800'],
             isAvailable: true,
             reservations: [],
@@ -595,73 +420,11 @@ async function createDemoAccount() {
           {
             accommodationId: accommodationRef.id,
             weddingId: weddingRef.id,
-            name: 'Dvoulůžkový pokoj 6',
-            description: 'Pokoj s manželskou postelí a balkonem',
-            type: 'double',
-            capacity: 2,
-            maxOccupancy: 2,
-            bedConfiguration: [{ type: 'queen', count: 1 }],
-            pricePerNight: 2000,
-            totalPrice: 4000,
-            amenities: ['WiFi', 'TV', 'Koupelna', 'Balkon'],
-            images: ['https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=800'],
-            isAvailable: true,
-            reservations: [],
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp()
-          },
-          // Třílůžkové pokoje (2 pokoje)
-          {
-            accommodationId: accommodationRef.id,
-            weddingId: weddingRef.id,
-            name: 'Třílůžkový pokoj 7',
-            description: 'Pokoj pro tři osoby',
-            type: 'twin',
-            capacity: 3,
-            maxOccupancy: 3,
-            bedConfiguration: [
-              { type: 'double', count: 1 },
-              { type: 'single', count: 1 }
-            ],
-            pricePerNight: 2400,
-            totalPrice: 4800,
-            amenities: ['WiFi', 'TV', 'Koupelna'],
-            images: ['https://images.unsplash.com/photo-1595576508898-0ad5c879a061?w=800'],
-            isAvailable: true,
-            reservations: [],
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp()
-          },
-          {
-            accommodationId: accommodationRef.id,
-            weddingId: weddingRef.id,
-            name: 'Třílůžkový pokoj 8',
-            description: 'Pokoj pro tři osoby s balkonem',
-            type: 'twin',
-            capacity: 3,
-            maxOccupancy: 3,
-            bedConfiguration: [
-              { type: 'double', count: 1 },
-              { type: 'single', count: 1 }
-            ],
-            pricePerNight: 2600,
-            totalPrice: 5200,
-            amenities: ['WiFi', 'TV', 'Koupelna', 'Balkon'],
-            images: ['https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=800'],
-            isAvailable: true,
-            reservations: [],
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp()
-          },
-          // Rodinné pokoje (2 pokoje)
-          {
-            accommodationId: accommodationRef.id,
-            weddingId: weddingRef.id,
-            name: 'Rodinný pokoj 9',
+            name: 'Rodinný pokoj',
             description: 'Prostorný pokoj pro rodinu',
             type: 'family',
             capacity: 4,
-            maxOccupancy: 4,
+            maxOccupancy: 5,
             bedConfiguration: [
               { type: 'queen', count: 1 },
               { type: 'single', count: 2 }
@@ -674,44 +437,16 @@ async function createDemoAccount() {
             reservations: [],
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
             updatedAt: admin.firestore.FieldValue.serverTimestamp()
-          },
-          {
-            accommodationId: accommodationRef.id,
-            weddingId: weddingRef.id,
-            name: 'Rodinný pokoj 10',
-            description: 'Velký rodinný pokoj s kuchyňkou',
-            type: 'family',
-            capacity: 5,
-            maxOccupancy: 5,
-            bedConfiguration: [
-              { type: 'queen', count: 1 },
-              { type: 'single', count: 2 },
-              { type: 'sofa-bed', count: 1 }
-            ],
-            pricePerNight: 3500,
-            totalPrice: 7000,
-            amenities: ['WiFi', 'TV', 'Koupelna', 'Balkon', 'Kuchyňka'],
-            images: ['https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800'],
-            isAvailable: true,
-            reservations: [],
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp()
           }
         ];
 
-        // Update accommodation document with rooms array
-        const now = new Date();
-        await accommodationRef.update({
-          rooms: rooms.map((room, index) => ({
-            id: `room_${accommodationRef.id}_${index + 1}`,
-            ...room,
-            accommodationId: accommodationRef.id,
-            weddingId: weddingRef.id,
-            createdAt: now,
-            updatedAt: now
-          }))
+        const roomBatch2 = db.batch();
+        rooms.forEach(room => {
+          const roomRef = db.collection('rooms').doc();
+          roomBatch2.set(roomRef, room);
         });
-        console.log(`✅ Added ${rooms.length} rooms to ${accommodation.name}`);
+        await roomBatch2.commit();
+        console.log(`✅ Added rooms to ${accommodation.name}`);
       }
     }
 
@@ -1680,22 +1415,11 @@ async function createDemoAccount() {
     const demoMusicData = {
       weddingId: weddingRef.id,
       userId: demoUser.uid,
-      vendors: [
-        {
-          id: 'vendor-1',
-          name: 'DJ Martin',
-          type: 'DJ',
-          contact: '+420 777 345 678',
-          email: 'martin@djmartin.cz'
-        },
-        {
-          id: 'vendor-2',
-          name: 'Smyčcový kvartet Harmonie',
-          type: 'Smyčcový kvartet',
-          contact: '+420 606 123 456',
-          email: 'info@kvartetharmonie.cz'
-        }
-      ],
+      vendor: {
+        name: 'DJ Martin',
+        contact: '+420 777 345 678',
+        email: 'martin@djmartin.cz'
+      },
       categories: [
         {
           id: 'groom-entrance',
@@ -1713,19 +1437,11 @@ async function createDemoAccount() {
           ]
         },
         {
-          id: 'bridesmaids-entrance',
-          name: 'Nástup svědků/družiček',
-          description: 'Hudba při příchodu svědků a družiček',
-          icon: '🤍',
-          required: false,
-          songs: []
-        },
-        {
           id: 'bride-entrance',
           name: 'Nástup nevěsty',
           description: 'Nejdůležitější okamžik - příchod nevěsty',
-          icon: '👰‍♀️',
-          required: false,
+          icon: '💍',
+          required: true,
           songs: [
             {
               id: 'song-1',
@@ -1736,43 +1452,11 @@ async function createDemoAccount() {
           ]
         },
         {
-          id: 'ring-exchange',
-          name: 'Nasazování prstýnků',
-          description: 'Hudba při výměně prstenů',
-          icon: '💍',
-          required: false,
-          songs: []
-        },
-        {
-          id: 'signing',
-          name: 'Podpis oddacího listu',
-          description: 'Hudba během podpisu dokumentů',
-          icon: '✍️',
-          required: false,
-          songs: []
-        },
-        {
-          id: 'congratulations',
-          name: 'Gratulace',
-          description: 'Hudba při gratulacích hostů',
-          icon: '🎉',
-          required: false,
-          songs: []
-        },
-        {
-          id: 'guard-of-honor',
-          name: 'Špalír',
-          description: 'Hudba při odchodu novomanželů špalírem',
-          icon: '🎊',
-          required: false,
-          songs: []
-        },
-        {
           id: 'first-dance',
           name: 'První tanec',
           description: 'Váš první tanec jako manželé',
           icon: '💃',
-          required: false,
+          required: true,
           songs: [
             {
               id: 'song-2',
@@ -1783,27 +1467,11 @@ async function createDemoAccount() {
           ]
         },
         {
-          id: 'parent-dance',
-          name: 'Tanec s rodiči',
-          description: 'Tanec nevěsty s otcem a ženicha s matkou',
-          icon: '👨‍👩‍👧',
-          required: false,
-          songs: []
-        },
-        {
-          id: 'cake-cutting',
-          name: 'Krájení dortu',
-          description: 'Hudba při krájení svatebního dortu',
-          icon: '🎂',
-          required: false,
-          songs: []
-        },
-        {
-          id: 'party-must-have',
-          name: 'Party písně',
-          description: 'Písně, které rozproudí zábavu',
+          id: 'party-songs',
+          name: 'Párty písně',
+          description: 'Písně na rozjetí večírku',
           icon: '🎵',
-          required: false,
+          required: true,
           songs: [
             {
               id: 'song-party-1',
@@ -1826,14 +1494,6 @@ async function createDemoAccount() {
           ]
         },
         {
-          id: 'party-favorites',
-          name: 'Oblíbené písně',
-          description: 'Vaše oblíbené písně na večírek',
-          icon: '🎶',
-          required: false,
-          songs: []
-        },
-        {
           id: 'slow-songs',
           name: 'Pomalé písně',
           description: 'Romantické písně pro pomalé tance',
@@ -1853,14 +1513,6 @@ async function createDemoAccount() {
               notes: 'Krásný text'
             }
           ]
-        },
-        {
-          id: 'do-not-play',
-          name: 'Nehrát!',
-          description: 'Písně, které určitě nechcete slyšet',
-          icon: '🚫',
-          required: false,
-          songs: []
         }
       ],
       updatedAt: admin.firestore.FieldValue.serverTimestamp()
