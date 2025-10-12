@@ -91,12 +91,20 @@ export interface InfoContent {
 }
 
 // Dress Code Section
+export interface ColorWithImages {
+  color: string // Hex color code
+  name?: string // Optional color name (e.g., "Burgundy", "Navy Blue")
+  images: string[] // Array of image URLs for this color inspiration
+}
+
 export interface DressCodeContent {
   enabled: boolean
   dressCode?: string
   dressCodeDetails?: string
-  colorPalette?: string[] // Array of hex color codes for wedding color palette
-  images?: string[] // Array of image URLs for dress code inspiration
+  colors?: ColorWithImages[] // Array of colors with their inspiration images
+  // Legacy support - will be migrated to colors array
+  colorPalette?: string[]
+  images?: string[]
 }
 
 // Schedule Section

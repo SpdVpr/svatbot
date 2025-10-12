@@ -8,13 +8,10 @@ interface DressCodeSectionProps {
 }
 
 export default function ModernDressCodeSection({ content }: DressCodeSectionProps) {
-  const { dressCode, dressCodeDetails, colorPalette, images } = content
+  const { dressCode, dressCodeDetails, colors } = content
 
-  console.log('🎨 DressCodeSection - Modern Template:', {
-    hasImages: !!images,
-    imagesCount: images?.length || 0,
-    images: images
-  })
+  // Legacy support - migrate old data structure
+  const colorItems = colors || []
 
   const getDressCodeText = (code: string) => {
     switch (code) {
@@ -49,76 +46,70 @@ export default function ModernDressCodeSection({ content }: DressCodeSectionProp
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
-          {/* Dress Code Card */}
-          {dressCode && (
-            <div className="bg-gray-50 rounded-lg p-8 hover:shadow-md transition-shadow">
-              <div className="flex items-start space-x-4">
-                <div className="p-3 bg-gray-900 rounded-full flex-shrink-0">
-                  <Shirt className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Dress Code</h3>
-                  <p className="text-gray-700 text-lg">
-                    {getDressCodeText(dressCode)}
-                  </p>
-                  {dressCodeDetails && dressCode !== 'custom' && (
-                    <p className="text-gray-600 mt-2 italic">{dressCodeDetails}</p>
-                  )}
-                </div>
+        {/* Dress Code Info */}
+        {dressCode && (
+          <div className="bg-gray-50 rounded-lg p-8 hover:shadow-md transition-shadow mb-12">
+            <div className="flex items-start space-x-4">
+              <div className="p-3 bg-gray-900 rounded-full flex-shrink-0">
+                <Shirt className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Dress Code</h3>
+                <p className="text-gray-700 text-lg">
+                  {getDressCodeText(dressCode)}
+                </p>
+                {dressCodeDetails && (
+                  <p className="text-gray-600 mt-2 italic">{dressCodeDetails}</p>
+                )}
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Color Palette Card */}
-          {colorPalette && colorPalette.length > 0 && (
-            <div className="bg-gray-50 rounded-lg p-8 hover:shadow-md transition-shadow">
-              <div className="flex items-start space-x-4">
-                <div className="p-3 bg-gray-900 rounded-full flex-shrink-0">
-                  <Palette className="w-6 h-6 text-white" />
+        {/* Color Palette with Inspiration Images */}
+        {colorItems.length > 0 && (
+          <div className="space-y-10">
+            <h3 className="text-2xl font-bold text-gray-900 text-center mb-8">
+              Barevná paleta & Inspirace
+            </h3>
+
+            {colorItems.map((colorItem, colorIndex) => (
+              <div key={colorIndex} className="bg-gray-50 rounded-lg p-6 hover:shadow-md transition-shadow">
+                {/* Color Header */}
+                <div className="flex items-center gap-4 mb-6">
+                  <div
+                    className="w-16 h-16 rounded-lg shadow-md flex-shrink-0"
+                    style={{ backgroundColor: colorItem.color }}
+                  />
+                  <div>
+                    {colorItem.name && (
+                      <h4 className="text-xl font-bold text-gray-900">{colorItem.name}</h4>
+                    )}
+                    <p className="text-gray-600 font-mono text-sm">{colorItem.color}</p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">Barevná paleta</h3>
-                  <div className="flex flex-wrap gap-3">
-                    {colorPalette.map((color, index) => (
-                      <div key={index} className="flex flex-col items-center gap-2">
-                        <div
-                          className="w-14 h-14 rounded-lg shadow-md"
-                          style={{ backgroundColor: color }}
-                          title={color}
-                        />
-                        <span className="text-xs text-gray-600 font-mono">{color}</span>
+
+                {/* Color Images */}
+                {colorItem.images && colorItem.images.length > 0 && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {colorItem.images.map((image, imageIndex) => (
+                      <div
+                        key={imageIndex}
+                        className="group relative bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300"
+                      >
+                        <div className="aspect-square overflow-hidden">
+                          <img
+                            src={image}
+                            alt={`${colorItem.name || 'Color'} inspirace ${imageIndex + 1}`}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
                       </div>
                     ))}
                   </div>
-                </div>
+                )}
               </div>
-            </div>
-          )}
-        </div>
-
-        {/* Inspiration Gallery */}
-        {images && images.length > 0 && (
-          <div className="mt-16">
-            <h3 className="text-2xl font-bold text-gray-900 mb-8 text-center">
-              Inspirace
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {images.map((image, index) => (
-                <div
-                  key={index}
-                  className="group relative bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300"
-                >
-                  <div className="aspect-square overflow-hidden">
-                    <img
-                      src={image}
-                      alt={`Dress code inspirace ${index + 1}`}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
+            ))}
           </div>
         )}
       </div>
