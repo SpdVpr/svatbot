@@ -144,10 +144,13 @@ export default function ContentEditor({ content, onContentChange }: ContentEdito
 
   const toggleSectionEnabled = (sectionId: SectionType, enabled: boolean) => {
     const updatedContent = { ...content }
-    
+
     switch (sectionId) {
       case 'info':
         updatedContent.info = { ...updatedContent.info, enabled }
+        break
+      case 'dressCode':
+        updatedContent.dressCode = { ...updatedContent.dressCode, enabled }
         break
       case 'rsvp':
         updatedContent.rsvp = { ...updatedContent.rsvp, enabled }

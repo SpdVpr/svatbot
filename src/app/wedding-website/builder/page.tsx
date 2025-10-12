@@ -71,7 +71,11 @@ export default function WeddingWebsiteBuilderPage() {
     if (website) {
       setSelectedTemplate(website.template)
       setCustomUrl(website.customUrl)
-      setContent(website.content)
+      // Ensure dressCode exists in content (for backward compatibility)
+      setContent({
+        ...website.content,
+        dressCode: website.content.dressCode || { enabled: false }
+      })
       // Pokud už web existuje a jsme na url kroku, přejdi na template step
       if (currentStep === 'url' && website.customUrl) {
         setCurrentStep('template')

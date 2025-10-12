@@ -154,9 +154,26 @@ export function generateCustomUrlSuggestions(
   
   // S rokem
   if (weddingDate) {
-    const year = weddingDate.getFullYear()
-    suggestions.push(`${normalizedBride}-${normalizedGroom}-${year}`)
-    suggestions.push(`${normalizedGroom}-${normalizedBride}-${year}`)
+    let dateObj: Date
+
+    // Convert to Date if needed
+    if (weddingDate instanceof Date) {
+      dateObj = weddingDate
+    } else if (typeof weddingDate === 'string') {
+      dateObj = new Date(weddingDate)
+    } else if (typeof weddingDate === 'object' && 'seconds' in weddingDate) {
+      // Firestore Timestamp
+      dateObj = new Date((weddingDate as any).seconds * 1000)
+    } else {
+      dateObj = new Date(weddingDate as any)
+    }
+
+    // Only use year if date is valid
+    if (!isNaN(dateObj.getTime())) {
+      const year = dateObj.getFullYear()
+      suggestions.push(`${normalizedBride}-${normalizedGroom}-${year}`)
+      suggestions.push(`${normalizedGroom}-${normalizedBride}-${year}`)
+    }
   }
   
   // Pouze příjmení (pokud jsou různá)
