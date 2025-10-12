@@ -11,6 +11,12 @@ interface DressCodeSectionProps {
 export default function ModernDressCodeSection({ content }: DressCodeSectionProps) {
   const { dressCode, dressCodeDetails, colorPalette, images } = content
 
+  console.log('🎨 DressCodeSection - Modern Template:', {
+    hasImages: !!images,
+    imagesCount: images?.length || 0,
+    images: images
+  })
+
   const getDressCodeText = (code: string) => {
     switch (code) {
       case 'formal':
