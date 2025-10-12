@@ -101,23 +101,28 @@ export default function DressCodeSection({ content }: DressCodeSectionProps) {
         {images && images.length > 0 && (
           <div className="mt-12">
             <h3 className="text-3xl font-bold text-gray-900 mb-8 text-center font-serif">
-              Inspirace
+              Inspirace ({images.length} fotek)
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {images.map((image, index) => (
-                <div
-                  key={index}
-                  className="group relative bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300"
-                >
-                  <div className="aspect-square overflow-hidden">
-                    <img
-                      src={image}
-                      alt={`Dress code inspirace ${index + 1}`}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
+              {images.map((image, index) => {
+                console.log(`🖼️ Rendering image ${index}:`, image)
+                return (
+                  <div
+                    key={index}
+                    className="group relative bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300"
+                  >
+                    <div className="aspect-square overflow-hidden">
+                      <img
+                        src={image}
+                        alt={`Dress code inspirace ${index + 1}`}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        onError={(e) => console.error(`❌ Image ${index} failed to load:`, image, e)}
+                        onLoad={() => console.log(`✅ Image ${index} loaded successfully:`, image)}
+                      />
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         )}
