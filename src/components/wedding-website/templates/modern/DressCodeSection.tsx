@@ -42,36 +42,13 @@ export default function ModernDressCodeSection({ content }: DressCodeSectionProp
           </h2>
           <div className="w-20 h-1 bg-gray-900 mx-auto mb-6"></div>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Pomozte nám vytvořit harmonický vzhled naší svatby
+            {dressCodeDetails || 'Pomozte nám vytvořit harmonický vzhled naší svatby'}
           </p>
         </div>
-
-        {/* Dress Code Info */}
-        {dressCode && (
-          <div className="bg-gray-50 rounded-lg p-8 hover:shadow-md transition-shadow mb-12">
-            <div className="flex items-start space-x-4">
-              <div className="p-3 bg-gray-900 rounded-full flex-shrink-0">
-                <Shirt className="w-6 h-6 text-white" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Dress Code</h3>
-                <p className="text-gray-700 text-lg">
-                  {getDressCodeText(dressCode)}
-                </p>
-                {dressCodeDetails && (
-                  <p className="text-gray-600 mt-2 italic">{dressCodeDetails}</p>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Color Palette with Inspiration Images */}
         {colorItems.length > 0 && (
           <div className="space-y-10">
-            <h3 className="text-2xl font-bold text-gray-900 text-center mb-8">
-              Barevná paleta & Inspirace
-            </h3>
 
             {colorItems.map((colorItem, colorIndex) => (
               <div key={colorIndex} className="bg-gray-50 rounded-lg p-6 hover:shadow-md transition-shadow">
