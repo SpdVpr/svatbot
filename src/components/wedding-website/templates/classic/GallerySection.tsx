@@ -11,8 +11,10 @@ interface GallerySectionProps {
 export default function ClassicGallerySection({ content }: GallerySectionProps) {
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [showAll, setShowAll] = useState(false)
 
   const images = content.images || []
+  const displayedImages = showAll ? images : images.slice(0, 9)
 
   const openLightbox = (image: GalleryImage, index: number) => {
     setSelectedImage(image)
@@ -91,8 +93,8 @@ export default function ClassicGallerySection({ content }: GallerySectionProps) 
           </div>
 
           {/* Gallery Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {images.map((image, index) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {displayedImages.map((image, index) => (
               <div
                 key={image.id}
                 className="group relative bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer"
@@ -126,11 +128,26 @@ export default function ClassicGallerySection({ content }: GallerySectionProps) 
             ))}
           </div>
 
-          {/* Load More Button (if needed) */}
-          {images.length > 9 && (
-            <div className="text-center mt-12">
-              <button className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-8 py-3 rounded-full font-semibold hover:from-pink-600 hover:to-purple-600 transition-all duration-300 shadow-lg hover:shadow-xl">
-                Zobrazit více fotek
+          {/* Load More Button */}
+          {images.length > 9 && !showAll && (
+            <div className="text-center">
+              <button
+                onClick={() => setShowAll(true)}
+                className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-8 py-3 rounded-full font-semibold hover:from-pink-600 hover:to-purple-600 transition-all duration-300 shadow-lg hover:shadow-xl"
+              >
+                Zobrazit více fotek ({images.length - 9} dalších)
+              </button>
+            </div>
+          )}
+
+          {/* Show Less Button */}
+          {showAll && images.length > 9 && (
+            <div className="text-center">
+              <button
+                onClick={() => setShowAll(false)}
+                className="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-8 py-3 rounded-full font-semibold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 shadow-lg hover:shadow-xl"
+              >
+                Zobrazit méně
               </button>
             </div>
           )}

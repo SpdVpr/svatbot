@@ -116,6 +116,32 @@ export default function ModernInfoSection({ content }: InfoSectionProps) {
                   </div>
                 </div>
               </div>
+
+              {/* Venue Images */}
+              {((ceremony?.images && ceremony.images.length > 0) || (reception?.images && reception.images.length > 0)) && (
+                <div className="px-6 pb-6">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {ceremony?.images?.map((image, index) => (
+                      <div key={`ceremony-${index}`} className="aspect-video rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                        <img
+                          src={image}
+                          alt={`${ceremony.venue || 'Obřad'} ${index + 1}`}
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    ))}
+                    {reception?.images?.map((image, index) => (
+                      <div key={`reception-${index}`} className="aspect-video rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                        <img
+                          src={image}
+                          alt={`${reception.venue || 'Hostina'} ${index + 1}`}
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
