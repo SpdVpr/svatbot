@@ -48,32 +48,28 @@ const DEFAULT_CATEGORIES: MusicCategory[] = [
     name: 'Nástup ženicha',
     description: 'Hudba při příchodu ženicha k oltáři',
     icon: '🤵',
-    songs: [],
-    required: false
+    songs: []
   },
   {
     id: 'bridesmaids-entrance',
     name: 'Nástup svědků/družiček',
     description: 'Hudba při příchodu svědků a družiček',
     icon: '🤍',
-    songs: [],
-    required: false
+    songs: []
   },
   {
     id: 'bride-entrance',
     name: 'Nástup nevěsty',
     description: 'Nejdůležitější okamžik - příchod nevěsty',
     icon: '👰‍♀️',
-    songs: [],
-    required: false
+    songs: []
   },
   {
     id: 'ring-exchange',
     name: 'Nasazování prstýnků',
     description: 'Hudba při výměně prstenů',
     icon: '💍',
-    songs: [],
-    required: false
+    songs: []
   },
   {
     id: 'signing',
@@ -101,8 +97,7 @@ const DEFAULT_CATEGORIES: MusicCategory[] = [
     name: 'První tanec',
     description: 'Váš první tanec jako manželé',
     icon: '💃',
-    songs: [],
-    required: false
+    songs: []
   },
   {
     id: 'parent-dance',
@@ -161,10 +156,13 @@ export function useMusic() {
   // Migrate old categories to new format
   const migrateCategories = (oldCategories: MusicCategory[]): MusicCategory[] => {
     return oldCategories.map(category => {
+      // Remove required property from all categories
+      const { required, ...categoryWithoutRequired } = category
+
       // Update bridesmaids-entrance
       if (category.id === 'bridesmaids-entrance') {
         return {
-          ...category,
+          ...categoryWithoutRequired,
           name: 'Nástup svědků/družiček',
           description: 'Hudba při příchodu svědků a družiček',
           icon: '🤍'
@@ -173,41 +171,33 @@ export function useMusic() {
       // Update bride-entrance
       if (category.id === 'bride-entrance') {
         return {
-          ...category,
+          ...categoryWithoutRequired,
           name: 'Nástup nevěsty',
-          icon: '👰‍♀️',
-          required: false
+          icon: '👰‍♀️'
         }
       }
       // Update congratulations
       if (category.id === 'congratulations') {
         return {
-          ...category,
+          ...categoryWithoutRequired,
           name: 'Gratulace'
         }
       }
       // Update guard-of-honor (Šplalíř -> Špalír)
       if (category.id === 'guard-of-honor') {
         return {
-          ...category,
+          ...categoryWithoutRequired,
           name: 'Špalír'
         }
       }
       // Update party-must-have
       if (category.id === 'party-must-have') {
         return {
-          ...category,
+          ...categoryWithoutRequired,
           name: 'Party písně'
         }
       }
-      // Update first-dance to not required
-      if (category.id === 'first-dance') {
-        return {
-          ...category,
-          required: false
-        }
-      }
-      return category
+      return categoryWithoutRequired
     })
   }
 
@@ -222,8 +212,7 @@ export function useMusic() {
         name: 'Nasazování prstýnků',
         description: 'Hudba při výměně prstenů',
         icon: '💍',
-        songs: [],
-        required: false
+        songs: []
       }
 
       if (brideEntranceIndex >= 0) {
