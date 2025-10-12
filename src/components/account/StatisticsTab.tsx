@@ -212,7 +212,7 @@ function StatisticsTab() {
                     </div>
                     <div className="text-center">
                       <p className="text-2xl font-bold text-gray-600">
-                        {tasks.filter(t => t.status === 'not-started').length}
+                        {tasks.filter(t => t.status === 'pending').length}
                       </p>
                       <p className="text-xs text-gray-600">Nezahájeno</p>
                     </div>
