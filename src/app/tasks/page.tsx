@@ -101,8 +101,7 @@ export default function TasksPage() {
         priority: data.priority,
         dueDate: data.dueDate,
         assignedTo: data.assignedTo,
-        estimatedDuration: data.estimatedDuration,
-        tags: data.tags
+        notes: data.notes
       })
       console.log('✅ Task updated successfully')
       setShowTaskForm(false)
@@ -404,13 +403,12 @@ export default function TasksPage() {
           error={error || undefined}
           initialData={editingTask ? {
             title: editingTask.title,
-            description: editingTask.description,
+            description: editingTask.description || '',
             category: editingTask.category,
             priority: editingTask.priority,
             dueDate: editingTask.dueDate,
             assignedTo: editingTask.assignedTo,
-            estimatedDuration: editingTask.estimatedDuration,
-            tags: editingTask.tags
+            notes: editingTask.notes
           } : undefined}
         />
       )}
