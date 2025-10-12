@@ -80,6 +80,11 @@ export default async function WeddingWebsitePage({ params }: PageProps) {
       isPublished: website.isPublished,
       template: website.template
     })
+    console.log('🎨 DressCode data:', {
+      enabled: website.content?.dressCode?.enabled,
+      imagesCount: website.content?.dressCode?.images?.length || 0,
+      images: website.content?.dressCode?.images
+    })
   }
 
   // Pokud web neexistuje nebo není publikovaný, zobraz 404
