@@ -68,48 +68,45 @@ export default function ModernDressCodeSection({ content }: DressCodeSectionProp
 
         {/* Color Palette with Inspiration Images */}
         {colorItems.length > 0 && (
-          <div>
-            <h3 className="text-2xl font-bold text-gray-900 text-center mb-10">
+          <div className="space-y-10">
+            <h3 className="text-2xl font-bold text-gray-900 text-center mb-8">
               Barevná paleta & Inspirace
             </h3>
 
-            {/* Grid of colors - max 3 per row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {colorItems.map((colorItem, colorIndex) => (
-                <div key={colorIndex} className="bg-gray-50 rounded-lg p-5 hover:shadow-md transition-shadow">
-                  {/* Color Header */}
-                  <div className="flex items-center gap-3 mb-4">
-                    <div
-                      className="w-10 h-10 rounded-lg shadow-md flex-shrink-0"
-                      style={{ backgroundColor: colorItem.color }}
-                    />
-                    {colorItem.name && (
-                      <h4 className="text-lg font-bold text-gray-900">{colorItem.name}</h4>
-                    )}
-                  </div>
-
-                  {/* Color Images */}
-                  {colorItem.images && colorItem.images.length > 0 && (
-                    <div className="grid grid-cols-2 gap-3">
-                      {colorItem.images.map((image, imageIndex) => (
-                        <div
-                          key={imageIndex}
-                          className="group relative bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300"
-                        >
-                          <div className="aspect-square overflow-hidden">
-                            <img
-                              src={image}
-                              alt={`${colorItem.name || 'Color'} inspirace ${imageIndex + 1}`}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+            {colorItems.map((colorItem, colorIndex) => (
+              <div key={colorIndex} className="bg-gray-50 rounded-lg p-6 hover:shadow-md transition-shadow">
+                {/* Color Header - Centered */}
+                <div className="flex flex-col items-center gap-3 mb-8">
+                  <div
+                    className="w-14 h-14 rounded-lg shadow-md"
+                    style={{ backgroundColor: colorItem.color }}
+                  />
+                  {colorItem.name && (
+                    <h4 className="text-xl font-bold text-gray-900 text-center">{colorItem.name}</h4>
                   )}
                 </div>
-              ))}
-            </div>
+
+                {/* Color Images - Max 3 per row */}
+                {colorItem.images && colorItem.images.length > 0 && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {colorItem.images.map((image, imageIndex) => (
+                      <div
+                        key={imageIndex}
+                        className="group relative bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300"
+                      >
+                        <div className="aspect-square overflow-hidden">
+                          <img
+                            src={image}
+                            alt={`${colorItem.name || 'Color'} inspirace ${imageIndex + 1}`}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         )}
       </div>

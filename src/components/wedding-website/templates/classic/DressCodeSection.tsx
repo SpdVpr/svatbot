@@ -68,48 +68,45 @@ export default function DressCodeSection({ content }: DressCodeSectionProps) {
 
         {/* Color Palette with Inspiration Images */}
         {colorItems.length > 0 && (
-          <div>
-            <h3 className="text-3xl font-bold text-gray-900 text-center font-serif mb-12">
+          <div className="space-y-12">
+            <h3 className="text-3xl font-bold text-gray-900 text-center font-serif mb-8">
               Barevná paleta & Inspirace
             </h3>
 
-            {/* Grid of colors - max 3 per row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {colorItems.map((colorItem, colorIndex) => (
-                <div key={colorIndex} className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100">
-                  {/* Color Header */}
-                  <div className="flex items-center gap-3 mb-4">
-                    <div
-                      className="w-12 h-12 rounded-xl border-4 border-white shadow-lg flex-shrink-0"
-                      style={{ backgroundColor: colorItem.color }}
-                    />
-                    {colorItem.name && (
-                      <h4 className="text-xl font-bold text-gray-900 font-serif">{colorItem.name}</h4>
-                    )}
-                  </div>
-
-                  {/* Color Images */}
-                  {colorItem.images && colorItem.images.length > 0 && (
-                    <div className="grid grid-cols-2 gap-3">
-                      {colorItem.images.map((image, imageIndex) => (
-                        <div
-                          key={imageIndex}
-                          className="group relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300"
-                        >
-                          <div className="aspect-square overflow-hidden">
-                            <img
-                              src={image}
-                              alt={`${colorItem.name || 'Color'} inspirace ${imageIndex + 1}`}
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+            {colorItems.map((colorItem, colorIndex) => (
+              <div key={colorIndex} className="bg-white rounded-2xl p-8 shadow-xl border border-gray-100">
+                {/* Color Header - Centered */}
+                <div className="flex flex-col items-center gap-3 mb-8">
+                  <div
+                    className="w-16 h-16 rounded-2xl border-4 border-white shadow-lg"
+                    style={{ backgroundColor: colorItem.color }}
+                  />
+                  {colorItem.name && (
+                    <h4 className="text-2xl font-bold text-gray-900 font-serif text-center">{colorItem.name}</h4>
                   )}
                 </div>
-              ))}
-            </div>
+
+                {/* Color Images - Max 3 per row */}
+                {colorItem.images && colorItem.images.length > 0 && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {colorItem.images.map((image, imageIndex) => (
+                      <div
+                        key={imageIndex}
+                        className="group relative bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300"
+                      >
+                        <div className="aspect-square overflow-hidden">
+                          <img
+                            src={image}
+                            alt={`${colorItem.name || 'Color'} inspirace ${imageIndex + 1}`}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         )}
       </div>
