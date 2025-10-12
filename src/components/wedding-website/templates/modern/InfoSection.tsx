@@ -16,12 +16,22 @@ export default function ModernInfoSection({ content }: InfoSectionProps) {
   const hasReception = reception && (reception.venue || reception.time || reception.address)
   const venueCount = (hasCeremony ? 1 : 0) + (hasReception ? 1 : 0)
 
-  // Dynamic grid classes based on number of filled venues
-  const getGridClasses = () => {
-    if (venueCount === 1) {
-      return "grid grid-cols-1 gap-16 mb-16" // Single column for one venue
+  // Combine all venue images
+  const allVenueImages = [
+    ...(ceremony?.images || []),
+    ...(reception?.images || [])
+  ]
+
+  // Dynamic grid classes based on number of images
+  const getImageGridClasses = () => {
+    const imageCount = allVenueImages.length
+    if (imageCount === 1) {
+      return "grid grid-cols-1" // 1 image = full width
+    } else if (imageCount === 2) {
+      return "grid grid-cols-1 md:grid-cols-2" // 2 images = 2 columns
+    } else {
+      return "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3" // 3+ images = 3 columns
     }
-    return "grid grid-cols-1 lg:grid-cols-2 gap-16 mb-16" // Two columns for two venues
   }
 
   return (
@@ -38,11 +48,31 @@ export default function ModernInfoSection({ content }: InfoSectionProps) {
           </p>
         </div>
 
-        {/* Main Venue Info - Full Width */}
+        {/* Main Venue Info */}
         {(hasCeremony || hasReception) && (
           <div className="mb-16">
-            {/* Venue Details */}
             <div className="bg-white rounded-lg overflow-hidden shadow-sm">
+              {/* Venue Images - First */}
+              {allVenueImages.length > 0 && (
+                <div className="p-6">
+                  <div className={`${getImageGridClasses()} gap-5`}>
+                    {allVenueImages.map((image, index) => (
+                      <div
+                        key={index}
+                        className="aspect-video rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group"
+                      >
+                        <img
+                          src={image}
+                          alt={`Místo konání ${index + 1}`}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Map and Info - Below images */}
               <div className="grid grid-cols-1 lg:grid-cols-2">
                 {/* Left: Map */}
                 <div className="h-96 lg:h-auto">
@@ -116,32 +146,6 @@ export default function ModernInfoSection({ content }: InfoSectionProps) {
                   </div>
                 </div>
               </div>
-
-              {/* Venue Images */}
-              {((ceremony?.images && ceremony.images.length > 0) || (reception?.images && reception.images.length > 0)) && (
-                <div className="px-6 pb-6">
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {ceremony?.images?.map((image, index) => (
-                      <div key={`ceremony-${index}`} className="aspect-video rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                        <img
-                          src={image}
-                          alt={`${ceremony.venue || 'Obřad'} ${index + 1}`}
-                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                    ))}
-                    {reception?.images?.map((image, index) => (
-                      <div key={`reception-${index}`} className="aspect-video rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                        <img
-                          src={image}
-                          alt={`${reception.venue || 'Hostina'} ${index + 1}`}
-                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         )}
