@@ -2,7 +2,6 @@
 
 import { Shirt, Palette } from 'lucide-react'
 import type { DressCodeContent } from '@/types/wedding-website'
-import Image from 'next/image'
 
 interface DressCodeSectionProps {
   content: DressCodeContent
@@ -108,15 +107,15 @@ export default function ModernDressCodeSection({ content }: DressCodeSectionProp
               {images.map((image, index) => (
                 <div
                   key={index}
-                  className="relative aspect-square rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow group"
+                  className="group relative bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300"
                 >
-                  <Image
-                    src={image}
-                    alt={`Dress code inspirace ${index + 1}`}
-                    fill
-                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
+                  <div className="aspect-square overflow-hidden">
+                    <img
+                      src={image}
+                      alt={`Dress code inspirace ${index + 1}`}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
                 </div>
               ))}
             </div>
