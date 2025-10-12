@@ -67,7 +67,7 @@ export default function InfoSectionEditor({ content, onChange }: InfoSectionEdit
       })
 
       const uploadedUrls = await Promise.all(uploadPromises)
-      const currentVenue = content[venueType] || {}
+      const currentVenue: VenueInfo = content[venueType] || { time: '', venue: '', address: '' }
       const updatedImages = [...(currentVenue.images || []), ...uploadedUrls]
 
       handleInputChange(venueType, {
@@ -83,7 +83,7 @@ export default function InfoSectionEditor({ content, onChange }: InfoSectionEdit
   }
 
   const removeVenueImage = (venueType: 'ceremony' | 'reception', index: number) => {
-    const currentVenue = content[venueType] || {}
+    const currentVenue: VenueInfo = content[venueType] || { time: '', venue: '', address: '' }
     const updatedImages = (currentVenue.images || []).filter((_, i) => i !== index)
 
     handleInputChange(venueType, {
