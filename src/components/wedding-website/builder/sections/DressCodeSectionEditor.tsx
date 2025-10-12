@@ -79,9 +79,7 @@ export default function DressCodeSectionEditor({ content, onChange }: DressCodeS
       })
 
       const uploadedUrls = await Promise.all(uploadPromises)
-      console.log('📤 Uploaded URLs:', uploadedUrls)
       const updatedImages = [...(content.images || []), ...uploadedUrls]
-      console.log('🖼️ Updated images array:', updatedImages)
       handleInputChange('images', updatedImages)
 
     } catch (error) {
@@ -112,10 +110,6 @@ export default function DressCodeSectionEditor({ content, onChange }: DressCodeS
     const updatedImages = (content.images || []).filter((_, i) => i !== index)
     handleInputChange('images', updatedImages)
   }
-
-  // Debug logging
-  console.log('🎨 DressCodeSectionEditor - content.images:', content.images)
-  console.log('🎨 DressCodeSectionEditor - images count:', content.images?.length || 0)
 
   return (
     <div className="p-6 space-y-6">
@@ -217,24 +211,46 @@ export default function DressCodeSectionEditor({ content, onChange }: DressCodeS
         </p>
       </div>
 
-      {/* Inspiration Gallery */}
+      {/* Upload fotek */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Inspirační galerie</h3>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Upload className="w-5 h-5 text-pink-600" />
+            <h3 className="text-lg font-semibold text-gray-900">Inspirační galerie</h3>
+          </div>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="inline-flex items-center gap-2 bg-pink-500 text-white px-3 py-2 rounded-lg hover:bg-pink-600 transition-colors text-sm disabled:opacity-50"
+          >
+            <ImageIcon className="w-4 h-4" />
+            Přidat fotky
+          </button>
+        </div>
+
         <p className="text-sm text-gray-600 mb-4">
           Přidejte fotky pro lepší ilustraci dress code a barevné palety
         </p>
 
-        {/* Upload Area */}
+        {/* Drag & Drop Area */}
         <div
+          className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+            dragOver
+              ? 'border-pink-400 bg-pink-50'
+              : 'border-gray-300 hover:border-pink-400'
+          }`}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
-          className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-            dragOver
-              ? 'border-pink-500 bg-pink-50'
-              : 'border-gray-300 hover:border-pink-400'
-          }`}
         >
+          <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <h4 className="text-lg font-semibold text-gray-900 mb-2">
+            Přetáhněte fotky sem
+          </h4>
+          <p className="text-gray-600 mb-4">
+            Nebo klikněte pro výběr souborů
+          </p>
+
           <input
             ref={fileInputRef}
             type="file"
@@ -243,59 +259,67 @@ export default function DressCodeSectionEditor({ content, onChange }: DressCodeS
             onChange={(e) => handleFileSelect(e.target.files)}
             className="hidden"
           />
-
-          {uploading ? (
-            <div className="space-y-2">
-              <div className="w-16 h-16 mx-auto border-4 border-pink-500 border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm text-gray-600">Nahrávání... {progress}%</p>
-            </div>
-          ) : (
-            <>
-              <Upload className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-              <p className="text-gray-600 mb-2">
-                Přetáhněte fotky sem nebo{' '}
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="text-pink-600 hover:text-pink-700 font-medium"
-                >
-                  vyberte soubory
-                </button>
-              </p>
-              <p className="text-xs text-gray-500">
-                Podporované formáty: JPG, PNG, WEBP (max 10MB)
-              </p>
-            </>
-          )}
         </div>
 
-        {error && (
-          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-            {error}
+        {uploading && (
+          <div className="mt-4 p-4 bg-pink-50 border border-pink-200 rounded-lg">
+            <div className="flex items-center gap-3">
+              <div className="w-5 h-5 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900">Nahrávání fotek...</p>
+                <div className="mt-2 bg-gray-200 rounded-full h-2 overflow-hidden">
+                  <div
+                    className="bg-pink-500 h-full transition-all duration-300"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+              </div>
+              <span className="text-sm font-medium text-gray-900">{progress}%</span>
+            </div>
           </div>
         )}
 
-        {/* Image Grid */}
-        {content.images && content.images.length > 0 && (
-          <div className="mt-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {content.images.map((imageUrl, index) => (
-              <div key={index} className="relative group aspect-square">
-                <img
-                  src={imageUrl}
-                  alt={`Dress code inspiration ${index + 1}`}
-                  className="w-full h-full object-cover rounded-lg"
-                />
-                <button
-                  onClick={() => removeImage(index)}
-                  className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
+        {error && (
+          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm text-red-600">{error}</p>
           </div>
         )}
       </div>
+
+      {/* Galerie fotek */}
+      {content.images && content.images.length > 0 && (
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Nahrané fotky ({content.images.length})
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {content.images.map((imageUrl, index) => (
+              <div key={index} className="relative">
+                <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden group">
+                  <img
+                    src={imageUrl}
+                    alt={`Dress code inspiration ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+
+                  {/* Overlay */}
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                    <button
+                      onClick={() => removeImage(index)}
+                      className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
