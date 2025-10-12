@@ -135,6 +135,12 @@ export default function WeddingWebsiteBuilderPage() {
   const handleSave = async () => {
     if (!selectedTemplate || !customUrl || !wedding) return
 
+    console.log('💾 Saving website...', {
+      dressCodeEnabled: content.dressCode?.enabled,
+      dressCodeImagesCount: content.dressCode?.images?.length || 0,
+      dressCodeImages: content.dressCode?.images
+    })
+
     setIsSaving(true)
     try {
       if (!website) {
