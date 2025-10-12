@@ -144,24 +144,6 @@ export default function TaskList({
     }))
   })
 
-  // Get priority label in Czech
-  const getPriorityLabel = (priority?: string): string => {
-    if (!priority) return ''
-
-    switch (priority) {
-      case 'urgent':
-        return 'Urgentní'
-      case 'high':
-        return 'Vysoká'
-      case 'medium':
-        return 'Střední'
-      case 'low':
-        return 'Nízká'
-      default:
-        return priority
-    }
-  }
-
   // Get priority icon and color
   const getPriorityDisplay = (priority?: string) => {
     if (!priority) return null
@@ -559,6 +541,24 @@ export default function TaskList({
       )}
     </div>
   )
+}
+
+// Helper function to get priority label in Czech
+function getPriorityLabel(priority?: string): string {
+  if (!priority) return ''
+
+  switch (priority) {
+    case 'urgent':
+      return 'Urgentní'
+    case 'high':
+      return 'Vysoká'
+    case 'medium':
+      return 'Střední'
+    case 'low':
+      return 'Nízká'
+    default:
+      return priority
+  }
 }
 
 // Helper function to group tasks
