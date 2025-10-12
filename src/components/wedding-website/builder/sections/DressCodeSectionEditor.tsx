@@ -79,7 +79,9 @@ export default function DressCodeSectionEditor({ content, onChange }: DressCodeS
       })
 
       const uploadedUrls = await Promise.all(uploadPromises)
+      console.log('📤 Uploaded URLs:', uploadedUrls)
       const updatedImages = [...(content.images || []), ...uploadedUrls]
+      console.log('🖼️ Updated images array:', updatedImages)
       handleInputChange('images', updatedImages)
 
     } catch (error) {
@@ -110,6 +112,10 @@ export default function DressCodeSectionEditor({ content, onChange }: DressCodeS
     const updatedImages = (content.images || []).filter((_, i) => i !== index)
     handleInputChange('images', updatedImages)
   }
+
+  // Debug logging
+  console.log('🎨 DressCodeSectionEditor - content.images:', content.images)
+  console.log('🎨 DressCodeSectionEditor - images count:', content.images?.length || 0)
 
   return (
     <div className="p-6 space-y-6">
