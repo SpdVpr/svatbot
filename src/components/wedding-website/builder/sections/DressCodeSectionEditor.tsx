@@ -268,7 +268,9 @@ export default function DressCodeSectionEditor({ content, onChange }: DressCodeS
                     : 'Přidat inspirační fotky'}
                 </button>
                 <input
-                  ref={(el) => (fileInputRefs.current[colorIndex] = el)}
+                  ref={(el) => {
+                    fileInputRefs.current[colorIndex] = el
+                  }}
                   type="file"
                   accept="image/*"
                   multiple
