@@ -54,10 +54,35 @@ interface UseBudgetReturn {
 export function useBudget(): UseBudgetReturn {
   const { user } = useAuth()
   const { wedding } = useWedding()
-  const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([])
+
+  // Initialize with localStorage data if available
+  const [budgetItems, setBudgetItems] = useState<BudgetItem[]>(() => {
+    if (typeof window === 'undefined') return []
+    const weddingId = wedding?.id
+    if (!weddingId) return []
+
+    const storageKey = `svatbot_budget_${weddingId}`
+    const cached = localStorage.getItem(storageKey)
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached)
+        console.log('⚡ Loaded budget items from localStorage immediately:', parsed.length)
+        return parsed.map((b: any) => ({
+          ...b,
+          createdAt: b.createdAt ? new Date(b.createdAt) : new Date(),
+          updatedAt: b.updatedAt ? new Date(b.updatedAt) : new Date(),
+          paidDate: b.paidDate ? new Date(b.paidDate) : undefined
+        }))
+      } catch (e) {
+        console.error('Error parsing cached budget items:', e)
+      }
+    }
+    return []
+  })
+
   const [vendors, setVendors] = useState<Vendor[]>([])
   const [payments, setPayments] = useState<Payment[]>([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(() => budgetItems.length === 0)
   const [error, setError] = useState<string | null>(null)
 
   // Convert Firestore data to BudgetItem

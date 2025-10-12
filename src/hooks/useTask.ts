@@ -50,8 +50,34 @@ interface UseTaskReturn {
 export function useTask(): UseTaskReturn {
   const { user } = useAuth()
   const { wedding } = useWedding()
-  const [tasks, setTasks] = useState<Task[]>([])
-  const [loading, setLoading] = useState(false)
+
+  // Initialize with localStorage data if available
+  const [tasks, setTasks] = useState<Task[]>(() => {
+    if (typeof window === 'undefined') return []
+    const weddingId = wedding?.id
+    if (!weddingId) return []
+
+    const storageKey = `svatbot_tasks_${weddingId}`
+    const cached = localStorage.getItem(storageKey)
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached)
+        console.log('⚡ Loaded tasks from localStorage immediately:', parsed.length)
+        return parsed.map((t: any) => ({
+          ...t,
+          createdAt: t.createdAt ? new Date(t.createdAt) : new Date(),
+          updatedAt: t.updatedAt ? new Date(t.updatedAt) : new Date(),
+          dueDate: t.dueDate ? new Date(t.dueDate) : undefined,
+          completedDate: t.completedDate ? new Date(t.completedDate) : undefined
+        }))
+      } catch (e) {
+        console.error('Error parsing cached tasks:', e)
+      }
+    }
+    return []
+  })
+
+  const [loading, setLoading] = useState(() => tasks.length === 0)
   const [error, setError] = useState<string | null>(null)
 
   // Convert Firestore data to Task

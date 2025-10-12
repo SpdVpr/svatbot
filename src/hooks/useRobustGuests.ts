@@ -151,16 +151,45 @@ const cleanForFirestore = (obj: any): any => {
 export function useRobustGuests() {
   const { user } = useAuth()
   const { wedding } = useWedding()
-  const [guests, setGuests] = useState<Guest[]>([])
-  const [loading, setLoading] = useState(true)
+
+  // Initialize with localStorage data if available
+  const [guests, setGuests] = useState<Guest[]>(() => {
+    if (typeof window === 'undefined') return []
+    const weddingId = wedding?.id
+    if (!weddingId) return []
+
+    const storageKey = `svatbot_guests_${weddingId}`
+    const cached = localStorage.getItem(storageKey)
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached)
+        console.log('⚡ Loaded guests from localStorage immediately:', parsed.length)
+        return parsed.map((g: any) => ({
+          ...g,
+          createdAt: g.createdAt ? new Date(g.createdAt) : new Date(),
+          updatedAt: g.updatedAt ? new Date(g.updatedAt) : new Date(),
+          rsvpDate: g.rsvpDate ? new Date(g.rsvpDate) : undefined,
+          invitationSentDate: g.invitationSentDate ? new Date(g.invitationSentDate) : undefined
+        }))
+      } catch (e) {
+        console.error('Error parsing cached guests:', e)
+      }
+    }
+    return []
+  })
+
+  const [loading, setLoading] = useState(() => {
+    // If we have cached data, don't show loading
+    return guests.length === 0
+  })
   const [error, setError] = useState<string | null>(null)
-  
+
   // Use refs to prevent infinite re-renders
   const initializationRef = useRef<{
     weddingId: string | null
     initialized: boolean
   }>({ weddingId: null, initialized: false })
-  
+
   const guestsRef = useRef<Guest[]>([])
   const isSavingRef = useRef(false)
 

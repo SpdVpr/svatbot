@@ -3,18 +3,22 @@
 import { useState } from 'react'
 import { useWeddingStore } from '@/stores/weddingStore'
 import { useAuth } from '@/hooks/useAuth'
+import { useSubscription } from '@/hooks/useSubscription'
 import { dateUtils } from '@/utils'
 import DragDropWrapper from './DragDropWrapper'
 import { CanvasProvider, useCanvas } from '@/contexts/CanvasContext'
 import {
   Heart,
   LogOut,
-  Settings,
+  User,
   Edit,
-  StickyNote
+  StickyNote,
+  Crown,
+  Clock
 } from 'lucide-react'
 import Link from 'next/link'
 import WeddingSettings from '@/components/wedding/WeddingSettings'
+import AccountModal from '@/components/account/AccountModal'
 import AIAssistant from '@/components/ai/AIAssistant'
 import NotesModal from '@/components/notes/NotesModal'
 import LiveNotifications, { LiveToastNotifications } from '@/components/notifications/LiveNotifications'
@@ -26,9 +30,11 @@ import { createDemoNotifications, createTestToast } from '@/utils/demoNotificati
 function DashboardContent() {
   const { currentWedding } = useWeddingStore()
   const { logout, user } = useAuth()
+  const { subscription, trialDaysRemaining, hasPremiumAccess } = useSubscription()
   const { getCanvasMaxWidth } = useCanvas()
   const [showWeddingSettings, setShowWeddingSettings] = useState(false)
   const [showNotesModal, setShowNotesModal] = useState(false)
+  const [showAccountModal, setShowAccountModal] = useState(false)
 
   // Initialize notification triggers - DISABLED to prevent spam
   // useNotificationTriggers()
@@ -125,11 +131,11 @@ function DashboardContent() {
                 <StickyNote className="w-4 h-4" />
               </button>
               <button
-                onClick={() => setShowWeddingSettings(true)}
+                onClick={() => setShowAccountModal(true)}
                 className="mobile-nav-button text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                title="Nastavení"
+                title="Účet"
               >
-                <Settings className="w-4 h-4" />
+                <User className="w-4 h-4" />
               </button>
               <button
                 onClick={logout}
@@ -157,6 +163,21 @@ function DashboardContent() {
                 }
               </p>
             </button>
+
+            {/* Subscription info */}
+            {subscription?.status === 'trialing' && trialDaysRemaining !== null && (
+              <div className="mt-2 px-2">
+                <div className="flex items-center gap-1.5 text-xs">
+                  <Clock className="w-3.5 h-3.5 text-amber-600" />
+                  <span className={`font-medium ${trialDaysRemaining <= 3 ? 'text-red-600' : 'text-amber-600'}`}>
+                    {trialDaysRemaining === 0
+                      ? 'Trial vyprší dnes!'
+                      : `Trial vyprší za ${trialDaysRemaining} ${trialDaysRemaining === 1 ? 'den' : trialDaysRemaining <= 4 ? 'dny' : 'dní'}`
+                    }
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -175,12 +196,27 @@ function DashboardContent() {
                     Svatba {wedding.brideName} & {wedding.groomName}
                     <Edit className="w-4 h-4 inline ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </h1>
-                  <p className="body-small text-text-muted">
-                    {wedding.weddingDate
-                      ? `${dateUtils.format(wedding.weddingDate, 'dd. MMMM yyyy')} • Dnes: ${dateUtils.format(new Date(), 'dd. MMMM yyyy')}`
-                      : 'Datum zatím nestanoveno - klikněte pro nastavení'
-                    }
-                  </p>
+                  <div className="flex items-center gap-4">
+                    <p className="body-small text-text-muted">
+                      {wedding.weddingDate
+                        ? `${dateUtils.format(wedding.weddingDate, 'dd. MMMM yyyy')} • Dnes: ${dateUtils.format(new Date(), 'dd. MMMM yyyy')}`
+                        : 'Datum zatím nestanoveno - klikněte pro nastavení'
+                      }
+                    </p>
+
+                    {/* Subscription info */}
+                    {subscription?.status === 'trialing' && trialDaysRemaining !== null && (
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="w-4 h-4 text-amber-600" />
+                        <span className={`text-sm font-medium ${trialDaysRemaining <= 3 ? 'text-red-600' : 'text-amber-600'}`}>
+                          {trialDaysRemaining === 0
+                            ? 'Trial vyprší dnes!'
+                            : `Trial vyprší za ${trialDaysRemaining} ${trialDaysRemaining === 1 ? 'den' : trialDaysRemaining <= 4 ? 'dny' : 'dní'}`
+                          }
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </button>
               </div>
             </div>
@@ -200,12 +236,12 @@ function DashboardContent() {
                 <span className="hidden sm:inline">Poznámky</span>
               </button>
               <button
-                onClick={() => setShowWeddingSettings(true)}
+                onClick={() => setShowAccountModal(true)}
                 className="btn-outline flex items-center space-x-2"
-                title="Nastavení svatby"
+                title="Účet"
               >
-                <Settings className="w-4 h-4" />
-                <span className="hidden sm:inline">Nastavení</span>
+                <User className="w-4 h-4" />
+                <span className="hidden sm:inline">Účet</span>
               </button>
               <button
                 onClick={logout}
@@ -275,6 +311,11 @@ function DashboardContent() {
         isOpen={showNotesModal}
         onClose={() => setShowNotesModal(false)}
       />
+
+      {/* Account Modal */}
+      {showAccountModal && (
+        <AccountModal onClose={() => setShowAccountModal(false)} />
+      )}
     </div>
   )
 }

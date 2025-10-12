@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import {
   collection,
   doc,
@@ -45,10 +45,36 @@ interface UseVendorReturn {
 export function useVendor(): UseVendorReturn {
   const { user } = useAuth()
   const { wedding } = useWedding()
-  const [vendors, setVendors] = useState<Vendor[]>([])
+
+  // Initialize with localStorage data if available
+  const [vendors, setVendors] = useState<Vendor[]>(() => {
+    if (typeof window === 'undefined') return []
+    const weddingId = wedding?.id
+    if (!weddingId) return []
+
+    const storageKey = `svatbot_vendors_${weddingId}`
+    const cached = localStorage.getItem(storageKey)
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached)
+        console.log('⚡ Loaded vendors from localStorage immediately:', parsed.length)
+        return parsed.map((v: any) => ({
+          ...v,
+          createdAt: v.createdAt ? new Date(v.createdAt) : new Date(),
+          updatedAt: v.updatedAt ? new Date(v.updatedAt) : new Date(),
+          lastContactDate: v.lastContactDate ? new Date(v.lastContactDate) : undefined,
+          nextFollowUpDate: v.nextFollowUpDate ? new Date(v.nextFollowUpDate) : undefined
+        }))
+      } catch (e) {
+        console.error('Error parsing cached vendors:', e)
+      }
+    }
+    return []
+  })
+
   const [contracts, setContracts] = useState<Contract[]>([])
   const [messages, setMessages] = useState<VendorMessage[]>([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(() => vendors.length === 0)
   const [error, setError] = useState<string | null>(null)
 
   // Convert Firestore data to Vendor
@@ -451,89 +477,84 @@ export function useVendor(): UseVendorReturn {
     return vendors.filter(vendor => vendor.status === status)
   }
 
-  // Calculate vendor statistics
-  const stats: VendorStats = {
-    totalVendors: vendors.length,
-    byCategory: vendors.reduce((acc, vendor) => {
-      acc[vendor.category] = (acc[vendor.category] || 0) + 1
-      return acc
-    }, {} as Record<VendorCategory, number>),
-    byStatus: vendors.reduce((acc, vendor) => {
-      acc[vendor.status] = (acc[vendor.status] || 0) + 1
-      return acc
-    }, {} as Record<VendorStatus, number>),
+  // Calculate vendor statistics - memoized to prevent recalculation on every render
+  const stats: VendorStats = useMemo(() => {
+    const calculatedStats = {
+      totalVendors: vendors.length,
+      byCategory: vendors.reduce((acc, vendor) => {
+        acc[vendor.category] = (acc[vendor.category] || 0) + 1
+        return acc
+      }, {} as Record<VendorCategory, number>),
+      byStatus: vendors.reduce((acc, vendor) => {
+        acc[vendor.status] = (acc[vendor.status] || 0) + 1
+        return acc
+      }, {} as Record<VendorStatus, number>),
 
-    // Contract stats - using vendor services as proxy for contracts
-    totalContracts: vendors.filter(v => v.status === 'contracted' || v.status === 'booked').length,
-    signedContracts: vendors.filter(v => v.status === 'contracted').length,
+      // Contract stats - using vendor services as proxy for contracts
+      totalContracts: vendors.filter(v => v.status === 'contracted' || v.status === 'booked').length,
+      signedContracts: vendors.filter(v => v.status === 'contracted').length,
 
-    // Calculate total value from vendor services (not actual contracts yet)
-    totalContractValue: vendors.reduce((sum, vendor) => {
-      if (vendor.status === 'contracted' || vendor.status === 'booked') {
-        // Use priceRange max or sum of service prices
-        if (vendor.priceRange) {
-          return sum + vendor.priceRange.max
-        } else {
-          const serviceTotal = vendor.services.reduce((serviceSum, service) => {
-            return serviceSum + (service.price || 0)
-          }, 0)
-          return sum + serviceTotal
+      // Calculate total value from vendor services (not actual contracts yet)
+      totalContractValue: vendors.reduce((sum, vendor) => {
+        if (vendor.status === 'contracted' || vendor.status === 'booked') {
+          // Use priceRange max or sum of service prices
+          if (vendor.priceRange) {
+            return sum + vendor.priceRange.max
+          } else {
+            const serviceTotal = vendor.services.reduce((serviceSum, service) => {
+              return serviceSum + (service.price || 0)
+            }, 0)
+            return sum + serviceTotal
+          }
         }
-      }
-      return sum
-    }, 0),
+        return sum
+      }, 0),
 
-    // For now, assume 30% is paid upfront for contracted vendors
-    paidAmount: vendors.reduce((sum, vendor) => {
-      if (vendor.status === 'contracted') {
-        const vendorValue = vendor.priceRange ? vendor.priceRange.max :
-          vendor.services.reduce((serviceSum, service) => serviceSum + (service.price || 0), 0)
-        return sum + (vendorValue * 0.3) // 30% upfront payment
-      }
-      return sum
-    }, 0),
+      // For now, assume 30% is paid upfront for contracted vendors
+      paidAmount: vendors.reduce((sum, vendor) => {
+        if (vendor.status === 'contracted') {
+          const vendorValue = vendor.priceRange ? vendor.priceRange.max :
+            vendor.services.reduce((serviceSum, service) => serviceSum + (service.price || 0), 0)
+          return sum + (vendorValue * 0.3) // 30% upfront payment
+        }
+        return sum
+      }, 0),
 
-    // Pending amount is remaining 70% for contracted vendors
-    pendingAmount: vendors.reduce((sum, vendor) => {
-      if (vendor.status === 'contracted') {
-        const vendorValue = vendor.priceRange ? vendor.priceRange.max :
-          vendor.services.reduce((serviceSum, service) => serviceSum + (service.price || 0), 0)
-        return sum + (vendorValue * 0.7) // 70% remaining
-      }
-      return sum
-    }, 0),
+      // Pending amount is remaining 70% for contracted vendors
+      pendingAmount: vendors.reduce((sum, vendor) => {
+        if (vendor.status === 'contracted') {
+          const vendorValue = vendor.priceRange ? vendor.priceRange.max :
+            vendor.services.reduce((serviceSum, service) => serviceSum + (service.price || 0), 0)
+          return sum + (vendorValue * 0.7) // 70% remaining
+        }
+        return sum
+      }, 0),
 
-    totalMessages: messages.length,
-    unreadMessages: messages.filter(m => m.status === 'delivered').length,
-    upcomingMeetings: messages.filter(m =>
-      m.type === 'meeting' &&
-      m.meetingDetails &&
-      m.meetingDetails.date > new Date()
-    ).length,
-    overdueFollowUps: vendors.filter(v =>
-      v.nextFollowUpDate && v.nextFollowUpDate < new Date()
-    ).length,
-    averageRating: vendors.filter(v => v.rating).reduce((sum, v) => sum + (v.rating?.overall || 0), 0) /
-                   Math.max(vendors.filter(v => v.rating).length, 1),
-    topRatedVendors: vendors
-      .filter(v => v.rating && v.rating.overall >= 4)
-      .sort((a, b) => (b.rating?.overall || 0) - (a.rating?.overall || 0))
-      .slice(0, 5)
-      .map(v => v.id),
-    completionRate: vendors.length > 0 ?
-      Math.round((vendors.filter(v => v.status === 'booked' || v.status === 'contracted' || v.status === 'completed').length / vendors.length) * 100) : 0,
-    onBudget: true, // TODO: Calculate based on budget vs actual costs
-    onSchedule: true // TODO: Calculate based on timeline
-  }
+      totalMessages: messages.length,
+      unreadMessages: messages.filter(m => m.status === 'delivered').length,
+      upcomingMeetings: messages.filter(m =>
+        m.type === 'meeting' &&
+        m.meetingDetails &&
+        m.meetingDetails.date > new Date()
+      ).length,
+      overdueFollowUps: vendors.filter(v =>
+        v.nextFollowUpDate && v.nextFollowUpDate < new Date()
+      ).length,
+      averageRating: vendors.filter(v => v.rating).reduce((sum, v) => sum + (v.rating?.overall || 0), 0) /
+                     Math.max(vendors.filter(v => v.rating).length, 1),
+      topRatedVendors: vendors
+        .filter(v => v.rating && v.rating.overall >= 4)
+        .sort((a, b) => (b.rating?.overall || 0) - (a.rating?.overall || 0))
+        .slice(0, 5)
+        .map(v => v.id),
+      completionRate: vendors.length > 0 ?
+        Math.round((vendors.filter(v => v.status === 'booked' || v.status === 'contracted' || v.status === 'completed').length / vendors.length) * 100) : 0,
+      onBudget: true, // TODO: Calculate based on budget vs actual costs
+      onSchedule: true // TODO: Calculate based on timeline
+    }
 
-  // Debug logging for stats
-  console.log('📊 Vendor stats calculated:', {
-    totalVendors: stats.totalVendors,
-    totalContractValue: stats.totalContractValue,
-    contractedVendors: stats.byStatus.contracted || 0,
-    bookedVendors: stats.byStatus.booked || 0,
-    vendorsWithPrices: vendors.filter(v => v.priceRange || v.services.some(s => s.price)).length
-  })
+    return calculatedStats
+  }, [vendors, messages]) // Only recalculate when vendors or messages change
 
   // Load vendors when wedding changes
   useEffect(() => {
