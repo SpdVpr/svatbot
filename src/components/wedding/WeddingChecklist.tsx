@@ -537,11 +537,6 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
                               <span className="text-2xl flex-shrink-0">{item.icon}</span>
                               <div className="flex-1 min-w-0">
                                 <h4 className="font-medium text-gray-900">{item.title}</h4>
-                                {item.description && (
-                                  <p className="text-sm text-gray-600 mt-1">
-                                    {item.description}
-                                  </p>
-                                )}
                               </div>
                             </div>
 

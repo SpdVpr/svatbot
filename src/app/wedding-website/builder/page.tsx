@@ -37,6 +37,7 @@ export default function WeddingWebsiteBuilderPage() {
     },
     story: { enabled: false },
     info: { enabled: true },
+    dressCode: { enabled: false },
     schedule: { enabled: false, items: [] },
     rsvp: { enabled: true, mealSelection: false, plusOneAllowed: true, songRequests: false },
     accommodation: {

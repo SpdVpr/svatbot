@@ -61,7 +61,7 @@ export interface StoryContent {
   timeline?: StoryTimelineItem[]
 }
 
-// Info Section
+// Info Section (Venue)
 export interface VenueInfo {
   time: string
   venue: string
@@ -71,6 +71,7 @@ export interface VenueInfo {
     lat: number
     lng: number
   }
+  images?: string[] // Array of image URLs for venue photos
 }
 
 export interface CustomInfo {
@@ -84,12 +85,18 @@ export interface InfoContent {
   enabled: boolean
   ceremony?: VenueInfo
   reception?: VenueInfo
-  dressCode?: string
-  dressCodeDetails?: string
-  colorPalette?: string[] // Array of hex color codes for wedding color palette
   parking?: string
   accessibility?: string
   customInfo?: CustomInfo[]
+}
+
+// Dress Code Section
+export interface DressCodeContent {
+  enabled: boolean
+  dressCode?: string
+  dressCodeDetails?: string
+  colorPalette?: string[] // Array of hex color codes for wedding color palette
+  images?: string[] // Array of image URLs for dress code inspiration
 }
 
 // Schedule Section
@@ -216,6 +223,7 @@ export interface WebsiteContent {
   hero: HeroContent
   story: StoryContent
   info: InfoContent
+  dressCode: DressCodeContent
   schedule: ScheduleContent
   rsvp: RSVPContent
   accommodation: AccommodationContent

@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronDown, Image, Calendar, MapPin, Users, MessageSquare, Gift, Camera, Phone, HelpCircle, Building2, UtensilsCrossed } from 'lucide-react'
+import { ChevronDown, Image, Calendar, MapPin, Users, MessageSquare, Gift, Camera, Phone, HelpCircle, Building2, UtensilsCrossed, Shirt } from 'lucide-react'
 import HeroSectionEditor from './sections/HeroSectionEditor'
 import InfoSectionEditor from './sections/InfoSectionEditor'
+import DressCodeSectionEditor from './sections/DressCodeSectionEditor'
 import RSVPSectionEditor from './sections/RSVPSectionEditor'
 import StorySectionEditor from './sections/StorySectionEditor'
 import ScheduleSectionEditor from './sections/ScheduleSectionEditor'
@@ -20,7 +21,7 @@ interface ContentEditorProps {
   onContentChange: (content: WebsiteContent) => void
 }
 
-type SectionType = 'hero' | 'info' | 'rsvp' | 'story' | 'schedule' | 'accommodation' | 'gift' | 'gallery' | 'contact' | 'faq' | 'menu'
+type SectionType = 'hero' | 'info' | 'dressCode' | 'rsvp' | 'story' | 'schedule' | 'accommodation' | 'gift' | 'gallery' | 'contact' | 'faq' | 'menu'
 
 interface Section {
   id: SectionType
@@ -45,11 +46,19 @@ export default function ContentEditor({ content, onContentChange }: ContentEdito
     },
     {
       id: 'info',
-      title: 'Informace o svatbě',
-      description: 'Místo konání, dress code, parkování',
+      title: 'Místo konání',
+      description: 'Obřad, hostina, parkování',
       icon: MapPin,
       required: true,
       enabled: content.info.enabled
+    },
+    {
+      id: 'dressCode',
+      title: 'Dress Code & Barevná paleta',
+      description: 'Požadavky na oblečení a svatební barvy',
+      icon: Shirt,
+      required: false,
+      enabled: content.dressCode?.enabled || false
     },
     {
       id: 'rsvp',
@@ -192,6 +201,13 @@ export default function ContentEditor({ content, onContentChange }: ContentEdito
           <InfoSectionEditor
             content={content.info}
             onChange={(infoContent) => updateSectionContent('info', infoContent)}
+          />
+        )
+      case 'dressCode':
+        return (
+          <DressCodeSectionEditor
+            content={content.dressCode}
+            onChange={(dressCodeContent) => updateSectionContent('dressCode', dressCodeContent)}
           />
         )
       case 'rsvp':

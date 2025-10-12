@@ -1,9 +1,12 @@
 'use client'
 
-import { useState } from 'react'
-import { MapPin, Clock, Shirt, Car, Plus, X } from 'lucide-react'
+import { useState, useRef } from 'react'
+import { MapPin, Clock, Car, Plus, X, Upload, Trash2, Image as ImageIcon } from 'lucide-react'
 import { useWeddingStore } from '@/stores/weddingStore'
-import type { InfoContent } from '@/types/wedding-website'
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { storage } from '@/config/firebase'
+import { compressImage } from '@/utils/imageCompression'
+import type { InfoContent, VenueInfo } from '@/types/wedding-website'
 
 interface InfoSectionEditorProps {
   content: InfoContent
@@ -12,11 +15,80 @@ interface InfoSectionEditorProps {
 
 export default function InfoSectionEditor({ content, onChange }: InfoSectionEditorProps) {
   const { currentWedding: wedding } = useWeddingStore()
+  const [uploadingCeremony, setUploadingCeremony] = useState(false)
+  const [uploadingReception, setUploadingReception] = useState(false)
+  const ceremonyFileInputRef = useRef<HTMLInputElement>(null)
+  const receptionFileInputRef = useRef<HTMLInputElement>(null)
 
   const handleInputChange = (field: keyof InfoContent, value: any) => {
     onChange({
       ...content,
       [field]: value
+    })
+  }
+
+  const handleVenueImageUpload = async (
+    files: FileList | null,
+    venueType: 'ceremony' | 'reception'
+  ) => {
+    if (!files || files.length === 0) return
+
+    const setUploading = venueType === 'ceremony' ? setUploadingCeremony : setUploadingReception
+    setUploading(true)
+
+    try {
+      const fileArray = Array.from(files).filter(file => {
+        if (!file.type.startsWith('image/')) {
+          alert(`Soubor ${file.name} není obrázek`)
+          return false
+        }
+        if (file.size > 10 * 1024 * 1024) {
+          alert(`Soubor ${file.name} je příliš velký (max 10MB)`)
+          return false
+        }
+        return true
+      })
+
+      if (fileArray.length === 0) return
+
+      const uploadPromises = fileArray.map(async (file, index) => {
+        const compressedResult = await compressImage(file, {
+          maxWidth: 1200,
+          maxHeight: 800,
+          quality: 0.85
+        })
+
+        const timestamp = Date.now()
+        const filename = `wedding-websites/${wedding?.id || 'temp'}/venues/${venueType}/${timestamp}_${index}_${file.name.replace(/\s+/g, '_')}`
+
+        const storageRef = ref(storage, filename)
+        const snapshot = await uploadBytes(storageRef, compressedResult.file)
+        return await getDownloadURL(snapshot.ref)
+      })
+
+      const uploadedUrls = await Promise.all(uploadPromises)
+      const currentVenue = content[venueType] || {}
+      const updatedImages = [...(currentVenue.images || []), ...uploadedUrls]
+
+      handleInputChange(venueType, {
+        ...currentVenue,
+        images: updatedImages
+      })
+    } catch (error) {
+      console.error('Error uploading images:', error)
+      alert('Chyba při nahrávání fotek')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const removeVenueImage = (venueType: 'ceremony' | 'reception', index: number) => {
+    const currentVenue = content[venueType] || {}
+    const updatedImages = (currentVenue.images || []).filter((_, i) => i !== index)
+
+    handleInputChange(venueType, {
+      ...currentVenue,
+      images: updatedImages
     })
   }
 
@@ -166,6 +238,59 @@ export default function InfoSectionEditor({ content, onChange }: InfoSectionEdit
             </p>
           </div>
         </div>
+
+        {/* Ceremony Photos */}
+        <div className="mt-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Fotky místa obřadu
+          </label>
+          <input
+            ref={ceremonyFileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => handleVenueImageUpload(e.target.files, 'ceremony')}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => ceremonyFileInputRef.current?.click()}
+            disabled={uploadingCeremony}
+            className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+          >
+            {uploadingCeremony ? (
+              <>
+                <div className="w-4 h-4 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" />
+                Nahrávání...
+              </>
+            ) : (
+              <>
+                <Upload className="w-4 h-4" />
+                Nahrát fotky
+              </>
+            )}
+          </button>
+
+          {content.ceremony?.images && content.ceremony.images.length > 0 && (
+            <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+              {content.ceremony.images.map((imageUrl, index) => (
+                <div key={index} className="relative group aspect-video">
+                  <img
+                    src={imageUrl}
+                    alt={`Obřad ${index + 1}`}
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                  <button
+                    onClick={() => removeVenueImage('ceremony', index)}
+                    className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Hostina */}
@@ -242,104 +367,58 @@ export default function InfoSectionEditor({ content, onChange }: InfoSectionEdit
             </p>
           </div>
         </div>
-      </div>
 
-      {/* Dress Code */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Shirt className="w-5 h-5 text-pink-600" />
-          <h3 className="text-lg font-semibold text-gray-900">Dress Code & Barevná paleta</h3>
-        </div>
-
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Požadované oblečení
-            </label>
-            <select
-              value={content.dressCode || ''}
-              onChange={(e) => handleInputChange('dressCode', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-            >
-              <option value="">Vyberte dress code</option>
-              <option value="formal">Formální (oblek/večerní šaty)</option>
-              <option value="semi-formal">Poloformální (košile/koktejlové šaty)</option>
-              <option value="casual">Neformální</option>
-              <option value="cocktail">Koktejlové oblečení</option>
-              <option value="black-tie">Black tie</option>
-              <option value="custom">Vlastní požadavky</option>
-            </select>
-
-            {content.dressCode === 'custom' && (
-              <textarea
-                value={content.dressCodeDetails || ''}
-                onChange={(e) => handleInputChange('dressCodeDetails', e.target.value)}
-                placeholder="Popište požadavky na oblečení..."
-                rows={3}
-                className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-              />
+        {/* Reception Photos */}
+        <div className="mt-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Fotky místa hostiny
+          </label>
+          <input
+            ref={receptionFileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => handleVenueImageUpload(e.target.files, 'reception')}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => receptionFileInputRef.current?.click()}
+            disabled={uploadingReception}
+            className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+          >
+            {uploadingReception ? (
+              <>
+                <div className="w-4 h-4 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" />
+                Nahrávání...
+              </>
+            ) : (
+              <>
+                <Upload className="w-4 h-4" />
+                Nahrát fotky
+              </>
             )}
-          </div>
+          </button>
 
-          {/* Color Palette */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Barevná paleta svatby
-            </label>
-            <div className="space-y-2">
-              {(content.colorPalette || []).map((color, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={color}
-                    onChange={(e) => {
-                      const newPalette = [...(content.colorPalette || [])]
-                      newPalette[index] = e.target.value
-                      handleInputChange('colorPalette', newPalette)
-                    }}
-                    className="w-12 h-8 border border-gray-300 rounded cursor-pointer"
-                  />
-                  <input
-                    type="text"
-                    value={color}
-                    onChange={(e) => {
-                      const newPalette = [...(content.colorPalette || [])]
-                      newPalette[index] = e.target.value
-                      handleInputChange('colorPalette', newPalette)
-                    }}
-                    placeholder="#000000"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+          {content.reception?.images && content.reception.images.length > 0 && (
+            <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+              {content.reception.images.map((imageUrl, index) => (
+                <div key={index} className="relative group aspect-video">
+                  <img
+                    src={imageUrl}
+                    alt={`Hostina ${index + 1}`}
+                    className="w-full h-full object-cover rounded-lg"
                   />
                   <button
-                    type="button"
-                    onClick={() => {
-                      const newPalette = (content.colorPalette || []).filter((_, i) => i !== index)
-                      handleInputChange('colorPalette', newPalette)
-                    }}
-                    className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    onClick={() => removeVenueImage('reception', index)}
+                    className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
                   >
-                    Odstranit
+                    <Trash2 className="w-3 h-3" />
                   </button>
                 </div>
               ))}
-
-              {(!content.colorPalette || content.colorPalette.length < 6) && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    const newPalette = [...(content.colorPalette || []), '#000000']
-                    handleInputChange('colorPalette', newPalette)
-                  }}
-                  className="w-full px-3 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-pink-500 hover:text-pink-600 transition-colors"
-                >
-                  + Přidat barvu
-                </button>
-              )}
             </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Přidejte barvy, které se budou objevovat na vaší svatbě (max. 6 barev)
-            </p>
-          </div>
+          )}
         </div>
       </div>
 
