@@ -85,7 +85,7 @@ export default function DressCodeSectionEditor({ content, onChange }: DressCodeS
       }
 
       const uploadPromises = fileArray.map(async (file, index) => {
-        const compressedBlob = await compressImage(file, {
+        const compressedResult = await compressImage(file, {
           maxWidth: 1200,
           maxHeight: 1200,
           quality: 0.85
@@ -98,7 +98,7 @@ export default function DressCodeSectionEditor({ content, onChange }: DressCodeS
           `wedding-websites/wedding_${wedding?.userId}_${wedding?.createdAt?.getTime()}/dress-code/${fileName}`
         )
 
-        await uploadBytes(storageRef, compressedBlob)
+        await uploadBytes(storageRef, compressedResult.file)
         const downloadURL = await getDownloadURL(storageRef)
 
         setProgress(((index + 1) / fileArray.length) * 100)
