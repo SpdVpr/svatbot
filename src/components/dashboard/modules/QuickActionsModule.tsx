@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Zap, Plus, Users, DollarSign, Search, Bot, ListChecks } from 'lucide-react'
+import { Zap, Plus, Users, DollarSign, Search, ListChecks } from 'lucide-react'
 
 export default function QuickActionsModule() {
   const quickActions = [
@@ -39,13 +39,6 @@ export default function QuickActionsModule() {
       description: 'Procházet marketplace',
       href: '/marketplace',
       color: 'text-white bg-purple-600 hover:bg-purple-500'
-    },
-    {
-      icon: Bot,
-      title: 'AI Asistent',
-      description: 'Inteligentní pomoc',
-      href: '/ai',
-      color: 'text-yellow-600 bg-yellow-50 hover:bg-yellow-100'
     }
   ]
 

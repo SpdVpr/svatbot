@@ -455,6 +455,19 @@ service cloud.firestore {
                        get(/databases/$(database)/documents/weddingWebsites/$(request.resource.data.websiteId)).data.isPublished == true;
     }
 
+    // Dashboards collection - user's dashboard layout preferences
+    match /dashboards/{dashboardId} {
+      // Allow read/write if authenticated and document belongs to user
+      // Document ID format: {userId}_{weddingId}
+      allow read, write, create, delete: if isAuthenticated() &&
+                                            request.auth.uid == resource.data.userId;
+
+      // Allow create if authenticated and userId in document matches auth user
+      allow create: if isAuthenticated() &&
+                       request.resource.data.keys().hasAll(['userId', 'weddingId', 'modules']) &&
+                       request.auth.uid == request.resource.data.userId;
+    }
+
     // Deny all other access
     match /{document=**} {
       allow read, write: if false;

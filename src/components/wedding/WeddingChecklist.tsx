@@ -27,19 +27,20 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
   const { createTask, tasks, updateTask, deleteTask } = useTask()
   const { wedding } = useWedding()
   const { user } = useAuth()
-  const [expandedPhases, setExpandedPhases] = useState<string[]>(['1-week-before'])
+  const [expandedPhases, setExpandedPhases] = useState<string[]>([]) // Žádná kategorie není automaticky otevřená
   const [addingToTasks, setAddingToTasks] = useState<string | null>(null)
   const [markingComplete, setMarkingComplete] = useState<string | null>(null)
   const [showSuccess, setShowSuccess] = useState<string | null>(null)
   const [completedItems, setCompletedItems] = useState<Set<string>>(new Set())
+  const [hiddenItems, setHiddenItems] = useState<Set<string>>(new Set())
   const [isLoading, setIsLoading] = useState(true)
 
   // Check if user is demo user
   const isDemoUser = user?.email === 'demo@svatbot.cz'
 
-  // Load completed items from storage on mount
+  // Load completed and hidden items from storage on mount
   useEffect(() => {
-    const loadCompletedItems = async () => {
+    const loadChecklistData = async () => {
       try {
         if (!wedding) {
           setIsLoading(false)
@@ -48,11 +49,19 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
 
         if (isDemoUser) {
           // Load from sessionStorage for demo user
-          const storageKey = `checklist_completed_${wedding.id}`
-          const stored = sessionStorage.getItem(storageKey)
-          if (stored) {
-            const itemIds = JSON.parse(stored) as string[]
+          const completedKey = `checklist_completed_${wedding.id}`
+          const hiddenKey = `checklist_hidden_${wedding.id}`
+
+          const storedCompleted = sessionStorage.getItem(completedKey)
+          if (storedCompleted) {
+            const itemIds = JSON.parse(storedCompleted) as string[]
             setCompletedItems(new Set(itemIds))
+          }
+
+          const storedHidden = sessionStorage.getItem(hiddenKey)
+          if (storedHidden) {
+            const itemIds = JSON.parse(storedHidden) as string[]
+            setHiddenItems(new Set(itemIds))
           }
         } else if (user) {
           // Load from Firestore for real user
@@ -61,38 +70,44 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
 
           if (checklistDoc.exists()) {
             const data = checklistDoc.data()
-            const itemIds = data.completedItems || []
-            setCompletedItems(new Set(itemIds))
+            const completedIds = data.completedItems || []
+            const hiddenIds = data.hiddenItems || []
+            setCompletedItems(new Set(completedIds))
+            setHiddenItems(new Set(hiddenIds))
           }
         }
       } catch (error) {
-        console.error('Error loading completed items:', error)
+        console.error('Error loading checklist data:', error)
       } finally {
         setIsLoading(false)
       }
     }
 
-    loadCompletedItems()
+    loadChecklistData()
   }, [wedding, user, isDemoUser])
 
-  // Save completed items to storage
-  const saveCompletedItems = async (items: Set<string>) => {
+  // Save completed and hidden items to storage
+  const saveChecklistData = async (completed: Set<string>, hidden: Set<string>) => {
     try {
       if (!wedding) return
 
-      const itemsArray = Array.from(items)
+      const completedArray = Array.from(completed)
+      const hiddenArray = Array.from(hidden)
 
       if (isDemoUser) {
         // Save to sessionStorage for demo user
-        const storageKey = `checklist_completed_${wedding.id}`
-        sessionStorage.setItem(storageKey, JSON.stringify(itemsArray))
+        const completedKey = `checklist_completed_${wedding.id}`
+        const hiddenKey = `checklist_hidden_${wedding.id}`
+        sessionStorage.setItem(completedKey, JSON.stringify(completedArray))
+        sessionStorage.setItem(hiddenKey, JSON.stringify(hiddenArray))
       } else if (user) {
         // Save to Firestore for real user
         const checklistRef = doc(db, 'checklist_completed', wedding.id)
         await setDoc(checklistRef, {
           weddingId: wedding.id,
           userId: user.id,
-          completedItems: itemsArray,
+          completedItems: completedArray,
+          hiddenItems: hiddenArray,
           updatedAt: new Date()
         })
       }
@@ -123,6 +138,11 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
   const isItemCompleted = useCallback((item: ChecklistItem): boolean => {
     return completedItems.has(item.id)
   }, [completedItems])
+
+  // Check if item is hidden
+  const isItemHidden = useCallback((item: ChecklistItem): boolean => {
+    return hiddenItems.has(item.id)
+  }, [hiddenItems])
 
   // Get task for item - memoized to update when tasks change
   const getTaskForItem = useCallback((item: ChecklistItem) => {
@@ -223,6 +243,29 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
     }
   }
 
+  // Hide item
+  const handleHideItem = async (item: ChecklistItem) => {
+    try {
+      const newHiddenItems = new Set(hiddenItems).add(item.id)
+      setHiddenItems(newHiddenItems)
+      await saveChecklistData(completedItems, newHiddenItems)
+    } catch (error) {
+      console.error('Error hiding item:', error)
+    }
+  }
+
+  // Unhide item
+  const handleUnhideItem = async (item: ChecklistItem) => {
+    try {
+      const newHiddenItems = new Set(hiddenItems)
+      newHiddenItems.delete(item.id)
+      setHiddenItems(newHiddenItems)
+      await saveChecklistData(completedItems, newHiddenItems)
+    } catch (error) {
+      console.error('Error unhiding item:', error)
+    }
+  }
+
   // Mark item as complete
   const handleMarkComplete = async (item: ChecklistItem) => {
     try {
@@ -233,7 +276,7 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
       setCompletedItems(newCompletedItems)
 
       // Save to storage (Firebase or sessionStorage)
-      await saveCompletedItems(newCompletedItems)
+      await saveChecklistData(newCompletedItems, hiddenItems)
 
       // Show success message
       setShowSuccess(item.id)
@@ -263,7 +306,7 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
       setCompletedItems(newCompletedItems)
 
       // Save to storage (Firebase or sessionStorage)
-      await saveCompletedItems(newCompletedItems)
+      await saveChecklistData(newCompletedItems, hiddenItems)
     } catch (error) {
       console.error('Error unmarking complete:', error)
       alert('Chyba při rušení dokončení')
@@ -469,7 +512,7 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
               {/* Phase items */}
               {isExpanded && (
                 <div className="px-6 pb-4 space-y-3">
-                  {phase.items.map((item) => {
+                  {phase.items.filter(item => !isItemHidden(item)).map((item) => {
                     const inTasks = isItemInTasks(item)
                     const isCompleted = isItemCompleted(item)
                     const isAdding = addingToTasks === item.id
@@ -606,6 +649,16 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
                                     </>
                                   )}
                                 </button>
+
+                                {/* Skrýt button */}
+                                <button
+                                  onClick={() => handleHideItem(item)}
+                                  className="flex items-center justify-center space-x-1 px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+                                  title="Skrýt tento úkol"
+                                >
+                                  <X className="w-3 h-3" />
+                                  <span>Skrýt</span>
+                                </button>
                               </div>
                             )}
                           </div>
@@ -619,6 +672,37 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
           )
         })}
       </div>
+
+      {/* Hidden items section */}
+      {hiddenItems.size > 0 && (
+        <div className="bg-gray-50 rounded-xl border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Skryté úkoly ({hiddenItems.size})
+          </h3>
+          <div className="space-y-2">
+            {WEDDING_CHECKLIST.flatMap(phase =>
+              phase.items.filter(item => isItemHidden(item))
+            ).map(item => (
+              <div
+                key={item.id}
+                className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200"
+              >
+                <div className="flex items-center space-x-3">
+                  <span className="text-xl">{item.icon}</span>
+                  <span className="text-sm text-gray-700">{item.title}</span>
+                </div>
+                <button
+                  onClick={() => handleUnhideItem(item)}
+                  className="flex items-center space-x-1 px-3 py-1 text-xs text-primary-600 bg-primary-50 rounded hover:bg-primary-100 transition-colors"
+                >
+                  <Plus className="w-3 h-3" />
+                  <span>Zobrazit</span>
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

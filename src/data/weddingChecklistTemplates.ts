@@ -205,7 +205,7 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: '6-9m-006',
-        title: 'Zajistit ubytování pro hosty z daleka',
+        title: 'Zajistit ubytování pro hosty',
         description: 'Ubytování pro svatebčany',
         category: 'preparation',
         phase: 'before-wedding',
@@ -326,7 +326,7 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
         phase: 'before-wedding',
         priority: 'medium',
         estimatedDuration: '1-2 týdny',
-        icon: '🎨',
+        icon: '🎀',
         order: 3
       },
       {
@@ -419,7 +419,7 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: '2m-012',
-        title: 'Zkušební makeup',
+        title: 'Zkouška makeupu',
         description: 'Zkouška makeupu',
         category: 'beauty',
         phase: 'before-wedding',
@@ -430,7 +430,7 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: '2m-013',
-        title: 'Zkušební účes',
+        title: 'Zkouška účesu',
         description: 'Zkouška účesu',
         category: 'beauty',
         phase: 'before-wedding',
@@ -471,7 +471,7 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: '1m-003',
-        title: 'Naplánovat rozlučku se svobodou',
+        title: 'Oslavit rozlučku se svobodou',
         description: 'Oslavit rozlučku se svobodou',
         category: 'other',
         phase: '1-week-before',

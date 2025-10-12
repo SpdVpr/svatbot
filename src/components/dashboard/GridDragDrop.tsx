@@ -58,6 +58,7 @@ export default function GridDragDrop({ onWeddingSettingsClick }: GridDragDropPro
   const [dragOverPosition, setDragOverPosition] = useState<GridPosition | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [modulePositions, setModulePositions] = useState<Map<string, GridPosition>>(new Map())
+  const [previewPositions, setPreviewPositions] = useState<Map<string, GridPosition>>(new Map())
   const gridRef = useRef<HTMLDivElement>(null)
   const dragTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -109,36 +110,84 @@ export default function GridDragDrop({ onWeddingSettingsClick }: GridDragDropPro
     setModulePositions(positions)
   }, [layout.modules, loading, getVisibleModules])
 
-  // Najdi volné místo v gridu
-  const findFreePosition = (width: number, height: number, excludeModule?: string): GridPosition | null => {
-    const occupiedCells = new Set<string>()
+  // Zkontroluj jestli je pozice volná
+  const isPositionFree = (
+    position: GridPosition,
+    excludeModule: string,
+    positions: Map<string, GridPosition>
+  ): boolean => {
+    for (const [moduleId, pos] of positions.entries()) {
+      if (moduleId === excludeModule) continue
 
-    // Označit obsazené buňky
-    modulePositions.forEach((pos, moduleId) => {
-      if (moduleId !== excludeModule) {
-        for (let r = pos.row; r < pos.row + pos.height; r++) {
-          for (let c = pos.col; c < pos.col + pos.width; c++) {
-            occupiedCells.add(`${r}-${c}`)
+      const overlaps = !(
+        position.row + position.height <= pos.row ||
+        position.row >= pos.row + pos.height ||
+        position.col + position.width <= pos.col ||
+        position.col >= pos.col + pos.width
+      )
+
+      if (overlaps) return false
+    }
+    return true
+  }
+
+  // Najdi nejbližší volné místo v gridu
+  const findFreePosition = (
+    width: number,
+    height: number,
+    preferredRow: number,
+    preferredCol: number,
+    excludeModule: string,
+    positions: Map<string, GridPosition>
+  ): GridPosition | null => {
+    // Nejprve zkus preferovanou pozici
+    const preferred: GridPosition = {
+      row: Math.max(0, Math.min(preferredRow, GRID_ROWS - height)),
+      col: Math.max(0, Math.min(preferredCol, GRID_COLS - width)),
+      width,
+      height
+    }
+
+    if (isPositionFree(preferred, excludeModule, positions)) {
+      return preferred
+    }
+
+    // Hledej nejbližší volné místo spirálovitě od preferované pozice
+    const maxDistance = Math.max(GRID_ROWS, GRID_COLS)
+
+    for (let distance = 1; distance <= maxDistance; distance++) {
+      // Zkus pozice v rostoucí vzdálenosti od preferované pozice
+      for (let rowOffset = -distance; rowOffset <= distance; rowOffset++) {
+        for (let colOffset = -distance; colOffset <= distance; colOffset++) {
+          // Přeskoč pozice které nejsou na okraji aktuální vzdálenosti
+          if (Math.abs(rowOffset) !== distance && Math.abs(colOffset) !== distance) {
+            continue
+          }
+
+          const row = preferredRow + rowOffset
+          const col = preferredCol + colOffset
+
+          // Zkontroluj hranice
+          if (row < 0 || row + height > GRID_ROWS || col < 0 || col + width > GRID_COLS) {
+            continue
+          }
+
+          const testPosition: GridPosition = { row, col, width, height }
+
+          if (isPositionFree(testPosition, excludeModule, positions)) {
+            return testPosition
           }
         }
       }
-    })
+    }
 
-    // Najít první volné místo
-    for (let row = 0; row < GRID_ROWS; row++) {
+    // Pokud nenajdeme místo, zkus najít jakékoliv volné místo
+    for (let row = 0; row <= GRID_ROWS - height; row++) {
       for (let col = 0; col <= GRID_COLS - width; col++) {
-        let canPlace = true
+        const testPosition: GridPosition = { row, col, width, height }
 
-        for (let r = row; r < row + height && canPlace; r++) {
-          for (let c = col; c < col + width && canPlace; c++) {
-            if (occupiedCells.has(`${r}-${c}`)) {
-              canPlace = false
-            }
-          }
-        }
-
-        if (canPlace) {
-          return { row, col, width, height }
+        if (isPositionFree(testPosition, excludeModule, positions)) {
+          return testPosition
         }
       }
     }
@@ -146,10 +195,10 @@ export default function GridDragDrop({ onWeddingSettingsClick }: GridDragDropPro
     return null
   }
 
-  // Posun moduly které jsou v cestě
+  // Posun moduly které jsou v cestě - vylepšená verze
   const pushModulesAway = (newPosition: GridPosition, excludeModule: string) => {
     const newPositions = new Map(modulePositions)
-    const conflictingModules: string[] = []
+    const conflictingModules: Array<{ id: string; pos: GridPosition }> = []
 
     // Najdi moduly které kolidují s novou pozicí
     modulePositions.forEach((pos, moduleId) => {
@@ -162,19 +211,33 @@ export default function GridDragDrop({ onWeddingSettingsClick }: GridDragDropPro
         )
 
         if (overlaps) {
-          conflictingModules.push(moduleId)
+          conflictingModules.push({ id: moduleId, pos })
         }
       }
     })
 
-    // Přesuň konfliktní moduly
-    conflictingModules.forEach(moduleId => {
-      const modulePos = modulePositions.get(moduleId)
-      if (modulePos) {
-        const freePos = findFreePosition(modulePos.width, modulePos.height, moduleId)
-        if (freePos) {
-          newPositions.set(moduleId, freePos)
-        }
+    // Seřaď konfliktní moduly podle vzdálenosti od nové pozice
+    // (nejbližší moduly se přesunou první)
+    conflictingModules.sort((a, b) => {
+      const distA = Math.abs(a.pos.row - newPosition.row) + Math.abs(a.pos.col - newPosition.col)
+      const distB = Math.abs(b.pos.row - newPosition.row) + Math.abs(b.pos.col - newPosition.col)
+      return distA - distB
+    })
+
+    // Přesuň konfliktní moduly jeden po druhém
+    conflictingModules.forEach(({ id: moduleId, pos: modulePos }) => {
+      // Zkus najít volné místo co nejblíže původní pozici
+      const freePos = findFreePosition(
+        modulePos.width,
+        modulePos.height,
+        modulePos.row,
+        modulePos.col,
+        moduleId,
+        newPositions
+      )
+
+      if (freePos) {
+        newPositions.set(moduleId, freePos)
       }
     })
 
@@ -201,6 +264,7 @@ export default function GridDragDrop({ onWeddingSettingsClick }: GridDragDropPro
     dragTimeoutRef.current = setTimeout(() => {
       setDraggedModule(null)
       setDragOverPosition(null)
+      setPreviewPositions(new Map())
       setIsDragging(false)
 
       // Obnovit scrollování
@@ -232,7 +296,19 @@ export default function GridDragDrop({ onWeddingSettingsClick }: GridDragDropPro
           height: draggedPos.height
         }
 
-        setDragOverPosition(newPosition)
+        // Zkontroluj jestli se pozice změnila
+        if (
+          !dragOverPosition ||
+          dragOverPosition.row !== newPosition.row ||
+          dragOverPosition.col !== newPosition.col
+        ) {
+          setDragOverPosition(newPosition)
+
+          // Vypočítej preview pozice pro ostatní moduly
+          const newPositions = pushModulesAway(newPosition, draggedModule)
+          newPositions.set(draggedModule, newPosition)
+          setPreviewPositions(newPositions)
+        }
       }
     }
   }
@@ -242,8 +318,14 @@ export default function GridDragDrop({ onWeddingSettingsClick }: GridDragDropPro
 
     if (!draggedModule || !dragOverPosition) return
 
-    const newPositions = pushModulesAway(dragOverPosition, draggedModule)
-    newPositions.set(draggedModule, dragOverPosition)
+    // Použij preview pozice pokud existují, jinak vypočítej nové
+    const newPositions = previewPositions.size > 0
+      ? new Map(previewPositions)
+      : (() => {
+          const positions = pushModulesAway(dragOverPosition, draggedModule)
+          positions.set(draggedModule, dragOverPosition)
+          return positions
+        })()
 
     setModulePositions(newPositions)
 
@@ -257,6 +339,7 @@ export default function GridDragDrop({ onWeddingSettingsClick }: GridDragDropPro
 
     setDraggedModule(null)
     setDragOverPosition(null)
+    setPreviewPositions(new Map())
     setIsDragging(false)
   }
 
@@ -421,8 +504,15 @@ export default function GridDragDrop({ onWeddingSettingsClick }: GridDragDropPro
 
         {/* Modules */}
         {visibleModules.map((module) => {
-          const position = modulePositions.get(module.id)
+          // Použij preview pozici během přetahování, jinak normální pozici
+          const position = (isDragging && previewPositions.size > 0)
+            ? previewPositions.get(module.id) || modulePositions.get(module.id)
+            : modulePositions.get(module.id)
+
           if (!position) return null
+
+          const isBeingDragged = draggedModule === module.id
+          const isMovingDueToDrag = isDragging && !isBeingDragged && previewPositions.has(module.id)
 
           return (
             <div
@@ -432,14 +522,16 @@ export default function GridDragDrop({ onWeddingSettingsClick }: GridDragDropPro
                 ${layout.isEditMode ? 'ring-2 ring-primary-200 ring-opacity-50' : ''}
                 ${module.isLocked ? 'ring-2 ring-gray-300' : ''}
                 ${layout.isEditMode && !module.isLocked ? 'cursor-grab active:cursor-grabbing' : ''}
-                ${draggedModule === module.id ? 'opacity-60 scale-105 z-50 rotate-1' : ''}
+                ${isBeingDragged ? 'opacity-60 scale-105 z-50 rotate-1' : ''}
+                ${isMovingDueToDrag ? 'ring-2 ring-orange-300 ring-opacity-70' : ''}
                 group
               `}
               style={{
                 left: `calc(${(position.col / GRID_COLS) * 100}% + 8px)`,
                 top: `${position.row * CELL_HEIGHT + 8}px`,
                 width: `calc(${(position.width / GRID_COLS) * 100}% - 16px)`,
-                height: `${position.height * CELL_HEIGHT - 16}px`
+                height: `${position.height * CELL_HEIGHT - 16}px`,
+                transition: isBeingDragged ? 'none' : 'all 0.3s ease-out'
               }}
               draggable={layout.isEditMode && !module.isLocked}
               onDragStart={(e) => handleDragStart(e, module.id)}
@@ -543,13 +635,14 @@ export default function GridDragDrop({ onWeddingSettingsClick }: GridDragDropPro
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
           <h3 className="font-medium text-blue-900 mb-2">Nápověda pro grid layout</h3>
           <ul className="text-sm text-blue-800 space-y-1">
-            <li>• Přetáhněte moduly kamkoliv na grid plochu</li>
-            <li>• Modrý náhled ukazuje kam modul spadne</li>
-            <li>• Moduly se automaticky posunou pokud jim stojíte v cestě</li>
-            <li>• Použijte scroll myši pro pohyb po celé ploše</li>
+            <li>• <strong>Přetáhněte modul</strong> kamkoliv na grid plochu - umístí se přesně tam, kde ho pustíte</li>
+            <li>• <strong>Modrý náhled</strong> ukazuje kam modul spadne</li>
+            <li>• <strong>Oranžový rámeček</strong> označuje moduly, které se automaticky přesunou</li>
+            <li>• Moduly se přesunou na <strong>nejbližší volné místo</strong> pokud jim stojíte v cestě</li>
+            <li>• Použijte <strong>scroll myši</strong> pro pohyb po celé ploše během přetahování</li>
             <li>• Grid má {GRID_COLS} sloupců a {GRID_ROWS} řádků</li>
-            <li>• Použijte ikonu oka (👁️) pro skrytí/zobrazení modulů</li>
-            <li>• Použijte ikonu zámku (🔒) pro zamknutí/odemknutí modulů</li>
+            <li>• Použijte ikonu <strong>oka (👁️)</strong> pro skrytí/zobrazení modulů</li>
+            <li>• Použijte ikonu <strong>zámku (🔒)</strong> pro zamknutí/odemknutí modulů</li>
           </ul>
         </div>
       )}

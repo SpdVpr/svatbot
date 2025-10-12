@@ -17,6 +17,7 @@ interface TaskStatsProps {
   showProgress?: boolean
   showTaskList?: boolean
   onCreateTask?: () => void
+  onEditTask?: (task: any) => void
   tasks?: any[] // Optional - if not provided, will use useTask hook
   stats?: any
   loading?: boolean
@@ -31,6 +32,7 @@ export default function TaskStats({
   showProgress = true,
   showTaskList = true,
   onCreateTask,
+  onEditTask,
   tasks: propTasks,
   stats: propStats,
   loading: propLoading,
@@ -298,6 +300,7 @@ export default function TaskStats({
             showFilters={true}
             compact={false}
             onCreateTask={onCreateTask}
+            onEditTask={onEditTask}
             tasks={isDemoUser ? tasks : undefined}
             loading={isDemoUser ? propLoading : undefined}
             error={isDemoUser ? propError : undefined}

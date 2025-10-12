@@ -13,7 +13,10 @@ import {
   Search,
   Calendar,
   User,
-  Flag
+  Flag,
+  Edit2,
+  Trash2,
+  MoreVertical
 } from 'lucide-react'
 
 interface TaskListProps {
@@ -21,6 +24,7 @@ interface TaskListProps {
   showFilters?: boolean
   compact?: boolean
   onCreateTask?: () => void
+  onEditTask?: (task: Task) => void
   tasks?: Task[] // Optional - if not provided, will use useTask hook
   loading?: boolean
   error?: string | null
@@ -35,6 +39,7 @@ export default function TaskList({
   showFilters = true,
   compact = false,
   onCreateTask,
+  onEditTask,
   tasks: propTasks,
   loading: propLoading,
   error: propError,
@@ -72,6 +77,19 @@ export default function TaskList({
   })
   const [searchTerm, setSearchTerm] = useState('')
   const [showFiltersPanel, setShowFiltersPanel] = useState(false)
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null)
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
+
+  // Handle delete with confirmation
+  const handleDelete = async (taskId: string) => {
+    try {
+      await deleteTask(taskId)
+      setDeleteConfirmId(null)
+      setOpenMenuId(null)
+    } catch (error) {
+      console.error('Error deleting task:', error)
+    }
+  }
 
   // Filter and sort tasks
   const filteredTasks = tasks.filter(task => {
@@ -126,19 +144,37 @@ export default function TaskList({
     }))
   })
 
+  // Get priority label in Czech
+  const getPriorityLabel = (priority?: string): string => {
+    if (!priority) return ''
+
+    switch (priority) {
+      case 'urgent':
+        return 'Urgentní'
+      case 'high':
+        return 'Vysoká'
+      case 'medium':
+        return 'Střední'
+      case 'low':
+        return 'Nízká'
+      default:
+        return priority
+    }
+  }
+
   // Get priority icon and color
   const getPriorityDisplay = (priority?: string) => {
     if (!priority) return null
 
     switch (priority) {
       case 'urgent':
-        return { icon: AlertTriangle, color: 'text-red-500', bg: 'bg-red-50' }
+        return { icon: AlertTriangle, color: 'text-red-500', bg: 'bg-red-50', label: 'Urgentní' }
       case 'high':
-        return { icon: Flag, color: 'text-orange-500', bg: 'bg-orange-50' }
+        return { icon: Flag, color: 'text-orange-500', bg: 'bg-orange-50', label: 'Vysoká' }
       case 'medium':
-        return { icon: Flag, color: 'text-yellow-500', bg: 'bg-yellow-50' }
+        return { icon: Flag, color: 'text-yellow-500', bg: 'bg-yellow-50', label: 'Střední' }
       case 'low':
-        return { icon: Flag, color: 'text-gray-400', bg: 'bg-gray-50' }
+        return { icon: Flag, color: 'text-gray-400', bg: 'bg-gray-50', label: 'Nízká' }
       default:
         return null
     }
@@ -417,28 +453,50 @@ export default function TaskList({
                             <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${priorityDisplay.bg}`}>
                               <priorityDisplay.icon className={`w-3 h-3 ${priorityDisplay.color}`} />
                               <span className={`text-xs font-medium ${priorityDisplay.color}`}>
-                                {task.priority}
+                                {priorityDisplay.label}
                               </span>
                             </div>
                           )}
                         </div>
 
                         {/* Task metadata */}
-                        <div className="flex items-center space-x-4 mt-2 text-sm text-text-muted">
-                          {task.dueDate && (
-                            <div className="flex items-center space-x-1">
-                              <Calendar className="w-3 h-3" />
-                              <span className={isOverdue ? 'text-red-600 font-medium' : ''}>
-                                {formatDate(task.dueDate)}
-                              </span>
-                            </div>
-                          )}
-                          {task.assignedTo && (
-                            <div className="flex items-center space-x-1">
-                              <User className="w-3 h-3" />
-                              <span>{task.assignedTo}</span>
-                            </div>
-                          )}
+                        <div className="flex items-center justify-between mt-2">
+                          <div className="flex items-center space-x-4 text-sm text-text-muted">
+                            {task.dueDate && (
+                              <div className="flex items-center space-x-1">
+                                <Calendar className="w-3 h-3" />
+                                <span className={isOverdue ? 'text-red-600 font-medium' : ''}>
+                                  {formatDate(task.dueDate)}
+                                </span>
+                              </div>
+                            )}
+                            {task.assignedTo && (
+                              <div className="flex items-center space-x-1">
+                                <User className="w-3 h-3" />
+                                <span>{task.assignedTo}</span>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Action buttons */}
+                          <div className="flex items-center space-x-1">
+                            {onEditTask && (
+                              <button
+                                onClick={() => onEditTask(task)}
+                                className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                                title="Upravit úkol"
+                              >
+                                <Edit2 className="w-4 h-4" />
+                              </button>
+                            )}
+                            <button
+                              onClick={() => setDeleteConfirmId(task.id)}
+                              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                              title="Smazat úkol"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -466,6 +524,39 @@ export default function TaskList({
           </div>
         )}
       </div>
+
+      {/* Delete confirmation modal */}
+      {deleteConfirmId && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="p-2 bg-red-100 rounded-full">
+                <AlertTriangle className="w-6 h-6 text-red-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Smazat úkol?
+              </h3>
+            </div>
+            <p className="text-text-muted mb-6">
+              Opravdu chcete smazat tento úkol? Tato akce je nevratná.
+            </p>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setDeleteConfirmId(null)}
+                className="flex-1 btn-outline"
+              >
+                Zrušit
+              </button>
+              <button
+                onClick={() => handleDelete(deleteConfirmId)}
+                className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium"
+              >
+                Smazat
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -485,7 +576,7 @@ function groupTasksBy(tasks: Task[], groupBy: string): Record<string, Task[]> {
         key = task.status
         break
       case 'priority':
-        key = task.priority || 'Bez priority'
+        key = getPriorityLabel(task.priority) || 'Bez priority'
         break
       case 'due-date':
         if (!task.dueDate) {

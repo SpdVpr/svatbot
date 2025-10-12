@@ -9,7 +9,7 @@ import TaskStats from '@/components/tasks/TaskStats'
 import TaskForm from '@/components/tasks/TaskForm'
 import TaskDebug from '@/components/debug/TaskDebug'
 
-import { TaskFormData } from '@/types/task'
+import { TaskFormData, Task } from '@/types/task'
 import {
   Plus,
   Download,
@@ -32,6 +32,7 @@ export default function TasksPage() {
     tasks,
     loading,
     createTask,
+    updateTask,
     error,
     stats,
     toggleTaskStatus,
@@ -42,6 +43,7 @@ export default function TasksPage() {
   const [showInitializeModal, setShowInitializeModal] = useState(false)
   const [showTaskForm, setShowTaskForm] = useState(false)
   const [taskFormLoading, setTaskFormLoading] = useState(false)
+  const [editingTask, setEditingTask] = useState<Task | null>(null)
 
   // Check if user has any tasks
   const hasTasks = tasks.length > 0
@@ -76,12 +78,47 @@ export default function TasksPage() {
       console.log('✅ Task created successfully:', newTask.title)
       console.log('✅ Tasks count after creation should be:', tasks.length + 1)
       setShowTaskForm(false)
+      setEditingTask(null)
     } catch (error) {
       console.error('Error creating task:', error)
       throw error // Re-throw to show error in form
     } finally {
       setTaskFormLoading(false)
     }
+  }
+
+  // Handle edit task
+  const handleEditTask = async (data: TaskFormData) => {
+    if (!editingTask) return
+
+    try {
+      console.log('🚀 Starting task update:', data.title)
+      setTaskFormLoading(true)
+      await updateTask(editingTask.id, {
+        title: data.title,
+        description: data.description,
+        category: data.category,
+        priority: data.priority,
+        dueDate: data.dueDate,
+        assignedTo: data.assignedTo,
+        estimatedDuration: data.estimatedDuration,
+        tags: data.tags
+      })
+      console.log('✅ Task updated successfully')
+      setShowTaskForm(false)
+      setEditingTask(null)
+    } catch (error) {
+      console.error('Error updating task:', error)
+      throw error
+    } finally {
+      setTaskFormLoading(false)
+    }
+  }
+
+  // Handle open edit modal
+  const handleOpenEditModal = (task: Task) => {
+    setEditingTask(task)
+    setShowTaskForm(true)
   }
 
   if (!user) {
@@ -297,7 +334,11 @@ export default function TasksPage() {
           /* Stats view - most informative display */
           <div className="space-y-6">
             <TaskStats
-              onCreateTask={() => setShowTaskForm(true)}
+              onCreateTask={() => {
+                setEditingTask(null)
+                setShowTaskForm(true)
+              }}
+              onEditTask={handleOpenEditModal}
               tasks={isDemoUser ? tasks : undefined}
               stats={isDemoUser ? stats : undefined}
               loading={isDemoUser ? loading : undefined}
@@ -354,10 +395,23 @@ export default function TasksPage() {
       {/* Task Form Modal */}
       {showTaskForm && (
         <TaskForm
-          onSubmit={handleCreateTask}
-          onCancel={() => setShowTaskForm(false)}
+          onSubmit={editingTask ? handleEditTask : handleCreateTask}
+          onCancel={() => {
+            setShowTaskForm(false)
+            setEditingTask(null)
+          }}
           loading={taskFormLoading}
           error={error || undefined}
+          initialData={editingTask ? {
+            title: editingTask.title,
+            description: editingTask.description,
+            category: editingTask.category,
+            priority: editingTask.priority,
+            dueDate: editingTask.dueDate,
+            assignedTo: editingTask.assignedTo,
+            estimatedDuration: editingTask.estimatedDuration,
+            tags: editingTask.tags
+          } : undefined}
         />
       )}
 
