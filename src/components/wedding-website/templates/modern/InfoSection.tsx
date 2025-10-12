@@ -1,6 +1,6 @@
 'use client'
 
-import { MapPin, Clock, Shirt, Car, Info, Palette } from 'lucide-react'
+import { MapPin, Clock, Car, Info } from 'lucide-react'
 import type { InfoContent } from '@/types/wedding-website'
 import GoogleMapsEmbed from '../../GoogleMapsEmbed'
 
@@ -9,26 +9,7 @@ interface InfoSectionProps {
 }
 
 export default function ModernInfoSection({ content }: InfoSectionProps) {
-  const { ceremony, reception, dressCode, dressCodeDetails, colorPalette, parking, customInfo } = content
-
-  const getDressCodeText = (code: string) => {
-    switch (code) {
-      case 'formal':
-        return 'Formální (oblek/večerní šaty)'
-      case 'semi-formal':
-        return 'Poloformální (košile/koktejlové šaty)'
-      case 'casual':
-        return 'Neformální'
-      case 'cocktail':
-        return 'Koktejlové oblečení'
-      case 'black-tie':
-        return 'Black tie'
-      case 'custom':
-        return dressCodeDetails || 'Vlastní požadavky'
-      default:
-        return code
-    }
-  }
+  const { ceremony, reception, parking, customInfo } = content
 
   // Check which venue sections are filled
   const hasCeremony = ceremony && (ceremony.venue || ceremony.time || ceremony.address)
@@ -151,26 +132,6 @@ export default function ModernInfoSection({ content }: InfoSectionProps) {
                 <div>
                   <h4 className="font-medium text-gray-900 mb-2 text-lg">Parkování</h4>
                   <p className="text-gray-600 leading-relaxed">{parking}</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Dress Code */}
-          {dressCode && (
-            <div className="bg-white rounded-lg p-8 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex flex-col items-center text-center space-y-4">
-                <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
-                  <Shirt className="w-8 h-8 text-gray-900" />
-                </div>
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-2 text-lg">Dress Code</h4>
-                  <p className="text-gray-600 leading-relaxed">
-                    {getDressCodeText(dressCode)}
-                  </p>
-                  {dressCodeDetails && dressCode !== 'custom' && (
-                    <p className="text-sm text-gray-500 mt-2 italic">{dressCodeDetails}</p>
-                  )}
                 </div>
               </div>
             </div>

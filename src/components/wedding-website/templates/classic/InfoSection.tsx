@@ -1,6 +1,6 @@
 'use client'
 
-import { MapPin, Clock, Shirt, Car, Info, Palette } from 'lucide-react'
+import { MapPin, Clock, Car, Info } from 'lucide-react'
 import type { InfoContent } from '@/types/wedding-website'
 import GoogleMapsEmbed from '../../GoogleMapsEmbed'
 
@@ -9,26 +9,7 @@ interface InfoSectionProps {
 }
 
 export default function InfoSection({ content }: InfoSectionProps) {
-  const { ceremony, reception, dressCode, dressCodeDetails, colorPalette, parking, customInfo } = content
-
-  const getDressCodeText = (code: string) => {
-    switch (code) {
-      case 'formal':
-        return 'Formální (oblek/večerní šaty)'
-      case 'semi-formal':
-        return 'Poloformální (košile/koktejlové šaty)'
-      case 'casual':
-        return 'Neformální'
-      case 'cocktail':
-        return 'Koktejlové oblečení'
-      case 'black-tie':
-        return 'Black tie'
-      case 'custom':
-        return dressCodeDetails || 'Vlastní požadavky'
-      default:
-        return code
-    }
-  }
+  const { ceremony, reception, parking, customInfo } = content
 
   // Check which venue sections are filled
   const hasCeremony = ceremony && (ceremony.venue || ceremony.time || ceremony.address)
@@ -159,46 +140,6 @@ export default function InfoSection({ content }: InfoSectionProps) {
                 <div>
                   <h4 className="font-bold text-gray-900 mb-3 text-xl font-serif">Parkování</h4>
                   <p className="text-gray-600 leading-relaxed">{parking}</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Dress Code */}
-          {dressCode && (
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-amber-100 hover:shadow-xl transition-shadow">
-              <div className="flex flex-col items-center text-center space-y-4">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center shadow-md">
-                  <Shirt className="w-10 h-10 text-purple-600" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900 mb-3 text-xl font-serif">Dress Code</h4>
-                  <p className="text-gray-600 leading-relaxed">
-                    {getDressCodeText(dressCode)}
-                  </p>
-                  {dressCodeDetails && dressCode !== 'custom' && (
-                    <p className="text-sm text-gray-500 mt-2 italic">{dressCodeDetails}</p>
-                  )}
-
-                  {/* Color Palette */}
-                  {colorPalette && colorPalette.length > 0 && (
-                    <div className="mt-4 pt-4 border-t border-gray-100">
-                      <div className="flex items-center justify-center gap-2 mb-3">
-                        <Palette className="w-4 h-4 text-purple-600" />
-                        <span className="text-sm font-medium text-gray-900">Barevná paleta</span>
-                      </div>
-                      <div className="flex flex-wrap gap-2 justify-center">
-                        {colorPalette.map((color, index) => (
-                          <div
-                            key={index}
-                            className="w-10 h-10 rounded-full border-2 border-white shadow-md"
-                            style={{ backgroundColor: color }}
-                            title={color}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>

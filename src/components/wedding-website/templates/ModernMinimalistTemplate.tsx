@@ -5,6 +5,7 @@ import { Calendar, MapPin, Clock, Users, Mail, Phone, Menu, X } from 'lucide-rea
 import type { WeddingWebsite } from '@/types/wedding-website'
 import ModernHeroSection from './modern/HeroSection'
 import ModernInfoSection from './modern/InfoSection'
+import ModernDressCodeSection from './modern/DressCodeSection'
 import ModernRSVPSection from './modern/RSVPSection'
 import AccommodationSection from './modern/AccommodationSection'
 import FAQSection from './modern/FAQSection'
@@ -253,6 +254,13 @@ export default function ModernMinimalistTemplate({ website }: ModernMinimalistTe
       {content.info.enabled && (
         <div id="misto">
           <ModernInfoSection content={content.info} />
+        </div>
+      )}
+
+      {/* Dress Code Section */}
+      {content.dressCode?.enabled && (
+        <div id="dress-code">
+          <ModernDressCodeSection content={content.dressCode} />
         </div>
       )}
 

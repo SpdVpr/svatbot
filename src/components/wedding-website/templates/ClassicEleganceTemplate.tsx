@@ -4,6 +4,7 @@ import { Calendar, MapPin, Clock, Users, Mail, Phone } from 'lucide-react'
 import type { WeddingWebsite } from '@/types/wedding-website'
 import HeroSection from './classic/HeroSection'
 import InfoSection from './classic/InfoSection'
+import DressCodeSection from './classic/DressCodeSection'
 import RSVPSection from './classic/RSVPSection'
 import StorySection from './classic/StorySection'
 import ScheduleSection from './classic/ScheduleSection'
@@ -59,6 +60,11 @@ export default function ClassicEleganceTemplate({ website }: ClassicEleganceTemp
       {/* Info Section */}
       {content.info.enabled && (
         <InfoSection content={content.info} />
+      )}
+
+      {/* Dress Code Section */}
+      {content.dressCode?.enabled && (
+        <DressCodeSection content={content.dressCode} />
       )}
 
       {/* Schedule Section */}
