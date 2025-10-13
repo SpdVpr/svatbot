@@ -446,20 +446,19 @@ function DraggableModule({
   return (
     <div
       ref={dragRef}
-      className={`absolute group select-none ${
+      className={`absolute group select-none transition-all duration-200 ${
         isDragging || isResizing
           ? 'z-50 scale-105 shadow-2xl cursor-grabbing'
           : isEditMode && !module.isLocked
-          ? 'z-10 hover:z-20 cursor-grab hover:shadow-lg transition-shadow duration-200'
-          : 'z-10'
+          ? 'z-10 hover:z-20 cursor-grab hover:shadow-lg hover:scale-[1.02]'
+          : 'z-10 hover:scale-[1.02] hover:shadow-lg'
       } ${isHidden && isEditMode ? 'opacity-40' : ''}`}
       style={{
         left: position.x,
         top: position.y,
         width: size.width,
         height: size.height,
-        willChange: isDragging || isResizing ? 'transform' : 'auto',
-        transition: isDragging || isResizing ? 'none' : 'transform 0.2s ease, box-shadow 0.2s ease'
+        willChange: isDragging || isResizing ? 'transform' : 'auto'
       }}
       onMouseDown={handleMouseDown}
       onMouseEnter={() => !isDragging && !isResizing && setIsHovered(true)}
@@ -528,7 +527,7 @@ function DraggableModule({
             </div>
           </div>
         ) : (
-          <div className={`h-full overflow-auto ${isEditMode ? 'pointer-events-none' : ''}`}>
+          <div className={`h-full ${isEditMode ? 'overflow-hidden pointer-events-none' : 'overflow-hidden'}`}>
             {renderContent()}
           </div>
         )}
