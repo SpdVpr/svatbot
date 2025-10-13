@@ -17,9 +17,21 @@ Jsi expert na svatební plánování v České republice. Znáš:
 
 Odpovídáš vždy v češtině, prakticky a s konkrétními čísly.
 
-DŮLEŽITÉ: Máš přístup k REÁLNÝM datům uživatele o jeho svatbě. Když se uživatel ptá na konkrétní informace
-(např. "Kdo má alergii na lepek?", "Kolik stojí fotograf?", "Jaké úkoly mám nesplněné?"),
-VŽDY odpovídej na základě poskytnutých dat, ne obecně. Pokud data nejsou k dispozici, řekni to uživateli.
+DŮLEŽITÉ: Máš přístup k REÁLNÝM datům uživatele o jeho svatbě včetně:
+- 👥 Hosté (jména, dietní omezení, RSVP status, ubytování)
+- 💰 Rozpočet (položky, částky, dodavatelé, platby)
+- ✅ Úkoly (názvy, termíny, statusy, priority)
+- 🪑 Seating plan (stoly, kapacity, přiřazení hostů)
+- 🌐 Svatební web (URL, publikace, RSVP, návštěvnost)
+- 🏨 Ubytování (hotely, pokoje, obsazenost)
+- 🛒 Nákupní seznam (položky, ceny, status nákupu)
+- ⏰ Timeline svatebního dne (události, časy, lokace)
+
+Když se uživatel ptá na konkrétní informace (např. "Kdo má alergii na lepek?", "Kolik mám stolů?",
+"Je svatební web publikovaný?", "Kolik mám volných pokojů?"), VŽDY odpovídej na základě poskytnutých dat,
+ne obecně. Pokud data nejsou k dispozici, řekni to uživateli.
+
+Buď konkrétní - uváděj jména, čísla, termíny z reálných dat!
 `
 
 // Helper function to build detailed context string
@@ -140,6 +152,114 @@ function buildDetailedContext(context: any): string {
       }
       contextStr += '\n'
     }
+  }
+
+  // Seating plan
+  if (context.seatingPlan) {
+    contextStr += '🪑 ROZMÍSTĚNÍ HOSTŮ (SEATING PLAN):\n'
+    contextStr += `- Celkem stolů: ${context.seatingPlan.tables?.length || 0}\n`
+    contextStr += `- Celkem míst: ${context.seatingPlan.totalSeats || 0}\n`
+    contextStr += `- Obsazených míst: ${context.seatingPlan.assignedSeats || 0}\n`
+    contextStr += `- Hostů bez přiřazeného místa: ${context.seatingPlan.unassignedGuests || 0}\n`
+
+    if (context.seatingPlan.tables && context.seatingPlan.tables.length > 0) {
+      contextStr += '\n📋 DETAILY STOLŮ:\n'
+      context.seatingPlan.tables.forEach((table: any) => {
+        const occupiedSeats = table.seats?.filter((s: any) => s.guestId).length || 0
+        contextStr += `- Stůl ${table.number || table.name}: ${occupiedSeats}/${table.capacity} míst obsazeno`
+        if (table.shape) {
+          contextStr += ` (${table.shape})`
+        }
+        contextStr += '\n'
+      })
+    }
+    contextStr += '\n'
+  }
+
+  // Wedding website
+  if (context.weddingWebsite) {
+    contextStr += '🌐 SVATEBNÍ WEB:\n'
+    contextStr += `- URL: ${context.weddingWebsite.customUrl}.svatbot.cz\n`
+    contextStr += `- Publikováno: ${context.weddingWebsite.isPublished ? 'Ano' : 'Ne'}\n`
+    contextStr += `- RSVP formulář: ${context.weddingWebsite.hasRSVP ? 'Aktivní' : 'Neaktivní'}\n`
+    contextStr += `- Počet zobrazení: ${context.weddingWebsite.views || 0}\n\n`
+  }
+
+  // Accommodations
+  if (context.accommodationStats) {
+    contextStr += '🏨 UBYTOVÁNÍ:\n'
+    contextStr += `- Celkem ubytování: ${context.accommodationStats.total || 0}\n`
+    contextStr += `- Celkem pokojů: ${context.accommodationStats.totalRooms || 0}\n`
+    contextStr += `- Rezervovaných pokojů: ${context.accommodationStats.reservedRooms || 0}\n`
+    contextStr += `- Volných pokojů: ${context.accommodationStats.availableRooms || 0}\n`
+
+    if (context.accommodations && context.accommodations.length > 0) {
+      contextStr += '\n📋 SEZNAM UBYTOVÁNÍ:\n'
+      context.accommodations.forEach((acc: any) => {
+        contextStr += `- ${acc.name}: ${acc.rooms?.length || 0} pokojů`
+        if (acc.address) {
+          contextStr += ` (${acc.address})`
+        }
+        contextStr += '\n'
+      })
+    }
+    contextStr += '\n'
+  }
+
+  // Shopping list
+  if (context.shoppingStats) {
+    contextStr += '🛒 NÁKUPNÍ SEZNAM:\n'
+    contextStr += `- Celkem položek: ${context.shoppingStats.total || 0}\n`
+    contextStr += `- Zakoupeno: ${context.shoppingStats.purchased || 0}\n`
+    contextStr += `- Celková cena: ${context.shoppingStats.totalCost?.toLocaleString() || 0} Kč\n`
+    contextStr += `- Zbývá nakoupit za: ${context.shoppingStats.remainingCost?.toLocaleString() || 0} Kč\n`
+
+    if (context.shoppingItems && context.shoppingItems.length > 0) {
+      const unpurchased = context.shoppingItems.filter((item: any) => !item.purchased)
+      if (unpurchased.length > 0) {
+        contextStr += '\n📝 NEZAKOUPENÉ POLOŽKY:\n'
+        unpurchased.slice(0, 10).forEach((item: any) => {
+          contextStr += `- ${item.name}`
+          if (item.estimatedPrice) {
+            contextStr += ` (${item.estimatedPrice.toLocaleString()} Kč)`
+          }
+          if (item.category) {
+            contextStr += ` - ${item.category}`
+          }
+          contextStr += '\n'
+        })
+        if (unpurchased.length > 10) {
+          contextStr += `... a dalších ${unpurchased.length - 10} položek\n`
+        }
+      }
+    }
+    contextStr += '\n'
+  }
+
+  // Timeline
+  if (context.timelineStats) {
+    contextStr += '⏰ ČASOVÝ PLÁN SVATEBNÍHO DNE:\n'
+    contextStr += `- Celkem událostí: ${context.timelineStats.total || 0}\n`
+    contextStr += `- Nadcházejících: ${context.timelineStats.upcoming || 0}\n`
+    contextStr += `- Dnes: ${context.timelineStats.today || 0}\n`
+
+    if (context.milestones && context.milestones.length > 0) {
+      contextStr += '\n📅 UDÁLOSTI:\n'
+      context.milestones.slice(0, 10).forEach((milestone: any) => {
+        contextStr += `- ${milestone.title}`
+        if (milestone.time) {
+          contextStr += ` v ${milestone.time}`
+        }
+        if (milestone.location) {
+          contextStr += ` (${milestone.location})`
+        }
+        contextStr += '\n'
+      })
+      if (context.milestones.length > 10) {
+        contextStr += `... a dalších ${context.milestones.length - 10} událostí\n`
+      }
+    }
+    contextStr += '\n'
   }
 
   contextStr += '=== KONEC KONTEXTU ===\n'

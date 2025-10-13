@@ -6,6 +6,11 @@ import { useWedding } from '@/hooks/useWedding'
 import { useGuest } from '@/hooks/useGuest'
 import { useBudget } from '@/hooks/useBudget'
 import { useTask } from '@/hooks/useTask'
+import { useSeating } from '@/hooks/useSeating'
+import { useWeddingWebsite } from '@/hooks/useWeddingWebsite'
+import { useAccommodation } from '@/hooks/useAccommodation'
+import { useShopping } from '@/hooks/useShopping'
+import { useTimeline } from '@/hooks/useTimeline'
 import { useSearchParams } from 'next/navigation'
 import {
   Bot,
@@ -20,7 +25,12 @@ import {
   Database,
   CheckCircle,
   AlertCircle,
-  Info
+  Info,
+  Armchair,
+  Globe,
+  Hotel,
+  ShoppingCart,
+  Clock
 } from 'lucide-react'
 import Link from 'next/link'
 import AIAssistant from '@/components/ai/AIAssistant'
@@ -34,6 +44,11 @@ function AIPageContent() {
   const { guests } = useGuest()
   const { budgetItems, stats } = useBudget()
   const { tasks } = useTask()
+  const { tables, stats: seatingStats } = useSeating()
+  const { website } = useWeddingWebsite()
+  const { accommodations, stats: accommodationStats } = useAccommodation()
+  const { items: shoppingItems, stats: shoppingStats } = useShopping()
+  const { milestones } = useTimeline()
   const searchParams = useSearchParams()
   const [showDataInfo, setShowDataInfo] = useState(true)
 
@@ -46,6 +61,8 @@ function AIPageContent() {
     if (!t.dueDate || t.status === 'completed') return false
     return new Date(t.dueDate) < new Date()
   }) || []
+  const totalSeats = seatingStats?.totalSeats || tables?.reduce((sum, table) => sum + table.capacity, 0) || 0
+  const assignedSeats = seatingStats?.assignedSeats || 0
 
   if (!user) {
     return (
@@ -206,17 +223,107 @@ function AIPageContent() {
                       </p>
                     </div>
 
-                    {/* Examples */}
+                    {/* Seating Plan */}
                     <div className="bg-white/50 rounded-lg p-3">
                       <div className="flex items-center space-x-2 mb-1">
-                        <Lightbulb className="w-4 h-4 text-green-600" />
-                        <span className="text-sm font-medium text-green-900">Zkuste se zeptat</span>
+                        <Armchair className="w-4 h-4 text-green-600" />
+                        <span className="text-sm font-medium text-green-900">Seating Plan</span>
                       </div>
                       <p className="text-xs text-green-700">
-                        "Kdo má alergii na lepek?"<br/>
-                        "Jsem v rozpočtu?"<br/>
-                        "Co je po termínu?"
+                        {tables?.length || 0} stolů
+                        {totalSeats > 0 && (
+                          <span className="block mt-1">
+                            {assignedSeats}/{totalSeats} míst obsazeno
+                          </span>
+                        )}
                       </p>
+                    </div>
+
+                    {/* Wedding Website */}
+                    <div className="bg-white/50 rounded-lg p-3">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <Globe className="w-4 h-4 text-green-600" />
+                        <span className="text-sm font-medium text-green-900">Svatební web</span>
+                      </div>
+                      <p className="text-xs text-green-700">
+                        {website ? (
+                          <>
+                            {website.isPublished ? 'Publikováno' : 'Nepublikováno'}
+                            <span className="block mt-1">
+                              {website.analytics?.views || 0} zobrazení
+                            </span>
+                          </>
+                        ) : (
+                          'Nevytvořeno'
+                        )}
+                      </p>
+                    </div>
+
+                    {/* Accommodations */}
+                    <div className="bg-white/50 rounded-lg p-3">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <Hotel className="w-4 h-4 text-green-600" />
+                        <span className="text-sm font-medium text-green-900">Ubytování</span>
+                      </div>
+                      <p className="text-xs text-green-700">
+                        {accommodations?.length || 0} ubytování
+                        {accommodationStats && (
+                          <span className="block mt-1">
+                            {accommodationStats.reservedRooms}/{accommodationStats.totalRooms} pokojů rezervováno
+                          </span>
+                        )}
+                      </p>
+                    </div>
+
+                    {/* Shopping List */}
+                    <div className="bg-white/50 rounded-lg p-3">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <ShoppingCart className="w-4 h-4 text-green-600" />
+                        <span className="text-sm font-medium text-green-900">Nákupní seznam</span>
+                      </div>
+                      <p className="text-xs text-green-700">
+                        {shoppingItems?.length || 0} položek
+                        {shoppingStats && (
+                          <span className="block mt-1">
+                            {shoppingStats.purchasedItems} zakoupeno
+                          </span>
+                        )}
+                      </p>
+                    </div>
+
+                    {/* Timeline */}
+                    <div className="bg-white/50 rounded-lg p-3">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <Clock className="w-4 h-4 text-green-600" />
+                        <span className="text-sm font-medium text-green-900">Timeline</span>
+                      </div>
+                      <p className="text-xs text-green-700">
+                        {milestones?.length || 0} událostí
+                        {milestones && milestones.length > 0 && (
+                          <span className="block mt-1">
+                            Svatební den naplánován
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Example questions */}
+                  <div className="mt-4 pt-4 border-t border-green-200">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Lightbulb className="w-4 h-4 text-green-600" />
+                      <span className="text-sm font-medium text-green-900">Příklady otázek:</span>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                      <p className="text-xs text-green-700">"Kdo má alergii na lepek?"</p>
+                      <p className="text-xs text-green-700">"Jsem v rozpočtu?"</p>
+                      <p className="text-xs text-green-700">"Co je po termínu?"</p>
+                      <p className="text-xs text-green-700">"Kolik mám stolů?"</p>
+                      <p className="text-xs text-green-700">"Je svatební web publikovaný?"</p>
+                      <p className="text-xs text-green-700">"Kolik mám volných pokojů?"</p>
+                      <p className="text-xs text-green-700">"Co ještě musím nakoupit?"</p>
+                      <p className="text-xs text-green-700">"Jaký je program svatebního dne?"</p>
+                      <p className="text-xs text-green-700">"Kdo ještě nepotvrdil účast?"</p>
                     </div>
                   </div>
                 </div>

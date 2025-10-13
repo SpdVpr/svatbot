@@ -5,6 +5,10 @@ import { BudgetItem } from '@/types/budget'
 import { Task } from '@/types/task'
 import { Milestone } from '@/types/timeline'
 import { Vendor } from '@/types/vendor'
+import { Table } from '@/types/seating'
+import { WeddingWebsite } from '@/types/wedding-website'
+import { Accommodation } from '@/types'
+import { ShoppingItem } from '@/types/shopping'
 
 export interface AIWeddingContext {
   // Basic wedding info
@@ -14,6 +18,8 @@ export interface AIWeddingContext {
   location?: string
   style?: string
   preferences?: string[]
+  brideName?: string
+  groomName?: string
 
   // Detailed data for AI analysis
   guests?: Guest[]
@@ -21,6 +27,40 @@ export interface AIWeddingContext {
   currentTasks?: Task[]
   milestones?: Milestone[]
   vendors?: Vendor[]
+
+  // Seating plan data
+  seatingPlan?: {
+    tables?: Table[]
+    totalSeats?: number
+    assignedSeats?: number
+    unassignedGuests?: number
+  }
+
+  // Wedding website data
+  weddingWebsite?: {
+    customUrl?: string
+    isPublished?: boolean
+    hasRSVP?: boolean
+    views?: number
+  }
+
+  // Accommodation data
+  accommodations?: Accommodation[]
+  accommodationStats?: {
+    total?: number
+    totalRooms?: number
+    reservedRooms?: number
+    availableRooms?: number
+  }
+
+  // Shopping list data
+  shoppingItems?: ShoppingItem[]
+  shoppingStats?: {
+    total?: number
+    purchased?: number
+    totalCost?: number
+    remainingCost?: number
+  }
 
   // Computed stats
   budgetStats?: {
@@ -45,6 +85,12 @@ export interface AIWeddingContext {
     pending: number
     withDietaryRestrictions: number
     needingAccommodation: number
+  }
+
+  timelineStats?: {
+    total: number
+    upcoming: number
+    today: number
   }
 }
 

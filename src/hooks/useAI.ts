@@ -6,6 +6,11 @@ import { useWedding } from './useWedding'
 import { useGuest } from './useGuest'
 import { useBudget } from './useBudget'
 import { useTask } from './useTask'
+import { useSeating } from './useSeating'
+import { useWeddingWebsite } from './useWeddingWebsite'
+import { useAccommodation } from './useAccommodation'
+import { useShopping } from './useShopping'
+import { useTimeline } from './useTimeline'
 
 export interface AIResponse {
   success: boolean
@@ -25,11 +30,16 @@ export function useAI() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([])
-  
+
   const { wedding } = useWedding()
   const { guests } = useGuest()
   const { budgetItems, stats } = useBudget()
   const { tasks } = useTask()
+  const { tables, stats: seatingStats } = useSeating()
+  const { website } = useWeddingWebsite()
+  const { accommodations, stats: accommodationStats } = useAccommodation()
+  const { items: shoppingItems, stats: shoppingStats } = useShopping()
+  const { milestones } = useTimeline()
 
   // Build AI context from current wedding data
   const buildContext = useCallback((): AIWeddingContext => {
@@ -63,6 +73,34 @@ export function useAI() {
       budgetUsed: stats.budgetUsed || 0
     } : undefined
 
+    // Calculate seating plan stats
+    const seatingPlanData = seatingStats && tables && tables.length > 0 ? {
+      tables: tables,
+      totalSeats: seatingStats.totalSeats,
+      assignedSeats: seatingStats.assignedSeats,
+      unassignedGuests: seatingStats.totalSeats - seatingStats.assignedSeats
+    } : undefined
+
+    // Wedding website data
+    const weddingWebsiteData = website ? {
+      customUrl: website.customUrl,
+      isPublished: website.isPublished,
+      hasRSVP: website.content?.rsvp?.enabled || false,
+      views: website.analytics?.views || 0
+    } : undefined
+
+    // Timeline stats
+    const timelineStats = milestones ? {
+      total: milestones.length,
+      upcoming: milestones.filter(m => m.targetDate && new Date(m.targetDate) > new Date()).length,
+      today: milestones.filter(m => {
+        if (!m.targetDate) return false
+        const today = new Date()
+        const milestoneDate = new Date(m.targetDate)
+        return milestoneDate.toDateString() === today.toDateString()
+      }).length
+    } : undefined
+
     return {
       // Basic info
       budget: stats?.totalBudget || wedding?.budget,
@@ -70,21 +108,48 @@ export function useAI() {
       weddingDate: wedding?.weddingDate || undefined,
       location: wedding?.region,
       style: wedding?.style,
-      preferences: [], // TODO: Add preferences to wedding type
+      preferences: [],
+      brideName: wedding?.brideName,
+      groomName: wedding?.groomName,
 
       // Detailed data
       guests: guests,
       budgetItems: budgetItems,
       currentTasks: tasks,
-      milestones: [], // TODO: Add milestones when available
-      vendors: [], // TODO: Add vendors from marketplace
+      milestones: milestones,
+      vendors: [],
+
+      // Seating plan
+      seatingPlan: seatingPlanData,
+
+      // Wedding website
+      weddingWebsite: weddingWebsiteData,
+
+      // Accommodations
+      accommodations: accommodations,
+      accommodationStats: accommodationStats ? {
+        total: accommodationStats.totalAccommodations,
+        totalRooms: accommodationStats.totalRooms,
+        reservedRooms: accommodationStats.reservedRooms,
+        availableRooms: accommodationStats.availableRooms
+      } : undefined,
+
+      // Shopping list
+      shoppingItems: shoppingItems,
+      shoppingStats: shoppingStats ? {
+        total: shoppingStats.totalItems,
+        purchased: shoppingStats.purchasedItems,
+        totalCost: shoppingStats.totalValue,
+        remainingCost: shoppingStats.pendingValue
+      } : undefined,
 
       // Stats
       guestStats,
       taskStats,
-      budgetStats
+      budgetStats,
+      timelineStats
     }
-  }, [wedding, guests, budgetItems, tasks, stats])
+  }, [wedding, guests, budgetItems, tasks, stats, tables, seatingStats, website, accommodations, accommodationStats, shoppingItems, shoppingStats, milestones])
 
   // Clear error
   const clearError = useCallback(() => {
