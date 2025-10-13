@@ -536,27 +536,31 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridD
         }}
       >
         <div className={`grid grid-cols-1 ${GRID_CONFIGS[gridSize].maxCols} gap-6`}>
-          {visibleModules.map((module, index) => (
-            <div
-              key={module.id}
-              className={`
-                ${getSizeClasses(module.size)}
-                ${layout.isEditMode ? 'ring-2 ring-primary-200 ring-opacity-50' : ''}
-                ${module.isLocked ? 'ring-2 ring-gray-300' : ''}
-                ${dragOverIndex === index ? 'ring-4 ring-blue-300 bg-blue-50' : ''}
-                ${layout.isEditMode && !module.isLocked ? 'cursor-grab active:cursor-grabbing' : ''}
-                ${draggedModule === module.id ? 'opacity-60 scale-105 z-50 rotate-1' : ''}
-                ${isDragging && draggedModule !== module.id ? 'transition-all duration-200 ease-out' : ''}
-                relative group
-              `}
-              draggable={layout.isEditMode && !module.isLocked}
-              onDragStart={(e) => handleDragStart(e, module.id, index)}
-              onDragEnd={handleDragEnd}
-              onDragOver={(e) => handleDragOver(e, index)}
-              onDragEnter={(e) => handleDragEnter(e, index)}
-              onDragLeave={handleDragLeave}
-              onDrop={(e) => handleDrop(e, index)}
-            >
+          {(layout.isEditMode ? layout.modules : visibleModules).map((module, index) => {
+            const isHidden = !module.isVisible
+
+            return (
+              <div
+                key={module.id}
+                className={`
+                  ${getSizeClasses(module.size)}
+                  ${layout.isEditMode ? 'ring-2 ring-primary-200 ring-opacity-50' : ''}
+                  ${module.isLocked ? 'ring-2 ring-gray-300' : ''}
+                  ${dragOverIndex === index ? 'ring-4 ring-blue-300 bg-blue-50' : ''}
+                  ${layout.isEditMode && !module.isLocked ? 'cursor-grab active:cursor-grabbing' : ''}
+                  ${draggedModule === module.id ? 'opacity-60 scale-105 z-50 rotate-1' : ''}
+                  ${isDragging && draggedModule !== module.id ? 'transition-all duration-200 ease-out' : ''}
+                  ${isHidden && layout.isEditMode ? 'opacity-40 border-2 border-dashed border-gray-300 bg-gray-50' : ''}
+                  relative group
+                `}
+                draggable={layout.isEditMode && !module.isLocked}
+                onDragStart={(e) => handleDragStart(e, module.id, index)}
+                onDragEnd={handleDragEnd}
+                onDragOver={(e) => handleDragOver(e, index)}
+                onDragEnter={(e) => handleDragEnter(e, index)}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, index)}
+              >
               {/* Edit Mode Controls */}
               {layout.isEditMode && (
                 <div className="absolute top-2 right-2 z-10 flex space-x-1">
@@ -602,13 +606,22 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridD
               )}
 
               {/* Module Content */}
-              <div className={`
-                h-full
-                ${!module.isVisible ? 'opacity-50' : ''}
-                ${layout.isEditMode ? 'pointer-events-none' : ''}
-              `}>
-                {renderModule(module)}
-              </div>
+              {isHidden && layout.isEditMode ? (
+                <div className="h-full flex items-center justify-center p-8">
+                  <div className="text-center">
+                    <EyeOff className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                    <p className="text-sm font-medium text-gray-500">{module.type}</p>
+                    <p className="text-xs text-gray-400 mt-1">Skrytý modul</p>
+                  </div>
+                </div>
+              ) : (
+                <div className={`
+                  h-full
+                  ${layout.isEditMode ? 'pointer-events-none' : ''}
+                `}>
+                  {renderModule(module)}
+                </div>
+              )}
 
               {/* Locked Overlay */}
               {module.isLocked && layout.isEditMode && (
@@ -619,7 +632,8 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridD
                 </div>
               )}
             </div>
-          ))}
+            )
+          })}
         </div>
       </div>
 
