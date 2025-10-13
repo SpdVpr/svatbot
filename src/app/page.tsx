@@ -8,11 +8,11 @@ import Dashboard from '@/components/dashboard/Dashboard'
 import LoadingScreen from '@/components/ui/LoadingScreen'
 
 export default function HomePage() {
-  const { user } = useAuth()
+  const { user, isInitialized } = useAuth()
   const { wedding } = useWedding()
 
   // Show loading while checking auth state
-  if (user === undefined) {
+  if (!isInitialized || user === undefined) {
     return <LoadingScreen message="Načítání..." />
   }
 

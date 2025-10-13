@@ -37,6 +37,7 @@ export function useAuth() {
   const { user, setUser, setLoading, isLoading } = useAuthStore()
   const [error, setError] = useState<AuthError | null>(null)
   const [isInitialized, setIsInitialized] = useState(false)
+  const [hasSetInitialized, setHasSetInitialized] = useState(false)
 
   // Convert Firebase User to our User type
   const convertFirebaseUser = async (firebaseUser: FirebaseUser): Promise<User> => {
@@ -203,8 +204,8 @@ export function useAuth() {
 
   // Listen to auth state changes
   useEffect(() => {
-    setLoading(true)
     let previousUserId: string | null = null
+    let isMounted = true
 
     // Get previously stored user ID
     if (typeof window !== 'undefined') {
@@ -219,44 +220,63 @@ export function useAuth() {
       }
     }
 
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      try {
-        if (firebaseUser) {
-          const newUserId = firebaseUser.uid
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      // Use setTimeout to avoid updating during render
+      setTimeout(async () => {
+        if (!isMounted) return
 
-          // If switching to a different user, clear previous user's data
-          if (previousUserId && previousUserId !== newUserId) {
-            console.log('🔄 Switching users, clearing data for:', previousUserId, '→', newUserId)
-            clearUserData()
+        try {
+          if (firebaseUser) {
+            const newUserId = firebaseUser.uid
+
+            // If switching to a different user, clear previous user's data
+            if (previousUserId && previousUserId !== newUserId) {
+              console.log('🔄 Switching users, clearing data for:', previousUserId, '→', newUserId)
+              clearUserData()
+            }
+
+            const user = await convertFirebaseUser(firebaseUser)
+            if (isMounted) {
+              setUser(user)
+              previousUserId = newUserId
+            }
+          } else {
+            if (isMounted) {
+              setUser(null)
+              previousUserId = null
+            }
+          }
+        } catch (error) {
+          console.error('Auth state change error:', error)
+
+          // Don't log out demo users even on error
+          const currentUser = JSON.parse(localStorage.getItem('auth_user') || 'null')
+          if (currentUser?.id === 'demo-user-id' || currentUser?.email === 'demo@svatbot.cz') {
+            console.log('🎭 Preserving demo user session despite auth error')
+            return
           }
 
-          const user = await convertFirebaseUser(firebaseUser)
-          setUser(user)
-          previousUserId = newUserId
-        } else {
-          setUser(null)
-          previousUserId = null
+          if (isMounted) {
+            setUser(null)
+            previousUserId = null
+          }
+        } finally {
+          if (isMounted) {
+            setLoading(false)
+            if (!hasSetInitialized) {
+              setIsInitialized(true)
+              setHasSetInitialized(true)
+            }
+          }
         }
-      } catch (error) {
-        console.error('Auth state change error:', error)
-
-        // Don't log out demo users even on error
-        const currentUser = JSON.parse(localStorage.getItem('auth_user') || 'null')
-        if (currentUser?.id === 'demo-user-id' || currentUser?.email === 'demo@svatbot.cz') {
-          console.log('🎭 Preserving demo user session despite auth error')
-          return
-        }
-
-        setUser(null)
-        previousUserId = null
-      } finally {
-        setLoading(false)
-        setIsInitialized(true)
-      }
+      }, 0)
     })
 
-    return () => unsubscribe()
-  }, [setUser, setLoading])
+    return () => {
+      isMounted = false
+      unsubscribe()
+    }
+  }, [setUser, setLoading, hasSetInitialized])
 
   // Clear all user data when switching users
   const clearUserData = () => {
