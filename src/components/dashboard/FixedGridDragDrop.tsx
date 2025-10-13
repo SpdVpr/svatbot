@@ -55,8 +55,15 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridD
     getVisibleModules
   } = useDashboard()
 
+  const currentLayoutMode: 'grid' | 'free' = layout.layoutMode || 'grid'
+
+  // If layoutMode is 'free', render FreeDragDrop instead
+  if (currentLayoutMode === 'free') {
+    const FreeDragDrop = require('./FreeDragDrop').default
+    return <FreeDragDrop onWeddingSettingsClick={onWeddingSettingsClick} />
+  }
+
   const { canvasWidth, setCanvasWidth, getCanvasMaxWidth } = useCanvas()
-  const layoutMode: 'grid' | 'free' = layout.layoutMode || 'grid'
 
   const [draggedModule, setDraggedModule] = useState<string | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
@@ -481,7 +488,7 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridD
             <button
               onClick={() => setLayoutMode('grid')}
               className={`flex items-center space-x-1 px-2 py-1.5 rounded-md transition-colors ${
-                layoutMode === 'grid'
+                (layout.layoutMode || 'grid') === 'grid'
                   ? 'bg-white text-primary-600 shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
@@ -493,7 +500,7 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridD
             <button
               onClick={() => setLayoutMode('free')}
               className={`flex items-center space-x-1 px-2 py-1.5 rounded-md transition-colors ${
-                layoutMode === 'free'
+                (layout.layoutMode || 'grid') === 'free'
                   ? 'bg-white text-primary-600 shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
               }`}

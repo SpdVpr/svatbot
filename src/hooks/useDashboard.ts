@@ -269,10 +269,15 @@ export function useDashboard() {
 
   const setLayoutMode = (mode: 'grid' | 'free') => {
     console.log('🔄 Changing layout mode to:', mode)
-    setLayout(prev => ({
-      ...prev,
-      layoutMode: mode
-    }))
+    console.log('📊 Current layout:', layout)
+    setLayout(prev => {
+      const newLayout = {
+        ...prev,
+        layoutMode: mode
+      }
+      console.log('📊 New layout:', newLayout)
+      return newLayout
+    })
   }
 
   const toggleModuleLock = (moduleId: string) => {
