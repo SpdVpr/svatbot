@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useDashboard } from '@/hooks/useDashboard'
 import { DashboardModule } from '@/types/dashboard'
-import { Edit3, Lock, Unlock, Eye, EyeOff, RotateCcw, GripVertical } from 'lucide-react'
+import { Edit3, Lock, Unlock, Eye, EyeOff, RotateCcw, GripVertical, Grid3x3, Maximize2 } from 'lucide-react'
 
 // Module components
 import WeddingCountdownModule from './modules/WeddingCountdownModule'
@@ -27,6 +27,8 @@ import ShoppingListModule from './modules/ShoppingListModule'
 
 interface FreeDragDropProps {
   onWeddingSettingsClick?: () => void
+  layoutMode: 'grid' | 'free'
+  onLayoutModeChange: (mode: 'grid' | 'free') => void
 }
 
 // Module size configurations (width x height in pixels)
@@ -37,7 +39,7 @@ const MODULE_SIZES = {
   full: { width: 1400, height: 280 }
 }
 
-export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropProps) {
+export default function FreeDragDrop({ onWeddingSettingsClick, layoutMode, onLayoutModeChange }: FreeDragDropProps) {
   const {
     layout,
     loading,
@@ -117,8 +119,36 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
         <div className="bg-white p-4 rounded-xl border border-gray-200">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">Dashboard</h2>
-            
+
             <div className="flex items-center space-x-2">
+              {/* Layout Mode Switcher */}
+              <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => onLayoutModeChange('grid')}
+                  className={`flex items-center space-x-1 px-2 py-1.5 rounded-md transition-colors ${
+                    layoutMode === 'grid'
+                      ? 'bg-white text-primary-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                  title="Grid layout"
+                >
+                  <Grid3x3 className="w-4 h-4" />
+                  <span className="hidden lg:inline text-sm">Grid</span>
+                </button>
+                <button
+                  onClick={() => onLayoutModeChange('free')}
+                  className={`flex items-center space-x-1 px-2 py-1.5 rounded-md transition-colors ${
+                    layoutMode === 'free'
+                      ? 'bg-white text-primary-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                  title="Volný layout"
+                >
+                  <Maximize2 className="w-4 h-4" />
+                  <span className="hidden lg:inline text-sm">Volný</span>
+                </button>
+              </div>
+
               <button
                 onClick={toggleEditMode}
                 className={`btn-outline flex items-center space-x-2 ${
@@ -310,6 +340,7 @@ function DraggableModule({
 
   const handleMouseUp = () => {
     if (isDragging && hasDragged) {
+      console.log('💾 Saving module position:', module.id, position)
       onPositionChange(module.id, position)
     }
     setIsDragging(false)
@@ -318,14 +349,16 @@ function DraggableModule({
 
   useEffect(() => {
     if (isDragging) {
+      console.log('🖱️ Adding mouse listeners for:', module.id)
       document.addEventListener('mousemove', handleMouseMove)
       document.addEventListener('mouseup', handleMouseUp)
       return () => {
+        console.log('🗑️ Removing mouse listeners for:', module.id)
         document.removeEventListener('mousemove', handleMouseMove)
         document.removeEventListener('mouseup', handleMouseUp)
       }
     }
-  }, [isDragging, dragOffset, moduleSize])
+  }, [isDragging, dragOffset, moduleSize, hasDragged, dragStartTime, position, module.id, onPositionChange])
 
   return (
     <div

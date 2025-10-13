@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Edit3, Lock, Unlock, RotateCcw, GripVertical, Eye, EyeOff, Monitor, Maximize2, ArrowLeftRight } from 'lucide-react'
+import { Edit3, Lock, Unlock, RotateCcw, GripVertical, Eye, EyeOff, Monitor, Maximize2, ArrowLeftRight, Grid3x3 } from 'lucide-react'
 import { useDashboard } from '@/hooks/useDashboard'
 import { DashboardModule } from '@/types/dashboard'
 import { useCanvas, CANVAS_CONFIGS, CanvasWidth } from '@/contexts/CanvasContext'
@@ -30,6 +30,8 @@ import ShoppingListModule from './modules/ShoppingListModule'
 
 interface FixedGridDragDropProps {
   onWeddingSettingsClick: () => void
+  layoutMode: 'grid' | 'free'
+  onLayoutModeChange: (mode: 'grid' | 'free') => void
 }
 
 type GridSize = 'compact' | 'normal' | 'wide' | 'ultra-wide'
@@ -41,7 +43,7 @@ const GRID_CONFIGS = {
   'ultra-wide': { cols: 5, maxCols: 'lg:grid-cols-5', label: 'Ultra široký (5 sloupců)' }
 }
 
-export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridDragDropProps) {
+export default function FixedGridDragDrop({ onWeddingSettingsClick, layoutMode, onLayoutModeChange }: FixedGridDragDropProps) {
   const {
     layout,
     loading,
@@ -472,6 +474,34 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridD
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Layout Mode Switcher */}
+          <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
+            <button
+              onClick={() => onLayoutModeChange('grid')}
+              className={`flex items-center space-x-1 px-2 py-1.5 rounded-md transition-colors ${
+                layoutMode === 'grid'
+                  ? 'bg-white text-primary-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+              title="Grid layout"
+            >
+              <Grid3x3 className="w-4 h-4" />
+              <span className="hidden lg:inline text-sm">Grid</span>
+            </button>
+            <button
+              onClick={() => onLayoutModeChange('free')}
+              className={`flex items-center space-x-1 px-2 py-1.5 rounded-md transition-colors ${
+                layoutMode === 'free'
+                  ? 'bg-white text-primary-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+              title="Volný layout"
+            >
+              <Maximize2 className="w-4 h-4" />
+              <span className="hidden lg:inline text-sm">Volný</span>
+            </button>
           </div>
 
           <button
