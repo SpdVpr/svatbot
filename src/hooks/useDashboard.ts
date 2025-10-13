@@ -170,28 +170,42 @@ export function useDashboard() {
           },
           (error) => {
             console.warn('⚠️ Firebase listener error:', error.message)
+
+            // Mark that we've "loaded" from Firebase (even if it failed) so we can start saving
+            hasLoadedFromFirebaseRef.current = true
+
             // Fallback to localStorage
             const savedLayout = localStorage.getItem(`${DASHBOARD_STORAGE_KEY}-${user.id}`)
             if (savedLayout) {
               try {
                 const parsedLayout = JSON.parse(savedLayout)
                 setLayout(parsedLayout)
+                console.log('✅ Loaded layout from localStorage fallback')
               } catch (e) {
                 console.error('Error parsing localStorage layout:', e)
                 setLayout({
                   modules: DEFAULT_DASHBOARD_MODULES,
                   isEditMode: false,
-                  isLocked: false
+                  isLocked: false,
+                  layoutMode: 'grid'
                 })
               }
             } else {
+              // No localStorage data, use defaults
+              console.log('📦 No localStorage data, using defaults')
               setLayout({
                 modules: DEFAULT_DASHBOARD_MODULES,
                 isEditMode: false,
-                isLocked: false
+                isLocked: false,
+                layoutMode: 'grid'
               })
             }
             setLoading(false)
+
+            // Reset loading flag
+            setTimeout(() => {
+              isLoadingFromFirebaseRef.current = false
+            }, 100)
           }
         )
 
