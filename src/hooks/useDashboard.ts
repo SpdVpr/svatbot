@@ -245,6 +245,17 @@ export function useDashboard() {
     }))
   }
 
+  const updateModulePosition = (moduleId: string, position: { x: number; y: number }) => {
+    setLayout(prev => ({
+      ...prev,
+      modules: prev.modules.map(module =>
+        module.id === moduleId
+          ? { ...module, position }
+          : module
+      )
+    }))
+  }
+
   const toggleModuleLock = (moduleId: string) => {
     setLayout(prev => ({
       ...prev,
@@ -292,6 +303,7 @@ export function useDashboard() {
     layout,
     loading,
     updateModuleOrder,
+    updateModulePosition,
     toggleEditMode,
     toggleLock,
     toggleModuleVisibility,

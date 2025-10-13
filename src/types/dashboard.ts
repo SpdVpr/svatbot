@@ -3,7 +3,12 @@ export interface DashboardModule {
   type: 'wedding-countdown' | 'quick-actions' | 'main-features' | 'upcoming-tasks' | 'marketplace' | 'coming-soon' | 'task-management' | 'guest-management' | 'budget-tracking' | 'timeline-planning' | 'vendor-management' | 'seating-plan' | 'wedding-day-timeline' | 'moodboard' | 'wedding-checklist' | 'music-playlist' | 'food-drinks' | 'wedding-website' | 'accommodation-management' | 'shopping-list'
   title: string
   size: 'small' | 'medium' | 'large' | 'full'
-  position: {
+  position?: {
+    x: number
+    y: number
+  }
+  // Legacy grid position (for backward compatibility)
+  gridPosition?: {
     row: number
     column: number
   }
@@ -33,7 +38,8 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     type: 'wedding-countdown',
     title: 'Odpočet do svatby',
     size: 'large',
-    position: { row: 0, column: 0 },
+    position: { x: 20, y: 20 },
+    gridPosition: { row: 0, column: 0 },
     isVisible: true,
     isLocked: false,
     order: 0
@@ -43,7 +49,8 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     type: 'quick-actions',
     title: 'Rychlé akce',
     size: 'medium',
-    position: { row: 0, column: 1 },
+    position: { x: 720, y: 20 },
+    gridPosition: { row: 0, column: 1 },
     isVisible: true,
     isLocked: false,
     order: 1
@@ -53,7 +60,8 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     type: 'task-management',
     title: 'Správa úkolů',
     size: 'medium',
-    position: { row: 1, column: 0 },
+    position: { x: 20, y: 320 },
+    gridPosition: { row: 1, column: 0 },
     isVisible: true,
     isLocked: false,
     order: 2
@@ -63,7 +71,8 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     type: 'guest-management',
     title: 'Správa hostů',
     size: 'medium',
-    position: { row: 1, column: 1 },
+    position: { x: 370, y: 320 },
+    gridPosition: { row: 1, column: 1 },
     isVisible: true,
     isLocked: false,
     order: 3
@@ -73,7 +82,8 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     type: 'budget-tracking',
     title: 'Rozpočet',
     size: 'medium',
-    position: { row: 1, column: 2 },
+    position: { x: 720, y: 320 },
+    gridPosition: { row: 1, column: 2 },
     isVisible: true,
     isLocked: false,
     order: 4
@@ -83,7 +93,8 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     type: 'upcoming-tasks',
     title: 'Nadcházející úkoly',
     size: 'large',
-    position: { row: 2, column: 0 },
+    position: { x: 20, y: 620 },
+    gridPosition: { row: 2, column: 0 },
     isVisible: true,
     isLocked: false,
     order: 5
@@ -93,7 +104,8 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     type: 'marketplace',
     title: 'Najít dodavatele',
     size: 'medium',
-    position: { row: 2, column: 1 },
+    position: { x: 720, y: 620 },
+    gridPosition: { row: 2, column: 1 },
     isVisible: true,
     isLocked: false,
     order: 6
@@ -103,7 +115,8 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     type: 'timeline-planning',
     title: 'Časový plán',
     size: 'medium',
-    position: { row: 3, column: 0 },
+    position: { x: 20, y: 920 },
+    gridPosition: { row: 3, column: 0 },
     isVisible: true,
     isLocked: false,
     order: 7
@@ -113,7 +126,8 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     type: 'vendor-management',
     title: 'Dodavatelé',
     size: 'medium',
-    position: { row: 3, column: 1 },
+    position: { x: 370, y: 920 },
+    gridPosition: { row: 3, column: 1 },
     isVisible: true,
     isLocked: false,
     order: 8
@@ -123,7 +137,8 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     type: 'shopping-list',
     title: 'Nákupní seznam',
     size: 'medium',
-    position: { row: 3, column: 2 },
+    position: { x: 720, y: 920 },
+    gridPosition: { row: 3, column: 2 },
     isVisible: true,
     isLocked: false,
     order: 9
@@ -133,7 +148,8 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     type: 'accommodation-management',
     title: 'Ubytování',
     size: 'medium',
-    position: { row: 4, column: 1 },
+    position: { x: 370, y: 1220 },
+    gridPosition: { row: 4, column: 1 },
     isVisible: true,
     isLocked: false,
     order: 13
@@ -143,7 +159,8 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     type: 'seating-plan',
     title: 'Rozmístění hostů',
     size: 'medium',
-    position: { row: 4, column: 0 },
+    position: { x: 20, y: 1220 },
+    gridPosition: { row: 4, column: 0 },
     isVisible: true,
     isLocked: false,
     order: 10
@@ -153,7 +170,8 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     type: 'wedding-day-timeline',
     title: 'Harmonogram svatebního dne',
     size: 'large',
-    position: { row: 5, column: 0 },
+    position: { x: 20, y: 1520 },
+    gridPosition: { row: 5, column: 0 },
     isVisible: true,
     isLocked: false,
     order: 10
@@ -163,7 +181,8 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     type: 'moodboard',
     title: 'Moodboard',
     size: 'medium',
-    position: { row: 5, column: 2 },
+    position: { x: 720, y: 1520 },
+    gridPosition: { row: 5, column: 2 },
     isVisible: true,
     isLocked: false,
     order: 11
@@ -173,7 +192,8 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     type: 'wedding-checklist',
     title: 'Svatební checklist',
     size: 'medium',
-    position: { row: 4, column: 0 },
+    position: { x: 1070, y: 1220 },
+    gridPosition: { row: 4, column: 0 },
     isVisible: true,
     isLocked: false,
     order: 12
@@ -183,7 +203,8 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     type: 'music-playlist',
     title: 'Svatební hudba',
     size: 'medium',
-    position: { row: 4, column: 1 },
+    position: { x: 1070, y: 920 },
+    gridPosition: { row: 4, column: 1 },
     isVisible: true,
     isLocked: false,
     order: 13
@@ -193,7 +214,8 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     type: 'food-drinks',
     title: 'Jídlo a Pití',
     size: 'medium',
-    position: { row: 3, column: 3 },
+    position: { x: 1070, y: 620 },
+    gridPosition: { row: 3, column: 3 },
     isVisible: true,
     isLocked: false,
     order: 14
@@ -203,7 +225,8 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     type: 'wedding-website',
     title: 'Svatební web',
     size: 'medium',
-    position: { row: 4, column: 2 },
+    position: { x: 720, y: 1220 },
+    gridPosition: { row: 4, column: 2 },
     isVisible: true,
     isLocked: false,
     order: 15
@@ -213,7 +236,8 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     type: 'coming-soon',
     title: 'Připravované funkce',
     size: 'full',
-    position: { row: 6, column: 0 },
+    position: { x: 20, y: 1820 },
+    gridPosition: { row: 6, column: 0 },
     isVisible: false,
     isLocked: false,
     order: 16
