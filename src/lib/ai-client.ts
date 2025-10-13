@@ -3,7 +3,7 @@
 import { Guest } from '@/types/guest'
 import { BudgetItem } from '@/types/budget'
 import { Task } from '@/types/task'
-import { Milestone } from '@/types/timeline'
+import { CalendarEvent } from '@/types/calendar'
 import { Vendor } from '@/types/vendor'
 import { Table } from '@/types/seating'
 import { WeddingWebsite } from '@/types/wedding-website'
@@ -25,7 +25,7 @@ export interface AIWeddingContext {
   guests?: Guest[]
   budgetItems?: BudgetItem[]
   currentTasks?: Task[]
-  milestones?: Milestone[]
+  calendarEvents?: CalendarEvent[]
   vendors?: Vendor[]
 
   // Seating plan data
@@ -87,10 +87,11 @@ export interface AIWeddingContext {
     needingAccommodation: number
   }
 
-  timelineStats?: {
+  calendarStats?: {
     total: number
     upcoming: number
     today: number
+    thisWeek: number
   }
 }
 

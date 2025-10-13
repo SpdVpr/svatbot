@@ -25,7 +25,7 @@ DŮLEŽITÉ: Máš přístup k REÁLNÝM datům uživatele o jeho svatbě včetn
 - 🌐 Svatební web (URL, publikace, RSVP, návštěvnost)
 - 🏨 Ubytování (hotely, pokoje, obsazenost)
 - 🛒 Nákupní seznam (položky, ceny, status nákupu)
-- ⏰ Timeline svatebního dne (události, časy, lokace)
+- 📅 Kalendář událostí (všechny události, schůzky, termíny)
 
 Když se uživatel ptá na konkrétní informace (např. "Kdo má alergii na lepek?", "Kolik mám stolů?",
 "Je svatební web publikovaný?", "Kolik mám volných pokojů?"), VŽDY odpovídej na základě poskytnutých dat,
@@ -236,27 +236,35 @@ function buildDetailedContext(context: any): string {
     contextStr += '\n'
   }
 
-  // Timeline
-  if (context.timelineStats) {
-    contextStr += '⏰ ČASOVÝ PLÁN SVATEBNÍHO DNE:\n'
-    contextStr += `- Celkem událostí: ${context.timelineStats.total || 0}\n`
-    contextStr += `- Nadcházejících: ${context.timelineStats.upcoming || 0}\n`
-    contextStr += `- Dnes: ${context.timelineStats.today || 0}\n`
+  // Calendar
+  if (context.calendarStats) {
+    contextStr += '📅 KALENDÁŘ UDÁLOSTÍ:\n'
+    contextStr += `- Celkem událostí: ${context.calendarStats.total || 0}\n`
+    contextStr += `- Nadcházejících: ${context.calendarStats.upcoming || 0}\n`
+    contextStr += `- Dnes: ${context.calendarStats.today || 0}\n`
+    contextStr += `- Tento týden: ${context.calendarStats.thisWeek || 0}\n`
 
-    if (context.milestones && context.milestones.length > 0) {
-      contextStr += '\n📅 UDÁLOSTI:\n'
-      context.milestones.slice(0, 10).forEach((milestone: any) => {
-        contextStr += `- ${milestone.title}`
-        if (milestone.time) {
-          contextStr += ` v ${milestone.time}`
+    if (context.calendarEvents && context.calendarEvents.length > 0) {
+      contextStr += '\n📋 NADCHÁZEJÍCÍ UDÁLOSTI:\n'
+      const upcomingEvents = context.calendarEvents
+        .filter((event: any) => new Date(event.startDate) >= new Date())
+        .slice(0, 10)
+
+      upcomingEvents.forEach((event: any) => {
+        const eventDate = new Date(event.startDate)
+        contextStr += `- ${event.title}`
+        contextStr += ` (${eventDate.toLocaleDateString('cs-CZ')})`
+        if (event.startTime) {
+          contextStr += ` v ${event.startTime}`
         }
-        if (milestone.location) {
-          contextStr += ` (${milestone.location})`
+        if (event.location) {
+          contextStr += ` - ${event.location}`
         }
         contextStr += '\n'
       })
-      if (context.milestones.length > 10) {
-        contextStr += `... a dalších ${context.milestones.length - 10} událostí\n`
+
+      if (context.calendarEvents.length > 10) {
+        contextStr += `... a dalších ${context.calendarEvents.length - 10} událostí\n`
       }
     }
     contextStr += '\n'

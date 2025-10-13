@@ -15,13 +15,13 @@ import {
 import { useTask } from '@/hooks/useTask'
 import { useGuest } from '@/hooks/useGuest'
 import { useBudget } from '@/hooks/useBudget'
-import { useTimeline } from '@/hooks/useTimeline'
+import { useCalendar } from '@/hooks/useCalendar'
 
 export default function MainFeaturesModule() {
   const { stats } = useTask()
   const { stats: guestStats } = useGuest()
   const { stats: budgetStats } = useBudget()
-  const { stats: timelineStats } = useTimeline()
+  const { stats: calendarStats } = useCalendar()
 
   const mainFeatures = [
     {
@@ -56,13 +56,13 @@ export default function MainFeaturesModule() {
     },
     {
       icon: Calendar,
-      title: 'Timeline & Planning',
-      subtitle: 'Časový plán',
-      description: timelineStats.totalMilestones > 0 ? `${timelineStats.overallProgress}% dokončeno` : 'Plánujte svatební timeline',
-      value: timelineStats.totalMilestones > 0 ? `${timelineStats.completedMilestones}/${timelineStats.totalMilestones}` : '0',
+      title: 'Kalendář událostí',
+      subtitle: 'Všechny události',
+      description: calendarStats.totalEvents > 0 ? `${calendarStats.todayEvents} dnes` : 'Spravujte všechny události',
+      value: calendarStats.totalEvents > 0 ? `${calendarStats.totalEvents}` : '0',
       color: 'text-purple-600 bg-purple-100',
-      href: '/timeline',
-      status: timelineStats.totalMilestones > 0 ? 'active' : 'empty'
+      href: '/calendar',
+      status: calendarStats.totalEvents > 0 ? 'active' : 'empty'
     },
     {
       icon: Briefcase,

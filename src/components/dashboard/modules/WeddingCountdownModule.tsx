@@ -2,7 +2,6 @@
 
 import { Calendar } from 'lucide-react'
 import { useWedding } from '@/hooks/useWedding'
-import { useTimeline } from '@/hooks/useTimeline'
 import { useTask } from '@/hooks/useTask'
 import { useGuest } from '@/hooks/useGuest'
 import { useBudget } from '@/hooks/useBudget'
@@ -14,12 +13,11 @@ interface WeddingCountdownModuleProps {
 
 export default function WeddingCountdownModule({ onWeddingSettingsClick }: WeddingCountdownModuleProps) {
   const { wedding } = useWedding()
-  const { getDaysUntilWedding, stats: timelineStats } = useTimeline()
   const { stats } = useTask()
   const { stats: guestStats } = useGuest()
   const { stats: budgetStats } = useBudget()
 
-  const daysUntilWedding = getDaysUntilWedding()
+  const daysUntilWedding = wedding?.weddingDate ? dateUtils.daysUntilWedding(wedding.weddingDate) : null
 
   // If no wedding data, show setup prompt
   if (!wedding) {
@@ -119,8 +117,8 @@ export default function WeddingCountdownModule({ onWeddingSettingsClick }: Weddi
             <div className="text-xs sm:text-sm text-text-muted">Rozpočet</div>
           </div>
           <div className="text-center">
-            <div className="text-xl sm:text-2xl font-bold text-purple-600">{timelineStats.totalMilestones}</div>
-            <div className="text-xs sm:text-sm text-text-muted">Milníků</div>
+            <div className="text-xl sm:text-2xl font-bold text-purple-600">{stats.total}</div>
+            <div className="text-xs sm:text-sm text-text-muted">Úkolů</div>
           </div>
         </div>
       </div>

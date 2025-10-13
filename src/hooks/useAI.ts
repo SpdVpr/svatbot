@@ -10,7 +10,7 @@ import { useSeating } from './useSeating'
 import { useWeddingWebsite } from './useWeddingWebsite'
 import { useAccommodation } from './useAccommodation'
 import { useShopping } from './useShopping'
-import { useTimeline } from './useTimeline'
+import { useCalendar } from './useCalendar'
 
 export interface AIResponse {
   success: boolean
@@ -39,7 +39,7 @@ export function useAI() {
   const { website } = useWeddingWebsite()
   const { accommodations, stats: accommodationStats } = useAccommodation()
   const { items: shoppingItems, stats: shoppingStats } = useShopping()
-  const { milestones } = useTimeline()
+  const { events: calendarEvents, stats: calendarStats } = useCalendar()
 
   // Build AI context from current wedding data
   const buildContext = useCallback((): AIWeddingContext => {
@@ -89,16 +89,12 @@ export function useAI() {
       views: website.analytics?.views || 0
     } : undefined
 
-    // Timeline stats
-    const timelineStats = milestones ? {
-      total: milestones.length,
-      upcoming: milestones.filter(m => m.targetDate && new Date(m.targetDate) > new Date()).length,
-      today: milestones.filter(m => {
-        if (!m.targetDate) return false
-        const today = new Date()
-        const milestoneDate = new Date(m.targetDate)
-        return milestoneDate.toDateString() === today.toDateString()
-      }).length
+    // Calendar stats
+    const calendarStatsData = calendarStats ? {
+      total: calendarStats.totalEvents,
+      upcoming: calendarStats.upcomingEvents,
+      today: calendarStats.todayEvents,
+      thisWeek: calendarStats.thisWeekEvents
     } : undefined
 
     return {
@@ -116,7 +112,7 @@ export function useAI() {
       guests: guests,
       budgetItems: budgetItems,
       currentTasks: tasks,
-      milestones: milestones,
+      calendarEvents: calendarEvents?.map(e => e.event),
       vendors: [],
 
       // Seating plan
@@ -147,9 +143,9 @@ export function useAI() {
       guestStats,
       taskStats,
       budgetStats,
-      timelineStats
+      calendarStats: calendarStatsData
     }
-  }, [wedding, guests, budgetItems, tasks, stats, tables, seatingStats, website, accommodations, accommodationStats, shoppingItems, shoppingStats, milestones])
+  }, [wedding, guests, budgetItems, tasks, stats, tables, seatingStats, website, accommodations, accommodationStats, shoppingItems, shoppingStats, calendarEvents, calendarStats])
 
   // Clear error
   const clearError = useCallback(() => {

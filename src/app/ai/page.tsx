@@ -10,7 +10,7 @@ import { useSeating } from '@/hooks/useSeating'
 import { useWeddingWebsite } from '@/hooks/useWeddingWebsite'
 import { useAccommodation } from '@/hooks/useAccommodation'
 import { useShopping } from '@/hooks/useShopping'
-import { useTimeline } from '@/hooks/useTimeline'
+import { useCalendar } from '@/hooks/useCalendar'
 import { useSearchParams } from 'next/navigation'
 import {
   Bot,
@@ -48,7 +48,7 @@ function AIPageContent() {
   const { website } = useWeddingWebsite()
   const { accommodations, stats: accommodationStats } = useAccommodation()
   const { items: shoppingItems, stats: shoppingStats } = useShopping()
-  const { milestones } = useTimeline()
+  const { stats: calendarStats } = useCalendar()
   const searchParams = useSearchParams()
   const [showDataInfo, setShowDataInfo] = useState(true)
 
@@ -291,17 +291,17 @@ function AIPageContent() {
                       </p>
                     </div>
 
-                    {/* Timeline */}
+                    {/* Calendar */}
                     <div className="bg-white/50 rounded-lg p-3">
                       <div className="flex items-center space-x-2 mb-1">
                         <Clock className="w-4 h-4 text-green-600" />
-                        <span className="text-sm font-medium text-green-900">Timeline</span>
+                        <span className="text-sm font-medium text-green-900">Kalendář</span>
                       </div>
                       <p className="text-xs text-green-700">
-                        {milestones?.length || 0} událostí
-                        {milestones && milestones.length > 0 && (
+                        {calendarStats?.totalEvents || 0} událostí
+                        {calendarStats && calendarStats.todayEvents > 0 && (
                           <span className="block mt-1">
-                            Svatební den naplánován
+                            {calendarStats.todayEvents} dnes
                           </span>
                         )}
                       </p>
@@ -322,7 +322,7 @@ function AIPageContent() {
                       <p className="text-xs text-green-700">"Je svatební web publikovaný?"</p>
                       <p className="text-xs text-green-700">"Kolik mám volných pokojů?"</p>
                       <p className="text-xs text-green-700">"Co ještě musím nakoupit?"</p>
-                      <p className="text-xs text-green-700">"Jaký je program svatebního dne?"</p>
+                      <p className="text-xs text-green-700">"Jaké události mám tento týden?"</p>
                       <p className="text-xs text-green-700">"Kdo ještě nepotvrdil účast?"</p>
                     </div>
                   </div>
