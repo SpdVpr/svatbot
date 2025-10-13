@@ -231,50 +231,6 @@ export default function VendorStats({
         </div>
       </div>
 
-      {/* Progress overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Overall progress */}
-        <div className="bg-blue-50 p-6 rounded-xl border border-blue-200">
-          <div className="flex items-center space-x-2 mb-4">
-            <Building className="w-5 h-5 text-blue-600" />
-            <h4 className="font-medium text-blue-900">Celkový pokrok</h4>
-          </div>
-          <p className="text-3xl font-bold text-blue-600">{completionRate}%</p>
-          <p className="text-sm text-blue-700">
-            {completionRate >= 80 ? 'Téměř hotovo!' :
-             completionRate >= 50 ? 'Dobrý pokrok' :
-             'Začínáme s výběrem'}
-          </p>
-        </div>
-
-        {/* Contact info */}
-        <div className="bg-green-50 p-6 rounded-xl border border-green-200">
-          <div className="flex items-center space-x-2 mb-4">
-            <Phone className="w-5 h-5 text-green-600" />
-            <h4 className="font-medium text-green-900">Kontakty</h4>
-          </div>
-          <p className="text-3xl font-bold text-green-600">
-            {vendors.filter(v => v.contacts && v.contacts.length > 0 &&
-              v.contacts.some(c => c.phone || c.email)).length}
-          </p>
-          <p className="text-sm text-green-700">
-            dodavatelů má kontakt
-          </p>
-        </div>
-
-        {/* Action needed */}
-        <div className="bg-orange-50 p-6 rounded-xl border border-orange-200">
-          <div className="flex items-center space-x-2 mb-4">
-            <AlertTriangle className="w-5 h-5 text-orange-600" />
-            <h4 className="font-medium text-orange-900">Akce</h4>
-          </div>
-          <p className="text-3xl font-bold text-orange-600">{stats.researching}</p>
-          <p className="text-sm text-orange-700">
-            {stats.researching > 0 ? 'dodavatelů hledat' : 'vše vyřešeno'}
-          </p>
-        </div>
-      </div>
-
       {/* Vendor List */}
       {showVendorList && (
         <div className="mt-8">

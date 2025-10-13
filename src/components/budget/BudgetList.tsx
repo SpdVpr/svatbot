@@ -609,17 +609,6 @@ export default function BudgetList({
                           <Plus className="w-4 h-4" />
                         </button>
 
-                        {/* Quick payment button */}
-                        {item.paymentStatus !== 'paid' && item.actualAmount > item.paidAmount && (
-                          <button
-                            onClick={() => handleRecordPayment(item.id, item.actualAmount - item.paidAmount)}
-                            className="p-1 text-green-600 hover:bg-green-50 rounded"
-                            title="Označit jako zaplaceno"
-                          >
-                            <CreditCard className="w-4 h-4" />
-                          </button>
-                        )}
-
                         {/* Edit button */}
                         <button
                           onClick={() => onEditItem?.(item)}

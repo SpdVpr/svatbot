@@ -645,26 +645,7 @@ export default function BudgetForm({
               <span>Platební údaje</span>
             </h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Payment Status */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Stav platby
-                </label>
-                <select
-                  value={formData.paymentStatus}
-                  onChange={(e) => handleChange('paymentStatus', e.target.value as PaymentStatus)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  disabled={loading}
-                >
-                  {paymentStatusOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Payment Method */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
