@@ -457,15 +457,26 @@ service cloud.firestore {
 
     // Dashboards collection - user's dashboard layout preferences
     match /dashboards/{dashboardId} {
-      // Allow read/write if authenticated and document belongs to user
-      // Document ID format: {userId}_{weddingId}
-      allow read, write, create, delete: if isAuthenticated() &&
-                                            request.auth.uid == resource.data.userId;
+      // Allow read if authenticated and document belongs to user OR is demo user
+      allow read: if isAuthenticated() &&
+                     (isDemoUser() ||
+                      (resource.data.userId == request.auth.uid));
 
-      // Allow create if authenticated and userId in document matches auth user
+      // Allow write/update if authenticated and document belongs to user OR is demo user
+      allow write, update: if isAuthenticated() &&
+                              (isDemoUser() ||
+                               (resource.data.userId == request.auth.uid));
+
+      // Allow create if authenticated and userId in document matches auth user OR is demo user
       allow create: if isAuthenticated() &&
-                       request.resource.data.keys().hasAll(['userId', 'weddingId', 'modules']) &&
-                       request.auth.uid == request.resource.data.userId;
+                       (isDemoUser() ||
+                        (request.resource.data.keys().hasAll(['userId', 'weddingId', 'modules']) &&
+                         request.auth.uid == request.resource.data.userId));
+
+      // Allow delete if authenticated and document belongs to user OR is demo user
+      allow delete: if isAuthenticated() &&
+                       (isDemoUser() ||
+                        (resource.data.userId == request.auth.uid));
     }
 
     // Subscriptions collection - user's subscription data
