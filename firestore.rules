@@ -457,26 +457,27 @@ service cloud.firestore {
 
     // Dashboards collection - user's dashboard layout preferences
     match /dashboards/{dashboardId} {
-      // Allow read if authenticated and document belongs to user OR is demo user
+      // Allow read if authenticated and (demo user OR document belongs to user OR document doesn't exist yet)
       allow read: if isAuthenticated() &&
                      (isDemoUser() ||
-                      (resource.data.userId == request.auth.uid));
+                      !exists(/databases/$(database)/documents/dashboards/$(dashboardId)) ||
+                      resource.data.userId == request.auth.uid);
 
-      // Allow write/update if authenticated and document belongs to user OR is demo user
+      // Allow write/update if authenticated and (demo user OR document belongs to user)
       allow write, update: if isAuthenticated() &&
                               (isDemoUser() ||
-                               (resource.data.userId == request.auth.uid));
+                               !exists(/databases/$(database)/documents/dashboards/$(dashboardId)) ||
+                               resource.data.userId == request.auth.uid);
 
       // Allow create if authenticated and userId in document matches auth user OR is demo user
       allow create: if isAuthenticated() &&
                        (isDemoUser() ||
-                        (request.resource.data.keys().hasAll(['userId', 'weddingId', 'modules']) &&
-                         request.auth.uid == request.resource.data.userId));
+                        request.auth.uid == request.resource.data.userId);
 
-      // Allow delete if authenticated and document belongs to user OR is demo user
+      // Allow delete if authenticated and (demo user OR document belongs to user)
       allow delete: if isAuthenticated() &&
                        (isDemoUser() ||
-                        (resource.data.userId == request.auth.uid));
+                        resource.data.userId == request.auth.uid);
     }
 
     // Subscriptions collection - user's subscription data
