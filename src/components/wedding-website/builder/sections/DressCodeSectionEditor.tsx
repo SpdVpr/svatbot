@@ -95,7 +95,7 @@ export default function DressCodeSectionEditor({ content, onChange }: DressCodeS
         const fileName = `${timestamp}_${index}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`
         const storageRef = ref(
           storage,
-          `wedding-websites/wedding_${wedding?.userId}_${wedding?.createdAt?.getTime()}/dress-code/${fileName}`
+          `wedding-websites/${wedding?.id}/dress-code/${fileName}`
         )
 
         await uploadBytes(storageRef, compressedResult.file)
@@ -199,29 +199,37 @@ export default function DressCodeSectionEditor({ content, onChange }: DressCodeS
         {/* Add New Color */}
         <div className="mb-6 p-4 bg-gray-50 rounded-lg">
           <h4 className="text-sm font-medium text-gray-900 mb-3">Přidat barvu</h4>
-          <div className="flex gap-3">
+          <div className="flex gap-3 items-start">
             <div className="flex-shrink-0">
+              <label className="block text-xs text-gray-600 mb-1">Barva</label>
               <input
                 type="color"
                 value={newColorHex}
                 onChange={(e) => setNewColorHex(e.target.value)}
                 className="w-16 h-10 rounded border border-gray-300 cursor-pointer"
+                title="Vyberte barvu"
+              />
+              <p className="text-xs text-gray-500 mt-1">{newColorHex}</p>
+            </div>
+            <div className="flex-1">
+              <label className="block text-xs text-gray-600 mb-1">Název barvy</label>
+              <input
+                type="text"
+                value={newColorName}
+                onChange={(e) => setNewColorName(e.target.value)}
+                placeholder="např. Burgundy, Navy Blue..."
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
               />
             </div>
-            <input
-              type="text"
-              value={newColorName}
-              onChange={(e) => setNewColorName(e.target.value)}
-              placeholder="Název barvy (volitelné)"
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-            />
-            <button
-              onClick={addColor}
-              className="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors flex items-center gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              Přidat
-            </button>
+            <div className="flex-shrink-0 pt-5">
+              <button
+                onClick={addColor}
+                className="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                Přidat
+              </button>
+            </div>
           </div>
         </div>
 
