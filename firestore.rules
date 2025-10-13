@@ -457,22 +457,19 @@ service cloud.firestore {
 
     // Dashboards collection - user's dashboard layout preferences
     match /dashboards/{dashboardId} {
-      // Allow read if authenticated and (demo user OR document belongs to user OR document doesn't exist yet)
-      allow read: if isAuthenticated() &&
-                     (isDemoUser() ||
-                      !exists(/databases/$(database)/documents/dashboards/$(dashboardId)) ||
-                      resource.data.userId == request.auth.uid);
+      // Allow read if authenticated
+      allow read: if isAuthenticated();
 
-      // Allow write/update if authenticated and (demo user OR document belongs to user)
+      // Allow write/update if authenticated and (demo user OR document belongs to user OR user is creating their own document)
       allow write, update: if isAuthenticated() &&
                               (isDemoUser() ||
-                               !exists(/databases/$(database)/documents/dashboards/$(dashboardId)) ||
-                               resource.data.userId == request.auth.uid);
+                               resource.data.userId == request.auth.uid ||
+                               request.resource.data.userId == request.auth.uid);
 
       // Allow create if authenticated and userId in document matches auth user OR is demo user
       allow create: if isAuthenticated() &&
                        (isDemoUser() ||
-                        request.auth.uid == request.resource.data.userId);
+                        request.resource.data.userId == request.auth.uid);
 
       // Allow delete if authenticated and (demo user OR document belongs to user)
       allow delete: if isAuthenticated() &&
