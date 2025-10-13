@@ -397,7 +397,7 @@ export const BUDGET_CATEGORIES = {
     priority: 'medium'
   },
   decoration: {
-    name: 'Výzdoba',
+    name: 'Dekorace',
     icon: '🎀',
     color: 'bg-orange-100 text-orange-700',
     defaultPercentage: 3,
@@ -446,7 +446,7 @@ export const BUDGET_CATEGORIES = {
     priority: 'low'
   },
   beauty: {
-    name: 'Vizáž',
+    name: 'Vzhled',
     icon: '💄',
     color: 'bg-fuchsia-100 text-fuchsia-700',
     defaultPercentage: 1,

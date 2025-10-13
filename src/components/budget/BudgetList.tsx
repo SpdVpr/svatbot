@@ -165,6 +165,20 @@ export default function BudgetList({
     }
   }
 
+  // Get payment period display
+  const getPaymentPeriodDisplay = (period?: string) => {
+    switch (period) {
+      case 'before-wedding':
+        return { icon: '📅', label: 'Před svatbou', color: 'text-blue-600', bg: 'bg-blue-50' }
+      case 'at-wedding':
+        return { icon: '💒', label: 'Na svatbě', color: 'text-pink-600', bg: 'bg-pink-50' }
+      case 'after-wedding':
+        return { icon: '✨', label: 'Po svatbě', color: 'text-purple-600', bg: 'bg-purple-50' }
+      default:
+        return null
+    }
+  }
+
   // Handle payment record
   const handleRecordPayment = async (itemId: string, amount: number) => {
     try {
@@ -453,6 +467,16 @@ export default function BudgetList({
                               <span>{getPaymentMethodDisplay(item.paymentMethod)!.icon}</span>
                               <span className={`text-xs font-medium ${getPaymentMethodDisplay(item.paymentMethod)!.color}`}>
                                 {getPaymentMethodDisplay(item.paymentMethod)!.label}
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Payment Period */}
+                          {item.paymentPeriod && getPaymentPeriodDisplay(item.paymentPeriod) && (
+                            <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${getPaymentPeriodDisplay(item.paymentPeriod)!.bg}`}>
+                              <span>{getPaymentPeriodDisplay(item.paymentPeriod)!.icon}</span>
+                              <span className={`text-xs font-medium ${getPaymentPeriodDisplay(item.paymentPeriod)!.color}`}>
+                                {getPaymentPeriodDisplay(item.paymentPeriod)!.label}
                               </span>
                             </div>
                           )}

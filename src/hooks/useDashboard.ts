@@ -74,13 +74,14 @@ export function useDashboard() {
                 }
                 const updatedLayout = {
                   modules: [...validModules, ...newModules],
-                  isEditMode: false,
+                  isEditMode: data.isEditMode || false,
                   isLocked: data.isLocked || false
                 }
 
                 // Update the ref with the new layout
                 lastFirebaseDataRef.current = JSON.stringify({
                   modules: updatedLayout.modules,
+                  isEditMode: updatedLayout.isEditMode,
                   isLocked: updatedLayout.isLocked
                 })
 
@@ -88,7 +89,7 @@ export function useDashboard() {
               } else {
                 setLayout({
                   modules: validModules,
-                  isEditMode: false,
+                  isEditMode: data.isEditMode || false,
                   isLocked: data.isLocked || false
                 })
               }
@@ -156,6 +157,7 @@ export function useDashboard() {
     // Compare current layout with last Firebase data to prevent loops
     const currentDataString = JSON.stringify({
       modules: layout.modules,
+      isEditMode: layout.isEditMode,
       isLocked: layout.isLocked
     })
 
@@ -175,6 +177,7 @@ export function useDashboard() {
 
         const layoutData = {
           modules: layout.modules,
+          isEditMode: layout.isEditMode,
           isLocked: layout.isLocked,
           userId: user.id,
           weddingId: wedding.id,

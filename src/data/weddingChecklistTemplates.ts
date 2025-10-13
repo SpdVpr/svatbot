@@ -482,7 +482,7 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: '1m-004',
-        title: 'Odevzdat doklady na matriku',
+        title: 'Dodat doklady na matriku',
         description: 'Dodat doklady na matriku',
         category: 'legal',
         phase: '1-week-before',
