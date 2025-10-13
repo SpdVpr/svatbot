@@ -470,9 +470,6 @@ export function useTask(): UseTaskReturn {
             const loadedTasks = snapshot.docs.map(doc =>
               convertFirestoreTask(doc.id, doc.data())
             )
-            if (process.env.NODE_ENV === 'development') {
-              console.log('📝 Loaded tasks from Firestore:', loadedTasks.length)
-            }
             setTasks(loadedTasks)
 
             // Clear localStorage when Firestore loads successfully

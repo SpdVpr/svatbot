@@ -559,12 +559,9 @@ export function useVendor(): UseVendorReturn {
   // Load vendors when wedding changes
   useEffect(() => {
     if (!wedding) {
-      console.log('🏢 No wedding, clearing vendors')
       setVendors([])
       return
     }
-
-    console.log('🏢 Loading vendors for wedding:', wedding.id)
 
     const loadVendors = async () => {
       try {
@@ -582,14 +579,11 @@ export function useVendor(): UseVendorReturn {
               createdAt: new Date(vendor.createdAt),
               updatedAt: new Date(vendor.updatedAt)
             }))
-            console.log('📦 Loaded vendors from localStorage immediately:', parsedVendors.length, parsedVendors)
             setVendors(parsedVendors)
           } catch (parseError) {
             console.error('Error parsing localStorage vendors:', parseError)
             localStorage.removeItem(`vendors_${wedding.id}`)
           }
-        } else {
-          console.log('📦 No vendors in localStorage for wedding:', wedding.id)
         }
 
         try {
@@ -599,26 +593,15 @@ export function useVendor(): UseVendorReturn {
             where('weddingId', '==', wedding.id)
           )
 
-          console.log('🔍 Setting up Firestore listener for weddingId:', wedding.id)
-
           const unsubscribe = onSnapshot(vendorsQuery, (snapshot) => {
-            console.log('📡 Firestore snapshot received:', snapshot.size, 'documents')
-            snapshot.docs.forEach(doc => {
-              console.log('📄 Document:', doc.id, doc.data())
-            })
-
             const loadedVendors = snapshot.docs.map(doc =>
               convertFirestoreVendor(doc.id, doc.data())
             ).sort((a, b) => a.name.localeCompare(b.name))
-            console.log('🏢 Loaded vendors from Firestore:', loadedVendors.length, loadedVendors)
             setVendors(loadedVendors)
 
             // Also update localStorage with Firestore data
             if (loadedVendors.length > 0) {
               localStorage.setItem(`vendors_${wedding.id}`, JSON.stringify(loadedVendors))
-              console.log('📦 Updated localStorage with Firestore data')
-            } else {
-              console.log('📦 No vendors to save to localStorage')
             }
           }, (error) => {
             console.error('❌ Firestore snapshot error:', error)

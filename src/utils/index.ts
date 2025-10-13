@@ -29,16 +29,6 @@ export const dateUtils = {
     const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate())
 
     const days = differenceInDays(weddingDateStart, todayStart)
-
-    // Debug logging
-    console.log('🗓️ Date calculation debug:', {
-      weddingDate: weddingDateStart.toISOString().split('T')[0],
-      today: todayStart.toISOString().split('T')[0],
-      daysUntil: days,
-      actualToday: new Date().toLocaleDateString('cs-CZ'),
-      actualWedding: dateObj.toLocaleDateString('cs-CZ')
-    })
-
     return days
   },
 

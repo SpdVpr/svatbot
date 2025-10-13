@@ -200,16 +200,8 @@ export function useRobustGuests() {
   useEffect(() => {
     const currentWeddingId = wedding?.id || null
 
-    console.log('🔄 RobustGuests useEffect triggered:', {
-      currentWeddingId,
-      refWeddingId: initializationRef.current.weddingId,
-      initialized: initializationRef.current.initialized,
-      loading
-    })
-
     // Skip if no wedding
     if (!currentWeddingId) {
-      console.log('❌ No wedding, resetting state')
       setGuests([])
       setLoading(false)
       initializationRef.current = { weddingId: null, initialized: false }
@@ -218,11 +210,8 @@ export function useRobustGuests() {
 
     // Skip if already initialized for this wedding
     if (initializationRef.current.weddingId === currentWeddingId && initializationRef.current.initialized) {
-      console.log('✅ Already initialized for this wedding, skipping')
       return
     }
-
-    console.log('🔄 Initializing guests from Firestore for wedding:', currentWeddingId)
 
     // Mark as initialized for this wedding IMMEDIATELY to prevent re-runs
     initializationRef.current = { weddingId: currentWeddingId, initialized: true }
@@ -232,7 +221,6 @@ export function useRobustGuests() {
     let cleanup: (() => void) | null = null
 
     // All users (including demo) load from Firestore with real-time listener
-    console.log('🔥 Setting up Firebase listener for wedding:', currentWeddingId)
 
     // Import Firebase modules dynamically
     import('@/config/firebase').then(({ db }) => {
@@ -294,7 +282,6 @@ export function useRobustGuests() {
 
             // Sort by sortOrder
             loadedGuests.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
-            console.log('🔥 Loaded guests from Firestore:', loadedGuests.length)
             setGuests(loadedGuests)
             guestsRef.current = loadedGuests
             setLoading(false)

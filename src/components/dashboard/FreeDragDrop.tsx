@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useDashboard } from '@/hooks/useDashboard'
 import { DashboardModule } from '@/types/dashboard'
-import { Edit3, Lock, Unlock, Eye, EyeOff, RotateCcw, GripVertical, Grid3x3, Maximize2 } from 'lucide-react'
+import { Edit3, Lock, Unlock, Eye, EyeOff, RotateCcw, GripVertical, Grid3x3, Maximize2, Maximize } from 'lucide-react'
 
 // Module components
 import WeddingCountdownModule from './modules/WeddingCountdownModule'
@@ -31,10 +31,10 @@ interface FreeDragDropProps {
 
 // Module size configurations (width x height in pixels)
 const MODULE_SIZES = {
-  small: { width: 300, height: 250 },
-  medium: { width: 330, height: 280 },
-  large: { width: 680, height: 280 },
-  full: { width: 1400, height: 280 }
+  small: { width: 300, height: 400 },
+  medium: { width: 330, height: 450 },
+  large: { width: 680, height: 450 },
+  full: { width: 1400, height: 500 }
 }
 
 export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropProps) {
@@ -47,13 +47,14 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
     toggleModuleLock,
     resetLayout,
     getVisibleModules,
-    updateModulePosition
+    updateModulePosition,
+    updateModuleSize
   } = useDashboard()
 
   const layoutMode = layout.layoutMode || 'grid'
 
   const containerRef = useRef<HTMLDivElement>(null)
-  const [canvasSize, setCanvasSize] = useState({ width: 2000, height: 2400 })
+  const [canvasSize, setCanvasSize] = useState({ width: 2000, height: 4000 })
 
   // Render module content
   const renderModule = (module: DashboardModule) => {
@@ -175,10 +176,31 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
           </div>
 
           {layout.isEditMode && (
-            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm text-blue-800">
-                💡 <strong>Tip:</strong> Přetáhněte moduly kamkoliv chcete. Můžete je umístit i přes sebe. Klikněte na ikonu oka pro skrytí/zobrazení modulu.
-              </p>
+            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-start space-x-2">
+                <span className="text-lg">💡</span>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-blue-900 mb-2">Jak upravit layout:</p>
+                  <ul className="text-sm text-blue-800 space-y-1.5">
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span><strong>Přesunout modul:</strong> Klikněte a táhněte modul na nové místo</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span><strong>Změnit velikost:</strong> Najeďte myší na modul a v pravém dolním rohu podržte a táhněte ikonku</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span><strong>Skrýt/Zobrazit:</strong> Klikněte na ikonu oka v pravém horním rohu modulu</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span><strong>Zamknout:</strong> Klikněte na ikonu zámku pro zamčení modulu na místě</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -211,6 +233,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
               module={module}
               isEditMode={layout.isEditMode}
               onPositionChange={updateModulePosition}
+              onSizeChange={updateModuleSize}
               onToggleVisibility={toggleModuleVisibility}
               onToggleLock={toggleModuleLock}
               renderContent={() => renderModule(module)}
@@ -262,6 +285,7 @@ interface DraggableModuleProps {
   module: DashboardModule
   isEditMode: boolean
   onPositionChange: (moduleId: string, position: { x: number; y: number }) => void
+  onSizeChange: (moduleId: string, size: { width: number; height: number }) => void
   onToggleVisibility: (moduleId: string) => void
   onToggleLock: (moduleId: string) => void
   renderContent: () => React.ReactNode
@@ -271,20 +295,23 @@ function DraggableModule({
   module,
   isEditMode,
   onPositionChange,
+  onSizeChange,
   onToggleVisibility,
   onToggleLock,
   renderContent
 }: DraggableModuleProps) {
   const [isDragging, setIsDragging] = useState(false)
+  const [isResizing, setIsResizing] = useState(false)
   const [position, setPosition] = useState(module.position || { x: 100, y: 100 })
+  const [size, setSize] = useState(module.customSize || MODULE_SIZES[module.size])
   const [isHovered, setIsHovered] = useState(false)
   const dragRef = useRef<HTMLDivElement>(null)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 })
   const [hasDragged, setHasDragged] = useState(false)
   const [dragStartTime, setDragStartTime] = useState(0)
   const lastMoveTime = useRef(0)
 
-  const moduleSize = MODULE_SIZES[module.size]
   const isHidden = !module.isVisible
 
   // Update position when module.position changes (from Firebase)
@@ -293,6 +320,15 @@ function DraggableModule({
       setPosition(module.position)
     }
   }, [module.position, isDragging])
+
+  // Update size when module.customSize changes (from Firebase)
+  useEffect(() => {
+    if (module.customSize && !isResizing) {
+      setSize(module.customSize)
+    } else if (!module.customSize && !isResizing) {
+      setSize(MODULE_SIZES[module.size])
+    }
+  }, [module.customSize, module.size, isResizing])
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!isEditMode || module.isLocked) return
@@ -327,16 +363,51 @@ function DraggableModule({
     const container = dragRef.current?.parentElement?.getBoundingClientRect()
     if (container) {
       const newX = Math.max(0, Math.min(
-        container.width - moduleSize.width,
+        container.width - size.width,
         e.clientX - container.left - dragOffset.x
       ))
       const newY = Math.max(0, Math.min(
-        container.height - moduleSize.height,
+        container.height - size.height,
         e.clientY - container.top - dragOffset.y
       ))
 
       setPosition({ x: newX, y: newY })
     }
+  }
+
+  const handleResizeStart = (e: React.MouseEvent) => {
+    if (!isEditMode || module.isLocked) return
+
+    e.preventDefault()
+    e.stopPropagation()
+
+    setIsResizing(true)
+    setResizeStart({
+      x: e.clientX,
+      y: e.clientY,
+      width: size.width,
+      height: size.height
+    })
+  }
+
+  const handleResizeMove = (e: MouseEvent) => {
+    if (!isResizing) return
+
+    const deltaX = e.clientX - resizeStart.x
+    const deltaY = e.clientY - resizeStart.y
+
+    const newWidth = Math.max(250, resizeStart.width + deltaX)
+    const newHeight = Math.max(200, resizeStart.height + deltaY)
+
+    setSize({ width: newWidth, height: newHeight })
+  }
+
+  const handleResizeEnd = () => {
+    if (isResizing) {
+      console.log('📏 Saving module size:', module.id, size)
+      onSizeChange(module.id, size)
+    }
+    setIsResizing(false)
   }
 
   const handleMouseUp = () => {
@@ -359,13 +430,24 @@ function DraggableModule({
         document.removeEventListener('mouseup', handleMouseUp)
       }
     }
-  }, [isDragging, dragOffset, moduleSize, hasDragged, dragStartTime, position, module.id, onPositionChange])
+  }, [isDragging, dragOffset, size, hasDragged, dragStartTime, position, module.id, onPositionChange])
+
+  useEffect(() => {
+    if (isResizing) {
+      document.addEventListener('mousemove', handleResizeMove)
+      document.addEventListener('mouseup', handleResizeEnd)
+      return () => {
+        document.removeEventListener('mousemove', handleResizeMove)
+        document.removeEventListener('mouseup', handleResizeEnd)
+      }
+    }
+  }, [isResizing, resizeStart, size, module.id, onSizeChange])
 
   return (
     <div
       ref={dragRef}
       className={`absolute group select-none ${
-        isDragging
+        isDragging || isResizing
           ? 'z-50 scale-105 shadow-2xl cursor-grabbing'
           : isEditMode && !module.isLocked
           ? 'z-10 hover:z-20 cursor-grab hover:shadow-lg transition-shadow duration-200'
@@ -374,14 +456,14 @@ function DraggableModule({
       style={{
         left: position.x,
         top: position.y,
-        width: moduleSize.width,
-        height: moduleSize.height,
-        willChange: isDragging ? 'transform' : 'auto',
-        transition: isDragging ? 'none' : 'transform 0.2s ease, box-shadow 0.2s ease'
+        width: size.width,
+        height: size.height,
+        willChange: isDragging || isResizing ? 'transform' : 'auto',
+        transition: isDragging || isResizing ? 'none' : 'transform 0.2s ease, box-shadow 0.2s ease'
       }}
       onMouseDown={handleMouseDown}
-      onMouseEnter={() => !isDragging && setIsHovered(true)}
-      onMouseLeave={() => !isDragging && setIsHovered(false)}
+      onMouseEnter={() => !isDragging && !isResizing && setIsHovered(true)}
+      onMouseLeave={() => !isDragging && !isResizing && setIsHovered(false)}
     >
       <div className={`relative w-full h-full rounded-lg overflow-hidden shadow-lg bg-white border-2 transition-all ${
         isDragging
@@ -457,6 +539,17 @@ function DraggableModule({
             <div className="bg-white p-2 rounded-lg shadow-md">
               <Lock className="w-6 h-6 text-gray-500" />
             </div>
+          </div>
+        )}
+
+        {/* Resize Handle */}
+        {isEditMode && !module.isLocked && (
+          <div
+            onMouseDown={handleResizeStart}
+            className="absolute bottom-1 right-1 w-7 h-7 cursor-nwse-resize opacity-0 group-hover:opacity-100 transition-opacity z-20 flex items-center justify-center bg-white rounded shadow-md hover:bg-primary-50 hover:border hover:border-primary-300"
+            title="Změnit velikost modulu - klikněte a táhněte pro zvětšení nebo zmenšení"
+          >
+            <Maximize className="w-4 h-4 text-gray-600" />
           </div>
         )}
       </div>

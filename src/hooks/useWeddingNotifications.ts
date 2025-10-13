@@ -84,14 +84,12 @@ export function useWeddingNotifications() {
     const wasCleanupDone = localStorage.getItem(cleanupKey)
 
     if (wasCleanupDone) {
-      console.log('🧹 Notifications cleanup already done for user:', user.id)
       setCleanupDone(true)
       return
     }
 
     const cleanupDuplicates = async () => {
       try {
-        console.log('🧹 Cleaning up duplicate notifications for user:', user.id)
 
         // Direct Firestore cleanup instead of API call
         const q = query(
@@ -168,12 +166,9 @@ export function useWeddingNotifications() {
 
     // Cleanup existing listener
     if (listenerRef.current) {
-      console.log('🧹 Cleaning up existing listener')
       listenerRef.current()
       listenerRef.current = null
     }
-
-    console.log('Setting up notifications listener for user:', user.id)
 
     // Real-time listener for wedding notifications
     const q = query(
@@ -185,9 +180,6 @@ export function useWeddingNotifications() {
 
     const unsubscribe = onSnapshot(q,
       (snapshot) => {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Notifications snapshot received:', snapshot.docs.length)
-        }
         const notificationData = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()

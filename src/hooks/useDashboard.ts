@@ -10,13 +10,37 @@ const DASHBOARD_STORAGE_KEY = 'svatbot-dashboard-layout'
 export function useDashboard() {
   const { user } = useAuth()
   const { wedding } = useWedding()
-  const [layout, setLayout] = useState<DashboardLayout>({
-    modules: DEFAULT_DASHBOARD_MODULES,
-    isEditMode: false,
-    isLocked: false
+
+  // Initialize layout with layoutMode from localStorage if available
+  const [layout, setLayout] = useState<DashboardLayout>(() => {
+    if (typeof window !== 'undefined' && user?.id) {
+      const saved = localStorage.getItem(`${DASHBOARD_STORAGE_KEY}-${user.id}`)
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved)
+          return {
+            modules: DEFAULT_DASHBOARD_MODULES,
+            isEditMode: false,
+            isLocked: false,
+            layoutMode: parsed.layoutMode || 'grid'
+          }
+        } catch (e) {
+          // Ignore parse errors
+        }
+      }
+    }
+    return {
+      modules: DEFAULT_DASHBOARD_MODULES,
+      isEditMode: false,
+      isLocked: false,
+      layoutMode: 'grid'
+    }
   })
+
   const [loading, setLoading] = useState(true)
   const isSavingRef = useRef(false)
+  const isLoadingFromFirebaseRef = useRef(false)
+  const hasLoadedFromFirebaseRef = useRef(false) // Track if we've loaded from Firebase at least once
   const lastFirebaseDataRef = useRef<string | null>(null)
   const unsubscribeRef = useRef<(() => void) | null>(null)
 
@@ -27,13 +51,13 @@ export function useDashboard() {
       return
     }
 
-    console.log('🔄 Loading dashboard layout from Firebase for wedding:', wedding.id)
     setLoading(true)
 
     // Setup Firebase listener
     import('@/config/firebase').then(({ db }) => {
       import('firebase/firestore').then(({ doc, onSnapshot, getDoc }) => {
         const dashboardRef = doc(db, 'dashboards', `${user.id}_${wedding.id}`)
+        console.log('📄 Loading from document ID:', `${user.id}_${wedding.id}`)
 
         // Setup real-time listener
         const unsubscribe = onSnapshot(
@@ -41,16 +65,34 @@ export function useDashboard() {
           (snapshot) => {
             if (snapshot.exists()) {
               const data = snapshot.data()
-              console.log('🔥 Dashboard layout loaded from Firebase')
-              console.log('📦 Modules with positions:', data.modules?.filter((m: any) => m.position).map((m: any) => ({ id: m.id, position: m.position })))
 
-              // Store the Firebase data as JSON string for comparison
+              // Store the Firebase data as JSON string for comparison (include isEditMode)
               const firebaseDataString = JSON.stringify({
                 modules: data.modules,
+                isEditMode: data.isEditMode,
                 isLocked: data.isLocked,
                 layoutMode: data.layoutMode
               })
+
+              // Only set loading flag if data actually changed
+              const dataChanged = lastFirebaseDataRef.current !== firebaseDataString
+              if (dataChanged) {
+                console.log('📥 Firebase data changed, setting loading flag')
+                isLoadingFromFirebaseRef.current = true
+              } else {
+                console.log('📥 Firebase data unchanged, skipping')
+              }
+
               lastFirebaseDataRef.current = firebaseDataString
+
+              console.log('📥 Raw Firebase data:', {
+                layoutMode: data.layoutMode,
+                modulesCount: data.modules?.length,
+                sampleModules: data.modules?.slice(0, 3).map((m: DashboardModule) => ({
+                  id: m.id,
+                  position: m.position
+                }))
+              })
 
               // Get valid module types from DEFAULT_DASHBOARD_MODULES
               const validModuleTypes = DEFAULT_DASHBOARD_MODULES.map(m => m.type)
@@ -91,15 +133,24 @@ export function useDashboard() {
 
                 setLayout(updatedLayout)
               } else {
-                setLayout({
+                const loadedLayout = {
                   modules: validModules,
                   isEditMode: data.isEditMode || false,
                   isLocked: data.isLocked || false,
                   layoutMode: data.layoutMode || 'grid'
+                }
+                console.log('📥 Loading layout from Firebase:', {
+                  layoutMode: loadedLayout.layoutMode,
+                  modulesCount: loadedLayout.modules.length,
+                  isEditMode: loadedLayout.isEditMode,
+                  sampleModulePositions: loadedLayout.modules.slice(0, 3).map((m: DashboardModule) => ({
+                    id: m.id,
+                    position: m.position
+                  }))
                 })
+                setLayout(loadedLayout)
               }
             } else {
-              console.log('📦 No saved layout found, using default')
               lastFirebaseDataRef.current = null
               setLayout({
                 modules: DEFAULT_DASHBOARD_MODULES,
@@ -109,6 +160,13 @@ export function useDashboard() {
               })
             }
             setLoading(false)
+            // Mark that we've loaded from Firebase at least once
+            hasLoadedFromFirebaseRef.current = true
+            // Reset loading flag after a short delay to allow React to process the state update
+            setTimeout(() => {
+              console.log('✅ Resetting isLoadingFromFirebase flag')
+              isLoadingFromFirebaseRef.current = false
+            }, 100)
           },
           (error) => {
             console.warn('⚠️ Firebase listener error:', error.message)
@@ -155,8 +213,16 @@ export function useDashboard() {
 
   // Save layout to Firebase whenever it changes
   useEffect(() => {
-    // Don't save if we're loading or already saving
-    if (!user || !wedding?.id || loading || isSavingRef.current) {
+    // Don't save if we haven't loaded from Firebase yet, we're loading, already saving, or loading from Firebase
+    if (!user || !wedding?.id || !hasLoadedFromFirebaseRef.current || loading || isSavingRef.current || isLoadingFromFirebaseRef.current) {
+      console.log('⏭️ Skipping save - conditions not met:', {
+        hasUser: !!user,
+        hasWedding: !!wedding?.id,
+        hasLoadedFromFirebase: hasLoadedFromFirebaseRef.current,
+        loading,
+        isSaving: isSavingRef.current,
+        isLoadingFromFirebase: isLoadingFromFirebaseRef.current
+      })
       return
     }
 
@@ -174,13 +240,14 @@ export function useDashboard() {
       return
     }
 
-    console.log('💾 Saving dashboard layout to Firebase...')
+    console.log('💾 Saving layout to Firebase...')
     isSavingRef.current = true
 
     // Save to Firebase
     import('@/config/firebase').then(({ db }) => {
       import('firebase/firestore').then(({ doc, setDoc }) => {
         const dashboardRef = doc(db, 'dashboards', `${user.id}_${wedding.id}`)
+        console.log('📄 Saving to document ID:', `${user.id}_${wedding.id}`)
 
         const layoutData = {
           modules: layout.modules,
@@ -192,18 +259,23 @@ export function useDashboard() {
           updatedAt: new Date()
         }
 
-        console.log('💾 Saving modules with positions:', layout.modules.filter(m => m.position).map(m => ({ id: m.id, position: m.position })))
+        console.log('💾 Saving to Firebase:', {
+          layoutMode: layoutData.layoutMode,
+          isEditMode: layoutData.isEditMode,
+          modulesCount: layoutData.modules.length,
+          sampleModulePositions: layout.modules.slice(0, 3).map(m => ({ id: m.id, position: m.position }))
+        })
 
         setDoc(dashboardRef, layoutData, { merge: true })
           .then(() => {
-            console.log('✅ Dashboard layout saved to Firebase')
+            console.log('✅ Layout saved to Firebase successfully')
             // Update the ref with the saved data
             lastFirebaseDataRef.current = currentDataString
             // Also save to localStorage as backup
             localStorage.setItem(`${DASHBOARD_STORAGE_KEY}-${user.id}`, JSON.stringify(layout))
             setTimeout(() => {
               isSavingRef.current = false
-            }, 500)
+            }, 100)
           })
           .catch((error) => {
             console.warn('⚠️ Firebase save failed:', error.message)
@@ -257,27 +329,38 @@ export function useDashboard() {
 
   const updateModulePosition = (moduleId: string, position: { x: number; y: number }) => {
     console.log('📍 Updating module position:', moduleId, position)
+    setLayout(prev => {
+      const updatedModules = prev.modules.map(module =>
+        module.id === moduleId
+          ? { ...module, position }
+          : module
+      )
+      console.log('📍 Updated modules:', updatedModules.find(m => m.id === moduleId)?.position)
+      return {
+        ...prev,
+        modules: updatedModules
+      }
+    })
+  }
+
+  const updateModuleSize = (moduleId: string, size: { width: number; height: number }) => {
+    console.log('📏 Updating module size:', moduleId, size)
     setLayout(prev => ({
       ...prev,
       modules: prev.modules.map(module =>
         module.id === moduleId
-          ? { ...module, position }
+          ? { ...module, customSize: size }
           : module
       )
     }))
   }
 
   const setLayoutMode = (mode: 'grid' | 'free') => {
-    console.log('🔄 Changing layout mode to:', mode)
-    console.log('📊 Current layout:', layout)
-    setLayout(prev => {
-      const newLayout = {
-        ...prev,
-        layoutMode: mode
-      }
-      console.log('📊 New layout:', newLayout)
-      return newLayout
-    })
+    console.log('🔄 Setting layout mode to:', mode)
+    setLayout(prev => ({
+      ...prev,
+      layoutMode: mode
+    }))
   }
 
   const toggleModuleLock = (moduleId: string) => {
@@ -326,8 +409,10 @@ export function useDashboard() {
   return {
     layout,
     loading,
+    hasLoadedFromFirebase: hasLoadedFromFirebaseRef.current,
     updateModuleOrder,
     updateModulePosition,
+    updateModuleSize,
     setLayoutMode,
     toggleEditMode,
     toggleLock,

@@ -12,7 +12,7 @@ import QuickActionsModule from './modules/QuickActionsModule'
 import UpcomingTasksModule from './modules/UpcomingTasksModule'
 import MainFeaturesModule from './modules/MainFeaturesModule'
 import MarketplaceModule from './modules/MarketplaceModule'
-import ComingSoonModule from './modules/ComingSoonModule'
+
 import TaskManagementModule from './modules/TaskManagementModule'
 import GuestManagementModule from './modules/GuestManagementModule'
 import BudgetTrackingModule from './modules/BudgetTrackingModule'
@@ -55,16 +55,7 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridD
     getVisibleModules
   } = useDashboard()
 
-  const currentLayoutMode: 'grid' | 'free' = layout.layoutMode || 'grid'
-
-  // If layoutMode is 'free', render FreeDragDrop instead
-  if (currentLayoutMode === 'free') {
-    const FreeDragDrop = require('./FreeDragDrop').default
-    return <FreeDragDrop onWeddingSettingsClick={onWeddingSettingsClick} />
-  }
-
   const { canvasWidth, setCanvasWidth, getCanvasMaxWidth } = useCanvas()
-
   const [draggedModule, setDraggedModule] = useState<string | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
   const [isDragging, setIsDragging] = useState(false)
@@ -72,6 +63,33 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridD
   const [showGridSizeMenu, setShowGridSizeMenu] = useState(false)
   const [showCanvasMenu, setShowCanvasMenu] = useState(false)
   const dragTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (dragTimeoutRef.current) {
+        clearTimeout(dragTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  // Close menus when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element
+
+      if (showGridSizeMenu && !target.closest('[data-grid-size-menu]')) {
+        setShowGridSizeMenu(false)
+      }
+
+      if (showCanvasMenu && !target.closest('[data-canvas-menu]')) {
+        setShowCanvasMenu(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showGridSizeMenu, showCanvasMenu])
 
   const handleDragStart = (e: React.DragEvent, moduleId: string, index: number) => {
     if (!layout.isEditMode) return
@@ -166,32 +184,6 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridD
     }
   }
 
-  useEffect(() => {
-    return () => {
-      if (dragTimeoutRef.current) {
-        clearTimeout(dragTimeoutRef.current)
-      }
-    }
-  }, [])
-
-  // Zavřít menu při kliknutí mimo něj
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Element
-
-      if (showGridSizeMenu && !target.closest('[data-grid-size-menu]')) {
-        setShowGridSizeMenu(false)
-      }
-
-      if (showCanvasMenu && !target.closest('[data-canvas-menu]')) {
-        setShowCanvasMenu(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [showGridSizeMenu, showCanvasMenu])
-
   const getSizeClasses = (size: string) => {
     const config = GRID_CONFIGS[gridSize]
     const maxCols = config.cols
@@ -222,8 +214,6 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridD
         return <MainFeaturesModule />
       case 'marketplace':
         return <MarketplaceModule />
-      case 'coming-soon':
-        return <ComingSoonModule />
       case 'task-management':
         return <TaskManagementModule />
       case 'guest-management':

@@ -154,8 +154,6 @@ export function useMoodboard() {
 
     const cleanupPinterestImages = async () => {
       try {
-        console.log('🧹 Cleaning up Pinterest images for user:', user.id)
-
         const q = query(
           collection(db, 'moodboards'),
           where('userId', '==', user.id),

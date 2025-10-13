@@ -446,7 +446,6 @@ export function useBudget(): UseBudgetReturn {
             const loadedItems = snapshot.docs.map(doc =>
               convertFirestoreBudgetItem(doc.id, doc.data())
             )
-            console.log('💰 Loaded budget items from Firestore:', loadedItems.length, loadedItems)
             setBudgetItems(loadedItems)
           }, (error) => {
             console.warn('Firestore snapshot error, using localStorage fallback:', error)

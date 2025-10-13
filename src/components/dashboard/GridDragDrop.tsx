@@ -11,7 +11,7 @@ import QuickActionsModule from './modules/QuickActionsModule'
 import UpcomingTasksModule from './modules/UpcomingTasksModule'
 import MainFeaturesModule from './modules/MainFeaturesModule'
 import MarketplaceModule from './modules/MarketplaceModule'
-import ComingSoonModule from './modules/ComingSoonModule'
+
 import TaskManagementModule from './modules/TaskManagementModule'
 import GuestManagementModule from './modules/GuestManagementModule'
 import BudgetTrackingModule from './modules/BudgetTrackingModule'
@@ -356,8 +356,6 @@ export default function GridDragDrop({ onWeddingSettingsClick }: GridDragDropPro
         return <MainFeaturesModule />
       case 'marketplace':
         return <MarketplaceModule />
-      case 'coming-soon':
-        return <ComingSoonModule />
       case 'task-management':
         return <TaskManagementModule />
       case 'guest-management':

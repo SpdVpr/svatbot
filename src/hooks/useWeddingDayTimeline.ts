@@ -58,13 +58,10 @@ export function useWeddingDayTimeline(): UseWeddingDayTimelineReturn {
   // Load timeline items from Firestore
   useEffect(() => {
     if (!wedding) {
-      console.log('📅 No wedding, clearing timeline')
       setTimeline([])
       setLoading(false)
       return
     }
-
-    console.log('📅 Loading wedding day timeline for wedding:', wedding.id)
 
     try {
       const timelineQuery = query(
@@ -95,7 +92,6 @@ export function useWeddingDayTimeline(): UseWeddingDayTimelineReturn {
               createdBy: data.createdBy
             } as WeddingDayTimelineItem
           })
-          console.log('📅 Loaded wedding day timeline items:', items.length)
           setTimeline(items)
           setLoading(false)
         },
