@@ -21,6 +21,7 @@ export interface DashboardLayout {
   modules: DashboardModule[]
   isEditMode: boolean
   isLocked: boolean
+  layoutMode?: 'grid' | 'free' // Preferred layout mode
 }
 
 export interface DashboardSettings {

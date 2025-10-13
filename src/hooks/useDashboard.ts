@@ -42,11 +42,13 @@ export function useDashboard() {
             if (snapshot.exists()) {
               const data = snapshot.data()
               console.log('🔥 Dashboard layout loaded from Firebase')
+              console.log('📦 Modules with positions:', data.modules?.filter((m: any) => m.position).map((m: any) => ({ id: m.id, position: m.position })))
 
               // Store the Firebase data as JSON string for comparison
               const firebaseDataString = JSON.stringify({
                 modules: data.modules,
-                isLocked: data.isLocked
+                isLocked: data.isLocked,
+                layoutMode: data.layoutMode
               })
               lastFirebaseDataRef.current = firebaseDataString
 
@@ -75,14 +77,16 @@ export function useDashboard() {
                 const updatedLayout = {
                   modules: [...validModules, ...newModules],
                   isEditMode: data.isEditMode || false,
-                  isLocked: data.isLocked || false
+                  isLocked: data.isLocked || false,
+                  layoutMode: data.layoutMode || 'grid'
                 }
 
                 // Update the ref with the new layout
                 lastFirebaseDataRef.current = JSON.stringify({
                   modules: updatedLayout.modules,
                   isEditMode: updatedLayout.isEditMode,
-                  isLocked: updatedLayout.isLocked
+                  isLocked: updatedLayout.isLocked,
+                  layoutMode: updatedLayout.layoutMode
                 })
 
                 setLayout(updatedLayout)
@@ -90,7 +94,8 @@ export function useDashboard() {
                 setLayout({
                   modules: validModules,
                   isEditMode: data.isEditMode || false,
-                  isLocked: data.isLocked || false
+                  isLocked: data.isLocked || false,
+                  layoutMode: data.layoutMode || 'grid'
                 })
               }
             } else {
@@ -99,7 +104,8 @@ export function useDashboard() {
               setLayout({
                 modules: DEFAULT_DASHBOARD_MODULES,
                 isEditMode: false,
-                isLocked: false
+                isLocked: false,
+                layoutMode: 'grid'
               })
             }
             setLoading(false)
@@ -158,7 +164,8 @@ export function useDashboard() {
     const currentDataString = JSON.stringify({
       modules: layout.modules,
       isEditMode: layout.isEditMode,
-      isLocked: layout.isLocked
+      isLocked: layout.isLocked,
+      layoutMode: layout.layoutMode
     })
 
     // If the current data matches what we last loaded from Firebase, don't save
@@ -179,10 +186,13 @@ export function useDashboard() {
           modules: layout.modules,
           isEditMode: layout.isEditMode,
           isLocked: layout.isLocked,
+          layoutMode: layout.layoutMode || 'grid',
           userId: user.id,
           weddingId: wedding.id,
           updatedAt: new Date()
         }
+
+        console.log('💾 Saving modules with positions:', layout.modules.filter(m => m.position).map(m => ({ id: m.id, position: m.position })))
 
         setDoc(dashboardRef, layoutData, { merge: true })
           .then(() => {
@@ -246,6 +256,7 @@ export function useDashboard() {
   }
 
   const updateModulePosition = (moduleId: string, position: { x: number; y: number }) => {
+    console.log('📍 Updating module position:', moduleId, position)
     setLayout(prev => ({
       ...prev,
       modules: prev.modules.map(module =>
@@ -253,6 +264,14 @@ export function useDashboard() {
           ? { ...module, position }
           : module
       )
+    }))
+  }
+
+  const setLayoutMode = (mode: 'grid' | 'free') => {
+    console.log('🔄 Changing layout mode to:', mode)
+    setLayout(prev => ({
+      ...prev,
+      layoutMode: mode
     }))
   }
 
@@ -304,6 +323,7 @@ export function useDashboard() {
     loading,
     updateModuleOrder,
     updateModulePosition,
+    setLayoutMode,
     toggleEditMode,
     toggleLock,
     toggleModuleVisibility,
