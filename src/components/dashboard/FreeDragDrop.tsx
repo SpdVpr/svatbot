@@ -27,8 +27,6 @@ import ShoppingListModule from './modules/ShoppingListModule'
 
 interface FreeDragDropProps {
   onWeddingSettingsClick?: () => void
-  layoutMode: 'grid' | 'free'
-  onLayoutModeChange: (mode: 'grid' | 'free') => void
 }
 
 // Module size configurations (width x height in pixels)
@@ -39,10 +37,11 @@ const MODULE_SIZES = {
   full: { width: 1400, height: 280 }
 }
 
-export default function FreeDragDrop({ onWeddingSettingsClick, layoutMode, onLayoutModeChange }: FreeDragDropProps) {
+export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropProps) {
   const {
     layout,
     loading,
+    setLayoutMode,
     toggleEditMode,
     toggleModuleVisibility,
     toggleModuleLock,
@@ -50,6 +49,8 @@ export default function FreeDragDrop({ onWeddingSettingsClick, layoutMode, onLay
     getVisibleModules,
     updateModulePosition
   } = useDashboard()
+
+  const layoutMode = layout.layoutMode || 'grid'
 
   const containerRef = useRef<HTMLDivElement>(null)
   const [canvasSize, setCanvasSize] = useState({ width: 2000, height: 2400 })
@@ -124,7 +125,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick, layoutMode, onLay
               {/* Layout Mode Switcher */}
               <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
                 <button
-                  onClick={() => onLayoutModeChange('grid')}
+                  onClick={() => setLayoutMode('grid')}
                   className={`flex items-center space-x-1 px-2 py-1.5 rounded-md transition-colors ${
                     layoutMode === 'grid'
                       ? 'bg-white text-primary-600 shadow-sm'
@@ -136,7 +137,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick, layoutMode, onLay
                   <span className="hidden lg:inline text-sm">Grid</span>
                 </button>
                 <button
-                  onClick={() => onLayoutModeChange('free')}
+                  onClick={() => setLayoutMode('free')}
                   className={`flex items-center space-x-1 px-2 py-1.5 rounded-md transition-colors ${
                     layoutMode === 'free'
                       ? 'bg-white text-primary-600 shadow-sm'

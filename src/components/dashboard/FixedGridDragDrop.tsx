@@ -30,8 +30,6 @@ import ShoppingListModule from './modules/ShoppingListModule'
 
 interface FixedGridDragDropProps {
   onWeddingSettingsClick: () => void
-  layoutMode: 'grid' | 'free'
-  onLayoutModeChange: (mode: 'grid' | 'free') => void
 }
 
 type GridSize = 'compact' | 'normal' | 'wide' | 'ultra-wide'
@@ -43,11 +41,12 @@ const GRID_CONFIGS = {
   'ultra-wide': { cols: 5, maxCols: 'lg:grid-cols-5', label: 'Ultra široký (5 sloupců)' }
 }
 
-export default function FixedGridDragDrop({ onWeddingSettingsClick, layoutMode, onLayoutModeChange }: FixedGridDragDropProps) {
+export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridDragDropProps) {
   const {
     layout,
     loading,
     updateModuleOrder,
+    setLayoutMode,
     toggleEditMode,
     toggleLock,
     toggleModuleVisibility,
@@ -57,6 +56,7 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick, layoutMode, 
   } = useDashboard()
 
   const { canvasWidth, setCanvasWidth, getCanvasMaxWidth } = useCanvas()
+  const layoutMode: 'grid' | 'free' = layout.layoutMode || 'grid'
 
   const [draggedModule, setDraggedModule] = useState<string | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
@@ -479,7 +479,7 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick, layoutMode, 
           {/* Layout Mode Switcher */}
           <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
             <button
-              onClick={() => onLayoutModeChange('grid')}
+              onClick={() => setLayoutMode('grid')}
               className={`flex items-center space-x-1 px-2 py-1.5 rounded-md transition-colors ${
                 layoutMode === 'grid'
                   ? 'bg-white text-primary-600 shadow-sm'
@@ -491,7 +491,7 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick, layoutMode, 
               <span className="hidden lg:inline text-sm">Grid</span>
             </button>
             <button
-              onClick={() => onLayoutModeChange('free')}
+              onClick={() => setLayoutMode('free')}
               className={`flex items-center space-x-1 px-2 py-1.5 rounded-md transition-colors ${
                 layoutMode === 'free'
                   ? 'bg-white text-primary-600 shadow-sm'
