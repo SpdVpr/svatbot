@@ -82,7 +82,7 @@ function buildDetailedContext(context: any): string {
     contextStr += `- Celkem utraceno: ${context.budgetStats.totalSpent.toLocaleString()} Kč\n`
     contextStr += `- Zaplaceno: ${context.budgetStats.totalPaid.toLocaleString()} Kč\n`
     contextStr += `- Zbývá: ${context.budgetStats.remaining.toLocaleString()} Kč\n`
-    contextStr += `- Procento utraceno: ${context.budgetStats.percentageSpent.toFixed(1)}%\n\n`
+    contextStr += `- Procento utraceno: ${context.budgetStats.budgetUsed}%\n\n`
   }
 
   // Budget items

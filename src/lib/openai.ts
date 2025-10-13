@@ -5,7 +5,7 @@
 import { Guest } from '@/types/guest'
 import { BudgetItem } from '@/types/budget'
 import { Task } from '@/types/task'
-import { TimelineEvent } from '@/types/timeline'
+import { Milestone } from '@/types/timeline'
 import { Vendor } from '@/types/vendor'
 
 export interface AIWeddingContext {
@@ -21,7 +21,7 @@ export interface AIWeddingContext {
   guests?: Guest[]
   budgetItems?: BudgetItem[]
   currentTasks?: Task[]
-  timelineEvents?: TimelineEvent[]
+  milestones?: Milestone[]
   vendors?: Vendor[]
 
   // Computed stats
@@ -30,7 +30,7 @@ export interface AIWeddingContext {
     totalSpent: number
     totalPaid: number
     remaining: number
-    percentageSpent: number
+    budgetUsed: number // percentage
   }
 
   taskStats?: {

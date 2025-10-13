@@ -36,11 +36,11 @@ export function useAI() {
     // Calculate guest stats
     const guestStats = guests ? {
       total: guests.length,
-      confirmed: guests.filter(g => g.rsvpStatus === 'accepted').length,
+      confirmed: guests.filter(g => g.rsvpStatus === 'attending').length,
       declined: guests.filter(g => g.rsvpStatus === 'declined').length,
-      pending: guests.filter(g => g.rsvpStatus === 'pending' || g.rsvpStatus === 'no-response').length,
+      pending: guests.filter(g => g.rsvpStatus === 'pending' || g.rsvpStatus === 'maybe').length,
       withDietaryRestrictions: guests.filter(g => g.dietaryRestrictions && g.dietaryRestrictions.length > 0).length,
-      needingAccommodation: guests.filter(g => g.accommodationNeeded).length
+      needingAccommodation: guests.filter(g => g.accommodationInterest === 'interested').length
     } : undefined
 
     // Calculate task stats
@@ -57,10 +57,10 @@ export function useAI() {
     // Calculate budget stats
     const budgetStats = stats ? {
       totalBudget: stats.totalBudget || 0,
-      totalSpent: stats.totalSpent || 0,
+      totalSpent: stats.totalActual || 0,
       totalPaid: stats.totalPaid || 0,
-      remaining: stats.remaining || 0,
-      percentageSpent: stats.percentageSpent || 0
+      remaining: stats.totalRemaining || 0,
+      budgetUsed: stats.budgetUsed || 0
     } : undefined
 
     return {
@@ -76,7 +76,7 @@ export function useAI() {
       guests: guests,
       budgetItems: budgetItems,
       currentTasks: tasks,
-      timelineEvents: [], // TODO: Add timeline events when available
+      milestones: [], // TODO: Add milestones when available
       vendors: [], // TODO: Add vendors from marketplace
 
       // Stats
@@ -259,7 +259,7 @@ export function useAI() {
           dataSpecificSuggestions.push('Kdo z hostů má dietní omezení?')
         }
 
-        const pendingGuests = guests.filter(g => g.rsvpStatus === 'pending' || g.rsvpStatus === 'no-response')
+        const pendingGuests = guests.filter(g => g.rsvpStatus === 'pending' || g.rsvpStatus === 'maybe')
         if (pendingGuests.length > 0) {
           dataSpecificSuggestions.push('Kteří hosté ještě nepotvrdili účast?')
         }

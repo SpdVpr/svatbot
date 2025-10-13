@@ -184,7 +184,7 @@ function AIPageContent() {
                         {budgetItems?.length || 0} položek
                         {stats && (
                           <span className="block mt-1">
-                            {stats.percentageSpent.toFixed(0)}% využito
+                            {stats.budgetUsed}% využito
                           </span>
                         )}
                       </p>
