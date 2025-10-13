@@ -33,16 +33,56 @@ export function useAI() {
 
   // Build AI context from current wedding data
   const buildContext = useCallback((): AIWeddingContext => {
+    // Calculate guest stats
+    const guestStats = guests ? {
+      total: guests.length,
+      confirmed: guests.filter(g => g.rsvpStatus === 'accepted').length,
+      declined: guests.filter(g => g.rsvpStatus === 'declined').length,
+      pending: guests.filter(g => g.rsvpStatus === 'pending' || g.rsvpStatus === 'no-response').length,
+      withDietaryRestrictions: guests.filter(g => g.dietaryRestrictions && g.dietaryRestrictions.length > 0).length,
+      needingAccommodation: guests.filter(g => g.accommodationNeeded).length
+    } : undefined
+
+    // Calculate task stats
+    const taskStats = tasks ? {
+      total: tasks.length,
+      completed: tasks.filter(t => t.status === 'completed').length,
+      pending: tasks.filter(t => t.status === 'pending').length,
+      overdue: tasks.filter(t => {
+        if (!t.dueDate || t.status === 'completed') return false
+        return new Date(t.dueDate) < new Date()
+      }).length
+    } : undefined
+
+    // Calculate budget stats
+    const budgetStats = stats ? {
+      totalBudget: stats.totalBudget || 0,
+      totalSpent: stats.totalSpent || 0,
+      totalPaid: stats.totalPaid || 0,
+      remaining: stats.remaining || 0,
+      percentageSpent: stats.percentageSpent || 0
+    } : undefined
+
     return {
+      // Basic info
       budget: stats?.totalBudget || wedding?.budget,
       guestCount: wedding?.estimatedGuestCount || guests?.length,
       weddingDate: wedding?.weddingDate || undefined,
       location: wedding?.region,
       style: wedding?.style,
       preferences: [], // TODO: Add preferences to wedding type
+
+      // Detailed data
+      guests: guests,
+      budgetItems: budgetItems,
       currentTasks: tasks,
+      timelineEvents: [], // TODO: Add timeline events when available
       vendors: [], // TODO: Add vendors from marketplace
-      guests: guests
+
+      // Stats
+      guestStats,
+      taskStats,
+      budgetStats
     }
   }, [wedding, guests, budgetItems, tasks, stats])
 
@@ -204,12 +244,44 @@ export function useAI() {
   const getQuickSuggestions = useCallback(async (): Promise<string[]> => {
     try {
       const context = buildContext()
-      const daysUntilWedding = wedding?.weddingDate 
+      const daysUntilWedding = wedding?.weddingDate
         ? Math.ceil((wedding.weddingDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
         : null
 
       let suggestions: string[] = []
 
+      // Add data-specific suggestions based on what user has
+      const dataSpecificSuggestions: string[] = []
+
+      if (guests && guests.length > 0) {
+        const guestsWithDietary = guests.filter(g => g.dietaryRestrictions && g.dietaryRestrictions.length > 0)
+        if (guestsWithDietary.length > 0) {
+          dataSpecificSuggestions.push('Kdo z hostů má dietní omezení?')
+        }
+
+        const pendingGuests = guests.filter(g => g.rsvpStatus === 'pending' || g.rsvpStatus === 'no-response')
+        if (pendingGuests.length > 0) {
+          dataSpecificSuggestions.push('Kteří hosté ještě nepotvrdili účast?')
+        }
+      }
+
+      if (budgetItems && budgetItems.length > 0) {
+        dataSpecificSuggestions.push('Jsem v rámci rozpočtu?')
+        dataSpecificSuggestions.push('Jaké jsou moje největší výdaje?')
+      }
+
+      if (tasks && tasks.length > 0) {
+        const overdueTasks = tasks.filter(t => {
+          if (!t.dueDate || t.status === 'completed') return false
+          return new Date(t.dueDate) < new Date()
+        })
+        if (overdueTasks.length > 0) {
+          dataSpecificSuggestions.push('Které úkoly jsou po termínu?')
+        }
+        dataSpecificSuggestions.push('Stíhám všechno podle plánu?')
+      }
+
+      // Time-based suggestions
       if (daysUntilWedding) {
         if (daysUntilWedding > 365) {
           suggestions = [
@@ -249,7 +321,14 @@ export function useAI() {
         ]
       }
 
-      return suggestions
+      // Mix data-specific and time-based suggestions
+      // Prioritize data-specific suggestions
+      const finalSuggestions = [
+        ...dataSpecificSuggestions.slice(0, 2),
+        ...suggestions.slice(0, 2)
+      ]
+
+      return finalSuggestions.length > 0 ? finalSuggestions : suggestions
     } catch (err) {
       console.error('Error getting quick suggestions:', err)
       return [
@@ -259,7 +338,7 @@ export function useAI() {
         'Jak vybrat dodavatele?'
       ]
     }
-  }, [wedding, buildContext])
+  }, [wedding, guests, budgetItems, tasks, buildContext])
 
   return {
     // State

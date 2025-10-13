@@ -3,6 +3,9 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useWedding } from '@/hooks/useWedding'
+import { useGuest } from '@/hooks/useGuest'
+import { useBudget } from '@/hooks/useBudget'
+import { useTask } from '@/hooks/useTask'
 import { useSearchParams } from 'next/navigation'
 import {
   Bot,
@@ -13,7 +16,11 @@ import {
   Users,
   MessageCircle,
   Lightbulb,
-  TrendingUp
+  TrendingUp,
+  Database,
+  CheckCircle,
+  AlertCircle,
+  Info
 } from 'lucide-react'
 import Link from 'next/link'
 import AIAssistant from '@/components/ai/AIAssistant'
@@ -24,13 +31,21 @@ import AIBudgetOptimizer from '@/components/ai/AIBudgetOptimizer'
 function AIPageContent() {
   const { user } = useAuth()
   const { wedding } = useWedding()
+  const { guests } = useGuest()
+  const { budgetItems, stats } = useBudget()
+  const { tasks } = useTask()
   const searchParams = useSearchParams()
-  // Removed activeTab - using chat as default (most interactive)
-
-  // Removed tab switching - always show chat (most interactive)
+  const [showDataInfo, setShowDataInfo] = useState(true)
 
   // Get pre-filled question from URL
   const prefilledQuestion = searchParams.get('question')
+
+  // Calculate what data AI has access to
+  const guestsWithDietary = guests?.filter(g => g.dietaryRestrictions && g.dietaryRestrictions.length > 0) || []
+  const overdueTasks = tasks?.filter(t => {
+    if (!t.dueDate || t.status === 'completed') return false
+    return new Date(t.dueDate) < new Date()
+  }) || []
 
   if (!user) {
     return (
@@ -128,6 +143,94 @@ function AIPageContent() {
 
       {/* Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Data Info Panel */}
+        {showDataInfo && (
+          <div className="mb-6">
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-6">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2 mb-3">
+                    <Database className="w-5 h-5 text-green-600" />
+                    <h3 className="font-semibold text-green-900">AI má přístup k vašim datům</h3>
+                  </div>
+                  <p className="text-sm text-green-700 mb-4">
+                    Chatbot vidí všechna vaše data a může odpovídat na konkrétní otázky o vaší svatbě.
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {/* Guests */}
+                    <div className="bg-white/50 rounded-lg p-3">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <Users className="w-4 h-4 text-green-600" />
+                        <span className="text-sm font-medium text-green-900">Hosté</span>
+                      </div>
+                      <p className="text-xs text-green-700">
+                        {guests?.length || 0} hostů
+                        {guestsWithDietary.length > 0 && (
+                          <span className="block mt-1">
+                            {guestsWithDietary.length} s dietními omezeními
+                          </span>
+                        )}
+                      </p>
+                    </div>
+
+                    {/* Budget */}
+                    <div className="bg-white/50 rounded-lg p-3">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <DollarSign className="w-4 h-4 text-green-600" />
+                        <span className="text-sm font-medium text-green-900">Rozpočet</span>
+                      </div>
+                      <p className="text-xs text-green-700">
+                        {budgetItems?.length || 0} položek
+                        {stats && (
+                          <span className="block mt-1">
+                            {stats.percentageSpent.toFixed(0)}% využito
+                          </span>
+                        )}
+                      </p>
+                    </div>
+
+                    {/* Tasks */}
+                    <div className="bg-white/50 rounded-lg p-3">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        <span className="text-sm font-medium text-green-900">Úkoly</span>
+                      </div>
+                      <p className="text-xs text-green-700">
+                        {tasks?.length || 0} úkolů
+                        {overdueTasks.length > 0 && (
+                          <span className="block mt-1 text-orange-600">
+                            {overdueTasks.length} po termínu
+                          </span>
+                        )}
+                      </p>
+                    </div>
+
+                    {/* Examples */}
+                    <div className="bg-white/50 rounded-lg p-3">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <Lightbulb className="w-4 h-4 text-green-600" />
+                        <span className="text-sm font-medium text-green-900">Zkuste se zeptat</span>
+                      </div>
+                      <p className="text-xs text-green-700">
+                        "Kdo má alergii na lepek?"<br/>
+                        "Jsem v rozpočtu?"<br/>
+                        "Co je po termínu?"
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowDataInfo(false)}
+                  className="ml-4 text-green-600 hover:text-green-800"
+                >
+                  <span className="text-xl">×</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Chat Description */}
         <div className="mb-8">
           <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6">
@@ -137,7 +240,7 @@ function AIPageContent() {
               </div>
               <div>
                 <h2 className="font-semibold text-blue-900">AI Chat</h2>
-                <p className="text-sm text-blue-700">Zeptejte se na cokoliv o svatbě</p>
+                <p className="text-sm text-blue-700">Zeptejte se na cokoliv o svatbě - AI zná všechna vaše data</p>
               </div>
             </div>
           </div>

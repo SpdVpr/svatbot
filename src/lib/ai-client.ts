@@ -1,15 +1,51 @@
 // Client-side AI wrapper that calls our API routes
 
+import { Guest } from '@/types/guest'
+import { BudgetItem } from '@/types/budget'
+import { Task } from '@/types/task'
+import { TimelineEvent } from '@/types/timeline'
+import { Vendor } from '@/types/vendor'
+
 export interface AIWeddingContext {
+  // Basic wedding info
   budget?: number
   guestCount?: number
   weddingDate?: Date
   location?: string
   style?: string
   preferences?: string[]
-  currentTasks?: any[]
-  vendors?: any[]
-  guests?: any[]
+
+  // Detailed data for AI analysis
+  guests?: Guest[]
+  budgetItems?: BudgetItem[]
+  currentTasks?: Task[]
+  timelineEvents?: TimelineEvent[]
+  vendors?: Vendor[]
+
+  // Computed stats
+  budgetStats?: {
+    totalBudget: number
+    totalSpent: number
+    totalPaid: number
+    remaining: number
+    percentageSpent: number
+  }
+
+  taskStats?: {
+    total: number
+    completed: number
+    pending: number
+    overdue: number
+  }
+
+  guestStats?: {
+    total: number
+    confirmed: number
+    declined: number
+    pending: number
+    withDietaryRestrictions: number
+    needingAccommodation: number
+  }
 }
 
 export class WeddingAI {
