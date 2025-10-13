@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Calendar, MapPin, Clock, Users, Mail, Phone, Menu, X } from 'lucide-react'
-import type { WeddingWebsite } from '@/types/wedding-website'
+import type { WeddingWebsite, SectionType } from '@/types/wedding-website'
 import ModernHeroSection from './modern/HeroSection'
 import ModernInfoSection from './modern/InfoSection'
 import ModernDressCodeSection from './modern/DressCodeSection'

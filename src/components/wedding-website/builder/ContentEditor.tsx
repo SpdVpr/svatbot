@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronDown, Image, Calendar, MapPin, Users, MessageSquare, Gift, Camera, Phone, HelpCircle, Building2, UtensilsCrossed, Shirt } from 'lucide-react'
 import HeroSectionEditor from './sections/HeroSectionEditor'
 import InfoSectionEditor from './sections/InfoSectionEditor'
@@ -14,14 +14,13 @@ import ContactSectionEditor from './sections/ContactSectionEditor'
 import FAQSectionEditor from './sections/FAQSectionEditor'
 import GiftSectionEditor from './sections/GiftSectionEditor'
 import MenuSectionEditor from './sections/MenuSectionEditor'
-import type { WebsiteContent } from '@/types/wedding-website'
+import SectionOrderEditor from './SectionOrderEditor'
+import type { WebsiteContent, SectionType } from '@/types/wedding-website'
 
 interface ContentEditorProps {
   content: WebsiteContent
   onContentChange: (content: WebsiteContent) => void
 }
-
-type SectionType = 'hero' | 'info' | 'dressCode' | 'rsvp' | 'story' | 'schedule' | 'accommodation' | 'gift' | 'gallery' | 'contact' | 'faq' | 'menu'
 
 interface Section {
   id: SectionType
@@ -34,6 +33,24 @@ interface Section {
 
 export default function ContentEditor({ content, onContentChange }: ContentEditorProps) {
   const [expandedSection, setExpandedSection] = useState<SectionType | null>(null)
+
+  // Default section order
+  const DEFAULT_SECTION_ORDER: SectionType[] = [
+    'hero', 'story', 'info', 'dressCode', 'schedule', 'rsvp',
+    'accommodation', 'gift', 'gallery', 'contact', 'faq', 'menu'
+  ]
+
+  // Initialize section order if not set
+  useEffect(() => {
+    if (!content.sectionOrder) {
+      onContentChange({
+        ...content,
+        sectionOrder: DEFAULT_SECTION_ORDER
+      })
+    }
+  }, [])
+
+  const sectionOrder = content.sectionOrder || DEFAULT_SECTION_ORDER
 
   const sections: Section[] = [
     {
@@ -190,6 +207,30 @@ export default function ContentEditor({ content, onContentChange }: ContentEdito
     onContentChange(updatedContent)
   }
 
+  const handleSectionOrderChange = (newOrder: SectionType[]) => {
+    onContentChange({
+      ...content,
+      sectionOrder: newOrder
+    })
+  }
+
+  const getEnabledSections = (): Set<SectionType> => {
+    const enabled = new Set<SectionType>()
+    enabled.add('hero') // Always enabled
+    if (content.info.enabled) enabled.add('info')
+    if (content.dressCode?.enabled) enabled.add('dressCode')
+    if (content.rsvp.enabled) enabled.add('rsvp')
+    if (content.story.enabled) enabled.add('story')
+    if (content.schedule.enabled) enabled.add('schedule')
+    if (content.accommodation?.enabled) enabled.add('accommodation')
+    if (content.gift?.enabled) enabled.add('gift')
+    if (content.gallery?.enabled) enabled.add('gallery')
+    if (content.contact?.enabled) enabled.add('contact')
+    if (content.faq?.enabled) enabled.add('faq')
+    if (content.menu?.enabled) enabled.add('menu')
+    return enabled
+  }
+
   const renderSectionEditor = (sectionId: SectionType) => {
     switch (sectionId) {
       case 'hero':
@@ -302,6 +343,15 @@ export default function ContentEditor({ content, onContentChange }: ContentEdito
           Vyberte sekci, kterou chcete upravit
         </p>
       </div>
+
+      {/* Section Order Editor - Only show when no section is expanded */}
+      {!expandedSection && (
+        <SectionOrderEditor
+          sectionOrder={sectionOrder}
+          enabledSections={getEnabledSections()}
+          onOrderChange={handleSectionOrderChange}
+        />
+      )}
 
       {/* Section Grid - Only show when no section is expanded */}
       {!expandedSection && (

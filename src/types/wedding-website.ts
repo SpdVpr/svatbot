@@ -226,6 +226,9 @@ export interface MenuContent {
   showDrinks: boolean
 }
 
+// Section order type
+export type SectionType = 'hero' | 'story' | 'info' | 'dressCode' | 'schedule' | 'rsvp' | 'accommodation' | 'gift' | 'gallery' | 'contact' | 'faq' | 'menu'
+
 // Website Content
 export interface WebsiteContent {
   hero: HeroContent
@@ -240,6 +243,7 @@ export interface WebsiteContent {
   contact: ContactContent
   faq: FAQContent
   menu: MenuContent
+  sectionOrder?: SectionType[] // Custom order of sections
 }
 
 // Website Style
