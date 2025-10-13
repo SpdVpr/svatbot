@@ -375,28 +375,32 @@ export function useDashboard() {
   }
 
   const resetLayout = async () => {
+    // Preserve the current layoutMode when resetting
+    const currentLayoutMode = layout.layoutMode || 'grid'
+
     const newLayout = {
       modules: DEFAULT_DASHBOARD_MODULES,
       isEditMode: false,
-      isLocked: false
+      isLocked: false,
+      layoutMode: currentLayoutMode // Keep the current layout mode
     }
     setLayout(newLayout)
 
-    // Clear from Firebase and localStorage
+    // Save to Firebase with the preserved layoutMode
     if (user && wedding?.id) {
       try {
-        const { doc, deleteDoc } = await import('firebase/firestore')
+        const { doc, setDoc } = await import('firebase/firestore')
         const { db } = await import('@/config/firebase')
 
         const dashboardRef = doc(db, 'dashboards', `${user.id}_${wedding.id}`)
-        await deleteDoc(dashboardRef)
-        console.log('✅ Dashboard layout reset in Firebase')
+        await setDoc(dashboardRef, newLayout)
+        console.log('✅ Dashboard layout reset in Firebase (layoutMode preserved:', currentLayoutMode, ')')
       } catch (error) {
         console.warn('⚠️ Failed to reset Firebase layout:', error)
       }
 
-      // Also clear localStorage
-      localStorage.removeItem(`${DASHBOARD_STORAGE_KEY}-${user.id}`)
+      // Also update localStorage with preserved layoutMode
+      localStorage.setItem(`${DASHBOARD_STORAGE_KEY}-${user.id}`, JSON.stringify(newLayout))
     }
   }
 
