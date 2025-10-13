@@ -101,6 +101,24 @@ export function useBudget(): UseBudgetReturn {
       .filter((payment: any) => payment.status === 'completed')
       .reduce((sum: number, payment: any) => sum + (payment.amount || 0), 0)
 
+    // Automatically determine payment status based on paid amount
+    const actualAmount = data.actualAmount || 0
+    let autoPaymentStatus = data.paymentStatus || 'pending'
+
+    if (actualAmount > 0 && calculatedPaidAmount >= actualAmount) {
+      // Fully paid
+      autoPaymentStatus = 'paid'
+    } else if (calculatedPaidAmount > 0 && calculatedPaidAmount < actualAmount) {
+      // Partially paid
+      autoPaymentStatus = 'partial'
+    } else if (data.dueDate && new Date(data.dueDate.toDate()) < new Date() && calculatedPaidAmount < actualAmount) {
+      // Overdue
+      autoPaymentStatus = 'overdue'
+    } else {
+      // Pending
+      autoPaymentStatus = 'pending'
+    }
+
     return {
       id,
       weddingId: data.weddingId,
@@ -108,12 +126,12 @@ export function useBudget(): UseBudgetReturn {
       description: data.description,
       category: data.category,
       budgetedAmount: data.budgetedAmount || 0,
-      actualAmount: data.actualAmount || 0,
+      actualAmount: actualAmount,
       paidAmount: calculatedPaidAmount, // Use calculated amount instead of stored value
       currency: data.currency || 'CZK',
       vendorId: data.vendorId,
       vendorName: data.vendorName,
-      paymentStatus: data.paymentStatus || 'pending',
+      paymentStatus: autoPaymentStatus, // Automatically calculated status
       paymentMethod: data.paymentMethod,
       dueDate: data.dueDate?.toDate(),
       paidDate: data.paidDate?.toDate(),

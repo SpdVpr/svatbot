@@ -176,6 +176,18 @@ export default function BudgetForm({
       .filter(payment => payment.status === 'completed')
       .reduce((sum, payment) => sum + payment.amount, 0)
     handleChange('paidAmount', newPaidAmount)
+
+    // Automatically update payment status based on paid amount
+    const actualAmount = formData.actualAmount || 0
+    if (actualAmount > 0 && newPaidAmount >= actualAmount) {
+      handleChange('paymentStatus', 'paid')
+    } else if (newPaidAmount > 0 && newPaidAmount < actualAmount) {
+      handleChange('paymentStatus', 'partial')
+    } else if (formData.dueDate && formData.dueDate < new Date() && newPaidAmount < actualAmount) {
+      handleChange('paymentStatus', 'overdue')
+    } else {
+      handleChange('paymentStatus', 'pending')
+    }
   }
 
   // Calculate paid amount from completed payments
@@ -215,6 +227,22 @@ export default function BudgetForm({
       .filter(payment => payment.status === 'completed')
       .reduce((sum, payment) => sum + payment.amount, 0)
     handleChange('paidAmount', newPaidAmount)
+
+    // Automatically update payment status based on paid amount
+    const actualAmount = formData.actualAmount || 0
+    if (actualAmount > 0 && newPaidAmount >= actualAmount) {
+      // Fully paid
+      handleChange('paymentStatus', 'paid')
+    } else if (newPaidAmount > 0 && newPaidAmount < actualAmount) {
+      // Partially paid
+      handleChange('paymentStatus', 'partial')
+    } else if (formData.dueDate && formData.dueDate < new Date() && newPaidAmount < actualAmount) {
+      // Overdue
+      handleChange('paymentStatus', 'overdue')
+    } else {
+      // Pending
+      handleChange('paymentStatus', 'pending')
+    }
 
     setShowPaymentModal(false)
     setEditingPayment(null)
