@@ -5,6 +5,7 @@ import { Edit3, Lock, Unlock, RotateCcw, GripVertical, Eye, EyeOff, Monitor, Max
 import { useDashboard } from '@/hooks/useDashboard'
 import { DashboardModule } from '@/types/dashboard'
 import { useCanvas, CANVAS_CONFIGS, CanvasWidth } from '@/contexts/CanvasContext'
+import RippleButton from '@/components/ui/RippleButton'
 
 // Import module components
 import WeddingCountdownModule from './modules/WeddingCountdownModule'
@@ -501,17 +502,18 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridD
             </button>
           </div>
 
-          <button
+          <RippleButton
             onClick={toggleEditMode}
             className={`btn-outline flex items-center space-x-2 ${
               layout.isEditMode ? 'bg-primary-50 border-primary-300 text-primary-700' : ''
             }`}
+            rippleColor="rgba(248, 113, 113, 0.3)"
           >
             <Edit3 className="w-4 h-4" />
             <span className="hidden sm:inline">
               {layout.isEditMode ? 'Dokončit úpravy' : 'Upravit layout'}
             </span>
-          </button>
+          </RippleButton>
 
           {layout.isEditMode && (
             <>
@@ -571,7 +573,7 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridD
                 key={module.id}
                 className={`
                   ${getSizeClasses(module.size)}
-                  ${layout.isEditMode ? 'ring-2 ring-primary-200 ring-opacity-50' : ''}
+                  ${layout.isEditMode ? 'ring-2 ring-primary-200 ring-opacity-50' : 'stagger-item'}
                   ${module.isLocked ? 'ring-2 ring-gray-300' : ''}
                   ${dragOverIndex === index ? 'ring-4 ring-blue-300 bg-blue-50' : ''}
                   ${layout.isEditMode && !module.isLocked ? 'cursor-grab active:cursor-grabbing' : ''}
@@ -580,6 +582,9 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridD
                   ${isHidden && layout.isEditMode ? 'opacity-40 border-2 border-dashed border-gray-300 bg-gray-50' : ''}
                   relative group
                 `}
+                style={{
+                  animationDelay: layout.isEditMode ? '0ms' : `${index * 50}ms`
+                }}
                 draggable={layout.isEditMode && !module.isLocked}
                 onDragStart={(e) => handleDragStart(e, module.id, index)}
                 onDragEnd={handleDragEnd}

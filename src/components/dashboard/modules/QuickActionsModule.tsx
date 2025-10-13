@@ -49,13 +49,14 @@ export default function QuickActionsModule() {
         <span>Rychlé akce</span>
       </h3>
       <div className="space-y-3">
-        {quickActions.map((action) => (
+        {quickActions.map((action, index) => (
           <Link
             key={action.title}
             href={action.href}
-            className={`flex items-center space-x-3 p-3 rounded-lg transition-colors ${action.color}`}
+            className={`stagger-item flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-md ${action.color}`}
+            style={{ animationDelay: `${index * 80}ms` }}
           >
-            <action.icon className="w-5 h-5" />
+            <action.icon className="w-5 h-5 float" />
             <div>
               <div className="font-medium text-sm">{action.title}</div>
               <div className="text-xs opacity-75">{action.description}</div>

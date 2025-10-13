@@ -1,6 +1,6 @@
 'use client'
 
-import { Calendar } from 'lucide-react'
+import { Calendar, Heart } from 'lucide-react'
 import { useWedding } from '@/hooks/useWedding'
 import { useTask } from '@/hooks/useTask'
 import { useGuest } from '@/hooks/useGuest'
@@ -43,14 +43,21 @@ export default function WeddingCountdownModule({ onWeddingSettingsClick }: Weddi
   }
 
   return (
-    <div className="wedding-card text-center">
-      <div className="space-y-6">
+    <div className="wedding-card text-center relative overflow-hidden">
+      {/* Floating hearts background */}
+      <div className="absolute inset-0 pointer-events-none opacity-10">
+        <Heart className="absolute top-4 left-4 w-8 h-8 text-primary-500 float" fill="currentColor" />
+        <Heart className="absolute top-8 right-8 w-6 h-6 text-secondary-500 float-rotate" fill="currentColor" style={{ animationDelay: '0.5s' }} />
+        <Heart className="absolute bottom-6 left-12 w-5 h-5 text-accent-500 float" fill="currentColor" style={{ animationDelay: '1s' }} />
+      </div>
+
+      <div className="space-y-6 relative z-10">
         {daysUntilWedding !== null ? (
           <div>
-            <div className="text-4xl sm:text-6xl font-bold text-primary-600 mb-2">
+            <div className="text-4xl sm:text-6xl font-bold text-primary-600 mb-2 scale-in">
               {daysUntilWedding > 0 ? daysUntilWedding : 0}
             </div>
-            <p className="text-lg sm:text-xl font-semibold text-text-primary">
+            <p className="text-lg sm:text-xl font-semibold text-text-primary slide-in-bottom">
               {daysUntilWedding > 0
                 ? `dní do svatby`
                 : daysUntilWedding === 0

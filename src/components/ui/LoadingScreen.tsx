@@ -8,24 +8,24 @@ interface LoadingScreenProps {
   className?: string
 }
 
-export default function LoadingScreen({ 
-  message = 'Načítáme vaši svatbu...', 
-  className 
+export default function LoadingScreen({
+  message = 'Načítáme vaši svatbu...',
+  className
 }: LoadingScreenProps) {
   return (
     <div className={cn(
       'min-h-screen flex items-center justify-center wedding-gradient',
       className
     )}>
-      <div className="text-center space-y-6 px-4">
+      <div className="text-center space-y-6 px-4 scale-in">
         {/* Animated logo */}
         <div className="relative">
           <div className="w-20 h-20 mx-auto mb-4 relative">
-            <Heart 
-              className="w-20 h-20 text-primary-500 bounce-gentle" 
+            <Heart
+              className="w-20 h-20 text-primary-500 heartbeat"
               fill="currentColor"
             />
-            <div className="absolute inset-0 w-20 h-20 border-4 border-primary-200 rounded-full animate-spin border-t-primary-500" />
+            <div className="absolute inset-0 w-20 h-20 border-4 border-primary-200 rounded-full animate-spin border-t-primary-500 pulse-glow" />
           </div>
         </div>
 
@@ -40,10 +40,10 @@ export default function LoadingScreen({
         </div>
 
         {/* Loading dots */}
-        <div className="flex justify-center space-x-1">
-          <div className="w-2 h-2 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-          <div className="w-2 h-2 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-          <div className="w-2 h-2 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+        <div className="flex justify-center space-x-2">
+          <div className="w-3 h-3 bg-primary-400 rounded-full wave" />
+          <div className="w-3 h-3 bg-secondary-400 rounded-full wave" />
+          <div className="w-3 h-3 bg-accent-400 rounded-full wave" />
         </div>
       </div>
     </div>
