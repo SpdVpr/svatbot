@@ -124,11 +124,15 @@ export default function AIAssistant({
     return (
       <button
         onClick={toggleOpen}
-        className={`fixed bottom-6 right-6 z-50 bg-primary-500 hover:bg-primary-600 text-white rounded-full p-4 shadow-lg transition-all duration-300 hover:scale-110 ${className}`}
+        className={`fixed bottom-6 right-6 z-50 bg-gradient-to-br from-primary-500 to-purple-600 hover:from-primary-600 hover:to-purple-700 text-white rounded-full p-5 shadow-2xl transition-all duration-300 hover:scale-110 hover:shadow-primary-500/50 group ${className}`}
         title="AI Svatební Asistent"
       >
-        <Bot className="w-6 h-6" />
-        <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse" />
+        <Bot className="w-7 h-7 group-hover:rotate-12 transition-transform duration-300" />
+        <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-pulse shadow-lg" />
+        <div className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
+
+        {/* Sparkle effect */}
+        <Sparkles className="absolute -top-2 -left-2 w-4 h-4 text-yellow-300 animate-pulse" />
       </button>
     )
   }
@@ -139,11 +143,15 @@ export default function AIAssistant({
       {compact && (
         <button
           onClick={toggleOpen}
-          className={`fixed bottom-6 right-6 z-50 bg-primary-500 hover:bg-primary-600 text-white rounded-full p-4 shadow-lg transition-all duration-300 hover:scale-110 ${isOpen ? 'scale-0' : 'scale-100'}`}
+          className={`fixed bottom-6 right-6 z-50 bg-gradient-to-br from-primary-500 to-purple-600 hover:from-primary-600 hover:to-purple-700 text-white rounded-full p-5 shadow-2xl transition-all duration-300 hover:scale-110 hover:shadow-primary-500/50 group ${isOpen ? 'scale-0' : 'scale-100'}`}
           title="AI Svatební Asistent"
         >
-          <Bot className="w-6 h-6" />
-          <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse" />
+          <Bot className="w-7 h-7 group-hover:rotate-12 transition-transform duration-300" />
+          <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-pulse shadow-lg" />
+          <div className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
+
+          {/* Sparkle effect */}
+          <Sparkles className="absolute -top-2 -left-2 w-4 h-4 text-yellow-300 animate-pulse" />
         </button>
       )}
 

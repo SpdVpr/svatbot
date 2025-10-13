@@ -375,16 +375,6 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridD
               </div>
 
               <button
-                onClick={toggleLock}
-                className={`btn-outline flex items-center justify-center px-2 py-1 text-xs ${
-                  layout.isLocked ? 'bg-red-50 border-red-300 text-red-700' : ''
-                }`}
-                title={layout.isLocked ? 'Odemknout' : 'Zamknout'}
-              >
-                {layout.isLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
-              </button>
-
-              <button
                 onClick={resetLayout}
                 className="btn-outline flex items-center justify-center px-2 py-1 text-xs text-gray-600 hover:text-red-600"
                 title="Reset"
@@ -485,33 +475,14 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridD
                 </div>
 
                 {layout.isEditMode && (
-                  <>
-                    <button
-                      onClick={toggleLock}
-                      className={`btn-outline flex items-center space-x-2 ${
-                        layout.isLocked ? 'bg-red-50 border-red-300 text-red-700' : ''
-                      }`}
-                      title={layout.isLocked ? 'Odemknout všechny moduly' : 'Zamknout všechny moduly'}
-                    >
-                      {layout.isLocked ? (
-                        <Unlock className="w-4 h-4" />
-                      ) : (
-                        <Lock className="w-4 h-4" />
-                      )}
-                      <span className="hidden sm:inline">
-                        {layout.isLocked ? 'Odemknout' : 'Zamknout'}
-                      </span>
-                    </button>
-
-                    <button
-                      onClick={resetLayout}
-                      className="btn-outline flex items-center space-x-2 text-gray-600 hover:text-red-600"
-                      title="Obnovit výchozí layout"
-                    >
-                      <RotateCcw className="w-4 h-4" />
-                      <span className="hidden sm:inline">Reset</span>
-                    </button>
-                  </>
+                  <button
+                    onClick={resetLayout}
+                    className="btn-outline flex items-center space-x-2 text-gray-600 hover:text-red-600"
+                    title="Obnovit výchozí layout"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    <span className="hidden sm:inline">Reset</span>
+                  </button>
                 )}
               </>
             )}
