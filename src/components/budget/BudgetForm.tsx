@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { BudgetFormData, BudgetCategory, PaymentStatus, PaymentMethod, BudgetItemPayment, BudgetSubItem, BUDGET_CATEGORIES } from '@/types/budget'
+import { BudgetFormData, BudgetCategory, PaymentStatus, PaymentMethod, PaymentPeriod, BudgetItemPayment, BudgetSubItem, BUDGET_CATEGORIES } from '@/types/budget'
 import { useVendor } from '@/hooks/useVendor'
 import {
   X,
@@ -43,6 +43,7 @@ export default function BudgetForm({
     vendorName: initialData?.vendorName || '',
     paymentStatus: initialData?.paymentStatus || 'pending',
     paymentMethod: initialData?.paymentMethod || undefined,
+    paymentPeriod: initialData?.paymentPeriod || undefined,
     dueDate: initialData?.dueDate || undefined,
     paidDate: initialData?.paidDate || undefined,
     priority: initialData?.priority || undefined,
@@ -73,15 +74,20 @@ export default function BudgetForm({
     { value: 'cancelled', label: 'Zrušeno', color: 'text-gray-600' }
   ]
 
-  // Payment method options
+  // Payment method options (removed "Po svatbě" and "Na svatbě")
   const paymentMethodOptions = [
     { value: 'cash', label: 'Hotovost', icon: '💵' },
     { value: 'card', label: 'Karta', icon: '💳' },
     { value: 'transfer', label: 'Převod', icon: '🏦' },
     { value: 'invoice', label: 'Faktura', icon: '📝' },
-    { value: 'after_wedding', label: 'Po svatbě', icon: '💒' },
-    { value: 'at_wedding', label: 'Na svatbě', icon: '🎉' },
     { value: 'other', label: 'Jiné', icon: '💰' }
+  ]
+
+  // Payment period options (new)
+  const paymentPeriodOptions = [
+    { value: 'before-wedding', label: 'Před svatbou', icon: '📅' },
+    { value: 'at-wedding', label: 'Na svatbě', icon: '💐' },
+    { value: 'after-wedding', label: 'Po svatbě', icon: '💒' }
   ]
 
   // Priority options
@@ -672,8 +678,28 @@ export default function BudgetForm({
               <Calendar className="w-5 h-5" />
               <span>Platební údaje</span>
             </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Payment Period */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Období platby
+                </label>
+                <select
+                  value={formData.paymentPeriod || ''}
+                  onChange={(e) => handleChange('paymentPeriod', e.target.value as PaymentPeriod || undefined)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  disabled={loading}
+                >
+                  <option value="">Vyberte období</option>
+                  {paymentPeriodOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.icon} {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               {/* Payment Method */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">

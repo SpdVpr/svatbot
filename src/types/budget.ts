@@ -33,7 +33,12 @@ export type PaymentMethod =
   | 'invoice'         // Faktura
   | 'other'           // Jiné
 
-export type VendorStatus = 
+export type PaymentPeriod =
+  | 'before-wedding'  // Před svatbou
+  | 'at-wedding'      // Na svatbě
+  | 'after-wedding'   // Po svatbě
+
+export type VendorStatus =
   | 'researching'     // Hledání
   | 'contacted'       // Kontaktováno
   | 'quoted'          // Nabídka
@@ -63,6 +68,7 @@ export interface BudgetItem {
   // Payment
   paymentStatus: PaymentStatus
   paymentMethod?: PaymentMethod
+  paymentPeriod?: PaymentPeriod
   dueDate?: Date
   paidDate?: Date
   payments: BudgetItemPayment[]
@@ -259,6 +265,7 @@ export interface BudgetFormData {
   vendorName?: string
   paymentStatus: PaymentStatus
   paymentMethod?: PaymentMethod
+  paymentPeriod?: PaymentPeriod
   dueDate?: Date
   paidDate?: Date
   priority?: 'low' | 'medium' | 'high' | 'critical'

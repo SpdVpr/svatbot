@@ -75,11 +75,15 @@ export default function SectionOrderEditor({ sectionOrder, enabledSections, onOr
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6">
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Pořadí sekcí na webu</h3>
-        <p className="text-sm text-gray-600">
-          Přetáhněte sekce pro změnu jejich pořadí na svatebním webu
+    <div className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200 rounded-xl p-6 shadow-lg">
+      <div className="mb-6">
+        <h3 className="text-xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+          <span className="text-2xl">🎯</span>
+          Pořadí sekcí na webu
+        </h3>
+        <p className="text-sm text-gray-700">
+          <strong>Přetáhněte sekce</strong> myší pro změnu jejich pořadí na svatebním webu.
+          Sekce se zobrazí v tomto pořadí shora dolů.
         </p>
       </div>
 
@@ -99,11 +103,11 @@ export default function SectionOrderEditor({ sectionOrder, enabledSections, onOr
               onDragEnd={handleDragEnd}
               onDragLeave={handleDragLeave}
               className={`
-                flex items-center gap-3 p-4 rounded-lg border-2 transition-all
-                ${isDragging ? 'opacity-50 scale-95' : ''}
-                ${isDragOver ? 'border-pink-400 bg-pink-50' : 'border-gray-200 bg-white'}
-                ${!isEnabled ? 'opacity-50' : ''}
-                ${!sectionInfo.required ? 'cursor-move hover:border-gray-300 hover:shadow-sm' : 'cursor-default'}
+                flex items-center gap-3 p-4 rounded-lg border-2 transition-all duration-200
+                ${isDragging ? 'opacity-50 scale-95 rotate-2' : ''}
+                ${isDragOver ? 'border-pink-500 bg-pink-100 scale-105 shadow-lg' : 'border-gray-300 bg-white'}
+                ${!isEnabled ? 'opacity-60' : ''}
+                ${!sectionInfo.required ? 'cursor-grab active:cursor-grabbing hover:border-blue-400 hover:shadow-md hover:scale-102' : 'cursor-default bg-gray-50'}
               `}
             >
               {/* Drag Handle */}
@@ -148,11 +152,21 @@ export default function SectionOrderEditor({ sectionOrder, enabledSections, onOr
         })}
       </div>
 
-      <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-        <p className="text-sm text-blue-800">
-          <strong>Tip:</strong> Povinné sekce (Hlavní sekce, Místo konání) nelze přesouvat. 
-          Ostatní sekce můžete přetáhnout na požadované místo.
-        </p>
+      <div className="mt-6 p-4 bg-white border-2 border-blue-300 rounded-lg">
+        <div className="flex items-start gap-3">
+          <span className="text-2xl">💡</span>
+          <div>
+            <p className="text-sm font-medium text-blue-900 mb-1">
+              <strong>Jak to funguje:</strong>
+            </p>
+            <ul className="text-sm text-blue-800 space-y-1">
+              <li>• <strong>Uchopte sekci</strong> za [≡] ikonu a přetáhněte ji na nové místo</li>
+              <li>• <strong>Povinné sekce</strong> (šedé pozadí) nelze přesouvat</li>
+              <li>• <strong>Pořadí se automaticky uloží</strong> při každé změně</li>
+              <li>• <strong>Číslo vpravo</strong> ukazuje aktuální pozici sekce na webu</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   )
