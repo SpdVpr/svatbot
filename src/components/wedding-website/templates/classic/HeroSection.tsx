@@ -98,19 +98,19 @@ export default function HeroSection({ content }: HeroSectionProps) {
       {/* Main content */}
       <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
         {/* Names */}
-        <div className="mb-6">
+        <div className="mb-6 scale-in">
           <h1 className={`text-5xl md:text-7xl font-bold mb-4 font-serif ${
             mainImage ? 'text-white' : 'text-gray-900'
           }`}>
             {bride && groom ? (
               <>
-                <span className="block">{bride}</span>
-                <span className={`text-3xl md:text-4xl mx-4 ${
+                <span className="block slide-in-left">{bride}</span>
+                <span className={`text-3xl md:text-4xl mx-4 heartbeat ${
                   mainImage ? 'text-amber-200' : 'text-amber-600'
-                }`}>
+                }`} style={{ animationDelay: '0.3s' }}>
                   &
                 </span>
-                <span className="block">{groom}</span>
+                <span className="block slide-in-right" style={{ animationDelay: '0.2s' }}>{groom}</span>
               </>
             ) : (
               <span className="text-gray-400">Jména snoubenců</span>
@@ -118,13 +118,13 @@ export default function HeroSection({ content }: HeroSectionProps) {
           </h1>
 
           {/* Decorative line */}
-          <div className="flex items-center justify-center my-6">
+          <div className="flex items-center justify-center my-6 slide-in-bottom" style={{ animationDelay: '0.4s' }}>
             <div className={`h-px w-12 ${
               mainImage ? 'bg-white' : 'bg-amber-400'
             }`}></div>
-            <Heart className={`w-5 h-5 mx-3 ${
+            <Heart className={`w-5 h-5 mx-3 heartbeat ${
               mainImage ? 'text-white' : 'text-rose-400'
-            }`} />
+            }`} fill="currentColor" />
             <div className={`h-px w-12 ${
               mainImage ? 'bg-white' : 'bg-amber-400'
             }`}></div>
@@ -133,13 +133,13 @@ export default function HeroSection({ content }: HeroSectionProps) {
 
         {/* Wedding Date */}
         {weddingDate && (
-          <div className="mb-6">
-            <div className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full ${
+          <div className="mb-6 bounce-in" style={{ animationDelay: '0.5s' }}>
+            <div className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full transition-all duration-300 hover:scale-110 ${
               mainImage
                 ? 'bg-white bg-opacity-20 backdrop-blur-sm text-white'
                 : 'bg-white shadow-lg text-gray-900'
             }`}>
-              <Calendar className="w-4 h-4" />
+              <Calendar className="w-4 h-4 float" />
               <span className="text-lg font-semibold">
                 {formatDate(weddingDate)}
               </span>
@@ -161,7 +161,7 @@ export default function HeroSection({ content }: HeroSectionProps) {
 
         {/* Tagline */}
         {tagline && (
-          <div className="mb-8">
+          <div className="mb-8 slide-in-bottom" style={{ animationDelay: '0.7s' }}>
             <p className={`text-lg md:text-xl italic font-light max-w-2xl mx-auto leading-relaxed ${
               mainImage ? 'text-white' : 'text-gray-700'
             }`}>

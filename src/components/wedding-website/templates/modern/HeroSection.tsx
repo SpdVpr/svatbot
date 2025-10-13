@@ -78,29 +78,29 @@ export default function ModernHeroSection({ content }: HeroSectionProps) {
       {/* Main content */}
       <div className="relative z-10 text-center px-4 max-w-5xl mx-auto py-20">
         {/* Velké iniciály */}
-        <div className="mb-8">
+        <div className="mb-8 scale-in">
           <div className="text-[12rem] md:text-[16rem] font-light text-gray-900 leading-none tracking-tight">
             {getInitials()}
           </div>
         </div>
 
         {/* Tagline "se budou brát" */}
-        <div className="mb-12">
+        <div className="mb-12 slide-in-bottom" style={{ animationDelay: '0.3s' }}>
           <p className="text-xl md:text-2xl font-light text-gray-600 tracking-wide">
             {tagline || 'se budou brát'}
           </p>
         </div>
 
         {/* Names */}
-        <div className="mb-12">
+        <div className="mb-12 fade-in" style={{ animationDelay: '0.5s' }}>
           <h1 className="text-4xl md:text-5xl font-light text-gray-900 mb-4">
             {bride && groom ? (
               <>
-                <span>{bride}</span>
-                <span className="text-2xl md:text-3xl font-light mx-4 text-gray-500">
+                <span className="slide-in-left">{bride}</span>
+                <span className="text-2xl md:text-3xl font-light mx-4 text-gray-500 heartbeat" style={{ animationDelay: '0.7s' }}>
                   a
                 </span>
-                <span>{groom}</span>
+                <span className="slide-in-right" style={{ animationDelay: '0.8s' }}>{groom}</span>
               </>
             ) : (
               <span className="text-gray-400">Jména snoubenců</span>
@@ -110,7 +110,7 @@ export default function ModernHeroSection({ content }: HeroSectionProps) {
 
         {/* Wedding Date */}
         {weddingDate && (
-          <div className="mb-12">
+          <div className="mb-12 bounce-in" style={{ animationDelay: '0.9s' }}>
             <div className="text-2xl md:text-3xl font-light text-gray-900 tracking-wide">
               {formatDate(weddingDate)}
             </div>
@@ -119,7 +119,7 @@ export default function ModernHeroSection({ content }: HeroSectionProps) {
 
         {/* Countdown */}
         {weddingDate && (
-          <div className="mb-16">
+          <div className="mb-16 fade-in" style={{ animationDelay: '1s' }}>
             <p className="text-sm uppercase tracking-widest text-gray-500 mb-6">
               Do svatby zbývá
             </p>
@@ -132,7 +132,7 @@ export default function ModernHeroSection({ content }: HeroSectionProps) {
         )}
 
         {/* Venue info */}
-        <div className="text-lg md:text-xl font-light text-gray-600">
+        <div className="text-lg md:text-xl font-light text-gray-600 slide-in-bottom" style={{ animationDelay: '1.2s' }}>
           <span>Místo konání</span>
         </div>
       </div>

@@ -39,11 +39,11 @@ export default function InfoSection({ content }: InfoSectionProps) {
       <div className="max-w-7xl mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-5xl font-bold text-gray-900 mb-4 font-serif">
+          <h2 className="text-5xl font-bold text-gray-900 mb-4 font-serif scale-in">
             {ceremony?.venue || reception?.venue || 'Místo konání'}
           </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-amber-400 to-rose-400 mx-auto mb-6"></div>
-          <p className="text-gray-600 text-lg leading-relaxed max-w-3xl mx-auto">
+          <div className="w-24 h-1 bg-gradient-to-r from-amber-400 to-rose-400 mx-auto mb-6 slide-in-left" style={{ animationDelay: '0.2s' }}></div>
+          <p className="text-gray-600 text-lg leading-relaxed max-w-3xl mx-auto slide-in-bottom" style={{ animationDelay: '0.3s' }}>
             {ceremony?.address || reception?.address || 'Všechny důležité informace o našem velkém dni'}
           </p>
         </div>
@@ -59,7 +59,8 @@ export default function InfoSection({ content }: InfoSectionProps) {
                     {allVenueImages.map((image, index) => (
                       <div
                         key={index}
-                        className="aspect-video rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 group"
+                        className="stagger-item aspect-video rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 group"
+                        style={{ animationDelay: `${index * 150}ms` }}
                       >
                         <img
                           src={image}

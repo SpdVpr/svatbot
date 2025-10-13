@@ -80,15 +80,15 @@ export default function ClassicGallerySection({ content }: GallerySectionProps) 
         <div className="max-w-6xl mx-auto px-4">
           {/* Section Header */}
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4 scale-in">
               {content.title || 'Fotogalerie'}
             </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-pink-500 to-purple-500 mx-auto mb-6"></div>
+            <div className="w-24 h-1 bg-gradient-to-r from-pink-500 to-purple-500 mx-auto mb-6 slide-in-left" style={{ animationDelay: '0.2s' }}></div>
             {content.subtitle && (
-              <p className="text-xl text-gray-600 mb-4">{content.subtitle}</p>
+              <p className="text-xl text-gray-600 mb-4 slide-in-bottom" style={{ animationDelay: '0.3s' }}>{content.subtitle}</p>
             )}
             {content.description && (
-              <p className="text-gray-700 max-w-3xl mx-auto">{content.description}</p>
+              <p className="text-gray-700 max-w-3xl mx-auto fade-in" style={{ animationDelay: '0.4s' }}>{content.description}</p>
             )}
           </div>
 
@@ -97,7 +97,8 @@ export default function ClassicGallerySection({ content }: GallerySectionProps) 
             {displayedImages.map((image, index) => (
               <div
                 key={image.id}
-                className="group relative bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer"
+                className="stagger-item group relative bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105"
+                style={{ animationDelay: `${index * 100}ms` }}
                 onClick={() => openLightbox(image, index)}
               >
                 <div className="aspect-square overflow-hidden">

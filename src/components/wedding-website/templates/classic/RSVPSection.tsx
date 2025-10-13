@@ -77,12 +77,12 @@ export default function RSVPSection({ content, websiteId, weddingId }: RSVPSecti
     return (
       <section className="py-20 bg-gradient-to-br from-green-50 to-emerald-50">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="bg-white rounded-2xl p-12 shadow-lg">
-            <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-6" />
-            <h2 className="text-3xl font-bold text-gray-900 mb-4 font-serif">
+          <div className="bg-white rounded-2xl p-12 shadow-lg scale-in">
+            <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-6 bounce-in" />
+            <h2 className="text-3xl font-bold text-gray-900 mb-4 font-serif slide-in-bottom" style={{ animationDelay: '0.2s' }}>
               Děkujeme za potvrzení!
             </h2>
-            <p className="text-gray-600 text-lg mb-6">
+            <p className="text-gray-600 text-lg mb-6 fade-in" style={{ animationDelay: '0.4s' }}>
               Vaše odpověď byla úspěšně odeslána. Těšíme se na vás!
             </p>
             
@@ -114,10 +114,10 @@ export default function RSVPSection({ content, websiteId, weddingId }: RSVPSecti
       <div className="max-w-4xl mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4 font-serif">
+          <h2 className="text-4xl font-bold text-gray-900 mb-4 font-serif scale-in">
             Potvrzení účasti
           </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-amber-400 to-rose-400 mx-auto mb-6"></div>
+          <div className="w-24 h-1 bg-gradient-to-r from-amber-400 to-rose-400 mx-auto mb-6 slide-in-left" style={{ animationDelay: '0.2s' }}></div>
           
           {content.message && (
             <p className="text-gray-700 text-lg max-w-2xl mx-auto mb-6">
