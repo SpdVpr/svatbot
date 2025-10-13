@@ -271,8 +271,35 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridD
       <div className="bg-white p-3 sm:p-4 rounded-xl border border-gray-200">
         {/* Mobile Layout */}
         <div className="sm:hidden space-y-3">
+          {/* Layout Mode Switcher - Mobile */}
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">Dashboard</h2>
+            <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1 flex-1 mr-2">
+              <button
+                onClick={() => setLayoutMode('grid')}
+                className={`flex items-center justify-center space-x-1 px-2 py-1.5 rounded-md transition-colors flex-1 ${
+                  (layout.layoutMode || 'grid') === 'grid'
+                    ? 'bg-white text-primary-600 shadow-sm'
+                    : 'text-gray-600'
+                }`}
+                title="Grid layout"
+              >
+                <Grid3x3 className="w-3 h-3" />
+                <span className="text-xs">Grid</span>
+              </button>
+              <button
+                onClick={() => setLayoutMode('free')}
+                className={`flex items-center justify-center space-x-1 px-2 py-1.5 rounded-md transition-colors flex-1 ${
+                  (layout.layoutMode || 'grid') === 'free'
+                    ? 'bg-white text-primary-600 shadow-sm'
+                    : 'text-gray-600'
+                }`}
+                title="Volný layout"
+              >
+                <Maximize2 className="w-3 h-3" />
+                <span className="text-xs">Volný</span>
+              </button>
+            </div>
+
             <button
               onClick={toggleEditMode}
               className={`btn-outline flex items-center space-x-1 text-sm px-2 py-1 ${
@@ -284,197 +311,213 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridD
             </button>
           </div>
 
+          {/* Mobile Controls Row - Only in Edit Mode */}
           {layout.isEditMode && (
-            <div className="flex items-center space-x-2 text-xs text-primary-600">
-              <Edit3 className="w-3 h-3" />
-              <span>Režim úprav aktivní</span>
+            <div className="flex items-center justify-between space-x-2">
+              {/* Canvas Width - Mobile */}
+              <div className="relative flex-1" data-canvas-menu>
+                <button
+                  onClick={() => setShowCanvasMenu(!showCanvasMenu)}
+                  className="btn-outline w-full flex items-center justify-center space-x-1 text-xs px-2 py-1"
+                  title="Šířka plochy"
+                >
+                  <ArrowLeftRight className="w-3 h-3" />
+                  <span className="truncate">{CANVAS_CONFIGS[canvasWidth].shortLabel || 'Šířka'}</span>
+                </button>
+                {showCanvasMenu && (
+                  <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                    {Object.entries(CANVAS_CONFIGS).map(([key, config]) => (
+                      <button
+                        key={key}
+                        onClick={() => {
+                          setCanvasWidth(key as CanvasWidth)
+                          setShowCanvasMenu(false)
+                        }}
+                        className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
+                          canvasWidth === key ? 'bg-primary-50 text-primary-700' : ''
+                        }`}
+                      >
+                        {config.shortLabel || config.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Grid Size - Mobile */}
+              <div className="relative flex-1" data-grid-size-menu>
+                <button
+                  onClick={() => setShowGridSizeMenu(!showGridSizeMenu)}
+                  className="btn-outline w-full flex items-center justify-center space-x-1 text-xs px-2 py-1"
+                  title="Počet sloupců"
+                >
+                  <Monitor className="w-3 h-3" />
+                  <span>{GRID_CONFIGS[gridSize].cols} sl.</span>
+                </button>
+                {showGridSizeMenu && (
+                  <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                    {Object.entries(GRID_CONFIGS).map(([key, config]) => (
+                      <button
+                        key={key}
+                        onClick={() => {
+                          setGridSize(key as GridSize)
+                          setShowGridSizeMenu(false)
+                        }}
+                        className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
+                          gridSize === key ? 'bg-primary-50 text-primary-700' : ''
+                        }`}
+                      >
+                        {config.cols} sloupců
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={toggleLock}
+                className={`btn-outline flex items-center justify-center px-2 py-1 text-xs ${
+                  layout.isLocked ? 'bg-red-50 border-red-300 text-red-700' : ''
+                }`}
+                title={layout.isLocked ? 'Odemknout' : 'Zamknout'}
+              >
+                {layout.isLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
+              </button>
+
+              <button
+                onClick={resetLayout}
+                className="btn-outline flex items-center justify-center px-2 py-1 text-xs text-gray-600 hover:text-red-600"
+                title="Reset"
+              >
+                <RotateCcw className="w-3 h-3" />
+              </button>
             </div>
           )}
-
-          {/* Mobile Controls Row */}
-          <div className="flex items-center justify-between space-x-2">
-            {/* Canvas Width - Mobile */}
-            <div className="relative flex-1" data-canvas-menu>
-              <button
-                onClick={() => setShowCanvasMenu(!showCanvasMenu)}
-                className="btn-outline w-full flex items-center justify-center space-x-1 text-xs px-2 py-1"
-                title="Šířka plochy"
-              >
-                <ArrowLeftRight className="w-3 h-3" />
-                <span className="truncate">{CANVAS_CONFIGS[canvasWidth].shortLabel || 'Šířka'}</span>
-              </button>
-              {showCanvasMenu && (
-                <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                  {Object.entries(CANVAS_CONFIGS).map(([key, config]) => (
-                    <button
-                      key={key}
-                      onClick={() => {
-                        setCanvasWidth(key as CanvasWidth)
-                        setShowCanvasMenu(false)
-                      }}
-                      className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
-                        canvasWidth === key ? 'bg-primary-50 text-primary-700' : ''
-                      }`}
-                    >
-                      {config.shortLabel || config.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Grid Size - Mobile */}
-            <div className="relative flex-1" data-grid-size-menu>
-              <button
-                onClick={() => setShowGridSizeMenu(!showGridSizeMenu)}
-                className="btn-outline w-full flex items-center justify-center space-x-1 text-xs px-2 py-1"
-                title="Počet sloupců"
-              >
-                <Monitor className="w-3 h-3" />
-                <span>{GRID_CONFIGS[gridSize].cols} sl.</span>
-              </button>
-              {showGridSizeMenu && (
-                <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                  {Object.entries(GRID_CONFIGS).map(([key, config]) => (
-                    <button
-                      key={key}
-                      onClick={() => {
-                        setGridSize(key as GridSize)
-                        setShowGridSizeMenu(false)
-                      }}
-                      className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
-                        gridSize === key ? 'bg-primary-50 text-primary-700' : ''
-                      }`}
-                    >
-                      {config.cols} sloupců
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Edit Mode Controls - Mobile */}
-            {layout.isEditMode && (
-              <>
-                <button
-                  onClick={toggleLock}
-                  className={`btn-outline flex items-center justify-center px-2 py-1 text-xs ${
-                    layout.isLocked ? 'bg-red-50 border-red-300 text-red-700' : ''
-                  }`}
-                  title={layout.isLocked ? 'Odemknout' : 'Zamknout'}
-                >
-                  {layout.isLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
-                </button>
-
-                <button
-                  onClick={resetLayout}
-                  className="btn-outline flex items-center justify-center px-2 py-1 text-xs text-gray-600 hover:text-red-600"
-                  title="Reset"
-                >
-                  <RotateCcw className="w-3 h-3" />
-                </button>
-              </>
-            )}
-          </div>
         </div>
 
         {/* Desktop Layout */}
         <div className="hidden sm:flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <h2 className="text-lg font-semibold text-gray-900">Dashboard</h2>
-            {layout.isEditMode && (
-              <div className="flex items-center space-x-2 text-sm text-primary-600">
-                <Edit3 className="w-4 h-4" />
-                <span>Režim úprav - Grid layout</span>
-              </div>
-            )}
-          </div>
-
+          {/* Left Side - Canvas Width & Grid Size (only in edit mode) */}
           <div className="flex items-center space-x-2">
-          {/* Canvas Width Selector */}
-          <div className="relative" data-canvas-menu>
-            <button
-              onClick={() => setShowCanvasMenu(!showCanvasMenu)}
-              className="btn-outline flex items-center space-x-2"
-              title="Změnit šířku plochy dashboardu"
-            >
-              <ArrowLeftRight className="w-4 h-4" />
-              <span className="hidden sm:inline">{CANVAS_CONFIGS[canvasWidth].label}</span>
-              <span className="sm:hidden">Šířka</span>
-            </button>
+            {layout.isEditMode && (
+              <>
+                {/* Canvas Width Selector */}
+                <div className="relative" data-canvas-menu>
+                  <button
+                    onClick={() => setShowCanvasMenu(!showCanvasMenu)}
+                    className="btn-outline flex items-center space-x-2"
+                    title="Změnit šířku plochy dashboardu"
+                  >
+                    <ArrowLeftRight className="w-4 h-4" />
+                    <span className="hidden sm:inline">{CANVAS_CONFIGS[canvasWidth].label}</span>
+                    <span className="sm:hidden">Šířka</span>
+                  </button>
 
-            {showCanvasMenu && (
-              <div className="absolute right-0 top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[280px]">
-                <div className="p-2">
-                  <div className="text-xs font-medium text-gray-500 mb-2 px-2">Šířka plochy dashboardu</div>
-                  {Object.entries(CANVAS_CONFIGS).map(([key, config]) => (
-                    <button
-                      key={key}
-                      onClick={() => {
-                        setCanvasWidth(key as CanvasWidth)
-                        setShowCanvasMenu(false)
-                      }}
-                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
-                        canvasWidth === key
-                          ? 'bg-primary-50 text-primary-700 font-medium'
-                          : 'hover:bg-gray-50 text-gray-700'
-                      }`}
-                    >
-                      <div className="flex flex-col">
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium">{config.label}</span>
-                          {canvasWidth === key && <ArrowLeftRight className="w-3 h-3" />}
-                        </div>
-                        <span className="text-xs text-gray-500 mt-1">{config.description}</span>
+                  {showCanvasMenu && (
+                    <div className="absolute left-0 top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[280px]">
+                      <div className="p-2">
+                        <div className="text-xs font-medium text-gray-500 mb-2 px-2">Šířka plochy dashboardu</div>
+                        {Object.entries(CANVAS_CONFIGS).map(([key, config]) => (
+                          <button
+                            key={key}
+                            onClick={() => {
+                              setCanvasWidth(key as CanvasWidth)
+                              setShowCanvasMenu(false)
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                              canvasWidth === key
+                                ? 'bg-primary-50 text-primary-700 font-medium'
+                                : 'hover:bg-gray-50 text-gray-700'
+                            }`}
+                          >
+                            <div className="flex flex-col">
+                              <div className="flex items-center justify-between">
+                                <span className="font-medium">{config.label}</span>
+                                {canvasWidth === key && <ArrowLeftRight className="w-3 h-3" />}
+                              </div>
+                              <span className="text-xs text-gray-500 mt-1">{config.description}</span>
+                            </div>
+                          </button>
+                        ))}
                       </div>
-                    </button>
-                  ))}
+                    </div>
+                  )}
                 </div>
-              </div>
+
+                {/* Grid Size Selector */}
+                <div className="relative" data-grid-size-menu>
+                  <button
+                    onClick={() => setShowGridSizeMenu(!showGridSizeMenu)}
+                    className="btn-outline flex items-center space-x-2"
+                    title="Změnit počet sloupců gridu"
+                  >
+                    <Monitor className="w-4 h-4" />
+                    <span className="hidden sm:inline">{GRID_CONFIGS[gridSize].label}</span>
+                    <span className="sm:hidden">{GRID_CONFIGS[gridSize].cols} sloupců</span>
+                  </button>
+
+                  {showGridSizeMenu && (
+                    <div className="absolute left-0 top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[200px]">
+                      <div className="p-2">
+                        <div className="text-xs font-medium text-gray-500 mb-2 px-2">Počet sloupců gridu</div>
+                        {Object.entries(GRID_CONFIGS).map(([key, config]) => (
+                          <button
+                            key={key}
+                            onClick={() => {
+                              setGridSize(key as GridSize)
+                              setShowGridSizeMenu(false)
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                              gridSize === key
+                                ? 'bg-primary-50 text-primary-700 font-medium'
+                                : 'hover:bg-gray-50 text-gray-700'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span>{config.label}</span>
+                              {gridSize === key && <Maximize2 className="w-3 h-3" />}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {layout.isEditMode && (
+                  <>
+                    <button
+                      onClick={toggleLock}
+                      className={`btn-outline flex items-center space-x-2 ${
+                        layout.isLocked ? 'bg-red-50 border-red-300 text-red-700' : ''
+                      }`}
+                      title={layout.isLocked ? 'Odemknout všechny moduly' : 'Zamknout všechny moduly'}
+                    >
+                      {layout.isLocked ? (
+                        <Unlock className="w-4 h-4" />
+                      ) : (
+                        <Lock className="w-4 h-4" />
+                      )}
+                      <span className="hidden sm:inline">
+                        {layout.isLocked ? 'Odemknout' : 'Zamknout'}
+                      </span>
+                    </button>
+
+                    <button
+                      onClick={resetLayout}
+                      className="btn-outline flex items-center space-x-2 text-gray-600 hover:text-red-600"
+                      title="Obnovit výchozí layout"
+                    >
+                      <RotateCcw className="w-4 h-4" />
+                      <span className="hidden sm:inline">Reset</span>
+                    </button>
+                  </>
+                )}
+              </>
             )}
           </div>
 
-          {/* Grid Size Selector */}
-          <div className="relative" data-grid-size-menu>
-            <button
-              onClick={() => setShowGridSizeMenu(!showGridSizeMenu)}
-              className="btn-outline flex items-center space-x-2"
-              title="Změnit počet sloupců gridu"
-            >
-              <Monitor className="w-4 h-4" />
-              <span className="hidden sm:inline">{GRID_CONFIGS[gridSize].label}</span>
-              <span className="sm:hidden">{GRID_CONFIGS[gridSize].cols} sloupců</span>
-            </button>
-
-            {showGridSizeMenu && (
-              <div className="absolute right-0 top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[200px]">
-                <div className="p-2">
-                  <div className="text-xs font-medium text-gray-500 mb-2 px-2">Počet sloupců gridu</div>
-                  {Object.entries(GRID_CONFIGS).map(([key, config]) => (
-                    <button
-                      key={key}
-                      onClick={() => {
-                        setGridSize(key as GridSize)
-                        setShowGridSizeMenu(false)
-                      }}
-                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
-                        gridSize === key
-                          ? 'bg-primary-50 text-primary-700 font-medium'
-                          : 'hover:bg-gray-50 text-gray-700'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span>{config.label}</span>
-                        {gridSize === key && <Maximize2 className="w-3 h-3" />}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Layout Mode Switcher */}
+          {/* Center - Layout Mode Switcher */}
           <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
             <button
               onClick={() => setLayoutMode('grid')}
@@ -502,48 +545,20 @@ export default function FixedGridDragDrop({ onWeddingSettingsClick }: FixedGridD
             </button>
           </div>
 
-          <RippleButton
-            onClick={toggleEditMode}
-            className={`btn-outline flex items-center space-x-2 ${
-              layout.isEditMode ? 'bg-primary-50 border-primary-300 text-primary-700' : ''
-            }`}
-            rippleColor="rgba(248, 113, 113, 0.3)"
-          >
-            <Edit3 className="w-4 h-4" />
-            <span className="hidden sm:inline">
-              {layout.isEditMode ? 'Dokončit úpravy' : 'Upravit layout'}
-            </span>
-          </RippleButton>
-
-          {layout.isEditMode && (
-            <>
-              <button
-                onClick={toggleLock}
-                className={`btn-outline flex items-center space-x-2 ${
-                  layout.isLocked ? 'bg-red-50 border-red-300 text-red-700' : ''
-                }`}
-                title={layout.isLocked ? 'Odemknout všechny moduly' : 'Zamknout všechny moduly'}
-              >
-                {layout.isLocked ? (
-                  <Unlock className="w-4 h-4" />
-                ) : (
-                  <Lock className="w-4 h-4" />
-                )}
-                <span className="hidden sm:inline">
-                  {layout.isLocked ? 'Odemknout' : 'Zamknout'}
-                </span>
-              </button>
-
-              <button
-                onClick={resetLayout}
-                className="btn-outline flex items-center space-x-2 text-gray-600 hover:text-red-600"
-                title="Obnovit výchozí layout"
-              >
-                <RotateCcw className="w-4 h-4" />
-                <span className="hidden sm:inline">Reset</span>
-              </button>
-            </>
-          )}
+          {/* Right Side - Edit Mode Button */}
+          <div className="flex items-center space-x-2">
+            <RippleButton
+              onClick={toggleEditMode}
+              className={`btn-outline flex items-center space-x-2 ${
+                layout.isEditMode ? 'bg-primary-50 border-primary-300 text-primary-700' : ''
+              }`}
+              rippleColor="rgba(248, 113, 113, 0.3)"
+            >
+              <Edit3 className="w-4 h-4" />
+              <span className="hidden sm:inline">
+                {layout.isEditMode ? 'Dokončit úpravy' : 'Upravit layout'}
+              </span>
+            </RippleButton>
           </div>
         </div>
       </div>

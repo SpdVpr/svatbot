@@ -120,37 +120,49 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
         {/* Dashboard Controls */}
         <div className="bg-white p-4 rounded-xl border border-gray-200">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">Dashboard</h2>
-
+            {/* Left Side - Empty or Edit Mode Controls */}
             <div className="flex items-center space-x-2">
-              {/* Layout Mode Switcher */}
-              <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
+              {layout.isEditMode && (
                 <button
-                  onClick={() => setLayoutMode('grid')}
-                  className={`flex items-center space-x-1 px-2 py-1.5 rounded-md transition-colors ${
-                    layoutMode === 'grid'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                  title="Grid layout"
+                  onClick={resetLayout}
+                  className="btn-outline flex items-center space-x-2 text-red-600 border-red-300 hover:bg-red-50"
                 >
-                  <Grid3x3 className="w-4 h-4" />
-                  <span className="hidden lg:inline text-sm">Grid</span>
+                  <RotateCcw className="w-4 h-4" />
+                  <span className="hidden sm:inline">Reset</span>
                 </button>
-                <button
-                  onClick={() => setLayoutMode('free')}
-                  className={`flex items-center space-x-1 px-2 py-1.5 rounded-md transition-colors ${
-                    layoutMode === 'free'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                  title="Volný layout"
-                >
-                  <Maximize2 className="w-4 h-4" />
-                  <span className="hidden lg:inline text-sm">Volný</span>
-                </button>
-              </div>
+              )}
+            </div>
 
+            {/* Center - Layout Mode Switcher */}
+            <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setLayoutMode('grid')}
+                className={`flex items-center space-x-1 px-2 py-1.5 rounded-md transition-colors ${
+                  layoutMode === 'grid'
+                    ? 'bg-white text-primary-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+                title="Grid layout"
+              >
+                <Grid3x3 className="w-4 h-4" />
+                <span className="hidden lg:inline text-sm">Grid</span>
+              </button>
+              <button
+                onClick={() => setLayoutMode('free')}
+                className={`flex items-center space-x-1 px-2 py-1.5 rounded-md transition-colors ${
+                  layoutMode === 'free'
+                    ? 'bg-white text-primary-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+                title="Volný layout"
+              >
+                <Maximize2 className="w-4 h-4" />
+                <span className="hidden lg:inline text-sm">Volný</span>
+              </button>
+            </div>
+
+            {/* Right Side - Edit Mode Button */}
+            <div className="flex items-center space-x-2">
               <button
                 onClick={toggleEditMode}
                 className={`btn-outline flex items-center space-x-2 ${
@@ -162,16 +174,6 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
                   {layout.isEditMode ? 'Dokončit úpravy' : 'Upravit layout'}
                 </span>
               </button>
-
-              {layout.isEditMode && (
-                <button
-                  onClick={resetLayout}
-                  className="btn-outline flex items-center space-x-2 text-red-600 border-red-300 hover:bg-red-50"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                  <span className="hidden sm:inline">Reset</span>
-                </button>
-              )}
             </div>
           </div>
 
