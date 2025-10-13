@@ -97,25 +97,23 @@ export default function SectionOrderEditor({ sectionOrder, enabledSections, onOr
           return (
             <div
               key={sectionId}
-              draggable={!sectionInfo.required}
+              draggable={true}
               onDragStart={() => handleDragStart(index)}
               onDragOver={(e) => handleDragOver(e, index)}
               onDragEnd={handleDragEnd}
               onDragLeave={handleDragLeave}
               className={`
                 flex items-center gap-3 p-4 rounded-lg border-2 transition-all duration-200
+                cursor-grab active:cursor-grabbing hover:border-blue-400 hover:shadow-md hover:scale-102
                 ${isDragging ? 'opacity-50 scale-95 rotate-2' : ''}
                 ${isDragOver ? 'border-pink-500 bg-pink-100 scale-105 shadow-lg' : 'border-gray-300 bg-white'}
                 ${!isEnabled ? 'opacity-60' : ''}
-                ${!sectionInfo.required ? 'cursor-grab active:cursor-grabbing hover:border-blue-400 hover:shadow-md hover:scale-102' : 'cursor-default bg-gray-50'}
               `}
             >
-              {/* Drag Handle */}
-              {!sectionInfo.required && (
-                <div className="flex-shrink-0 text-gray-400">
-                  <GripVertical className="w-5 h-5" />
-                </div>
-              )}
+              {/* Drag Handle - Always visible */}
+              <div className="flex-shrink-0 text-gray-400">
+                <GripVertical className="w-5 h-5" />
+              </div>
 
               {/* Section Info */}
               <div className="flex-1 min-w-0">
@@ -161,7 +159,7 @@ export default function SectionOrderEditor({ sectionOrder, enabledSections, onOr
             </p>
             <ul className="text-sm text-blue-800 space-y-1">
               <li>• <strong>Uchopte sekci</strong> za [≡] ikonu a přetáhněte ji na nové místo</li>
-              <li>• <strong>Povinné sekce</strong> (šedé pozadí) nelze přesouvat</li>
+              <li>• <strong>Všechny sekce</strong> lze volně přesouvat podle vašich preferencí</li>
               <li>• <strong>Pořadí se automaticky uloží</strong> při každé změně</li>
               <li>• <strong>Číslo vpravo</strong> ukazuje aktuální pozici sekce na webu</li>
             </ul>

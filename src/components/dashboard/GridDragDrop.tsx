@@ -25,6 +25,7 @@ import MusicPlaylistModule from './modules/MusicPlaylistModule'
 import FoodDrinksModule from './modules/FoodDrinksModule'
 import WeddingWebsiteModule from './modules/WeddingWebsiteModule'
 import AccommodationManagementModule from './modules/AccommodationManagementModule'
+import ShoppingListModule from './modules/ShoppingListModule'
 
 interface GridDragDropProps {
   onWeddingSettingsClick: () => void
@@ -383,6 +384,8 @@ export default function GridDragDrop({ onWeddingSettingsClick }: GridDragDropPro
         return <WeddingWebsiteModule />
       case 'accommodation-management':
         return <AccommodationManagementModule />
+      case 'shopping-list':
+        return <ShoppingListModule />
       default:
         return (
           <div className="wedding-card">

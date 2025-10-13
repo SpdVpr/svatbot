@@ -344,15 +344,6 @@ export default function ContentEditor({ content, onContentChange }: ContentEdito
         </p>
       </div>
 
-      {/* Section Order Editor - Only show when no section is expanded */}
-      {!expandedSection && (
-        <SectionOrderEditor
-          sectionOrder={sectionOrder}
-          enabledSections={getEnabledSections()}
-          onOrderChange={handleSectionOrderChange}
-        />
-      )}
-
       {/* Section Grid - Only show when no section is expanded */}
       {!expandedSection && (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -407,6 +398,15 @@ export default function ContentEditor({ content, onContentChange }: ContentEdito
             </button>
           ))}
         </div>
+      )}
+
+      {/* Section Order Editor - Only show when no section is expanded */}
+      {!expandedSection && (
+        <SectionOrderEditor
+          sectionOrder={sectionOrder}
+          enabledSections={getEnabledSections()}
+          onOrderChange={handleSectionOrderChange}
+        />
       )}
 
       {/* Expanded Section Editor */}

@@ -1,6 +1,6 @@
 export interface DashboardModule {
   id: string
-  type: 'wedding-countdown' | 'quick-actions' | 'main-features' | 'upcoming-tasks' | 'marketplace' | 'coming-soon' | 'task-management' | 'guest-management' | 'budget-tracking' | 'timeline-planning' | 'vendor-management' | 'seating-plan' | 'wedding-day-timeline' | 'moodboard' | 'wedding-checklist' | 'music-playlist' | 'food-drinks' | 'wedding-website' | 'accommodation-management'
+  type: 'wedding-countdown' | 'quick-actions' | 'main-features' | 'upcoming-tasks' | 'marketplace' | 'coming-soon' | 'task-management' | 'guest-management' | 'budget-tracking' | 'timeline-planning' | 'vendor-management' | 'seating-plan' | 'wedding-day-timeline' | 'moodboard' | 'wedding-checklist' | 'music-playlist' | 'food-drinks' | 'wedding-website' | 'accommodation-management' | 'shopping-list'
   title: string
   size: 'small' | 'medium' | 'large' | 'full'
   position: {
@@ -119,6 +119,16 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     order: 8
   },
   {
+    id: 'shopping-list',
+    type: 'shopping-list',
+    title: 'Nákupní seznam',
+    size: 'medium',
+    position: { row: 3, column: 2 },
+    isVisible: true,
+    isLocked: false,
+    order: 9
+  },
+  {
     id: 'accommodation-management',
     type: 'accommodation-management',
     title: 'Ubytování',
@@ -133,10 +143,10 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     type: 'seating-plan',
     title: 'Rozmístění hostů',
     size: 'medium',
-    position: { row: 3, column: 2 },
+    position: { row: 4, column: 0 },
     isVisible: true,
     isLocked: false,
-    order: 9
+    order: 10
   },
   {
     id: 'wedding-day-timeline',

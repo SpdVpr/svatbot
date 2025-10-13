@@ -512,6 +512,33 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Shopping collection - user's shopping list
+    match /shopping/{itemId} {
+      // Allow read if authenticated and (demo user OR user owns the wedding)
+      allow read: if isAuthenticated() &&
+                     (isDemoUser() ||
+                      (exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                       get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid));
+
+      // Allow create if authenticated and (demo user OR user owns the wedding)
+      allow create: if isAuthenticated() &&
+                       (isDemoUser() ||
+                        (exists(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)) &&
+                         get(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)).data.userId == request.auth.uid));
+
+      // Allow update if authenticated and (demo user OR user owns the wedding)
+      allow update: if isAuthenticated() &&
+                       (isDemoUser() ||
+                        (exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                         get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid));
+
+      // Allow delete if authenticated and (demo user OR user owns the wedding)
+      allow delete: if isAuthenticated() &&
+                       (isDemoUser() ||
+                        (exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                         get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid));
+    }
+
     // Deny all other access
     match /{document=**} {
       allow read, write: if false;
