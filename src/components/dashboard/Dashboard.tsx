@@ -117,9 +117,9 @@ function DashboardContent() {
           <div className="mobile-header">
             <div className="flex items-center">
               <img
-                src="/logo.svg"
+                src="/logo2.png"
                 alt="SvatBot.cz"
-                className="h-8 w-auto"
+                className="h-10 w-auto"
               />
             </div>
             <div className="flex items-center space-x-2">
@@ -187,9 +187,9 @@ function DashboardContent() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-6">
               <img
-                src="/logo.svg"
+                src="/logo2.png"
                 alt="SvatBot.cz"
-                className="h-10 w-auto"
+                className="h-14 w-auto"
               />
               <div className="border-l border-gray-300 pl-6">
                 <button

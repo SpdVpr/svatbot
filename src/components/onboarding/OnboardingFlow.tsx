@@ -412,9 +412,9 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <img
-              src="/logo.svg"
+              src="/logo2.png"
               alt="SvatBot.cz"
-              className="h-10 w-auto"
+              className="h-16 w-auto"
             />
           </div>
 
