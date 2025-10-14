@@ -410,11 +410,12 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
       {/* Header */}
       <header className="container-desktop py-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Heart className="w-8 h-8 text-primary-500" fill="currentColor" />
-            <span className="font-display text-2xl font-bold text-text-primary">
-              SvatBot.cz
-            </span>
+          <div className="flex items-center">
+            <img
+              src="/logo.svg"
+              alt="SvatBot.cz"
+              className="h-10 w-auto"
+            />
           </div>
 
           <button

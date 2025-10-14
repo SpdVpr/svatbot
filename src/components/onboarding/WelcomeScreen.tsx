@@ -119,13 +119,14 @@ export default function WelcomeScreen() {
         {/* Header */}
         <header className="container-desktop py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Heart className="w-8 h-8 text-primary-500" fill="currentColor" />
-              <span className="font-display text-2xl font-bold text-text-primary">
-                SvatBot.cz
-              </span>
+            <div className="flex items-center">
+              <img
+                src="/logo.svg"
+                alt="SvatBot.cz"
+                className="h-10 w-auto"
+              />
             </div>
-            
+
             <button
               onClick={handleLogin}
               className="btn-outline text-sm px-4 py-2"
@@ -285,8 +286,11 @@ export default function WelcomeScreen() {
                   <div className="bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
-                        <Heart className="w-6 h-6 text-white" fill="currentColor" />
-                        <span className="text-white font-semibold text-lg">SvatBot Dashboard</span>
+                        <img
+                          src="/logo.svg"
+                          alt="SvatBot.cz"
+                          className="h-8 w-auto brightness-0 invert"
+                        />
                       </div>
                       <div className="text-white text-sm">
                         Anna & Tomáš • 15. 6. 2025

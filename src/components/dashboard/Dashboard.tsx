@@ -115,11 +115,12 @@ function DashboardContent() {
         {/* Mobile Header */}
         <div className="sm:hidden">
           <div className="mobile-header">
-            <div className="flex items-center space-x-3">
-              <Heart className="w-6 h-6 text-primary-500" fill="currentColor" />
-              <div>
-                <h1 className="text-lg font-bold text-gray-900">SvatBot.cz</h1>
-              </div>
+            <div className="flex items-center">
+              <img
+                src="/logo.svg"
+                alt="SvatBot.cz"
+                className="h-8 w-auto"
+              />
             </div>
             <div className="flex items-center space-x-2">
               <LiveNotifications />
@@ -184,9 +185,13 @@ function DashboardContent() {
         {/* Desktop Header */}
         <div className={`hidden sm:block mx-auto px-4 sm:px-6 lg:px-8 py-6 ${getCanvasMaxWidth()}`}>
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Heart className="w-8 h-8 text-primary-500" fill="currentColor" />
-              <div>
+            <div className="flex items-center space-x-6">
+              <img
+                src="/logo.svg"
+                alt="SvatBot.cz"
+                className="h-10 w-auto"
+              />
+              <div className="border-l border-gray-300 pl-6">
                 <button
                   onClick={() => setShowWeddingSettings(true)}
                   className="text-left hover:text-primary-600 transition-colors group"
