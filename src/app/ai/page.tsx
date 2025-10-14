@@ -53,6 +53,7 @@ function AIPageContent() {
   const { stats: calendarStats } = useCalendar()
   const searchParams = useSearchParams()
   const [showDataInfo, setShowDataInfo] = useState(true)
+  const [quickSearchQuery, setQuickSearchQuery] = useState<string | null>(null)
 
   // Get pre-filled question from URL
   const prefilledQuestion = searchParams.get('question')
@@ -140,9 +141,15 @@ function AIPageContent() {
               </div>
             </div>
             
-            <div className="flex items-center space-x-2">
-              <Sparkles className="w-5 h-5 text-yellow-500" />
-              <span className="text-sm text-gray-600">Powered by OpenAI</span>
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-full">
+                <Globe className="w-4 h-4 text-blue-600" />
+                <span className="text-xs font-medium text-blue-700">Real-time AI</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Sparkles className="w-5 h-5 text-yellow-500" />
+                <span className="text-sm text-gray-600">Powered by GPT-4 + Perplexity</span>
+              </div>
             </div>
           </div>
         </div>
@@ -355,6 +362,72 @@ function AIPageContent() {
           </div>
         </div>
 
+        {/* Quick Search Panel */}
+        <div className="mb-6">
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <div className="flex items-center space-x-2 mb-4">
+              <Globe className="w-5 h-5 text-blue-600" />
+              <h3 className="font-semibold text-gray-900">Rychlé vyhledávání</h3>
+              <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                Real-time
+              </span>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">
+              Klikněte na tlačítko pro okamžité vyhledání aktuálních informací z internetu
+            </p>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+              <button
+                onClick={() => setQuickSearchQuery('Jaké jsou aktuální svatební trendy pro rok 2025?')}
+                className="p-3 bg-gradient-to-br from-pink-50 to-rose-50 hover:from-pink-100 hover:to-rose-100 border border-pink-200 rounded-lg transition-all group"
+              >
+                <TrendingUp className="w-5 h-5 text-pink-600 mb-2 mx-auto" />
+                <div className="text-xs font-medium text-pink-700">Trendy 2025</div>
+              </button>
+
+              <button
+                onClick={() => setQuickSearchQuery(`Najdi mi svatební fotografy v ${wedding?.region || 'Praze'}`)}
+                className="p-3 bg-gradient-to-br from-purple-50 to-indigo-50 hover:from-purple-100 hover:to-indigo-100 border border-purple-200 rounded-lg transition-all group"
+              >
+                <Users className="w-5 h-5 text-purple-600 mb-2 mx-auto" />
+                <div className="text-xs font-medium text-purple-700">Fotografové</div>
+              </button>
+
+              <button
+                onClick={() => setQuickSearchQuery(`Kolik stojí catering pro ${wedding?.estimatedGuestCount || '80'} hostů?`)}
+                className="p-3 bg-gradient-to-br from-green-50 to-emerald-50 hover:from-green-100 hover:to-emerald-100 border border-green-200 rounded-lg transition-all group"
+              >
+                <DollarSign className="w-5 h-5 text-green-600 mb-2 mx-auto" />
+                <div className="text-xs font-medium text-green-700">Ceny</div>
+              </button>
+
+              <button
+                onClick={() => setQuickSearchQuery(`Doporuč svatební místa v ${wedding?.region || 'Praze'}`)}
+                className="p-3 bg-gradient-to-br from-blue-50 to-cyan-50 hover:from-blue-100 hover:to-cyan-100 border border-blue-200 rounded-lg transition-all group"
+              >
+                <Globe className="w-5 h-5 text-blue-600 mb-2 mx-auto" />
+                <div className="text-xs font-medium text-blue-700">Místa</div>
+              </button>
+
+              <button
+                onClick={() => setQuickSearchQuery('Jaké jsou nejlepší nápady na svatební dekorace?')}
+                className="p-3 bg-gradient-to-br from-yellow-50 to-amber-50 hover:from-yellow-100 hover:to-amber-100 border border-yellow-200 rounded-lg transition-all group"
+              >
+                <Lightbulb className="w-5 h-5 text-yellow-600 mb-2 mx-auto" />
+                <div className="text-xs font-medium text-yellow-700">Inspirace</div>
+              </button>
+
+              <button
+                onClick={() => setQuickSearchQuery(`Najdi ubytování pro hosty v okolí ${wedding?.region || 'Prahy'}`)}
+                className="p-3 bg-gradient-to-br from-orange-50 to-red-50 hover:from-orange-100 hover:to-red-100 border border-orange-200 rounded-lg transition-all group"
+              >
+                <Hotel className="w-5 h-5 text-orange-600 mb-2 mx-auto" />
+                <div className="text-xs font-medium text-orange-700">Ubytování</div>
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* Chat Content */}
         <div className="space-y-8">
           <div className="max-w-4xl mx-auto">
@@ -362,7 +435,8 @@ function AIPageContent() {
               className="h-[600px]"
               compact={false}
               defaultOpen={true}
-              prefilledQuestion={prefilledQuestion}
+              prefilledQuestion={prefilledQuestion || quickSearchQuery || undefined}
+              onQuestionSent={() => setQuickSearchQuery(null)}
             />
           </div>
         </div>

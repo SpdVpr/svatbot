@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { WeddingAI, AIWeddingContext } from '@/lib/ai-client'
+import { WeddingAI, AIWeddingContext, AIResponse as AIClientResponse, AISource } from '@/lib/ai-client'
 import { useWedding } from './useWedding'
 import { useGuest } from './useGuest'
 import { useBudget } from './useBudget'
@@ -24,6 +24,9 @@ export interface ChatMessage {
   role: 'user' | 'assistant'
   content: string
   timestamp: Date
+  sources?: AISource[]
+  provider?: 'gpt' | 'perplexity' | 'hybrid'
+  reasoning?: string
 }
 
 export function useAI() {
@@ -152,7 +155,7 @@ export function useAI() {
     setError(null)
   }, [])
 
-  // AI Wedding Assistant Chat
+  // AI Wedding Assistant Chat (Legacy - GPT only)
   const askAssistant = useCallback(async (question: string): Promise<string> => {
     setLoading(true)
     setError(null)
@@ -188,6 +191,136 @@ export function useAI() {
       setLoading(false)
     }
   }, [buildContext])
+
+  // AI Wedding Assistant Chat (Hybrid - GPT + Perplexity)
+  const askHybrid = useCallback(async (question: string): Promise<ChatMessage> => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      // Add user message to chat
+      const userMessage: ChatMessage = {
+        id: Date.now().toString(),
+        role: 'user',
+        content: question,
+        timestamp: new Date()
+      }
+
+      // Get current chat history before adding new message
+      const currentHistory = chatHistory.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }))
+
+      setChatHistory(prev => [...prev, userMessage])
+
+      const context = buildContext()
+      // ✅ NOVÉ: Posíláme historii chatu pro kontext
+      const result = await WeddingAI.askHybrid(question, context, currentHistory)
+
+      // Add AI response to chat with sources
+      const aiMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: result.response,
+        timestamp: new Date(),
+        sources: result.sources,
+        provider: result.provider,
+        reasoning: result.reasoning
+      }
+      setChatHistory(prev => [...prev, aiMessage])
+
+      return aiMessage
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Neočekávaná chyba'
+      setError(errorMessage)
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }, [buildContext])
+
+  // Search for real-time information
+  const searchInfo = useCallback(async (
+    query: string,
+    type?: 'vendors' | 'trends' | 'prices' | 'venues' | 'inspiration' | 'legal' | 'seasonal' | 'accommodation'
+  ): Promise<AIClientResponse> => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const result = await WeddingAI.search(query, type)
+      return result
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Neočekávaná chyba'
+      setError(errorMessage)
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  // Find vendors using Perplexity
+  const findVendors = useCallback(async (
+    vendorType: string,
+    location?: string,
+    style?: string
+  ): Promise<AIClientResponse> => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const loc = location || wedding?.region || 'Praha'
+      const result = await WeddingAI.findVendors(vendorType, loc, style)
+      return result
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Neočekávaná chyba'
+      setError(errorMessage)
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }, [wedding])
+
+  // Get current trends
+  const getTrends = useCallback(async (year: number = 2025): Promise<AIClientResponse> => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const result = await WeddingAI.getTrends(year)
+      return result
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Neočekávaná chyba'
+      setError(errorMessage)
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  // Get service prices
+  const getPrices = useCallback(async (
+    service: string,
+    location?: string,
+    guestCount?: number
+  ): Promise<AIClientResponse> => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const loc = location || wedding?.region || 'Praha'
+      const count = guestCount || guests?.length
+      const result = await WeddingAI.getPrices(service, loc, count)
+      return result
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Neočekávaná chyba'
+      setError(errorMessage)
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }, [wedding, guests])
 
   // Smart Vendor Recommendations
   const getVendorRecommendations = useCallback(async (category: string) => {
@@ -406,8 +539,8 @@ export function useAI() {
     loading,
     error,
     chatHistory,
-    
-    // Actions
+
+    // Actions - Legacy (GPT only)
     askAssistant,
     getVendorRecommendations,
     generateTimeline,
@@ -417,7 +550,14 @@ export function useAI() {
     getQuickSuggestions,
     clearError,
     clearChat,
-    
+
+    // Actions - Hybrid (GPT + Perplexity)
+    askHybrid,
+    searchInfo,
+    findVendors,
+    getTrends,
+    getPrices,
+
     // Utils
     buildContext
   }

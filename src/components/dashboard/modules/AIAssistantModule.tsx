@@ -14,7 +14,8 @@ import {
   Users,
   ChevronRight,
   Loader2,
-  RefreshCw
+  RefreshCw,
+  Globe
 } from 'lucide-react'
 
 interface AIAssistantModuleProps {
@@ -196,6 +197,18 @@ export default function AIAssistantModule({ className = '' }: AIAssistantModuleP
         <h4 className="font-medium text-gray-900 mb-3">AI Nástroje</h4>
         
         <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => router.push('/ai')}
+            className="p-3 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg transition-colors group relative"
+          >
+            <div className="absolute top-1 right-1 px-1.5 py-0.5 bg-indigo-600 text-white text-[10px] font-bold rounded">
+              NEW
+            </div>
+            <Globe className="w-5 h-5 text-indigo-600 mb-2" />
+            <div className="text-xs font-medium text-indigo-700">Real-time AI</div>
+            <div className="text-xs text-indigo-600">Perplexity</div>
+          </button>
+
           <button
             onClick={() => router.push('/ai?tab=budget')}
             className="p-3 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg transition-colors group"

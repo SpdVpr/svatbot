@@ -570,6 +570,23 @@ service cloud.firestore {
                        resource.data.userId == request.auth.uid;
     }
 
+    // Onboarding collection - User onboarding state
+    match /onboarding/{userId} {
+      // User can read their own onboarding state
+      allow read: if isAuthenticated() && isOwner(userId);
+
+      // User can create their own onboarding state
+      allow create: if isAuthenticated() &&
+                       isOwner(userId) &&
+                       request.resource.data.userId == request.auth.uid;
+
+      // User can update their own onboarding state
+      allow update: if isAuthenticated() && isOwner(userId);
+
+      // User can delete their own onboarding state
+      allow delete: if isAuthenticated() && isOwner(userId);
+    }
+
     // Deny all other access
     match /{document=**} {
       allow read, write: if false;

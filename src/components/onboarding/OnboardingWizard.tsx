@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useOnboarding } from '@/hooks/useOnboarding'
-import { 
-  X, 
-  ChevronRight, 
-  ChevronLeft, 
+import {
+  X,
+  ChevronRight,
+  ChevronLeft,
   Check,
   Sparkles,
   ArrowRight,
@@ -34,6 +35,12 @@ export default function OnboardingWizard({ onClose, autoShow = true }: Onboardin
 
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
   const [isOpen, setIsOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  // Check if component is mounted (for portal)
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Auto-show for new users
   useEffect(() => {
@@ -41,6 +48,13 @@ export default function OnboardingWizard({ onClose, autoShow = true }: Onboardin
       setIsOpen(true)
     }
   }, [loading, autoShow, onboardingState.showWelcome, onboardingState.isNewUser])
+
+  // Manual open (when autoShow is false, open immediately)
+  useEffect(() => {
+    if (!autoShow) {
+      setIsOpen(true)
+    }
+  }, [autoShow])
 
   const currentStep = steps[currentStepIndex]
   const progress = getProgress()
@@ -82,11 +96,11 @@ export default function OnboardingWizard({ onClose, autoShow = true }: Onboardin
     }
   }
 
-  if (loading || !isOpen || !currentStep) return null
+  if (loading || !isOpen || !currentStep || !mounted) return null
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+  const modalContent = (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden my-8">
         {/* Header */}
         <div className="bg-gradient-to-r from-primary-500 to-pink-500 p-6 text-white relative">
           <button
@@ -220,5 +234,7 @@ export default function OnboardingWizard({ onClose, autoShow = true }: Onboardin
       </div>
     </div>
   )
-}
 
+  // Render modal in portal (outside of normal DOM hierarchy)
+  return createPortal(modalContent, document.body)
+}

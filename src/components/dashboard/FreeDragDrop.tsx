@@ -2,8 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useDashboard } from '@/hooks/useDashboard'
+import { useOnboarding } from '@/hooks/useOnboarding'
 import { DashboardModule } from '@/types/dashboard'
-import { Edit3, Lock, Unlock, Eye, EyeOff, RotateCcw, GripVertical, Grid3x3, Maximize2, Maximize } from 'lucide-react'
+import { Edit3, Lock, Unlock, Eye, EyeOff, RotateCcw, GripVertical, Grid3x3, Maximize2, Maximize, BookOpen, Sparkles } from 'lucide-react'
+import OnboardingWizard from '../onboarding/OnboardingWizard'
 
 // Module components
 import WeddingCountdownModule from './modules/WeddingCountdownModule'
@@ -66,6 +68,8 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
     updateModuleSize
   } = useDashboard()
 
+  const { getProgress, getNextStep } = useOnboarding()
+
   const layoutMode = layout.layoutMode || 'grid'
 
   const containerRef = useRef<HTMLDivElement>(null)
@@ -74,6 +78,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
   const [snapGuides, setSnapGuides] = useState<{ x: number[], y: number[] }>({ x: [], y: [] })
   const [showCanvasMenu, setShowCanvasMenu] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [showOnboardingWizard, setShowOnboardingWizard] = useState(false)
 
   // Detect mobile device
   useEffect(() => {
@@ -144,8 +149,6 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
         return <ShoppingListModule />
       case 'svatbot-coach':
         return <SvatbotCoachModule />
-      case 'onboarding-guide':
-        return <OnboardingWidget />
       default:
         return <div className="p-4">Modul není k dispozici</div>
     }
@@ -264,33 +267,56 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
               )}
             </div>
 
-            {/* Center - Layout Mode Switcher */}
-            <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
-              <button
-                onClick={() => setLayoutMode('grid')}
-                className={`flex items-center space-x-1 px-2 py-1.5 rounded-md transition-colors ${
-                  layoutMode === 'grid'
-                    ? 'bg-white text-primary-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-                title="Grid layout"
-              >
-                <Grid3x3 className="w-4 h-4" />
-                <span className="hidden lg:inline text-sm">Grid</span>
-              </button>
-              <button
-                onClick={() => setLayoutMode('free')}
-                className={`flex items-center space-x-1 px-2 py-1.5 rounded-md transition-colors ${
-                  layoutMode === 'free'
-                    ? 'bg-white text-primary-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-                title="Volný layout"
-              >
-                <Maximize2 className="w-4 h-4" />
-                <span className="hidden lg:inline text-sm">Volný</span>
-              </button>
-            </div>
+            {/* Center - Layout Mode Switcher (only in edit mode) OR Onboarding Guide */}
+            {layout.isEditMode ? (
+              <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setLayoutMode('grid')}
+                  className={`flex items-center space-x-1 px-2 py-1.5 rounded-md transition-colors ${
+                    layoutMode === 'grid'
+                      ? 'bg-white text-primary-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                  title="Grid layout"
+                >
+                  <Grid3x3 className="w-4 h-4" />
+                  <span className="hidden lg:inline text-sm">Grid</span>
+                </button>
+                <button
+                  onClick={() => setLayoutMode('free')}
+                  className={`flex items-center space-x-1 px-2 py-1.5 rounded-md transition-colors ${
+                    layoutMode === 'free'
+                      ? 'bg-white text-primary-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                  title="Volný layout"
+                >
+                  <Maximize2 className="w-4 h-4" />
+                  <span className="hidden lg:inline text-sm">Volný</span>
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-3 px-4 py-2 bg-gradient-to-r from-primary-50 to-pink-50 rounded-lg border border-primary-200">
+                <div className="flex items-center space-x-2">
+                  <Sparkles className="w-5 h-5 text-primary-600" />
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">
+                      Průvodce nastavením
+                    </p>
+                    <p className="text-xs text-gray-600">
+                      {getProgress()}% dokončeno • {getNextStep()?.title || 'Vše hotovo!'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowOnboardingWizard(true)}
+                  className="btn-primary flex items-center space-x-1 text-sm px-3 py-1.5"
+                >
+                  <BookOpen className="w-4 h-4" />
+                  <span className="hidden sm:inline">Otevřít</span>
+                </button>
+              </div>
+            )}
 
             {/* Right Side - Canvas Width & Edit Mode Button */}
             <div className="flex items-center space-x-2">
@@ -492,6 +518,14 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
           </div>
         )}
       </div>
+
+      {/* Onboarding Wizard */}
+      {showOnboardingWizard && (
+        <OnboardingWizard
+          onClose={() => setShowOnboardingWizard(false)}
+          autoShow={false}
+        />
+      )}
     </div>
   )
 }

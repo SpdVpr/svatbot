@@ -206,12 +206,13 @@ export function useOnboarding() {
             showWelcome: true,
             lastInteraction: new Date()
           }
-          
+
           await setDoc(onboardingRef, {
+            userId: user.id,
             ...newState,
             createdAt: new Date()
           })
-          
+
           setOnboardingState(newState)
         }
       } catch (error) {
@@ -280,11 +281,11 @@ export function useOnboarding() {
     try {
       const onboardingRef = doc(db, 'onboarding', user.id)
       const newState = { ...onboardingState, ...updates, lastInteraction: new Date() }
-      
-      await updateDoc(onboardingRef, {
-        ...updates,
+
+      await setDoc(onboardingRef, {
+        ...newState,
         lastInteraction: new Date()
-      })
+      }, { merge: true })
       
       setOnboardingState(newState)
     } catch (error) {

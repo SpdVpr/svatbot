@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { useAI } from '@/hooks/useAI'
 import { useAICoach } from '@/hooks/useAICoach'
 import {
@@ -16,25 +16,31 @@ import {
   Lightbulb,
   Heart
 } from 'lucide-react'
+import AISourcesList, { AIProviderBadge } from './AISourcesList'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 interface AIAssistantProps {
   className?: string
   compact?: boolean
   defaultOpen?: boolean
   prefilledQuestion?: string | null
+  onQuestionSent?: () => void
 }
 
 export default function AIAssistant({
   className = '',
   compact = false,
   defaultOpen = false,
-  prefilledQuestion = null
+  prefilledQuestion = null,
+  onQuestionSent
 }: AIAssistantProps) {
   const {
     loading,
     error,
     chatHistory,
     askAssistant,
+    askHybrid,
     getQuickSuggestions,
     clearError,
     clearChat
@@ -63,13 +69,6 @@ export default function AIAssistant({
     }
   }, [isOpen])
 
-  // Handle prefilled question
-  useEffect(() => {
-    if (prefilledQuestion && isOpen) {
-      setMessage(prefilledQuestion)
-    }
-  }, [prefilledQuestion, isOpen])
-
   const loadQuickSuggestions = async () => {
     setLoadingSuggestions(true)
     try {
@@ -82,7 +81,7 @@ export default function AIAssistant({
     }
   }
 
-  const handleSendMessage = async (messageText?: string) => {
+  const handleSendMessage = useCallback(async (messageText?: string) => {
     const textToSend = messageText || message.trim()
     if (!textToSend || loading) return
 
@@ -90,11 +89,25 @@ export default function AIAssistant({
     clearError()
 
     try {
-      await askAssistant(textToSend)
+      // Use hybrid AI for better results (GPT + Perplexity)
+      await askHybrid(textToSend)
     } catch (err) {
       console.error('Failed to send message:', err)
     }
-  }
+  }, [message, loading, askHybrid, clearError])
+
+  // Handle prefilled question
+  useEffect(() => {
+    if (prefilledQuestion && isOpen) {
+      setMessage(prefilledQuestion)
+      // Auto-send the question
+      const timer = setTimeout(() => {
+        handleSendMessage(prefilledQuestion)
+        onQuestionSent?.()
+      }, 500)
+      return () => clearTimeout(timer)
+    }
+  }, [prefilledQuestion, isOpen, handleSendMessage, onQuestionSent])
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -261,21 +274,56 @@ export default function AIAssistant({
                         className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
                         <div className={`
-                          max-w-[80%] p-3 rounded-lg
-                          ${msg.role === 'user' 
-                            ? 'bg-primary-500 text-white' 
-                            : 'bg-gray-100 text-gray-900'
-                          }
+                          max-w-[80%] space-y-2
                         `}>
-                          <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                          <p className={`text-xs mt-1 ${
-                            msg.role === 'user' ? 'text-primary-100' : 'text-gray-500'
-                          }`}>
-                            {msg.timestamp.toLocaleTimeString('cs-CZ', { 
-                              hour: '2-digit', 
-                              minute: '2-digit' 
-                            })}
-                          </p>
+                          <div className={`
+                            p-3 rounded-lg
+                            ${msg.role === 'user'
+                              ? 'bg-primary-500 text-white'
+                              : 'bg-gray-100 text-gray-900'
+                            }
+                          `}>
+                            {msg.role === 'user' ? (
+                              <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                            ) : (
+                              <div className="text-sm prose prose-sm max-w-none
+                                prose-headings:text-gray-900 prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2
+                                prose-h3:text-base prose-h3:flex prose-h3:items-center prose-h3:gap-2
+                                prose-p:text-gray-700 prose-p:my-2
+                                prose-strong:text-gray-900 prose-strong:font-semibold
+                                prose-ul:my-2 prose-ul:list-none prose-ul:pl-0
+                                prose-li:text-gray-700 prose-li:my-1 prose-li:pl-0
+                                prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline
+                              ">
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                  {msg.content}
+                                </ReactMarkdown>
+                              </div>
+                            )}
+                            <div className="flex items-center justify-between mt-2">
+                              <p className={`text-xs ${
+                                msg.role === 'user' ? 'text-primary-100' : 'text-gray-500'
+                              }`}>
+                                {msg.timestamp.toLocaleTimeString('cs-CZ', {
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </p>
+                              {msg.role === 'assistant' && msg.provider && (
+                                <AIProviderBadge provider={msg.provider} />
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Show sources for assistant messages */}
+                          {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
+                            <div className="ml-2">
+                              <AISourcesList
+                                sources={msg.sources}
+                                compact={true}
+                              />
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}

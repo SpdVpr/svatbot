@@ -95,11 +95,24 @@ export interface AIWeddingContext {
   }
 }
 
+export interface AISource {
+  title: string
+  url: string
+  snippet?: string
+}
+
+export interface AIResponse {
+  response: string
+  sources?: AISource[]
+  provider?: 'gpt' | 'perplexity' | 'hybrid'
+  reasoning?: string
+}
+
 export class WeddingAI {
-  
-  // AI Wedding Assistant - General chat
+
+  // AI Wedding Assistant - General chat (Legacy - uses GPT only)
   static async askAssistant(
-    question: string, 
+    question: string,
     context?: AIWeddingContext
   ): Promise<string> {
     try {
@@ -119,7 +132,7 @@ export class WeddingAI {
       }
 
       const data = await response.json()
-      
+
       if (data.error) {
         throw new Error(data.error)
       }
@@ -132,6 +145,188 @@ export class WeddingAI {
       }
       throw new Error('Nepodařilo se získat odpověď od AI asistenta')
     }
+  }
+
+  // AI Wedding Assistant - Hybrid (GPT + Perplexity)
+  static async askHybrid(
+    question: string,
+    context?: AIWeddingContext,
+    chatHistory?: Array<{ role: string; content: string }>
+  ): Promise<AIResponse> {
+    try {
+      const response = await fetch('/api/ai/hybrid-chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question,
+          context,
+          chatHistory  // ✅ NOVÉ: Posíláme historii chatu
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
+
+      if (data.error) {
+        throw new Error(data.error)
+      }
+
+      return {
+        response: data.response,
+        sources: data.sources,
+        provider: data.provider,
+        reasoning: data.reasoning
+      }
+    } catch (error) {
+      console.error('Hybrid AI error:', error)
+      if (error instanceof Error) {
+        throw new Error(`AI chyba: ${error.message}`)
+      }
+      throw new Error('Nepodařilo se získat odpověď od AI asistenta')
+    }
+  }
+
+  // Search for real-time information using Perplexity
+  static async search(
+    query: string,
+    type?: 'vendors' | 'trends' | 'prices' | 'venues' | 'inspiration' | 'legal' | 'seasonal' | 'accommodation',
+    params?: any
+  ): Promise<AIResponse> {
+    try {
+      const response = await fetch('/api/ai/search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query,
+          type,
+          ...params
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
+
+      if (data.error) {
+        throw new Error(data.error)
+      }
+
+      return {
+        response: data.answer,
+        sources: data.sources,
+        provider: 'perplexity'
+      }
+    } catch (error) {
+      console.error('AI Search error:', error)
+      if (error instanceof Error) {
+        throw new Error(`Vyhledávání selhalo: ${error.message}`)
+      }
+      throw new Error('Nepodařilo se vyhledat informace')
+    }
+  }
+
+  // Find vendors using Perplexity
+  static async findVendors(
+    vendorType: string,
+    location: string,
+    style?: string
+  ): Promise<AIResponse> {
+    return this.search(
+      `Hledám ${vendorType} pro svatbu v okolí ${location}${style ? ` ve stylu ${style}` : ''}`,
+      'vendors',
+      { vendorType, location, style }
+    )
+  }
+
+  // Get current wedding trends
+  static async getTrends(year: number = 2025): Promise<AIResponse> {
+    return this.search(
+      `Jaké jsou aktuální svatební trendy v roce ${year}?`,
+      'trends',
+      { year }
+    )
+  }
+
+  // Get service prices
+  static async getPrices(
+    service: string,
+    location: string,
+    guestCount?: number
+  ): Promise<AIResponse> {
+    return this.search(
+      `Kolik stojí ${service} pro svatbu v ${location}${guestCount ? ` pro ${guestCount} hostů` : ''}?`,
+      'prices',
+      { service, priceLocation: location, guestCount }
+    )
+  }
+
+  // Search venues
+  static async searchVenues(
+    location: string,
+    guestCount: number,
+    style?: string,
+    budget?: number
+  ): Promise<AIResponse> {
+    return this.search(
+      `Svatební místa v okolí ${location} pro ${guestCount} hostů`,
+      'venues',
+      { venueLocation: location, venueGuestCount: guestCount, venueStyle: style, budget }
+    )
+  }
+
+  // Get inspiration
+  static async getInspiration(
+    theme: string,
+    season?: string
+  ): Promise<AIResponse> {
+    return this.search(
+      `Inspirace pro svatbu v tématu ${theme}${season ? ` v ${season}` : ''}`,
+      'inspiration',
+      { theme, season }
+    )
+  }
+
+  // Get legal information
+  static async getLegalInfo(topic: string): Promise<AIResponse> {
+    return this.search(
+      `Právní požadavky pro ${topic} při svatbě v ČR`,
+      'legal',
+      { topic }
+    )
+  }
+
+  // Get seasonal tips
+  static async getSeasonalTips(
+    season: string,
+    month?: string
+  ): Promise<AIResponse> {
+    return this.search(
+      `Tipy pro ${season} svatbu${month ? ` v měsíci ${month}` : ''}`,
+      'seasonal',
+      { searchSeason: season, month }
+    )
+  }
+
+  // Search accommodation
+  static async searchAccommodation(
+    location: string,
+    guestCount: number,
+    date?: Date
+  ): Promise<AIResponse> {
+    return this.search(
+      `Ubytování pro svatební hosty v okolí ${location}`,
+      'accommodation',
+      { accommodationLocation: location, accommodationGuestCount: guestCount, date: date?.toISOString() }
+    )
   }
 
   // Smart Vendor Recommendations
