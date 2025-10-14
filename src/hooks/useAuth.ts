@@ -33,6 +33,10 @@ export interface LoginData {
   password: string
 }
 
+// Cache for user data to prevent repeated Firestore fetches
+const userDataCache = new Map<string, { user: User; timestamp: number }>()
+const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
+
 export function useAuth() {
   const { user, setUser, setLoading, isLoading } = useAuthStore()
   const [error, setError] = useState<AuthError | null>(null)
@@ -41,6 +45,13 @@ export function useAuth() {
 
   // Convert Firebase User to our User type
   const convertFirebaseUser = async (firebaseUser: FirebaseUser): Promise<User> => {
+    // Check cache first
+    const cached = userDataCache.get(firebaseUser.uid)
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      console.log('✅ Using cached user data for:', firebaseUser.uid)
+      return cached.user
+    }
+
     let userData = null
 
     // Only try to access Firestore if user has verified email
@@ -58,7 +69,7 @@ export function useAuth() {
       console.log('User email not verified, skipping Firestore user data fetch')
     }
 
-    return {
+    const user: User = {
       id: firebaseUser.uid,
       email: firebaseUser.email!,
       displayName: firebaseUser.displayName || userData?.displayName || '',
@@ -66,6 +77,11 @@ export function useAuth() {
       createdAt: userData?.createdAt?.toDate() || new Date(),
       updatedAt: new Date()
     }
+
+    // Cache the user data
+    userDataCache.set(firebaseUser.uid, { user, timestamp: Date.now() })
+
+    return user
   }
 
   // Save user data to Firestore
@@ -191,6 +207,11 @@ export function useAuth() {
   // Logout
   const logout = async (): Promise<void> => {
     try {
+      // Clear user data cache
+      if (user?.id) {
+        userDataCache.delete(user.id)
+      }
+
       await signOut(auth)
       setUser(null)
     } catch (error: any) {
@@ -206,6 +227,8 @@ export function useAuth() {
   useEffect(() => {
     let previousUserId: string | null = null
     let isMounted = true
+    let authStateTimeout: NodeJS.Timeout | null = null
+    let lastAuthStateChange = 0
 
     // Get previously stored user ID
     if (typeof window !== 'undefined') {
@@ -221,8 +244,25 @@ export function useAuth() {
     }
 
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      // Use setTimeout to avoid updating during render
-      setTimeout(async () => {
+      const now = Date.now()
+
+      // Debounce rapid auth state changes (within 500ms)
+      if (now - lastAuthStateChange < 500) {
+        console.log('🔄 Debouncing rapid auth state change')
+        if (authStateTimeout) {
+          clearTimeout(authStateTimeout)
+        }
+      }
+
+      lastAuthStateChange = now
+
+      // Clear any pending timeout
+      if (authStateTimeout) {
+        clearTimeout(authStateTimeout)
+      }
+
+      // Debounce auth state changes to prevent flickering
+      authStateTimeout = setTimeout(async () => {
         if (!isMounted) return
 
         try {
@@ -235,10 +275,15 @@ export function useAuth() {
               clearUserData()
             }
 
-            const user = await convertFirebaseUser(firebaseUser)
-            if (isMounted) {
-              setUser(user)
-              previousUserId = newUserId
+            // Only fetch user data if we don't have it or user changed
+            if (!previousUserId || previousUserId !== newUserId) {
+              const user = await convertFirebaseUser(firebaseUser)
+              if (isMounted) {
+                setUser(user)
+                previousUserId = newUserId
+              }
+            } else {
+              console.log('✅ User already loaded, skipping Firestore fetch')
             }
           } else {
             if (isMounted) {
@@ -269,11 +314,14 @@ export function useAuth() {
             }
           }
         }
-      }, 0)
+      }, 300) // 300ms debounce delay
     })
 
     return () => {
       isMounted = false
+      if (authStateTimeout) {
+        clearTimeout(authStateTimeout)
+      }
       unsubscribe()
     }
   }, [setUser, setLoading, hasSetInitialized])
