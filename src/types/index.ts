@@ -17,7 +17,7 @@ export interface Wedding {
   weddingDate: Date | null
   estimatedGuestCount: number
   budget: number
-  style: WeddingStyle
+  style?: string // Volné pole pro styl svatby (např. "rustikální", "moderní", vlastní text)
   region: string
   venue?: Venue
   status: WeddingStatus
@@ -529,6 +529,6 @@ export interface OnboardingData {
   weddingDate?: Date
   estimatedGuestCount: number
   budget: number
-  style: WeddingStyle
+  style?: string // Volné pole pro styl svatby (nepovinné)
   region: string
 }

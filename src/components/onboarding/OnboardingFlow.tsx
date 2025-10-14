@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { ArrowLeft, ArrowRight, Heart } from 'lucide-react'
 import { cn } from '@/utils'
-import { OnboardingData, WeddingStyle } from '@/types'
+import { OnboardingData } from '@/types'
 import { useWedding } from '@/hooks/useWedding'
 import { useAuthStore } from '@/stores/authStore'
 
@@ -33,7 +33,7 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
     weddingDate: undefined,
     estimatedGuestCount: 75,
     budget: 450000,
-    style: 'classic',
+    style: '', // Volné pole - uživatel může zadat vlastní styl
     region: 'Praha'
   })
 
@@ -52,7 +52,7 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
       case 'budget':
         return formData.budget > 0
       case 'style':
-        return formData.style !== null && formData.style !== undefined
+        return true // Style is optional
       case 'region':
         return formData.region !== ''
       default:
@@ -300,38 +300,60 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
         )
 
       case 'style':
-        const styles: { value: WeddingStyle; label: string; emoji: string }[] = [
-          { value: 'classic', label: 'Klasicky elegantní', emoji: '🏰' },
-          { value: 'rustic', label: 'Rustic/venkovský', emoji: '🌿' },
-          { value: 'modern', label: 'Moderní minimální', emoji: '✨' },
-          { value: 'vintage', label: 'Romanticky vintage', emoji: '🌸' },
-          { value: 'bohemian', label: 'Bohémská', emoji: '🦋' },
-          { value: 'garden', label: 'Zahradní', emoji: '🌺' }
+        const styles = [
+          { value: 'Rustikální', emoji: '🌿' },
+          { value: 'Moderní', emoji: '✨' },
+          { value: 'Romantická', emoji: '🌸' },
+          { value: 'Vintage', emoji: '🦋' },
+          { value: 'Boho', emoji: '🌺' },
+          { value: 'Klasická', emoji: '🏰' }
         ]
 
         return (
           <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {styles.map((style) => (
-                <button
-                  key={style.value}
-                  onClick={() => updateFormData({ style: style.value })}
-                  className={cn(
-                    'p-4 border-2 rounded-xl text-left transition-all duration-200',
-                    formData.style === style.value
-                      ? 'border-primary-500 bg-primary-50'
-                      : 'border-gray-200 hover:border-primary-300 hover:bg-primary-25'
-                  )}
-                >
-                  <div className="text-2xl mb-2">{style.emoji}</div>
-                  <div className="font-medium text-text-primary">{style.label}</div>
-                </button>
-              ))}
+            {/* Free text input */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Styl svatby (nepovinné)
+              </label>
+              <input
+                type="text"
+                value={formData.style || ''}
+                onChange={(e) => updateFormData({ style: e.target.value })}
+                placeholder="např. rustikální, moderní, romantická..."
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+              <p className="mt-2 text-sm text-gray-500">
+                Tento styl pomáhá AI generovat lepší moodboardy
+              </p>
+            </div>
+
+            {/* Suggested styles */}
+            <div>
+              <p className="text-sm text-gray-600 mb-3">Nebo vyberte z návrhů:</p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {styles.map((style) => (
+                  <button
+                    key={style.value}
+                    type="button"
+                    onClick={() => updateFormData({ style: style.value })}
+                    className={cn(
+                      'p-4 border-2 rounded-xl text-left transition-all duration-200',
+                      formData.style?.toLowerCase() === style.value.toLowerCase()
+                        ? 'border-primary-500 bg-primary-50'
+                        : 'border-gray-200 hover:border-primary-300 hover:bg-primary-25'
+                    )}
+                  >
+                    <div className="text-2xl mb-2">{style.emoji}</div>
+                    <div className="font-medium text-text-primary">{style.value}</div>
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="bg-primary-50 p-4 rounded-xl">
               <p className="body-small text-primary-700">
-                💡 Můžete změnit později podle vybraného místa konání
+                💡 Toto pole je nepovinné a můžete ho změnit kdykoli v nastavení
               </p>
             </div>
           </div>

@@ -13,7 +13,8 @@ import {
   AlertCircle,
   Edit,
   Check,
-  Coins
+  Coins,
+  Sparkles
 } from 'lucide-react'
 
 interface WeddingSettingsProps {
@@ -44,6 +45,7 @@ export default function WeddingSettings({ onClose, onSave }: WeddingSettingsProp
       return ''
     })() : '',
     location: typeof wedding?.venue === 'string' ? wedding.venue : wedding?.venue?.name || '',
+    style: wedding?.style || '',
     budget: wedding?.budget || 0,
     guestCount: wedding?.estimatedGuestCount || 0
   })
@@ -118,6 +120,11 @@ export default function WeddingSettings({ onClose, onSave }: WeddingSettingsProp
       // Only update venue if location is provided
       if (formData.location.trim()) {
         updates.venue = formData.location.trim()
+      }
+
+      // Update style if provided (optional field)
+      if (formData.style.trim()) {
+        updates.style = formData.style.trim()
       }
 
       console.log('🔄 Calling updateWedding with:', updates)
@@ -259,6 +266,48 @@ export default function WeddingSettings({ onClose, onSave }: WeddingSettingsProp
                 )}
               </div>
 
+              {/* Wedding Style */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Styl svatby (nepovinné)
+                </label>
+                <input
+                  type="text"
+                  value={formData.style}
+                  onChange={(e) => handleChange('style', e.target.value)}
+                  placeholder="např. rustikální, moderní, romantická..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  disabled={loading}
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  Tento styl pomáhá AI generovat lepší moodboardy
+                </p>
+
+                {/* Suggested Styles */}
+                <div className="mt-3">
+                  <p className="text-xs text-gray-600 mb-2 flex items-center space-x-1">
+                    <Sparkles className="w-3 h-3" />
+                    <span>Návrhy stylů:</span>
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {['Rustikální', 'Moderní', 'Romantická', 'Vintage', 'Boho', 'Minimalistická', 'Zahradní', 'Klasická'].map((style) => (
+                      <button
+                        key={style}
+                        type="button"
+                        onClick={() => handleChange('style', style)}
+                        className={`px-3 py-1 text-xs rounded-full transition-colors ${
+                          formData.style.toLowerCase() === style.toLowerCase()
+                            ? 'bg-primary-100 text-primary-700 border border-primary-300'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200'
+                        }`}
+                        disabled={loading}
+                      >
+                        {style}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
 
             </div>
           </div>
