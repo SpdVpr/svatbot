@@ -16,11 +16,11 @@ export default function MusicPlaylistModule() {
         </h3>
       </Link>
 
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {/* Total Songs */}
-        <div className="bg-purple-50 p-4 rounded-lg text-center">
-          <div className="text-2xl font-bold text-purple-600 mb-1">{totalSongs}</div>
-          <div className="text-sm text-purple-700">Celkem písní</div>
+        <div className="bg-purple-50 p-3 sm:p-4 rounded-lg text-center">
+          <div className="text-xl sm:text-2xl font-bold text-purple-600 mb-1">{totalSongs}</div>
+          <div className="text-xs sm:text-sm text-purple-700">Celkem písní</div>
         </div>
 
         {/* Vendors */}
@@ -29,7 +29,7 @@ export default function MusicPlaylistModule() {
             {vendors.slice(0, 2).map((vendor) => (
               <div key={vendor.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">{vendor.name}</p>
+                  <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">{vendor.name}</p>
                   {vendor.type && <p className="text-xs text-purple-600">{vendor.type}</p>}
                 </div>
                 <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 ml-2" />
@@ -42,18 +42,18 @@ export default function MusicPlaylistModule() {
             )}
           </div>
         ) : (
-          <div className="bg-gray-50 rounded-lg p-4 border-2 border-dashed border-gray-300">
-            <p className="text-sm text-gray-600 text-center">
+          <div className="bg-gray-50 rounded-lg p-3 sm:p-4 border-2 border-dashed border-gray-300">
+            <p className="text-xs sm:text-sm text-gray-600 text-center">
               Zatím nemáte žádného dodavatele hudby
             </p>
           </div>
         )}
       </div>
 
-      <div className="mt-4 pt-4 border-t border-gray-200">
+      <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
         <Link
           href="/music"
-          className="btn-primary w-full flex items-center justify-center space-x-2"
+          className="btn-primary w-full flex items-center justify-center space-x-2 text-sm sm:text-base"
         >
           <Music className="w-4 h-4" />
           <span>Spravovat playlist</span>

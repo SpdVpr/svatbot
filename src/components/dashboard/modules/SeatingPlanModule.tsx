@@ -30,15 +30,15 @@ export default function SeatingPlanModule() {
         </h3>
       </Link>
 
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {/* Seating Overview */}
-        <div className="bg-indigo-50 p-4 rounded-lg text-center">
-          <div className="text-2xl font-bold text-indigo-600 mb-1">{seatingStats.totalTables}</div>
-          <div className="text-sm text-indigo-700">Stolů naplánováno</div>
+        <div className="bg-indigo-50 p-3 sm:p-4 rounded-lg text-center">
+          <div className="text-xl sm:text-2xl font-bold text-indigo-600 mb-1">{seatingStats.totalTables}</div>
+          <div className="text-xs sm:text-sm text-indigo-700">Stolů naplánováno</div>
         </div>
 
         {/* Assignment Stats */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3">
           <div className="text-center">
             <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg mx-auto mb-1">
               <Users className="w-4 h-4 text-green-600" />
@@ -56,10 +56,10 @@ export default function SeatingPlanModule() {
         </div>
       </div>
 
-      <div className="mt-4 pt-4 border-t border-gray-200">
-        <Link 
-          href="/seating" 
-          className="btn-primary w-full flex items-center justify-center space-x-2"
+      <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
+        <Link
+          href="/seating"
+          className="btn-primary w-full flex items-center justify-center space-x-2 text-sm sm:text-base"
         >
           <Grid3X3 className="w-4 h-4" />
           <span>Vytvořit plán</span>

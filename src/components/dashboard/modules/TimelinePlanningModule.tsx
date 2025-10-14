@@ -16,12 +16,12 @@ export default function TimelinePlanningModule() {
         </h3>
       </Link>
 
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {/* Calendar Overview */}
-        <div className="bg-purple-50 p-4 rounded-lg">
+        <div className="bg-purple-50 p-3 sm:p-4 rounded-lg">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-purple-900">Celkem událostí</span>
-            <span className="text-lg font-bold text-purple-600">{stats.totalEvents}</span>
+            <span className="text-xs sm:text-sm font-medium text-purple-900">Celkem událostí</span>
+            <span className="text-base sm:text-lg font-bold text-purple-600">{stats.totalEvents}</span>
           </div>
           <div className="text-xs text-purple-700 mt-1">
             {stats.todayEvents} dnes • {stats.thisWeekEvents} tento týden
@@ -31,33 +31,33 @@ export default function TimelinePlanningModule() {
         {/* Event Stats */}
         <div className="grid grid-cols-3 gap-2">
           <div className="text-center">
-            <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg mx-auto mb-1">
-              <CheckCircle className="w-4 h-4 text-green-600" />
+            <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-green-100 rounded-lg mx-auto mb-1">
+              <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-600" />
             </div>
-            <div className="text-lg font-bold text-gray-900">{stats.completedEvents}</div>
+            <div className="text-sm sm:text-lg font-bold text-gray-900">{stats.completedEvents}</div>
             <div className="text-xs text-gray-500">Hotovo</div>
           </div>
           <div className="text-center">
-            <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-lg mx-auto mb-1">
-              <Clock className="w-4 h-4 text-blue-600" />
+            <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-blue-100 rounded-lg mx-auto mb-1">
+              <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />
             </div>
-            <div className="text-lg font-bold text-gray-900">{stats.upcomingEvents}</div>
+            <div className="text-sm sm:text-lg font-bold text-gray-900">{stats.upcomingEvents}</div>
             <div className="text-xs text-gray-500">Nadcházející</div>
           </div>
           <div className="text-center">
-            <div className="flex items-center justify-center w-8 h-8 bg-red-100 rounded-lg mx-auto mb-1">
-              <AlertCircle className="w-4 h-4 text-red-600" />
+            <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-red-100 rounded-lg mx-auto mb-1">
+              <AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-600" />
             </div>
-            <div className="text-lg font-bold text-gray-900">{stats.overdueEvents}</div>
+            <div className="text-sm sm:text-lg font-bold text-gray-900">{stats.overdueEvents}</div>
             <div className="text-xs text-gray-500">Po termínu</div>
           </div>
         </div>
       </div>
 
-      <div className="mt-4 pt-4 border-t border-gray-200">
-        <Link 
-          href="/calendar" 
-          className="btn-primary w-full flex items-center justify-center space-x-2"
+      <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
+        <Link
+          href="/calendar"
+          className="btn-primary w-full flex items-center justify-center space-x-2 text-sm sm:text-base"
         >
           <Calendar className="w-4 h-4" />
           <span>Zobrazit kalendář</span>

@@ -55,9 +55,9 @@
     @apply bg-primary-300 rounded-full hover:bg-primary-400;
   }
 
-  /* Wedding card styles */
+  /* Wedding card styles - responsive padding */
   .wedding-card {
-    @apply bg-white rounded-2xl shadow-wedding border border-primary-100 p-6 transition-all duration-300 hover:shadow-lg hover:scale-[1.02];
+    @apply bg-white rounded-2xl shadow-wedding border border-primary-100 p-4 sm:p-6 transition-all duration-300 hover:shadow-lg hover:scale-[1.02];
   }
 
   /* Progress bar styles */
