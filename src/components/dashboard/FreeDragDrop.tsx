@@ -72,6 +72,17 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
   const [canvasSize, setCanvasSize] = useState({ width: CANVAS_WIDTHS['normal'].width, height: 4000 })
   const [snapGuides, setSnapGuides] = useState<{ x: number[], y: number[] }>({ x: [], y: [] })
   const [showCanvasMenu, setShowCanvasMenu] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // Update canvas size when width changes
   useEffect(() => {
@@ -151,6 +162,86 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
     )
   }
 
+  // Mobile: Use simple vertical stack layout
+  if (isMobile) {
+    return (
+      <div className="mx-auto px-4 max-w-full">
+        <div className="space-y-4">
+          {/* Mobile Controls - Simplified */}
+          <div className="bg-white p-3 rounded-xl border border-gray-200">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900">Dashboard</h2>
+              <button
+                onClick={toggleEditMode}
+                className={`btn-outline flex items-center space-x-2 text-sm ${
+                  layout.isEditMode ? 'bg-primary-50 border-primary-300 text-primary-700' : ''
+                }`}
+              >
+                <Edit3 className="w-4 h-4" />
+                <span>{layout.isEditMode ? 'Hotovo' : 'Upravit'}</span>
+              </button>
+            </div>
+            {layout.isEditMode && (
+              <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-xs text-blue-800">
+                  💡 Klikněte na ikonu oka pro skrytí/zobrazení modulů
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Mobile Modules - Vertical Stack */}
+          <div className="space-y-4">
+            {(layout.isEditMode ? allModules : visibleModules).map((module) => (
+              <div
+                key={module.id}
+                className={`bg-white rounded-xl border-2 transition-all ${
+                  !module.isVisible ? 'opacity-50 border-gray-200' : 'border-gray-200'
+                }`}
+              >
+                {/* Mobile Module Header (Edit Mode) */}
+                {layout.isEditMode && (
+                  <div className="flex items-center justify-between p-3 border-b border-gray-200 bg-gray-50">
+                    <span className="text-sm font-medium text-gray-700">{module.title}</span>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => toggleModuleVisibility(module.id)}
+                        className="p-1.5 rounded-lg hover:bg-gray-200 transition-colors"
+                        title={module.isVisible ? 'Skrýt modul' : 'Zobrazit modul'}
+                      >
+                        {module.isVisible ? (
+                          <Eye className="w-4 h-4 text-gray-600" />
+                        ) : (
+                          <EyeOff className="w-4 h-4 text-gray-400" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {/* Module Content */}
+                {module.isVisible && (
+                  <div className="p-4">
+                    {renderModule(module)}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Empty state */}
+          {visibleModules.length === 0 && !layout.isEditMode && (
+            <div className="text-center py-12 text-gray-400">
+              <div className="text-6xl mb-4">📊</div>
+              <p className="text-lg font-medium">Váš dashboard je prázdný</p>
+              <p className="text-sm">Klikněte na "Upravit" a zobrazte moduly</p>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  // Desktop: Use drag & drop layout
   return (
     <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-[2000px]">
       <div className="space-y-6">
