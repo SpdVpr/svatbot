@@ -24,17 +24,31 @@ import FoodDrinksModule from './modules/FoodDrinksModule'
 import WeddingWebsiteModule from './modules/WeddingWebsiteModule'
 import AccommodationManagementModule from './modules/AccommodationManagementModule'
 import ShoppingListModule from './modules/ShoppingListModule'
+import SvatbotCoachModule from './modules/SvatbotCoachModule'
 
 interface FreeDragDropProps {
   onWeddingSettingsClick?: () => void
 }
 
 // Module size configurations (width x height in pixels)
+// Calculation: 3 modules × 360px = 1080px + 4 gaps × 40px = 1240px
 const MODULE_SIZES = {
-  small: { width: 300, height: 400 },
-  medium: { width: 330, height: 450 },
-  large: { width: 680, height: 450 },
-  full: { width: 1400, height: 500 }
+  small: { width: 360, height: 400 },
+  medium: { width: 360, height: 450 },
+  large: { width: 760, height: 450 },  // 2 modules wide: 360 + 40 + 360
+  full: { width: 1160, height: 500 }   // 3 modules wide: 360 + 40 + 360 + 40 + 360
+}
+
+// Grid configuration for snapping
+const GRID_SIZE = 40 // Grid cell size in pixels
+const SNAP_THRESHOLD = 20 // Distance in pixels to snap to grid
+
+// Canvas width configurations
+type CanvasWidth = 'normal' | 'wide' | 'ultra-wide'
+const CANVAS_WIDTHS = {
+  'normal': { width: 1240, label: 'Normální (3 moduly)', description: '1240px - 3 moduly vedle sebe' },
+  'wide': { width: 1640, label: 'Široký (4 moduly)', description: '1640px - 4 moduly vedle sebe' },
+  'ultra-wide': { width: 2040, label: 'Ultra široký (5 modulů)', description: '2040px - 5 modulů vedle sebe' }
 }
 
 export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropProps) {
@@ -54,7 +68,28 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
   const layoutMode = layout.layoutMode || 'grid'
 
   const containerRef = useRef<HTMLDivElement>(null)
-  const [canvasSize, setCanvasSize] = useState({ width: 2000, height: 4000 })
+  const [canvasWidth, setCanvasWidth] = useState<CanvasWidth>('normal')
+  const [canvasSize, setCanvasSize] = useState({ width: CANVAS_WIDTHS['normal'].width, height: 4000 })
+  const [snapGuides, setSnapGuides] = useState<{ x: number[], y: number[] }>({ x: [], y: [] })
+  const [showCanvasMenu, setShowCanvasMenu] = useState(false)
+
+  // Update canvas size when width changes
+  useEffect(() => {
+    setCanvasSize(prev => ({ ...prev, width: CANVAS_WIDTHS[canvasWidth].width }))
+  }, [canvasWidth])
+
+  // Close canvas menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element
+      if (showCanvasMenu && !target.closest('[data-canvas-menu]')) {
+        setShowCanvasMenu(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showCanvasMenu])
 
   // Render module content
   const renderModule = (module: DashboardModule) => {
@@ -95,6 +130,8 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
         return <AccommodationManagementModule />
       case 'shopping-list':
         return <ShoppingListModule />
+      case 'svatbot-coach':
+        return <SvatbotCoachModule />
       default:
         return <div className="p-4">Modul není k dispozici</div>
     }
@@ -118,7 +155,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
     <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-[2000px]">
       <div className="space-y-6">
         {/* Dashboard Controls */}
-        <div className="bg-white p-4 rounded-xl border border-gray-200">
+        <div className="bg-white p-4 rounded-xl border border-gray-200 mx-auto" style={{ maxWidth: '1240px' }}>
           <div className="flex items-center justify-between">
             {/* Left Side - Empty or Edit Mode Controls */}
             <div className="flex items-center space-x-2">
@@ -161,8 +198,54 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
               </button>
             </div>
 
-            {/* Right Side - Edit Mode Button */}
+            {/* Right Side - Canvas Width & Edit Mode Button */}
             <div className="flex items-center space-x-2">
+              {/* Canvas Width Selector */}
+              <div className="relative" data-canvas-menu>
+                <button
+                  onClick={() => setShowCanvasMenu(!showCanvasMenu)}
+                  className="btn-outline flex items-center space-x-2"
+                  title="Změnit šířku plochy"
+                >
+                  <Maximize className="w-4 h-4" />
+                  <span className="hidden lg:inline text-sm">
+                    {CANVAS_WIDTHS[canvasWidth].label.split(' ')[0]}
+                  </span>
+                </button>
+
+                {showCanvasMenu && (
+                  <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                    <div className="p-3">
+                      <p className="text-sm font-semibold text-gray-700 mb-2">Šířka plochy</p>
+                      <div className="space-y-1">
+                        {(Object.keys(CANVAS_WIDTHS) as CanvasWidth[]).map((width) => (
+                          <button
+                            key={width}
+                            onClick={() => {
+                              setCanvasWidth(width)
+                              setShowCanvasMenu(false)
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                              canvasWidth === width
+                                ? 'bg-primary-50 text-primary-700 font-medium'
+                                : 'hover:bg-gray-50 text-gray-700'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm">{CANVAS_WIDTHS[width].label}</span>
+                              {canvasWidth === width && (
+                                <span className="text-primary-600">✓</span>
+                              )}
+                            </div>
+                            <span className="text-xs text-gray-500">{CANVAS_WIDTHS[width].description}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <button
                 onClick={toggleEditMode}
                 className={`btn-outline flex items-center space-x-2 ${
@@ -182,23 +265,34 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
               <div className="flex items-start space-x-2">
                 <span className="text-lg">💡</span>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-blue-900 mb-2">Jak upravit layout:</p>
+                  <p className="text-sm font-semibold text-blue-900 mb-2">
+                    {layoutMode === 'grid' ? 'Grid layout s přichytáváním:' : 'Volný layout:'}
+                  </p>
                   <ul className="text-sm text-blue-800 space-y-1.5">
                     <li className="flex items-start">
                       <span className="mr-2">•</span>
-                      <span><strong>Přesunout modul:</strong> Klikněte a táhněte modul na nové místo</span>
+                      <span>
+                        <strong>Přesunout modul:</strong> Klikněte a táhněte modul
+                        {layoutMode === 'grid' && ' - automaticky se přichytí k mřížce'}
+                      </span>
+                    </li>
+                    {layoutMode === 'grid' && (
+                      <li className="flex items-start">
+                        <span className="mr-2">•</span>
+                        <span><strong>Vodící čáry:</strong> Modré čáry se zobrazí při přetahování pro snadné zarovnání</span>
+                      </li>
+                    )}
+                    <li className="flex items-start">
+                      <span className="mr-2">•</span>
+                      <span><strong>Změnit velikost:</strong> Táhněte za pravý dolní roh modulu</span>
                     </li>
                     <li className="flex items-start">
                       <span className="mr-2">•</span>
-                      <span><strong>Změnit velikost:</strong> Najeďte myší na modul a v pravém dolním rohu podržte a táhněte ikonku</span>
+                      <span><strong>Skrýt/Zobrazit:</strong> Klikněte na ikonu oka</span>
                     </li>
                     <li className="flex items-start">
                       <span className="mr-2">•</span>
-                      <span><strong>Skrýt/Zobrazit:</strong> Klikněte na ikonu oka v pravém horním rohu modulu</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2">•</span>
-                      <span><strong>Zamknout:</strong> Klikněte na ikonu zámku pro zamčení modulu na místě</span>
+                      <span><strong>Zamknout:</strong> Klikněte na ikonu zámku</span>
                     </li>
                   </ul>
                 </div>
@@ -210,21 +304,43 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
         {/* Free Canvas with Absolute Positioning */}
         <div
           ref={containerRef}
-          className="relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200 overflow-hidden touch-none"
+          className="relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200 overflow-hidden touch-none mx-auto"
           style={{
-            width: '100%',
+            width: `${canvasSize.width}px`,
+            maxWidth: '100%',
             height: `${canvasSize.height}px`,
             minHeight: '1200px',
-            backgroundImage: layout.isEditMode
+            backgroundImage: layout.isEditMode && layoutMode === 'grid'
+              ? `linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+                 linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px)`
+              : layout.isEditMode
               ? `radial-gradient(circle at 1px 1px, rgba(0,0,0,0.08) 1px, transparent 0)`
               : 'none',
-            backgroundSize: layout.isEditMode ? '40px 40px' : 'auto'
+            backgroundSize: layout.isEditMode && layoutMode === 'grid'
+              ? `${GRID_SIZE}px ${GRID_SIZE}px`
+              : layout.isEditMode ? '40px 40px' : 'auto'
           }}
         >
+          {/* Snap Guide Lines (only in grid mode) */}
+          {layout.isEditMode && layoutMode === 'grid' && snapGuides.x.map((x, i) => (
+            <div
+              key={`guide-x-${i}`}
+              className="absolute top-0 bottom-0 w-0.5 bg-blue-400 pointer-events-none z-50"
+              style={{ left: `${x}px` }}
+            />
+          ))}
+          {layout.isEditMode && layoutMode === 'grid' && snapGuides.y.map((y, i) => (
+            <div
+              key={`guide-y-${i}`}
+              className="absolute left-0 right-0 h-0.5 bg-blue-400 pointer-events-none z-50"
+              style={{ top: `${y}px` }}
+            />
+          ))}
+
           {/* Canvas info overlay */}
           {layout.isEditMode && (
             <div className="absolute top-4 left-4 text-gray-400 text-sm font-medium pointer-events-none z-0">
-              Dashboard • {visibleModules.length} {visibleModules.length === 1 ? 'modul' : visibleModules.length < 5 ? 'moduly' : 'modulů'}
+              {layoutMode === 'grid' ? 'Grid Dashboard' : 'Volný Dashboard'} • {visibleModules.length} {visibleModules.length === 1 ? 'modul' : visibleModules.length < 5 ? 'moduly' : 'modulů'}
             </div>
           )}
 
@@ -234,10 +350,14 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
               key={module.id}
               module={module}
               isEditMode={layout.isEditMode}
+              enableGridSnap={layoutMode === 'grid'}
+              gridSize={GRID_SIZE}
+              snapThreshold={SNAP_THRESHOLD}
               onPositionChange={updateModulePosition}
               onSizeChange={updateModuleSize}
               onToggleVisibility={toggleModuleVisibility}
               onToggleLock={toggleModuleLock}
+              onSnapGuidesChange={setSnapGuides}
               renderContent={() => renderModule(module)}
             />
           ))}
@@ -286,20 +406,28 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
 interface DraggableModuleProps {
   module: DashboardModule
   isEditMode: boolean
+  enableGridSnap?: boolean
+  gridSize?: number
+  snapThreshold?: number
   onPositionChange: (moduleId: string, position: { x: number; y: number }) => void
   onSizeChange: (moduleId: string, size: { width: number; height: number }) => void
   onToggleVisibility: (moduleId: string) => void
   onToggleLock: (moduleId: string) => void
+  onSnapGuidesChange?: (guides: { x: number[], y: number[] }) => void
   renderContent: () => React.ReactNode
 }
 
 function DraggableModule({
   module,
   isEditMode,
+  enableGridSnap = false,
+  gridSize = 40,
+  snapThreshold = 20,
   onPositionChange,
   onSizeChange,
   onToggleVisibility,
   onToggleLock,
+  onSnapGuidesChange,
   renderContent
 }: DraggableModuleProps) {
   const [isDragging, setIsDragging] = useState(false)
@@ -315,6 +443,19 @@ function DraggableModule({
   const lastMoveTime = useRef(0)
 
   const isHidden = !module.isVisible
+
+  // Snap position to grid
+  const snapToGrid = (value: number): number => {
+    if (!enableGridSnap) return value
+    return Math.round(value / gridSize) * gridSize
+  }
+
+  // Check if value is close to grid line
+  const isNearGridLine = (value: number): boolean => {
+    if (!enableGridSnap) return false
+    const remainder = value % gridSize
+    return remainder < snapThreshold || remainder > gridSize - snapThreshold
+  }
 
   // Update position when module.position changes (from Firebase)
   useEffect(() => {
@@ -364,14 +505,34 @@ function DraggableModule({
 
     const container = dragRef.current?.parentElement?.getBoundingClientRect()
     if (container) {
-      const newX = Math.max(0, Math.min(
+      let newX = Math.max(0, Math.min(
         container.width - size.width,
         e.clientX - container.left - dragOffset.x
       ))
-      const newY = Math.max(0, Math.min(
+      let newY = Math.max(0, Math.min(
         container.height - size.height,
         e.clientY - container.top - dragOffset.y
       ))
+
+      // Apply grid snapping if enabled
+      if (enableGridSnap) {
+        const snappedX = snapToGrid(newX)
+        const snappedY = snapToGrid(newY)
+
+        // Show snap guides if near grid line
+        const guides: { x: number[], y: number[] } = { x: [], y: [] }
+        if (isNearGridLine(newX)) {
+          newX = snappedX
+          guides.x.push(snappedX, snappedX + size.width)
+        }
+        if (isNearGridLine(newY)) {
+          newY = snappedY
+          guides.y.push(snappedY, snappedY + size.height)
+        }
+        if (onSnapGuidesChange) {
+          onSnapGuidesChange(guides)
+        }
+      }
 
       setPosition({ x: newX, y: newY })
     }
@@ -398,27 +559,50 @@ function DraggableModule({
     const deltaX = e.clientX - resizeStart.x
     const deltaY = e.clientY - resizeStart.y
 
-    const newWidth = Math.max(250, resizeStart.width + deltaX)
-    const newHeight = Math.max(200, resizeStart.height + deltaY)
+    let newWidth = Math.max(250, resizeStart.width + deltaX)
+    let newHeight = Math.max(200, resizeStart.height + deltaY)
+
+    // Apply grid snapping if enabled
+    if (enableGridSnap) {
+      if (isNearGridLine(newWidth)) {
+        newWidth = snapToGrid(newWidth)
+      }
+      if (isNearGridLine(newHeight)) {
+        newHeight = snapToGrid(newHeight)
+      }
+    }
 
     setSize({ width: newWidth, height: newHeight })
   }
 
   const handleResizeEnd = () => {
     if (isResizing) {
-      console.log('📏 Saving module size:', module.id, size)
-      onSizeChange(module.id, size)
+      // Final snap to grid
+      const finalSize = enableGridSnap ? {
+        width: snapToGrid(size.width),
+        height: snapToGrid(size.height)
+      } : size
+      setSize(finalSize)
+      onSizeChange(module.id, finalSize)
     }
     setIsResizing(false)
   }
 
   const handleMouseUp = () => {
     if (isDragging && hasDragged) {
-      console.log('💾 Saving module position:', module.id, position)
-      onPositionChange(module.id, position)
+      // Final snap to grid
+      const finalPosition = enableGridSnap ? {
+        x: snapToGrid(position.x),
+        y: snapToGrid(position.y)
+      } : position
+      setPosition(finalPosition)
+      onPositionChange(module.id, finalPosition)
     }
     setIsDragging(false)
     setHasDragged(false)
+    if (onSnapGuidesChange) {
+      onSnapGuidesChange({ x: [], y: [] })
+    }
   }
 
   useEffect(() => {

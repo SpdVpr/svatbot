@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useAI } from '@/hooks/useAI'
+import { useAICoach } from '@/hooks/useAICoach'
 import {
   Bot,
   Send,
@@ -12,7 +13,8 @@ import {
   Minimize2,
   Maximize2,
   RotateCcw,
-  Lightbulb
+  Lightbulb,
+  Heart
 } from 'lucide-react'
 
 interface AIAssistantProps {
@@ -37,6 +39,8 @@ export default function AIAssistant({
     clearError,
     clearChat
   } = useAI()
+
+  const { svatbot } = useAICoach()
 
   const [isOpen, setIsOpen] = useState(defaultOpen)
   const [isMinimized, setIsMinimized] = useState(false)
@@ -124,10 +128,10 @@ export default function AIAssistant({
     return (
       <button
         onClick={toggleOpen}
-        className={`fixed bottom-6 right-6 z-50 bg-gradient-to-br from-primary-500 to-purple-600 hover:from-primary-600 hover:to-purple-700 text-white rounded-full p-5 shadow-2xl transition-all duration-300 hover:scale-110 hover:shadow-primary-500/50 group ${className}`}
-        title="AI Svatební Asistent"
+        className={`fixed bottom-6 right-6 z-50 bg-gradient-to-br from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 text-white rounded-full p-5 shadow-2xl transition-all duration-300 hover:scale-110 hover:shadow-primary-500/50 group ${className}`}
+        title={`${svatbot.name} - ${svatbot.tagline}`}
       >
-        <Bot className="w-7 h-7 group-hover:rotate-12 transition-transform duration-300" />
+        <div className="text-2xl group-hover:scale-110 transition-transform duration-300">🤖</div>
         <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-pulse shadow-lg" />
         <div className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
 
@@ -143,10 +147,10 @@ export default function AIAssistant({
       {compact && (
         <button
           onClick={toggleOpen}
-          className={`fixed bottom-6 right-6 z-50 bg-gradient-to-br from-primary-500 to-purple-600 hover:from-primary-600 hover:to-purple-700 text-white rounded-full p-5 shadow-2xl transition-all duration-300 hover:scale-110 hover:shadow-primary-500/50 group ${isOpen ? 'scale-0' : 'scale-100'}`}
-          title="AI Svatební Asistent"
+          className={`fixed bottom-6 right-6 z-50 bg-gradient-to-br from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 text-white rounded-full p-5 shadow-2xl transition-all duration-300 hover:scale-110 hover:shadow-primary-500/50 group ${isOpen ? 'scale-0' : 'scale-100'}`}
+          title={`${svatbot.name} - ${svatbot.tagline}`}
         >
-          <Bot className="w-7 h-7 group-hover:rotate-12 transition-transform duration-300" />
+          <div className="text-2xl group-hover:scale-110 transition-transform duration-300">🤖</div>
           <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-pulse shadow-lg" />
           <div className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
 
@@ -167,15 +171,17 @@ export default function AIAssistant({
           ${className}
         `}>
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-primary-50 to-purple-50">
+          <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-primary-50 to-pink-50">
             <div className="flex items-center space-x-3">
               <div className="relative">
-                <Bot className="w-6 h-6 text-primary-500" />
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full" />
+                <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-pink-500 rounded-full flex items-center justify-center">
+                  <span className="text-xl">🤖</span>
+                </div>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse" />
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900">AI Svatební Asistent</h3>
-                <p className="text-xs text-gray-500">Váš osobní svatební expert</p>
+                <h3 className="font-bold text-gray-900">{svatbot.name}</h3>
+                <p className="text-xs text-gray-600">{svatbot.tagline}</p>
               </div>
             </div>
             

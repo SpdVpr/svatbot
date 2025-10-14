@@ -26,6 +26,7 @@ import FoodDrinksModule from './modules/FoodDrinksModule'
 import WeddingWebsiteModule from './modules/WeddingWebsiteModule'
 import AccommodationManagementModule from './modules/AccommodationManagementModule'
 import ShoppingListModule from './modules/ShoppingListModule'
+import SvatbotCoachModule from './modules/SvatbotCoachModule'
 
 interface SimpleDragDropProps {
   onWeddingSettingsClick: () => void
@@ -215,6 +216,8 @@ export default function SimpleDragDrop({ onWeddingSettingsClick }: SimpleDragDro
         return <AccommodationManagementModule />
       case 'shopping-list':
         return <ShoppingListModule />
+      case 'svatbot-coach':
+        return <SvatbotCoachModule />
       default:
         return (
           <div className="wedding-card">

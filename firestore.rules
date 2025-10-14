@@ -548,6 +548,28 @@ service cloud.firestore {
                          get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid));
     }
 
+    // Mood Entries collection - Svatbot AI Coach mood tracking
+    match /moodEntries/{entryId} {
+      // Allow read if authenticated and user owns the entry
+      allow read: if isAuthenticated() &&
+                     resource.data.userId == request.auth.uid;
+
+      // Allow create if authenticated and userId matches
+      allow create: if isAuthenticated() &&
+                       request.resource.data.keys().hasAll(['userId', 'weddingId', 'mood', 'stressLevel', 'energyLevel']) &&
+                       request.auth.uid == request.resource.data.userId &&
+                       exists(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)) &&
+                       get(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)).data.userId == request.auth.uid;
+
+      // Allow update if authenticated and user owns the entry
+      allow update: if isAuthenticated() &&
+                       resource.data.userId == request.auth.uid;
+
+      // Allow delete if authenticated and user owns the entry
+      allow delete: if isAuthenticated() &&
+                       resource.data.userId == request.auth.uid;
+    }
+
     // Deny all other access
     match /{document=**} {
       allow read, write: if false;

@@ -37,6 +37,8 @@ import AIAssistant from '@/components/ai/AIAssistant'
 import AIVendorRecommendations from '@/components/ai/AIVendorRecommendations'
 import AITimelineGenerator from '@/components/ai/AITimelineGenerator'
 import AIBudgetOptimizer from '@/components/ai/AIBudgetOptimizer'
+import SvatbotWidget from '@/components/ai/SvatbotWidget'
+import MoodTracker from '@/components/ai/MoodTracker'
 
 function AIPageContent() {
   const { user } = useAuth()
