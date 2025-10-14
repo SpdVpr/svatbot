@@ -31,7 +31,7 @@ export interface MoodboardImage {
   thumbnailUrl: string
   title: string
   description: string
-  source: 'upload'
+  source: 'upload' | 'ai-generated'
   sourceUrl: string
   isFavorite: boolean
   tags: string[]
@@ -42,6 +42,16 @@ export interface MoodboardImage {
   userId: string
   weddingId: string
   storageRef: string // Pro Firebase Storage reference
+  aiMetadata?: {
+    prompt: string
+    sourceImages: string[] // IDs původních fotek
+    style: string
+    colors: string[]
+    mood: string
+    generatedAt: Date
+    analysis?: any
+    description?: any
+  }
 }
 
 export type WeddingCategory =
@@ -99,6 +109,11 @@ export function useMoodboard() {
     // Use onSnapshot for real-time updates
     const unsubscribe = onSnapshot(q,
       (snapshot) => {
+        console.log('🔄 Moodboard: Loading images from Firebase...', {
+          totalDocs: snapshot.docs.length,
+          weddingId: wedding.id
+        })
+
         const loadedImages: MoodboardImage[] = snapshot.docs
           .filter(doc => {
             const data = doc.data()
@@ -115,6 +130,17 @@ export function useMoodboard() {
           })
           .map(doc => {
             const data = doc.data()
+
+            // Debug log for category
+            if (data.source === 'upload' && data.category !== 'other') {
+              console.log('📋 Loading image with category:', {
+                id: doc.id,
+                title: data.title,
+                category: data.category,
+                rawCategory: data.category
+              })
+            }
+
             return {
               id: doc.id,
               url: data.url || '',
@@ -131,9 +157,20 @@ export function useMoodboard() {
               createdAt: data.createdAt?.toDate() || new Date(),
               userId: data.userId || '',
               weddingId: data.weddingId || '',
-              storageRef: data.storageRef || ''
+              storageRef: data.storageRef || '',
+              aiMetadata: data.aiMetadata || undefined
             }
           }) as MoodboardImage[]
+
+        console.log('✅ Moodboard: Loaded images:', {
+          total: loadedImages.length,
+          uploaded: loadedImages.filter(img => img.source === 'upload').length,
+          aiGenerated: loadedImages.filter(img => img.source === 'ai-generated').length,
+          categories: loadedImages.reduce((acc, img) => {
+            acc[img.category] = (acc[img.category] || 0) + 1
+            return acc
+          }, {} as Record<string, number>)
+        })
 
         setImages(loadedImages)
         setIsLoading(false)
@@ -206,6 +243,13 @@ export function useMoodboard() {
   }) => {
     if (!user || !wedding?.id) return
 
+    console.log('🔍 uploadImage called with metadata:', {
+      fileName: file.name,
+      metadata: metadata,
+      category: metadata?.category,
+      hasMetadata: !!metadata
+    })
+
     // Validate file type
     if (!isValidImageFile(file)) {
       throw new Error('Nepodporovaný formát obrázku. Podporované formáty: JPEG, PNG, WebP')
@@ -260,10 +304,18 @@ export function useMoodboard() {
         storageRef: storageRef.fullPath
       }
 
+      console.log('💾 Saving to Firestore with category:', {
+        category: newImage.category,
+        metadataCategory: metadata?.category,
+        title: newImage.title
+      })
+
       const docRef = await addDoc(collection(db, 'moodboards'), {
         ...newImage,
         createdAt: serverTimestamp()
       })
+
+      console.log('✅ Saved to Firestore with ID:', docRef.id)
 
       const addedImage: MoodboardImage = {
         ...newImage,
@@ -337,9 +389,14 @@ export function useMoodboard() {
   }
 
   // Generic add image function
-  const addImage = async (imageData: any) => {
+  const addImage = async (imageData: any, metadata?: {
+    title?: string
+    description?: string
+    tags?: string[]
+    category?: WeddingCategory
+  }) => {
     if (imageData instanceof File) {
-      return uploadImage(imageData)
+      return uploadImage(imageData, metadata)
     } else {
       throw new Error('Pouze upload souborů je podporován')
     }
@@ -389,6 +446,185 @@ export function useMoodboard() {
     }
   }
 
+  // Generate AI Moodboard
+  const generateAIMoodboard = async (
+    selectedImageIds: string[],
+    options?: {
+      aspectRatio?: string
+      style?: string
+      seed?: number
+    }
+  ) => {
+    if (!user || !wedding?.id) {
+      throw new Error('Musíte být přihlášeni')
+    }
+
+    if (selectedImageIds.length < 2) {
+      throw new Error('Vyberte alespoň 2 obrázky')
+    }
+
+    if (selectedImageIds.length > 10) {
+      throw new Error('Maximální počet obrázků je 10')
+    }
+
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      // Get selected images
+      const selectedImages = images.filter(img => selectedImageIds.includes(img.id))
+      const imageUrls = selectedImages.map(img => img.url)
+
+      // Build wedding context
+      const weddingContext = {
+        weddingDate: wedding.weddingDate,
+        location: wedding.region,
+        style: wedding.style,
+        guestCount: wedding.estimatedGuestCount
+      }
+
+      console.log('🔍 Step 1: Analyzing images...')
+
+      // Step 1: Analyze images with GPT-4o-mini Vision
+      const analyzeResponse = await fetch('/api/ai/moodboard/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageUrls, weddingContext })
+      })
+
+      if (!analyzeResponse.ok) {
+        const errorData = await analyzeResponse.json()
+        throw new Error(errorData.error || 'Nepodařilo se analyzovat obrázky')
+      }
+
+      const { analysis } = await analyzeResponse.json()
+      console.log('✅ Analysis complete:', analysis)
+
+      console.log('🎨 Step 2: Generating moodboard...')
+
+      // Step 2: Generate moodboard with Ideogram
+      const generateResponse = await fetch('/api/ai/moodboard/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: analysis.prompt,
+          options
+        })
+      })
+
+      if (!generateResponse.ok) {
+        const errorData = await generateResponse.json()
+        throw new Error(errorData.error || 'Nepodařilo se vygenerovat moodboard')
+      }
+
+      const { imageUrl: generatedImageUrl } = await generateResponse.json()
+      console.log('✅ Moodboard generated:', generatedImageUrl)
+
+      console.log('✍️ Step 3: Generating description...')
+
+      // Step 3: Generate description with GPT-4o-mini
+      const describeResponse = await fetch('/api/ai/moodboard/describe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          analysis,
+          generatedImageUrl,
+          weddingContext
+        })
+      })
+
+      if (!describeResponse.ok) {
+        const errorData = await describeResponse.json()
+        throw new Error(errorData.error || 'Nepodařilo se vygenerovat popis')
+      }
+
+      const { description } = await describeResponse.json()
+      console.log('✅ Description generated')
+
+      // Step 4: Save to Firebase Storage and Firestore
+      console.log('💾 Step 4: Saving to Firebase...')
+
+      // Download generated image via proxy to bypass CORS
+      const proxyResponse = await fetch('/api/ai/moodboard/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageUrl: generatedImageUrl })
+      })
+
+      if (!proxyResponse.ok) {
+        throw new Error('Nepodařilo se stáhnout vygenerovaný obrázek')
+      }
+
+      const imageBlob = await proxyResponse.blob()
+      console.log('✅ Image downloaded via proxy')
+
+      // Create file from blob
+      const timestamp = Date.now()
+      const filename = `ai_moodboard_${timestamp}.png`
+      const thumbnailFilename = `thumb_ai_moodboard_${timestamp}.png`
+
+      // Upload to Firebase Storage
+      const storageRef = ref(storage, `moodboards/${wedding.id}/ai-generated/${filename}`)
+      const snapshot = await uploadBytes(storageRef, imageBlob)
+      const downloadURL = await getDownloadURL(snapshot.ref)
+
+      // Create thumbnail (reuse the same image for now, or compress it)
+      const thumbnailRef = ref(storage, `moodboards/${wedding.id}/ai-generated/thumbnails/${thumbnailFilename}`)
+      const thumbnailSnapshot = await uploadBytes(thumbnailRef, imageBlob)
+      const thumbnailURL = await getDownloadURL(thumbnailSnapshot.ref)
+
+      // Save to Firestore
+      const newImage: Omit<MoodboardImage, 'id'> = {
+        url: downloadURL,
+        thumbnailUrl: thumbnailURL,
+        title: `AI Moodboard - ${analysis.style}`,
+        description: description.summary || description.styleDescription,
+        source: 'ai-generated',
+        sourceUrl: generatedImageUrl,
+        isFavorite: false,
+        tags: analysis.colors || [],
+        category: 'other',
+        createdAt: new Date(),
+        userId: user.id,
+        weddingId: wedding.id,
+        storageRef: storageRef.fullPath,
+        aiMetadata: {
+          prompt: analysis.prompt,
+          sourceImages: selectedImageIds,
+          style: analysis.style,
+          colors: analysis.colors || [],
+          mood: analysis.mood || '',
+          generatedAt: new Date(),
+          analysis,
+          description
+        }
+      }
+
+      const docRef = await addDoc(collection(db, 'moodboards'), {
+        ...newImage,
+        createdAt: serverTimestamp(),
+        'aiMetadata.generatedAt': serverTimestamp()
+      })
+
+      console.log('✅ AI Moodboard saved successfully!')
+
+      setIsLoading(false)
+
+      return {
+        id: docRef.id,
+        ...newImage,
+        analysis,
+        description
+      }
+
+    } catch (err) {
+      console.error('❌ Error generating AI moodboard:', err)
+      setError(err instanceof Error ? err.message : 'Nepodařilo se vygenerovat AI moodboard')
+      setIsLoading(false)
+      throw err
+    }
+  }
+
   return {
     images,
     isLoading,
@@ -398,6 +634,7 @@ export function useMoodboard() {
     removeImage,
     toggleFavorite,
     updateImagePosition,
-    updateImageCategory
+    updateImageCategory,
+    generateAIMoodboard
   }
 }

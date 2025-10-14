@@ -5,6 +5,7 @@ import { Heart, Trash2, ExternalLink, Tag, Calendar, X } from 'lucide-react'
 import { MoodboardImage, WEDDING_CATEGORIES, WeddingCategory } from '@/hooks/useMoodboard'
 import Image from 'next/image'
 import SimpleMoodboardCard from './SimpleMoodboardCard'
+import AIMoodboardDetail from './AIMoodboardDetail'
 
 interface MoodboardGridProps {
   images: MoodboardImage[]
@@ -321,7 +322,14 @@ export default function MoodboardGrid({
       )}
 
       {/* Image Detail Modal */}
-      {selectedImage && (
+      {selectedImage && selectedImage.source === 'ai-generated' && selectedImage.aiMetadata && (
+        <AIMoodboardDetail
+          image={selectedImage}
+          onClose={() => setSelectedImage(null)}
+        />
+      )}
+
+      {selectedImage && selectedImage.source !== 'ai-generated' && (
         <div
           className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
           onClick={(e) => {

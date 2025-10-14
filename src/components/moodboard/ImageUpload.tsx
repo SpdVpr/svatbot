@@ -85,7 +85,9 @@ export default function ImageUpload({ onUpload, isLoading }: ImageUploadProps) {
   const removePendingImage = (index: number) => {
     setPendingImages(prev => {
       const updated = [...prev]
-      URL.revokeObjectURL(updated[index].preview)
+      if (updated[index] && updated[index].preview) {
+        URL.revokeObjectURL(updated[index].preview)
+      }
       updated.splice(index, 1)
       return updated
     })
@@ -97,35 +99,76 @@ export default function ImageUpload({ onUpload, isLoading }: ImageUploadProps) {
     ))
   }
 
-  const uploadImage = async (pendingImage: PendingImage, index: number) => {
+  const uploadImage = async (pendingImage: PendingImage) => {
     try {
-      updatePendingImage(index, { isUploading: true })
-
-      await onUpload(pendingImage.file, {
+      const metadata = {
         title: pendingImage.title,
         description: pendingImage.description,
         tags: pendingImage.tags,
         category: pendingImage.category
+      }
+
+      console.log('📤 Uploading image:', {
+        title: pendingImage.title,
+        category: pendingImage.category,
+        tags: pendingImage.tags,
+        metadata: metadata
       })
 
-      // Remove from pending after successful upload
-      removePendingImage(index)
+      await onUpload(pendingImage.file, metadata)
+
+      return { success: true, image: pendingImage }
     } catch (err) {
-      updatePendingImage(index, { isUploading: false })
-      alert('Nepodařilo se nahrát obrázek: ' + (err as Error).message)
+      console.error('Upload error:', err)
+      return { success: false, image: pendingImage, error: err }
     }
   }
 
   const uploadAllImages = async () => {
-    const uploadPromises = pendingImages.map((img, index) => 
-      uploadImage(img, index)
-    )
-    
+    console.log('📤 Starting upload all images...')
+    console.log('📋 Current pending images:', pendingImages.length)
+
+    if (pendingImages.length === 0) {
+      console.warn('⚠️ No images to upload')
+      return
+    }
+
+    // Store images to upload before state update
+    const imagesToUpload = pendingImages.map(img => ({ ...img, isUploading: true }))
+    console.log(`📤 Uploading ${imagesToUpload.length} images...`)
+
+    // Mark all as uploading in state
+    setPendingImages(imagesToUpload)
+
     try {
-      await Promise.all(uploadPromises)
+      // Upload all images using the current state
+      const results = await Promise.allSettled(
+        imagesToUpload.map(img => uploadImage(img))
+      )
+
+      console.log('✅ Upload results:', results)
+
+      // Check for errors
+      const errors = results.filter(r => r.status === 'rejected' || (r.status === 'fulfilled' && !r.value.success))
+
+      if (errors.length > 0) {
+        console.error('❌ Upload errors:', errors)
+        alert(`Nepodařilo se nahrát ${errors.length} obrázků`)
+      } else {
+        console.log('✅ All images uploaded successfully')
+      }
+
+      // Clear all pending images after upload
+      imagesToUpload.forEach(img => {
+        if (img.preview) {
+          URL.revokeObjectURL(img.preview)
+        }
+      })
       setPendingImages([])
+
     } catch (err) {
-      // Individual errors are handled in uploadImage
+      console.error('❌ Upload all error:', err)
+      setPendingImages(prev => prev.map(img => ({ ...img, isUploading: false })))
     }
   }
 
@@ -165,6 +208,7 @@ export default function ImageUpload({ onUpload, isLoading }: ImageUploadProps) {
           Podporované formáty: JPG, PNG, GIF, WebP (max 10MB)
         </p>
         <button
+          type="button"
           onClick={() => fileInputRef.current?.click()}
           className="inline-flex items-center px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors"
         >
@@ -190,12 +234,21 @@ export default function ImageUpload({ onUpload, isLoading }: ImageUploadProps) {
             </h3>
             <div className="flex space-x-2">
               <button
-                onClick={() => setPendingImages([])}
+                type="button"
+                onClick={() => {
+                  pendingImages.forEach(img => {
+                    if (img.preview) {
+                      URL.revokeObjectURL(img.preview)
+                    }
+                  })
+                  setPendingImages([])
+                }}
                 className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800"
               >
                 Zrušit vše
               </button>
               <button
+                type="button"
                 onClick={uploadAllImages}
                 disabled={isLoading}
                 className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -229,6 +282,7 @@ export default function ImageUpload({ onUpload, isLoading }: ImageUploadProps) {
                         <p className="text-sm text-gray-500">{formatFileSize(pendingImage.file.size)}</p>
                       </div>
                       <button
+                        type="button"
                         onClick={() => removePendingImage(index)}
                         className="text-gray-400 hover:text-gray-600"
                       >
@@ -280,6 +334,7 @@ export default function ImageUpload({ onUpload, isLoading }: ImageUploadProps) {
                           >
                             {tag}
                             <button
+                              type="button"
                               onClick={() => removeTag(index, tag)}
                               className="ml-1 text-pink-500 hover:text-pink-700"
                             >
@@ -303,11 +358,21 @@ export default function ImageUpload({ onUpload, isLoading }: ImageUploadProps) {
                     </div>
 
                     <button
-                      onClick={() => uploadImage(pendingImage, index)}
-                      disabled={isLoading}
+                      type="button"
+                      onClick={async () => {
+                        updatePendingImage(index, { isUploading: true })
+                        const result = await uploadImage(pendingImage)
+                        if (result.success) {
+                          removePendingImage(index)
+                        } else {
+                          updatePendingImage(index, { isUploading: false })
+                          alert('Nepodařilo se nahrát obrázek')
+                        }
+                      }}
+                      disabled={isLoading || pendingImage.isUploading}
                       className="w-full px-3 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                     >
-                      {isLoading ? 'Nahrávám...' : 'Nahrát tento obrázek'}
+                      {pendingImage.isUploading ? 'Nahrávám...' : 'Nahrát tento obrázek'}
                     </button>
                   </div>
                 </div>
