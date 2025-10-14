@@ -31,6 +31,13 @@
 
   html {
     scroll-behavior: smooth;
+    /* Prevent scrollbar from appearing during initial load */
+    overflow-y: scroll;
+  }
+
+  /* Smooth scrollbar appearance to prevent flickering */
+  body {
+    min-height: 100vh;
   }
 }
 

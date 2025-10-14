@@ -74,14 +74,15 @@ export function useDashboard() {
                 layoutMode: data.layoutMode
               })
 
-              // Only set loading flag if data actually changed
+              // Only process if data actually changed
               const dataChanged = lastFirebaseDataRef.current !== firebaseDataString
-              if (dataChanged) {
-                console.log('📥 Firebase data changed, setting loading flag')
-                isLoadingFromFirebaseRef.current = true
-              } else {
-                console.log('📥 Firebase data unchanged, skipping')
+              if (!dataChanged) {
+                console.log('📥 Firebase data unchanged, skipping update')
+                return
               }
+
+              console.log('📥 Firebase data changed, updating layout')
+              isLoadingFromFirebaseRef.current = true
 
               lastFirebaseDataRef.current = firebaseDataString
 
@@ -159,14 +160,18 @@ export function useDashboard() {
                 layoutMode: 'grid'
               })
             }
-            setLoading(false)
+
+            // Only set loading to false on first load
+            if (!hasLoadedFromFirebaseRef.current) {
+              setLoading(false)
+            }
+
             // Mark that we've loaded from Firebase at least once
             hasLoadedFromFirebaseRef.current = true
-            // Reset loading flag after a short delay to allow React to process the state update
-            setTimeout(() => {
-              console.log('✅ Resetting isLoadingFromFirebase flag')
-              isLoadingFromFirebaseRef.current = false
-            }, 100)
+
+            // Reset loading flag immediately (no delay needed)
+            console.log('✅ Resetting isLoadingFromFirebase flag')
+            isLoadingFromFirebaseRef.current = false
           },
           (error) => {
             console.warn('⚠️ Firebase listener error:', error.message)
@@ -202,10 +207,8 @@ export function useDashboard() {
             }
             setLoading(false)
 
-            // Reset loading flag
-            setTimeout(() => {
-              isLoadingFromFirebaseRef.current = false
-            }, 100)
+            // Reset loading flag immediately
+            isLoadingFromFirebaseRef.current = false
           }
         )
 
