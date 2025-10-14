@@ -25,6 +25,7 @@ import WeddingWebsiteModule from './modules/WeddingWebsiteModule'
 import AccommodationManagementModule from './modules/AccommodationManagementModule'
 import ShoppingListModule from './modules/ShoppingListModule'
 import SvatbotCoachModule from './modules/SvatbotCoachModule'
+import OnboardingWidget from '../onboarding/OnboardingWidget'
 
 interface FreeDragDropProps {
   onWeddingSettingsClick?: () => void
@@ -143,6 +144,8 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
         return <ShoppingListModule />
       case 'svatbot-coach':
         return <SvatbotCoachModule />
+      case 'onboarding-guide':
+        return <OnboardingWidget />
       default:
         return <div className="p-4">Modul není k dispozici</div>
     }

@@ -26,6 +26,8 @@ import SimpleToastContainer, { showSimpleToast } from '@/components/notification
 // import { useNotificationTriggers } from '@/hooks/useNotificationTriggers'
 import { useWeddingNotifications, useLiveToastNotifications } from '@/hooks/useWeddingNotifications'
 import { createDemoNotifications, createTestToast } from '@/utils/demoNotifications'
+import { useAutoNotifications } from '@/hooks/useAutoNotifications'
+import OnboardingWizard from '@/components/onboarding/OnboardingWizard'
 
 function DashboardContent() {
   const { currentWedding } = useWeddingStore()
@@ -36,8 +38,8 @@ function DashboardContent() {
   const [showNotesModal, setShowNotesModal] = useState(false)
   const [showAccountModal, setShowAccountModal] = useState(false)
 
-  // Initialize notification triggers - DISABLED to prevent spam
-  // useNotificationTriggers()
+  // Initialize auto-notifications system
+  useAutoNotifications()
 
   // Demo notification hooks (for testing)
   const { createNotification, deleteAllNotifications } = useWeddingNotifications()
@@ -304,6 +306,9 @@ function DashboardContent() {
 
       {/* Floating AI Assistant */}
       <AIAssistant compact={true} />
+
+      {/* Onboarding Wizard */}
+      <OnboardingWizard />
 
       {/* Live Toast Notifications */}
       <LiveToastNotifications />
