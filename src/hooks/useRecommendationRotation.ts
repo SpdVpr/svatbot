@@ -5,46 +5,56 @@ export function useRecommendationRotation<T>(items: T[], intervalMs: number = 50
   const [isTransitioning, setIsTransitioning] = useState(false)
   const itemsRef = useRef(items)
   const hasInitialized = useRef(false)
-  
+
   // Update items ref
   useEffect(() => {
     itemsRef.current = items
   }, [items])
-  
-  // Initialize with random index and start rotation
+
+  // Initialize with random index (only once)
   useEffect(() => {
     if (hasInitialized.current) return
     if (items.length === 0) return
-    
+
     // Set random starting index
     const randomIndex = Math.floor(Math.random() * items.length)
     setCurrentIndex(randomIndex)
     hasInitialized.current = true
-    
-    // Don't start interval if only one item
+  }, [items.length])
+
+  // Separate effect for rotation interval
+  useEffect(() => {
+    // Don't start interval if not initialized or only one item
+    if (!hasInitialized.current) return
     if (items.length <= 1) return
-    
+
+    console.log('🔄 Starting rotation interval:', { itemsCount: items.length, intervalMs })
+
     // Start interval
     const interval = setInterval(() => {
+      console.log('⏰ Interval tick - rotating recommendation')
       // Start fade out
       setIsTransitioning(true)
-      
+
       // After fade, change index
       setTimeout(() => {
         setCurrentIndex(prev => {
           const currentItems = itemsRef.current
-          return currentItems.length > 0 ? (prev + 1) % currentItems.length : 0
+          const nextIndex = currentItems.length > 0 ? (prev + 1) % currentItems.length : 0
+          console.log('➡️ Changing index:', { from: prev, to: nextIndex, total: currentItems.length })
+          return nextIndex
         })
         setIsTransitioning(false)
       }, 300)
     }, intervalMs)
-    
+
     // Cleanup
     return () => {
+      console.log('🛑 Clearing rotation interval')
       clearInterval(interval)
     }
-  }, [items.length, intervalMs])
-  
+  }, [items.length, intervalMs, hasInitialized.current])
+
   return {
     currentIndex,
     currentItem: items[currentIndex],
