@@ -662,16 +662,24 @@ export default function WeddingCountdownModule({ onWeddingSettingsClick }: Weddi
     const medium = recommendations.filter(r => r.priority === 'medium')
     const low = recommendations.filter(r => r.priority === 'low')
 
-    const shuffle = (array: Recommendation[]) => {
+    // Seeded random - prevents re-shuffle on hover
+    const seededRandom = (seed: number) => {
+      const x = Math.sin(seed) * 10000
+      return x - Math.floor(x)
+    }
+
+    const shuffle = (array: Recommendation[], seedOffset: number) => {
       const shuffled = [...array]
       for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1))
+        const seed = randomSeed * 1000 + seedOffset + i
+        const j = Math.floor(seededRandom(seed) * (i + 1))
         ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
       }
       return shuffled
     }
 
-    const result = [...shuffle(urgent), ...shuffle(high), ...shuffle(medium), ...shuffle(low)]
+    const result = [...shuffle(urgent, 0), ...shuffle(high, 100), ...shuffle(medium, 200), ...shuffle(low, 300)]
+    console.log('🔀 Shuffled recommendations with seed:', randomSeed)
     return result
   }, [recommendations, randomSeed])
 
