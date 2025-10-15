@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { Users, UserCheck, UserX, Mail, ArrowRight } from 'lucide-react'
 import { useGuest } from '@/hooks/useGuest'
+import NumberCounter from '@/components/animations/NumberCounter'
 
 export default function GuestManagementModule() {
   const { stats } = useGuest()
@@ -23,32 +24,40 @@ export default function GuestManagementModule() {
 
       <div className="space-y-4">
         {/* Guest Count */}
-        <div className="bg-primary-50 p-4 rounded-lg text-center">
-          <div className="text-2xl font-bold text-primary-600 mb-1">{stats.total}</div>
+        <div className="bg-primary-50 p-4 rounded-lg text-center glass-morphism">
+          <div className="text-2xl font-bold text-primary-600 mb-1">
+            <NumberCounter end={stats.total} duration={1800} />
+          </div>
           <div className="text-sm text-primary-700">Celkem hostů</div>
         </div>
 
         {/* RSVP Stats */}
         <div className="grid grid-cols-3 gap-2">
-          <div className="text-center">
-            <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg mx-auto mb-1">
+          <div className="text-center hover-lift">
+            <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg mx-auto mb-1 float-enhanced">
               <UserCheck className="w-4 h-4 text-green-600" />
             </div>
-            <div className="text-sm font-bold text-gray-900">{stats.attending}</div>
+            <div className="text-sm font-bold text-gray-900">
+              <NumberCounter end={stats.attending} duration={1500} />
+            </div>
             <div className="text-xs text-gray-500">Přijde</div>
           </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center w-8 h-8 bg-red-100 rounded-lg mx-auto mb-1">
+          <div className="text-center hover-lift">
+            <div className="flex items-center justify-center w-8 h-8 bg-red-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.2s' }}>
               <UserX className="w-4 h-4 text-red-600" />
             </div>
-            <div className="text-sm font-bold text-gray-900">{stats.declined}</div>
+            <div className="text-sm font-bold text-gray-900">
+              <NumberCounter end={stats.declined} duration={1500} />
+            </div>
             <div className="text-xs text-gray-500">Nepřijde</div>
           </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center w-8 h-8 bg-yellow-100 rounded-lg mx-auto mb-1">
+          <div className="text-center hover-lift">
+            <div className="flex items-center justify-center w-8 h-8 bg-yellow-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.4s' }}>
               <Mail className="w-4 h-4 text-yellow-600" />
             </div>
-            <div className="text-sm font-bold text-gray-900">{stats.pending}</div>
+            <div className="text-sm font-bold text-gray-900">
+              <NumberCounter end={stats.pending} duration={1500} />
+            </div>
             <div className="text-xs text-gray-500">Čeká</div>
           </div>
         </div>

@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { Search, ArrowRight } from 'lucide-react'
+import NumberCounter from '@/components/animations/NumberCounter'
 
 export default function MarketplaceModule() {
   const marketplaceCategories = [
@@ -68,23 +69,27 @@ export default function MarketplaceModule() {
       </div>
 
       <div className="space-y-3">
-        <div className="bg-gray-50 p-3 rounded-lg">
+        <div className="bg-gray-50 p-3 rounded-lg glass-morphism hover-lift">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm font-medium text-gray-900">Doporučení pro vás</div>
               <div className="text-xs text-gray-500">Založeno na vašem rozpočtu a stylu</div>
             </div>
-            <div className="text-lg font-bold text-primary-600">12</div>
+            <div className="text-lg font-bold text-primary-600">
+              <NumberCounter end={12} duration={1500} />
+            </div>
           </div>
         </div>
 
-        <div className="bg-blue-50 p-3 rounded-lg">
+        <div className="bg-blue-50 p-3 rounded-lg glass-morphism hover-lift">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm font-medium text-blue-900">Nové dodavatelé</div>
               <div className="text-xs text-blue-600">Přidáno tento týden</div>
             </div>
-            <div className="text-lg font-bold text-blue-600">5</div>
+            <div className="text-lg font-bold text-blue-600">
+              <NumberCounter end={5} duration={1500} />
+            </div>
           </div>
         </div>
       </div>

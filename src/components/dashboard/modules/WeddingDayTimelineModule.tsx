@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { Calendar, Clock, CheckCircle, ArrowRight } from 'lucide-react'
 import { useWeddingDayTimeline } from '@/hooks/useWeddingDayTimeline'
+import NumberCounter from '@/components/animations/NumberCounter'
 
 const categoryColors = {
   preparation: 'bg-blue-100 text-blue-600',
@@ -48,10 +49,10 @@ export default function WeddingDayTimelineModule() {
         {/* Timeline Overview */}
         {timeline.length > 0 ? (
           <>
-            <div className="bg-purple-50 p-3 sm:p-4 rounded-lg">
+            <div className="bg-purple-50 p-3 sm:p-4 rounded-lg glass-morphism">
               <div className="text-center mb-3">
                 <div className="text-xl sm:text-2xl font-bold text-purple-600">
-                  {stats.total}
+                  <NumberCounter end={stats.total} duration={1800} />
                 </div>
                 <div className="text-xs sm:text-sm text-purple-700">Naplánovaných aktivit</div>
               </div>

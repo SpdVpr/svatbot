@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { Calendar, CheckCircle, Clock, ArrowRight, AlertCircle } from 'lucide-react'
 import { useCalendar } from '@/hooks/useCalendar'
+import NumberCounter from '@/components/animations/NumberCounter'
 
 export default function TimelinePlanningModule() {
   const { stats } = useCalendar()
@@ -18,37 +19,45 @@ export default function TimelinePlanningModule() {
 
       <div className="space-y-3 sm:space-y-4">
         {/* Calendar Overview */}
-        <div className="bg-purple-50 p-3 sm:p-4 rounded-lg">
+        <div className="bg-purple-50 p-3 sm:p-4 rounded-lg glass-morphism">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs sm:text-sm font-medium text-purple-900">Celkem událostí</span>
-            <span className="text-base sm:text-lg font-bold text-purple-600">{stats.totalEvents}</span>
+            <span className="text-base sm:text-lg font-bold text-purple-600">
+              <NumberCounter end={stats.totalEvents} duration={1800} />
+            </span>
           </div>
           <div className="text-xs text-purple-700 mt-1">
-            {stats.todayEvents} dnes • {stats.thisWeekEvents} tento týden
+            <NumberCounter end={stats.todayEvents} duration={1200} className="inline-block" /> dnes • <NumberCounter end={stats.thisWeekEvents} duration={1200} className="inline-block" /> tento týden
           </div>
         </div>
 
         {/* Event Stats */}
         <div className="grid grid-cols-3 gap-2">
-          <div className="text-center">
-            <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-green-100 rounded-lg mx-auto mb-1">
+          <div className="text-center hover-lift">
+            <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-green-100 rounded-lg mx-auto mb-1 float-enhanced">
               <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-600" />
             </div>
-            <div className="text-sm sm:text-lg font-bold text-gray-900">{stats.completedEvents}</div>
+            <div className="text-sm sm:text-lg font-bold text-gray-900">
+              <NumberCounter end={stats.completedEvents} duration={1500} />
+            </div>
             <div className="text-xs text-gray-500">Hotovo</div>
           </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-blue-100 rounded-lg mx-auto mb-1">
+          <div className="text-center hover-lift">
+            <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-blue-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.2s' }}>
               <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />
             </div>
-            <div className="text-sm sm:text-lg font-bold text-gray-900">{stats.upcomingEvents}</div>
+            <div className="text-sm sm:text-lg font-bold text-gray-900">
+              <NumberCounter end={stats.upcomingEvents} duration={1500} />
+            </div>
             <div className="text-xs text-gray-500">Nadcházející</div>
           </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-red-100 rounded-lg mx-auto mb-1">
+          <div className="text-center hover-lift">
+            <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-red-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.4s' }}>
               <AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-600" />
             </div>
-            <div className="text-sm sm:text-lg font-bold text-gray-900">{stats.overdueEvents}</div>
+            <div className="text-sm sm:text-lg font-bold text-gray-900">
+              <NumberCounter end={stats.overdueEvents} duration={1500} />
+            </div>
             <div className="text-xs text-gray-500">Po termínu</div>
           </div>
         </div>
