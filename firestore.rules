@@ -62,7 +62,7 @@ service cloud.firestore {
                               get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid));
       allow create: if isAuthenticated() &&
                        (isDemoUser() ||
-                        (request.resource.data.keys().hasAll(['weddingId', 'title', 'category', 'priority', 'status']) &&
+                        (request.resource.data.keys().hasAll(['weddingId', 'title', 'category', 'status']) &&
                          exists(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)) &&
                          get(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)).data.userId == request.auth.uid));
     }
