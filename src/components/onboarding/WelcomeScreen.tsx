@@ -5,6 +5,14 @@ import { Heart, Sparkles, CheckSquare, Users, CreditCard, Clock, Calendar, Check
 import { cn } from '@/utils'
 import { useAuth } from '@/hooks/useAuth'
 import AuthModal from '@/components/auth/AuthModal'
+import CustomCursor from '@/components/animations/CustomCursor'
+import MorphingBlobs from '@/components/animations/MorphingBlobs'
+import ScrollProgress from '@/components/animations/ScrollProgress'
+import AmbientParticles from '@/components/animations/AmbientParticles'
+import CardTilt from '@/components/animations/CardTilt'
+import NumberCounter from '@/components/animations/NumberCounter'
+import ParallaxSection from '@/components/animations/ParallaxSection'
+import TextReveal from '@/components/animations/TextReveal'
 
 export default function WelcomeScreen() {
   const { login, clearError } = useAuth()
@@ -41,6 +49,12 @@ export default function WelcomeScreen() {
 
   return (
     <>
+      {/* Custom Cursor */}
+      <CustomCursor />
+
+      {/* Scroll Progress */}
+      <ScrollProgress />
+
       <header className="relative z-20 w-full bg-white bg-opacity-80 backdrop-blur-sm shadow-sm py-4">
         <div className="container mx-auto px-6 flex items-center justify-between">
           <div className="flex items-center space-x-2">
@@ -55,10 +69,10 @@ export default function WelcomeScreen() {
             <a href="#contact" className="text-gray-600 hover:text-rose-500 transition-colors duration-200 font-medium">Kontakt</a>
           </nav>
           <div className="flex items-center space-x-4">
-            <button onClick={handleLogin} className="px-6 py-2 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 transition-all duration-200 font-medium">
+            <button onClick={handleLogin} className="px-6 py-2 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 transition-all duration-200 font-medium micro-bounce">
               Přihlásit se
             </button>
-            <button onClick={handleGetStarted} className="px-6 py-2 rounded-full bg-rose-500 text-white hover:bg-rose-600 transition-all duration-200 font-medium button-glow">
+            <button onClick={handleGetStarted} className="px-6 py-2 rounded-full bg-rose-500 text-white hover:bg-rose-600 transition-all duration-200 font-medium button-glow button-pulse-attention">
               Začít zdarma
             </button>
           </div>
@@ -66,6 +80,12 @@ export default function WelcomeScreen() {
       </header>
 
       <section className="bg-gradient-hero py-20 lg:py-32 relative overflow-hidden">
+        {/* Morphing Blobs Background */}
+        <MorphingBlobs />
+
+        {/* Ambient Particles */}
+        <AmbientParticles count={30} />
+
         <div className="absolute inset-0 z-0 opacity-20">
           <div className="w-full h-full transform scale-150"></div>
         </div>
@@ -121,34 +141,42 @@ export default function WelcomeScreen() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 card-hover-scale animate-slide-up" style={{ animationDelay: '300ms' }}>
-              <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mb-6 shadow-sm">
-                <Sparkles className="w-8 h-8 text-rose-500" />
+            <CardTilt className="stagger-fade-enhanced" style={{ animationDelay: '300ms' }}>
+              <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover-lift h-full">
+                <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mb-6 shadow-sm float-enhanced">
+                  <Sparkles className="w-8 h-8 text-rose-500" />
+                </div>
+                <h3 className="text-2xl font-display font-semibold text-gray-900 mb-3">AI Svatební Asistent</h3>
+                <p className="text-gray-600 leading-relaxed">Inteligentní kouč s GPT-4 a Perplexity AI, který odpovídá na otázky a poskytuje personalizované rady 24/7.</p>
               </div>
-              <h3 className="text-2xl font-display font-semibold text-gray-900 mb-3">AI Svatební Asistent</h3>
-              <p className="text-gray-600 leading-relaxed">Inteligentní kouč s GPT-4 a Perplexity AI, který odpovídá na otázky a poskytuje personalizované rady 24/7.</p>
-            </div>
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 card-hover-scale animate-slide-up" style={{ animationDelay: '400ms' }}>
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-6 shadow-sm">
-                <Users className="w-8 h-8 text-purple-500" />
+            </CardTilt>
+            <CardTilt className="stagger-fade-enhanced" style={{ animationDelay: '400ms' }}>
+              <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover-lift h-full">
+                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-6 shadow-sm float-enhanced" style={{ animationDelay: '0.5s' }}>
+                  <Users className="w-8 h-8 text-purple-500" />
+                </div>
+                <h3 className="text-2xl font-display font-semibold text-gray-900 mb-3">Správa hostů & RSVP</h3>
+                <p className="text-gray-600 leading-relaxed">Kompletní správa hostů s RSVP systémem, dietními omezeními, seating planem a exportem do Excel.</p>
               </div>
-              <h3 className="text-2xl font-display font-semibold text-gray-900 mb-3">Správa hostů & RSVP</h3>
-              <p className="text-gray-600 leading-relaxed">Kompletní správa hostů s RSVP systémem, dietními omezeními, seating planem a exportem do Excel.</p>
-            </div>
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 card-hover-scale animate-slide-up" style={{ animationDelay: '500ms' }}>
-              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-6 shadow-sm">
-                <CreditCard className="w-8 h-8 text-emerald-500" />
+            </CardTilt>
+            <CardTilt className="stagger-fade-enhanced" style={{ animationDelay: '500ms' }}>
+              <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover-lift h-full">
+                <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-6 shadow-sm float-enhanced" style={{ animationDelay: '1s' }}>
+                  <CreditCard className="w-8 h-8 text-emerald-500" />
+                </div>
+                <h3 className="text-2xl font-display font-semibold text-gray-900 mb-3">Inteligentní rozpočet</h3>
+                <p className="text-gray-600 leading-relaxed">AI optimalizace rozpočtu, sledování výdajů, grafy a statistiky s propojením na dodavatele.</p>
               </div>
-              <h3 className="text-2xl font-display font-semibold text-gray-900 mb-3">Inteligentní rozpočet</h3>
-              <p className="text-gray-600 leading-relaxed">AI optimalizace rozpočtu, sledování výdajů, grafy a statistiky s propojením na dodavatele.</p>
-            </div>
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 card-hover-scale animate-slide-up" style={{ animationDelay: '600ms' }}>
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6 shadow-sm">
-                <CheckSquare className="w-8 h-8 text-blue-500" />
+            </CardTilt>
+            <CardTilt className="stagger-fade-enhanced" style={{ animationDelay: '600ms' }}>
+              <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover-lift h-full">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6 shadow-sm float-enhanced" style={{ animationDelay: '1.5s' }}>
+                  <CheckSquare className="w-8 h-8 text-blue-500" />
+                </div>
+                <h3 className="text-2xl font-display font-semibold text-gray-900 mb-3">Úkoly & Timeline</h3>
+                <p className="text-gray-600 leading-relaxed">Předpřipravený checklist 200+ úkolů s AI prioritizací a automatickým generováním timeline.</p>
               </div>
-              <h3 className="text-2xl font-display font-semibold text-gray-900 mb-3">Úkoly & Timeline</h3>
-              <p className="text-gray-600 leading-relaxed">Předpřipravený checklist 200+ úkolů s AI prioritizací a automatickým generováním timeline.</p>
-            </div>
+            </CardTilt>
           </div>
         </div>
       </section>
@@ -210,12 +238,14 @@ export default function WelcomeScreen() {
       <section id="dashboard" className="py-20 bg-gray-50">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-5xl font-display font-bold text-gray-900 mb-6 animate-slide-up" style={{ animationDelay: '100ms' }}>
-              Váš <span className="text-gradient-accent">přizpůsobitelný dashboard</span>
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto animate-slide-up" style={{ animationDelay: '200ms' }}>
-              Drag & drop dashboard s 18+ moduly včetně AI asistenta. Přesuňte, změňte velikost a skryjte moduly podle vašich potřeb.
-            </p>
+            <TextReveal mode="line" className="text-5xl font-display font-bold text-gray-900 mb-6" delay={100}>
+              Váš přizpůsobitelný dashboard
+            </TextReveal>
+            <ParallaxSection speed="slow">
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto animate-slide-up" style={{ animationDelay: '200ms' }}>
+                Drag & drop dashboard s <NumberCounter end={18} suffix="+" className="text-gradient-accent font-bold" /> moduly včetně AI asistenta. Přesuňte, změňte velikost a skryjte moduly podle vašich potřeb.
+              </p>
+            </ParallaxSection>
           </div>
           <div className="relative max-w-6xl mx-auto animate-fade-in" style={{ animationDelay: '0.3s' }}>
             <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
@@ -227,25 +257,29 @@ export default function WelcomeScreen() {
                 <div className="text-white text-lg font-medium">Anna & Tomáš • 15. června 2025</div>
               </div>
               <div className="p-8 bg-gray-50 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100 hover:shadow-lg transition-shadow card-hover-scale">
+                <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100 hover-lift glass-morphism">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-semibold text-gray-800 text-lg">Odpočet do svatby</h3>
-                    <Calendar className="w-6 h-6 text-rose-500" />
+                    <Calendar className="w-6 h-6 text-rose-500 float-slow" />
                   </div>
                   <div className="text-center">
-                    <div className="text-4xl font-bold text-rose-600 mb-1">180</div>
+                    <div className="text-4xl font-bold text-rose-600 mb-1">
+                      <NumberCounter end={180} duration={2500} />
+                    </div>
                     <div className="text-md text-gray-500">dní do velkého dne!</div>
                   </div>
                 </div>
-                <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100 hover:shadow-lg transition-shadow card-hover-scale">
+                <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100 hover-lift glass-morphism">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-semibold text-gray-800 text-lg">Pokrok úkolů</h3>
-                    <CheckCircle className="w-6 h-6 text-emerald-500" />
+                    <CheckCircle className="w-6 h-6 text-emerald-500 float-slow" style={{ animationDelay: '0.5s' }} />
                   </div>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-md text-gray-600">Dokončeno</span>
-                      <span className="text-md font-semibold text-emerald-600">24/30</span>
+                      <span className="text-md font-semibold text-emerald-600">
+                        <NumberCounter end={24} duration={2000} />/30
+                      </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                       <div className="bg-emerald-500 h-2.5 rounded-full" style={{ width: '80%' }}></div>
