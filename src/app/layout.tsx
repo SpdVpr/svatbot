@@ -111,7 +111,7 @@ export default function RootLayout({
         <meta name="msapplication-TileColor" content="#F8BBD9" />
       </head>
       <body className={cn(
-        'min-h-screen bg-neutral-50 font-sans antialiased',
+        'min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 font-sans antialiased',
         'selection:bg-primary-200 selection:text-primary-800'
       )}>
         <div id="root" className="relative">
