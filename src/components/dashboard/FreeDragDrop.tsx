@@ -424,17 +424,17 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
         {/* Free Canvas with Absolute Positioning */}
         <div
           ref={containerRef}
-          className="relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200 overflow-hidden touch-none mx-auto"
+          className="relative bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden touch-none mx-auto"
           style={{
             width: `${canvasSize.width}px`,
             maxWidth: '100%',
             height: `${canvasSize.height}px`,
             minHeight: '1200px',
             backgroundImage: layout.isEditMode && layoutMode === 'grid'
-              ? `linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
-                 linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px)`
+              ? `linear-gradient(to right, rgba(147,51,234,0.06) 1px, transparent 1px),
+                 linear-gradient(to bottom, rgba(147,51,234,0.06) 1px, transparent 1px)`
               : layout.isEditMode
-              ? `radial-gradient(circle at 1px 1px, rgba(0,0,0,0.08) 1px, transparent 0)`
+              ? `radial-gradient(circle at 1px 1px, rgba(147,51,234,0.08) 1px, transparent 0)`
               : 'none',
             backgroundSize: layout.isEditMode && layoutMode === 'grid'
               ? `${GRID_SIZE}px ${GRID_SIZE}px`
