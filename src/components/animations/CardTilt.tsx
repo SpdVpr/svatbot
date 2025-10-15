@@ -6,12 +6,14 @@ interface CardTiltProps {
   children: ReactNode
   className?: string
   maxTilt?: number
+  style?: React.CSSProperties
 }
 
-export default function CardTilt({ 
-  children, 
+export default function CardTilt({
+  children,
   className = '',
-  maxTilt = 15 
+  maxTilt = 15,
+  style
 }: CardTiltProps) {
   const cardRef = useRef<HTMLDivElement>(null)
   const [tilt, setTilt] = useState({ x: 0, y: 0 })
@@ -44,7 +46,8 @@ export default function CardTilt({
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={{
-        transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`
+        transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+        ...style
       }}
     >
       <div className="card-tilt-inner relative">
