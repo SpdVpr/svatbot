@@ -83,6 +83,10 @@ export interface Guest {
   accommodationId?: string // ID vybraného ubytování
   roomId?: string // ID vybraného pokoje
 
+  // Seating
+  tableNumber?: number
+  seatNumber?: number
+
   // Tracking
   invitationSent: boolean
   invitationSentDate?: Date

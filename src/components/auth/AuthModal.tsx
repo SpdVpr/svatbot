@@ -20,6 +20,7 @@ export default function AuthModal({ mode, onClose, onSwitchMode, showDemoOption 
     confirmPassword: '',
     firstName: '',
     lastName: '',
+    gender: '' as 'male' | 'female' | 'other' | '',
     acceptTerms: false
   })
   const [showPassword, setShowPassword] = useState(false)
@@ -55,6 +56,9 @@ export default function AuthModal({ mode, onClose, onSwitchMode, showDemoOption 
       if (!formData.lastName) {
         newErrors.lastName = 'Příjmení je povinné'
       }
+      if (!formData.gender) {
+        newErrors.gender = 'Pohlaví je povinné'
+      }
       if (formData.password !== formData.confirmPassword) {
         newErrors.confirmPassword = 'Hesla se neshodují'
       }
@@ -82,7 +86,8 @@ export default function AuthModal({ mode, onClose, onSwitchMode, showDemoOption 
           email: formData.email,
           password: formData.password,
           firstName: formData.firstName,
-          lastName: formData.lastName
+          lastName: formData.lastName,
+          gender: formData.gender as 'male' | 'female' | 'other'
         })
       }
 
@@ -130,6 +135,7 @@ export default function AuthModal({ mode, onClose, onSwitchMode, showDemoOption 
         confirmPassword: '',
         firstName: '',
         lastName: '',
+        gender: '' as 'male' | 'female' | 'other' | '',
         acceptTerms: false
       })
 
@@ -220,6 +226,56 @@ export default function AuthModal({ mode, onClose, onSwitchMode, showDemoOption 
                   <p className="mt-1 body-small text-red-600">{errors.lastName}</p>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* Gender selection for registration */}
+          {!isLogin && (
+            <div>
+              <label className="block body-small font-medium text-text-primary mb-2">
+                Pohlaví
+              </label>
+              <div className="grid grid-cols-3 gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleInputChange('gender', 'female')}
+                  className={cn(
+                    'py-3 px-4 rounded-lg border-2 transition-all text-sm font-medium',
+                    formData.gender === 'female'
+                      ? 'border-primary-500 bg-primary-50 text-primary-700'
+                      : 'border-gray-300 bg-white text-gray-700 hover:border-primary-300'
+                  )}
+                >
+                  👰 Žena
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleInputChange('gender', 'male')}
+                  className={cn(
+                    'py-3 px-4 rounded-lg border-2 transition-all text-sm font-medium',
+                    formData.gender === 'male'
+                      ? 'border-primary-500 bg-primary-50 text-primary-700'
+                      : 'border-gray-300 bg-white text-gray-700 hover:border-primary-300'
+                  )}
+                >
+                  🤵 Muž
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleInputChange('gender', 'other')}
+                  className={cn(
+                    'py-3 px-4 rounded-lg border-2 transition-all text-sm font-medium',
+                    formData.gender === 'other'
+                      ? 'border-primary-500 bg-primary-50 text-primary-700'
+                      : 'border-gray-300 bg-white text-gray-700 hover:border-primary-300'
+                  )}
+                >
+                  💫 Jiné
+                </button>
+              </div>
+              {errors.gender && (
+                <p className="mt-1 body-small text-red-600">{errors.gender}</p>
+              )}
             </div>
           )}
 

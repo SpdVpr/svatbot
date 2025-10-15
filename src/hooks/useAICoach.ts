@@ -245,47 +245,118 @@ export function useAICoach() {
     }
   }, [getRecentMoods])
 
-  // Generate proactive suggestions based on wedding data
+  // Generate motivational and supportive messages (friend & companion style)
   const generateSuggestions = useCallback(async (): Promise<CoachSuggestion[]> => {
-    if (!wedding || !tasks) return []
+    if (!wedding || !user) return []
 
     const suggestions: CoachSuggestion[] = []
     const now = new Date()
+    const hour = now.getHours()
+    const isFemale = user.gender === 'female'
+    const isMale = user.gender === 'male'
 
-    // Check for completed tasks to celebrate
-    const recentlyCompleted = tasks.filter(t =>
-      t.status === 'completed' &&
+    // Check today's activity (tasks completed today)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const tasksCompletedToday = tasks?.filter(t =>
       t.completedAt &&
-      (now.getTime() - new Date(t.completedAt).getTime()) < 24 * 60 * 60 * 1000 // Last 24h
-    )
+      new Date(t.completedAt).setHours(0, 0, 0, 0) === today.getTime()
+    ).length || 0
 
-    if (recentlyCompleted.length > 0) {
+    // Morning motivation (6-11)
+    if (hour >= 6 && hour < 11 && Math.random() > 0.6) {
+      const morningMessagesFemale = [
+        { title: '☀️ Dobré ráno, krásko!', message: 'Nový den, nové možnosti! Dnes budeš zářit ještě víc než včera! ✨' },
+        { title: '🌅 Krásné ráno!', message: 'Začni den s úsměvem - tvoje svatba bude úžasná, protože TY jsi úžasná! 💕' },
+        { title: '☕ Dobré ráno!', message: 'Dej si kafe, nadechni se a pamatuj - jsi silná a zvládneš to! 🌟' }
+      ]
+      const morningMessagesMale = [
+        { title: '☀️ Dobré ráno, šampione!', message: 'Nový den, nové možnosti! Dnes to zvládneš skvěle! ✨' },
+        { title: '🌅 Krásné ráno!', message: 'Začni den s úsměvem - tvoje svatba bude úžasná, protože TY jsi úžasný! 💪' },
+        { title: '☕ Dobré ráno!', message: 'Dej si kafe, nadechni se a pamatuj - jsi silný a zvládneš to! 🌟' }
+      ]
+      const messages = isFemale ? morningMessagesFemale : isMale ? morningMessagesMale : morningMessagesFemale
+      const msg = messages[Math.floor(Math.random() * messages.length)]
       suggestions.push({
-        id: 'celebration-tasks',
+        id: 'morning-motivation',
         type: 'motivation',
-        title: '🎉 Skvělá práce!',
-        message: `Dokončili jste ${recentlyCompleted.length} ${recentlyCompleted.length === 1 ? 'úkol' : 'úkoly'}! Jste na skvělé cestě!`,
-        priority: 'medium',
-        icon: '🎉'
+        ...msg,
+        priority: 'low',
+        icon: msg.title.split(' ')[0]
       })
     }
 
-    // Check for overdue tasks
-    const overdueTasks = tasks.filter(t => 
-      t.status !== 'completed' &&
-      t.dueDate &&
-      new Date(t.dueDate) < now
-    )
+    // Afternoon encouragement (12-17) - based on actual activity
+    if (hour >= 12 && hour < 17 && Math.random() > 0.7) {
+      // If user completed tasks today, congratulate them
+      if (tasksCompletedToday > 0) {
+        // Czech grammar: 1 úkol, 2-4 úkoly, 5+ úkolů
+        const taskWord = tasksCompletedToday === 1 ? 'úkol' :
+                        tasksCompletedToday >= 2 && tasksCompletedToday <= 4 ? 'úkoly' : 'úkolů'
 
-    if (overdueTasks.length > 0 && overdueTasks.length <= 3) {
+        const afternoonMessagesFemale = [
+          { title: '🎉 Skvělá práce!', message: `Dnes jsi dokončila ${tasksCompletedToday} ${taskWord}! Nezapomeň si dát pauzu. 🥗` },
+          { title: '✨ Paráda!', message: `Dneska toho děláš hodně! ${tasksCompletedToday} ${taskWord} hotových! Jsi úžasná! 💕` },
+          { title: '💪 Makáš!', message: `${tasksCompletedToday} ${taskWord} dokončených! Tvůj budoucí manžel má štěstí! Nezapomeň si odpočinout. 🌟` }
+        ]
+        const afternoonMessagesMale = [
+          { title: '🎉 Skvělá práce!', message: `Dnes jsi dokončil ${tasksCompletedToday} ${taskWord}! Nezapomeň si dát pauzu. 🍔` },
+          { title: '✨ Paráda!', message: `Dneska toho děláš hodně! ${tasksCompletedToday} ${taskWord} hotových! Jsi úžasný! 💪` },
+          { title: '💪 Makáš!', message: `${tasksCompletedToday} ${taskWord} dokončených! Tvoje budoucí manželka má štěstí! Nezapomeň si odpočinout. 🌟` }
+        ]
+        const messages = isFemale ? afternoonMessagesFemale : isMale ? afternoonMessagesMale : afternoonMessagesFemale
+        const msg = messages[Math.floor(Math.random() * messages.length)]
+        suggestions.push({
+          id: 'afternoon-encouragement',
+          type: 'motivation',
+          ...msg,
+          priority: 'medium',
+          icon: msg.title.split(' ')[0]
+        })
+      } else {
+        // General encouragement if no tasks completed today
+        const afternoonMessagesFemale = [
+          { title: '💪 Jsi skvělá!', message: 'Tvoje budoucí manžel má štěstí! Nezapomeň si dát pauzu a něco dobrého k jídlu. 🥗' },
+          { title: '✨ Máš to!', message: 'Každý krok tě přibližuje k tvému velkému dni. A budeš v něm vypadat úžasně! 👰' },
+          { title: '🌟 Pokračuj!', message: 'Jsi na skvělé cestě! Nezapomeň si užívat i cestu, ne jen cíl. 💕' }
+        ]
+        const afternoonMessagesMale = [
+          { title: '💪 Jsi skvělý!', message: 'Tvoje budoucí manželka má štěstí! Nezapomeň si dát pauzu a něco dobrého k jídlu. 🍔' },
+          { title: '✨ Máš to!', message: 'Každý krok tě přibližuje k tvému velkému dni. Bude to úžasná svatba! 🤵' },
+          { title: '🌟 Pokračuj!', message: 'Jsi na skvělé cestě! Nezapomeň si užívat i cestu, ne jen cíl. 💪' }
+        ]
+        const messages = isFemale ? afternoonMessagesFemale : isMale ? afternoonMessagesMale : afternoonMessagesFemale
+        const msg = messages[Math.floor(Math.random() * messages.length)]
+        suggestions.push({
+          id: 'afternoon-encouragement',
+          type: 'motivation',
+          ...msg,
+          priority: 'low',
+          icon: msg.title.split(' ')[0]
+        })
+      }
+    }
+
+    // Evening relaxation (18-23)
+    if (hour >= 18 && hour < 23 && Math.random() > 0.6) {
+      const eveningMessagesFemale = [
+        { title: '🌙 Čas na odpočinek', message: 'Dnes jsi toho zvládla dost. Teď si zasloužíš relax s partnerem nebo sklenku vína! 🍷' },
+        { title: '💆‍♀️ Uvolni se', message: 'Večer je na to, abys se uvolnila. Možná teplá koupel? Zasloužíš si to! 🛁' },
+        { title: '✨ Krásný večer!', message: 'Jsi úžasná nevěsta a ještě úžasnější člověk. Nezapomeň na to! 💕' }
+      ]
+      const eveningMessagesMale = [
+        { title: '🌙 Čas na odpočinek', message: 'Dnes jsi toho zvládl dost. Teď si zasloužíš relax s partnerkou nebo pivo! 🍺' },
+        { title: '💆‍♂️ Uvolni se', message: 'Večer je na to, abys se uvolnil. Možná sport nebo film? Zasloužíš si to! 🎮' },
+        { title: '✨ Krásný večer!', message: 'Jsi úžasný ženich a ještě úžasnější člověk. Nezapomeň na to! 💪' }
+      ]
+      const messages = isFemale ? eveningMessagesFemale : isMale ? eveningMessagesMale : eveningMessagesFemale
+      const msg = messages[Math.floor(Math.random() * messages.length)]
       suggestions.push({
-        id: 'overdue-tasks',
-        type: 'task',
-        title: '⏰ Úkoly po termínu',
-        message: `Máte ${overdueTasks.length} ${overdueTasks.length === 1 ? 'úkol' : 'úkoly'} po termínu. Pojďme to společně zvládnout!`,
-        priority: 'high',
-        actionUrl: '/tasks',
-        icon: '⏰'
+        id: 'evening-relaxation',
+        type: 'relaxation',
+        ...msg,
+        priority: 'low',
+        icon: msg.title.split(' ')[0]
       })
     }
 
@@ -295,39 +366,91 @@ export function useAICoach() {
       const daysUntil = Math.ceil((weddingDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
 
       if ([365, 180, 100, 60, 30, 14, 7, 3, 1].includes(daysUntil)) {
+        const messageFemale = daysUntil === 1 ? 'Zítra je ten velký den! Budeš v něm vypadat jako princezna! 👑💕' :
+                              daysUntil <= 7 ? 'Už je to za rohem! Tvůj velký den se blíží a ty budeš zářit! ✨' :
+                              daysUntil <= 30 ? 'Měsíc do svatby! Jsi na skvělé cestě a budeš nádherná nevěsta! 💕' :
+                              'Máš ještě čas, ale už se můžeš těšit! Bude to úžasný den! 🌟'
+
+        const messageMale = daysUntil === 1 ? 'Zítra je ten velký den! Bude to úžasný zážitek! 🤵💪' :
+                            daysUntil <= 7 ? 'Už je to za rohem! Tvůj velký den se blíží! Jsi připravený! ✨' :
+                            daysUntil <= 30 ? 'Měsíc do svatby! Jsi na skvělé cestě! Bude to bomba! 💪' :
+                            'Máš ještě čas, ale už se můžeš těšit! Bude to úžasný den! 🌟'
+
         suggestions.push({
           id: 'countdown-milestone',
           type: 'milestone',
           title: `🎊 ${daysUntil} dní do svatby!`,
-          message: daysUntil === 1 ? 'Zítra je ten velký den! Užijte si každou chvíli! 💕' : 
-                   daysUntil <= 7 ? 'Už je to za rohem! Nezapomeňte si užít tento speciální čas! ✨' :
-                   'Jste na skvělé cestě! Pokračujte v přípravách, ale nezapomeňte si užívat cestu! 🌟',
+          message: isFemale ? messageFemale : isMale ? messageMale : messageFemale,
           priority: daysUntil <= 7 ? 'high' : 'medium',
           icon: '🎊'
         })
       }
     }
 
-    // Relationship reminder (if no date night planned recently)
-    const hasRecentDateNight = tasks.some(t =>
-      t.title.toLowerCase().includes('date') &&
-      t.completedAt &&
-      (now.getTime() - new Date(t.completedAt).getTime()) < 14 * 24 * 60 * 60 * 1000
-    )
-
-    if (!hasRecentDateNight && Math.random() > 0.7) { // Random to not spam
+    // Relationship reminder
+    if (Math.random() > 0.7) {
       suggestions.push({
         id: 'relationship-reminder',
         type: 'relationship',
         title: '💑 Čas pro vás dva',
-        message: 'Nezapomeňte si naplánovat večer jen pro sebe - bez svatebního plánování! Váš vztah je důležitější než dokonalá svatba.',
+        message: 'Nezapomeň si užít čas s partnerem - bez svatebního plánování! Váš vztah je to nejdůležitější. 💕',
         priority: 'low',
         icon: '💑'
       })
     }
 
+    // Self-care reminder
+    if (Math.random() > 0.75) {
+      const selfCareMessagesFemale = [
+        { title: '💅 Péče o sebe', message: 'Kdy naposledy jsi byla u kadeřníka nebo na manikúře? Zasloužíš si to! ✨' },
+        { title: '🧘‍♀️ Relaxuj', message: 'Svatební přípravy jsou náročné. Nezapomeň na jógu, meditaci nebo jen procházku! 🌸' },
+        { title: '😴 Odpočinek', message: 'Spánek je důležitý! Krásná nevěsta potřebuje odpočinek. 💤' },
+        { title: '🌺 Jsi krásná!', message: 'Pamatuj - jsi krásná už teď. Svatební šaty jen zvýrazní to, co už máš! 💕' }
+      ]
+      const selfCareMessagesMale = [
+        { title: '💈 Péče o sebe', message: 'Kdy naposledy jsi byl u holiče? Ženich musí vypadat skvěle! ✨' },
+        { title: '🏋️‍♂️ Relaxuj', message: 'Svatební přípravy jsou náročné. Nezapomeň na sport, běh nebo jen procházku! 💪' },
+        { title: '😴 Odpočinek', message: 'Spánek je důležitý! Odpočatý ženich je šťastný ženich. 💤' },
+        { title: '💪 Jsi skvělý!', message: 'Pamatuj - jsi skvělý už teď. Oblek jen zvýrazní to, co už máš! 🤵' }
+      ]
+      const messages = isFemale ? selfCareMessagesFemale : isMale ? selfCareMessagesMale : selfCareMessagesFemale
+      const msg = messages[Math.floor(Math.random() * messages.length)]
+      suggestions.push({
+        id: 'self-care',
+        type: 'relaxation',
+        ...msg,
+        priority: 'low',
+        icon: msg.title.split(' ')[0]
+      })
+    }
+
+    // Positive affirmations
+    if (Math.random() > 0.8) {
+      const affirmationsFemale = [
+        { title: '✨ Jsi úžasná!', message: 'Tvoje svatba bude krásná, protože TY jsi krásná - uvnitř i navenek! 💕' },
+        { title: '🌟 Věř si!', message: 'Máš skvělý vkus a všechno bude perfektní. Věř si! 💪' },
+        { title: '👑 Jsi princezna!', message: 'Tvůj velký den bude jako z pohádky. A ty budeš ta nejkrásnější princezna! 💕' },
+        { title: '💖 Jsi silná!', message: 'Zvládáš toho tolik! Jsi silná, krásná a úžasná žena! 🌟' }
+      ]
+      const affirmationsMale = [
+        { title: '✨ Jsi úžasný!', message: 'Tvoje svatba bude skvělá, protože TY jsi skvělý - uvnitř i navenek! 💪' },
+        { title: '🌟 Věř si!', message: 'Máš skvělý vkus a všechno bude perfektní. Věř si! 🔥' },
+        { title: '🤵 Jsi šampion!', message: 'Tvůj velký den bude úžasný. A ty budeš ten nejlepší ženich! 💪' },
+        { title: '💪 Jsi silný!', message: 'Zvládáš toho tolik! Jsi silný, skvělý a úžasný chlap! 🌟' }
+      ]
+      const messages = isFemale ? affirmationsFemale : isMale ? affirmationsMale : affirmationsFemale
+      const msg = messages[Math.floor(Math.random() * messages.length)]
+      suggestions.push({
+        id: 'affirmation',
+        type: 'motivation',
+        ...msg,
+        priority: 'medium',
+        icon: msg.title.split(' ')[0]
+      })
+    }
+
     return suggestions
-  }, [wedding, tasks])
+  }, [wedding, user, tasks])
 
   // Load suggestions on mount and when data changes
   useEffect(() => {
@@ -335,7 +458,18 @@ export function useAICoach() {
       generateSuggestions().then(setSuggestions)
       analyzeEmotionalState().then(setEmotionalInsight)
     }
-  }, [user, wedding, tasks, generateSuggestions, analyzeEmotionalState])
+  }, [user, wedding, generateSuggestions, analyzeEmotionalState])
+
+  // Refresh suggestions every 5 minutes to show different messages
+  useEffect(() => {
+    if (!user || !wedding) return
+
+    const interval = setInterval(() => {
+      generateSuggestions().then(setSuggestions)
+    }, 5 * 60 * 1000) // 5 minutes
+
+    return () => clearInterval(interval)
+  }, [user, wedding, generateSuggestions])
 
   return {
     // State

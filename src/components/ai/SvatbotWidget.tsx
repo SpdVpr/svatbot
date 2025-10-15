@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { useAICoach, CoachSuggestion } from '@/hooks/useAICoach'
-import { 
-  Sparkles, 
-  Heart, 
-  TrendingUp, 
-  CheckCircle, 
-  Clock, 
+import {
+  Sparkles,
+  Heart,
+  TrendingUp,
+  CheckCircle,
+  Clock,
   Calendar,
   MessageCircle,
   ChevronRight,
@@ -15,6 +15,7 @@ import {
   Loader2
 } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import MoodTracker from './MoodTracker'
 
 interface SvatbotWidgetProps {
@@ -57,12 +58,18 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
     return (
       <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-pink-500 rounded-full flex items-center justify-center">
-            <span className="text-xl">🤖</span>
+          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border-2 border-primary-500 p-1.5">
+            <Image
+              src="/logo.svg"
+              alt="Svatbot"
+              width={32}
+              height={32}
+              className="w-full h-full object-contain"
+            />
           </div>
           <div>
-            <h3 className="font-bold text-gray-900">{svatbot.name}</h3>
-            <p className="text-xs text-gray-600">{svatbot.tagline}</p>
+            <h3 className="font-bold text-gray-900">Svatbot - Tvůj kamarád</h3>
+            <p className="text-xs text-gray-600">💕 Jsem tu pro tebe!</p>
           </div>
         </div>
 
@@ -112,7 +119,7 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
         ) : (
           <div className="text-center py-4">
             <p className="text-sm text-gray-600">
-              Skvělá práce! Momentálně nemám žádná doporučení. 🎉
+              ✨ Jsi úžasná! Zatím tu pro tebe nemám žádnou zprávu, ale jsem tu, kdyby ses chtěla popovídat! 💕
             </p>
           </div>
         )}
@@ -125,21 +132,20 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
     <div className="space-y-6">
       {/* Svatbot Header */}
       <div className="bg-gradient-to-r from-primary-500 to-pink-500 rounded-xl p-6 text-white shadow-lg">
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-md">
-            <span className="text-3xl">🤖</span>
+        <div className="flex items-start gap-4">
+          <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-md flex-shrink-0 p-2">
+            <Image
+              src="/logo.svg"
+              alt="Svatbot"
+              width={48}
+              height={48}
+              className="w-full h-full object-contain"
+            />
           </div>
-          <div className="flex-1">
-            <h2 className="text-2xl font-bold mb-1">{svatbot.name}</h2>
-            <p className="text-white/90">{svatbot.tagline}</p>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-2xl font-bold mb-2 leading-tight">Svatbot - Tvůj kamarád 💕</h2>
+            <p className="text-white/90 text-base leading-relaxed">Jsem tu pro tebe! Povzbudím tě a budu ti dělat společnost! ✨</p>
           </div>
-          <Link
-            href="/ai"
-            className="bg-white/20 hover:bg-white/30 backdrop-blur-sm px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
-          >
-            <MessageCircle className="w-4 h-4" />
-            <span className="font-medium">Chat</span>
-          </Link>
         </div>
 
         {/* Emotional Insight Summary */}
@@ -168,16 +174,16 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
       {/* Mood Tracker */}
       {showMoodTracker && <MoodTracker compact />}
 
-      {/* Suggestions */}
+      {/* Messages from Svatbot */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-primary-500" />
-            <h3 className="text-lg font-bold text-gray-900">Doporučení od Svatbota</h3>
+            <Heart className="w-5 h-5 text-pink-500" />
+            <h3 className="text-lg font-bold text-gray-900">Zprávy od Svatbota</h3>
           </div>
           {activeSuggestions.length > 0 && (
             <span className="text-sm text-gray-600">
-              {activeSuggestions.length} {activeSuggestions.length === 1 ? 'doporučení' : 'doporučení'}
+              {activeSuggestions.length} {activeSuggestions.length === 1 ? 'zpráva' : activeSuggestions.length < 5 ? 'zprávy' : 'zpráv'}
             </span>
           )}
         </div>
@@ -188,7 +194,7 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
           </div>
         ) : activeSuggestions.length > 0 ? (
           <div className="space-y-3">
-            {(showAllSuggestions ? activeSuggestions : activeSuggestions.slice(0, 3)).map((suggestion) => (
+            {(showAllSuggestions ? activeSuggestions : activeSuggestions.slice(0, 2)).map((suggestion) => (
               <div
                 key={suggestion.id}
                 className={`p-4 rounded-lg border-l-4 ${getPriorityColor(suggestion.priority)} transition-all hover:shadow-md`}
@@ -199,7 +205,7 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
                     <h4 className="font-semibold text-gray-900 mb-1">{suggestion.title}</h4>
                     <p className="text-sm text-gray-700">{suggestion.message}</p>
                     {suggestion.actionUrl && (
-                      <Link 
+                      <Link
                         href={suggestion.actionUrl}
                         className="text-sm text-primary-600 hover:text-primary-700 font-medium mt-2 inline-flex items-center gap-1"
                       >
@@ -217,17 +223,17 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
                 </div>
               </div>
             ))}
-            
-            {!showAllSuggestions && activeSuggestions.length > 3 && (
+
+            {!showAllSuggestions && activeSuggestions.length > 2 && (
               <button
                 onClick={() => setShowAllSuggestions(true)}
                 className="w-full text-sm text-primary-600 hover:text-primary-700 font-medium py-3 border border-primary-200 rounded-lg hover:bg-primary-50 transition-colors"
               >
-                Zobrazit všechna doporučení ({activeSuggestions.length - 3} dalších)
+                Zobrazit všechny zprávy ({activeSuggestions.length - 2} dalších)
               </button>
             )}
-            
-            {showAllSuggestions && activeSuggestions.length > 3 && (
+
+            {showAllSuggestions && activeSuggestions.length > 2 && (
               <button
                 onClick={() => setShowAllSuggestions(false)}
                 className="w-full text-sm text-gray-600 hover:text-gray-700 font-medium py-2"
@@ -238,48 +244,26 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
           </div>
         ) : (
           <div className="text-center py-8">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <CheckCircle className="w-8 h-8 text-green-600" />
+            <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <span className="text-3xl">💕</span>
             </div>
-            <p className="text-gray-900 font-semibold mb-1">Skvělá práce! 🎉</p>
+            <p className="text-gray-900 font-semibold mb-1">Jsi úžasná! ✨</p>
             <p className="text-sm text-gray-600">
-              Momentálně nemám žádná doporučení. Pokračujte v dobré práci!
+              Zatím tu pro tebe nemám žádnou zprávu, ale jsem tu, kdyby ses chtěla popovídat! 💬
             </p>
           </div>
         )}
-      </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 gap-4">
-        <Link
-          href="/ai"
-          className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all group"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center group-hover:bg-primary-200 transition-colors">
-              <MessageCircle className="w-5 h-5 text-primary-600" />
-            </div>
-            <div>
-              <p className="font-semibold text-gray-900">Zeptat se Svatbota</p>
-              <p className="text-xs text-gray-600">Otevřít chat</p>
-            </div>
-          </div>
-        </Link>
-
-        <Link
-          href="/tasks"
-          className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all group"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-              <CheckCircle className="w-5 h-5 text-blue-600" />
-            </div>
-            <div>
-              <p className="font-semibold text-gray-900">Úkoly</p>
-              <p className="text-xs text-gray-600">Zobrazit všechny</p>
-            </div>
-          </div>
-        </Link>
+        {/* Chat Button */}
+        <div className="mt-4 pt-4 border-t border-gray-200">
+          <Link
+            href="/ai"
+            className="w-full bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 text-white px-6 py-3 rounded-lg transition-all flex items-center justify-center gap-2 font-medium shadow-md hover:shadow-lg"
+          >
+            <MessageCircle className="w-5 h-5" />
+            <span>Popovídat si se Svatbotem</span>
+          </Link>
+        </div>
       </div>
     </div>
   )

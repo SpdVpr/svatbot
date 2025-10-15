@@ -4,6 +4,7 @@ export interface User {
   email: string
   displayName?: string
   photoURL?: string
+  gender?: 'male' | 'female' | 'other'
   createdAt: Date
   updatedAt: Date
 }

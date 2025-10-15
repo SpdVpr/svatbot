@@ -30,12 +30,14 @@ export default function MoodTracker({ compact = false, onMoodSaved }: MoodTracke
   const [note, setNote] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
 
   const { saveMoodEntry, emotionalInsight } = useAICoach()
 
   const handleMoodSelect = (mood: MoodEntry['mood']) => {
     setSelectedMood(mood)
     setShowForm(true)
+    setSaved(false)
 
     // Auto-set stress level based on mood
     const stressDefaults = {
@@ -54,13 +56,19 @@ export default function MoodTracker({ compact = false, onMoodSaved }: MoodTracke
     setSaving(true)
     try {
       await saveMoodEntry(selectedMood, stressLevel, energyLevel, note)
-      
-      // Reset form
-      setSelectedMood(null)
-      setStressLevel(5)
-      setEnergyLevel(5)
-      setNote('')
-      setShowForm(false)
+
+      // Show success state
+      setSaved(true)
+
+      // Reset form after delay
+      setTimeout(() => {
+        setSelectedMood(null)
+        setStressLevel(5)
+        setEnergyLevel(5)
+        setNote('')
+        setShowForm(false)
+        setSaved(false)
+      }, 1500)
 
       onMoodSaved?.()
     } catch (error) {
@@ -173,18 +181,43 @@ export default function MoodTracker({ compact = false, onMoodSaved }: MoodTracke
             <div className="flex gap-2">
               <button
                 onClick={handleSave}
-                disabled={saving}
-                className="flex-1 bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-600 transition-colors disabled:opacity-50 text-sm font-medium"
+                disabled={saving || saved}
+                className={`flex-1 px-4 py-2 rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2 ${
+                  saved
+                    ? 'bg-green-500 text-white'
+                    : 'bg-gradient-to-r from-primary-500 to-pink-500 text-white hover:from-primary-600 hover:to-pink-600 shadow-md hover:shadow-lg disabled:opacity-50'
+                }`}
               >
-                {saving ? 'Ukládám...' : 'Uložit'}
+                {saved ? (
+                  <>
+                    <span>✓</span>
+                    <span>Odesláno!</span>
+                  </>
+                ) : saving ? (
+                  <>
+                    <span className="animate-spin">⏳</span>
+                    <span>Odesílám...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>📤</span>
+                    <span>Odeslat</span>
+                  </>
+                )}
               </button>
               <button
                 onClick={handleCancel}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
+                disabled={saving || saved}
+                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium disabled:opacity-50"
               >
                 Zrušit
               </button>
             </div>
+
+            {/* Info text */}
+            <p className="text-xs text-gray-500 text-center">
+              💡 Svatbot analyzuje tvou náladu a přizpůsobí ti podporu
+            </p>
           </div>
         )}
       </div>

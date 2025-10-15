@@ -26,6 +26,7 @@ export interface RegisterData {
   password: string
   firstName: string
   lastName: string
+  gender: 'male' | 'female' | 'other'
 }
 
 export interface LoginData {
@@ -44,29 +45,30 @@ export function useAuth() {
   const [hasSetInitialized, setHasSetInitialized] = useState(false)
 
   // Convert Firebase User to our User type
-  const convertFirebaseUser = async (firebaseUser: FirebaseUser): Promise<User> => {
-    // Check cache first
-    const cached = userDataCache.get(firebaseUser.uid)
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      console.log('✅ Using cached user data for:', firebaseUser.uid)
-      return cached.user
+  const convertFirebaseUser = async (firebaseUser: FirebaseUser, forceRefresh = false): Promise<User> => {
+    // Check cache first (unless force refresh)
+    if (!forceRefresh) {
+      const cached = userDataCache.get(firebaseUser.uid)
+      if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+        console.log('✅ Using cached user data for:', firebaseUser.uid)
+        return cached.user
+      }
     }
 
     let userData = null
 
-    // Only try to access Firestore if user has verified email
-    if (firebaseUser.emailVerified) {
-      try {
-        // Try to get additional user data from Firestore
-        const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid))
-        if (userDoc.exists()) {
-          userData = userDoc.data()
-        }
-      } catch (error) {
-        console.warn('Firestore not available for user data, using Firebase Auth data only:', error)
+    // Always try to get user data from Firestore (not just for verified emails)
+    try {
+      // Try to get additional user data from Firestore
+      const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid))
+      if (userDoc.exists()) {
+        userData = userDoc.data()
+        console.log('📥 Loaded user data from Firestore:', { gender: userData?.gender })
+      } else {
+        console.log('⚠️ No Firestore document found for user:', firebaseUser.uid)
       }
-    } else {
-      console.log('User email not verified, skipping Firestore user data fetch')
+    } catch (error) {
+      console.warn('Firestore not available for user data, using Firebase Auth data only:', error)
     }
 
     const user: User = {
@@ -74,6 +76,7 @@ export function useAuth() {
       email: firebaseUser.email!,
       displayName: firebaseUser.displayName || userData?.displayName || '',
       photoURL: firebaseUser.photoURL || userData?.photoURL,
+      gender: userData?.gender,
       createdAt: userData?.createdAt?.toDate() || new Date(),
       updatedAt: new Date()
     }
@@ -131,7 +134,8 @@ export function useAuth() {
       await saveUserToFirestore(firebaseUser, {
         firstName: data.firstName,
         lastName: data.lastName,
-        displayName: `${data.firstName} ${data.lastName}`
+        displayName: `${data.firstName} ${data.lastName}`,
+        gender: data.gender
       })
 
       // Convert and set user
@@ -351,6 +355,23 @@ export function useAuth() {
   // Clear error
   const clearError = () => setError(null)
 
+  // Refresh user data from Firestore (useful after profile updates)
+  const refreshUser = async () => {
+    const currentUser = auth.currentUser
+    if (!currentUser) return
+
+    console.log('🔄 Refreshing user data from Firestore...')
+
+    // Clear cache for this user
+    userDataCache.delete(currentUser.uid)
+
+    // Force refresh from Firestore
+    const updatedUser = await convertFirebaseUser(currentUser, true)
+    setUser(updatedUser)
+
+    console.log('✅ User data refreshed:', { gender: updatedUser.gender })
+  }
+
   return {
     user: isInitialized ? user : undefined,
     isLoading,
@@ -360,7 +381,8 @@ export function useAuth() {
     login,
     loginWithGoogle,
     logout,
-    clearError
+    clearError,
+    refreshUser
   }
 }
 
