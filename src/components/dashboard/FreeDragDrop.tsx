@@ -760,12 +760,12 @@ function DraggableModule({
   return (
     <div
       ref={dragRef}
-      className={`absolute group select-none ${
+      className={`absolute group select-none rounded-xl ${
         isDragging || isResizing
-          ? 'z-50 scale-105 shadow-2xl cursor-grabbing'
+          ? 'z-50 scale-105 cursor-grabbing'
           : isEditMode && !module.isLocked
-          ? 'z-10 hover:z-20 cursor-grab hover:shadow-lg hover:scale-[1.02] transition-all duration-200'
-          : 'z-10 hover:scale-[1.02] hover:shadow-lg transition-all duration-200'
+          ? 'z-10 hover:z-20 cursor-grab hover:scale-[1.01] transition-all duration-300 ease-out'
+          : 'z-10 hover:scale-[1.01] transition-all duration-300 ease-out'
       } ${isHidden && isEditMode ? 'opacity-40' : ''}`}
       style={{
         left: position.x,
@@ -779,7 +779,7 @@ function DraggableModule({
       onMouseEnter={() => !isDragging && !isResizing && setIsHovered(true)}
       onMouseLeave={() => !isDragging && !isResizing && setIsHovered(false)}
     >
-      <div className={`relative w-full h-full rounded-xl overflow-hidden shadow-md bg-white border transition-all ${
+      <div className={`relative w-full h-full rounded-xl overflow-hidden bg-white border transition-all shadow-sm hover:shadow-xl ${
         isDragging
           ? 'border-primary-400 shadow-2xl'
           : module.isLocked
