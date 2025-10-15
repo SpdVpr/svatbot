@@ -93,10 +93,10 @@ export default function TaskForm({
     { value: 'venue', label: 'Místo konání', description: 'Obřad, hostina, ubytování' },
     { value: 'guests', label: 'Hosté', description: 'Seznam hostů, oznámení, RSVP' },
     { value: 'budget', label: 'Rozpočet', description: 'Dodavatelé, platby, výdaje' },
-    { value: 'design', label: 'Design', description: 'Šaty, oblek, výzdoba, květiny' },
+    { value: 'design', label: 'Vzhled', description: 'Šaty, oblek, výzdoba, květiny' },
     { value: 'organization', label: 'Organizace', description: 'Koordinace, zkouška, timeline' },
     { value: 'final', label: 'Finální přípravy', description: 'Poslední týden před svatbou' },
-    { value: 'custom', label: 'Vlastní', description: 'Vlastní kategorie úkolu' }
+    { value: 'custom', label: 'Osobní úkoly', description: 'Vlastní kategorie úkolu' }
   ]
 
   // Priority options

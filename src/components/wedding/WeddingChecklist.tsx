@@ -199,9 +199,9 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
 
       const taskData: TaskFormData = {
         title: item.title,
-        description: item.description || '',
+        description: '',
         category: categoryMap[item.category],
-        priority: item.priority as TaskFormData['priority'],
+        priority: undefined,
         dueDate,
         notes: item.tips?.join('\n') || ''
       }

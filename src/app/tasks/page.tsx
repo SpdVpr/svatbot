@@ -225,13 +225,6 @@ export default function TasksPage() {
 
             {/* Actions */}
             <div className="flex items-center space-x-3">
-
-              {/* Action buttons */}
-              <button className="btn-outline flex items-center space-x-2">
-                <Settings className="w-4 h-4" />
-                <span>Nastavení</span>
-              </button>
-
               <button
                 onClick={() => setShowTaskForm(true)}
                 className="btn-primary flex items-center space-x-2"

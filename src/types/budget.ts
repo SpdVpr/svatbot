@@ -1,6 +1,6 @@
 // Budget Management Types for SvatBot.cz
 
-export type BudgetCategory = 
+export type BudgetCategory =
   | 'venue'           // Místo konání
   | 'catering'        // Catering
   | 'photography'     // Fotografie
@@ -16,6 +16,7 @@ export type BudgetCategory =
   | 'accommodation'   // Ubytování
   | 'beauty'          // Kosmetika
   | 'gifts'           // Dárky
+  | 'children'        // Děti
   | 'honeymoon'       // Svatební cesta
   | 'other'           // Ostatní
 
@@ -456,6 +457,13 @@ export const BUDGET_CATEGORIES = {
     name: 'Dárky',
     icon: '🎁',
     color: 'bg-violet-100 text-violet-700',
+    defaultPercentage: 1,
+    priority: 'low'
+  },
+  children: {
+    name: 'Děti',
+    icon: '👶',
+    color: 'bg-lime-100 text-lime-700',
     defaultPercentage: 1,
     priority: 'low'
   },

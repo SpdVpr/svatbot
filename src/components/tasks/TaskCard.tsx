@@ -2,12 +2,13 @@
 
 import { Task } from '@/types/task'
 import { useTask } from '@/hooks/useTask'
-import { 
-  CheckCircle2, 
-  Circle, 
-  Clock, 
-  AlertTriangle, 
+import {
+  CheckCircle2,
+  Circle,
+  Clock,
+  AlertTriangle,
   Calendar,
+  CalendarPlus,
   Flag,
   MoreHorizontal,
   Edit,
@@ -90,10 +91,10 @@ export default function TaskCard({
       venue: { label: 'Místo', color: 'bg-blue-100 text-blue-700' },
       guests: { label: 'Hosté', color: 'bg-green-100 text-green-700' },
       budget: { label: 'Rozpočet', color: 'bg-yellow-100 text-yellow-700' },
-      design: { label: 'Design', color: 'bg-pink-100 text-pink-700' },
+      design: { label: 'Vzhled', color: 'bg-pink-100 text-pink-700' },
       organization: { label: 'Organizace', color: 'bg-indigo-100 text-indigo-700' },
       final: { label: 'Finální', color: 'bg-red-100 text-red-700' },
-      custom: { label: 'Vlastní', color: 'bg-gray-100 text-gray-700' }
+      custom: { label: 'Osobní', color: 'bg-gray-100 text-gray-700' }
     }
     return categories[task.category as keyof typeof categories] || categories.custom
   }
@@ -142,6 +143,60 @@ export default function TaskCard({
     setShowActions(false)
   }
 
+  // Handle add to calendar
+  const handleAddToCalendar = (e: React.MouseEvent) => {
+    e.stopPropagation()
+
+    // Format dates for iCalendar format (YYYYMMDDTHHMMSSZ)
+    const formatICalDate = (date: Date) => {
+      return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
+    }
+
+    const now = new Date()
+    const dueDate = task.dueDate || new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000) // Default: 7 days from now
+
+    // Set event to be all-day if no specific time
+    const startDate = new Date(dueDate)
+    startDate.setHours(9, 0, 0, 0) // 9:00 AM
+    const endDate = new Date(dueDate)
+    endDate.setHours(10, 0, 0, 0) // 10:00 AM
+
+    // Create iCalendar content
+    const icsContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//SvatBot.cz//Wedding Planner//CS',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      'BEGIN:VEVENT',
+      `UID:svatbot-task-${task.id}@svatbot.cz`,
+      `DTSTAMP:${formatICalDate(now)}`,
+      `DTSTART:${formatICalDate(startDate)}`,
+      `DTEND:${formatICalDate(endDate)}`,
+      `SUMMARY:${task.title}`,
+      task.description ? `DESCRIPTION:${task.description.replace(/\n/g, '\\n')}` : '',
+      `CATEGORIES:${categoryDisplay.label}`,
+      task.priority ? `PRIORITY:${task.priority === 'urgent' ? '1' : task.priority === 'high' ? '3' : task.priority === 'medium' ? '5' : '7'}` : '',
+      'STATUS:CONFIRMED',
+      'TRANSP:OPAQUE',
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].filter(line => line).join('\r\n')
+
+    // Create blob and download
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `svatbot-ukol-${task.title.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.ics`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+
+    setShowActions(false)
+  }
+
   const statusDisplay = getStatusDisplay()
   const priorityDisplay = getPriorityDisplay()
   const categoryDisplay = getCategoryDisplay()
@@ -174,7 +229,7 @@ export default function TaskCard({
           </button>
 
           {showActions && (
-            <div className="absolute right-0 top-full mt-1 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+            <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
               <button
                 onClick={(e) => {
                   e.stopPropagation()
@@ -185,6 +240,13 @@ export default function TaskCard({
               >
                 <Edit className="w-3 h-3" />
                 <span>Upravit</span>
+              </button>
+              <button
+                onClick={handleAddToCalendar}
+                className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center space-x-2 text-blue-600"
+              >
+                <CalendarPlus className="w-3 h-3" />
+                <span>Přidat do kalendáře</span>
               </button>
               <button
                 onClick={handleDelete}

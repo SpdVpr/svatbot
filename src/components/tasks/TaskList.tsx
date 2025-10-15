@@ -188,10 +188,10 @@ export default function TaskList({
       venue: 'Místo konání',
       guests: 'Hosté',
       budget: 'Rozpočet',
-      design: 'Design',
+      design: 'Vzhled',
       organization: 'Organizace',
       final: 'Finální přípravy',
-      custom: 'Vlastní úkoly'
+      custom: 'Osobní úkoly'
     }
     return categoryNames[category as keyof typeof categoryNames] || category
   }
