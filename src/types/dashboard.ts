@@ -99,9 +99,9 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     order: 4
   },
   {
-    id: 'budget-tracking',
-    type: 'budget-tracking',
-    title: 'Rozpočet',
+    id: 'vendor-management',
+    type: 'vendor-management',
+    title: 'Dodavatelé',
     size: 'medium',
     position: { x: 440, y: 1020 },
     gridPosition: { row: 2, column: 1 },
@@ -110,9 +110,9 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     order: 5
   },
   {
-    id: 'timeline-planning',
-    type: 'timeline-planning',
-    title: 'Časová osa',
+    id: 'seating-plan',
+    type: 'seating-plan',
+    title: 'Rozmístění hostů',
     size: 'medium',
     position: { x: 840, y: 1020 },
     gridPosition: { row: 2, column: 2 },
@@ -120,22 +120,23 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     isLocked: false,
     order: 6
   },
-  // Row 3 - 3 modules
+  // Row 3 - Svatební checklist pod "Správa hostů" + 2 další moduly
   {
-    id: 'vendor-management',
-    type: 'vendor-management',
-    title: 'Dodavatelé',
+    id: 'wedding-checklist',
+    type: 'wedding-checklist',
+    title: 'Svatební checklist',
     size: 'medium',
     position: { x: 40, y: 1510 },
+    customSize: { width: 360, height: 940 }, // Zvětšeno na výšku pro zobrazení celého obsahu (2 moduly vysoké)
     gridPosition: { row: 3, column: 0 },
     isVisible: true,
     isLocked: false,
     order: 7
   },
   {
-    id: 'seating-plan',
-    type: 'seating-plan',
-    title: 'Rozmístění hostů',
+    id: 'budget-tracking',
+    type: 'budget-tracking',
+    title: 'Rozpočet',
     size: 'medium',
     position: { x: 440, y: 1510 },
     gridPosition: { row: 3, column: 1 },
@@ -144,9 +145,9 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     order: 8
   },
   {
-    id: 'marketplace',
-    type: 'marketplace',
-    title: 'Najít dodavatele',
+    id: 'timeline-planning',
+    type: 'timeline-planning',
+    title: 'Časová osa',
     size: 'medium',
     position: { x: 840, y: 1510 },
     gridPosition: { row: 3, column: 2 },
@@ -154,28 +155,17 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     isLocked: false,
     order: 9
   },
-  // Row 4 - 3 modules
+  // Row 4 - 2 moduly (budget-tracking a timeline-planning přesunuty sem)
   {
-    id: 'food-drinks',
-    type: 'food-drinks',
-    title: 'Jídlo a Pití',
-    size: 'medium',
-    position: { x: 40, y: 2000 },
-    gridPosition: { row: 4, column: 0 },
-    isVisible: true,
-    isLocked: false,
-    order: 10
-  },
-  {
-    id: 'music-playlist',
-    type: 'music-playlist',
-    title: 'Svatební hudba',
+    id: 'marketplace',
+    type: 'marketplace',
+    title: 'Najít dodavatele',
     size: 'medium',
     position: { x: 440, y: 2000 },
     gridPosition: { row: 4, column: 1 },
     isVisible: true,
     isLocked: false,
-    order: 11
+    order: 10
   },
   {
     id: 'upcoming-tasks',
@@ -186,72 +176,85 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     gridPosition: { row: 4, column: 2 },
     isVisible: true,
     isLocked: false,
+    order: 11
+  },
+  // Row 5 - Harmonogram svatebního dne pod "Jídlo a pití" + 2 další moduly
+  {
+    id: 'wedding-day-timeline',
+    type: 'wedding-day-timeline',
+    title: 'Harmonogram svatebního dne',
+    size: 'large',
+    position: { x: 40, y: 2490 },
+    customSize: { width: 760, height: 450 }, // Rozšířeno na šířku jako "Odpočet do svatby" (2 moduly široké)
+    gridPosition: { row: 5, column: 0 },
+    isVisible: true,
+    isLocked: false,
     order: 12
   },
-  // Row 5 - 3 modules
+  {
+    id: 'food-drinks',
+    type: 'food-drinks',
+    title: 'Jídlo a Pití',
+    size: 'medium',
+    position: { x: 840, y: 2490 },
+    gridPosition: { row: 5, column: 2 },
+    isVisible: true,
+    isLocked: false,
+    order: 13
+  },
+  // Row 6 - 3 modules
+  {
+    id: 'music-playlist',
+    type: 'music-playlist',
+    title: 'Svatební hudba',
+    size: 'medium',
+    position: { x: 40, y: 2980 },
+    gridPosition: { row: 6, column: 0 },
+    isVisible: true,
+    isLocked: false,
+    order: 14
+  },
   {
     id: 'shopping-list',
     type: 'shopping-list',
     title: 'Nákupní seznam',
     size: 'medium',
-    position: { x: 40, y: 2490 },
-    gridPosition: { row: 5, column: 0 },
+    position: { x: 440, y: 2980 },
+    gridPosition: { row: 6, column: 1 },
     isVisible: true,
     isLocked: false,
-    order: 13
-  },
-  {
-    id: 'wedding-checklist',
-    type: 'wedding-checklist',
-    title: 'Svatební checklist',
-    size: 'medium',
-    position: { x: 440, y: 2490 },
-    gridPosition: { row: 5, column: 1 },
-    isVisible: true,
-    isLocked: false,
-    order: 14
+    order: 15
   },
   {
     id: 'accommodation-management',
     type: 'accommodation-management',
     title: 'Ubytování',
     size: 'medium',
-    position: { x: 840, y: 2490 },
-    gridPosition: { row: 5, column: 2 },
+    position: { x: 840, y: 2980 },
+    gridPosition: { row: 6, column: 2 },
     isVisible: true,
     isLocked: false,
-    order: 15
+    order: 16
   },
-  // Row 6 - 3 modules
+  // Row 7 - 3 modules
   {
     id: 'wedding-website',
     type: 'wedding-website',
     title: 'Svatební web',
     size: 'medium',
-    position: { x: 40, y: 2980 },
-    gridPosition: { row: 6, column: 0 },
+    position: { x: 40, y: 3470 },
+    gridPosition: { row: 7, column: 0 },
     isVisible: true,
     isLocked: false,
-    order: 16
+    order: 17
   },
   {
     id: 'moodboard',
     type: 'moodboard',
     title: 'Moodboard',
     size: 'medium',
-    position: { x: 440, y: 2980 },
-    gridPosition: { row: 6, column: 1 },
-    isVisible: true,
-    isLocked: false,
-    order: 17
-  },
-  {
-    id: 'wedding-day-timeline',
-    type: 'wedding-day-timeline',
-    title: 'Harmonogram svatebního dne',
-    size: 'large',
-    position: { x: 840, y: 2980 },
-    gridPosition: { row: 6, column: 2 },
+    position: { x: 440, y: 3470 },
+    gridPosition: { row: 7, column: 1 },
     isVisible: true,
     isLocked: false,
     order: 18
