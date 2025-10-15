@@ -180,7 +180,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
               <button
                 onClick={toggleEditMode}
                 className={`btn-outline flex items-center space-x-2 text-sm ${
-                  layout.isEditMode ? 'bg-primary-50 border-primary-300 text-primary-700' : ''
+                  layout.isEditMode ? 'bg-primary-50 border-primary-400 shadow-2xl text-primary-700' : ''
                 }`}
               >
                 <Edit3 className="w-4 h-4" />
@@ -369,7 +369,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
               <button
                 onClick={toggleEditMode}
                 className={`btn-outline flex items-center space-x-2 ${
-                  layout.isEditMode ? 'bg-primary-50 border-primary-300 text-primary-700' : ''
+                  layout.isEditMode ? 'bg-primary-50 border-primary-400 shadow-2xl text-primary-700' : ''
                 }`}
               >
                 <Edit3 className="w-4 h-4" />
@@ -507,7 +507,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
                   <button
                     key={module.id}
                     onClick={() => toggleModuleVisibility(module.id)}
-                    className="flex items-center space-x-2 px-3 py-2 bg-white border border-gray-300 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-colors"
+                    className="flex items-center space-x-2 px-3 py-2 bg-white border border-gray-200 rounded-lg hover:border-primary-400 shadow-2xl hover:bg-primary-50 transition-colors"
                     title="Klikněte pro zobrazení modulu"
                   >
                     <EyeOff className="w-4 h-4 text-gray-400" />
@@ -779,14 +779,14 @@ function DraggableModule({
       onMouseEnter={() => !isDragging && !isResizing && setIsHovered(true)}
       onMouseLeave={() => !isDragging && !isResizing && setIsHovered(false)}
     >
-      <div className={`relative w-full h-full rounded-lg overflow-hidden shadow-lg bg-white border-2 transition-all ${
+      <div className={`relative w-full h-full rounded-xl overflow-hidden shadow-md bg-white border transition-all ${
         isDragging
-          ? 'border-primary-300'
+          ? 'border-primary-400 shadow-2xl'
           : module.isLocked
-          ? 'border-gray-300'
+          ? 'border-gray-200'
           : isEditMode
-          ? 'border-primary-200 border-opacity-50'
-          : 'border-transparent'
+          ? 'border-primary-100'
+          : 'border-gray-100 hover:border-primary-200'
       }`}>
         {/* Edit Mode Controls */}
         {isEditMode && (
@@ -860,7 +860,7 @@ function DraggableModule({
         {isEditMode && !module.isLocked && (
           <div
             onMouseDown={handleResizeStart}
-            className="absolute bottom-1 right-1 w-7 h-7 cursor-nwse-resize opacity-0 group-hover:opacity-100 transition-opacity z-20 flex items-center justify-center bg-white rounded shadow-md hover:bg-primary-50 hover:border hover:border-primary-300"
+            className="absolute bottom-1 right-1 w-7 h-7 cursor-nwse-resize opacity-0 group-hover:opacity-100 transition-opacity z-20 flex items-center justify-center bg-white rounded shadow-md hover:bg-primary-50 hover:border hover:border-primary-400 shadow-2xl"
             title="Změnit velikost modulu - klikněte a táhněte pro zvětšení nebo zmenšení"
           >
             <Maximize className="w-4 h-4 text-gray-600" />

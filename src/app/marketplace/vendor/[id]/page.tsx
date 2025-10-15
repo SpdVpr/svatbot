@@ -102,7 +102,7 @@ export default function VendorDetailPage() {
 
   if (!vendor) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Dodavatel nenalezen</h1>
           <p className="text-gray-600 mb-6">Požadovaný dodavatel neexistuje nebo byl odstraněn.</p>
@@ -134,7 +134,7 @@ export default function VendorDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="container-desktop py-6">

@@ -49,14 +49,14 @@ export default function AccommodationPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="loading-spinner w-8 h-8" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-gray-200">
         {/* Breadcrumb - Hidden on mobile */}

@@ -39,7 +39,7 @@ function AdminLayoutContent({
   // Show admin dashboard layout
   if (isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen">
         <AdminSidebar />
         <div className="lg:pl-64">
           <AdminHeader />

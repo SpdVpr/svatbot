@@ -23,7 +23,7 @@ export default function WeddingWebsitePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500 mb-4"></div>
           <p className="text-gray-600">Načítání...</p>
@@ -35,7 +35,7 @@ export default function WeddingWebsitePage() {
   // Pokud web neexistuje, zobraz vytvoření
   if (!website) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
+      <div className="min-h-screen py-8">
         <div className="max-w-4xl mx-auto px-4">
           {/* Header */}
           <div className="mb-8">
@@ -119,7 +119,7 @@ export default function WeddingWebsitePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen py-8">
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="mb-8">

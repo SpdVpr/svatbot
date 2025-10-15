@@ -111,9 +111,9 @@ function DashboardContent() {
 
 
   return (
-    <div className="min-h-screen bg-neutral-50 flex flex-col">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
+    <div className="min-h-screen flex flex-col">
+      {/* Glassmorphism Header */}
+      <header className="bg-white/80 backdrop-blur-xl border-b border-white/20 shadow-sm sticky top-0 z-50">
         {/* Mobile Header */}
         <div className="sm:hidden">
           <div className="mobile-header">

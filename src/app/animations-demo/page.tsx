@@ -11,7 +11,7 @@ export default function AnimationsDemo() {
   const [showConfetti, setShowConfetti] = useState(false)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-secondary-50 to-accent-50 py-12 px-4">
+    <div className="min-h-screen py-12 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16 slide-in-bottom">

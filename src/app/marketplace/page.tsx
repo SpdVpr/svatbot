@@ -48,7 +48,7 @@ export default function MarketplacePage() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen">
       {/* Header */}
       <div className="bg-white border-b border-neutral-200">
         <div className="container-desktop py-6">

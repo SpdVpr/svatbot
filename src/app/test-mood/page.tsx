@@ -53,7 +53,7 @@ export default function TestMoodPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4">
         <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
           <AlertCircle className="w-16 h-16 text-orange-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Přihlášení vyžadováno</h2>
@@ -64,7 +64,7 @@ export default function TestMoodPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+    <div className="min-h-screen p-4 md:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="bg-gradient-to-r from-primary-500 to-pink-500 rounded-xl p-6 text-white shadow-lg">
