@@ -113,11 +113,10 @@ export default function MoodTracker({ compact = false, onMoodSaved }: MoodTracke
                 <button
                   key={option.value}
                   onClick={() => handleMoodSelect(option.value)}
-                  className={`${option.bgColor} ${option.color} p-3 rounded-lg transition-all hover:scale-105 flex flex-col items-center gap-1`}
+                  className={`${option.bgColor} ${option.color} p-3 rounded-lg transition-all hover:scale-105 flex items-center justify-center`}
                   title={option.label}
                 >
-                  <Icon className="w-5 h-5" />
-                  <span className="text-xs font-medium">{option.label}</span>
+                  <Icon className="w-6 h-6" />
                 </button>
               )
             })}

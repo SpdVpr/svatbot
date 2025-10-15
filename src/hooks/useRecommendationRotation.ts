@@ -28,11 +28,8 @@ export function useRecommendationRotation<T>(items: T[], intervalMs: number = 50
     if (!hasInitialized.current) return
     if (items.length <= 1) return
 
-    console.log('🔄 Starting rotation interval:', { itemsCount: items.length, intervalMs })
-
     // Start interval
     const interval = setInterval(() => {
-      console.log('⏰ Interval tick - rotating recommendation')
       // Start fade out
       setIsTransitioning(true)
 
@@ -41,7 +38,6 @@ export function useRecommendationRotation<T>(items: T[], intervalMs: number = 50
         setCurrentIndex(prev => {
           const currentItems = itemsRef.current
           const nextIndex = currentItems.length > 0 ? (prev + 1) % currentItems.length : 0
-          console.log('➡️ Changing index:', { from: prev, to: nextIndex, total: currentItems.length })
           return nextIndex
         })
         setIsTransitioning(false)
@@ -50,7 +46,6 @@ export function useRecommendationRotation<T>(items: T[], intervalMs: number = 50
 
     // Cleanup
     return () => {
-      console.log('🛑 Clearing rotation interval')
       clearInterval(interval)
     }
   }, [items.length, intervalMs, hasInitialized.current])

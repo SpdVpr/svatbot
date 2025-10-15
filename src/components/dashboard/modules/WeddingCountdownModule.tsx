@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useMemo } from 'react'
 import { Calendar, Heart, Lightbulb } from 'lucide-react'
@@ -679,7 +679,6 @@ export default function WeddingCountdownModule({ onWeddingSettingsClick }: Weddi
     }
 
     const result = [...shuffle(urgent, 0), ...shuffle(high, 100), ...shuffle(medium, 200), ...shuffle(low, 300)]
-    console.log('🔀 Shuffled recommendations with seed:', randomSeed)
     return result
   }, [recommendations, randomSeed])
 
