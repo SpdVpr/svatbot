@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { imageUrls, weddingContext } = await request.json()
+    const { imageUrls, weddingContext, userPrompt } = await request.json()
 
     if (!imageUrls || !Array.isArray(imageUrls) || imageUrls.length === 0) {
       return NextResponse.json(
@@ -41,6 +41,15 @@ Kontext svatby:
 - Počet hostů: ${weddingContext.guestCount || 'neurčen'}
 ` : ''
 
+    // Add user prompt if provided
+    const userPromptString = userPrompt ? `
+
+DŮLEŽITÉ - Uživatelské instrukce:
+"${userPrompt}"
+
+Vezmi tyto instrukce v úvahu při analýze a vytváření promptu. Zaměř se na prvky, které uživatel zmínil.
+` : ''
+
     // Prepare messages for GPT-4o-mini with vision
     const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
       {
@@ -62,7 +71,7 @@ Odpovídej POUZE ve formátu JSON bez jakéhokoliv dalšího textu.`
         content: [
           {
             type: 'text',
-            text: `${contextString}
+            text: `${contextString}${userPromptString}
 
 Analyzuj tyto svatební inspirační fotografie a vytvoř:
 1. Detailní prompt pro generování svatebního moodboardu (v angličtině, optimalizovaný pro AI generování)

@@ -65,6 +65,10 @@ service cloud.firestore {
                         (request.resource.data.keys().hasAll(['weddingId', 'title', 'category', 'status']) &&
                          exists(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)) &&
                          get(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)).data.userId == request.auth.uid));
+      allow delete: if isAuthenticated() &&
+                       (isDemoUser() ||
+                        (exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                         get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid));
     }
 
     // Budget items collection
@@ -212,6 +216,28 @@ service cloud.firestore {
                                     (isDemoUser() ||
                                      (exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
                                       get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid));
+    }
+
+    // Moodboard Folders collection (Pinterest-style boards)
+    match /moodboardFolders/{folderId} {
+      allow read: if isAuthenticated() &&
+                     (isDemoUser() ||
+                      (exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                       get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid));
+      allow create: if isAuthenticated() &&
+                       (isDemoUser() ||
+                        (request.resource.data.keys().hasAll(['name', 'weddingId', 'userId']) &&
+                         exists(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)) &&
+                         get(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)).data.userId == request.auth.uid &&
+                         request.auth.uid == request.resource.data.userId));
+      allow update: if isAuthenticated() &&
+                       (isDemoUser() ||
+                        (exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                         get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid));
+      allow delete: if isAuthenticated() &&
+                       (isDemoUser() ||
+                        (exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                         get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid));
     }
 
     // Notes collection
@@ -585,6 +611,35 @@ service cloud.firestore {
 
       // User can delete their own onboarding state
       allow delete: if isAuthenticated() && isOwner(userId);
+    }
+
+    // Calendar Events collection - Custom calendar events
+    match /calendarEvents/{eventId} {
+      // Allow read if authenticated and (demo user OR user owns the wedding)
+      allow read: if isAuthenticated() &&
+                     (isDemoUser() ||
+                      (exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                       get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid));
+
+      // Allow create if authenticated and (demo user OR user owns the wedding)
+      allow create: if isAuthenticated() &&
+                       (isDemoUser() ||
+                        (request.resource.data.keys().hasAll(['weddingId', 'userId', 'title', 'type', 'source']) &&
+                         exists(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)) &&
+                         get(/databases/$(database)/documents/weddings/$(request.resource.data.weddingId)).data.userId == request.auth.uid &&
+                         request.auth.uid == request.resource.data.userId));
+
+      // Allow update if authenticated and (demo user OR user owns the wedding)
+      allow update: if isAuthenticated() &&
+                       (isDemoUser() ||
+                        (exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                         get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid));
+
+      // Allow delete if authenticated and (demo user OR user owns the wedding)
+      allow delete: if isAuthenticated() &&
+                       (isDemoUser() ||
+                        (exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
+                         get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid));
     }
 
     // Deny all other access

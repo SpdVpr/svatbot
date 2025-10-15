@@ -21,7 +21,26 @@ function SimpleMoodboardCard({
 }: SimpleMoodboardCardProps) {
   // Simple state management
   const [position, setPosition] = useState(image.position || { x: 0, y: 0 })
-  const [imageSize, setImageSize] = useState(image.size || { width: 200, height: 200 })
+
+  // AI generated images should be larger by default
+  // If image has saved size but it's too small for AI image, upgrade it
+  const getInitialSize = () => {
+    if (image.size) {
+      // If it's an AI image and saved size is small, upgrade to larger size
+      if (image.source === 'ai-generated') {
+        const maxDimension = Math.max(image.size.width, image.size.height)
+        if (maxDimension < 400) {
+          // Upgrade small AI images to larger size
+          return { width: 500, height: 500 }
+        }
+      }
+      return image.size
+    }
+    // Default sizes for new images
+    return image.source === 'ai-generated' ? { width: 500, height: 500 } : { width: 200, height: 200 }
+  }
+
+  const [imageSize, setImageSize] = useState(getInitialSize())
   const [isDragging, setIsDragging] = useState(false)
   const [isResizing, setIsResizing] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
@@ -65,6 +84,36 @@ function SimpleMoodboardCard({
     }
   }, [image.size])
 
+  // Check and upgrade AI image size when image loads or changes
+  useEffect(() => {
+    console.log('🔍 Checking image size:', {
+      id: image.id,
+      source: image.source,
+      currentSize: imageSize,
+      savedSize: image.size
+    })
+
+    if (image.source === 'ai-generated') {
+      const currentMax = Math.max(imageSize.width, imageSize.height)
+      console.log('🤖 AI image detected, current max dimension:', currentMax)
+
+      // If current size is too small, upgrade it
+      if (currentMax < 400) {
+        console.log('📐 Upgrading AI image from', imageSize, 'to 500x500')
+        const newSize = { width: 500, height: 500 }
+        setImageSize(newSize)
+
+        // Save to database immediately
+        setTimeout(() => {
+          console.log('💾 Saving upgraded size to database')
+          onPositionChange(image.id, position, newSize)
+        }, 100)
+      } else {
+        console.log('✅ AI image size is already good:', currentMax)
+      }
+    }
+  }, [image.id, image.source])
+
   // Handle image load for sizing
   const handleImageLoad = (e: any) => {
     const img = e.target
@@ -73,11 +122,14 @@ function SimpleMoodboardCard({
 
     // Only set initial size if not already set from Firebase
     if (!image.size) {
-      let width = Math.min(img.naturalWidth, 300)
+      // AI generated images should be larger
+      const maxWidth = image.source === 'ai-generated' ? 500 : 300
+      let width = Math.min(img.naturalWidth, maxWidth)
       let height = width / aspectRatio.current
 
-      if (height > 400) {
-        height = 400
+      const maxHeight = image.source === 'ai-generated' ? 600 : 400
+      if (height > maxHeight) {
+        height = maxHeight
         width = height * aspectRatio.current
       }
 

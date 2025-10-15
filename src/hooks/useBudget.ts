@@ -133,6 +133,7 @@ export function useBudget(): UseBudgetReturn {
       vendorName: data.vendorName,
       paymentStatus: autoPaymentStatus, // Automatically calculated status
       paymentMethod: data.paymentMethod,
+      paymentPeriod: data.paymentPeriod,
       dueDate: data.dueDate?.toDate(),
       paidDate: data.paidDate?.toDate(),
       priority: data.priority,
@@ -165,9 +166,13 @@ export function useBudget(): UseBudgetReturn {
     if (item.vendorName !== undefined) result.vendorName = item.vendorName || null
     if (item.paymentStatus !== undefined) result.paymentStatus = item.paymentStatus
     if (item.paymentMethod !== undefined) result.paymentMethod = item.paymentMethod || null
+    if (item.paymentPeriod !== undefined) {
+      result.paymentPeriod = item.paymentPeriod || null
+      console.log('💰 Converting paymentPeriod:', item.paymentPeriod, '→', result.paymentPeriod)
+    }
     if (item.dueDate !== undefined) result.dueDate = item.dueDate ? Timestamp.fromDate(item.dueDate) : null
     if (item.paidDate !== undefined) result.paidDate = item.paidDate ? Timestamp.fromDate(item.paidDate) : null
-    if (item.priority !== undefined) result.priority = item.priority
+    if (item.priority !== undefined) result.priority = item.priority || null
     if (item.notes !== undefined) result.notes = item.notes || null
     if (item.tags !== undefined) result.tags = item.tags
     if (item.isEstimate !== undefined) result.isEstimate = item.isEstimate
@@ -184,6 +189,14 @@ export function useBudget(): UseBudgetReturn {
     if (item.createdAt !== undefined) result.createdAt = Timestamp.fromDate(item.createdAt)
     if (item.updatedAt !== undefined) result.updatedAt = Timestamp.fromDate(item.updatedAt)
     if (item.createdBy !== undefined) result.createdBy = item.createdBy
+
+    // Remove undefined values (Firestore doesn't accept undefined)
+    Object.keys(result).forEach(key => {
+      if (result[key] === undefined) {
+        console.warn(`⚠️ Removing undefined value for key: ${key}`)
+        delete result[key]
+      }
+    })
 
     return result
   }
@@ -275,11 +288,21 @@ export function useBudget(): UseBudgetReturn {
         updatedAt: new Date()
       }
 
+      console.log('💰 Updating budget item:', {
+        itemId,
+        updates,
+        paymentPeriod: updates.paymentPeriod,
+        updatedData
+      })
+
       try {
         // Try to update in Firestore
         if (user && wedding?.id) {
           const itemRef = doc(db, 'budgetItems', itemId)
-          await updateDoc(itemRef, convertToFirestoreData(updatedData as any))
+          const firestoreData = convertToFirestoreData(updatedData as any)
+          console.log('💰 Firestore data to save:', firestoreData)
+          await updateDoc(itemRef, firestoreData)
+          console.log('✅ Budget item updated in Firestore')
         } else {
           throw new Error('User not authenticated or wedding not found')
         }

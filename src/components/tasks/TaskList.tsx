@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { Task, TaskFilters, TaskViewOptions } from '@/types/task'
 import { useTask } from '@/hooks/useTask'
+import { useCalendar } from '@/hooks/useCalendar'
+import { useRouter } from 'next/navigation'
 import {
   CheckCircle2,
   Circle,
@@ -12,6 +14,7 @@ import {
   Filter,
   Search,
   Calendar,
+  CalendarPlus,
   User,
   Flag,
   Edit2,
@@ -49,6 +52,8 @@ export default function TaskList({
   clearError: propClearError
 }: TaskListProps) {
   const hookData = useTask()
+  const { createEvent } = useCalendar()
+  const router = useRouter()
 
   // Check if this is a demo user - if so, use props, otherwise use hook data
   const isDemoUser = hookData.tasks.length > 0 && hookData.tasks[0]?.weddingId === 'demo-wedding'
@@ -88,6 +93,38 @@ export default function TaskList({
       setOpenMenuId(null)
     } catch (error) {
       console.error('Error deleting task:', error)
+    }
+  }
+
+  // Handle add to calendar - creates a custom calendar event from task
+  const handleAddToCalendar = async (task: Task) => {
+    try {
+      const dueDate = task.dueDate || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // Default: 7 days from now
+
+      // Create calendar event from task
+      await createEvent({
+        title: task.title,
+        description: task.description || '',
+        type: 'task',
+        startDate: dueDate,
+        isAllDay: true,
+        priority: (task.priority || 'medium') as 'low' | 'medium' | 'high' | 'critical',
+        notes: task.notes || '',
+        tags: [task.category],
+        reminders: [
+          { type: 'notification', minutesBefore: 1440 }, // 1 day before
+          { type: 'notification', minutesBefore: 60 }    // 1 hour before
+        ],
+        recurrence: 'none',
+        isOnline: false
+      })
+
+      // Show success message and redirect to calendar
+      alert('✅ Úkol byl přidán do kalendáře!')
+      router.push('/calendar')
+    } catch (error) {
+      console.error('Error adding task to calendar:', error)
+      alert('❌ Chyba při přidávání do kalendáře')
     }
   }
 
@@ -471,6 +508,13 @@ export default function TaskList({
                                 <Edit2 className="w-4 h-4" />
                               </button>
                             )}
+                            <button
+                              onClick={() => handleAddToCalendar(task)}
+                              className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                              title="Přidat do kalendáře"
+                            >
+                              <CalendarPlus className="w-4 h-4" />
+                            </button>
                             <button
                               onClick={() => setDeleteConfirmId(task.id)}
                               className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"

@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { X, Sparkles, Loader2, Check, Image as ImageIcon, Filter } from 'lucide-react'
-import { MoodboardImage, WEDDING_CATEGORIES, WeddingCategory } from '@/hooks/useMoodboard'
+import { X, Sparkles, Loader2, Check, Image as ImageIcon, Filter, Folder } from 'lucide-react'
+import { MoodboardImage, MoodboardFolder } from '@/hooks/useMoodboard'
 
 interface AIMoodboardGeneratorProps {
   images: MoodboardImage[]
+  folders: MoodboardFolder[]
   onGenerate: (selectedImageIds: string[], options?: any) => Promise<any>
   onClose: () => void
   isLoading?: boolean
@@ -16,6 +17,7 @@ type GenerationPhase = 'analyzing' | 'generating' | 'describing' | 'saving' | 'c
 
 export default function AIMoodboardGenerator({
   images,
+  folders,
   onGenerate,
   onClose,
   isLoading: externalLoading
@@ -25,7 +27,8 @@ export default function AIMoodboardGenerator({
   const [currentPhase, setCurrentPhase] = useState<GenerationPhase>('analyzing')
   const [result, setResult] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
-  const [selectedCategory, setSelectedCategory] = useState<WeddingCategory | 'all'>('all')
+  const [selectedFolder, setSelectedFolder] = useState<string | 'all'>('all')
+  const [userPrompt, setUserPrompt] = useState<string>('')
 
   // Filter only uploaded images (not AI generated)
   const uploadedImages = useMemo(() =>
@@ -33,24 +36,30 @@ export default function AIMoodboardGenerator({
     [images]
   )
 
-  // Filter by category
+  // Filter by folder
   const filteredImages = useMemo(() => {
-    if (selectedCategory === 'all') {
+    if (selectedFolder === 'all') {
       return uploadedImages
     }
-    return uploadedImages.filter(img => img.category === selectedCategory)
-  }, [uploadedImages, selectedCategory])
+    if (selectedFolder === 'unassigned') {
+      return uploadedImages.filter(img => !img.folderId)
+    }
+    return uploadedImages.filter(img => img.folderId === selectedFolder)
+  }, [uploadedImages, selectedFolder])
 
-  // Group images by category for display
-  const imagesByCategory = useMemo(() => {
+  // Group images by folder for display
+  const imagesByFolder = useMemo(() => {
     const grouped: Record<string, MoodboardImage[]> = {}
+
+    // Group by folder
     uploadedImages.forEach(img => {
-      const cat = img.category || 'other'
-      if (!grouped[cat]) {
-        grouped[cat] = []
+      const folderId = img.folderId || 'unassigned'
+      if (!grouped[folderId]) {
+        grouped[folderId] = []
       }
-      grouped[cat].push(img)
+      grouped[folderId].push(img)
     })
+
     return grouped
   }, [uploadedImages])
 
@@ -69,13 +78,13 @@ export default function AIMoodboardGenerator({
     })
   }
 
-  const selectAllFromCategory = (category: WeddingCategory) => {
-    const categoryImages = uploadedImages.filter(img => img.category === category)
-    const categoryImageIds = categoryImages.map(img => img.id)
+  const selectAllFromFolder = (folderId: string) => {
+    const folderImages = uploadedImages.filter(img => img.folderId === folderId)
+    const folderImageIds = folderImages.map(img => img.id)
 
     // Add up to 10 total images
     const availableSlots = 10 - selectedImageIds.length
-    const idsToAdd = categoryImageIds.filter(id => !selectedImageIds.includes(id)).slice(0, availableSlots)
+    const idsToAdd = folderImageIds.filter(id => !selectedImageIds.includes(id)).slice(0, availableSlots)
 
     if (idsToAdd.length > 0) {
       setSelectedImageIds(prev => [...prev, ...idsToAdd])
@@ -95,12 +104,14 @@ export default function AIMoodboardGenerator({
     try {
       // Simulate phase progression
       const phaseTimers: NodeJS.Timeout[] = []
-      
+
       phaseTimers.push(setTimeout(() => setCurrentPhase('generating'), 8000))
       phaseTimers.push(setTimeout(() => setCurrentPhase('describing'), 35000))
       phaseTimers.push(setTimeout(() => setCurrentPhase('saving'), 45000))
 
-      const generatedResult = await onGenerate(selectedImageIds)
+      // Pass user prompt as options
+      const options = userPrompt.trim() ? { userPrompt: userPrompt.trim() } : undefined
+      const generatedResult = await onGenerate(selectedImageIds, options)
 
       // Clear timers
       phaseTimers.forEach(timer => clearTimeout(timer))
@@ -167,6 +178,29 @@ export default function AIMoodboardGenerator({
                 </div>
               )}
 
+              {/* User prompt input */}
+              <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-4">
+                <label className="block text-sm font-medium text-gray-900 mb-2">
+                  ✨ Vlastní instrukce pro AI (volitelné)
+                </label>
+                <textarea
+                  value={userPrompt}
+                  onChange={(e) => setUserPrompt(e.target.value)}
+                  placeholder="Např: 'Chci romantickou atmosféru s pastelové barvami', 'Moderní minimalistický styl', 'Vintage svatba na venkově'..."
+                  className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                  rows={3}
+                  maxLength={500}
+                />
+                <div className="flex items-center justify-between mt-2">
+                  <p className="text-xs text-gray-600">
+                    Popište styl, atmosféru nebo konkrétní prvky, které chcete zdůraznit
+                  </p>
+                  <span className="text-xs text-gray-500">
+                    {userPrompt.length}/500
+                  </span>
+                </div>
+              </div>
+
               {/* Selection counter and category filter */}
               <div className="flex items-center justify-between flex-wrap gap-3">
                 <h3 className="font-semibold text-gray-900">
@@ -184,37 +218,50 @@ export default function AIMoodboardGenerator({
                 </div>
               </div>
 
-              {/* Category filter */}
+              {/* Folder filter */}
               <div className="flex items-center gap-2 overflow-x-auto pb-2">
                 <Filter className="w-4 h-4 text-gray-500 flex-shrink-0" />
                 <button
-                  onClick={() => setSelectedCategory('all')}
+                  onClick={() => setSelectedFolder('all')}
                   className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                    selectedCategory === 'all'
+                    selectedFolder === 'all'
                       ? 'bg-pink-500 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
                   Vše ({uploadedImages.length})
                 </button>
-                {Object.entries(imagesByCategory).map(([category, categoryImages]) => {
-                  const categoryInfo = WEDDING_CATEGORIES[category as WeddingCategory]
-                  if (!categoryInfo) return null
+                {folders.map((folder) => {
+                  const folderImages = uploadedImages.filter(img => img.folderId === folder.id)
+                  if (folderImages.length === 0) return null
 
                   return (
                     <button
-                      key={category}
-                      onClick={() => setSelectedCategory(category as WeddingCategory)}
+                      key={folder.id}
+                      onClick={() => setSelectedFolder(folder.id)}
                       className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                        selectedCategory === category
+                        selectedFolder === folder.id
                           ? 'bg-pink-500 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
-                      {categoryInfo.icon} {categoryInfo.label} ({categoryImages.length})
+                      {folder.icon || '📁'} {folder.name} ({folderImages.length})
                     </button>
                   )
                 })}
+                {/* Unassigned images */}
+                {uploadedImages.filter(img => !img.folderId).length > 0 && (
+                  <button
+                    onClick={() => setSelectedFolder('unassigned')}
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                      selectedFolder === 'unassigned'
+                        ? 'bg-pink-500 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    📂 Nepřiřazené ({uploadedImages.filter(img => !img.folderId).length})
+                  </button>
+                )}
               </div>
 
               {/* Loading state */}
@@ -232,26 +279,26 @@ export default function AIMoodboardGenerator({
               ) : filteredImages.length === 0 ? (
                 <div className="text-center py-12">
                   <ImageIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-600">V této kategorii nejsou žádné fotky</p>
+                  <p className="text-gray-600">V této složce nejsou žádné fotky</p>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {/* Quick select by category */}
-                  {selectedCategory === 'all' && Object.keys(imagesByCategory).length > 1 && (
+                  {/* Quick select by folder */}
+                  {selectedFolder === 'all' && folders.length > 0 && (
                     <div className="bg-gray-50 rounded-lg p-3">
-                      <p className="text-sm text-gray-700 mb-2">Rychlý výběr podle kategorie:</p>
+                      <p className="text-sm text-gray-700 mb-2">Rychlý výběr podle složky:</p>
                       <div className="flex flex-wrap gap-2">
-                        {Object.entries(imagesByCategory).map(([category, categoryImages]) => {
-                          const categoryInfo = WEDDING_CATEGORIES[category as WeddingCategory]
-                          if (!categoryInfo) return null
+                        {folders.map((folder) => {
+                          const folderImages = uploadedImages.filter(img => img.folderId === folder.id)
+                          if (folderImages.length === 0) return null
 
                           return (
                             <button
-                              key={category}
-                              onClick={() => selectAllFromCategory(category as WeddingCategory)}
+                              key={folder.id}
+                              onClick={() => selectAllFromFolder(folder.id)}
                               className="text-xs px-2 py-1 bg-white border border-gray-200 rounded-md hover:border-pink-300 hover:bg-pink-50 transition-colors"
                             >
-                              {categoryInfo.icon} Vybrat {categoryInfo.label}
+                              {folder.icon || '📁'} Vybrat {folder.name}
                             </button>
                           )
                         })}
@@ -263,7 +310,7 @@ export default function AIMoodboardGenerator({
                   <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                     {filteredImages.map((image) => {
                       const isSelected = selectedImageIds.includes(image.id)
-                      const categoryInfo = WEDDING_CATEGORIES[image.category || 'other']
+                      const folder = folders.find(f => f.id === image.folderId)
 
                       return (
                         <button
@@ -284,11 +331,11 @@ export default function AIMoodboardGenerator({
                             />
                           </div>
 
-                          {/* Category badge */}
-                          {categoryInfo && (
+                          {/* Folder badge */}
+                          {folder && (
                             <div className="absolute top-1 left-1 z-10">
                               <span className="text-xs bg-white/90 backdrop-blur-sm px-1.5 py-0.5 rounded">
-                                {categoryInfo.icon}
+                                {folder.icon || '📁'}
                               </span>
                             </div>
                           )}
@@ -309,7 +356,11 @@ export default function AIMoodboardGenerator({
                   {/* Stats */}
                   <div className="text-center text-sm text-gray-600">
                     Zobrazeno {filteredImages.length} {filteredImages.length === 1 ? 'fotka' : filteredImages.length < 5 ? 'fotky' : 'fotek'}
-                    {selectedCategory !== 'all' && ` v kategorii ${WEDDING_CATEGORIES[selectedCategory]?.label}`}
+                    {selectedFolder !== 'all' && selectedFolder !== 'unassigned' && (() => {
+                      const folder = folders.find(f => f.id === selectedFolder)
+                      return folder ? ` ve složce ${folder.name}` : ''
+                    })()}
+                    {selectedFolder === 'unassigned' && ' (nepřiřazené)'}
                   </div>
                 </div>
               )}

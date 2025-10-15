@@ -104,23 +104,32 @@ export function useTask(): UseTaskReturn {
 
   // Convert Task to Firestore data
   const convertToFirestoreData = (task: Omit<Task, 'id'>): any => {
-    return {
+    const data: any = {
       weddingId: task.weddingId,
       title: task.title,
-      description: task.description,
+      description: task.description || null,
       category: task.category,
       status: task.status,
-      priority: task.priority,
+      priority: task.priority || null,
       dueDate: task.dueDate ? Timestamp.fromDate(task.dueDate) : null,
       completedAt: task.completedAt ? Timestamp.fromDate(task.completedAt) : null,
       assignedTo: task.assignedTo || null,
-      notes: task.notes,
+      notes: task.notes || null,
       isTemplate: task.isTemplate,
       templateId: task.templateId || null,
       order: task.order,
       createdAt: Timestamp.fromDate(task.createdAt),
       updatedAt: Timestamp.fromDate(task.updatedAt)
     }
+
+    // Remove undefined values (Firestore doesn't accept undefined)
+    Object.keys(data).forEach(key => {
+      if (data[key] === undefined) {
+        delete data[key]
+      }
+    })
+
+    return data
   }
 
   // Create new task
@@ -151,6 +160,7 @@ export function useTask(): UseTaskReturn {
 
       try {
         // Try to save to Firestore for real users
+        console.log('🔄 Attempting to save task to Firestore...', { weddingId: wedding.id, title: taskData.title })
         const docRef = await addDoc(collection(db, 'tasks'), convertToFirestoreData(taskData))
         const newTask: Task = { id: docRef.id, ...taskData }
 
@@ -160,8 +170,16 @@ export function useTask(): UseTaskReturn {
         // This ensures consistency with the database
 
         return newTask
-      } catch (firestoreError) {
+      } catch (firestoreError: any) {
+        console.error('❌ Firestore error details:', {
+          error: firestoreError,
+          code: firestoreError?.code,
+          message: firestoreError?.message,
+          weddingId: wedding.id,
+          userId: user?.id
+        })
         console.warn('⚠️ Firestore not available, using localStorage fallback')
+
         // Create task with local ID
         const localId = `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
         const newTask: Task = { id: localId, ...taskData }

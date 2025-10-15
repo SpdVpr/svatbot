@@ -249,6 +249,20 @@
       ]
     },
     {
+      "collectionGroup": "moodboardFolders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "weddingId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
       "collectionGroup": "weddingNotifications",
       "queryScope": "COLLECTION",
       "fields": [

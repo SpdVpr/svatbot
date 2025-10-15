@@ -25,6 +25,21 @@ import {
 import { db, storage } from '@/lib/firebase'
 import { compressImage, createThumbnail, isValidImageFile, formatFileSize } from '@/utils/imageCompression'
 
+// Moodboard Folder (Pinterest-style boards)
+export interface MoodboardFolder {
+  id: string
+  name: string
+  description: string
+  coverImageUrl?: string // URL of the cover image (first or selected image)
+  imageCount: number
+  createdAt: Date
+  updatedAt: Date
+  userId: string
+  weddingId: string
+  color?: string // Optional color theme for the folder
+  icon?: string // Optional emoji icon
+}
+
 export interface MoodboardImage {
   id: string
   url: string
@@ -35,7 +50,8 @@ export interface MoodboardImage {
   sourceUrl: string
   isFavorite: boolean
   tags: string[]
-  category: WeddingCategory
+  folderId: string // Changed from category to folderId
+  category: WeddingCategory // Keep for backward compatibility and AI features
   position?: { x: number; y: number } // Pro drag & drop pozicování
   size?: { width: number; height: number } // Pro zachování velikosti
   createdAt: Date
@@ -87,6 +103,7 @@ export function useMoodboard() {
   const { user } = useAuth()
   const { wedding } = useWedding()
   const [images, setImages] = useState<MoodboardImage[]>([])
+  const [folders, setFolders] = useState<MoodboardFolder[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [cleanupDone, setCleanupDone] = useState(false)
@@ -151,6 +168,7 @@ export function useMoodboard() {
               sourceUrl: data.sourceUrl || '',
               isFavorite: data.isFavorite || false,
               tags: data.tags || [],
+              folderId: data.folderId || '', // New: folder ID
               category: data.category || 'other',
               position: data.position || undefined,
               size: data.size || undefined,
@@ -234,12 +252,243 @@ export function useMoodboard() {
     cleanupPinterestImages()
   }, [user, wedding?.id, cleanupDone])
 
+  // Load folders from Firestore with real-time updates
+  useEffect(() => {
+    if (!user || !wedding?.id) {
+      return
+    }
+
+    const foldersRef = collection(db, 'moodboardFolders')
+    const q = query(
+      foldersRef,
+      where('weddingId', '==', wedding.id)
+    )
+
+    const unsubscribe = onSnapshot(q,
+      (snapshot) => {
+        console.log('📁 Loading moodboard folders:', snapshot.docs.length)
+
+        const loadedFolders: MoodboardFolder[] = snapshot.docs.map(doc => {
+          const data = doc.data()
+          return {
+            id: doc.id,
+            name: data.name || 'Bez názvu',
+            description: data.description || '',
+            coverImageUrl: data.coverImageUrl || undefined,
+            imageCount: data.imageCount || 0,
+            createdAt: data.createdAt?.toDate() || new Date(),
+            updatedAt: data.updatedAt?.toDate() || new Date(),
+            userId: data.userId || '',
+            weddingId: data.weddingId || '',
+            color: data.color || undefined,
+            icon: data.icon || undefined
+          }
+        }) as MoodboardFolder[]
+
+        // Sort folders by creation date (newest first) on the client side
+        loadedFolders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+
+        setFolders(loadedFolders)
+      },
+      (err) => {
+        console.error('Error loading moodboard folders:', err)
+      }
+    )
+
+    return () => unsubscribe()
+  }, [user, wedding?.id])
+
+  // Update folder stats when images change (with debounce)
+  useEffect(() => {
+    if (!user || !wedding?.id || folders.length === 0 || images.length === 0) {
+      return
+    }
+
+    // Debounce to avoid too many updates
+    const timeoutId = setTimeout(async () => {
+      for (const folder of folders) {
+        const folderImages = images.filter(img => img.folderId === folder.id)
+        const imageCount = folderImages.length
+
+        // Only update if count is different
+        if (folder.imageCount !== imageCount) {
+          console.log(`📊 Updating folder ${folder.name}: ${folder.imageCount} -> ${imageCount}`)
+          await updateFolderStats(folder.id)
+        }
+      }
+    }, 1000) // Wait 1 second after last change
+
+    return () => clearTimeout(timeoutId)
+  }, [images.length, folders.length, user, wedding?.id])
+
+  // Get or create AI Moodboards folder
+  const getOrCreateAIFolder = async (): Promise<MoodboardFolder> => {
+    if (!user || !wedding?.id) {
+      throw new Error('User not authenticated or wedding not found')
+    }
+
+    // Check if AI folder already exists
+    const existingFolder = folders.find(f => f.name === 'AI Moodboardy')
+    if (existingFolder) {
+      return existingFolder
+    }
+
+    // Create new AI folder
+    const folderData = {
+      name: 'AI Moodboardy',
+      description: 'Automaticky vygenerované AI moodboardy',
+      weddingId: wedding.id,
+      userId: user.id,
+      imageCount: 0,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      color: '#8B5CF6', // Purple color for AI
+      icon: '✨' // Sparkles icon
+    }
+
+    const docRef = await addDoc(collection(db, 'moodboardFolders'), folderData)
+    console.log('✅ AI Folder created:', docRef.id)
+
+    const newFolder: MoodboardFolder = {
+      id: docRef.id,
+      name: folderData.name,
+      description: folderData.description,
+      coverImageUrl: undefined,
+      imageCount: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      userId: user.id,
+      weddingId: wedding.id,
+      color: folderData.color,
+      icon: folderData.icon
+    }
+
+    return newFolder
+  }
+
+  // Create new folder
+  const createFolder = async (data: {
+    name: string
+    description?: string
+    color?: string
+    icon?: string
+  }): Promise<MoodboardFolder> => {
+    if (!user || !wedding?.id) {
+      throw new Error('User not authenticated or wedding not found')
+    }
+
+    try {
+      const newFolder = {
+        name: data.name,
+        description: data.description || '',
+        coverImageUrl: null,
+        imageCount: 0,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        userId: user.id,
+        weddingId: wedding.id,
+        color: data.color || null,
+        icon: data.icon || null
+      }
+
+      const docRef = await addDoc(collection(db, 'moodboardFolders'), newFolder)
+
+      console.log('✅ Folder created:', docRef.id)
+
+      return {
+        id: docRef.id,
+        name: data.name,
+        description: data.description || '',
+        imageCount: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        userId: user.id,
+        weddingId: wedding.id,
+        color: data.color,
+        icon: data.icon
+      }
+    } catch (err) {
+      console.error('Error creating folder:', err)
+      throw err
+    }
+  }
+
+  // Update folder
+  const updateFolder = async (folderId: string, updates: Partial<MoodboardFolder>): Promise<void> => {
+    try {
+      const folderRef = doc(db, 'moodboardFolders', folderId)
+      await updateDoc(folderRef, {
+        ...updates,
+        updatedAt: serverTimestamp()
+      })
+      console.log('✅ Folder updated:', folderId)
+    } catch (err) {
+      console.error('Error updating folder:', err)
+      throw err
+    }
+  }
+
+  // Delete folder
+  const deleteFolder = async (folderId: string): Promise<void> => {
+    try {
+      // Check if folder has images
+      const imagesInFolder = images.filter(img => img.folderId === folderId)
+      if (imagesInFolder.length > 0) {
+        throw new Error('Nelze smazat složku s obrázky. Nejdříve přesuňte nebo smažte všechny obrázky.')
+      }
+
+      await deleteDoc(doc(db, 'moodboardFolders', folderId))
+      console.log('✅ Folder deleted:', folderId)
+    } catch (err) {
+      console.error('Error deleting folder:', err)
+      throw err
+    }
+  }
+
+  // Update folder image count and cover (using local images state)
+  const updateFolderStats = async (folderId: string): Promise<void> => {
+    try {
+      if (!wedding?.id) return
+
+      // Use local images state to count
+      const folderImages = images.filter(img => img.folderId === folderId)
+      const imageCount = folderImages.length
+      const coverImageUrl = folderImages[0]?.thumbnailUrl || folderImages[0]?.url || null
+
+      await updateDoc(doc(db, 'moodboardFolders', folderId), {
+        imageCount,
+        coverImageUrl,
+        updatedAt: serverTimestamp()
+      })
+
+      console.log(`✅ Updated folder ${folderId} stats: ${imageCount} images`)
+    } catch (err) {
+      console.error('Error updating folder stats:', err)
+    }
+  }
+
+  // Update all folder stats (useful after bulk operations)
+  const updateAllFolderStats = async (): Promise<void> => {
+    try {
+      if (!wedding?.id) return
+
+      for (const folder of folders) {
+        await updateFolderStats(folder.id)
+      }
+
+      console.log('✅ Updated all folder stats')
+    } catch (err) {
+      console.error('Error updating all folder stats:', err)
+    }
+  }
+
   // Upload image file with compression
   const uploadImage = async (file: File, metadata?: {
     title?: string
     description?: string
     tags?: string[]
     category?: WeddingCategory
+    folderId?: string
   }) => {
     if (!user || !wedding?.id) return
 
@@ -288,6 +537,11 @@ export function useMoodboard() {
       const thumbnailSnapshot = await uploadBytes(thumbnailRef, thumbnailFile)
       const thumbnailURL = await getDownloadURL(thumbnailSnapshot.ref)
       
+      // If no folderId provided, throw error (user must select a folder)
+      if (!metadata?.folderId) {
+        throw new Error('Musíte vybrat složku pro uložení obrázku')
+      }
+
       const newImage: Omit<MoodboardImage, 'id'> = {
         url: downloadURL,
         thumbnailUrl: thumbnailURL,
@@ -297,6 +551,7 @@ export function useMoodboard() {
         sourceUrl: '',
         isFavorite: false,
         tags: metadata?.tags || [],
+        folderId: metadata.folderId,
         category: metadata?.category || 'other',
         createdAt: new Date(),
         userId: user.id,
@@ -304,9 +559,9 @@ export function useMoodboard() {
         storageRef: storageRef.fullPath
       }
 
-      console.log('💾 Saving to Firestore with category:', {
+      console.log('💾 Saving to Firestore with folder:', {
+        folderId: newImage.folderId,
         category: newImage.category,
-        metadataCategory: metadata?.category,
         title: newImage.title
       })
 
@@ -323,6 +578,10 @@ export function useMoodboard() {
       }
 
       setImages(prev => [addedImage, ...prev])
+
+      // Update folder stats (image count and cover)
+      await updateFolderStats(metadata.folderId)
+
       return addedImage
     } catch (err) {
       console.error('Error uploading image:', err)
@@ -337,13 +596,15 @@ export function useMoodboard() {
   const removeImage = async (imageId: string) => {
     try {
       setIsLoading(true)
-      
+
       const image = images.find(img => img.id === imageId)
       if (!image) return
 
+      const folderId = image.folderId
+
       // Delete from Firestore
       await deleteDoc(doc(db, 'moodboards', imageId))
-      
+
       // Delete from Storage if it's an uploaded image
       if (image.source === 'upload' && image.storageRef) {
         try {
@@ -355,6 +616,11 @@ export function useMoodboard() {
       }
 
       setImages(prev => prev.filter(img => img.id !== imageId))
+
+      // Update folder stats
+      if (folderId) {
+        await updateFolderStats(folderId)
+      }
     } catch (err) {
       console.error('Error removing image:', err)
       setError('Nepodařilo se smazat obrázek')
@@ -453,6 +719,7 @@ export function useMoodboard() {
       aspectRatio?: string
       style?: string
       seed?: number
+      userPrompt?: string
     }
   ) => {
     if (!user || !wedding?.id) {
@@ -489,7 +756,11 @@ export function useMoodboard() {
       const analyzeResponse = await fetch('/api/ai/moodboard/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageUrls, weddingContext })
+        body: JSON.stringify({
+          imageUrls,
+          weddingContext,
+          userPrompt: options?.userPrompt // Pass user prompt to API
+        })
       })
 
       if (!analyzeResponse.ok) {
@@ -541,8 +812,13 @@ export function useMoodboard() {
       const { description } = await describeResponse.json()
       console.log('✅ Description generated')
 
-      // Step 4: Save to Firebase Storage and Firestore
-      console.log('💾 Step 4: Saving to Firebase...')
+      // Step 4: Get or create AI folder
+      console.log('📁 Step 4: Getting AI folder...')
+      const aiFolder = await getOrCreateAIFolder()
+      console.log('✅ AI Folder ready:', aiFolder.id)
+
+      // Step 5: Save to Firebase Storage and Firestore
+      console.log('💾 Step 5: Saving to Firebase...')
 
       // Download generated image via proxy to bypass CORS
       const proxyResponse = await fetch('/api/ai/moodboard/save', {
@@ -573,7 +849,7 @@ export function useMoodboard() {
       const thumbnailSnapshot = await uploadBytes(thumbnailRef, imageBlob)
       const thumbnailURL = await getDownloadURL(thumbnailSnapshot.ref)
 
-      // Save to Firestore
+      // Save to Firestore with AI folder assignment
       const newImage: Omit<MoodboardImage, 'id'> = {
         url: downloadURL,
         thumbnailUrl: thumbnailURL,
@@ -583,6 +859,7 @@ export function useMoodboard() {
         sourceUrl: generatedImageUrl,
         isFavorite: false,
         tags: analysis.colors || [],
+        folderId: aiFolder.id, // Assign to AI folder
         category: 'other',
         createdAt: new Date(),
         userId: user.id,
@@ -608,6 +885,9 @@ export function useMoodboard() {
 
       console.log('✅ AI Moodboard saved successfully!')
 
+      // Update AI folder stats
+      await updateFolderStats(aiFolder.id)
+
       setIsLoading(false)
 
       return {
@@ -625,8 +905,38 @@ export function useMoodboard() {
     }
   }
 
+  // Move image to different folder
+  const moveImageToFolder = async (imageId: string, newFolderId: string): Promise<void> => {
+    try {
+      const image = images.find(img => img.id === imageId)
+      if (!image) return
+
+      const oldFolderId = image.folderId
+
+      await updateDoc(doc(db, 'moodboards', imageId), {
+        folderId: newFolderId
+      })
+
+      setImages(prev => prev.map(img =>
+        img.id === imageId ? { ...img, folderId: newFolderId } : img
+      ))
+
+      // Update both folder stats
+      if (oldFolderId) {
+        await updateFolderStats(oldFolderId)
+      }
+      await updateFolderStats(newFolderId)
+
+      console.log('✅ Image moved to new folder')
+    } catch (err) {
+      console.error('Error moving image:', err)
+      throw err
+    }
+  }
+
   return {
     images,
+    folders,
     isLoading,
     error,
     addImage,
@@ -635,6 +945,12 @@ export function useMoodboard() {
     toggleFavorite,
     updateImagePosition,
     updateImageCategory,
-    generateAIMoodboard
+    generateAIMoodboard,
+    createFolder,
+    updateFolder,
+    deleteFolder,
+    moveImageToFolder,
+    updateFolderStats,
+    updateAllFolderStats
   }
 }
