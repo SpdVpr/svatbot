@@ -10,6 +10,7 @@ import { useVendor } from '@/hooks/useVendor'
 import { useRecommendationRotation } from '@/hooks/useRecommendationRotation'
 import { WEDDING_CHECKLIST } from '@/data/weddingChecklistTemplates'
 import { dateUtils } from '@/utils'
+import NumberCounter from '@/components/animations/NumberCounter'
 
 interface WeddingCountdownModuleProps {
   onWeddingSettingsClick: () => void
@@ -735,7 +736,11 @@ export default function WeddingCountdownModule({ onWeddingSettingsClick }: Weddi
           {daysUntilWedding !== null ? (
             <div>
               <div className="text-3xl sm:text-5xl font-bold text-primary-600 scale-in leading-tight">
-                {daysUntilWedding > 0 ? daysUntilWedding : 0}
+                <NumberCounter
+                  end={daysUntilWedding > 0 ? daysUntilWedding : 0}
+                  duration={2000}
+                  className="inline-block"
+                />
               </div>
               <p className="text-base sm:text-lg font-semibold text-text-primary slide-in-bottom mt-1">
                 {daysUntilWedding > 0
@@ -794,19 +799,27 @@ export default function WeddingCountdownModule({ onWeddingSettingsClick }: Weddi
         <div className="pt-2 border-t border-gray-100">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             <div className="text-center py-1">
-              <div className="text-base sm:text-lg font-bold text-blue-600 leading-tight">{stats.total}</div>
+              <div className="text-base sm:text-lg font-bold text-blue-600 leading-tight">
+                <NumberCounter end={stats.total} duration={1500} />
+              </div>
               <div className="text-xs text-text-muted leading-tight">Úkolů</div>
             </div>
             <div className="text-center py-1">
-              <div className="text-base sm:text-lg font-bold text-primary-600 leading-tight">{guestStats.total}</div>
+              <div className="text-base sm:text-lg font-bold text-primary-600 leading-tight">
+                <NumberCounter end={guestStats.total} duration={1500} />
+              </div>
               <div className="text-xs text-text-muted leading-tight">Hostů</div>
             </div>
             <div className="text-center py-1">
-              <div className="text-base sm:text-lg font-bold text-green-600 leading-tight">{Math.round(budgetStats.totalBudget / 1000)}k</div>
+              <div className="text-base sm:text-lg font-bold text-green-600 leading-tight">
+                <NumberCounter end={Math.round(budgetStats.totalBudget / 1000)} duration={1500} suffix="k" />
+              </div>
               <div className="text-xs text-text-muted leading-tight">Rozpočet</div>
             </div>
             <div className="text-center py-1">
-              <div className="text-base sm:text-lg font-bold text-purple-600 leading-tight">{vendorStats.totalVendors}</div>
+              <div className="text-base sm:text-lg font-bold text-purple-600 leading-tight">
+                <NumberCounter end={vendorStats.totalVendors} duration={1500} />
+              </div>
               <div className="text-xs text-text-muted leading-tight">Dodavatelů</div>
             </div>
           </div>

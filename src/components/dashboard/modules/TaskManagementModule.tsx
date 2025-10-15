@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { List, CheckCircle, Clock, AlertTriangle, ArrowRight } from 'lucide-react'
 import { useTask } from '@/hooks/useTask'
+import NumberCounter from '@/components/animations/NumberCounter'
 
 export default function TaskManagementModule() {
   const { stats } = useTask()
@@ -18,10 +19,12 @@ export default function TaskManagementModule() {
 
       <div className="space-y-4">
         {/* Progress Overview */}
-        <div className="bg-blue-50 p-4 rounded-lg">
+        <div className="bg-blue-50 p-4 rounded-lg glass-morphism">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-blue-900">Celkový pokrok</span>
-            <span className="text-lg font-bold text-blue-600">{stats.completionRate}%</span>
+            <span className="text-lg font-bold text-blue-600">
+              <NumberCounter end={stats.completionRate} duration={1500} suffix="%" />
+            </span>
           </div>
           <div className="w-full bg-blue-200 rounded-full h-2">
             <div
@@ -30,31 +33,37 @@ export default function TaskManagementModule() {
             />
           </div>
           <div className="text-xs text-blue-700 mt-1">
-            {stats.completed} z {stats.total} úkolů dokončeno
+            <NumberCounter end={stats.completed} duration={1200} className="inline-block" /> z <NumberCounter end={stats.total} duration={1200} className="inline-block" /> úkolů dokončeno
           </div>
         </div>
 
         {/* Quick Stats */}
         <div className="grid grid-cols-3 gap-3">
-          <div className="text-center">
-            <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg mx-auto mb-1">
+          <div className="text-center hover-lift">
+            <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg mx-auto mb-1 float-enhanced">
               <CheckCircle className="w-4 h-4 text-green-600" />
             </div>
-            <div className="text-lg font-bold text-gray-900">{stats.completed}</div>
+            <div className="text-lg font-bold text-gray-900">
+              <NumberCounter end={stats.completed} duration={1500} />
+            </div>
             <div className="text-xs text-gray-500">Dokončeno</div>
           </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center w-8 h-8 bg-yellow-100 rounded-lg mx-auto mb-1">
+          <div className="text-center hover-lift">
+            <div className="flex items-center justify-center w-8 h-8 bg-yellow-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.2s' }}>
               <Clock className="w-4 h-4 text-yellow-600" />
             </div>
-            <div className="text-lg font-bold text-gray-900">{stats.inProgress}</div>
+            <div className="text-lg font-bold text-gray-900">
+              <NumberCounter end={stats.inProgress} duration={1500} />
+            </div>
             <div className="text-xs text-gray-500">Probíhá</div>
           </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center w-8 h-8 bg-red-100 rounded-lg mx-auto mb-1">
+          <div className="text-center hover-lift">
+            <div className="flex items-center justify-center w-8 h-8 bg-red-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.4s' }}>
               <AlertTriangle className="w-4 h-4 text-red-600" />
             </div>
-            <div className="text-lg font-bold text-gray-900">{stats.overdue}</div>
+            <div className="text-lg font-bold text-gray-900">
+              <NumberCounter end={stats.overdue} duration={1500} />
+            </div>
             <div className="text-xs text-gray-500">Po termínu</div>
           </div>
         </div>

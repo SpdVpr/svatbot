@@ -28,6 +28,7 @@ import { useWeddingNotifications, useLiveToastNotifications } from '@/hooks/useW
 import { createDemoNotifications, createTestToast } from '@/utils/demoNotifications'
 import { useAutoNotifications } from '@/hooks/useAutoNotifications'
 import OnboardingWizard from '@/components/onboarding/OnboardingWizard'
+import ScrollProgress from '@/components/animations/ScrollProgress'
 
 function DashboardContent() {
   const { currentWedding } = useWeddingStore()
@@ -112,6 +113,9 @@ function DashboardContent() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Scroll Progress Indicator */}
+      <ScrollProgress />
+
       {/* Glassmorphism Header */}
       <header className="bg-white/80 backdrop-blur-xl border-b border-white/20 shadow-sm sticky top-0 z-50">
         {/* Mobile Header */}
