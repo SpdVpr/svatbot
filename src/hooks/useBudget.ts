@@ -210,6 +210,7 @@ export function useBudget(): UseBudgetReturn {
         vendorName: data.vendorName,
         paymentStatus: data.paymentStatus,
         paymentMethod: data.paymentMethod,
+        paymentPeriod: data.paymentPeriod,
         dueDate: data.dueDate,
         paidDate: data.paidDate,
         priority: data.priority,

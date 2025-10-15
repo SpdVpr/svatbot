@@ -328,6 +328,18 @@ export default function TaskCard({
                   {categoryDisplay.label}
                 </span>
               )}
+
+              {/* Add to Calendar button */}
+              {!compact && (
+                <button
+                  onClick={handleAddToCalendar}
+                  className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 transition-colors"
+                  title="Přidat do kalendáře"
+                >
+                  <CalendarPlus className="w-3 h-3" />
+                  <span className="text-xs font-medium">Kalendář</span>
+                </button>
+              )}
             </div>
 
             {/* Priority for compact mode */}
