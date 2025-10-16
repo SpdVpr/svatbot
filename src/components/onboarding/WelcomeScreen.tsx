@@ -5,13 +5,8 @@ import { Heart, Sparkles, CheckSquare, Users, CreditCard, Clock, Calendar, Check
 import { cn } from '@/utils'
 import { useAuth } from '@/hooks/useAuth'
 import AuthModal from '@/components/auth/AuthModal'
-import MorphingBlobs from '@/components/animations/MorphingBlobs'
 import ScrollProgress from '@/components/animations/ScrollProgress'
-import AmbientParticles from '@/components/animations/AmbientParticles'
-import CardTilt from '@/components/animations/CardTilt'
 import NumberCounter from '@/components/animations/NumberCounter'
-import ParallaxSection from '@/components/animations/ParallaxSection'
-import TextReveal from '@/components/animations/TextReveal'
 
 export default function WelcomeScreen() {
   const { login, clearError } = useAuth()
@@ -75,28 +70,22 @@ export default function WelcomeScreen() {
         </div>
       </header>
 
-      <section className="bg-gradient-hero py-12 md:py-20 lg:py-32 relative overflow-hidden">
-        {/* Morphing Blobs Background */}
-        <MorphingBlobs />
-
-        {/* Ambient Particles */}
-        <AmbientParticles count={30} />
-
-        <div className="absolute inset-0 z-0 opacity-20">
+      <section className="bg-gradient-hero py-12 md:py-20 lg:py-32 relative overflow-hidden touch-pan-y">
+        <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
           <div className="w-full h-full transform scale-150"></div>
         </div>
         <div className="container mx-auto px-4 md:px-6 relative z-10 flex flex-col lg:flex-row items-center justify-between">
-          <div className="lg:w-1/2 text-center lg:text-left mb-8 lg:mb-0 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-            <span className="inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-rose-100 text-rose-700 text-xs md:text-sm font-semibold rounded-full mb-4 md:mb-6 shadow-sm">
+          <div className="lg:w-1/2 text-center mb-8 lg:mb-0 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <span className="inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-rose-100 text-rose-700 text-xs md:text-sm font-semibold rounded-full mb-4 md:mb-6 shadow-sm mx-auto">
               <Sparkles className="w-3 h-3 md:w-4 md:h-4 mr-1.5 md:mr-2 text-rose-500" /> První český svatební plánovač s AI
             </span>
             <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-display font-extrabold leading-tight mb-4 md:mb-6 text-gray-900">
               Plánujte svatbu snů <span className="text-gradient-primary">s AI pomocníkem</span> & bez stresu
             </h1>
-            <p className="text-base md:text-lg lg:text-xl text-gray-600 mb-6 md:mb-10 max-w-lg lg:max-w-xl mx-auto lg:mx-0">
+            <p className="text-base md:text-lg lg:text-xl text-gray-600 mb-6 md:mb-10 max-w-lg lg:max-w-xl mx-auto">
               SvatBot.cz kombinuje AI technologie s intuitivními nástroji: inteligentní asistent, rozpočet, timeline, hosté, seating plan, svatební web a marketplace ověřených dodavatelů – vše na jedné platformě.
             </p>
-            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 justify-center lg:justify-start">
+            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 justify-center">
               <button onClick={handleDemoLogin} disabled={isDemoLoading} className={cn("px-6 py-3 md:px-8 md:py-4 bg-rose-500 text-white font-semibold text-base md:text-lg rounded-full shadow-lg hover:bg-rose-600 transition-all duration-300 button-glow flex items-center justify-center", isDemoLoading && "opacity-50 cursor-not-allowed")}>
                 {isDemoLoading ? (
                   <>
@@ -126,60 +115,52 @@ export default function WelcomeScreen() {
         </div>
       </section>
 
-      <section id="features" className="py-12 md:py-16 lg:py-20 bg-white">
+      <section id="features" className="py-12 md:py-16 lg:py-20 bg-white touch-pan-y">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-8 md:mb-12 lg:mb-16">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-gray-900 mb-4 md:mb-6 animate-slide-up" style={{ animationDelay: '100ms' }}>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-gray-900 mb-4 md:mb-6">
               Vše, co potřebujete pro <span className="text-gradient-primary">dokonalou svatbu</span>
             </h2>
-            <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto animate-slide-up" style={{ animationDelay: '200ms' }}>
+            <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
               Komplexní sada nástrojů s AI technologiemi pro bezproblémové plánování svatby od začátku do konce.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 max-w-7xl mx-auto">
-            <CardTilt className="stagger-fade-enhanced" style={{ animationDelay: '300ms' }}>
-              <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover-lift h-full">
-                <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mb-6 shadow-sm float-enhanced">
-                  <Sparkles className="w-8 h-8 text-rose-500" />
-                </div>
-                <h3 className="text-2xl font-display font-semibold text-gray-900 mb-3">AI Svatební Asistent</h3>
-                <p className="text-gray-600 leading-relaxed">Inteligentní kouč s GPT-4 a Perplexity AI, který odpovídá na otázky a poskytuje personalizované rady 24/7.</p>
+            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow h-full text-center">
+              <div className="w-14 h-14 md:w-16 md:h-16 bg-rose-100 rounded-full flex items-center justify-center mb-4 md:mb-6 shadow-sm mx-auto">
+                <Sparkles className="w-7 h-7 md:w-8 md:h-8 text-rose-500" />
               </div>
-            </CardTilt>
-            <CardTilt className="stagger-fade-enhanced" style={{ animationDelay: '400ms' }}>
-              <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover-lift h-full">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-6 shadow-sm float-enhanced" style={{ animationDelay: '0.5s' }}>
-                  <Users className="w-8 h-8 text-purple-500" />
-                </div>
-                <h3 className="text-2xl font-display font-semibold text-gray-900 mb-3">Správa hostů & RSVP</h3>
-                <p className="text-gray-600 leading-relaxed">Kompletní správa hostů s RSVP systémem, dietními omezeními, seating planem a exportem do Excel.</p>
+              <h3 className="text-xl md:text-2xl font-display font-semibold text-gray-900 mb-2 md:mb-3">AI Svatební Asistent</h3>
+              <p className="text-sm md:text-base text-gray-600 leading-relaxed">Inteligentní kouč s GPT-4 a Perplexity AI, který odpovídá na otázky a poskytuje personalizované rady 24/7.</p>
+            </div>
+            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow h-full text-center">
+              <div className="w-14 h-14 md:w-16 md:h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4 md:mb-6 shadow-sm mx-auto">
+                <Users className="w-7 h-7 md:w-8 md:h-8 text-purple-500" />
               </div>
-            </CardTilt>
-            <CardTilt className="stagger-fade-enhanced" style={{ animationDelay: '500ms' }}>
-              <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover-lift h-full">
-                <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-6 shadow-sm float-enhanced" style={{ animationDelay: '1s' }}>
-                  <CreditCard className="w-8 h-8 text-emerald-500" />
-                </div>
-                <h3 className="text-2xl font-display font-semibold text-gray-900 mb-3">Inteligentní rozpočet</h3>
-                <p className="text-gray-600 leading-relaxed">AI optimalizace rozpočtu, sledování výdajů, grafy a statistiky s propojením na dodavatele.</p>
+              <h3 className="text-xl md:text-2xl font-display font-semibold text-gray-900 mb-2 md:mb-3">Správa hostů & RSVP</h3>
+              <p className="text-sm md:text-base text-gray-600 leading-relaxed">Kompletní správa hostů s RSVP systémem, dietními omezeními, seating planem a exportem do Excel.</p>
+            </div>
+            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow h-full text-center">
+              <div className="w-14 h-14 md:w-16 md:h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-4 md:mb-6 shadow-sm mx-auto">
+                <CreditCard className="w-7 h-7 md:w-8 md:h-8 text-emerald-500" />
               </div>
-            </CardTilt>
-            <CardTilt className="stagger-fade-enhanced" style={{ animationDelay: '600ms' }}>
-              <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover-lift h-full">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6 shadow-sm float-enhanced" style={{ animationDelay: '1.5s' }}>
-                  <CheckSquare className="w-8 h-8 text-blue-500" />
-                </div>
-                <h3 className="text-2xl font-display font-semibold text-gray-900 mb-3">Úkoly & Timeline</h3>
-                <p className="text-gray-600 leading-relaxed">Předpřipravený checklist 200+ úkolů s AI prioritizací a automatickým generováním timeline.</p>
+              <h3 className="text-xl md:text-2xl font-display font-semibold text-gray-900 mb-2 md:mb-3">Inteligentní rozpočet</h3>
+              <p className="text-sm md:text-base text-gray-600 leading-relaxed">AI optimalizace rozpočtu, sledování výdajů, grafy a statistiky s propojením na dodavatele.</p>
+            </div>
+            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow h-full text-center">
+              <div className="w-14 h-14 md:w-16 md:h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4 md:mb-6 shadow-sm mx-auto">
+                <CheckSquare className="w-7 h-7 md:w-8 md:h-8 text-blue-500" />
               </div>
-            </CardTilt>
+              <h3 className="text-xl md:text-2xl font-display font-semibold text-gray-900 mb-2 md:mb-3">Úkoly & Timeline</h3>
+              <p className="text-sm md:text-base text-gray-600 leading-relaxed">Předpřipravený checklist 200+ úkolů s AI prioritizací a automatickým generováním timeline.</p>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="py-12 md:py-16 lg:py-20 bg-rose-50">
+      <section className="py-12 md:py-16 lg:py-20 bg-rose-50 touch-pan-y">
         <div className="container mx-auto px-4 md:px-6 text-center">
-          <div className="max-w-4xl mx-auto p-6 md:p-10 lg:p-12 bg-white rounded-2xl md:rounded-3xl shadow-xl border border-rose-100 animate-fade-in" style={{ animationDelay: '700ms' }}>
+          <div className="max-w-4xl mx-auto p-6 md:p-10 lg:p-12 bg-white rounded-2xl md:rounded-3xl shadow-xl border border-rose-100">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold text-gray-900 mb-4 md:mb-6">
               Připraveni vyzkoušet <span className="text-gradient-primary">plánování bez námahy</span>?
             </h2>
@@ -231,17 +212,15 @@ export default function WelcomeScreen() {
         </div>
       </section>
 
-      <section id="dashboard" className="py-12 md:py-16 lg:py-20 bg-gray-50">
+      <section id="dashboard" className="py-12 md:py-16 lg:py-20 bg-gray-50 touch-pan-y">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-8 md:mb-12 lg:mb-16">
-            <TextReveal mode="line" className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-gray-900 mb-4 md:mb-6" delay={100}>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-gray-900 mb-4 md:mb-6">
               Váš přizpůsobitelný dashboard
-            </TextReveal>
-            <ParallaxSection speed="slow">
-              <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto animate-slide-up" style={{ animationDelay: '200ms' }}>
-                Drag & drop dashboard s <NumberCounter end={18} suffix="+" className="text-gradient-accent font-bold" /> moduly včetně AI asistenta. Přesuňte, změňte velikost a skryjte moduly podle vašich potřeb.
-              </p>
-            </ParallaxSection>
+            </h2>
+            <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
+              Drag & drop dashboard s <NumberCounter end={18} suffix="+" className="text-gradient-accent font-bold" /> moduly včetně AI asistenta. Přesuňte, změňte velikost a skryjte moduly podle vašich potřeb.
+            </p>
           </div>
           <div className="relative max-w-6xl mx-auto animate-fade-in" style={{ animationDelay: '0.3s' }}>
             <div className="bg-white rounded-2xl md:rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
@@ -376,56 +355,56 @@ export default function WelcomeScreen() {
         </div>
       </section>
 
-      <section className="py-12 md:py-16 lg:py-20 bg-gradient-to-br from-rose-50 via-purple-50 to-blue-50">
+      <section className="py-12 md:py-16 lg:py-20 bg-gradient-to-br from-rose-50 via-purple-50 to-blue-50 touch-pan-y">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-8 md:mb-12 lg:mb-16">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-gray-900 mb-4 md:mb-6 animate-slide-up" style={{ animationDelay: '100ms' }}>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-gray-900 mb-4 md:mb-6">
               Pokročilé funkce: <span className="text-gradient-accent">Vše pro perfektní svatbu</span>
             </h2>
-            <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto animate-slide-up" style={{ animationDelay: '200ms' }}>
+            <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
               Kompletní sada nástrojů pro profesionální plánování svatby s moderními technologiemi.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 max-w-7xl mx-auto">
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 card-hover-scale animate-slide-up" style={{ animationDelay: '300ms' }}>
-              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-6 shadow-sm">
-                <Store className="w-8 h-8 text-yellow-500" />
+            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow text-center">
+              <div className="w-14 h-14 md:w-16 md:h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-4 md:mb-6 shadow-sm mx-auto">
+                <Store className="w-7 h-7 md:w-8 md:h-8 text-yellow-500" />
               </div>
-              <h3 className="text-2xl font-display font-semibold text-gray-900 mb-3">Marketplace dodavatelů</h3>
-              <p className="text-gray-600 leading-relaxed">Databáze 200+ ověřených dodavatelů s reálnými portfolii, Google recenzemi a AI doporučeními.</p>
+              <h3 className="text-xl md:text-2xl font-display font-semibold text-gray-900 mb-2 md:mb-3">Marketplace dodavatelů</h3>
+              <p className="text-sm md:text-base text-gray-600 leading-relaxed">Databáze 200+ ověřených dodavatelů s reálnými portfolii, Google recenzemi a AI doporučeními.</p>
             </div>
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 card-hover-scale animate-slide-up" style={{ animationDelay: '400ms' }}>
-              <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mb-6 shadow-sm">
-                <Users className="w-8 h-8 text-pink-500" />
+            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow text-center">
+              <div className="w-14 h-14 md:w-16 md:h-16 bg-pink-100 rounded-full flex items-center justify-center mb-4 md:mb-6 shadow-sm mx-auto">
+                <Users className="w-7 h-7 md:w-8 md:h-8 text-pink-500" />
               </div>
-              <h3 className="text-2xl font-display font-semibold text-gray-900 mb-3">Seating Plan Editor</h3>
-              <p className="text-gray-600 leading-relaxed">Interaktivní editor s drag & drop, přizpůsobitelné stoly (kulaté/čtvercové) a automatické rozmístění hostů.</p>
+              <h3 className="text-xl md:text-2xl font-display font-semibold text-gray-900 mb-2 md:mb-3">Seating Plan Editor</h3>
+              <p className="text-sm md:text-base text-gray-600 leading-relaxed">Interaktivní editor s drag & drop, přizpůsobitelné stoly (kulaté/čtvercové) a automatické rozmístění hostů.</p>
             </div>
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 card-hover-scale animate-slide-up" style={{ animationDelay: '500ms' }}>
-              <div className="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mb-6 shadow-sm">
-                <Cloud className="w-8 h-8 text-teal-500" />
+            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow text-center">
+              <div className="w-14 h-14 md:w-16 md:h-16 bg-teal-100 rounded-full flex items-center justify-center mb-4 md:mb-6 shadow-sm mx-auto">
+                <Cloud className="w-7 h-7 md:w-8 md:h-8 text-teal-500" />
               </div>
-              <h3 className="text-2xl font-display font-semibold text-gray-900 mb-3">Svatební web builder</h3>
-              <p className="text-gray-600 leading-relaxed">Vytvořte vlastní svatební web s RSVP systémem, fotogalerií a vlastní doménou – vše bez kódování.</p>
+              <h3 className="text-xl md:text-2xl font-display font-semibold text-gray-900 mb-2 md:mb-3">Svatební web builder</h3>
+              <p className="text-sm md:text-base text-gray-600 leading-relaxed">Vytvořte vlastní svatební web s RSVP systémem, fotogalerií a vlastní doménou – vše bez kódování.</p>
             </div>
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 card-hover-scale animate-slide-up" style={{ animationDelay: '600ms' }}>
-              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-6 shadow-sm">
-                <Calendar className="w-8 h-8 text-orange-500" />
+            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow text-center">
+              <div className="w-14 h-14 md:w-16 md:h-16 bg-orange-100 rounded-full flex items-center justify-center mb-4 md:mb-6 shadow-sm mx-auto">
+                <Calendar className="w-7 h-7 md:w-8 md:h-8 text-orange-500" />
               </div>
-              <h3 className="text-2xl font-display font-semibold text-gray-900 mb-3">Google Calendar & Spotify</h3>
-              <p className="text-gray-600 leading-relaxed">Integrace s Google Calendar pro synchronizaci událostí a Spotify pro vytváření svatebních playlistů.</p>
+              <h3 className="text-xl md:text-2xl font-display font-semibold text-gray-900 mb-2 md:mb-3">Google Calendar & Spotify</h3>
+              <p className="text-sm md:text-base text-gray-600 leading-relaxed">Integrace s Google Calendar pro synchronizaci událostí a Spotify pro vytváření svatebních playlistů.</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-12 md:py-16 lg:py-20 bg-white border-t border-gray-100">
+      <section className="py-12 md:py-16 lg:py-20 bg-white border-t border-gray-100 touch-pan-y">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-8 md:mb-12 lg:mb-16">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-gray-900 mb-4 md:mb-6 animate-slide-up" style={{ animationDelay: '100ms' }}>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-gray-900 mb-4 md:mb-6">
               Proč zvolit <span className="text-gradient-primary">SvatBot.cz</span>?
             </h2>
-            <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto animate-slide-up" style={{ animationDelay: '200ms' }}>
+            <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
               Moderní přístup k plánování svatby, zaměřený na jednoduchost, eleganci a efektivitu.
             </p>
           </div>
@@ -455,9 +434,9 @@ export default function WelcomeScreen() {
         </div>
       </section>
 
-      <section id="vendors" className="py-12 md:py-16 lg:py-20 bg-gradient-to-br from-yellow-50 to-orange-50">
+      <section id="vendors" className="py-12 md:py-16 lg:py-20 bg-gradient-to-br from-yellow-50 to-orange-50 touch-pan-y">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="max-w-6xl mx-auto bg-white rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row animate-fade-in" style={{ animationDelay: '0.1s' }}>
+          <div className="max-w-6xl mx-auto bg-white rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
             <div className="md:w-1/2 p-6 md:p-10 lg:p-12 bg-gradient-to-br from-rose-500 to-purple-500 text-white flex flex-col justify-between">
               <div>
                 <div className="flex items-center space-x-2 md:space-x-3 mb-4 md:mb-6">
