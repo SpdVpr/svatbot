@@ -75,6 +75,23 @@
   body {
     min-height: 100vh;
   }
+
+  /* Smooth page transitions */
+  * {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  /* Disable transitions for specific elements */
+  input, textarea, select, button {
+    transition: none;
+  }
+
+  /* Re-enable for hover states */
+  button:hover, a:hover {
+    transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
 }
 
 @layer components {
@@ -305,6 +322,15 @@
   }
   50% {
     transform: translateY(-5px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
   }
 }
 

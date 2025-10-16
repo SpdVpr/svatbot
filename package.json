@@ -51,6 +51,7 @@
     "clsx": "^2.0.0",
     "date-fns": "^2.30.0",
     "firebase": "^10.14.1",
+    "framer-motion": "^12.23.24",
     "google-auth-library": "^9.15.1",
     "lucide-react": "^0.290.0",
     "next": "^14.0.0",

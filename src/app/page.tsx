@@ -6,13 +6,22 @@ import WelcomeScreen from '@/components/onboarding/WelcomeScreen'
 import OnboardingFlow from '@/components/onboarding/OnboardingFlow'
 import Dashboard from '@/components/dashboard/Dashboard'
 import LoadingScreen from '@/components/ui/LoadingScreen'
+import { useEffect, useState } from 'react'
 
 export default function HomePage() {
   const { user, isInitialized } = useAuth()
   const { wedding } = useWedding()
+  const [showContent, setShowContent] = useState(false)
 
-  // Show loading while checking auth state
-  if (!isInitialized || user === undefined) {
+  // Show content immediately after initialization to prevent flickering
+  useEffect(() => {
+    if (isInitialized) {
+      setShowContent(true)
+    }
+  }, [isInitialized])
+
+  // Show minimal loading only on first load
+  if (!isInitialized || !showContent) {
     return <LoadingScreen message="Načítání..." />
   }
 

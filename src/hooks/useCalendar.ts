@@ -5,7 +5,6 @@ import { collection, query, where, onSnapshot, addDoc, updateDoc, deleteDoc, doc
 import { db } from '@/lib/firebase'
 import { useAuth } from './useAuth'
 import { useWedding } from './useWedding'
-import { useTask } from './useTask'
 import { useVendor } from './useVendor'
 import { useWeddingDayTimeline } from './useWeddingDayTimeline'
 import {
@@ -23,7 +22,6 @@ import {
 export function useCalendar() {
   const { user } = useAuth()
   const { wedding } = useWedding()
-  const { tasks } = useTask()
   const { vendors } = useVendor()
   const { timeline: weddingDayEvents } = useWeddingDayTimeline()
 
@@ -87,39 +85,8 @@ export function useCalendar() {
       })
     })
 
-    // Add events from tasks
-    tasks?.forEach(task => {
-      if (task.dueDate) {
-        const event: CalendarEvent = {
-          id: `task-${task.id}`,
-          weddingId: wedding?.id || '',
-          userId: user?.id || '',
-          title: task.title,
-          description: task.description,
-          type: 'task' as EventType,
-          source: 'tasks' as EventSource,
-          sourceId: task.id,
-          startDate: new Date(task.dueDate),
-          isAllDay: true,
-          status: task.status === 'completed' ? 'completed' : 'upcoming',
-          priority: (task.priority || 'medium') as EventPriority,
-          isCompleted: task.status === 'completed',
-          reminders: [],
-          recurrence: 'none',
-          isOnline: false,
-          createdAt: task.createdAt || new Date(),
-          updatedAt: task.updatedAt || new Date(),
-          createdBy: user?.id || ''
-        }
-
-        aggregated.push({
-          event,
-          sourceData: { taskId: task.id },
-          canEdit: false, // Edit in tasks module
-          canDelete: false
-        })
-      }
-    })
+    // Note: Tasks are no longer automatically added to calendar
+    // Users must manually add tasks to calendar using the "Add to Calendar" button in TaskList
 
     // TODO: Add events from vendors (appointments)
     // Vendor appointments should be stored in a separate collection or in vendor.appointments array
@@ -167,10 +134,10 @@ export function useCalendar() {
     }
 
     // Sort by date
-    return aggregated.sort((a, b) => 
+    return aggregated.sort((a, b) =>
       a.event.startDate.getTime() - b.event.startDate.getTime()
     )
-  }, [customEvents, tasks, vendors, weddingDayEvents, wedding, user])
+  }, [customEvents, vendors, weddingDayEvents, wedding, user])
 
   // Calculate statistics
   const stats = useMemo((): CalendarStats => {

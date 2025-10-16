@@ -78,11 +78,12 @@ export default function MoodboardModule() {
                 }}
               >
                 <Image
-                  src={image.thumbnailUrl || image.url}
+                  src={image.url}
                   alt={image.title || 'Moodboard image'}
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 33vw, (max-width: 1024px) 20vw, 15vw"
+                  quality={90}
                 />
 
                 {/* Gradient overlay */}

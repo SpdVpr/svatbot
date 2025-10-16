@@ -5,7 +5,6 @@ import { Heart, Sparkles, CheckSquare, Users, CreditCard, Clock, Calendar, Check
 import { cn } from '@/utils'
 import { useAuth } from '@/hooks/useAuth'
 import AuthModal from '@/components/auth/AuthModal'
-import CustomCursor from '@/components/animations/CustomCursor'
 import MorphingBlobs from '@/components/animations/MorphingBlobs'
 import ScrollProgress from '@/components/animations/ScrollProgress'
 import AmbientParticles from '@/components/animations/AmbientParticles'
@@ -49,9 +48,6 @@ export default function WelcomeScreen() {
 
   return (
     <>
-      {/* Custom Cursor */}
-      <CustomCursor />
-
       {/* Scroll Progress */}
       <ScrollProgress />
 

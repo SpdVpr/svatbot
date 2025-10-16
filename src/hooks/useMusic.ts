@@ -107,6 +107,13 @@ const DEFAULT_CATEGORIES: MusicCategory[] = [
     songs: []
   },
   {
+    id: 'sparkler-dance',
+    name: 'Prskavkový tanec',
+    description: 'Tanec s prskavkami',
+    icon: '✨',
+    songs: []
+  },
+  {
     id: 'cake-cutting',
     name: 'Krájení dortu',
     description: 'Hudba při krájení svatebního dortu',
@@ -228,6 +235,33 @@ export function useMusic() {
     return categories
   }
 
+  // Add sparkler-dance category if missing
+  const ensureSparklerDanceCategory = (categories: MusicCategory[]): MusicCategory[] => {
+    const hasSparklerDance = categories.some(cat => cat.id === 'sparkler-dance')
+    if (!hasSparklerDance) {
+      // Find parent-dance index to insert after it
+      const parentDanceIndex = categories.findIndex(cat => cat.id === 'parent-dance')
+      const newCategory: MusicCategory = {
+        id: 'sparkler-dance',
+        name: 'Prskavkový tanec',
+        description: 'Tanec s prskavkami',
+        icon: '✨',
+        songs: []
+      }
+
+      if (parentDanceIndex >= 0) {
+        // Insert after parent-dance
+        const newCategories = [...categories]
+        newCategories.splice(parentDanceIndex + 1, 0, newCategory)
+        return newCategories
+      } else {
+        // Add at the end if parent-dance not found
+        return [...categories, newCategory]
+      }
+    }
+    return categories
+  }
+
   // Load music data from Firestore with real-time updates
   useEffect(() => {
     if (!wedding?.id) {
@@ -259,10 +293,11 @@ export function useMusic() {
           setVendors(data.vendors || [])
         }
 
-        // Migrate old categories and ensure ring-exchange exists
+        // Migrate old categories and ensure ring-exchange and sparkler-dance exist
         let loadedCategories = data.categories || DEFAULT_CATEGORIES
         loadedCategories = migrateCategories(loadedCategories)
         loadedCategories = ensureRingExchangeCategory(loadedCategories)
+        loadedCategories = ensureSparklerDanceCategory(loadedCategories)
         setCategories(loadedCategories)
       } else {
         setMusicId(null)

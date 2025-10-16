@@ -318,7 +318,7 @@ export function useAuth() {
             }
           }
         }
-      }, 300) // 300ms debounce delay
+      }, 100) // Reduced to 100ms for faster response
     })
 
     return () => {

@@ -219,11 +219,12 @@ export default function MoodboardGrid({
               style={{ minHeight: '150px' }}
             >
               <Image
-                src={image.thumbnailUrl || image.url}
+                src={image.url}
                 alt={image.title || 'Moodboard obrázek'}
                 fill
                 className="object-cover transition-transform group-hover:scale-105"
                 sizes="(max-width: 768px) 50vw, 25vw"
+                quality={90}
               />
 
               {/* Overlay with favorite indicator */}

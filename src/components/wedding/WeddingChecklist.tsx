@@ -171,38 +171,13 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
         'other': 'custom'
       }
 
-      // Calculate due date based on phase
-      let dueDate: Date | undefined
-      if (wedding.weddingDate) {
-        const weddingDate = new Date(wedding.weddingDate)
-        switch (item.phase) {
-          case '1-week-before':
-            dueDate = new Date(weddingDate)
-            dueDate.setDate(dueDate.getDate() - 7)
-            break
-          case '1-day-before':
-            dueDate = new Date(weddingDate)
-            dueDate.setDate(dueDate.getDate() - 1)
-            break
-          case 'wedding-day':
-            dueDate = new Date(weddingDate)
-            break
-          case 'after-wedding':
-            dueDate = new Date(weddingDate)
-            dueDate.setDate(dueDate.getDate() + 7)
-            break
-          default:
-            dueDate = new Date(weddingDate)
-            dueDate.setDate(dueDate.getDate() - 14)
-        }
-      }
-
+      // Don't set due date automatically - user will set it manually in tasks
       const taskData: TaskFormData = {
         title: item.title,
         description: '',
         category: categoryMap[item.category],
         priority: undefined,
-        dueDate,
+        dueDate: undefined,
         notes: item.tips?.join('\n') || ''
       }
 
