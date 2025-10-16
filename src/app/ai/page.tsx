@@ -26,21 +26,9 @@ function AIPageContent() {
   // Get pre-filled question from URL
   const prefilledQuestion = searchParams.get('question')
 
-  if (!user) {
-    return (
-      <div className="min-h-screen wedding-gradient flex items-center justify-center">
-        <div className="text-center">
-          <Bot className="w-16 h-16 text-primary-500 mx-auto mb-4" />
-          <h2 className="heading-3 mb-2">Přihlaste se pro AI asistenta</h2>
-          <p className="body-large text-text-muted mb-6">
-            AI funkce jsou dostupné pouze pro přihlášené uživatele
-          </p>
-          <Link href="/" className="btn-primary">
-            Přihlásit se
-          </Link>
-        </div>
-      </div>
-    )
+  // Don't show auth check - let AppTemplate handle transitions smoothly
+  if (!user || !wedding) {
+    return null
   }
 
   const tabs = [

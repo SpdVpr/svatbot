@@ -14,18 +14,18 @@ export default function AppTemplate({ children }: AppTemplateProps) {
   const [displayPath, setDisplayPath] = useState(pathname)
 
   useEffect(() => {
-    // Start navigation animation
+    // Start navigation animation - MUCH FASTER
     setIsNavigating(true)
 
-    // Update display path after fade out
+    // Update display path after fade out - 50ms instead of 150ms
     const pathTimer = setTimeout(() => {
       setDisplayPath(pathname)
-    }, 150)
+    }, 50)
 
-    // Complete navigation after fade in
+    // Complete navigation after fade in - 100ms instead of 300ms
     const timer = setTimeout(() => {
       setIsNavigating(false)
-    }, 300)
+    }, 100)
 
     return () => {
       clearTimeout(pathTimer)
@@ -35,27 +35,27 @@ export default function AppTemplate({ children }: AppTemplateProps) {
 
   return (
     <>
-      {/* Smooth fade overlay during navigation - no loading text or icons */}
+      {/* Ultra-fast fade overlay - no visible white screen */}
       <AnimatePresence>
         {isNavigating && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
+            transition={{ duration: 0.05 }}
             className="fixed inset-0 z-[9998] bg-white pointer-events-none"
           />
         )}
       </AnimatePresence>
 
-      {/* Page content with smooth transition */}
+      {/* Page content with instant transition */}
       <AnimatePresence mode="wait">
         <motion.div
           key={displayPath}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.15, ease: 'easeInOut' }}
+          transition={{ duration: 0.05, ease: 'easeInOut' }}
           className="w-full"
         >
           {children}

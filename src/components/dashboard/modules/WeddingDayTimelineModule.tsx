@@ -24,17 +24,7 @@ const categoryLabels = {
 export default function WeddingDayTimelineModule() {
   const { timeline, stats, loading } = useWeddingDayTimeline()
 
-  if (loading) {
-    return (
-      <div className="wedding-card">
-        <h3 className="text-lg font-semibold flex items-center justify-center space-x-2 mb-4">
-          <Calendar className="w-5 h-5 text-purple-600" />
-          <span>Harmonogram svatebního dne</span>
-        </h3>
-        <div className="text-center text-gray-500">Načítání...</div>
-      </div>
-    )
-  }
+  // Don't show loading state - let content fade in smoothly
 
   return (
     <div className="wedding-card">

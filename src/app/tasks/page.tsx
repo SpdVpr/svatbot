@@ -120,37 +120,9 @@ export default function TasksPage() {
     setShowTaskForm(true)
   }
 
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Přihlášení vyžadováno
-          </h1>
-          <p className="text-text-muted">
-            Pro přístup k úkolům se musíte přihlásit.
-          </p>
-        </div>
-      </div>
-    )
-  }
-
-  if (!wedding) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Žádná svatba
-          </h1>
-          <p className="text-text-muted mb-4">
-            Nejdříve si vytvořte svatbu v onboarding procesu.
-          </p>
-          <button className="btn-primary">
-            Vytvořit svatbu
-          </button>
-        </div>
-      </div>
-    )
+  // Don't show auth check - let AppTemplate handle transitions smoothly
+  if (!user || !wedding) {
+    return null
   }
 
   return (

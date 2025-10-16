@@ -263,22 +263,13 @@ export default function BudgetPage() {
 
       {/* Main content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 loading-spinner" />
-              <span className="text-text-muted">Načítání rozpočtu...</span>
-            </div>
-          </div>
-        ) : (
-          /* Stats view - most informative display */
-          <div className="space-y-6">
-            <BudgetStats
-              onCreateItem={() => setShowBudgetForm(true)}
-              onEditItem={handleEditBudgetItem}
-            />
-          </div>
-        )}
+        {/* Stats view - most informative display */}
+        <div className="space-y-6">
+          <BudgetStats
+            onCreateItem={() => setShowBudgetForm(true)}
+            onEditItem={handleEditBudgetItem}
+          />
+        </div>
 
         {/* Empty state when no budget items */}
         {!loading && !hasBudgetItems && (

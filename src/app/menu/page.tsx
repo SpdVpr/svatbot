@@ -118,19 +118,9 @@ export default function MenuPage() {
     }
   }
 
-  // Check authentication
+  // Don't show auth check - let AppTemplate handle transitions smoothly
   if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Přihlaste se prosím</h2>
-          <p className="text-gray-600 mb-4">Pro přístup k menu musíte být přihlášeni</p>
-          <Link href="/" className="btn-primary">
-            Přejít na hlavní stránku
-          </Link>
-        </div>
-      </div>
-    )
+    return null
   }
 
   // Filter items based on search and category
