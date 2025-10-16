@@ -43,7 +43,7 @@ interface GuestListProps {
   viewMode?: 'list' | 'grid'
   onCreateGuest?: () => void
   onEditGuest?: (guest: Guest) => void
-  onGuestReorder?: (guests: Guest[]) => void
+  onGuestReorder?: (guests: Guest[]) => void | Promise<void>
   getAccommodationById?: (id: string) => any
 }
 
@@ -110,8 +110,15 @@ export default function GuestList({
     onGuestReorderRef.current = onGuestReorder
   }, [onGuestReorder])
 
+  // Sort guests by sortOrder first (to preserve drag and drop order)
+  const sortedGuests = [...guests].sort((a, b) => {
+    const orderA = a.sortOrder ?? 999999
+    const orderB = b.sortOrder ?? 999999
+    return orderA - orderB
+  })
+
   // Filter and sort guests
-  const filteredGuests = guests.filter(guest => {
+  const filteredGuests = sortedGuests.filter(guest => {
     // Search filter
     if (searchTerm && !`${guest.firstName} ${guest.lastName}`.toLowerCase().includes(searchTerm.toLowerCase())) {
       return false
@@ -175,8 +182,8 @@ export default function GuestList({
     return true
   })
 
-  // Group guests
-  const groupedGuests = groupGuestsBy(filteredGuests, viewOptions.groupBy)
+  // Group guests (preserving sortOrder within groups)
+  const groupedGuests = groupGuestsBy(filteredGuests, viewOptions.groupBy, true)
 
   // Get RSVP status display
   const getRSVPDisplay = (status: string) => {
@@ -277,7 +284,7 @@ export default function GuestList({
     }
   }, [draggedGuest, isDragging, dragOverIndex, viewMode])
 
-  const handleDrop = useCallback((e: React.DragEvent, dropIndex: number) => {
+  const handleDrop = useCallback(async (e: React.DragEvent, dropIndex: number) => {
     console.log('🎯 DROP EVENT:', dropIndex)
     e.preventDefault()
     e.stopPropagation()
@@ -323,9 +330,14 @@ export default function GuestList({
 
     console.log('✅ Reordered guests, calling callback with', allGuests.length, 'guests')
 
-    // Call reorder callback with FULL array
+    // Call reorder callback with FULL array (await if it's a promise)
     if (onGuestReorder && typeof onGuestReorder === 'function') {
-      onGuestReorder(allGuests)
+      try {
+        await onGuestReorder(allGuests)
+        console.log('✅ onGuestReorder completed successfully')
+      } catch (error) {
+        console.error('❌ Error in onGuestReorder:', error)
+      }
     }
 
     // Clear states
@@ -410,7 +422,7 @@ export default function GuestList({
     }
   }, [draggedGuest, touchStartY, dragOverIndex, viewMode, isDragging])
 
-  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+  const handleTouchEnd = useCallback(async (e: React.TouchEvent) => {
     // Clear long press timer
     if (longPressTimerRef.current) {
       clearTimeout(longPressTimerRef.current)
@@ -428,22 +440,38 @@ export default function GuestList({
     }
 
     if (isDragging && dragOverIndex !== null) {
-      const draggedIndex = filteredGuests.findIndex(g => g.id === draggedGuest)
+      // Find indices in the DISPLAYED filtered list
+      const draggedIndexInFiltered = filteredGuests.findIndex(g => g.id === draggedGuest)
 
-      if (draggedIndex !== -1 && draggedIndex !== dragOverIndex) {
-        // Reorder guests
-        const newGuests = [...filteredGuests]
-        const [removed] = newGuests.splice(draggedIndex, 1)
-        newGuests.splice(dragOverIndex, 0, removed)
+      if (draggedIndexInFiltered !== -1 && draggedIndexInFiltered !== dragOverIndex) {
+        // Get the guest IDs at the drag positions in filtered list
+        const draggedGuestId = filteredGuests[draggedIndexInFiltered].id
+        const targetGuestId = filteredGuests[dragOverIndex].id
 
-        // Call reorder callback
-        if (onGuestReorder) {
-          onGuestReorder(newGuests)
-        }
+        // Now reorder in the FULL guests array (not just filtered)
+        const allGuests = [...guests]
+        const draggedIndexInAll = allGuests.findIndex(g => g.id === draggedGuestId)
+        const targetIndexInAll = allGuests.findIndex(g => g.id === targetGuestId)
 
-        // Add success haptic feedback
-        if ('vibrate' in navigator) {
-          navigator.vibrate([50, 50, 50])
+        if (draggedIndexInAll !== -1 && targetIndexInAll !== -1) {
+          // Reorder in full array
+          const [removed] = allGuests.splice(draggedIndexInAll, 1)
+          allGuests.splice(targetIndexInAll, 0, removed)
+
+          // Call reorder callback with FULL array
+          if (onGuestReorder) {
+            try {
+              await onGuestReorder(allGuests)
+              console.log('✅ Touch reorder completed successfully')
+            } catch (error) {
+              console.error('❌ Error in touch reorder:', error)
+            }
+          }
+
+          // Add success haptic feedback
+          if ('vibrate' in navigator) {
+            navigator.vibrate([50, 50, 50])
+          }
         }
       }
     }
@@ -454,7 +482,7 @@ export default function GuestList({
     setIsDragging(false)
     setTouchStartY(null)
     setTouchCurrentY(null)
-  }, [draggedGuest, isDragging, dragOverIndex, filteredGuests, onGuestReorder, viewMode])
+  }, [draggedGuest, isDragging, dragOverIndex, filteredGuests, guests, onGuestReorder, viewMode])
 
   if (loading) {
     return (
@@ -1038,7 +1066,7 @@ export default function GuestList({
 }
 
 // Helper function to group guests
-function groupGuestsBy(guests: Guest[], groupBy: string): Record<string, Guest[]> {
+function groupGuestsBy(guests: Guest[], groupBy: string, preserveSortOrder: boolean = false): Record<string, Guest[]> {
   const grouped: Record<string, Guest[]> = {}
 
   guests.forEach(guest => {
@@ -1065,11 +1093,22 @@ function groupGuestsBy(guests: Guest[], groupBy: string): Record<string, Guest[]
   })
 
   // Sort guests within each group
-  Object.keys(grouped).forEach(key => {
-    grouped[key].sort((a, b) => {
-      return `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`)
+  if (!preserveSortOrder) {
+    Object.keys(grouped).forEach(key => {
+      grouped[key].sort((a, b) => {
+        return `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`)
+      })
     })
-  })
+  } else {
+    // Keep sortOrder (guests are already sorted by sortOrder before grouping)
+    Object.keys(grouped).forEach(key => {
+      grouped[key].sort((a, b) => {
+        const orderA = a.sortOrder ?? 999999
+        const orderB = b.sortOrder ?? 999999
+        return orderA - orderB
+      })
+    })
+  }
 
   return grouped
 }
