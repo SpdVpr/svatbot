@@ -601,22 +601,45 @@ export function useRobustGuests() {
     sendReminders: async () => {},
     reorderGuests: async (reorderedGuests: Guest[]) => {
       console.log('🔄 Reordering guests:', reorderedGuests.length)
-      setGuests(reorderedGuests)
-      guestsRef.current = reorderedGuests
 
-      // Save to Firestore for ALL users
+      // Update sortOrder for each guest
+      const guestsWithOrder = reorderedGuests.map((guest, index) => ({
+        ...guest,
+        sortOrder: index
+      }))
+
+      // Update local state immediately for instant UI feedback
+      setGuests(guestsWithOrder)
+      guestsRef.current = guestsWithOrder
+
+      // Save to Firestore - update each guest's sortOrder in guests collection
       if (user && wedding?.id) {
         try {
-          const { doc, setDoc } = await import('firebase/firestore')
+          isSavingRef.current = true
+          const { doc, updateDoc, writeBatch } = await import('firebase/firestore')
           const { db } = await import('@/config/firebase')
 
-          const weddingRef = doc(db, 'weddings', wedding.id)
-          const cleanedGuests = reorderedGuests.map(cleanForFirestore)
+          // Use batch write for atomic update of all guests
+          const batch = writeBatch(db)
 
-          await setDoc(weddingRef, { guests: cleanedGuests }, { merge: true })
+          guestsWithOrder.forEach((guest) => {
+            const guestRef = doc(db, 'guests', guest.id)
+            batch.update(guestRef, {
+              sortOrder: guest.sortOrder,
+              updatedAt: new Date()
+            })
+          })
+
+          await batch.commit()
           console.log('✅ Firebase guests reordered and saved')
+
+          // Small delay before allowing Firebase updates again
+          setTimeout(() => {
+            isSavingRef.current = false
+          }, 500)
         } catch (error) {
           console.error('❌ Error saving reordered guests to Firebase:', error)
+          isSavingRef.current = false
           throw error
         }
       }

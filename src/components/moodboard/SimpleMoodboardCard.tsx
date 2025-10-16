@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, memo } from 'react'
+import Image from 'next/image'
 import { Heart, Trash2, Move, Sparkles } from 'lucide-react'
 import { MoodboardImage, WEDDING_CATEGORIES } from '@/hooks/useMoodboard'
 
@@ -369,15 +370,19 @@ function SimpleMoodboardCard({
         
         {/* Image - always full quality like dashboard */}
         <div className="relative w-full h-full">
-          {/* Main image - always use full quality */}
-          <img
+          {/* Main image - always use full quality with Next.js Image optimization */}
+          <Image
             src={image.url}
             alt={image.title}
-            className={`w-full h-full object-cover transition-opacity duration-300 ${
+            fill
+            className={`object-cover transition-opacity duration-300 ${
               imageLoaded ? 'opacity-100' : 'opacity-0'
             }`}
             onLoad={handleImageLoad}
             draggable={false}
+            quality={95}
+            sizes="(max-width: 768px) 50vw, 33vw"
+            priority={false}
           />
 
           {/* Loading indicator */}
