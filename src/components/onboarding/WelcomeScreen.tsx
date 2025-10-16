@@ -42,7 +42,7 @@ export default function WelcomeScreen() {
   }
 
   return (
-    <>
+    <div className="w-full min-h-screen overflow-x-hidden">
       {/* Scroll Progress */}
       <ScrollProgress />
 
@@ -591,7 +591,7 @@ export default function WelcomeScreen() {
           onSwitchMode={(mode) => setAuthMode(mode)}
         />
       )}
-    </>
+    </div>
   )
 }
 
