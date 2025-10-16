@@ -25,6 +25,7 @@ interface GuestStatsProps {
   updateGuest: (guestId: string, updates: Partial<Guest>) => Promise<void>
   updateRSVP?: (guestId: string, rsvpStatus: Guest['rsvpStatus']) => Promise<void>
   deleteGuest?: (guestId: string) => Promise<void>
+  onGuestReorder?: (reorderedGuests: Guest[]) => Promise<void>
   compact?: boolean
   showProgress?: boolean
   showGuestList?: boolean
@@ -39,6 +40,7 @@ export default function GuestStats({
   updateGuest,
   updateRSVP,
   deleteGuest,
+  onGuestReorder,
   compact = false,
   showProgress = true,
   showGuestList = true,
@@ -434,6 +436,7 @@ export default function GuestStats({
             updateGuest={updateGuest}
             updateRSVP={updateRSVP}
             deleteGuest={deleteGuest}
+            onGuestReorder={onGuestReorder}
             showHeader={false}
             showFilters={true}
             compact={false}

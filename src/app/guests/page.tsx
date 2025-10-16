@@ -327,6 +327,7 @@ export default function GuestsPage() {
               updateGuest={updateGuest}
               updateRSVP={updateRSVP}
               deleteGuest={deleteGuest}
+              onGuestReorder={handleGuestReorder}
               onCreateGuest={() => setShowGuestForm(true)}
               onEditGuest={handleEditGuest}
               getAccommodationById={getAccommodationById}

@@ -326,33 +326,59 @@ export default function GuestList({
     }
   }, [draggedGuest, isDragging, viewMode, filteredGuests, onGuestReorder])
 
-  // Touch handlers for mobile
+  // Touch handlers for mobile with long press detection
+  const longPressTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const touchMoveDistanceRef = useRef(0)
+
   const handleTouchStart = useCallback((e: React.TouchEvent, guestId: string) => {
     if (viewMode !== 'list') return
 
     const touch = e.touches[0]
     setTouchStartY(touch.clientY)
     setTouchCurrentY(touch.clientY)
-    setDraggedGuest(guestId)
+    touchMoveDistanceRef.current = 0
 
-    // Add haptic feedback on supported devices
-    if ('vibrate' in navigator) {
-      navigator.vibrate(50)
-    }
+    // Start long press timer (500ms)
+    longPressTimerRef.current = setTimeout(() => {
+      // Only activate drag if user hasn't moved much (not scrolling)
+      if (touchMoveDistanceRef.current < 10) {
+        setDraggedGuest(guestId)
+        setIsDragging(true)
 
-    // Add visual feedback class
-    const element = e.currentTarget as HTMLElement
-    element.classList.add('haptic-feedback')
-    setTimeout(() => {
-      element.classList.remove('haptic-feedback')
-    }, 100)
+        // Add haptic feedback on supported devices
+        if ('vibrate' in navigator) {
+          navigator.vibrate(50)
+        }
+
+        // Add visual feedback class
+        const element = e.currentTarget as HTMLElement
+        element.classList.add('haptic-feedback')
+        setTimeout(() => {
+          element.classList.remove('haptic-feedback')
+        }, 100)
+      }
+    }, 500) // 500ms long press
   }, [viewMode])
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!draggedGuest || !touchStartY || viewMode !== 'list') return
+    const touch = e.touches[0]
+
+    // Track movement distance to detect scrolling
+    if (touchStartY) {
+      touchMoveDistanceRef.current = Math.abs(touch.clientY - touchStartY)
+    }
+
+    // If moved more than 10px before long press completes, cancel drag
+    if (touchMoveDistanceRef.current > 10 && longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current)
+      longPressTimerRef.current = null
+      return
+    }
+
+    // Only handle drag if already dragging
+    if (!draggedGuest || !touchStartY || viewMode !== 'list' || !isDragging) return
 
     e.preventDefault()
-    const touch = e.touches[0]
     setTouchCurrentY(touch.clientY)
 
     // Calculate which guest we're over
@@ -368,12 +394,25 @@ export default function GuestList({
 
     if (newDragOverIndex !== null && newDragOverIndex !== dragOverIndex) {
       setDragOverIndex(newDragOverIndex)
-      setIsDragging(true)
     }
-  }, [draggedGuest, touchStartY, dragOverIndex, viewMode])
+  }, [draggedGuest, touchStartY, dragOverIndex, viewMode, isDragging])
 
   const handleTouchEnd = useCallback((e: React.TouchEvent) => {
-    if (!draggedGuest || viewMode !== 'list') return
+    // Clear long press timer
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current)
+      longPressTimerRef.current = null
+    }
+
+    if (!draggedGuest || viewMode !== 'list') {
+      // Reset states
+      setDraggedGuest(null)
+      setIsDragging(false)
+      setDragOverIndex(null)
+      setTouchStartY(null)
+      setTouchCurrentY(null)
+      return
+    }
 
     if (isDragging && dragOverIndex !== null) {
       const draggedIndex = filteredGuests.findIndex(g => g.id === draggedGuest)
