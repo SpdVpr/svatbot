@@ -195,7 +195,7 @@ export default function MenuPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="wedding-card">
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Celkem položek</p>
@@ -207,7 +207,7 @@ export default function MenuPage() {
             </div>
           </div>
 
-          <div className="wedding-card">
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Jídla</p>
@@ -217,7 +217,7 @@ export default function MenuPage() {
             </div>
           </div>
 
-          <div className="wedding-card">
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Nápoje</p>
@@ -227,7 +227,7 @@ export default function MenuPage() {
             </div>
           </div>
 
-          <div className="wedding-card">
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Odhadované náklady</p>
@@ -241,7 +241,7 @@ export default function MenuPage() {
         </div>
 
         {/* Tabs */}
-        <div className="wedding-card mb-6">
+        <div className="bg-white rounded-2xl shadow-wedding border border-primary-100 p-4 sm:p-6 mb-6">
           <div className="flex space-x-1 border-b border-gray-200">
             <button
               onClick={() => {
@@ -341,7 +341,7 @@ export default function MenuPage() {
             <div className="loading-spinner w-8 h-8" />
           </div>
         ) : (
-          <div className="wedding-card">
+          <div className="bg-white rounded-2xl shadow-wedding border border-primary-100 p-4 sm:p-6">
             {activeTab === 'food' ? (
               <div>
                 {filteredMenuItems.length === 0 ? (
