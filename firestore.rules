@@ -27,6 +27,21 @@ service cloud.firestore {
       match /wedding/{document=**} {
         allow read, write: if isAuthenticated() && isOwner(userId);
       }
+
+      // Settings subcollection (cookie consent, preferences, etc.)
+      match /settings/{settingId} {
+        // User can read their own settings
+        allow read: if isAuthenticated() && isOwner(userId);
+
+        // User can create their own settings
+        allow create: if isAuthenticated() && isOwner(userId);
+
+        // User can update their own settings
+        allow update: if isAuthenticated() && isOwner(userId);
+
+        // User can delete their own settings
+        allow delete: if isAuthenticated() && isOwner(userId);
+      }
     }
 
     // Weddings collection
