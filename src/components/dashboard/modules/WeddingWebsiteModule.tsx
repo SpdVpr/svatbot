@@ -46,8 +46,8 @@ export default function WeddingWebsiteModule({ onResize }: WeddingWebsiteModuleP
 
   // Don't show loading state - let content fade in smoothly
 
-  // Pokud web neexistuje
-  if (!website && !loading) {
+  // Pokud web neexistuje nebo se načítá
+  if (!website || loading) {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
         <div className="flex items-center gap-3 mb-4">
@@ -114,7 +114,7 @@ export default function WeddingWebsiteModule({ onResize }: WeddingWebsiteModuleP
     )
   }
 
-  // Pokud web existuje
+  // Pokud web existuje (TypeScript ví, že website není null)
   const websiteUrl = `https://${website.subdomain}`
   const previewUrl = `/wedding/${website.customUrl}`
 
