@@ -32,6 +32,7 @@ export default function MoodboardGrid({
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [touchStart, setTouchStart] = useState<number | null>(null)
   const [touchEnd, setTouchEnd] = useState<number | null>(null)
+  const [imageLoading, setImageLoading] = useState(true)
 
   // Detect mobile device
   useEffect(() => {
@@ -113,12 +114,14 @@ export default function MoodboardGrid({
   const handleImageClick = (image: MoodboardImage) => {
     const index = images.findIndex(img => img.id === image.id)
     setCurrentImageIndex(index)
+    setImageLoading(true)
     setSelectedImage(image)
   }
 
   const navigateToNext = () => {
     const nextIndex = (currentImageIndex + 1) % images.length
     setCurrentImageIndex(nextIndex)
+    setImageLoading(true)
     setSelectedImage(images[nextIndex])
     setIsEditingCategory(false)
   }
@@ -126,6 +129,7 @@ export default function MoodboardGrid({
   const navigateToPrevious = () => {
     const prevIndex = currentImageIndex === 0 ? images.length - 1 : currentImageIndex - 1
     setCurrentImageIndex(prevIndex)
+    setImageLoading(true)
     setSelectedImage(images[prevIndex])
     setIsEditingCategory(false)
   }
@@ -224,7 +228,7 @@ export default function MoodboardGrid({
                 fill
                 className="object-cover transition-transform group-hover:scale-105"
                 sizes="(max-width: 768px) 50vw, 25vw"
-                quality={90}
+                quality={95}
               />
 
               {/* Overlay with favorite indicator */}
@@ -381,13 +385,21 @@ export default function MoodboardGrid({
 
             <div className={`flex ${isMobile ? 'flex-col' : 'flex-col md:flex-row'}`}>
               {/* Image */}
-              <div className="flex-1 relative">
+              <div className="flex-1 relative bg-gray-100 flex items-center justify-center" style={{ minHeight: isMobile ? '300px' : '400px', minWidth: isMobile ? '100%' : '400px' }}>
+                {imageLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center z-10">
+                    <div className="w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                )}
                 <Image
                   src={selectedImage.url}
                   alt={selectedImage.title || 'Moodboard image'}
                   width={800}
                   height={600}
-                  className={`object-contain ${isMobile ? 'max-h-[50vh]' : 'max-h-[70vh]'}`}
+                  className={`object-contain ${isMobile ? 'max-h-[50vh]' : 'max-h-[70vh]'} transition-opacity duration-300 ${
+                    imageLoading ? 'opacity-0' : 'opacity-100'
+                  }`}
+                  onLoad={() => setImageLoading(false)}
                 />
               </div>
 

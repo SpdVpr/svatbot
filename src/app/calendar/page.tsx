@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useWedding } from '@/hooks/useWedding'
 import { useCalendar } from '@/hooks/useCalendar'
 import CalendarView from '@/components/calendar/CalendarView'
+import EventDetailModal from '@/components/calendar/EventDetailModal'
 import { generateICalendar, downloadICalFile, generateCSV, downloadCSVFile, openInGoogleCalendar } from '@/lib/calendarExport'
 import { AggregatedEvent, CalendarEvent } from '@/types/calendar'
 import {
@@ -335,6 +336,14 @@ export default function CalendarPage() {
               ))}
             </div>
           </div>
+        )}
+
+        {/* Event Detail Modal */}
+        {selectedEvent && (
+          <EventDetailModal
+            event={selectedEvent}
+            onClose={() => setSelectedEvent(null)}
+          />
         )}
       </main>
     </div>

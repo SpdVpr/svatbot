@@ -225,12 +225,13 @@ export default function FolderGrid({
               >
                 <div className="relative rounded-xl overflow-hidden bg-gray-100 shadow-sm hover:shadow-md transition-all">
                   <Image
-                    src={image.thumbnailUrl || image.url}
+                    src={image.url}
                     alt={image.title || 'Moodboard image'}
                     width={400}
                     height={600}
                     className="w-full object-cover"
                     sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                    quality={95}
                   />
 
                   {/* Overlay on hover */}

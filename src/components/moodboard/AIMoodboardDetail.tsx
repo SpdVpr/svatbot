@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { X, Sparkles, Palette, Lightbulb, Flower2, Download } from 'lucide-react'
 import { MoodboardImage } from '@/hooks/useMoodboard'
 
@@ -9,6 +10,8 @@ interface AIMoodboardDetailProps {
 }
 
 export default function AIMoodboardDetail({ image, onClose }: AIMoodboardDetailProps) {
+  const [imageLoading, setImageLoading] = useState(true)
+
   if (!image.aiMetadata) return null
 
   const { description, style, colors, mood } = image.aiMetadata
@@ -76,11 +79,19 @@ export default function AIMoodboardDetail({ image, onClose }: AIMoodboardDetailP
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Image */}
             <div className="space-y-4">
-              <div className="relative w-full rounded-xl overflow-hidden border border-gray-200" style={{ aspectRatio: '16 / 9' }}>
+              <div className="relative w-full rounded-xl overflow-hidden border border-gray-200 bg-gray-100 flex items-center justify-center" style={{ aspectRatio: '16 / 9', minHeight: '300px' }}>
+                {imageLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center z-10">
+                    <div className="w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                )}
                 <img
                   src={image.url}
                   alt={image.title}
-                  className="w-full h-full object-cover"
+                  className={`w-full h-full object-cover transition-opacity duration-300 ${
+                    imageLoading ? 'opacity-0' : 'opacity-100'
+                  }`}
+                  onLoad={() => setImageLoading(false)}
                 />
               </div>
 

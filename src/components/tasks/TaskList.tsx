@@ -52,7 +52,7 @@ export default function TaskList({
   clearError: propClearError
 }: TaskListProps) {
   const hookData = useTask()
-  const { createEvent } = useCalendar()
+  const { createEvent, events: calendarEvents } = useCalendar()
   const router = useRouter()
 
   // Check if this is a demo user - if so, use props, otherwise use hook data
@@ -96,17 +96,29 @@ export default function TaskList({
     }
   }
 
+  // Check if task is already in calendar
+  const isTaskInCalendar = (task: Task): boolean => {
+    return calendarEvents.some(aggEvent =>
+      aggEvent.event.type === 'task' &&
+      aggEvent.event.title === task.title
+    )
+  }
+
   // Handle add to calendar - creates a custom calendar event from task
   const handleAddToCalendar = async (task: Task) => {
-    try {
-      const dueDate = task.dueDate || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // Default: 7 days from now
+    // Don't allow adding tasks without due date
+    if (!task.dueDate) {
+      alert('Tento úkol nemá nastavené datum. Nejdříve přidejte datum úkolu.')
+      return
+    }
 
+    try {
       // Create calendar event from task
       await createEvent({
         title: task.title,
         description: task.description || '',
         type: 'task',
-        startDate: dueDate,
+        startDate: task.dueDate,
         isAllDay: true,
         priority: (task.priority || 'medium') as 'low' | 'medium' | 'high' | 'critical',
         notes: task.notes || '',
@@ -119,9 +131,8 @@ export default function TaskList({
         isOnline: false
       })
 
-      // Show success message and redirect to calendar
+      // Don't navigate - let user add more tasks
       alert('✅ Úkol byl přidán do kalendáře!')
-      router.push('/calendar')
     } catch (error) {
       console.error('Error adding task to calendar:', error)
       alert('❌ Chyba při přidávání do kalendáře')
@@ -510,8 +521,20 @@ export default function TaskList({
                             )}
                             <button
                               onClick={() => handleAddToCalendar(task)}
-                              className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
-                              title="Přidat do kalendáře"
+                              className={`p-1.5 rounded transition-colors ${
+                                !task.dueDate
+                                  ? 'text-orange-500 hover:text-orange-600 hover:bg-orange-50'
+                                  : isTaskInCalendar(task)
+                                  ? 'text-green-500 hover:text-green-600 hover:bg-green-50'
+                                  : 'text-gray-400 hover:text-blue-600 hover:bg-blue-50'
+                              }`}
+                              title={
+                                !task.dueDate
+                                  ? 'Úkol nemá datum - nelze přidat do kalendáře'
+                                  : isTaskInCalendar(task)
+                                  ? 'Úkol je již v kalendáři'
+                                  : 'Přidat do kalendáře'
+                              }
                             >
                               <CalendarPlus className="w-4 h-4" />
                             </button>

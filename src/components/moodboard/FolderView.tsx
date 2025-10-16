@@ -289,12 +289,13 @@ export default function FolderView({
             >
               <div className="relative rounded-xl overflow-hidden bg-gray-100 shadow-sm hover:shadow-md transition-all">
                 <Image
-                  src={image.thumbnailUrl || image.url}
+                  src={image.url}
                   alt={image.title}
                   width={400}
                   height={viewMode === 'grid' ? 400 : 600}
                   className={`w-full ${viewMode === 'grid' ? 'aspect-square' : ''} object-cover`}
                   sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                  quality={95}
                 />
 
                 {/* Overlay with actions */}
