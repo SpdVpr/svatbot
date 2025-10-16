@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter, Playfair_Display, Montserrat } from 'next/font/google'
 import './globals.css'
 import { cn } from '@/utils'
+import CookieBanner from '@/components/common/CookieBanner'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -117,6 +118,9 @@ export default function RootLayout({
         <div id="root" className="relative">
           {children}
         </div>
+
+        {/* Cookie Banner */}
+        <CookieBanner />
 
         {/* Portal for modals */}
         <div id="modal-root" />

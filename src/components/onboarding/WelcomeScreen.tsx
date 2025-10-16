@@ -563,11 +563,12 @@ export default function WelcomeScreen() {
           </div>
           <div className="border-t border-gray-700 pt-8 mt-12 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
             <div className="flex flex-col md:flex-row items-center space-y-3 md:space-y-0 md:space-x-6 mb-6 md:mb-0">
-              <p className="flex items-center">© 2024 SvatBot.cz - Vytvořeno s <Heart className="w-4 h-4 inline-block text-rose-400 fill-current mx-1" /> pro české páry.</p>
+              <p className="flex items-center">© 2025 SvatBot.cz - Vytvořeno s <Heart className="w-4 h-4 inline-block text-rose-400 fill-current mx-1" /> pro české páry.</p>
               <div className="flex space-x-4">
-                <a href="#" className="hover:text-rose-300 transition-colors">Ochrana soukromí</a>
-                <a href="#" className="hover:text-rose-300 transition-colors">Podmínky služby</a>
-                <a href="#" className="hover:text-rose-300 transition-colors">GDPR</a>
+                <a href="/ochrana-soukromi" className="hover:text-rose-300 transition-colors">Ochrana soukromí</a>
+                <a href="/obchodni-podminky" className="hover:text-rose-300 transition-colors">Obchodní podmínky</a>
+                <a href="/podminky-sluzby" className="hover:text-rose-300 transition-colors">Podmínky služby</a>
+                <a href="/gdpr" className="hover:text-rose-300 transition-colors">GDPR</a>
               </div>
             </div>
             <div className="flex items-center space-x-6">
