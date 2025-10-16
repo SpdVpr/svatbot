@@ -21,15 +21,6 @@
     --shadow-wedding: 0 4px 25px -5px rgba(248, 187, 217, 0.3), 0 10px 30px -5px rgba(225, 213, 231, 0.2);
   }
 
-  /* Smooth scrolling */
-  html {
-    scroll-behavior: smooth;
-  }
-
-  body {
-    overflow-x: hidden;
-  }
-
   /* Redesignr.ai styles */
   .text-gradient-primary {
     background: linear-gradient(to right, #FB7185, #E879F9);
@@ -76,8 +67,6 @@
 
   html {
     scroll-behavior: smooth;
-    /* Prevent scrollbar from appearing during initial load */
-    overflow-y: scroll;
   }
 
   /* Smooth scrollbar appearance to prevent flickering */

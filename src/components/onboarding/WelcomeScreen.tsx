@@ -70,12 +70,12 @@ export default function WelcomeScreen() {
         </div>
       </header>
 
-      <section className="bg-gradient-hero py-12 md:py-20 lg:py-32 relative overflow-hidden">
+      <section className="bg-gradient-hero py-12 md:py-20 lg:py-32 relative overflow-hidden touch-pan-y">
         <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
           <div className="w-full h-full transform scale-150"></div>
         </div>
         <div className="container mx-auto px-4 md:px-6 relative z-10 flex flex-col lg:flex-row items-center justify-between">
-          <div className="lg:w-1/2 text-center mb-8 lg:mb-0">
+          <div className="lg:w-1/2 text-center mb-8 lg:mb-0 animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <span className="inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-rose-100 text-rose-700 text-xs md:text-sm font-semibold rounded-full mb-4 md:mb-6 shadow-sm mx-auto">
               <Sparkles className="w-3 h-3 md:w-4 md:h-4 mr-1.5 md:mr-2 text-rose-500" /> První český svatební plánovač s AI
             </span>
@@ -103,7 +103,7 @@ export default function WelcomeScreen() {
               </button>
             </div>
           </div>
-          <div className="lg:w-1/2 flex justify-center w-full">
+          <div className="lg:w-1/2 flex justify-center animate-fade-in w-full" style={{ animationDelay: '0.4s' }}>
             <div className="w-full max-w-[500px] aspect-[5/3.5] bg-gray-200 rounded-2xl md:rounded-3xl shadow-2xl flex items-center justify-center border-2 md:border-4 border-white overflow-hidden relative">
               <div className="absolute inset-0 bg-gradient-to-br from-rose-100 to-purple-100 opacity-75"></div>
               <Heart className="w-24 h-24 md:w-36 md:h-36 text-rose-400 opacity-60 relative z-10" />
@@ -115,7 +115,7 @@ export default function WelcomeScreen() {
         </div>
       </section>
 
-      <section id="features" className="py-12 md:py-16 lg:py-20 bg-white">
+      <section id="features" className="py-12 md:py-16 lg:py-20 bg-white touch-pan-y">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-8 md:mb-12 lg:mb-16">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-gray-900 mb-4 md:mb-6">
@@ -126,28 +126,28 @@ export default function WelcomeScreen() {
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 max-w-7xl mx-auto">
-            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-200 h-full text-center">
+            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow h-full text-center">
               <div className="w-14 h-14 md:w-16 md:h-16 bg-rose-100 rounded-full flex items-center justify-center mb-4 md:mb-6 shadow-sm mx-auto">
                 <Sparkles className="w-7 h-7 md:w-8 md:h-8 text-rose-500" />
               </div>
               <h3 className="text-xl md:text-2xl font-display font-semibold text-gray-900 mb-2 md:mb-3">AI Svatební Asistent</h3>
               <p className="text-sm md:text-base text-gray-600 leading-relaxed">Inteligentní kouč s GPT-4 a Perplexity AI, který odpovídá na otázky a poskytuje personalizované rady 24/7.</p>
             </div>
-            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-200 h-full text-center">
+            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow h-full text-center">
               <div className="w-14 h-14 md:w-16 md:h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4 md:mb-6 shadow-sm mx-auto">
                 <Users className="w-7 h-7 md:w-8 md:h-8 text-purple-500" />
               </div>
               <h3 className="text-xl md:text-2xl font-display font-semibold text-gray-900 mb-2 md:mb-3">Správa hostů & RSVP</h3>
               <p className="text-sm md:text-base text-gray-600 leading-relaxed">Kompletní správa hostů s RSVP systémem, dietními omezeními, seating planem a exportem do Excel.</p>
             </div>
-            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-200 h-full text-center">
+            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow h-full text-center">
               <div className="w-14 h-14 md:w-16 md:h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-4 md:mb-6 shadow-sm mx-auto">
                 <CreditCard className="w-7 h-7 md:w-8 md:h-8 text-emerald-500" />
               </div>
               <h3 className="text-xl md:text-2xl font-display font-semibold text-gray-900 mb-2 md:mb-3">Inteligentní rozpočet</h3>
               <p className="text-sm md:text-base text-gray-600 leading-relaxed">AI optimalizace rozpočtu, sledování výdajů, grafy a statistiky s propojením na dodavatele.</p>
             </div>
-            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-200 h-full text-center">
+            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow h-full text-center">
               <div className="w-14 h-14 md:w-16 md:h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4 md:mb-6 shadow-sm mx-auto">
                 <CheckSquare className="w-7 h-7 md:w-8 md:h-8 text-blue-500" />
               </div>
@@ -158,7 +158,7 @@ export default function WelcomeScreen() {
         </div>
       </section>
 
-      <section className="py-12 md:py-16 lg:py-20 bg-rose-50">
+      <section className="py-12 md:py-16 lg:py-20 bg-rose-50 touch-pan-y">
         <div className="container mx-auto px-4 md:px-6 text-center">
           <div className="max-w-4xl mx-auto p-6 md:p-10 lg:p-12 bg-white rounded-2xl md:rounded-3xl shadow-xl border border-rose-100">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold text-gray-900 mb-4 md:mb-6">
@@ -212,7 +212,7 @@ export default function WelcomeScreen() {
         </div>
       </section>
 
-      <section id="dashboard" className="py-12 md:py-16 lg:py-20 bg-gray-50">
+      <section id="dashboard" className="py-12 md:py-16 lg:py-20 bg-gray-50 touch-pan-y">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-8 md:mb-12 lg:mb-16">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-gray-900 mb-4 md:mb-6">
@@ -222,7 +222,7 @@ export default function WelcomeScreen() {
               Drag & drop dashboard s <NumberCounter end={18} suffix="+" className="text-gradient-accent font-bold" /> moduly včetně AI asistenta. Přesuňte, změňte velikost a skryjte moduly podle vašich potřeb.
             </p>
           </div>
-          <div className="relative max-w-6xl mx-auto">
+          <div className="relative max-w-6xl mx-auto animate-fade-in" style={{ animationDelay: '0.3s' }}>
             <div className="bg-white rounded-2xl md:rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
               <div className="bg-gradient-to-r from-rose-500 to-purple-500 px-4 md:px-6 lg:px-8 py-3 md:py-4 flex items-center justify-between">
                 <div className="flex items-center space-x-2 md:space-x-3">
@@ -247,7 +247,7 @@ export default function WelcomeScreen() {
                 <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100 hover-lift glass-morphism">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-semibold text-gray-800 text-lg">Pokrok úkolů</h3>
-                    <CheckCircle className="w-6 h-6 text-emerald-500" />
+                    <CheckCircle className="w-6 h-6 text-emerald-500 float-slow" style={{ animationDelay: '0.5s' }} />
                   </div>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
@@ -355,7 +355,7 @@ export default function WelcomeScreen() {
         </div>
       </section>
 
-      <section className="py-12 md:py-16 lg:py-20 bg-gradient-to-br from-rose-50 via-purple-50 to-blue-50">
+      <section className="py-12 md:py-16 lg:py-20 bg-gradient-to-br from-rose-50 via-purple-50 to-blue-50 touch-pan-y">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-8 md:mb-12 lg:mb-16">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-gray-900 mb-4 md:mb-6">
@@ -366,28 +366,28 @@ export default function WelcomeScreen() {
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 max-w-7xl mx-auto">
-            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-200 text-center">
+            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow text-center">
               <div className="w-14 h-14 md:w-16 md:h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-4 md:mb-6 shadow-sm mx-auto">
                 <Store className="w-7 h-7 md:w-8 md:h-8 text-yellow-500" />
               </div>
               <h3 className="text-xl md:text-2xl font-display font-semibold text-gray-900 mb-2 md:mb-3">Marketplace dodavatelů</h3>
               <p className="text-sm md:text-base text-gray-600 leading-relaxed">Databáze 200+ ověřených dodavatelů s reálnými portfolii, Google recenzemi a AI doporučeními.</p>
             </div>
-            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-200 text-center">
+            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow text-center">
               <div className="w-14 h-14 md:w-16 md:h-16 bg-pink-100 rounded-full flex items-center justify-center mb-4 md:mb-6 shadow-sm mx-auto">
                 <Users className="w-7 h-7 md:w-8 md:h-8 text-pink-500" />
               </div>
               <h3 className="text-xl md:text-2xl font-display font-semibold text-gray-900 mb-2 md:mb-3">Seating Plan Editor</h3>
               <p className="text-sm md:text-base text-gray-600 leading-relaxed">Interaktivní editor s drag & drop, přizpůsobitelné stoly (kulaté/čtvercové) a automatické rozmístění hostů.</p>
             </div>
-            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-200 text-center">
+            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow text-center">
               <div className="w-14 h-14 md:w-16 md:h-16 bg-teal-100 rounded-full flex items-center justify-center mb-4 md:mb-6 shadow-sm mx-auto">
                 <Cloud className="w-7 h-7 md:w-8 md:h-8 text-teal-500" />
               </div>
               <h3 className="text-xl md:text-2xl font-display font-semibold text-gray-900 mb-2 md:mb-3">Svatební web builder</h3>
               <p className="text-sm md:text-base text-gray-600 leading-relaxed">Vytvořte vlastní svatební web s RSVP systémem, fotogalerií a vlastní doménou – vše bez kódování.</p>
             </div>
-            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-200 text-center">
+            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow text-center">
               <div className="w-14 h-14 md:w-16 md:h-16 bg-orange-100 rounded-full flex items-center justify-center mb-4 md:mb-6 shadow-sm mx-auto">
                 <Calendar className="w-7 h-7 md:w-8 md:h-8 text-orange-500" />
               </div>
@@ -398,7 +398,7 @@ export default function WelcomeScreen() {
         </div>
       </section>
 
-      <section className="py-12 md:py-16 lg:py-20 bg-white border-t border-gray-100">
+      <section className="py-12 md:py-16 lg:py-20 bg-white border-t border-gray-100 touch-pan-y">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-8 md:mb-12 lg:mb-16">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-gray-900 mb-4 md:mb-6">
@@ -409,21 +409,21 @@ export default function WelcomeScreen() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 max-w-6xl mx-auto">
-            <div className="text-center space-y-6">
+            <div className="text-center space-y-6 animate-slide-up" style={{ animationDelay: '300ms' }}>
               <div className="w-24 h-24 bg-rose-100 rounded-3xl flex items-center justify-center mx-auto shadow-md">
                 <Sparkles className="w-12 h-12 text-rose-600" />
               </div>
               <h3 className="text-3xl font-display font-semibold text-gray-900">AI technologie</h3>
               <p className="text-gray-600 leading-relaxed max-w-sm mx-auto">První český svatební plánovač s GPT-4 a Perplexity AI pro inteligentní doporučení a automatizaci.</p>
             </div>
-            <div className="text-center space-y-6">
+            <div className="text-center space-y-6 animate-slide-up" style={{ animationDelay: '400ms' }}>
               <div className="w-24 h-24 bg-purple-100 rounded-3xl flex items-center justify-center mx-auto shadow-md">
                 <Shield className="w-12 h-12 text-purple-600" />
               </div>
               <h3 className="text-3xl font-display font-semibold text-gray-900">Firebase & GDPR</h3>
               <p className="text-gray-600 leading-relaxed max-w-sm mx-auto">Všechna data bezpečně uložená v Google Firebase s GDPR compliance a automatickým zálohováním.</p>
             </div>
-            <div className="text-center space-y-6">
+            <div className="text-center space-y-6 animate-slide-up" style={{ animationDelay: '500ms' }}>
               <div className="w-24 h-24 bg-emerald-100 rounded-3xl flex items-center justify-center mx-auto shadow-md">
                 <Clock className="w-12 h-12 text-emerald-600" />
               </div>
@@ -434,7 +434,7 @@ export default function WelcomeScreen() {
         </div>
       </section>
 
-      <section id="vendors" className="py-12 md:py-16 lg:py-20 bg-gradient-to-br from-yellow-50 to-orange-50">
+      <section id="vendors" className="py-12 md:py-16 lg:py-20 bg-gradient-to-br from-yellow-50 to-orange-50 touch-pan-y">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-6xl mx-auto bg-white rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
             <div className="md:w-1/2 p-6 md:p-10 lg:p-12 bg-gradient-to-br from-rose-500 to-purple-500 text-white flex flex-col justify-between">
