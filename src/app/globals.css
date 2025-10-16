@@ -21,25 +21,13 @@
     --shadow-wedding: 0 4px 25px -5px rgba(248, 187, 217, 0.3), 0 10px 30px -5px rgba(225, 213, 231, 0.2);
   }
 
-  /* Smooth scrolling optimization */
+  /* Smooth scrolling */
   html {
     scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    overflow-x: hidden;
-    overflow-y: auto;
   }
 
   body {
-    overscroll-behavior-y: none;
     overflow-x: hidden;
-    overflow-y: auto;
-    position: relative;
-  }
-
-  /* Prevent double scrollbars */
-  #root {
-    overflow: visible;
-    min-height: 100vh;
   }
 
   /* Redesignr.ai styles */

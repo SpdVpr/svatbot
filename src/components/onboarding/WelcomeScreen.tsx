@@ -42,7 +42,7 @@ export default function WelcomeScreen() {
   }
 
   return (
-    <div className="w-full min-h-screen overflow-x-hidden">
+    <>
       {/* Scroll Progress */}
       <ScrollProgress />
 
@@ -70,7 +70,7 @@ export default function WelcomeScreen() {
         </div>
       </header>
 
-      <section className="bg-gradient-hero py-12 md:py-20 lg:py-32 relative overflow-hidden touch-pan-y will-change-scroll">
+      <section className="bg-gradient-hero py-12 md:py-20 lg:py-32 relative overflow-hidden">
         <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
           <div className="w-full h-full transform scale-150"></div>
         </div>
@@ -115,7 +115,7 @@ export default function WelcomeScreen() {
         </div>
       </section>
 
-      <section id="features" className="py-12 md:py-16 lg:py-20 bg-white touch-pan-y will-change-scroll">
+      <section id="features" className="py-12 md:py-16 lg:py-20 bg-white">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-8 md:mb-12 lg:mb-16">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-gray-900 mb-4 md:mb-6">
@@ -158,7 +158,7 @@ export default function WelcomeScreen() {
         </div>
       </section>
 
-      <section className="py-12 md:py-16 lg:py-20 bg-rose-50 touch-pan-y will-change-scroll">
+      <section className="py-12 md:py-16 lg:py-20 bg-rose-50">
         <div className="container mx-auto px-4 md:px-6 text-center">
           <div className="max-w-4xl mx-auto p-6 md:p-10 lg:p-12 bg-white rounded-2xl md:rounded-3xl shadow-xl border border-rose-100">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold text-gray-900 mb-4 md:mb-6">
@@ -212,7 +212,7 @@ export default function WelcomeScreen() {
         </div>
       </section>
 
-      <section id="dashboard" className="py-12 md:py-16 lg:py-20 bg-gray-50 touch-pan-y will-change-scroll">
+      <section id="dashboard" className="py-12 md:py-16 lg:py-20 bg-gray-50">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-8 md:mb-12 lg:mb-16">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-gray-900 mb-4 md:mb-6">
@@ -355,7 +355,7 @@ export default function WelcomeScreen() {
         </div>
       </section>
 
-      <section className="py-12 md:py-16 lg:py-20 bg-gradient-to-br from-rose-50 via-purple-50 to-blue-50 touch-pan-y will-change-scroll">
+      <section className="py-12 md:py-16 lg:py-20 bg-gradient-to-br from-rose-50 via-purple-50 to-blue-50">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-8 md:mb-12 lg:mb-16">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-gray-900 mb-4 md:mb-6">
@@ -398,7 +398,7 @@ export default function WelcomeScreen() {
         </div>
       </section>
 
-      <section className="py-12 md:py-16 lg:py-20 bg-white border-t border-gray-100 touch-pan-y will-change-scroll">
+      <section className="py-12 md:py-16 lg:py-20 bg-white border-t border-gray-100">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-8 md:mb-12 lg:mb-16">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-gray-900 mb-4 md:mb-6">
@@ -434,7 +434,7 @@ export default function WelcomeScreen() {
         </div>
       </section>
 
-      <section id="vendors" className="py-12 md:py-16 lg:py-20 bg-gradient-to-br from-yellow-50 to-orange-50 touch-pan-y will-change-scroll">
+      <section id="vendors" className="py-12 md:py-16 lg:py-20 bg-gradient-to-br from-yellow-50 to-orange-50">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-6xl mx-auto bg-white rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
             <div className="md:w-1/2 p-6 md:p-10 lg:p-12 bg-gradient-to-br from-rose-500 to-purple-500 text-white flex flex-col justify-between">
@@ -591,7 +591,7 @@ export default function WelcomeScreen() {
           onSwitchMode={(mode) => setAuthMode(mode)}
         />
       )}
-    </div>
+    </>
   )
 }
 
