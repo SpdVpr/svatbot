@@ -213,7 +213,7 @@ export default function EventDetailModal({ event, onClose }: EventDetailModalPro
           {/* Source info */}
           <div className="border-t border-gray-200 pt-4">
             <p className="text-sm text-gray-500">
-              Zdroj: <span className="font-medium">{event.source === 'custom' ? 'Vlastní událost' : event.source}</span>
+              Zdroj: <span className="font-medium">{event.event.source === 'custom' ? 'Vlastní událost' : event.event.source}</span>
             </p>
           </div>
         </div>
