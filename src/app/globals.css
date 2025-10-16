@@ -21,6 +21,16 @@
     --shadow-wedding: 0 4px 25px -5px rgba(248, 187, 217, 0.3), 0 10px 30px -5px rgba(225, 213, 231, 0.2);
   }
 
+  /* Smooth scrolling optimization */
+  html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body {
+    overscroll-behavior-y: none;
+  }
+
   /* Redesignr.ai styles */
   .text-gradient-primary {
     background: linear-gradient(to right, #FB7185, #E879F9);
