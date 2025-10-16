@@ -48,7 +48,8 @@ function SimpleMoodboardCard({
   const [resizeStartSize, setResizeStartSize] = useState({ width: 0, height: 0 })
   const [resizeStartPos, setResizeStartPos] = useState({ x: 0, y: 0 })
   const [imageLoaded, setImageLoaded] = useState(false)
-  const [showFullQuality, setShowFullQuality] = useState(false)
+  // Always use full quality like in dashboard
+  const [showFullQuality] = useState(true)
   const [hasBeenResized, setHasBeenResized] = useState(false)
 
   const dragRef = useRef<HTMLDivElement>(null)
@@ -142,31 +143,7 @@ function SimpleMoodboardCard({
     }
   }
 
-  // Switch to full quality when image gets larger or during resize
-  useEffect(() => {
-    const minDimension = Math.min(imageSize.width, imageSize.height)
-    const maxDimension = Math.max(imageSize.width, imageSize.height)
-
-    // Use HD quality if:
-    // 1. Currently resizing (for smooth experience)
-    // 2. Image is larger than thumbnail dimensions (300px)
-    // 3. Image has been manually resized by user (keep HD quality)
-    // 4. Image has been significantly enlarged (max dimension > 350px)
-    const shouldUseHD = isResizing ||
-                       minDimension > 300 ||
-                       hasBeenResized ||
-                       maxDimension > 350
-
-    setShowFullQuality(shouldUseHD)
-  }, [imageSize, isResizing, hasBeenResized])
-
-  // Preload full quality image on hover
-  useEffect(() => {
-    if (isHovered && !showFullQuality && image.url !== image.thumbnailUrl) {
-      const img = new Image()
-      img.src = image.url // Preload full quality
-    }
-  }, [isHovered, showFullQuality, image.url, image.thumbnailUrl])
+  // Always use full quality - removed quality switching logic for better UX
 
   // Resize handlers
   const handleResizeStart = (e: React.MouseEvent | React.TouchEvent) => {
@@ -390,21 +367,11 @@ function SimpleMoodboardCard({
         isDragging ? 'border-pink-300' : 'border-transparent hover:border-pink-200'
       } transition-all`}>
         
-        {/* Image with quality switching */}
+        {/* Image - always full quality like dashboard */}
         <div className="relative w-full h-full">
-          {/* Thumbnail for fast loading */}
-          {!imageLoaded && image.thumbnailUrl && (
-            <img
-              src={image.thumbnailUrl}
-              alt={image.title}
-              className="w-full h-full object-cover opacity-50"
-              draggable={false}
-            />
-          )}
-
-          {/* Main image - use full quality for larger sizes */}
+          {/* Main image - always use full quality */}
           <img
-            src={showFullQuality ? image.url : (image.thumbnailUrl || image.url)}
+            src={image.url}
             alt={image.title}
             className={`w-full h-full object-cover transition-opacity duration-300 ${
               imageLoaded ? 'opacity-100' : 'opacity-0'
@@ -465,27 +432,6 @@ function SimpleMoodboardCard({
               <span>{category.icon}</span>
               {category.label}
             </span>
-          </div>
-        )}
-
-        {/* Quality indicator */}
-        {(isHovered || isResizing) && (
-          <div className="absolute top-2 right-12 opacity-75">
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                setHasBeenResized(!hasBeenResized)
-              }}
-              className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-colors cursor-pointer ${
-                showFullQuality
-                  ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-              title={showFullQuality ? 'Přepnout na rychlou kvalitu' : 'Přepnout na HD kvalitu'}
-            >
-              <span>{showFullQuality ? '🔍' : '⚡'}</span>
-              {showFullQuality ? 'HD' : 'FAST'}
-            </button>
           </div>
         )}
 
