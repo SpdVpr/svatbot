@@ -7,15 +7,7 @@ import { useAccommodationWithGuests } from '@/hooks/useAccommodationWithGuests'
 export default function AccommodationManagementModule() {
   const { stats, accommodations, loading } = useAccommodationWithGuests()
 
-  if (loading) {
-    return (
-      <div className="wedding-card">
-        <div className="flex items-center justify-center py-8">
-          <div className="loading-spinner w-6 h-6" />
-        </div>
-      </div>
-    )
-  }
+  // Don't show loading state - let content fade in smoothly
 
   return (
     <div className="wedding-card">

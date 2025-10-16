@@ -118,11 +118,10 @@ export default function AIAssistantModule({ className = '' }: AIAssistantModuleP
           <Lightbulb className="w-4 h-4 text-yellow-500 mr-2" />
           AI Doporučení
         </h4>
-        
+
         {loadingInsights ? (
           <div className="flex items-center justify-center py-6">
-            <Loader2 className="w-5 h-5 animate-spin text-purple-500 mr-2" />
-            <span className="text-sm text-gray-500">Analyzuji vaši svatbu...</span>
+            <Loader2 className="w-5 h-5 animate-spin text-purple-500" />
           </div>
         ) : insights ? (
           <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-4">

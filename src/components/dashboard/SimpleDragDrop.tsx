@@ -228,13 +228,7 @@ export default function SimpleDragDrop({ onWeddingSettingsClick }: SimpleDragDro
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="loading-spinner w-8 h-8" />
-      </div>
-    )
-  }
+  // Don't show loading state - let content fade in smoothly with AppTemplate
 
   const visibleModules = getVisibleModules()
   const allModules = layout.modules // Všechny moduly včetně skrytých

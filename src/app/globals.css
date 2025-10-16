@@ -76,21 +76,31 @@
     min-height: 100vh;
   }
 
-  /* Smooth page transitions */
+  /* Smooth page transitions - optimized for performance */
   * {
-    transition-property: background-color, border-color, color, fill, stroke;
+    transition-property: opacity, transform;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 150ms;
   }
 
-  /* Disable transitions for specific elements */
-  input, textarea, select, button {
+  /* Disable transitions for specific elements to prevent jank */
+  input, textarea, select {
     transition: none;
   }
 
-  /* Re-enable for hover states */
-  button:hover, a:hover {
+  /* Re-enable smooth transitions for interactive elements */
+  button, a, .wedding-card {
     transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Prevent layout shift during page transitions */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Smooth scrolling for all elements */
+  * {
+    scroll-behavior: smooth;
   }
 }
 
