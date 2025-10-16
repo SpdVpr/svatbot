@@ -287,32 +287,45 @@ export default function GuestList({
       return
     }
 
-    const draggedIndex = filteredGuests.findIndex(g => g.id === draggedGuest)
-    console.log('📊 Drop indices:', { draggedIndex, dropIndex })
+    // Find indices in the DISPLAYED filtered list
+    const draggedIndexInFiltered = filteredGuests.findIndex(g => g.id === draggedGuest)
+    console.log('📊 Drop indices in filtered list:', { draggedIndexInFiltered, dropIndex })
 
-    if (draggedIndex === -1 || draggedIndex === dropIndex) {
+    if (draggedIndexInFiltered === -1 || draggedIndexInFiltered === dropIndex) {
       setDraggedGuest(null)
       setDragOverIndex(null)
       setIsDragging(false)
       return
     }
 
-    // Reorder guests
-    const newGuests = [...filteredGuests]
-    const [removed] = newGuests.splice(draggedIndex, 1)
-    newGuests.splice(dropIndex, 0, removed)
+    // Get the guest IDs at the drag positions in filtered list
+    const draggedGuestId = filteredGuests[draggedIndexInFiltered].id
+    const targetGuestId = filteredGuests[dropIndex].id
 
-    // Call reorder callback directly
-    console.log('🔍 Direct callback check:', {
-      onGuestReorder: !!onGuestReorder,
-      onGuestReorderType: typeof onGuestReorder
-    })
+    // Now reorder in the FULL guests array (not just filtered)
+    const allGuests = [...guests]
+    const draggedIndexInAll = allGuests.findIndex(g => g.id === draggedGuestId)
+    const targetIndexInAll = allGuests.findIndex(g => g.id === targetGuestId)
 
+    console.log('📊 Indices in full array:', { draggedIndexInAll, targetIndexInAll })
+
+    if (draggedIndexInAll === -1 || targetIndexInAll === -1) {
+      console.log('❌ Guest not found in full array')
+      setDraggedGuest(null)
+      setDragOverIndex(null)
+      setIsDragging(false)
+      return
+    }
+
+    // Reorder in full array
+    const [removed] = allGuests.splice(draggedIndexInAll, 1)
+    allGuests.splice(targetIndexInAll, 0, removed)
+
+    console.log('✅ Reordered guests, calling callback with', allGuests.length, 'guests')
+
+    // Call reorder callback with FULL array
     if (onGuestReorder && typeof onGuestReorder === 'function') {
-      console.log('📞 Calling direct callback with', newGuests.length, 'guests')
-      onGuestReorder(newGuests)
-    } else {
-      console.log('❌ No direct callback available')
+      onGuestReorder(allGuests)
     }
 
     // Clear states
@@ -324,7 +337,7 @@ export default function GuestList({
     if (dragTimeoutRef.current) {
       clearTimeout(dragTimeoutRef.current)
     }
-  }, [draggedGuest, isDragging, viewMode, filteredGuests, onGuestReorder])
+  }, [draggedGuest, isDragging, viewMode, filteredGuests, guests, onGuestReorder])
 
   // Touch handlers for mobile with long press detection
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null)

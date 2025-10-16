@@ -281,12 +281,13 @@ export default function MoodboardImageCard({
         transform: 'translateZ(0)', // Force hardware acceleration
       }}>
         <Image
-          src={image.thumbnailUrl || image.url}
+          src={image.url}
           alt={image.title || 'Moodboard image'}
           fill
           className="object-cover"
           onLoad={handleImageLoad}
           sizes="400px"
+          quality={95}
         />
         
         {/* Drag handle */}
