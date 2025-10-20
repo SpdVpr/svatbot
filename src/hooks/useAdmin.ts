@@ -2,6 +2,9 @@
 
 import { useState, useEffect, createContext, useContext } from 'react'
 import { AdminUser, AdminSession, AdminStats } from '@/types/admin'
+import { auth, db } from '@/lib/firebase'
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth'
+import { doc, getDoc } from 'firebase/firestore'
 
 interface AdminContextType {
   user: AdminUser | null
@@ -14,6 +17,61 @@ interface AdminContextType {
 }
 
 const AdminContext = createContext<AdminContextType | null>(null)
+
+// Helper function to get permissions based on role
+function getPermissionsForRole(role: string) {
+  if (role === 'super_admin') {
+    return [
+      {
+        resource: 'vendors' as const,
+        actions: ['create', 'read', 'update', 'delete'] as ('create' | 'read' | 'update' | 'delete')[]
+      },
+      {
+        resource: 'users' as const,
+        actions: ['create', 'read', 'update', 'delete'] as ('create' | 'read' | 'update' | 'delete')[]
+      },
+      {
+        resource: 'orders' as const,
+        actions: ['read', 'update'] as ('read' | 'update')[]
+      },
+      {
+        resource: 'analytics' as const,
+        actions: ['read'] as ('read')[]
+      },
+      {
+        resource: 'settings' as const,
+        actions: ['read', 'update'] as ('read' | 'update')[]
+      }
+    ]
+  } else if (role === 'admin') {
+    return [
+      {
+        resource: 'vendors' as const,
+        actions: ['read', 'update'] as ('read' | 'update')[]
+      },
+      {
+        resource: 'users' as const,
+        actions: ['read'] as ('read')[]
+      },
+      {
+        resource: 'analytics' as const,
+        actions: ['read'] as ('read')[]
+      }
+    ]
+  } else if (role === 'moderator') {
+    return [
+      {
+        resource: 'vendors' as const,
+        actions: ['read', 'update'] as ('read' | 'update')[]
+      },
+      {
+        resource: 'users' as const,
+        actions: ['read'] as ('read')[]
+      }
+    ]
+  }
+  return []
+}
 
 // Mock admin users for development
 const MOCK_ADMIN_USERS = [
@@ -79,12 +137,19 @@ export function useAdmin() {
       try {
         const parsedSession = JSON.parse(savedSession)
         if (new Date(parsedSession.expiresAt) > new Date()) {
-          setSession(parsedSession)
-          setUser(parsedSession.user)
+          // Convert date strings back to Date objects
+          const user = {
+            ...parsedSession.user,
+            createdAt: new Date(parsedSession.user.createdAt),
+            lastLogin: parsedSession.user.lastLogin ? new Date(parsedSession.user.lastLogin) : undefined
+          }
+          setSession({ ...parsedSession, user })
+          setUser(user)
         } else {
           localStorage.removeItem('admin_session')
         }
       } catch (error) {
+        console.error('Error loading admin session:', error)
         localStorage.removeItem('admin_session')
       }
     }
@@ -94,33 +159,96 @@ export function useAdmin() {
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true)
 
-    // Mock authentication - in production, this would be a real API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    try {
+      // Sign in with Firebase Authentication
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      const firebaseUser = userCredential.user
 
-    const adminUser = MOCK_ADMIN_USERS.find(u => u.email === email)
+      // Get ID token to check custom claims
+      const idTokenResult = await firebaseUser.getIdTokenResult()
+      const role = idTokenResult.claims.role as string
+      const isAdmin = idTokenResult.claims.admin as boolean
 
-    if (adminUser && password === 'admin123') {
+      console.log('🔐 Login attempt:', { email, role, isAdmin })
+
+      // Check if user has admin role
+      if (!isAdmin || !role) {
+        console.error('❌ User is not an admin')
+        await signOut(auth)
+        setIsLoading(false)
+        return false
+      }
+
+      // Get admin user data from Firestore
+      const adminUserDoc = await getDoc(doc(db, 'adminUsers', firebaseUser.uid))
+
+      if (!adminUserDoc.exists()) {
+        console.error('❌ Admin user document not found')
+        await signOut(auth)
+        setIsLoading(false)
+        return false
+      }
+
+      const adminData = adminUserDoc.data()
+
+      // Check if admin is active
+      if (!adminData.isActive) {
+        console.error('❌ Admin account is not active')
+        await signOut(auth)
+        setIsLoading(false)
+        return false
+      }
+
+      // Create admin user object
+      const adminUser: AdminUser = {
+        id: firebaseUser.uid,
+        email: adminData.email,
+        name: adminData.name || 'Admin',
+        role: adminData.role,
+        permissions: getPermissionsForRole(adminData.role),
+        createdAt: adminData.createdAt?.toDate() || new Date(),
+        lastLogin: new Date(),
+        isActive: adminData.isActive
+      }
+
+      // Create session
       const newSession: AdminSession = {
-        user: { ...adminUser, lastLogin: new Date() },
-        token: 'mock-jwt-token-' + Date.now(),
+        user: adminUser,
+        token: await firebaseUser.getIdToken(),
         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
       }
 
       setSession(newSession)
-      setUser(newSession.user)
-      localStorage.setItem('admin_session', JSON.stringify(newSession))
+      setUser(adminUser)
+      localStorage.setItem('admin_session', JSON.stringify({
+        ...newSession,
+        user: {
+          ...adminUser,
+          createdAt: adminUser.createdAt.toISOString(),
+          lastLogin: adminUser.lastLogin?.toISOString()
+        }
+      }))
+
+      console.log('✅ Admin login successful:', adminUser)
       setIsLoading(false)
       return true
-    }
 
-    setIsLoading(false)
-    return false
+    } catch (error: any) {
+      console.error('❌ Login error:', error)
+      setIsLoading(false)
+      return false
+    }
   }
 
-  const logout = () => {
-    setUser(null)
-    setSession(null)
-    localStorage.removeItem('admin_session')
+  const logout = async () => {
+    try {
+      await signOut(auth)
+      setUser(null)
+      setSession(null)
+      localStorage.removeItem('admin_session')
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
   }
 
   const checkPermission = (resource: string, action: string): boolean => {
@@ -149,11 +277,37 @@ export function useAdminStats() {
     // Mock stats - in production, this would fetch from API
     setTimeout(() => {
       setStats({
+        // Users
+        totalUsers: 1247,
+        activeUsers: 856,
+        onlineUsers: 42,
+        newUsersToday: 12,
+        newUsersThisWeek: 87,
+        newUsersThisMonth: 342,
+
+        // Vendors
         totalVendors: 11,
         activeVendors: 11,
         pendingApprovals: 3,
-        totalUsers: 1247,
+
+        // Finance
         monthlyRevenue: 45600,
+        totalRevenue: 234500,
+        activeSubscriptions: 156,
+        trialUsers: 89,
+        churnRate: 3.2,
+
+        // Engagement
+        avgSessionTime: 24.5,
+        totalSessions: 5432,
+        avgSessionsPerUser: 4.3,
+
+        // Support
+        openConversations: 8,
+        pendingFeedback: 5,
+        avgResponseTime: 2.4,
+
+        // Top Categories
         topCategories: [
           { category: 'photographer', count: 6 },
           { category: 'venue', count: 1 },
@@ -161,7 +315,12 @@ export function useAdminStats() {
           { category: 'music', count: 1 },
           { category: 'flowers', count: 1 },
           { category: 'dress', count: 1 }
-        ]
+        ],
+
+        // Charts Data
+        userGrowth: [],
+        revenueGrowth: [],
+        engagementTrend: []
       })
       setLoading(false)
     }, 500)

@@ -254,18 +254,25 @@ export function useSubscription() {
 
     try {
       setLoading(true)
-      
-      // This would integrate with Stripe via Firebase Extensions
-      // For now, we'll just update the subscription status
-      console.log('🔄 Upgrading to:', plan)
-      
-      // TODO: Implement Stripe payment flow
-      // This should redirect to Stripe Checkout or use Stripe Elements
-      
-      setError('Platební brána bude implementována v další fázi')
+
+      // Import Stripe module dynamically
+      const { createCheckoutSession } = await import('@/lib/stripe')
+
+      // Create checkout session
+      const checkoutUrl = await createCheckoutSession({
+        userId: user.id,
+        userEmail: user.email,
+        plan,
+        successUrl: `${window.location.origin}/dashboard?payment=success`,
+        cancelUrl: `${window.location.origin}/dashboard?payment=canceled`
+      })
+
+      // Redirect to checkout (or success page in mock mode)
+      window.location.href = checkoutUrl
+
     } catch (err) {
       console.error('Error upgrading subscription:', err)
-      setError('Chyba při upgradu předplatného')
+      setError('Chyba při vytváření platby')
     } finally {
       setLoading(false)
     }
@@ -277,13 +284,12 @@ export function useSubscription() {
 
     try {
       setLoading(true)
-      
-      const subscriptionRef = doc(db, 'subscriptions', user.id)
-      await updateDoc(subscriptionRef, {
-        cancelAtPeriodEnd: true,
-        canceledAt: Timestamp.fromDate(new Date()),
-        updatedAt: Timestamp.fromDate(new Date())
-      })
+
+      // Import Stripe module dynamically
+      const { cancelSubscription: cancelStripeSubscription } = await import('@/lib/stripe')
+
+      // Cancel via Stripe (or mock)
+      await cancelStripeSubscription(user.id, subscription.stripeSubscriptionId || subscription.id)
 
       setSubscription({
         ...subscription,
@@ -307,13 +313,12 @@ export function useSubscription() {
 
     try {
       setLoading(true)
-      
-      const subscriptionRef = doc(db, 'subscriptions', user.id)
-      await updateDoc(subscriptionRef, {
-        cancelAtPeriodEnd: false,
-        canceledAt: null,
-        updatedAt: Timestamp.fromDate(new Date())
-      })
+
+      // Import Stripe module dynamically
+      const { reactivateSubscription: reactivateStripeSubscription } = await import('@/lib/stripe')
+
+      // Reactivate via Stripe (or mock)
+      await reactivateStripeSubscription(user.id, subscription.stripeSubscriptionId || subscription.id)
 
       setSubscription({
         ...subscription,

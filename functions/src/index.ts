@@ -118,9 +118,12 @@ export { default as scheduledCleanup } from './triggers/scheduledCleanup'
 // Callable functions for client-side
 export { default as getVendors } from './callable/getVendors'
 export { default as createVendor } from './callable/createVendor'
-export { default as updateVendor } from './callable/updateVendor'
-export { default as deleteVendor } from './callable/deleteVendor'
-export { default as uploadImages } from './callable/uploadImages'
-export { default as sendInquiry } from './callable/sendInquiry'
-export { default as addReview } from './callable/addReview'
-export { default as toggleFavorite } from './callable/toggleFavorite'
+// export { default as updateVendor } from './callable/updateVendor'
+// export { default as deleteVendor } from './callable/deleteVendor'
+// export { default as uploadImages } from './callable/uploadImages'
+// export { default as sendInquiry } from './callable/sendInquiry'
+// export { default as addReview } from './callable/addReview'
+// export { default as toggleFavorite } from './callable/toggleFavorite'
+
+// Admin setup function (one-time use)
+export { setAdminRole } from './setAdminRole'

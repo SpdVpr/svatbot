@@ -49,30 +49,6 @@ const navigation: NavigationItem[] = [
     href: '/admin/marketplace',
     icon: CheckCircle,
     permission: { resource: 'vendors', action: 'read' }
-  },
-  {
-    name: 'Uživatelé',
-    href: '/admin/users',
-    icon: Users,
-    permission: { resource: 'users', action: 'read' }
-  },
-  {
-    name: 'Objednávky',
-    href: '/admin/orders',
-    icon: ShoppingCart,
-    permission: { resource: 'orders', action: 'read' }
-  },
-  {
-    name: 'Analytika',
-    href: '/admin/analytics',
-    icon: BarChart3,
-    permission: { resource: 'analytics', action: 'read' }
-  },
-  {
-    name: 'Nastavení',
-    href: '/admin/settings',
-    icon: Settings,
-    permission: { resource: 'settings', action: 'read' }
   }
 ]
 

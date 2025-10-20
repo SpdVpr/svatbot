@@ -1,6 +1,12 @@
 'use client'
 
+import { useState } from 'react'
 import { useAdminStats } from '@/hooks/useAdmin'
+import AdminDashboardStats from '@/components/admin/AdminDashboardStats'
+import UserAnalyticsTable from '@/components/admin/UserAnalyticsTable'
+import AdminMessaging from '@/components/admin/AdminMessaging'
+import FeedbackManagement from '@/components/admin/FeedbackManagement'
+import PaymentsTab from '@/components/admin/PaymentsTab'
 import {
   Store,
   Users,
@@ -14,8 +20,14 @@ import {
   Music,
   Flower,
   Utensils,
-  Shirt
+  Shirt,
+  LayoutDashboard,
+  MessageSquare,
+  MessageCircle,
+  ShoppingBag
 } from 'lucide-react'
+
+type TabType = 'overview' | 'users' | 'messages' | 'feedback' | 'payments' | 'vendors'
 
 const categoryIcons = {
   photographer: Camera,
@@ -28,6 +40,7 @@ const categoryIcons = {
 
 export default function AdminDashboard() {
   const { stats, loading } = useAdminStats()
+  const [activeTab, setActiveTab] = useState<TabType>('overview')
 
   if (loading) {
     return (
@@ -44,14 +57,62 @@ export default function AdminDashboard() {
     )
   }
 
+  const tabs = [
+    { id: 'overview' as TabType, label: 'Přehled', icon: LayoutDashboard },
+    { id: 'users' as TabType, label: 'Uživatelé', icon: Users },
+    { id: 'payments' as TabType, label: 'Platby', icon: DollarSign },
+    { id: 'messages' as TabType, label: 'Zprávy', icon: MessageSquare },
+    { id: 'feedback' as TabType, label: 'Feedback', icon: MessageCircle },
+    { id: 'vendors' as TabType, label: 'Vendors', icon: ShoppingBag }
+  ]
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600">Přehled marketplace SvatBot.cz</p>
+        <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+        <p className="text-gray-600">Správa a analytika SvatBot.cz</p>
       </div>
 
+      {/* Navigation Tabs */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <nav className="flex space-x-4 p-4 overflow-x-auto">
+          {tabs.map((tab) => {
+            const Icon = tab.icon
+            const isActive = activeTab === tab.id
+
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-colors ${
+                  isActive
+                    ? 'bg-primary-600 text-white'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <Icon className="w-5 h-5" />
+                {tab.label}
+              </button>
+            )
+          })}
+        </nav>
+      </div>
+
+      {/* Content */}
+      {activeTab === 'overview' && <OverviewTab stats={stats} />}
+      {activeTab === 'users' && <UserAnalyticsTable />}
+      {activeTab === 'payments' && <PaymentsTab />}
+      {activeTab === 'messages' && <AdminMessaging />}
+      {activeTab === 'feedback' && <FeedbackManagement />}
+      {activeTab === 'vendors' && <VendorsTab />}
+    </div>
+  )
+}
+
+function OverviewTab({ stats }: { stats: any }) {
+  return (
+    <div className="space-y-6">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
@@ -108,7 +169,7 @@ export default function AdminDashboard() {
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Nejpopulárnější kategorie</h3>
           <div className="space-y-3">
-            {stats?.topCategories.map((category) => {
+            {stats?.topCategories?.map((category: any) => {
               const Icon = categoryIcons[category.category as keyof typeof categoryIcons] || Store
               return (
                 <div key={category.category} className="flex items-center justify-between">
@@ -176,12 +237,40 @@ export default function AdminDashboard() {
             description="Zkontrolovat čekající žádosti"
           />
           <QuickActionButton
-            href="/admin/analytics"
+            href="/admin/marketplace"
             icon={TrendingUp}
-            title="Zobrazit analytiku"
-            description="Detailní přehledy a statistiky"
+            title="Marketplace"
+            description="Správa marketplace registrací"
           />
         </div>
+      </div>
+    </div>
+  )
+}
+
+function VendorsTab() {
+  return (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+      <ShoppingBag className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+      <h3 className="text-xl font-semibold text-gray-900 mb-2">
+        Vendor Management
+      </h3>
+      <p className="text-gray-600 mb-6">
+        Správa dodavatelů a marketplace
+      </p>
+      <div className="flex gap-4 justify-center">
+        <a
+          href="/admin/vendors"
+          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Spravovat Vendors
+        </a>
+        <a
+          href="/admin/marketplace"
+          className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+        >
+          Marketplace
+        </a>
       </div>
     </div>
   )

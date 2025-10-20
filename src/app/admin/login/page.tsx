@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@/hooks/useAuth'
+import { useAdmin } from '@/hooks/useAdmin'
 import {
   Lock,
   Mail,
@@ -20,15 +20,14 @@ export default function AdminLoginPage() {
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const { user, login, isLoading, error: authError } = useAuth()
-  const isAdmin = false // TODO: implement admin check
+  const { user, login, isLoading, isAuthenticated } = useAdmin()
   const router = useRouter()
 
   useEffect(() => {
-    if (user && isAdmin && !isLoading) {
+    if (isAuthenticated && !isLoading) {
       router.push('/admin/dashboard')
     }
-  }, [user, isAdmin, isLoading, router])
+  }, [isAuthenticated, isLoading, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -36,18 +35,15 @@ export default function AdminLoginPage() {
     setIsSubmitting(true)
 
     try {
-      await login({ email, password })
+      const success = await login(email, password)
 
-      // Check if user is admin after login
-      // This will be handled by the useEffect above
-    } catch (err: any) {
-      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
-        setError('Neplatné přihlašovací údaje')
-      } else if (err.code === 'auth/too-many-requests') {
-        setError('Příliš mnoho pokusů. Zkuste to později.')
-      } else {
-        setError('Chyba při přihlašování: ' + (err.message || 'Neznámá chyba'))
+      if (!success) {
+        setError('Neplatné přihlašovací údaje nebo nemáte admin oprávnění')
       }
+      // If successful, useEffect will redirect to /admin/dashboard
+    } catch (err: any) {
+      console.error('Login error:', err)
+      setError('Chyba při přihlašování: ' + (err.message || 'Neznámá chyba'))
     } finally {
       setIsSubmitting(false)
     }
@@ -157,9 +153,8 @@ export default function AdminLoginPage() {
 
           <div className="text-center">
             <div className="text-sm text-gray-600 bg-gray-100 p-4 rounded-md">
-              <p className="font-medium mb-2">Demo přihlašovací údaje:</p>
-              <p><strong>Admin:</strong> admin@svatbot.cz / admin123</p>
-              <p><strong>Moderátor:</strong> moderator@svatbot.cz / admin123</p>
+              <p className="font-medium mb-2">Admin přihlášení:</p>
+              <p>Použijte své admin přihlašovací údaje</p>
             </div>
           </div>
         </form>

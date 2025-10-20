@@ -1,6 +1,27 @@
-# Demo Account Setup Scripts
+# Admin & Demo Scripts
 
-Tento adresář obsahuje skripty a dokumentaci pro správu demo účtu v aplikaci Svatbot.
+Tento adresář obsahuje utility skripty pro správu admin uživatelů a demo účtu v aplikaci Svatbot.
+
+## 🔐 Admin Setup
+
+Pro bezpečné vytvoření admin účtu použijte **Cloud Function** metodu.
+
+**Dokumentace**: [../SECURE_ADMIN_SETUP.md](../SECURE_ADMIN_SETUP.md)
+
+### Rychlý Postup:
+
+1. Vytvořte uživatele v Firebase Console
+2. Deploy Cloud Function: `firebase deploy --only functions:setAdminRole`
+3. Zavolejte funkci s UID uživatele
+4. Přihlaste se na `/admin/login`
+
+⚠️ **BEZPEČNOST**: Nepoužívejte scripty s service account keys v projektu!
+
+---
+
+## 🎭 Demo Account Scripts
+
+Skripty pro správu demo účtu v aplikaci Svatbot.
 
 ## 🚀 Rychlý start
 

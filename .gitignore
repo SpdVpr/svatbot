@@ -56,6 +56,7 @@ firebase-debug.log
 firestore-debug.log
 firebase-service-account.json
 *-firebase-adminsdk-*.json
+scripts/serviceAccountKey.json
 
 # Mobile
 mobile/node_modules/
