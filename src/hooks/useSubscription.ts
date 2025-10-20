@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuth } from './useAuth'
 import { useWedding } from './useWedding'
 import { db } from '@/config/firebase'
@@ -34,12 +34,18 @@ export function useSubscription() {
   const [usageStats, setUsageStats] = useState<UsageStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const hasLoadedRef = useRef(false) // Track if data has been loaded
 
   // Load subscription data - only once when user/wedding changes
   useEffect(() => {
     if (!user || !wedding) {
       setLoading(false)
       return
+    }
+
+    // Only set loading on first load
+    if (!hasLoadedRef.current) {
+      setLoading(true)
     }
 
     loadSubscription()
@@ -52,7 +58,6 @@ export function useSubscription() {
     if (!user || !wedding) return
 
     try {
-      setLoading(true)
       const subscriptionRef = doc(db, 'subscriptions', user.id)
       const subscriptionDoc = await getDoc(subscriptionRef)
 
@@ -94,6 +99,7 @@ export function useSubscription() {
       }
     } finally {
       setLoading(false)
+      hasLoadedRef.current = true // Mark as loaded
     }
   }
 
