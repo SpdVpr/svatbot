@@ -189,6 +189,19 @@ async function handlePaymentSucceeded(invoice: any) {
       invoiceId: invoice.id
     })
 
+    console.log('📥 Invoice timestamp data:', {
+      created: invoice.created,
+      createdType: typeof invoice.created,
+      createdValue: invoice.created,
+      multiplied: invoice.created * 1000
+    })
+
+    // Validate invoice.created
+    if (!invoice.created || typeof invoice.created !== 'number') {
+      console.error('❌ Invalid invoice.created:', invoice.created)
+      throw new Error(`Invalid invoice.created: ${invoice.created}`)
+    }
+
     // Create payment record using Admin SDK
     const adminDb = getAdminDb()
     const paymentData = {
@@ -242,6 +255,19 @@ async function handlePaymentFailed(invoice: any) {
       amount: invoice.amount_due,
       invoiceId: invoice.id
     })
+
+    console.log('📥 Invoice timestamp data (failed):', {
+      created: invoice.created,
+      createdType: typeof invoice.created,
+      createdValue: invoice.created,
+      multiplied: invoice.created * 1000
+    })
+
+    // Validate invoice.created
+    if (!invoice.created || typeof invoice.created !== 'number') {
+      console.error('❌ Invalid invoice.created:', invoice.created)
+      throw new Error(`Invalid invoice.created: ${invoice.created}`)
+    }
 
     // Create payment record using Admin SDK
     const adminDb = getAdminDb()
