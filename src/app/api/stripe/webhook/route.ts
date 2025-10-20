@@ -142,13 +142,35 @@ async function handleSubscriptionUpdate(subscription: any) {
   }
 
   console.log('🔄 Subscription updated:', { userId, status: subscription.status })
+  console.log('📥 Subscription timestamp data:', {
+    current_period_start: subscription.current_period_start,
+    current_period_end: subscription.current_period_end,
+    billing_cycle_anchor: subscription.billing_cycle_anchor,
+    start_date: subscription.start_date,
+    hasItems: !!subscription.items,
+    itemsCount: subscription.items?.data?.length
+  })
+
+  // Use billing_cycle_anchor and calculate end date if current_period fields don't exist
+  const periodStart = subscription.current_period_start || subscription.billing_cycle_anchor || subscription.start_date
+  const periodEnd = subscription.current_period_end || (subscription.items?.data?.[0]?.current_period_end)
+
+  if (!periodStart || !periodEnd) {
+    console.error('❌ Cannot find period start/end in subscription:', {
+      current_period_start: subscription.current_period_start,
+      current_period_end: subscription.current_period_end,
+      billing_cycle_anchor: subscription.billing_cycle_anchor,
+      start_date: subscription.start_date
+    })
+    throw new Error('Missing period start/end in subscription')
+  }
 
   const adminDb = getAdminDb()
   const subscriptionRef = adminDb.collection('subscriptions').doc(userId)
   await subscriptionRef.update({
     status: subscription.status,
-    currentPeriodStart: stripeTimestampToFirestore(subscription.current_period_start),
-    currentPeriodEnd: stripeTimestampToFirestore(subscription.current_period_end),
+    currentPeriodStart: stripeTimestampToFirestore(periodStart),
+    currentPeriodEnd: stripeTimestampToFirestore(periodEnd),
     cancelAtPeriodEnd: subscription.cancel_at_period_end,
     canceledAt: subscription.canceled_at
       ? stripeTimestampToFirestore(subscription.canceled_at)
