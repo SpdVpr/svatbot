@@ -111,6 +111,29 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       session.subscription as string
     )
 
+    console.log('📥 Checkout subscription timestamp data:', {
+      current_period_start: subscriptionData.current_period_start,
+      current_period_end: subscriptionData.current_period_end,
+      billing_cycle_anchor: subscriptionData.billing_cycle_anchor,
+      start_date: subscriptionData.start_date,
+      hasItems: !!subscriptionData.items,
+      itemsCount: subscriptionData.items?.data?.length
+    })
+
+    // Use billing_cycle_anchor and calculate end date if current_period fields don't exist
+    const periodStart = subscriptionData.current_period_start || subscriptionData.billing_cycle_anchor || subscriptionData.start_date
+    const periodEnd = subscriptionData.current_period_end || (subscriptionData.items?.data?.[0]?.current_period_end)
+
+    if (!periodStart || !periodEnd) {
+      console.error('❌ Cannot find period start/end in checkout subscription:', {
+        current_period_start: subscriptionData.current_period_start,
+        current_period_end: subscriptionData.current_period_end,
+        billing_cycle_anchor: subscriptionData.billing_cycle_anchor,
+        start_date: subscriptionData.start_date
+      })
+      throw new Error('Missing period start/end in checkout subscription')
+    }
+
     // Update subscription in Firestore using Admin SDK
     const adminDb = getAdminDb()
     const subscriptionRef = adminDb.collection('subscriptions').doc(userId)
@@ -119,8 +142,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       status: 'active',
       stripeCustomerId: session.customer as string,
       stripeSubscriptionId: subscriptionData.id,
-      currentPeriodStart: stripeTimestampToFirestore(subscriptionData.current_period_start),
-      currentPeriodEnd: stripeTimestampToFirestore(subscriptionData.current_period_end),
+      currentPeriodStart: stripeTimestampToFirestore(periodStart),
+      currentPeriodEnd: stripeTimestampToFirestore(periodEnd),
       cancelAtPeriodEnd: false,
       isTrialActive: false,
       updatedAt: Timestamp.now()
