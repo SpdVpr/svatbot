@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { db } from '@/config/firebase'
-import { doc, updateDoc, addDoc, collection, Timestamp } from 'firebase/firestore'
+import { adminDb } from '@/config/firebase-admin'
+import { Timestamp } from 'firebase-admin/firestore'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-09-30.clover'
@@ -90,9 +90,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     session.subscription as string
   )
 
-  // Update subscription in Firestore
-  const subscriptionRef = doc(db, 'subscriptions', userId)
-  await updateDoc(subscriptionRef, {
+  // Update subscription in Firestore using Admin SDK
+  const subscriptionRef = adminDb.collection('subscriptions').doc(userId)
+  await subscriptionRef.update({
     plan,
     status: 'active',
     stripeCustomerId: session.customer as string,
@@ -115,8 +115,8 @@ async function handleSubscriptionUpdate(subscription: any) {
 
   console.log('🔄 Subscription updated:', { userId, status: subscription.status })
 
-  const subscriptionRef = doc(db, 'subscriptions', userId)
-  await updateDoc(subscriptionRef, {
+  const subscriptionRef = adminDb.collection('subscriptions').doc(userId)
+  await subscriptionRef.update({
     status: subscription.status,
     currentPeriodStart: Timestamp.fromDate(new Date(subscription.current_period_start * 1000)),
     currentPeriodEnd: Timestamp.fromDate(new Date(subscription.current_period_end * 1000)),
@@ -138,8 +138,8 @@ async function handleSubscriptionDeleted(subscription: any) {
 
   console.log('❌ Subscription deleted:', { userId })
 
-  const subscriptionRef = doc(db, 'subscriptions', userId)
-  await updateDoc(subscriptionRef, {
+  const subscriptionRef = adminDb.collection('subscriptions').doc(userId)
+  await subscriptionRef.update({
     status: 'canceled',
     canceledAt: Timestamp.now(),
     updatedAt: Timestamp.now()
@@ -162,8 +162,8 @@ async function handlePaymentSucceeded(invoice: any) {
 
   console.log('💰 Payment succeeded:', { userId, amount: invoice.amount_paid })
 
-  // Create payment record
-  await addDoc(collection(db, 'payments'), {
+  // Create payment record using Admin SDK
+  await adminDb.collection('payments').add({
     userId,
     userEmail: userEmail || invoice.customer_email,
     subscriptionId: subscriptionData.id,
@@ -197,8 +197,8 @@ async function handlePaymentFailed(invoice: any) {
 
   console.log('❌ Payment failed:', { userId, amount: invoice.amount_due })
 
-  // Create payment record
-  await addDoc(collection(db, 'payments'), {
+  // Create payment record using Admin SDK
+  await adminDb.collection('payments').add({
     userId,
     userEmail: userEmail || invoice.customer_email,
     subscriptionId: subscriptionData.id,
