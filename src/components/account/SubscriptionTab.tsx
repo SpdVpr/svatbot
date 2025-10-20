@@ -42,6 +42,19 @@ function SubscriptionTab() {
     await reactivateSubscription()
   }
 
+  // Show loading only on initial load (when subscription is null and loading is true)
+  if (loading && !subscription) {
+    return (
+      <div className="space-y-6 animate-pulse">
+        <div className="bg-gray-100 rounded-lg p-6 h-32"></div>
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="bg-gray-100 rounded-xl p-6 h-64"></div>
+          <div className="bg-gray-100 rounded-xl p-6 h-64"></div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       {/* Current Subscription Status */}

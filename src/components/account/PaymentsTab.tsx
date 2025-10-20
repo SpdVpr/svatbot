@@ -16,10 +16,8 @@ import {
 function PaymentsTab() {
   const { payments, loading } = useSubscription()
 
-  // Show skeleton only on initial load
-  if (loading && !payments) {
-    return <PaymentsTabSkeleton />
-  }
+  // Don't show skeleton - just show empty state or payments immediately
+  // This prevents flickering when switching tabs
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -72,14 +70,6 @@ function PaymentsTab() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="w-8 h-8 loading-spinner" />
-      </div>
-    )
-  }
-
   return (
     <div className="space-y-6">
       {/* Payment History */}
@@ -93,7 +83,7 @@ function PaymentsTab() {
           Všechny platby jsou zpracovávány bezpečně přes Stripe. Platební metodu a fakturační údaje zadáváte přímo v Stripe při platbě.
         </p>
 
-        {payments.length === 0 ? (
+        {!payments || payments.length === 0 ? (
           <div className="text-center py-12">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <FileText className="w-8 h-8 text-gray-400" />

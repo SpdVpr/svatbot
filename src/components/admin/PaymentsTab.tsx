@@ -22,6 +22,7 @@ import {
 } from 'lucide-react'
 
 export default function PaymentsTab() {
+  const [activeTab, setActiveTab] = useState<'subscriptions' | 'payments'>('subscriptions') // Default to subscriptions
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [planFilter, setPlanFilter] = useState<string>('all')
@@ -240,11 +241,25 @@ export default function PaymentsTab() {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="border-b border-gray-200">
           <nav className="flex space-x-8 px-6" aria-label="Tabs">
-            <button className="border-b-2 border-blue-600 py-4 px-1 text-sm font-medium text-blue-600">
-              Platby ({filteredPayments.length})
-            </button>
-            <button className="border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
+            <button
+              onClick={() => setActiveTab('subscriptions')}
+              className={`border-b-2 py-4 px-1 text-sm font-medium ${
+                activeTab === 'subscriptions'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
               Předplatná ({filteredSubscriptions.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('payments')}
+              className={`border-b-2 py-4 px-1 text-sm font-medium ${
+                activeTab === 'payments'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Platby ({filteredPayments.length})
             </button>
           </nav>
         </div>
@@ -286,30 +301,104 @@ export default function PaymentsTab() {
           </div>
         </div>
 
+        {/* Subscriptions Table */}
+        {activeTab === 'subscriptions' && (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Uživatel
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Plán
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Stav
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Začátek
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Konec období
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredSubscriptions.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                      Žádná předplatná nenalezena
+                    </td>
+                  </tr>
+                ) : (
+                  filteredSubscriptions.map((sub) => (
+                    <tr key={sub.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">
+                            {sub.userName || sub.userEmail.split('@')[0]}
+                          </div>
+                          <div className="text-sm text-gray-500">{sub.userEmail}</div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm text-gray-900">
+                          {sub.plan === 'premium_monthly' ? 'Měsíční' : sub.plan === 'premium_yearly' ? 'Roční' : 'Trial'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 py-1 text-xs rounded-full ${
+                          sub.status === 'active' ? 'bg-green-100 text-green-800' :
+                          sub.status === 'trialing' ? 'bg-blue-100 text-blue-800' :
+                          sub.status === 'canceled' ? 'bg-red-100 text-red-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {sub.status === 'active' ? 'Aktivní' :
+                           sub.status === 'trialing' ? 'Trial' :
+                           sub.status === 'canceled' ? 'Zrušeno' :
+                           sub.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {sub.createdAt ? new Date(sub.createdAt).toLocaleDateString('cs-CZ') : '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {sub.currentPeriodEnd ? new Date(sub.currentPeriodEnd).toLocaleDateString('cs-CZ') : '-'}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
         {/* Payments Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Uživatel
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Částka
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Stav
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Datum
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Faktura
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredPayments.length === 0 ? (
+        {activeTab === 'payments' && (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Uživatel
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Částka
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Stav
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Datum
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Faktura
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredPayments.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
                     Žádné platby nenalezeny
@@ -372,6 +461,7 @@ export default function PaymentsTab() {
             </tbody>
           </table>
         </div>
+        )}
       </div>
     </div>
   )

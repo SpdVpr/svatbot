@@ -342,12 +342,12 @@ export function useAdminPayments(onNewPayment?: (payment: AdminPaymentRecord) =>
       if (sub.status === 'active') {
         activeSubscriptions++
         
-        // Calculate MRR
+        // Calculate MRR (use fixed prices from plans)
         if (sub.plan === 'premium_monthly') {
-          mrr += sub.amount
+          mrr += 299 // 299 CZK per month
           monthlyPlanCount++
         } else if (sub.plan === 'premium_yearly') {
-          mrr += sub.amount / 12 // Convert yearly to monthly
+          mrr += 2999 / 12 // 2999 CZK per year = ~250 CZK per month
           yearlyPlanCount++
         }
       } else if (sub.status === 'trialing') {

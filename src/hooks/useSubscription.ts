@@ -30,7 +30,7 @@ export function useSubscription() {
   const { user } = useAuth()
   const { wedding } = useWedding()
   const [subscription, setSubscription] = useState<Subscription | null>(null)
-  const [payments, setPayments] = useState<Payment[]>([])
+  const [payments, setPayments] = useState<Payment[] | null>(null)
   const [usageStats, setUsageStats] = useState<UsageStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
