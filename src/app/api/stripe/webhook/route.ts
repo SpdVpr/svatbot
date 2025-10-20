@@ -223,15 +223,23 @@ async function handleSubscriptionDeleted(subscription: any) {
 
 async function handlePaymentSucceeded(invoice: any) {
   try {
-    // Check if invoice has subscription
-    if (!invoice.subscription) {
-      console.error('No subscription in invoice')
+    // Get subscription ID from invoice (different locations in different API versions)
+    const subscriptionId = invoice.subscription ||
+                          invoice.parent?.subscription_details?.subscription ||
+                          invoice.lines?.data?.[0]?.parent?.subscription_item_details?.subscription
+
+    if (!subscriptionId) {
+      console.error('No subscription in invoice:', {
+        hasSubscription: !!invoice.subscription,
+        hasParent: !!invoice.parent,
+        hasLines: !!invoice.lines?.data?.[0]
+      })
       return
     }
 
-    const subscriptionData: any = await stripe.subscriptions.retrieve(
-      invoice.subscription as string
-    )
+    console.log('🔍 Found subscription ID:', subscriptionId)
+
+    const subscriptionData: any = await stripe.subscriptions.retrieve(subscriptionId)
 
     const userId = subscriptionData.metadata?.userId
     const userEmail = subscriptionData.metadata?.userEmail
@@ -290,15 +298,23 @@ async function handlePaymentSucceeded(invoice: any) {
 
 async function handlePaymentFailed(invoice: any) {
   try {
-    // Check if invoice has subscription
-    if (!invoice.subscription) {
-      console.error('No subscription in invoice')
+    // Get subscription ID from invoice (different locations in different API versions)
+    const subscriptionId = invoice.subscription ||
+                          invoice.parent?.subscription_details?.subscription ||
+                          invoice.lines?.data?.[0]?.parent?.subscription_item_details?.subscription
+
+    if (!subscriptionId) {
+      console.error('No subscription in failed invoice:', {
+        hasSubscription: !!invoice.subscription,
+        hasParent: !!invoice.parent,
+        hasLines: !!invoice.lines?.data?.[0]
+      })
       return
     }
 
-    const subscriptionData: any = await stripe.subscriptions.retrieve(
-      invoice.subscription as string
-    )
+    console.log('🔍 Found subscription ID in failed payment:', subscriptionId)
+
+    const subscriptionData: any = await stripe.subscriptions.retrieve(subscriptionId)
 
     const userId = subscriptionData.metadata?.userId
     const userEmail = subscriptionData.metadata?.userEmail
