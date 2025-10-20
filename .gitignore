@@ -57,6 +57,10 @@ firestore-debug.log
 firebase-service-account.json
 *-firebase-adminsdk-*.json
 scripts/serviceAccountKey.json
+functions/serviceAccountKey.json
+functions/node_modules/
+functions/lib/
+serviceAccountKey.json
 
 # Mobile
 mobile/node_modules/
