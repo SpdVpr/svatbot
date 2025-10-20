@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAdmin } from '@/hooks/useAdmin'
 import {
@@ -19,13 +19,16 @@ export default function AdminLoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const hasRedirected = useRef(false)
 
   const { user, login, isLoading, isAuthenticated } = useAdmin()
   const router = useRouter()
 
   useEffect(() => {
-    if (isAuthenticated && !isLoading) {
-      router.push('/admin/dashboard')
+    // Only redirect once when authenticated
+    if (isAuthenticated && !isLoading && !hasRedirected.current) {
+      hasRedirected.current = true
+      router.replace('/admin/dashboard')
     }
   }, [isAuthenticated, isLoading, router])
 

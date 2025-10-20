@@ -4,7 +4,6 @@ import React, { memo } from 'react'
 import { useSubscription } from '@/hooks/useSubscription'
 import { PaymentsTabSkeleton } from './TabSkeleton'
 import {
-  CreditCard,
   Download,
   CheckCircle,
   XCircle,
@@ -83,39 +82,16 @@ function PaymentsTab() {
 
   return (
     <div className="space-y-6">
-      {/* Payment Method */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2 mb-4">
-          <CreditCard className="w-5 h-5 text-primary-600" />
-          <span>Platební metoda</span>
-        </h3>
-
-        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-          <div className="flex items-center space-x-3">
-            <div className="w-12 h-8 bg-gradient-to-r from-blue-600 to-blue-400 rounded flex items-center justify-center">
-              <CreditCard className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <p className="font-medium text-gray-900">Kreditní karta</p>
-              <p className="text-sm text-gray-600">Bude nastaveno při první platbě</p>
-            </div>
-          </div>
-          <button className="btn-outline" disabled>
-            Změnit
-          </button>
-        </div>
-
-        <p className="text-sm text-gray-500 mt-4">
-          Platby jsou zpracovávány bezpečně přes Stripe. Vaše platební údaje nejsou ukládány na našich serverech.
-        </p>
-      </div>
-
       {/* Payment History */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2 mb-4">
           <FileText className="w-5 h-5 text-primary-600" />
           <span>Historie plateb</span>
         </h3>
+
+        <p className="text-sm text-gray-600 mb-4">
+          Všechny platby jsou zpracovávány bezpečně přes Stripe. Platební metodu a fakturační údaje zadáváte přímo v Stripe při platbě.
+        </p>
 
         {payments.length === 0 ? (
           <div className="text-center py-12">
@@ -181,84 +157,6 @@ function PaymentsTab() {
             ))}
           </div>
         )}
-      </div>
-
-      {/* Billing Information */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Fakturační údaje
-        </h3>
-
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Jméno / Název firmy
-            </label>
-            <input
-              type="text"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              placeholder="Vaše jméno nebo název firmy"
-              disabled
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              IČO (volitelné)
-            </label>
-            <input
-              type="text"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              placeholder="12345678"
-              disabled
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Adresa
-            </label>
-            <input
-              type="text"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              placeholder="Ulice a číslo popisné"
-              disabled
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                PSČ
-              </label>
-              <input
-                type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="12000"
-                disabled
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Město
-              </label>
-              <input
-                type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Praha"
-                disabled
-              />
-            </div>
-          </div>
-
-          <button className="btn-outline w-full" disabled>
-            Uložit fakturační údaje
-          </button>
-
-          <p className="text-sm text-gray-500">
-            Fakturační údaje budou dostupné po aktivaci placeného tarifu
-          </p>
-        </div>
       </div>
     </div>
   )

@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { useAdminPayments } from '@/hooks/useAdminPayments'
+import { useState, useCallback } from 'react'
+import { useAdminPayments, AdminPaymentRecord } from '@/hooks/useAdminPayments'
+import { showSimpleToast } from '@/components/notifications/SimpleToast'
 import {
   DollarSign,
   TrendingUp,
@@ -21,10 +22,28 @@ import {
 } from 'lucide-react'
 
 export default function PaymentsTab() {
-  const { stats, payments, subscriptions, loading, refresh } = useAdminPayments()
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [planFilter, setPlanFilter] = useState<string>('all')
+
+  // Callback for new payment notifications
+  const handleNewPayment = useCallback((payment: AdminPaymentRecord) => {
+    if (payment.status === 'succeeded') {
+      showSimpleToast(
+        'success',
+        'Nová platba! 💰',
+        `${payment.userEmail} zaplatil ${payment.amount} ${payment.currency}`
+      )
+    } else if (payment.status === 'failed') {
+      showSimpleToast(
+        'error',
+        'Platba selhala',
+        `Platba od ${payment.userEmail} selhala`
+      )
+    }
+  }, [])
+
+  const { stats, payments, subscriptions, loading, refresh } = useAdminPayments(handleNewPayment)
 
   if (loading) {
     return (

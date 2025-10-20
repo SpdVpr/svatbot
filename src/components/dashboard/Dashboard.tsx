@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useWeddingStore } from '@/stores/weddingStore'
 import { useAuth } from '@/hooks/useAuth'
 import { useSubscription } from '@/hooks/useSubscription'
@@ -29,6 +29,7 @@ import { createDemoNotifications, createTestToast } from '@/utils/demoNotificati
 import { useAutoNotifications } from '@/hooks/useAutoNotifications'
 import OnboardingWizard from '@/components/onboarding/OnboardingWizard'
 import ScrollProgress from '@/components/animations/ScrollProgress'
+import { useSearchParams } from 'next/navigation'
 
 function DashboardContent() {
   const { currentWedding } = useWeddingStore()
@@ -38,9 +39,25 @@ function DashboardContent() {
   const [showWeddingSettings, setShowWeddingSettings] = useState(false)
   const [showNotesModal, setShowNotesModal] = useState(false)
   const [showAccountModal, setShowAccountModal] = useState(false)
+  const searchParams = useSearchParams()
 
   // Initialize auto-notifications system
   useAutoNotifications()
+
+  // Check for payment success/cancel in URL
+  useEffect(() => {
+    const payment = searchParams.get('payment')
+
+    if (payment === 'success') {
+      showSimpleToast('success', 'Platba úspěšná! 🎉', 'Vaše předplatné bylo aktivováno. Děkujeme!')
+      // Remove payment param from URL
+      window.history.replaceState({}, '', '/')
+    } else if (payment === 'canceled') {
+      showSimpleToast('info', 'Platba zrušena', 'Platba byla zrušena. Můžete to zkusit znovu kdykoliv.')
+      // Remove payment param from URL
+      window.history.replaceState({}, '', '/')
+    }
+  }, [searchParams])
 
   // Demo notification hooks (for testing)
   const { createNotification, deleteAllNotifications } = useWeddingNotifications()

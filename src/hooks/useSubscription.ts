@@ -263,8 +263,8 @@ export function useSubscription() {
         userId: user.id,
         userEmail: user.email,
         plan,
-        successUrl: `${window.location.origin}/dashboard?payment=success`,
-        cancelUrl: `${window.location.origin}/dashboard?payment=canceled`
+        successUrl: `${window.location.origin}/?payment=success`,
+        cancelUrl: `${window.location.origin}/?payment=canceled`
       })
 
       // Redirect to checkout (or success page in mock mode)

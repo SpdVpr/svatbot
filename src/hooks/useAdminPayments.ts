@@ -88,16 +88,69 @@ export interface AdminSubscriptionRecord {
   updatedAt: Date
 }
 
-export function useAdminPayments() {
+export function useAdminPayments(onNewPayment?: (payment: AdminPaymentRecord) => void) {
   const [stats, setStats] = useState<AdminPaymentStats | null>(null)
   const [payments, setPayments] = useState<AdminPaymentRecord[]>([])
   const [subscriptions, setSubscriptions] = useState<AdminSubscriptionRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [lastPaymentId, setLastPaymentId] = useState<string | null>(null)
 
   useEffect(() => {
     loadPaymentData()
-  }, [])
+
+    // Set up real-time listener for new payments
+    const paymentsRef = collection(db, 'payments')
+    const q = query(
+      paymentsRef,
+      orderBy('createdAt', 'desc'),
+      limit(1)
+    )
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === 'added') {
+          const docId = change.doc.id
+
+          // Skip if this is the initial load or we've already seen this payment
+          if (lastPaymentId && docId !== lastPaymentId) {
+            const data = change.doc.data()
+            const newPayment: AdminPaymentRecord = {
+              id: docId,
+              userId: data.userId,
+              userEmail: data.userEmail || 'Unknown',
+              userName: data.userName,
+              subscriptionId: data.subscriptionId,
+              amount: data.amount,
+              currency: data.currency,
+              status: data.status,
+              paymentMethod: data.paymentMethod,
+              last4: data.last4,
+              createdAt: data.createdAt?.toDate() || new Date(),
+              paidAt: data.paidAt?.toDate(),
+              invoiceUrl: data.invoiceUrl,
+              invoiceNumber: data.invoiceNumber,
+              stripePaymentIntentId: data.stripePaymentIntentId,
+              stripeInvoiceId: data.stripeInvoiceId,
+              plan: data.plan
+            }
+
+            // Call callback if provided
+            if (onNewPayment) {
+              onNewPayment(newPayment)
+            }
+
+            // Refresh data
+            loadPaymentData()
+          }
+
+          setLastPaymentId(docId)
+        }
+      })
+    })
+
+    return () => unsubscribe()
+  }, [lastPaymentId, onNewPayment])
 
   const loadPaymentData = async () => {
     try {

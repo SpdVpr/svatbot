@@ -86,11 +86,39 @@ function SubscriptionTab() {
             )}
           </div>
 
+          {/* Premium Days Remaining - Show for active subscriptions */}
+          {subscription.status === 'active' && subscription.currentPeriodEnd && (
+            <div className="mt-4 grid grid-cols-2 gap-4">
+              <div className="bg-white rounded-lg p-4 border border-primary-200">
+                <div className="flex items-center space-x-2 mb-1">
+                  <Clock className="w-4 h-4 text-primary-600" />
+                  <span className="text-sm font-medium text-gray-600">Zbývající dny</span>
+                </div>
+                <p className="text-2xl font-bold text-primary-600">
+                  {Math.max(0, Math.ceil((new Date(subscription.currentPeriodEnd).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))}
+                </p>
+              </div>
+              <div className="bg-white rounded-lg p-4 border border-primary-200">
+                <div className="flex items-center space-x-2 mb-1">
+                  <Calendar className="w-4 h-4 text-primary-600" />
+                  <span className="text-sm font-medium text-gray-600">Vyprší</span>
+                </div>
+                <p className="text-lg font-bold text-gray-900">
+                  {new Date(subscription.currentPeriodEnd).toLocaleDateString('cs-CZ', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
+                  })}
+                </p>
+              </div>
+            </div>
+          )}
+
           {subscription.cancelAtPeriodEnd && (
             <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center space-x-2">
               <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
               <p className="text-sm text-amber-800">
-                Vaše předplatné bude zrušeno {new Date(subscription.currentPeriodEnd).toLocaleDateString('cs-CZ')}. 
+                Vaše předplatné bude zrušeno {new Date(subscription.currentPeriodEnd).toLocaleDateString('cs-CZ')}.
                 Můžete ho obnovit kdykoliv před tímto datem.
               </p>
             </div>
