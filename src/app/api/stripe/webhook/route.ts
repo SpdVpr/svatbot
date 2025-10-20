@@ -9,6 +9,20 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
 
+// Helper function to convert Stripe timestamp to Firestore Timestamp
+// Stripe can send timestamps in seconds OR milliseconds depending on API version
+function stripeTimestampToFirestore(timestamp: number): Timestamp {
+  // If timestamp is less than year 2100 in seconds (4102444800), it's in seconds
+  // Otherwise it's already in milliseconds
+  if (timestamp < 4102444800) {
+    // Timestamp is in seconds, convert to milliseconds
+    return Timestamp.fromMillis(timestamp * 1000)
+  } else {
+    // Timestamp is already in milliseconds
+    return Timestamp.fromMillis(timestamp)
+  }
+}
+
 export async function POST(request: NextRequest) {
   console.log('🔥 Webhook v2.0 - Using Timestamp.fromMillis() - Deployed:', new Date().toISOString())
   try {
@@ -105,8 +119,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       status: 'active',
       stripeCustomerId: session.customer as string,
       stripeSubscriptionId: subscriptionData.id,
-      currentPeriodStart: Timestamp.fromMillis(subscriptionData.current_period_start * 1000),
-      currentPeriodEnd: Timestamp.fromMillis(subscriptionData.current_period_end * 1000),
+      currentPeriodStart: stripeTimestampToFirestore(subscriptionData.current_period_start),
+      currentPeriodEnd: stripeTimestampToFirestore(subscriptionData.current_period_end),
       cancelAtPeriodEnd: false,
       isTrialActive: false,
       updatedAt: Timestamp.now()
@@ -133,11 +147,11 @@ async function handleSubscriptionUpdate(subscription: any) {
   const subscriptionRef = adminDb.collection('subscriptions').doc(userId)
   await subscriptionRef.update({
     status: subscription.status,
-    currentPeriodStart: Timestamp.fromMillis(subscription.current_period_start * 1000),
-    currentPeriodEnd: Timestamp.fromMillis(subscription.current_period_end * 1000),
+    currentPeriodStart: stripeTimestampToFirestore(subscription.current_period_start),
+    currentPeriodEnd: stripeTimestampToFirestore(subscription.current_period_end),
     cancelAtPeriodEnd: subscription.cancel_at_period_end,
     canceledAt: subscription.canceled_at
-      ? Timestamp.fromMillis(subscription.canceled_at * 1000)
+      ? stripeTimestampToFirestore(subscription.canceled_at)
       : null,
     updatedAt: Timestamp.now()
   })
@@ -217,7 +231,7 @@ async function handlePaymentSucceeded(invoice: any) {
       invoiceUrl: invoice.hosted_invoice_url,
       stripePaymentIntentId: invoice.payment_intent,
       stripeInvoiceId: invoice.id,
-      createdAt: Timestamp.fromMillis(invoice.created * 1000), // Stripe timestamps are in seconds
+      createdAt: stripeTimestampToFirestore(invoice.created),
       paidAt: Timestamp.now()
     }
 
@@ -284,7 +298,8 @@ async function handlePaymentFailed(invoice: any) {
       invoiceUrl: invoice.hosted_invoice_url,
       stripePaymentIntentId: invoice.payment_intent,
       stripeInvoiceId: invoice.id,
-      createdAt: Timestamp.fromMillis(invoice.created * 1000) // Stripe timestamps are in seconds
+      createdAt: stripeTimestampToFirestore(invoice.created),
+      failedAt: Timestamp.now()
     }
 
     const docRef = await adminDb.collection('payments').add(paymentData)
