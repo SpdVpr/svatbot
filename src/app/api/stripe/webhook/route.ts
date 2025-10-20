@@ -10,6 +10,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
 
 export async function POST(request: NextRequest) {
+  console.log('🔥 Webhook v2.0 - Using Timestamp.fromMillis() - Deployed:', new Date().toISOString())
   try {
     const body = await request.text()
     const signature = request.headers.get('stripe-signature')!
