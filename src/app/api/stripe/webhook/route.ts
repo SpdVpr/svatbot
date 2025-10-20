@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { adminDb } from '@/config/firebase-admin'
+import { getAdminDb } from '@/config/firebase-admin'
 import { Timestamp } from 'firebase-admin/firestore'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -74,35 +74,48 @@ export async function POST(request: NextRequest) {
 }
 
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
-  const userId = session.metadata?.userId
-  const userEmail = session.metadata?.userEmail
-  const plan = session.metadata?.plan
+  try {
+    const userId = session.metadata?.userId
+    const userEmail = session.metadata?.userEmail
+    const plan = session.metadata?.plan
 
-  if (!userId) {
-    console.error('No userId in session metadata')
-    return
+    if (!userId) {
+      console.error('No userId in session metadata')
+      return
+    }
+
+    if (!session.subscription) {
+      console.error('No subscription in checkout session')
+      return
+    }
+
+    console.log('✅ Checkout completed:', { userId, plan, subscriptionId: session.subscription })
+
+    // Get subscription details
+    const subscriptionData: any = await stripe.subscriptions.retrieve(
+      session.subscription as string
+    )
+
+    // Update subscription in Firestore using Admin SDK
+    const adminDb = getAdminDb()
+    const subscriptionRef = adminDb.collection('subscriptions').doc(userId)
+    await subscriptionRef.update({
+      plan,
+      status: 'active',
+      stripeCustomerId: session.customer as string,
+      stripeSubscriptionId: subscriptionData.id,
+      currentPeriodStart: Timestamp.fromDate(new Date(subscriptionData.current_period_start * 1000)),
+      currentPeriodEnd: Timestamp.fromDate(new Date(subscriptionData.current_period_end * 1000)),
+      cancelAtPeriodEnd: false,
+      isTrialActive: false,
+      updatedAt: Timestamp.now()
+    })
+
+    console.log('✅ Subscription updated in Firestore:', userId)
+  } catch (error: any) {
+    console.error('❌ Error in handleCheckoutCompleted:', error.message)
+    throw error
   }
-
-  console.log('✅ Checkout completed:', { userId, plan })
-
-  // Get subscription details
-  const subscriptionData: any = await stripe.subscriptions.retrieve(
-    session.subscription as string
-  )
-
-  // Update subscription in Firestore using Admin SDK
-  const subscriptionRef = adminDb.collection('subscriptions').doc(userId)
-  await subscriptionRef.update({
-    plan,
-    status: 'active',
-    stripeCustomerId: session.customer as string,
-    stripeSubscriptionId: subscriptionData.id,
-    currentPeriodStart: Timestamp.fromDate(new Date(subscriptionData.current_period_start * 1000)),
-    currentPeriodEnd: Timestamp.fromDate(new Date(subscriptionData.current_period_end * 1000)),
-    cancelAtPeriodEnd: false,
-    isTrialActive: false,
-    updatedAt: Timestamp.now()
-  })
 }
 
 async function handleSubscriptionUpdate(subscription: any) {
@@ -115,6 +128,7 @@ async function handleSubscriptionUpdate(subscription: any) {
 
   console.log('🔄 Subscription updated:', { userId, status: subscription.status })
 
+  const adminDb = getAdminDb()
   const subscriptionRef = adminDb.collection('subscriptions').doc(userId)
   await subscriptionRef.update({
     status: subscription.status,
@@ -138,6 +152,7 @@ async function handleSubscriptionDeleted(subscription: any) {
 
   console.log('❌ Subscription deleted:', { userId })
 
+  const adminDb = getAdminDb()
   const subscriptionRef = adminDb.collection('subscriptions').doc(userId)
   await subscriptionRef.update({
     status: 'canceled',
@@ -147,71 +162,109 @@ async function handleSubscriptionDeleted(subscription: any) {
 }
 
 async function handlePaymentSucceeded(invoice: any) {
-  const subscriptionData: any = await stripe.subscriptions.retrieve(
-    invoice.subscription as string
-  )
+  try {
+    // Check if invoice has subscription
+    if (!invoice.subscription) {
+      console.error('No subscription in invoice')
+      return
+    }
 
-  const userId = subscriptionData.metadata?.userId
-  const userEmail = subscriptionData.metadata?.userEmail
-  const plan = subscriptionData.metadata?.plan
+    const subscriptionData: any = await stripe.subscriptions.retrieve(
+      invoice.subscription as string
+    )
 
-  if (!userId) {
-    console.error('No userId in subscription metadata')
-    return
+    const userId = subscriptionData.metadata?.userId
+    const userEmail = subscriptionData.metadata?.userEmail
+    const plan = subscriptionData.metadata?.plan
+
+    if (!userId) {
+      console.error('No userId in subscription metadata')
+      return
+    }
+
+    console.log('💰 Payment succeeded:', {
+      userId,
+      amount: invoice.amount_paid,
+      invoiceId: invoice.id
+    })
+
+    // Create payment record using Admin SDK
+    const adminDb = getAdminDb()
+    const paymentData = {
+      userId,
+      userEmail: userEmail || invoice.customer_email,
+      subscriptionId: subscriptionData.id,
+      amount: invoice.amount_paid / 100, // Convert from cents
+      currency: invoice.currency.toUpperCase(),
+      status: 'succeeded',
+      paymentMethod: 'card',
+      plan,
+      invoiceNumber: invoice.number,
+      invoiceUrl: invoice.hosted_invoice_url,
+      stripePaymentIntentId: invoice.payment_intent,
+      stripeInvoiceId: invoice.id,
+      createdAt: Timestamp.fromMillis(invoice.created * 1000), // Stripe timestamps are in seconds
+      paidAt: Timestamp.now()
+    }
+
+    const docRef = await adminDb.collection('payments').add(paymentData)
+    console.log('✅ Payment record created in Firestore:', docRef.id)
+  } catch (error: any) {
+    console.error('❌ Error in handlePaymentSucceeded:', error.message)
+    throw error
   }
-
-  console.log('💰 Payment succeeded:', { userId, amount: invoice.amount_paid })
-
-  // Create payment record using Admin SDK
-  await adminDb.collection('payments').add({
-    userId,
-    userEmail: userEmail || invoice.customer_email,
-    subscriptionId: subscriptionData.id,
-    amount: invoice.amount_paid / 100, // Convert from cents
-    currency: invoice.currency.toUpperCase(),
-    status: 'succeeded',
-    paymentMethod: 'card',
-    plan,
-    invoiceNumber: invoice.number,
-    invoiceUrl: invoice.hosted_invoice_url,
-    stripePaymentIntentId: invoice.payment_intent,
-    stripeInvoiceId: invoice.id,
-    createdAt: Timestamp.fromDate(new Date(invoice.created * 1000)),
-    paidAt: Timestamp.now()
-  })
 }
 
 async function handlePaymentFailed(invoice: any) {
-  const subscriptionData: any = await stripe.subscriptions.retrieve(
-    invoice.subscription as string
-  )
+  try {
+    // Check if invoice has subscription
+    if (!invoice.subscription) {
+      console.error('No subscription in invoice')
+      return
+    }
 
-  const userId = subscriptionData.metadata?.userId
-  const userEmail = subscriptionData.metadata?.userEmail
-  const plan = subscriptionData.metadata?.plan
+    const subscriptionData: any = await stripe.subscriptions.retrieve(
+      invoice.subscription as string
+    )
 
-  if (!userId) {
-    console.error('No userId in subscription metadata')
-    return
+    const userId = subscriptionData.metadata?.userId
+    const userEmail = subscriptionData.metadata?.userEmail
+    const plan = subscriptionData.metadata?.plan
+
+    if (!userId) {
+      console.error('No userId in subscription metadata')
+      return
+    }
+
+    console.log('❌ Payment failed:', {
+      userId,
+      amount: invoice.amount_due,
+      invoiceId: invoice.id
+    })
+
+    // Create payment record using Admin SDK
+    const adminDb = getAdminDb()
+    const paymentData = {
+      userId,
+      userEmail: userEmail || invoice.customer_email,
+      subscriptionId: subscriptionData.id,
+      amount: invoice.amount_due / 100, // Convert from cents
+      currency: invoice.currency.toUpperCase(),
+      status: 'failed',
+      paymentMethod: 'card',
+      plan,
+      invoiceNumber: invoice.number,
+      invoiceUrl: invoice.hosted_invoice_url,
+      stripePaymentIntentId: invoice.payment_intent,
+      stripeInvoiceId: invoice.id,
+      createdAt: Timestamp.fromMillis(invoice.created * 1000) // Stripe timestamps are in seconds
+    }
+
+    const docRef = await adminDb.collection('payments').add(paymentData)
+    console.log('✅ Failed payment record created in Firestore:', docRef.id)
+  } catch (error: any) {
+    console.error('❌ Error in handlePaymentFailed:', error.message)
+    throw error
   }
-
-  console.log('❌ Payment failed:', { userId, amount: invoice.amount_due })
-
-  // Create payment record using Admin SDK
-  await adminDb.collection('payments').add({
-    userId,
-    userEmail: userEmail || invoice.customer_email,
-    subscriptionId: subscriptionData.id,
-    amount: invoice.amount_due / 100, // Convert from cents
-    currency: invoice.currency.toUpperCase(),
-    status: 'failed',
-    paymentMethod: 'card',
-    plan,
-    invoiceNumber: invoice.number,
-    invoiceUrl: invoice.hosted_invoice_url,
-    stripePaymentIntentId: invoice.payment_intent,
-    stripeInvoiceId: invoice.id,
-    createdAt: Timestamp.fromDate(new Date(invoice.created * 1000))
-  })
 }
 
