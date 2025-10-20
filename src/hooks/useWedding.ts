@@ -288,9 +288,14 @@ export function useWedding() {
       const unsubscribe = onSnapshot(weddingRef, (doc) => {
         if (doc.exists()) {
           const wedding = convertFirestoreWedding(doc.id, doc.data())
+
           // Only update if data actually changed (check updatedAt timestamp)
-          if (!currentWedding.updatedAt ||
-              wedding.updatedAt.getTime() !== currentWedding.updatedAt.getTime()) {
+          const shouldUpdate = !currentWedding.updatedAt ||
+            (wedding.updatedAt instanceof Date &&
+             currentWedding.updatedAt instanceof Date &&
+             wedding.updatedAt.getTime() !== currentWedding.updatedAt.getTime())
+
+          if (shouldUpdate) {
             console.log('📡 Wedding updated from Firestore snapshot')
             setCurrentWedding(wedding)
           }

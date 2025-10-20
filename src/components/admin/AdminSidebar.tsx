@@ -15,7 +15,8 @@ import {
   Heart,
   Menu,
   X,
-  CheckCircle
+  CheckCircle,
+  DollarSign
 } from 'lucide-react'
 
 interface NavigationItem {
@@ -49,6 +50,12 @@ const navigation: NavigationItem[] = [
     href: '/admin/marketplace',
     icon: CheckCircle,
     permission: { resource: 'vendors', action: 'read' }
+  },
+  {
+    name: 'Affiliate systém',
+    href: '/admin/affiliates',
+    icon: DollarSign,
+    permission: { resource: 'analytics', action: 'read' }
   }
 ]
 

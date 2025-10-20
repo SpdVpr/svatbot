@@ -294,9 +294,146 @@ async function handlePaymentSucceeded(invoice: any) {
 
     const docRef = await adminDb.collection('payments').add(paymentData)
     console.log('✅ Payment record created in Firestore:', docRef.id)
+
+    // 🎯 AFFILIATE TRACKING: Track conversion and create commission
+    try {
+      await trackAffiliateConversionServer(
+        userId,
+        userEmail || invoice.customer_email,
+        subscriptionData.id,
+        plan,
+        invoice.amount_paid / 100,
+        invoice.payment_intent,
+        invoice.id,
+        adminDb
+      )
+    } catch (affiliateError: any) {
+      console.error('❌ Error tracking affiliate conversion:', affiliateError.message)
+      // Don't throw - payment succeeded, affiliate tracking is secondary
+    }
   } catch (error: any) {
     console.error('❌ Error in handlePaymentSucceeded:', error.message)
     throw error
+  }
+}
+
+/**
+ * Track affiliate conversion on server side (called from webhook)
+ */
+async function trackAffiliateConversionServer(
+  userId: string,
+  userEmail: string,
+  subscriptionId: string,
+  plan: string,
+  amount: number,
+  stripePaymentIntentId?: string,
+  stripeInvoiceId?: string,
+  adminDb?: any
+) {
+  try {
+    const db = adminDb || getAdminDb()
+
+    // Check if user has affiliate reference
+    const refSnapshot = await db.collection('userAffiliateRefs')
+      .where('userId', '==', userId)
+      .where('converted', '==', false)
+      .limit(1)
+      .get()
+
+    if (refSnapshot.empty) {
+      console.log('ℹ️ No affiliate reference found for user:', userId)
+      return
+    }
+
+    const refDoc = refSnapshot.docs[0]
+    const refData = refDoc.data()
+    const affiliateId = refData.affiliateId
+    const affiliateCode = refData.affiliateCode
+
+    console.log('🎯 Found affiliate reference:', { affiliateCode, userId })
+
+    // Get affiliate partner to get commission rate
+    const partnerSnapshot = await db.collection('affiliatePartners')
+      .where('referralCode', '==', affiliateCode)
+      .limit(1)
+      .get()
+
+    if (partnerSnapshot.empty) {
+      console.warn('⚠️ Affiliate partner not found:', affiliateCode)
+      return
+    }
+
+    const partnerDoc = partnerSnapshot.docs[0]
+    const partnerId = partnerDoc.id
+    const partnerData = partnerDoc.data()
+    const commissionRate = partnerData.customCommissionRate || partnerData.commissionRate || 10
+    const commissionAmount = (amount * commissionRate) / 100
+
+    console.log('💰 Creating commission:', {
+      affiliateCode,
+      amount,
+      commissionRate,
+      commissionAmount
+    })
+
+    // Create commission record
+    await db.collection('commissions').add({
+      affiliateId: partnerId,
+      affiliateCode,
+      userId,
+      userEmail,
+      subscriptionId,
+      stripePaymentIntentId: stripePaymentIntentId || null,
+      stripeInvoiceId: stripeInvoiceId || null,
+      plan,
+      amount,
+      currency: 'CZK',
+      commissionRate,
+      commissionAmount,
+      status: 'confirmed',
+      createdAt: Timestamp.now(),
+      confirmedAt: Timestamp.now()
+    })
+
+    // Update affiliate reference
+    await refDoc.ref.update({
+      converted: true,
+      subscriptionId,
+      convertedAt: Timestamp.now()
+    })
+
+    // Update click record
+    const clickSnapshot = await db.collection('affiliateClicks')
+      .where('affiliateId', '==', partnerId)
+      .where('userId', '==', userId)
+      .limit(1)
+      .get()
+
+    if (!clickSnapshot.empty) {
+      await clickSnapshot.docs[0].ref.update({
+        subscriptionId,
+        convertedAt: Timestamp.now()
+      })
+    }
+
+    // Update partner stats
+    const stats = partnerData.stats || {}
+    await partnerDoc.ref.update({
+      'stats.totalConversions': (stats.totalConversions || 0) + 1,
+      'stats.totalRevenue': (stats.totalRevenue || 0) + amount,
+      'stats.totalCommission': (stats.totalCommission || 0) + commissionAmount,
+      'stats.pendingCommission': (stats.pendingCommission || 0) + commissionAmount,
+      lastActivityAt: Timestamp.now(),
+      updatedAt: Timestamp.now()
+    })
+
+    console.log('✅ Affiliate conversion tracked successfully:', {
+      affiliateCode,
+      commissionAmount
+    })
+  } catch (err: any) {
+    console.error('❌ Error in trackAffiliateConversionServer:', err.message)
+    throw err
   }
 }
 

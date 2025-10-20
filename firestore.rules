@@ -795,6 +795,116 @@ service cloud.firestore {
       allow delete: if isSuperAdmin();
     }
 
+    // ========================================
+    // AFFILIATE SYSTEM
+    // ========================================
+
+    // Helper function for affiliate partners
+    function isAffiliatePartner(affiliateId) {
+      return isAuthenticated() &&
+             exists(/databases/$(database)/documents/affiliatePartners/$(affiliateId)) &&
+             get(/databases/$(database)/documents/affiliatePartners/$(affiliateId)).data.userId == request.auth.uid;
+    }
+
+    // Affiliate Applications
+    match /affiliateApplications/{applicationId} {
+      // Anyone can create an application
+      allow create: if isAuthenticated() &&
+                       request.resource.data.keys().hasAll(['firstName', 'lastName', 'email', 'motivation']) &&
+                       request.resource.data.email == request.auth.token.email;
+
+      // User can read their own application
+      allow read: if isAuthenticated() &&
+                     (resource.data.email == request.auth.token.email || isAdmin());
+
+      // Only admins can update/delete
+      allow update, delete: if isAdmin();
+    }
+
+    // Affiliate Partners
+    match /affiliatePartners/{affiliateId} {
+      // Partner can read their own data
+      allow read: if isAuthenticated() &&
+                     (isAffiliatePartner(affiliateId) || isAdmin());
+
+      // Only admins can create/update partners
+      allow create, update: if isAdmin();
+
+      // Partner can update their own payout details and contact info
+      allow update: if isAuthenticated() &&
+                       isAffiliatePartner(affiliateId) &&
+                       request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['payoutDetails', 'payoutMethod', 'phone', 'website', 'notes', 'updatedAt']);
+
+      // Only super admin can delete
+      allow delete: if isSuperAdmin();
+    }
+
+    // Commissions
+    match /commissions/{commissionId} {
+      // Partner can read their own commissions
+      allow read: if isAuthenticated() &&
+                     (isAffiliatePartner(resource.data.affiliateId) || isAdmin());
+
+      // Only system/admin can create commissions
+      allow create: if isAdmin();
+
+      // Only admin can update commissions
+      allow update: if isAdmin();
+
+      // Only super admin can delete
+      allow delete: if isSuperAdmin();
+    }
+
+    // Payouts
+    match /payouts/{payoutId} {
+      // Partner can read their own payouts
+      allow read: if isAuthenticated() &&
+                     (isAffiliatePartner(resource.data.affiliateId) || isAdmin());
+
+      // Partner can create payout request
+      allow create: if isAuthenticated() &&
+                       isAffiliatePartner(request.resource.data.affiliateId) &&
+                       request.resource.data.status == 'pending';
+
+      // Only admin can update/process payouts
+      allow update: if isAdmin();
+
+      // Only super admin can delete
+      allow delete: if isSuperAdmin();
+    }
+
+    // Affiliate Clicks (tracking)
+    match /affiliateClicks/{clickId} {
+      // Public can create clicks (for tracking)
+      allow create: if true;
+
+      // Only admin can read/update clicks
+      allow read, update: if isAdmin();
+
+      // Only super admin can delete
+      allow delete: if isSuperAdmin();
+    }
+
+    // Affiliate Stats
+    match /affiliateStats/{statsId} {
+      // Partner can read their own stats
+      allow read: if isAuthenticated() &&
+                     (isAffiliatePartner(resource.data.affiliateId) || isAdmin());
+
+      // Only system/admin can write stats
+      allow write: if isAdmin();
+    }
+
+    // Affiliate Config
+    match /affiliateConfig/settings {
+      // Anyone can read config (for public info)
+      allow read: if true;
+
+      // Only admin can update config
+      allow write: if isAdmin();
+    }
+
     // Deny all other access
     match /{document=**} {
       allow read, write: if false;

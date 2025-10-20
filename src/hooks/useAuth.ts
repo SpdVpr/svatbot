@@ -141,6 +141,15 @@ export function useAuth() {
       // Convert and set user
       const user = await convertFirebaseUser(firebaseUser)
       setUser(user)
+
+      // Track affiliate registration
+      try {
+        const { trackAffiliateRegistration } = await import('@/lib/affiliateTracking')
+        await trackAffiliateRegistration(firebaseUser.uid, firebaseUser.email || '')
+      } catch (affiliateError) {
+        console.error('Error tracking affiliate registration:', affiliateError)
+        // Don't throw - registration succeeded
+      }
     } catch (error: any) {
       console.error('Registration error:', error)
       setError({

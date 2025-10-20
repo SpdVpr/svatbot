@@ -1,7 +1,9 @@
 'use client'
 
 import React, { useState, memo } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
+import { useAffiliate } from '@/hooks/useAffiliate'
 import { auth, db } from '@/config/firebase'
 import { updateProfile, updateEmail, sendEmailVerification } from 'firebase/auth'
 import { doc, updateDoc } from 'firebase/firestore'
@@ -15,12 +17,17 @@ import {
   X,
   CheckCircle,
   AlertCircle,
-  Shield
+  Shield,
+  DollarSign,
+  TrendingUp,
+  ExternalLink
 } from 'lucide-react'
 import { cn } from '@/utils'
 
 function ProfileTab() {
+  const router = useRouter()
   const { user, refreshUser } = useAuth()
+  const { partner, loading: affiliateLoading } = useAffiliate()
   const [isEditing, setIsEditing] = useState(false)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'warning', text: string } | null>(null)
@@ -397,6 +404,137 @@ function ProfileTab() {
                 </>
               )}
             </button>
+          </div>
+        )}
+      </div>
+
+      {/* Affiliate Program Section */}
+      <div className="bg-gradient-to-br from-pink-50 to-purple-50 border-2 border-pink-200 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2 mb-4">
+          <DollarSign className="w-5 h-5 text-pink-600" />
+          <span>Affiliate Program</span>
+        </h3>
+
+        {affiliateLoading ? (
+          <div className="text-center py-4">
+            <div className="animate-spin w-6 h-6 border-2 border-pink-500 border-t-transparent rounded-full mx-auto"></div>
+          </div>
+        ) : partner ? (
+          // User is an affiliate partner
+          <div className="space-y-4">
+            <div className="bg-white rounded-lg p-4 border border-pink-200">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <span className="font-medium text-gray-900">Aktivní partner</span>
+                </div>
+                <span className="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
+                  {partner.status === 'active' ? 'Aktivní' : partner.status}
+                </span>
+              </div>
+
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm text-gray-600">Váš referral odkaz</p>
+                  <span className="text-sm font-medium text-pink-600">{partner.commissionRate}% provize</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    value={partner.referralLink}
+                    readOnly
+                    className="flex-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm font-mono text-gray-700"
+                  />
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(partner.referralLink)
+                      setMessage({ type: 'success', text: 'Odkaz zkopírován!' })
+                      setTimeout(() => setMessage(null), 2000)
+                    }}
+                    className="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors flex items-center space-x-1"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <span>Kopírovat</span>
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Sdílejte tento odkaz a získejte {partner.commissionRate}% z každého prodeje
+                </p>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3 mb-4 pt-4 border-t border-gray-200">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-pink-600">{partner.stats.totalClicks}</p>
+                  <p className="text-xs text-gray-600">Kliknutí</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-purple-600">{partner.stats.totalConversions}</p>
+                  <p className="text-xs text-gray-600">Konverze</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-green-600">{partner.stats.totalCommission.toFixed(0)} Kč</p>
+                  <p className="text-xs text-gray-600">Provize</p>
+                </div>
+              </div>
+
+              <a
+                href="/affiliate/dashboard"
+                className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 rounded-lg font-semibold hover:from-pink-600 hover:to-purple-600 transition-all flex items-center justify-center space-x-2"
+              >
+                <span>Otevřít Dashboard</span>
+                <ExternalLink className="w-4 h-4" />
+              </a>
+            </div>
+          </div>
+        ) : (
+          // User is not an affiliate partner
+          <div className="space-y-4">
+            <div className="flex items-start space-x-3">
+              <TrendingUp className="w-6 h-6 text-pink-600 flex-shrink-0 mt-1" />
+              <div>
+                <p className="font-medium text-gray-900 mb-2">
+                  Vydělávejte s námi!
+                </p>
+                <p className="text-sm text-gray-600 mb-3">
+                  Staňte se naším affiliate partnerem a získejte <strong>10% provizi</strong> z každého prodeje Premium předplatného, které přivedete.
+                </p>
+                <ul className="space-y-1 text-sm text-gray-600 mb-4">
+                  <li className="flex items-center space-x-2">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span>10% provize z každého prodeje</span>
+                  </li>
+                  <li className="flex items-center space-x-2">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span>Pasivní příjem</span>
+                  </li>
+                  <li className="flex items-center space-x-2">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span>Marketingové materiály zdarma</span>
+                  </li>
+                  <li className="flex items-center space-x-2">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span>Detailní statistiky</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="flex space-x-3">
+              <button
+                onClick={() => router.push('/affiliate/register')}
+                className="flex-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 rounded-lg font-semibold hover:from-pink-600 hover:to-purple-600 transition-all"
+              >
+                Registrovat se
+              </button>
+              <button
+                onClick={() => router.push('/affiliate')}
+                className="flex-1 border-2 border-pink-500 text-pink-600 py-2 rounded-lg font-semibold hover:bg-pink-50 transition-all"
+              >
+                Více info
+              </button>
+            </div>
           </div>
         )}
       </div>

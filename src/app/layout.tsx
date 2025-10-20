@@ -3,6 +3,7 @@ import { Inter, Playfair_Display, Montserrat } from 'next/font/google'
 import './globals.css'
 import { cn } from '@/utils'
 import CookieBanner from '@/components/common/CookieBanner'
+import AffiliateTracker from '@/components/affiliate/AffiliateTracker'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -118,6 +119,9 @@ export default function RootLayout({
         <div id="root" className="relative">
           {children}
         </div>
+
+        {/* Affiliate Tracking */}
+        <AffiliateTracker />
 
         {/* Cookie Banner */}
         <CookieBanner />
