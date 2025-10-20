@@ -105,8 +105,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       status: 'active',
       stripeCustomerId: session.customer as string,
       stripeSubscriptionId: subscriptionData.id,
-      currentPeriodStart: Timestamp.fromDate(new Date(subscriptionData.current_period_start * 1000)),
-      currentPeriodEnd: Timestamp.fromDate(new Date(subscriptionData.current_period_end * 1000)),
+      currentPeriodStart: Timestamp.fromMillis(subscriptionData.current_period_start * 1000),
+      currentPeriodEnd: Timestamp.fromMillis(subscriptionData.current_period_end * 1000),
       cancelAtPeriodEnd: false,
       isTrialActive: false,
       updatedAt: Timestamp.now()
@@ -133,11 +133,11 @@ async function handleSubscriptionUpdate(subscription: any) {
   const subscriptionRef = adminDb.collection('subscriptions').doc(userId)
   await subscriptionRef.update({
     status: subscription.status,
-    currentPeriodStart: Timestamp.fromDate(new Date(subscription.current_period_start * 1000)),
-    currentPeriodEnd: Timestamp.fromDate(new Date(subscription.current_period_end * 1000)),
+    currentPeriodStart: Timestamp.fromMillis(subscription.current_period_start * 1000),
+    currentPeriodEnd: Timestamp.fromMillis(subscription.current_period_end * 1000),
     cancelAtPeriodEnd: subscription.cancel_at_period_end,
     canceledAt: subscription.canceled_at
-      ? Timestamp.fromDate(new Date(subscription.canceled_at * 1000))
+      ? Timestamp.fromMillis(subscription.canceled_at * 1000)
       : null,
     updatedAt: Timestamp.now()
   })
