@@ -271,7 +271,7 @@ async function handlePaymentSucceeded(invoice: any) {
 
     // Create payment record using Admin SDK
     const adminDb = getAdminDb()
-    const paymentData = {
+    const paymentData: any = {
       userId,
       userEmail: userEmail || invoice.customer_email,
       subscriptionId: subscriptionData.id,
@@ -282,10 +282,14 @@ async function handlePaymentSucceeded(invoice: any) {
       plan,
       invoiceNumber: invoice.number,
       invoiceUrl: invoice.hosted_invoice_url,
-      stripePaymentIntentId: invoice.payment_intent,
       stripeInvoiceId: invoice.id,
       createdAt: stripeTimestampToFirestore(invoice.created),
       paidAt: Timestamp.now()
+    }
+
+    // Only add payment_intent if it exists (not present in all API versions)
+    if (invoice.payment_intent) {
+      paymentData.stripePaymentIntentId = invoice.payment_intent
     }
 
     const docRef = await adminDb.collection('payments').add(paymentData)
@@ -346,7 +350,7 @@ async function handlePaymentFailed(invoice: any) {
 
     // Create payment record using Admin SDK
     const adminDb = getAdminDb()
-    const paymentData = {
+    const paymentData: any = {
       userId,
       userEmail: userEmail || invoice.customer_email,
       subscriptionId: subscriptionData.id,
@@ -357,10 +361,14 @@ async function handlePaymentFailed(invoice: any) {
       plan,
       invoiceNumber: invoice.number,
       invoiceUrl: invoice.hosted_invoice_url,
-      stripePaymentIntentId: invoice.payment_intent,
       stripeInvoiceId: invoice.id,
       createdAt: stripeTimestampToFirestore(invoice.created),
       failedAt: Timestamp.now()
+    }
+
+    // Only add payment_intent if it exists (not present in all API versions)
+    if (invoice.payment_intent) {
+      paymentData.stripePaymentIntentId = invoice.payment_intent
     }
 
     const docRef = await adminDb.collection('payments').add(paymentData)
