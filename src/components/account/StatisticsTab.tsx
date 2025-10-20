@@ -20,19 +20,22 @@ import {
   Sparkles
 } from 'lucide-react'
 
-function StatisticsTab() {
-  const { usageStats, loading: subscriptionLoading } = useSubscription()
+interface StatisticsTabProps {
+  subscriptionData: ReturnType<typeof useSubscription>
+}
+
+function StatisticsTab({ subscriptionData }: StatisticsTabProps) {
+  const { usageStats, loading: subscriptionLoading } = subscriptionData
   const { guests, loading: guestsLoading } = useGuest()
   const { tasks, loading: tasksLoading } = useTask()
   const { budgetItems, loading: budgetLoading } = useBudget()
   const { vendors, loading: vendorsLoading } = useVendor()
 
-  // Show skeleton only on initial load (when all data is empty)
-  const isInitialLoad = !guests && !tasks && !budgetItems && !vendors
-
-  if (isInitialLoad && (guestsLoading || tasksLoading || budgetLoading || vendorsLoading)) {
-    return <StatisticsTabSkeleton />
-  }
+  // Don't show skeleton - render immediately to prevent flickering
+  // const isInitialLoad = !guests && !tasks && !budgetItems && !vendors
+  // if (isInitialLoad && (guestsLoading || tasksLoading || budgetLoading || vendorsLoading)) {
+  //   return <StatisticsTabSkeleton />
+  // }
 
   const stats = [
     {

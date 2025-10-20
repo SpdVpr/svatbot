@@ -35,7 +35,9 @@ type TabType = 'profile' | 'subscription' | 'payments' | 'statistics' | 'setting
 
 export default function AccountModal({ onClose }: AccountModalProps) {
   const { user, logout } = useAuth()
-  const { subscription, hasPremiumAccess, trialDaysRemaining } = useSubscription()
+  // Load subscription data once at modal level and pass to all tabs
+  const subscriptionData = useSubscription()
+  const { subscription, hasPremiumAccess, trialDaysRemaining } = subscriptionData
   const [activeTab, setActiveTab] = useState<TabType>('profile')
 
   const tabs = [
@@ -157,9 +159,9 @@ export default function AccountModal({ onClose }: AccountModalProps) {
         {/* Tab Content with smooth transitions */}
         <div className="flex-1 overflow-y-auto p-6">
           {activeTab === 'profile' && <ProfileTab />}
-          {activeTab === 'subscription' && <SubscriptionTab />}
-          {activeTab === 'payments' && <PaymentsTab />}
-          {activeTab === 'statistics' && <StatisticsTab />}
+          {activeTab === 'subscription' && <SubscriptionTab subscriptionData={subscriptionData} />}
+          {activeTab === 'payments' && <PaymentsTab subscriptionData={subscriptionData} />}
+          {activeTab === 'statistics' && <StatisticsTab subscriptionData={subscriptionData} />}
           {activeTab === 'settings' && <SettingsTab />}
         </div>
       </div>

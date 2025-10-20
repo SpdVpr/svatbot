@@ -13,8 +13,12 @@ import {
   AlertCircle
 } from 'lucide-react'
 
-function PaymentsTab() {
-  const { payments, loading } = useSubscription()
+interface PaymentsTabProps {
+  subscriptionData: ReturnType<typeof useSubscription>
+}
+
+function PaymentsTab({ subscriptionData }: PaymentsTabProps) {
+  const { payments, loading } = subscriptionData
 
   // Don't show skeleton - just show empty state or payments immediately
   // This prevents flickering when switching tabs

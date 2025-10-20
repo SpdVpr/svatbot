@@ -15,7 +15,11 @@ import {
 } from 'lucide-react'
 import { SUBSCRIPTION_PLANS } from '@/types/subscription'
 
-function SubscriptionTab() {
+interface SubscriptionTabProps {
+  subscriptionData: ReturnType<typeof useSubscription>
+}
+
+function SubscriptionTab({ subscriptionData }: SubscriptionTabProps) {
   const {
     subscription,
     hasPremiumAccess,
@@ -24,7 +28,7 @@ function SubscriptionTab() {
     cancelSubscription,
     reactivateSubscription,
     loading
-  } = useSubscription()
+  } = subscriptionData
 
   const [selectedPlan, setSelectedPlan] = useState<'premium_monthly' | 'premium_yearly'>('premium_yearly')
 
