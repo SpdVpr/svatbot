@@ -12,6 +12,7 @@ import {
   getDocs,
   doc,
   updateDoc,
+  setDoc,
   Timestamp,
   limit,
   increment
@@ -117,30 +118,63 @@ export async function trackAffiliateClick(
     const affiliateDoc = snapshot.docs[0]
     const affiliateId = affiliateDoc.id
 
-    // Create click record
-    await addDoc(collection(db, 'affiliateClicks'), {
-      affiliateId,
-      affiliateCode,
-      landingPage,
-      converted: false,
-      clickedAt: Timestamp.now(),
-      createdAt: Timestamp.now()
-    })
+    // Get today's date for daily stats
+    const today = new Date()
+    const dateStr = today.toISOString().split('T')[0] // YYYY-MM-DD
+    const dailyStatsId = `${affiliateId}_${dateStr}`
 
-    // Update partner stats using increment (atomic operation)
+    // Update partner stats using increment (atomic operation) - REALTIME
     const currentClicks = affiliateDoc.data().stats?.totalClicks || 0
 
     console.log('📊 Updating partner stats:', {
       affiliateId,
       currentClicks,
-      incrementing: true
+      incrementing: true,
+      dailyStatsId
     })
 
+    // 1. Update realtime counter in partner document
     await updateDoc(doc(db, 'affiliatePartners', affiliateId), {
       'stats.totalClicks': increment(1),
       lastActivityAt: Timestamp.now(),
       updatedAt: Timestamp.now()
     })
+
+    // 2. Update daily aggregated stats (for history and charts)
+    const dailyStatsRef = doc(db, 'affiliateStats', dailyStatsId)
+
+    try {
+      // Try to increment existing daily stats
+      await updateDoc(dailyStatsRef, {
+        clicks: increment(1),
+        lastClickAt: Timestamp.now(),
+        updatedAt: Timestamp.now()
+      })
+    } catch (error) {
+      // If document doesn't exist, create it
+      try {
+        await setDoc(dailyStatsRef, {
+          affiliateId,
+          affiliateCode,
+          date: dateStr,
+          clicks: 1,
+          conversions: 0,
+          registrations: 0,
+          revenue: 0,
+          commission: 0,
+          lastClickAt: Timestamp.now(),
+          createdAt: Timestamp.now(),
+          updatedAt: Timestamp.now()
+        })
+      } catch (setError) {
+        // If another request created it in the meantime, try update again
+        await updateDoc(dailyStatsRef, {
+          clicks: increment(1),
+          lastClickAt: Timestamp.now(),
+          updatedAt: Timestamp.now()
+        })
+      }
+    }
 
     // Store last tracked click
     if (typeof window !== 'undefined') {
