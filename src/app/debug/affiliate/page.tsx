@@ -38,6 +38,28 @@ export default function DebugAffiliatePage() {
           stats: data.stats,
           createdAt: data.createdAt?.toDate?.()?.toISOString() || 'N/A'
         }, null, 2))
+
+        // Check affiliateStats
+        addLog('\n📊 Checking affiliateStats...')
+        const statsQuery = query(
+          collection(db, 'affiliateStats'),
+          where('affiliateId', '==', doc.id)
+        )
+        const statsSnapshot = await getDocs(statsQuery)
+
+        if (statsSnapshot.empty) {
+          addLog('⚠️ No affiliateStats found for this partner')
+        } else {
+          addLog(`✅ Found ${statsSnapshot.size} affiliateStats documents`)
+          statsSnapshot.docs.forEach(statsDoc => {
+            const statsData = statsDoc.data()
+            addLog(`\n📅 Date: ${statsData.date}`)
+            addLog(`  Clicks: ${statsData.clicks}`)
+            addLog(`  Sources: ${JSON.stringify(statsData.sources || {})}`)
+            addLog(`  Devices: ${JSON.stringify(statsData.devices || {})}`)
+            addLog(`  Browsers: ${JSON.stringify(statsData.browsers || {})}`)
+          })
+        }
       } else {
         addLog('❌ Partner not found')
       }
