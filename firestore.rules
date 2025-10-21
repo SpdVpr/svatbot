@@ -836,11 +836,16 @@ service cloud.firestore {
                        request.resource.data.diff(resource.data).affectedKeys()
                          .hasOnly(['payoutDetails', 'payoutMethod', 'phone', 'website', 'notes', 'billingAddress', 'updatedAt']);
 
-      // Allow system to update stats for tracking (anyone can increment click stats)
-      // Using increment() for atomic updates
-      allow update: if request.resource.data.diff(resource.data).affectedKeys()
-                         .hasOnly(['stats', 'lastActivityAt', 'updatedAt']) &&
-                       request.resource.data.stats.totalClicks >= resource.data.stats.totalClicks;
+      // Allow anyone to increment click stats (for tracking)
+      // Check that only stats.totalClicks is being incremented (not decremented)
+      // and lastActivityAt/updatedAt are being updated
+      allow update: if
+        // Only these top-level fields can change
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stats', 'lastActivityAt', 'updatedAt']) &&
+        // Stats can only have totalClicks changed
+        request.resource.data.stats.diff(resource.data.stats).affectedKeys().hasOnly(['totalClicks']) &&
+        // TotalClicks can only increase
+        request.resource.data.stats.totalClicks >= resource.data.stats.totalClicks;
 
       // Only super admin can delete
       allow delete: if isSuperAdmin();
