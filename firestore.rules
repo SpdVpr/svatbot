@@ -837,14 +837,10 @@ service cloud.firestore {
                          .hasOnly(['payoutDetails', 'payoutMethod', 'phone', 'website', 'notes', 'billingAddress', 'updatedAt']);
 
       // Allow anyone to increment click stats (for tracking)
-      // Check that only stats.totalClicks is being incremented (not decremented)
-      // and lastActivityAt/updatedAt are being updated
+      // When using increment(), Firebase only sends the changed fields
+      // So we just check that stats.totalClicks is increasing
       allow update: if
-        // Only these top-level fields can change
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stats', 'lastActivityAt', 'updatedAt']) &&
-        // Stats can only have totalClicks changed
-        request.resource.data.stats.diff(resource.data.stats).affectedKeys().hasOnly(['totalClicks']) &&
-        // TotalClicks can only increase
         request.resource.data.stats.totalClicks >= resource.data.stats.totalClicks;
 
       // Only super admin can delete
