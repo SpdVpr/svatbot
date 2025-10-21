@@ -823,9 +823,9 @@ service cloud.firestore {
 
     // Affiliate Partners
     match /affiliatePartners/{affiliateId} {
-      // Allow public read for active partners (needed for tracking by referral code)
-      allow read: if resource.data.status == 'active' ||
-                     (isAuthenticated() && (isAffiliatePartner(affiliateId) || isAdmin()));
+      // Allow public read for all partners (needed for tracking queries)
+      // The tracking code filters by status='active' in the query
+      allow read: if true;
 
       // Only admins can create partners
       allow create: if isAdmin();
