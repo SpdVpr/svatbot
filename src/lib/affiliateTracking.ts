@@ -4,16 +4,17 @@
  * Handles tracking of affiliate clicks, registrations, and conversions
  */
 
-import { 
-  collection, 
-  addDoc, 
-  query, 
-  where, 
-  getDocs, 
-  doc, 
+import {
+  collection,
+  addDoc,
+  query,
+  where,
+  getDocs,
+  doc,
   updateDoc,
   Timestamp,
-  limit
+  limit,
+  increment
 } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 
@@ -126,23 +127,17 @@ export async function trackAffiliateClick(
       createdAt: Timestamp.now()
     })
 
-    // Update partner stats
-    const currentStats = affiliateDoc.data().stats || {}
-    const currentClicks = currentStats.totalClicks || 0
-    const newClicks = currentClicks + 1
+    // Update partner stats using increment (atomic operation)
+    const currentClicks = affiliateDoc.data().stats?.totalClicks || 0
 
     console.log('📊 Updating partner stats:', {
       affiliateId,
       currentClicks,
-      newClicks,
-      hasStats: !!affiliateDoc.data().stats
+      incrementing: true
     })
 
     await updateDoc(doc(db, 'affiliatePartners', affiliateId), {
-      stats: {
-        ...currentStats,
-        totalClicks: newClicks
-      },
+      'stats.totalClicks': increment(1),
       lastActivityAt: Timestamp.now(),
       updatedAt: Timestamp.now()
     })
@@ -155,7 +150,7 @@ export async function trackAffiliateClick(
       }))
     }
 
-    console.log('✅ Affiliate click tracked successfully:', { affiliateCode, affiliateId, clicks: newClicks })
+    console.log('✅ Affiliate click tracked successfully:', { affiliateCode, affiliateId, clicks: currentClicks + 1 })
   } catch (err) {
     console.error('❌ Error tracking affiliate click:', err)
   }
