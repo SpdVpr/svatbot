@@ -395,6 +395,25 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     }
   }
 
+  // Delete dance floor
+  const handleDeleteDanceFloor = async () => {
+    if (!confirm('Opravdu chcete smazat taneční parket?')) {
+      return
+    }
+
+    try {
+      // Create new venueLayout without danceFloor
+      const { danceFloor, ...venueLayoutWithoutDanceFloor } = currentPlan.venueLayout
+      await updateSeatingPlan(currentPlan.id, {
+        venueLayout: venueLayoutWithoutDanceFloor
+      })
+      setEditingDanceFloor(false)
+    } catch (error) {
+      console.error('Error deleting dance floor:', error)
+      alert('Chyba při mazání tanečního parketu: ' + (error as Error).message)
+    }
+  }
+
   // Handle venue settings
   const handleEditVenue = () => {
     setShowVenueSettings(true)
@@ -2406,20 +2425,30 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
               </div>
             </div>
 
-            <div className="flex space-x-3 pt-6">
+            <div className="flex flex-col space-y-3 pt-6">
+              <div className="flex space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setEditingDanceFloor(false)}
+                  className="flex-1 btn-outline"
+                >
+                  Zrušit
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveDanceFloor}
+                  className="flex-1 btn-primary"
+                >
+                  Uložit změny
+                </button>
+              </div>
               <button
                 type="button"
-                onClick={() => setEditingDanceFloor(false)}
-                className="flex-1 btn-outline"
+                onClick={handleDeleteDanceFloor}
+                className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center space-x-2"
               >
-                Zrušit
-              </button>
-              <button
-                type="button"
-                onClick={handleSaveDanceFloor}
-                className="flex-1 btn-primary"
-              >
-                Uložit změny
+                <Trash2 className="w-4 h-4" />
+                <span>Smazat taneční parket</span>
               </button>
             </div>
           </div>

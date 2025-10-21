@@ -93,9 +93,19 @@ export function useSeating(): UseSeatingReturn {
   // Update tables and seats when currentPlan changes
   useEffect(() => {
     if (currentPlan) {
+      console.log(`📊 Updating tables and seats for plan ${currentPlan.id}:`, {
+        name: currentPlan.name,
+        tablesCount: currentPlan.tables?.length || 0,
+        seatsCount: currentPlan.seats?.length || 0,
+        sampleTable: currentPlan.tables?.[0] ? {
+          id: currentPlan.tables[0].id,
+          name: currentPlan.tables[0].name
+        } : null
+      })
       setTables(currentPlan.tables || [])
       setSeats(currentPlan.seats || [])
     } else {
+      console.log('📊 Clearing tables and seats (no current plan)')
       setTables([])
       setSeats([])
     }
@@ -106,20 +116,20 @@ export function useSeating(): UseSeatingReturn {
     if (currentPlan && seatingPlans.length > 0) {
       const updatedPlan = seatingPlans.find(p => p.id === currentPlan.id)
       if (updatedPlan) {
-        // Only update if the updatedAt timestamp is newer
-        const currentUpdatedAt = currentPlan.updatedAt instanceof Date
-          ? currentPlan.updatedAt.getTime()
-          : new Date(currentPlan.updatedAt).getTime()
-        const newUpdatedAt = updatedPlan.updatedAt instanceof Date
-          ? updatedPlan.updatedAt.getTime()
-          : new Date(updatedPlan.updatedAt).getTime()
+        // Always update to get the latest data from Firebase
+        // Check if there are actual changes to avoid infinite loops
+        const hasChanges =
+          JSON.stringify(updatedPlan.tables) !== JSON.stringify(currentPlan.tables) ||
+          JSON.stringify(updatedPlan.seats) !== JSON.stringify(currentPlan.seats) ||
+          updatedPlan.venueLayout !== currentPlan.venueLayout
 
-        if (newUpdatedAt > currentUpdatedAt) {
+        if (hasChanges) {
+          console.log('🔄 Updating currentPlan with fresh data from Firebase')
           setCurrentPlanState(updatedPlan)
         }
       }
     }
-  }, [seatingPlans, currentPlan?.id])
+  }, [seatingPlans])
 
   // Load seating plans when wedding changes
   useEffect(() => {
@@ -213,14 +223,39 @@ export function useSeating(): UseSeatingReturn {
     const updatedAt = data.updatedAt?.toDate ? data.updatedAt.toDate() :
                       data.updatedAt ? new Date(data.updatedAt) : new Date()
 
+    // Convert tables with proper date handling
+    const tables = (data.tables || []).map((table: any) => ({
+      ...table,
+      createdAt: table.createdAt?.toDate ? table.createdAt.toDate() :
+                 table.createdAt ? new Date(table.createdAt) : new Date(),
+      updatedAt: table.updatedAt?.toDate ? table.updatedAt.toDate() :
+                 table.updatedAt ? new Date(table.updatedAt) : new Date()
+    }))
+
+    // Convert seats with proper date handling
+    const seats = (data.seats || []).map((seat: any) => ({
+      ...seat,
+      createdAt: seat.createdAt?.toDate ? seat.createdAt.toDate() :
+                 seat.createdAt ? new Date(seat.createdAt) : new Date(),
+      updatedAt: seat.updatedAt?.toDate ? seat.updatedAt.toDate() :
+                 seat.updatedAt ? new Date(seat.updatedAt) : new Date()
+    }))
+
+    console.log(`📋 Converting seating plan ${id}:`, {
+      name: data.name,
+      tablesCount: tables.length,
+      seatsCount: seats.length,
+      sampleTable: tables[0] ? { id: tables[0].id, name: tables[0].name, capacity: tables[0].capacity } : null
+    })
+
     return {
       id,
       weddingId: data.weddingId,
       name: data.name,
       description: data.description,
       venueLayout: data.venueLayout,
-      tables: data.tables || [],
-      seats: data.seats || [],
+      tables,
+      seats,
       isActive: data.isActive,
       isPublished: data.isPublished,
       totalSeats: data.totalSeats,
@@ -280,6 +315,13 @@ export function useSeating(): UseSeatingReturn {
 
       const newPlan: SeatingPlan = { id: localId, ...planData }
 
+      console.log('✨ Creating new seating plan:', {
+        id: newPlan.id,
+        name: newPlan.name,
+        tablesCount: newPlan.tables.length,
+        seatsCount: newPlan.seats.length
+      })
+
       // Save to localStorage immediately
       const savedPlans = localStorage.getItem(`seatingPlans_${wedding.id}`) || '[]'
       const existingPlans = JSON.parse(savedPlans)
@@ -290,7 +332,10 @@ export function useSeating(): UseSeatingReturn {
       setSeatingPlans(prev => [...prev, newPlan])
 
       // Set as current plan immediately
+      console.log('🎯 Setting new plan as current plan')
       setCurrentPlanState(newPlan)
+      // Mark that we've set the initial plan to prevent Firebase listener from overriding it
+      hasSetInitialPlan.current = true
 
       // Save to Firebase in background
       try {
