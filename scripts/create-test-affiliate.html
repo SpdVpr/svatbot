@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Create Test Affiliate Partner</title>
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getFirestore, collection, query, where, getDocs, addDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBxOCjVYZ9QZ9Z9Z9Z9Z9Z9Z9Z9Z9Z9Z9Z",
+      authDomain: "svatbot-app.firebaseapp.com",
+      projectId: "svatbot-app",
+      storageBucket: "svatbot-app.firebasestorage.app",
+      messagingSenderId: "123456789",
+      appId: "1:123456789:web:abcdef"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function checkAndCreatePartner() {
+      const referralCode = 'MIC150254';
+      const log = document.getElementById('log');
+      
+      try {
+        log.innerHTML += '<p>🔍 Checking for partner with code: ' + referralCode + '</p>';
+        
+        // Check if partner exists
+        const q = query(
+          collection(db, 'affiliatePartners'),
+          where('referralCode', '==', referralCode)
+        );
+        const snapshot = await getDocs(q);
+        
+        if (!snapshot.empty) {
+          const doc = snapshot.docs[0];
+          const data = doc.data();
+          log.innerHTML += '<p>✅ Partner found!</p>';
+          log.innerHTML += '<pre>' + JSON.stringify({
+            id: doc.id,
+            referralCode: data.referralCode,
+            status: data.status,
+            stats: data.stats
+          }, null, 2) + '</pre>';
+          return;
+        }
+        
+        log.innerHTML += '<p>❌ Partner not found. Creating...</p>';
+        
+        // Create partner
+        const partnerData = {
+          userId: 'test-user-id',
+          firstName: 'Michal',
+          lastName: 'Test',
+          email: 'michal@test.cz',
+          phone: null,
+          company: null,
+          website: null,
+          status: 'active',
+          referralCode: referralCode,
+          referralLink: 'https://svatbot.cz?ref=' + referralCode,
+          commissionRate: 10,
+          stats: {
+            totalClicks: 0,
+            totalRegistrations: 0,
+            totalConversions: 0,
+            totalRevenue: 0,
+            totalCommission: 0,
+            pendingCommission: 0,
+            paidCommission: 0
+          },
+          payoutMethod: 'bank_transfer',
+          payoutDetails: {},
+          minPayoutAmount: 1000,
+          motivation: 'Test partner',
+          experience: 'Test',
+          audience: 'Test',
+          promotionPlan: 'Test',
+          socialMedia: {
+            instagram: null,
+            facebook: null,
+            youtube: null,
+            tiktok: null,
+            blog: null
+          },
+          expectedMonthlyClicks: 0,
+          expectedMonthlyConversions: 0,
+          createdAt: Timestamp.now(),
+          updatedAt: Timestamp.now(),
+          lastActivityAt: Timestamp.now()
+        };
+        
+        const docRef = await addDoc(collection(db, 'affiliatePartners'), partnerData);
+        log.innerHTML += '<p>✅ Partner created with ID: ' + docRef.id + '</p>';
+        log.innerHTML += '<p>🔗 Referral link: <a href="https://svatbot.cz?ref=' + referralCode + '" target="_blank">https://svatbot.cz?ref=' + referralCode + '</a></p>';
+        
+      } catch (error) {
+        log.innerHTML += '<p style="color: red;">❌ Error: ' + error.message + '</p>';
+        console.error(error);
+      }
+    }
+
+    window.checkAndCreatePartner = checkAndCreatePartner;
+  </script>
+</head>
+<body>
+  <h1>Create Test Affiliate Partner</h1>
+  <button onclick="checkAndCreatePartner()">Check / Create Partner MIC150254</button>
+  <div id="log" style="margin-top: 20px; padding: 10px; background: #f5f5f5; border-radius: 5px;"></div>
+</body>
+</html>
+
