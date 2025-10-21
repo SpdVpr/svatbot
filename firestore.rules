@@ -830,11 +830,16 @@ service cloud.firestore {
       // Only admins can create/update partners
       allow create, update: if isAdmin();
 
-      // Partner can update their own payout details and contact info
+      // Partner can update their own payout details, contact info, and billing address
       allow update: if isAuthenticated() &&
                        isAffiliatePartner(affiliateId) &&
                        request.resource.data.diff(resource.data).affectedKeys()
-                         .hasOnly(['payoutDetails', 'payoutMethod', 'phone', 'website', 'notes', 'updatedAt']);
+                         .hasOnly(['payoutDetails', 'payoutMethod', 'phone', 'website', 'notes', 'billingAddress', 'updatedAt']);
+
+      // Allow system to update stats for tracking (anyone can increment click stats)
+      allow update: if request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['stats', 'lastActivityAt', 'updatedAt']) &&
+                       request.resource.data.stats.totalClicks >= resource.data.stats.totalClicks;
 
       // Only super admin can delete
       allow delete: if isSuperAdmin();
