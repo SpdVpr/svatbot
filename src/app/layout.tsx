@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter, Playfair_Display, Montserrat } from 'next/font/google'
+import { Suspense } from 'react'
 import './globals.css'
 import { cn } from '@/utils'
 import CookieBanner from '@/components/common/CookieBanner'
@@ -121,7 +122,9 @@ export default function RootLayout({
         </div>
 
         {/* Affiliate Tracking */}
-        <AffiliateTracker />
+        <Suspense fallback={null}>
+          <AffiliateTracker />
+        </Suspense>
 
         {/* Cookie Banner */}
         <CookieBanner />
