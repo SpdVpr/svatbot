@@ -81,6 +81,92 @@ export function clearAffiliateCookie(): void {
 }
 
 /**
+ * Helper function to get referrer source
+ */
+function getReferrerSource(referrer: string): string {
+  if (!referrer) return 'direct'
+
+  try {
+    const url = new URL(referrer)
+    const hostname = url.hostname.toLowerCase()
+
+    // Social media
+    if (hostname.includes('facebook.com') || hostname.includes('fb.com')) return 'facebook'
+    if (hostname.includes('instagram.com')) return 'instagram'
+    if (hostname.includes('twitter.com') || hostname.includes('x.com')) return 'twitter'
+    if (hostname.includes('linkedin.com')) return 'linkedin'
+    if (hostname.includes('pinterest.com')) return 'pinterest'
+    if (hostname.includes('tiktok.com')) return 'tiktok'
+    if (hostname.includes('youtube.com')) return 'youtube'
+
+    // Search engines
+    if (hostname.includes('google.')) return 'google'
+    if (hostname.includes('bing.com')) return 'bing'
+    if (hostname.includes('seznam.cz')) return 'seznam'
+
+    // Email
+    if (hostname.includes('mail.') || hostname.includes('email.')) return 'email'
+
+    // Other
+    return hostname.replace('www.', '')
+  } catch {
+    return 'unknown'
+  }
+}
+
+/**
+ * Helper function to get device type
+ */
+function getDeviceType(): string {
+  if (typeof window === 'undefined') return 'unknown'
+
+  const ua = navigator.userAgent.toLowerCase()
+
+  if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
+    return 'tablet'
+  }
+  if (/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(ua)) {
+    return 'mobile'
+  }
+  return 'desktop'
+}
+
+/**
+ * Helper function to get browser
+ */
+function getBrowser(): string {
+  if (typeof window === 'undefined') return 'unknown'
+
+  const ua = navigator.userAgent.toLowerCase()
+
+  if (ua.includes('edg/')) return 'edge'
+  if (ua.includes('chrome/') && !ua.includes('edg/')) return 'chrome'
+  if (ua.includes('safari/') && !ua.includes('chrome/')) return 'safari'
+  if (ua.includes('firefox/')) return 'firefox'
+  if (ua.includes('opera/') || ua.includes('opr/')) return 'opera'
+
+  return 'other'
+}
+
+/**
+ * Helper function to extract UTM parameters
+ */
+function getUTMParams(url: string): { source?: string; medium?: string; campaign?: string; term?: string; content?: string } {
+  try {
+    const urlObj = new URL(url)
+    return {
+      source: urlObj.searchParams.get('utm_source') || undefined,
+      medium: urlObj.searchParams.get('utm_medium') || undefined,
+      campaign: urlObj.searchParams.get('utm_campaign') || undefined,
+      term: urlObj.searchParams.get('utm_term') || undefined,
+      content: urlObj.searchParams.get('utm_content') || undefined,
+    }
+  } catch {
+    return {}
+  }
+}
+
+/**
  * Track affiliate click
  */
 export async function trackAffiliateClick(
@@ -118,6 +204,16 @@ export async function trackAffiliateClick(
     const affiliateDoc = snapshot.docs[0]
     const affiliateId = affiliateDoc.id
 
+    // Collect analytics data
+    const referrer = typeof document !== 'undefined' ? document.referrer : ''
+    const source = getReferrerSource(referrer)
+    const device = getDeviceType()
+    const browser = getBrowser()
+    const currentUrl = typeof window !== 'undefined' ? window.location.href : ''
+    const utmParams = getUTMParams(currentUrl)
+
+    console.log('📊 Analytics data:', { source, device, browser, utmParams, landingPage })
+
     // Get today's date for daily stats
     const today = new Date()
     const dateStr = today.toISOString().split('T')[0] // YYYY-MM-DD
@@ -143,15 +239,33 @@ export async function trackAffiliateClick(
     // 2. Update daily aggregated stats (for history and charts)
     const dailyStatsRef = doc(db, 'affiliateStats', dailyStatsId)
 
+    // Prepare analytics updates
+    const sourceKey = `sources.${source}.clicks`
+    const deviceKey = `devices.${device}.clicks`
+    const browserKey = `browsers.${browser}.clicks`
+    const landingPageKey = `landingPages.${landingPage.replace(/\//g, '_')}.clicks`
+
+    const analyticsUpdates: any = {
+      clicks: increment(1),
+      [sourceKey]: increment(1),
+      [deviceKey]: increment(1),
+      [browserKey]: increment(1),
+      [landingPageKey]: increment(1),
+      lastClickAt: Timestamp.now(),
+      updatedAt: Timestamp.now()
+    }
+
+    // Add UTM campaign tracking if present
+    if (utmParams.campaign) {
+      const campaignKey = `campaigns.${utmParams.campaign}.clicks`
+      analyticsUpdates[campaignKey] = increment(1)
+    }
+
     try {
       // Try to increment existing daily stats
-      await updateDoc(dailyStatsRef, {
-        clicks: increment(1),
-        lastClickAt: Timestamp.now(),
-        updatedAt: Timestamp.now()
-      })
+      await updateDoc(dailyStatsRef, analyticsUpdates)
     } catch (error) {
-      // If document doesn't exist, create it
+      // If document doesn't exist, create it with initial structure
       try {
         await setDoc(dailyStatsRef, {
           affiliateId,
@@ -162,17 +276,28 @@ export async function trackAffiliateClick(
           registrations: 0,
           revenue: 0,
           commission: 0,
+          sources: {
+            [source]: { clicks: 1, conversions: 0 }
+          },
+          devices: {
+            [device]: { clicks: 1, conversions: 0 }
+          },
+          browsers: {
+            [browser]: { clicks: 1, conversions: 0 }
+          },
+          landingPages: {
+            [landingPage.replace(/\//g, '_')]: { clicks: 1, conversions: 0 }
+          },
+          campaigns: utmParams.campaign ? {
+            [utmParams.campaign]: { clicks: 1, conversions: 0 }
+          } : {},
           lastClickAt: Timestamp.now(),
           createdAt: Timestamp.now(),
           updatedAt: Timestamp.now()
         })
       } catch (setError) {
         // If another request created it in the meantime, try update again
-        await updateDoc(dailyStatsRef, {
-          clicks: increment(1),
-          lastClickAt: Timestamp.now(),
-          updatedAt: Timestamp.now()
-        })
+        await updateDoc(dailyStatsRef, analyticsUpdates)
       }
     }
 

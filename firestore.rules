@@ -897,7 +897,7 @@ service cloud.firestore {
       allow delete: if isSuperAdmin();
     }
 
-    // Affiliate Stats (daily aggregated stats)
+    // Affiliate Stats (daily aggregated stats with analytics)
     match /affiliateStats/{statsId} {
       // Partner can read their own stats, admins can read all
       allow read: if isAuthenticated() &&
@@ -906,13 +906,18 @@ service cloud.firestore {
                      isAdmin();
 
       // Anyone can create daily stats (for tracking)
+      // Must have basic required fields
       allow create: if request.resource.data.keys().hasAll(['affiliateId', 'affiliateCode', 'date', 'clicks']) &&
                        request.resource.data.clicks >= 0;
 
       // Anyone can increment stats (for tracking)
+      // Allow updating clicks, conversions, registrations, and nested analytics fields
+      // (sources, devices, browsers, landingPages, campaigns)
       allow update: if request.resource.data.clicks >= resource.data.clicks &&
-                       request.resource.data.conversions >= resource.data.conversions &&
-                       request.resource.data.registrations >= resource.data.registrations;
+                       (request.resource.data.conversions == null ||
+                        request.resource.data.conversions >= resource.data.conversions) &&
+                       (request.resource.data.registrations == null ||
+                        request.resource.data.registrations >= resource.data.registrations);
 
       // Only admins can delete
       allow delete: if isAdmin();
