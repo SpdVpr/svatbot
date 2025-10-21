@@ -416,13 +416,13 @@ async function trackAffiliateConversionServer(
       })
     }
 
-    // Update partner stats
-    const stats = partnerData.stats || {}
+    // Update partner stats using increment (atomic operation)
+    const FieldValue = (await import('firebase-admin/firestore')).FieldValue
     await partnerDoc.ref.update({
-      'stats.totalConversions': (stats.totalConversions || 0) + 1,
-      'stats.totalRevenue': (stats.totalRevenue || 0) + amount,
-      'stats.totalCommission': (stats.totalCommission || 0) + commissionAmount,
-      'stats.pendingCommission': (stats.pendingCommission || 0) + commissionAmount,
+      'stats.totalConversions': FieldValue.increment(1),
+      'stats.totalRevenue': FieldValue.increment(amount),
+      'stats.totalCommission': FieldValue.increment(commissionAmount),
+      'stats.pendingCommission': FieldValue.increment(commissionAmount),
       lastActivityAt: Timestamp.now(),
       updatedAt: Timestamp.now()
     })

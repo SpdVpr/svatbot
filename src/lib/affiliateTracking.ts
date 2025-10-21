@@ -358,10 +358,9 @@ export async function trackAffiliateRegistration(
       })
     }
 
-    // Update partner stats
-    const currentRegistrations = affiliateDoc.data().stats?.totalRegistrations || 0
+    // Update partner stats using increment (atomic operation)
     await updateDoc(doc(db, 'affiliatePartners', affiliateId), {
-      'stats.totalRegistrations': currentRegistrations + 1,
+      'stats.totalRegistrations': increment(1),
       lastActivityAt: Timestamp.now(),
       updatedAt: Timestamp.now()
     })
@@ -478,13 +477,12 @@ export async function trackAffiliateConversion(
       })
     }
 
-    // Update partner stats
-    const stats = partnerData.stats || {}
+    // Update partner stats using increment (atomic operation)
     await updateDoc(doc(db, 'affiliatePartners', partnerId), {
-      'stats.totalConversions': (stats.totalConversions || 0) + 1,
-      'stats.totalRevenue': (stats.totalRevenue || 0) + amount,
-      'stats.totalCommission': (stats.totalCommission || 0) + commissionAmount,
-      'stats.pendingCommission': (stats.pendingCommission || 0) + commissionAmount,
+      'stats.totalConversions': increment(1),
+      'stats.totalRevenue': increment(amount),
+      'stats.totalCommission': increment(commissionAmount),
+      'stats.pendingCommission': increment(commissionAmount),
       lastActivityAt: Timestamp.now(),
       updatedAt: Timestamp.now()
     })

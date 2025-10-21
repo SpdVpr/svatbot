@@ -930,6 +930,60 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // User Affiliate References (links users to their referring affiliate)
+    match /userAffiliateRefs/{refId} {
+      // Allow system to create references (during registration)
+      allow create: if true;
+
+      // Users can read their own references
+      allow read: if isAuthenticated() &&
+                     (resource.data.userId == request.auth.uid || isAdmin());
+
+      // Only system/admin can update (for conversion tracking)
+      allow update: if isAdmin();
+
+      // Only admin can delete
+      allow delete: if isAdmin();
+    }
+
+    // Commissions (affiliate earnings records)
+    match /commissions/{commissionId} {
+      // Affiliate partners can read their own commissions
+      allow read: if isAuthenticated() &&
+                     (resource.data.affiliateId != null &&
+                      isAffiliatePartner(resource.data.affiliateId)) ||
+                     isAdmin();
+
+      // Only system/admin can create commissions (from webhook)
+      allow create: if true;
+
+      // Only admin can update commissions (for status changes)
+      allow update: if isAdmin();
+
+      // Only admin can delete
+      allow delete: if isAdmin();
+    }
+
+    // Payouts (affiliate payout requests)
+    match /payouts/{payoutId} {
+      // Affiliate partners can read their own payouts
+      allow read: if isAuthenticated() &&
+                     (resource.data.affiliateId != null &&
+                      isAffiliatePartner(resource.data.affiliateId)) ||
+                     isAdmin();
+
+      // Affiliate partners can create payout requests
+      allow create: if isAuthenticated() &&
+                       request.resource.data.affiliateId != null &&
+                       isAffiliatePartner(request.resource.data.affiliateId);
+
+      // Only admin can update payouts (for approval/rejection)
+      allow update: if isAdmin();
+
+      // Only admin can delete
+      allow delete: if isAdmin();
+    }
+
     // Deny all other access
     match /{document=**} {
       allow read, write: if false;
