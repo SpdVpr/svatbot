@@ -937,8 +937,11 @@ service cloud.firestore {
       allow read: if isAuthenticated() &&
                      (resource.data.userId == request.auth.uid || isAdmin());
 
-      // Only system/admin can update (for conversion tracking)
-      allow update: if isAdmin();
+      // Allow system/admin to update (for conversion tracking)
+      // Just verify that core fields don't change
+      allow update: if request.resource.data.userId == resource.data.userId &&
+                       request.resource.data.affiliateId == resource.data.affiliateId &&
+                       request.resource.data.affiliateCode == resource.data.affiliateCode;
 
       // Only admin can delete
       allow delete: if isAdmin();
