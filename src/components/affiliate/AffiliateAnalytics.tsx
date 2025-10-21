@@ -147,7 +147,7 @@ export default function AffiliateAnalytics({ affiliateId, days = 30 }: Props) {
   const totalClicks = Object.values(analytics.sources).reduce((sum, s) => sum + s.clicks, 0)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Sources */}
       <AnalyticsSection
         title="Zdroje návštěvnosti"
@@ -155,6 +155,7 @@ export default function AffiliateAnalytics({ affiliateId, days = 30 }: Props) {
         data={analytics.sources}
         totalClicks={totalClicks}
         color="blue"
+        description="Odkud lidé přišli (Google, Facebook, přímý odkaz, atd.)"
       />
 
       {/* Devices */}
@@ -173,16 +174,6 @@ export default function AffiliateAnalytics({ affiliateId, days = 30 }: Props) {
         data={analytics.browsers}
         totalClicks={totalClicks}
         color="green"
-      />
-
-      {/* Landing Pages */}
-      <AnalyticsSection
-        title="Vstupní stránky"
-        icon={Target}
-        data={analytics.landingPages}
-        totalClicks={totalClicks}
-        color="orange"
-        formatLabel={(key) => key.replace(/_/g, '/')}
       />
 
       {/* Campaigns */}
@@ -206,9 +197,10 @@ interface AnalyticsSectionProps {
   totalClicks: number
   color: 'blue' | 'purple' | 'green' | 'orange' | 'pink'
   formatLabel?: (key: string) => string
+  description?: string
 }
 
-function AnalyticsSection({ title, icon: Icon, data, totalClicks, color, formatLabel }: AnalyticsSectionProps) {
+function AnalyticsSection({ title, icon: Icon, data, totalClicks, color, formatLabel, description }: AnalyticsSectionProps) {
   // Sort by clicks descending
   const sortedData = Object.entries(data).sort((a, b) => b[1].clicks - a[1].clicks)
 
@@ -233,34 +225,39 @@ function AnalyticsSection({ title, icon: Icon, data, totalClicks, color, formatL
   }
 
   return (
-    <div className={`rounded-lg border p-6 ${colorClasses[color]}`}>
-      <div className="flex items-center space-x-3 mb-4">
-        <Icon className="w-6 h-6" />
-        <h3 className="text-lg font-semibold">{title}</h3>
+    <div className={`rounded-lg border p-4 md:p-6 ${colorClasses[color]}`}>
+      <div className="mb-4">
+        <div className="flex items-center space-x-2 md:space-x-3 mb-1">
+          <Icon className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0" />
+          <h3 className="text-base md:text-lg font-semibold">{title}</h3>
+        </div>
+        {description && (
+          <p className="text-xs md:text-sm opacity-80 mt-1 ml-7 md:ml-9">{description}</p>
+        )}
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2 md:space-y-3">
         {sortedData.map(([key, stats]) => {
           const percentage = totalClicks > 0 ? (stats.clicks / totalClicks) * 100 : 0
           const label = formatLabel ? formatLabel(key) : key
 
           return (
-            <div key={key} className="bg-white rounded-lg p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-gray-900 capitalize">{label}</span>
-                <div className="text-right">
-                  <span className="font-bold text-gray-900">{stats.clicks}</span>
-                  <span className="text-sm text-gray-600 ml-2">({percentage.toFixed(1)}%)</span>
+            <div key={key} className="bg-white rounded-lg p-3 md:p-4">
+              <div className="flex items-center justify-between mb-2 gap-2">
+                <span className="font-medium text-gray-900 capitalize text-sm md:text-base truncate">{label}</span>
+                <div className="text-right flex-shrink-0">
+                  <span className="font-bold text-gray-900 text-sm md:text-base">{stats.clicks}</span>
+                  <span className="text-xs md:text-sm text-gray-600 ml-1 md:ml-2">({percentage.toFixed(1)}%)</span>
                 </div>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-gray-200 rounded-full h-1.5 md:h-2">
                 <div
-                  className={`h-2 rounded-full ${barColors[color]}`}
+                  className={`h-1.5 md:h-2 rounded-full ${barColors[color]}`}
                   style={{ width: `${percentage}%` }}
                 />
               </div>
               {stats.conversions > 0 && (
-                <div className="mt-2 text-sm text-gray-600">
+                <div className="mt-1.5 md:mt-2 text-xs md:text-sm text-gray-600">
                   {stats.conversions} konverzí
                 </div>
               )}

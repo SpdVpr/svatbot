@@ -235,80 +235,80 @@ export default function AffiliateDashboardPage() {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid md:grid-cols-4 gap-6">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 md:p-6">
               <div className="flex items-center justify-between mb-2">
-                <MousePointerClick className="w-8 h-8" />
+                <MousePointerClick className="w-6 h-6 md:w-8 md:h-8" />
               </div>
-              <div className="text-3xl font-bold mb-1">{stats.totalClicks}</div>
-              <div className="text-pink-100 text-sm">Celkem kliknutí</div>
+              <div className="text-2xl md:text-3xl font-bold mb-1">{stats.totalClicks}</div>
+              <div className="text-pink-100 text-xs md:text-sm">Celkem kliknutí</div>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 md:p-6">
               <div className="flex items-center justify-between mb-2">
-                <Users className="w-8 h-8" />
+                <Users className="w-6 h-6 md:w-8 md:h-8" />
               </div>
-              <div className="text-3xl font-bold mb-1">{stats.totalConversions}</div>
-              <div className="text-pink-100 text-sm">Konverze</div>
+              <div className="text-2xl md:text-3xl font-bold mb-1">{stats.totalConversions}</div>
+              <div className="text-pink-100 text-xs md:text-sm">Konverze</div>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 md:p-6">
               <div className="flex items-center justify-between mb-2">
-                <TrendingUp className="w-8 h-8" />
+                <TrendingUp className="w-6 h-6 md:w-8 md:h-8" />
               </div>
-              <div className="text-3xl font-bold mb-1">{stats.totalRevenue.toFixed(0)} Kč</div>
-              <div className="text-pink-100 text-sm">Celkový obrat</div>
+              <div className="text-2xl md:text-3xl font-bold mb-1">{stats.totalRevenue.toFixed(0)} Kč</div>
+              <div className="text-pink-100 text-xs md:text-sm">Celkový obrat</div>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 md:p-6">
               <div className="flex items-center justify-between mb-2">
-                <DollarSign className="w-8 h-8" />
+                <DollarSign className="w-6 h-6 md:w-8 md:h-8" />
               </div>
-              <div className="text-3xl font-bold mb-1">{stats.totalCommission.toFixed(0)} Kč</div>
-              <div className="text-pink-100 text-sm">Celková provize</div>
+              <div className="text-2xl md:text-3xl font-bold mb-1">{stats.totalCommission.toFixed(0)} Kč</div>
+              <div className="text-pink-100 text-xs md:text-sm">Celková provize</div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-4 md:py-8">
         {/* Referral Link */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Váš referral odkaz</h2>
-          <div className="flex items-center space-x-4">
-            <div className="flex-1 bg-gray-50 rounded-lg px-4 py-3 font-mono text-sm">
+        <div className="bg-white rounded-xl shadow-sm p-4 md:p-6 mb-4 md:mb-6">
+          <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-3 md:mb-4">Váš referral odkaz</h2>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+            <div className="flex-1 bg-gray-50 rounded-lg px-3 md:px-4 py-2 md:py-3 font-mono text-xs md:text-sm overflow-x-auto">
               {getProductionReferralLink()}
             </div>
             <button
               onClick={copyReferralLink}
-              className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-lg font-semibold hover:from-pink-600 hover:to-purple-600 transition-all flex items-center space-x-2"
+              className="px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-lg font-semibold hover:from-pink-600 hover:to-purple-600 transition-all flex items-center justify-center space-x-2 whitespace-nowrap"
             >
               {copied ? (
                 <>
-                  <CheckCircle className="w-5 h-5" />
-                  <span>Zkopírováno!</span>
+                  <CheckCircle className="w-4 h-4 md:w-5 md:h-5" />
+                  <span className="text-sm md:text-base">Zkopírováno!</span>
                 </>
               ) : (
                 <>
-                  <Copy className="w-5 h-5" />
-                  <span>Kopírovat</span>
+                  <Copy className="w-4 h-4 md:w-5 md:h-5" />
+                  <span className="text-sm md:text-base">Kopírovat</span>
                 </>
               )}
             </button>
           </div>
-          <p className="text-sm text-gray-600 mt-2">
+          <p className="text-xs md:text-sm text-gray-600 mt-2">
             Váš referral kód: <span className="font-semibold">{partner.referralCode}</span>
           </p>
         </div>
 
         {/* Tabs */}
-        <div className="bg-white rounded-xl shadow-sm mb-6">
+        <div className="bg-white rounded-xl shadow-sm mb-4 md:mb-6">
           <div className="border-b border-gray-200">
-            <div className="flex space-x-8 px-6">
+            <div className="flex space-x-4 md:space-x-8 px-4 md:px-6 overflow-x-auto">
               <button
                 onClick={() => setActiveTab('overview')}
-                className={`py-4 border-b-2 font-semibold transition-colors ${
+                className={`py-3 md:py-4 border-b-2 font-semibold transition-colors text-sm md:text-base whitespace-nowrap ${
                   activeTab === 'overview'
                     ? 'border-pink-500 text-pink-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -318,7 +318,7 @@ export default function AffiliateDashboardPage() {
               </button>
               <button
                 onClick={() => setActiveTab('analytics')}
-                className={`py-4 border-b-2 font-semibold transition-colors ${
+                className={`py-3 md:py-4 border-b-2 font-semibold transition-colors text-sm md:text-base whitespace-nowrap ${
                   activeTab === 'analytics'
                     ? 'border-pink-500 text-pink-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -328,7 +328,7 @@ export default function AffiliateDashboardPage() {
               </button>
               <button
                 onClick={() => setActiveTab('commissions')}
-                className={`py-4 border-b-2 font-semibold transition-colors ${
+                className={`py-3 md:py-4 border-b-2 font-semibold transition-colors text-sm md:text-base whitespace-nowrap ${
                   activeTab === 'commissions'
                     ? 'border-pink-500 text-pink-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -338,7 +338,7 @@ export default function AffiliateDashboardPage() {
               </button>
               <button
                 onClick={() => setActiveTab('payouts')}
-                className={`py-4 border-b-2 font-semibold transition-colors ${
+                className={`py-3 md:py-4 border-b-2 font-semibold transition-colors text-sm md:text-base whitespace-nowrap ${
                   activeTab === 'payouts'
                     ? 'border-pink-500 text-pink-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -348,7 +348,7 @@ export default function AffiliateDashboardPage() {
               </button>
               <button
                 onClick={() => setActiveTab('settings')}
-                className={`py-4 border-b-2 font-semibold transition-colors ${
+                className={`py-3 md:py-4 border-b-2 font-semibold transition-colors text-sm md:text-base whitespace-nowrap ${
                   activeTab === 'settings'
                     ? 'border-pink-500 text-pink-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -359,65 +359,65 @@ export default function AffiliateDashboardPage() {
             </div>
           </div>
 
-          <div className="p-6">
+          <div className="p-4 md:p-6">
             {activeTab === 'overview' && (
-              <div className="space-y-6">
+              <div className="space-y-4 md:space-y-6">
                 {/* Pending Payout */}
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-6 border border-green-200">
-                  <div className="flex items-center justify-between">
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4 md:p-6 border border-green-200">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                      <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-1">
                         K výplatě
                       </h3>
-                      <div className="text-3xl font-bold text-green-600 mb-2">
+                      <div className="text-2xl md:text-3xl font-bold text-green-600 mb-2">
                         {pendingPayoutAmount.toFixed(2)} Kč
                       </div>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-xs md:text-sm text-gray-600">
                         {pendingCommissions.length} potvrzených provizí
                       </p>
                     </div>
                     <button
                       onClick={handleRequestPayout}
                       disabled={requestingPayout || pendingPayoutAmount < partner.minPayoutAmount}
-                      className="px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                      className="w-full sm:w-auto px-4 md:px-6 py-2 md:py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm md:text-base"
                     >
                       {requestingPayout ? (
                         <>
-                          <Loader2 className="w-5 h-5 animate-spin" />
+                          <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" />
                           <span>Zpracovávám...</span>
                         </>
                       ) : (
                         <>
-                          <Download className="w-5 h-5" />
+                          <Download className="w-4 h-4 md:w-5 md:h-5" />
                           <span>Požádat o výplatu</span>
                         </>
                       )}
                     </button>
                   </div>
                   {pendingPayoutAmount < partner.minPayoutAmount && (
-                    <p className="text-sm text-gray-600 mt-4">
+                    <p className="text-xs md:text-sm text-gray-600 mt-4">
                       Minimální částka pro výplatu je {partner.minPayoutAmount} Kč
                     </p>
                   )}
                 </div>
 
                 {/* Performance Stats */}
-                <div className="grid md:grid-cols-3 gap-6">
-                  <div className="bg-gray-50 rounded-lg p-6">
-                    <h4 className="text-sm font-medium text-gray-600 mb-2">Conversion Rate</h4>
-                    <div className="text-2xl font-bold text-gray-900">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-6">
+                  <div className="bg-gray-50 rounded-lg p-4 md:p-6">
+                    <h4 className="text-xs md:text-sm font-medium text-gray-600 mb-2">Conversion Rate</h4>
+                    <div className="text-xl md:text-2xl font-bold text-gray-900">
                       {stats.totalClicks > 0 ? ((stats.totalConversions / stats.totalClicks) * 100).toFixed(2) : 0}%
                     </div>
                   </div>
-                  <div className="bg-gray-50 rounded-lg p-6">
-                    <h4 className="text-sm font-medium text-gray-600 mb-2">Průměrná provize</h4>
-                    <div className="text-2xl font-bold text-gray-900">
+                  <div className="bg-gray-50 rounded-lg p-4 md:p-6">
+                    <h4 className="text-xs md:text-sm font-medium text-gray-600 mb-2">Průměrná provize</h4>
+                    <div className="text-xl md:text-2xl font-bold text-gray-900">
                       {stats.totalConversions > 0 ? (stats.totalCommission / stats.totalConversions).toFixed(0) : 0} Kč
                     </div>
                   </div>
-                  <div className="bg-gray-50 rounded-lg p-6">
-                    <h4 className="text-sm font-medium text-gray-600 mb-2">Vyplaceno</h4>
-                    <div className="text-2xl font-bold text-gray-900">
+                  <div className="bg-gray-50 rounded-lg p-4 md:p-6">
+                    <h4 className="text-xs md:text-sm font-medium text-gray-600 mb-2">Vyplaceno</h4>
+                    <div className="text-xl md:text-2xl font-bold text-gray-900">
                       {stats.paidCommission.toFixed(0)} Kč
                     </div>
                   </div>
@@ -425,23 +425,23 @@ export default function AffiliateDashboardPage() {
 
                 {/* Recent Commissions */}
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Poslední provize</h3>
-                  <div className="space-y-3">
+                  <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3 md:mb-4">Poslední provize</h3>
+                  <div className="space-y-2 md:space-y-3">
                     {commissions.slice(0, 5).map((commission) => (
-                      <div key={commission.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                        <div>
-                          <div className="font-semibold text-gray-900">
+                      <div key={commission.id} className="flex items-center justify-between p-3 md:p-4 bg-gray-50 rounded-lg gap-3">
+                        <div className="min-w-0 flex-1">
+                          <div className="font-semibold text-gray-900 text-sm md:text-base truncate">
                             {commission.plan === 'premium_monthly' ? 'Premium měsíční' : 'Premium roční'}
                           </div>
-                          <div className="text-sm text-gray-600">
+                          <div className="text-xs md:text-sm text-gray-600">
                             {commission.createdAt.toLocaleDateString('cs-CZ')}
                           </div>
                         </div>
-                        <div className="text-right">
-                          <div className="font-bold text-gray-900">
+                        <div className="text-right flex-shrink-0">
+                          <div className="font-bold text-gray-900 text-sm md:text-base">
                             {commission.commissionAmount.toFixed(2)} Kč
                           </div>
-                          <div className={`text-sm ${
+                          <div className={`text-xs md:text-sm ${
                             commission.status === 'paid' ? 'text-green-600' :
                             commission.status === 'confirmed' ? 'text-blue-600' :
                             'text-yellow-600'
@@ -460,9 +460,9 @@ export default function AffiliateDashboardPage() {
 
             {activeTab === 'analytics' && (
               <div>
-                <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Analytika prokliků</h3>
-                  <p className="text-sm text-gray-600">
+                <div className="mb-4 md:mb-6">
+                  <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">Analytika prokliků</h3>
+                  <p className="text-xs md:text-sm text-gray-600">
                     Detailní přehled zdrojů návštěvnosti, zařízení a kampaní za posledních 30 dní
                   </p>
                 </div>
