@@ -839,7 +839,14 @@ service cloud.firestore {
       // Allow system to update stats for tracking (anyone can increment click stats)
       allow update: if request.resource.data.diff(resource.data).affectedKeys()
                          .hasOnly(['stats', 'lastActivityAt', 'updatedAt']) &&
-                       request.resource.data.stats.totalClicks >= resource.data.stats.totalClicks;
+                       (
+                         // Allow if totalClicks is being incremented
+                         (resource.data.stats != null &&
+                          resource.data.stats.totalClicks != null &&
+                          request.resource.data.stats.totalClicks >= resource.data.stats.totalClicks) ||
+                         // Allow if this is the first click (stats doesn't exist yet)
+                         (resource.data.stats == null || resource.data.stats.totalClicks == null)
+                       );
 
       // Only super admin can delete
       allow delete: if isSuperAdmin();
