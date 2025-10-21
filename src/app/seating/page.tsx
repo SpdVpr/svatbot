@@ -30,13 +30,6 @@ export default function SeatingPage() {
     description: ''
   })
 
-  // Auto-select first plan if none is selected
-  React.useEffect(() => {
-    if (seatingPlans.length > 0 && !currentPlan) {
-      setCurrentPlan(seatingPlans[0].id)
-    }
-  }, [seatingPlans, currentPlan, setCurrentPlan])
-
   // Handle create seating plan
   const handleCreatePlan = async (e: React.FormEvent) => {
     e.preventDefault()
