@@ -901,9 +901,7 @@ service cloud.firestore {
     match /affiliateStats/{statsId} {
       // Partner can read their own stats, admins can read all
       allow read: if isAuthenticated() &&
-                     (resource.data.affiliateId != null &&
-                      isAffiliatePartner(resource.data.affiliateId)) ||
-                     isAdmin();
+                     (isAffiliatePartner(resource.data.affiliateId) || isAdmin());
 
       // Anyone can create daily stats (for tracking)
       // Must have basic required fields
