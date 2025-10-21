@@ -45,13 +45,15 @@ export default function AffiliateHomePage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               {user && partner ? (
                 // User is already a partner - show dashboard button
-                <button
-                  onClick={() => router.push('/affiliate/dashboard')}
+                <a
+                  href="/affiliate/dashboard"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="px-8 py-4 bg-white text-pink-600 rounded-lg font-bold text-lg hover:bg-pink-50 transition-all shadow-lg flex items-center justify-center space-x-2"
                 >
                   <span>Vstoupit do programu</span>
                   <ArrowRight className="w-5 h-5" />
-                </button>
+                </a>
               ) : (
                 // User is not a partner - show registration button
                 <>
@@ -63,12 +65,14 @@ export default function AffiliateHomePage() {
                     <ArrowRight className="w-5 h-5" />
                   </button>
                   {user && (
-                    <button
-                      onClick={() => router.push('/affiliate/dashboard')}
-                      className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white rounded-lg font-bold text-lg hover:bg-white/20 transition-all border-2 border-white/30"
+                    <a
+                      href="/affiliate/dashboard"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white rounded-lg font-bold text-lg hover:bg-white/20 transition-all border-2 border-white/30 flex items-center justify-center"
                     >
                       Partner Dashboard
-                    </button>
+                    </a>
                   )}
                 </>
               )}

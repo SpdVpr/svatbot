@@ -481,6 +481,8 @@ function ProfileTab() {
 
               <a
                 href="/affiliate/dashboard"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 rounded-lg font-semibold hover:from-pink-600 hover:to-purple-600 transition-all flex items-center justify-center space-x-2"
               >
                 <span>Otevřít Dashboard</span>

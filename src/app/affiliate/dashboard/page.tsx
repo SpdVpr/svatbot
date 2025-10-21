@@ -17,7 +17,9 @@ import {
   Download,
   Settings,
   Loader2,
-  ExternalLink
+  ExternalLink,
+  Home,
+  ArrowLeft
 } from 'lucide-react'
 
 export default function AffiliateDashboardPage() {
@@ -79,9 +81,17 @@ export default function AffiliateDashboardPage() {
     }
   }
 
+  // Generate production referral link
+  const getProductionReferralLink = () => {
+    if (!partner) return ''
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://svatbot.cz'
+    return `${baseUrl}?ref=${partner.referralCode}`
+  }
+
   const copyReferralLink = () => {
-    if (partner?.referralLink) {
-      navigator.clipboard.writeText(partner.referralLink)
+    const link = getProductionReferralLink()
+    if (link) {
+      navigator.clipboard.writeText(link)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     }
@@ -203,7 +213,14 @@ export default function AffiliateDashboardPage() {
                 Vítejte zpět, {partner.firstName}!
               </p>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={() => router.push('/')}
+                className="px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg transition-colors flex items-center space-x-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Zpět na hlavní dashboard</span>
+              </button>
               <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
                 partner.status === 'active' ? 'bg-green-500' :
                 partner.status === 'pending' ? 'bg-yellow-500' :
@@ -260,7 +277,7 @@ export default function AffiliateDashboardPage() {
           <h2 className="text-xl font-bold text-gray-900 mb-4">Váš referral odkaz</h2>
           <div className="flex items-center space-x-4">
             <div className="flex-1 bg-gray-50 rounded-lg px-4 py-3 font-mono text-sm">
-              {partner.referralLink}
+              {getProductionReferralLink()}
             </div>
             <button
               onClick={copyReferralLink}
