@@ -319,6 +319,7 @@ async function handlePaymentSucceeded(invoice: any) {
 
 /**
  * Track affiliate conversion on server side (called from webhook)
+ * Supports both first-time conversions and recurring payments
  */
 async function trackAffiliateConversionServer(
   userId: string,
@@ -333,52 +334,73 @@ async function trackAffiliateConversionServer(
   try {
     const db = adminDb || getAdminDb()
 
-    // Check if user has affiliate reference
-    const refSnapshot = await db.collection('userAffiliateRefs')
-      .where('userId', '==', userId)
-      .where('converted', '==', false)
-      .limit(1)
-      .get()
+    // First, try to get affiliate reference from user document (most reliable)
+    let affiliateCode: string | null = null
+    let affiliateId: string | null = null
 
-    if (refSnapshot.empty) {
+    const userDoc = await db.collection('users').doc(userId).get()
+    if (userDoc.exists) {
+      const userData = userDoc.data()
+      affiliateCode = userData?.affiliateCode || null
+      affiliateId = userData?.affiliateId || null
+    }
+
+    // If not found in user doc, check userAffiliateRefs (fallback)
+    if (!affiliateCode) {
+      const refSnapshot = await db.collection('userAffiliateRefs')
+        .where('userId', '==', userId)
+        .limit(1)
+        .get()
+
+      if (!refSnapshot.empty) {
+        const refData = refSnapshot.docs[0].data()
+        affiliateCode = refData.affiliateCode
+        affiliateId = refData.affiliateId
+      }
+    }
+
+    if (!affiliateCode || !affiliateId) {
       console.log('ℹ️ No affiliate reference found for user:', userId)
       return
     }
 
-    const refDoc = refSnapshot.docs[0]
-    const refData = refDoc.data()
-    const affiliateId = refData.affiliateId
-    const affiliateCode = refData.affiliateCode
-
     console.log('🎯 Found affiliate reference:', { affiliateCode, userId })
 
     // Get affiliate partner to get commission rate
-    const partnerSnapshot = await db.collection('affiliatePartners')
-      .where('referralCode', '==', affiliateCode)
-      .limit(1)
-      .get()
+    const partnerDoc = await db.collection('affiliatePartners').doc(affiliateId).get()
 
-    if (partnerSnapshot.empty) {
-      console.warn('⚠️ Affiliate partner not found:', affiliateCode)
+    if (!partnerDoc.exists) {
+      console.warn('⚠️ Affiliate partner not found:', affiliateId)
       return
     }
 
-    const partnerDoc = partnerSnapshot.docs[0]
-    const partnerId = partnerDoc.id
     const partnerData = partnerDoc.data()
     const commissionRate = partnerData.customCommissionRate || partnerData.commissionRate || 10
-    const commissionAmount = (amount * commissionRate) / 100
+    const recurringCommissionRate = partnerData.recurringCommissionRate || commissionRate // Can be different for recurring
+
+    // Check if this is first conversion or recurring payment
+    const existingCommissionsSnapshot = await db.collection('commissions')
+      .where('userId', '==', userId)
+      .where('affiliateId', '==', affiliateId)
+      .limit(1)
+      .get()
+
+    const isFirstConversion = existingCommissionsSnapshot.empty
+    const actualCommissionRate = isFirstConversion ? commissionRate : recurringCommissionRate
+    const commissionAmount = (amount * actualCommissionRate) / 100
+    const commissionType = isFirstConversion ? 'first_conversion' : 'recurring'
 
     console.log('💰 Creating commission:', {
       affiliateCode,
       amount,
-      commissionRate,
-      commissionAmount
+      commissionRate: actualCommissionRate,
+      commissionAmount,
+      type: commissionType
     })
 
     // Create commission record
     await db.collection('commissions').add({
-      affiliateId: partnerId,
+      affiliateId,
       affiliateCode,
       userId,
       userEmail,
@@ -388,48 +410,68 @@ async function trackAffiliateConversionServer(
       plan,
       amount,
       currency: 'CZK',
-      commissionRate,
+      commissionRate: actualCommissionRate,
       commissionAmount,
+      commissionType, // 'first_conversion' or 'recurring'
       status: 'confirmed',
       createdAt: Timestamp.now(),
       confirmedAt: Timestamp.now()
     })
 
-    // Update affiliate reference
-    await refDoc.ref.update({
-      converted: true,
-      subscriptionId,
-      convertedAt: Timestamp.now()
-    })
+    // Update affiliate reference (only on first conversion)
+    if (isFirstConversion) {
+      const refSnapshot = await db.collection('userAffiliateRefs')
+        .where('userId', '==', userId)
+        .limit(1)
+        .get()
 
-    // Update click record
-    const clickSnapshot = await db.collection('affiliateClicks')
-      .where('affiliateId', '==', partnerId)
-      .where('userId', '==', userId)
-      .limit(1)
-      .get()
+      if (!refSnapshot.empty) {
+        await refSnapshot.docs[0].ref.update({
+          converted: true,
+          subscriptionId,
+          convertedAt: Timestamp.now()
+        })
+      }
 
-    if (!clickSnapshot.empty) {
-      await clickSnapshot.docs[0].ref.update({
-        subscriptionId,
-        convertedAt: Timestamp.now()
-      })
+      // Update click record
+      const clickSnapshot = await db.collection('affiliateClicks')
+        .where('affiliateId', '==', affiliateId)
+        .where('userId', '==', userId)
+        .limit(1)
+        .get()
+
+      if (!clickSnapshot.empty) {
+        await clickSnapshot.docs[0].ref.update({
+          subscriptionId,
+          convertedAt: Timestamp.now()
+        })
+      }
     }
 
     // Update partner stats using increment (atomic operation)
     const FieldValue = (await import('firebase-admin/firestore')).FieldValue
-    await partnerDoc.ref.update({
-      'stats.totalConversions': FieldValue.increment(1),
+    const statsUpdate: any = {
       'stats.totalRevenue': FieldValue.increment(amount),
       'stats.totalCommission': FieldValue.increment(commissionAmount),
       'stats.pendingCommission': FieldValue.increment(commissionAmount),
       lastActivityAt: Timestamp.now(),
       updatedAt: Timestamp.now()
-    })
+    }
+
+    // Only increment conversion count on first conversion
+    if (isFirstConversion) {
+      statsUpdate['stats.totalConversions'] = FieldValue.increment(1)
+    } else {
+      // Track recurring payments separately
+      statsUpdate['stats.recurringPayments'] = FieldValue.increment(1)
+    }
+
+    await partnerDoc.ref.update(statsUpdate)
 
     console.log('✅ Affiliate conversion tracked successfully:', {
       affiliateCode,
-      commissionAmount
+      commissionAmount,
+      type: commissionType
     })
   } catch (err: any) {
     console.error('❌ Error in trackAffiliateConversionServer:', err.message)

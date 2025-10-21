@@ -334,7 +334,7 @@ export async function trackAffiliateRegistration(
       limit(1)
     )
     const snapshot = await getDocs(q)
-    
+
     if (snapshot.empty) return
 
     const affiliateDoc = snapshot.docs[0]
@@ -348,7 +348,7 @@ export async function trackAffiliateRegistration(
       limit(1)
     )
     const clicksSnapshot = await getDocs(clicksQuery)
-    
+
     if (!clicksSnapshot.empty) {
       const clickDoc = clicksSnapshot.docs[0]
       await updateDoc(doc(db, 'affiliateClicks', clickDoc.id), {
@@ -375,9 +375,80 @@ export async function trackAffiliateRegistration(
       converted: false
     })
 
+    // Also store affiliate reference directly in user document for easy access
+    await updateDoc(doc(db, 'users', userId), {
+      affiliateCode,
+      affiliateId,
+      affiliateRegisteredAt: Timestamp.now()
+    })
+
     console.log('✅ Affiliate registration tracked:', affiliateCode)
   } catch (err) {
     console.error('Error tracking affiliate registration:', err)
+  }
+}
+
+/**
+ * Link existing user to affiliate (when already registered user clicks affiliate link)
+ * This allows tracking conversions for users who register before clicking affiliate link
+ */
+export async function linkUserToAffiliate(
+  userId: string,
+  userEmail: string
+): Promise<void> {
+  const affiliateCode = getAffiliateCookie()
+  if (!affiliateCode) return
+
+  try {
+    // Check if user already has affiliate reference
+    const userDoc = await getDocs(
+      query(collection(db, 'users'), where('__name__', '==', userId), limit(1))
+    )
+
+    if (userDoc.empty) return
+
+    const userData = userDoc.docs[0].data()
+
+    // Don't override existing affiliate reference (first referrer wins)
+    if (userData.affiliateCode) {
+      console.log('ℹ️ User already has affiliate reference:', userData.affiliateCode)
+      return
+    }
+
+    // Get affiliate partner
+    const q = query(
+      collection(db, 'affiliatePartners'),
+      where('referralCode', '==', affiliateCode),
+      where('status', '==', 'active'),
+      limit(1)
+    )
+    const snapshot = await getDocs(q)
+
+    if (snapshot.empty) return
+
+    const affiliateDoc = snapshot.docs[0]
+    const affiliateId = affiliateDoc.id
+
+    // Store affiliate reference in user document
+    await updateDoc(doc(db, 'users', userId), {
+      affiliateCode,
+      affiliateId,
+      affiliateLinkedAt: Timestamp.now()
+    })
+
+    // Create userAffiliateRef for tracking
+    await addDoc(collection(db, 'userAffiliateRefs'), {
+      userId,
+      userEmail,
+      affiliateId,
+      affiliateCode,
+      linkedAt: Timestamp.now(),
+      converted: false
+    })
+
+    console.log('✅ Existing user linked to affiliate:', affiliateCode)
+  } catch (err) {
+    console.error('Error linking user to affiliate:', err)
   }
 }
 
