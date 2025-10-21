@@ -165,11 +165,22 @@ export function useSeating(): UseSeatingReturn {
 
           setSeatingPlans(plansData)
 
-          // Automatically set first plan as current if none is set
-          // This will run on initial load and when plans are added/removed
+          // Automatically set a plan as current if none is set
+          // Prefer plans with tables, otherwise take the first one
           if (plansData.length > 0 && !currentPlan) {
-            console.log('🎯 Auto-selecting first plan:', plansData[0].id)
-            setCurrentPlanState(plansData[0])
+            // Find plan with most tables
+            const planWithTables = plansData.reduce((best, plan) => {
+              const tablesCount = plan.tables?.length || 0
+              const bestTablesCount = best?.tables?.length || 0
+              return tablesCount > bestTablesCount ? plan : best
+            }, plansData[0])
+
+            console.log('🎯 Auto-selecting plan:', {
+              id: planWithTables.id,
+              name: planWithTables.name,
+              tablesCount: planWithTables.tables?.length || 0
+            })
+            setCurrentPlanState(planWithTables)
             hasSetInitialPlan.current = true
           }
 
