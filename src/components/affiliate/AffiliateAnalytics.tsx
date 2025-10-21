@@ -250,10 +250,10 @@ function AnalyticsSection({ title, icon: Icon, data, totalClicks, color, formatL
                   <span className="text-xs md:text-sm text-gray-600 ml-1 md:ml-2">({percentage.toFixed(1)}%)</span>
                 </div>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-1.5 md:h-2">
+              <div className="w-full bg-gray-200 rounded-full h-1.5 md:h-2 overflow-hidden">
                 <div
-                  className={`h-1.5 md:h-2 rounded-full ${barColors[color]}`}
-                  style={{ width: `${percentage}%` }}
+                  className={`h-1.5 md:h-2 rounded-full ${barColors[color]} transition-all duration-300`}
+                  style={{ width: `${Math.min(percentage, 100)}%` }}
                 />
               </div>
               {stats.conversions > 0 && (
