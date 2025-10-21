@@ -622,6 +622,34 @@
       ]
     },
     {
+      "collectionGroup": "affiliatePartners",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "referralCode",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "affiliateClicks",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "affiliateId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "clickedAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
       "collectionGroup": "affiliateReferrals",
       "queryScope": "COLLECTION",
       "fields": [
