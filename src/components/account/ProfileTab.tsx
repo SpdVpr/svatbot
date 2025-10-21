@@ -441,13 +441,14 @@ function ProfileTab() {
                 <div className="flex items-center space-x-2">
                   <input
                     type="text"
-                    value={partner.referralLink}
+                    value={`${process.env.NEXT_PUBLIC_APP_URL || 'https://svatbot.cz'}?ref=${partner.referralCode}`}
                     readOnly
                     className="flex-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm font-mono text-gray-700"
                   />
                   <button
                     onClick={() => {
-                      navigator.clipboard.writeText(partner.referralLink)
+                      const productionLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://svatbot.cz'}?ref=${partner.referralCode}`
+                      navigator.clipboard.writeText(productionLink)
                       setMessage({ type: 'success', text: 'Odkaz zkopírován!' })
                       setTimeout(() => setMessage(null), 2000)
                     }}

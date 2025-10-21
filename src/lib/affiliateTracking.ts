@@ -19,6 +19,7 @@ import { db } from '@/lib/firebase'
 
 const AFFILIATE_COOKIE_NAME = 'affiliate_ref'
 const COOKIE_DURATION_DAYS = 30
+const LAST_CLICK_TRACKED_KEY = 'affiliate_last_click_tracked'
 
 /**
  * Get affiliate code from URL or cookie
@@ -85,6 +86,19 @@ export async function trackAffiliateClick(
   landingPage: string
 ): Promise<void> {
   try {
+    // Check if we already tracked this click recently (prevent duplicates)
+    if (typeof window !== 'undefined') {
+      const lastTracked = localStorage.getItem(LAST_CLICK_TRACKED_KEY)
+      const lastTrackedData = lastTracked ? JSON.parse(lastTracked) : null
+
+      if (lastTrackedData &&
+          lastTrackedData.code === affiliateCode &&
+          Date.now() - lastTrackedData.timestamp < 60000) { // 1 minute
+        console.log('⏭️ Click already tracked recently, skipping')
+        return
+      }
+    }
+
     // Get affiliate partner by code
     const q = query(
       collection(db, 'affiliatePartners'),
@@ -93,9 +107,9 @@ export async function trackAffiliateClick(
       limit(1)
     )
     const snapshot = await getDocs(q)
-    
+
     if (snapshot.empty) {
-      console.warn('Affiliate code not found or inactive:', affiliateCode)
+      console.warn('⚠️ Affiliate code not found or inactive:', affiliateCode)
       return
     }
 
@@ -120,9 +134,17 @@ export async function trackAffiliateClick(
       updatedAt: Timestamp.now()
     })
 
-    console.log('✅ Affiliate click tracked:', affiliateCode)
+    // Store last tracked click
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(LAST_CLICK_TRACKED_KEY, JSON.stringify({
+        code: affiliateCode,
+        timestamp: Date.now()
+      }))
+    }
+
+    console.log('✅ Affiliate click tracked successfully:', { affiliateCode, affiliateId, clicks: currentClicks + 1 })
   } catch (err) {
-    console.error('Error tracking affiliate click:', err)
+    console.error('❌ Error tracking affiliate click:', err)
   }
 }
 
