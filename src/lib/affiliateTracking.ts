@@ -127,9 +127,22 @@ export async function trackAffiliateClick(
     })
 
     // Update partner stats
-    const currentClicks = affiliateDoc.data().stats?.totalClicks || 0
+    const currentStats = affiliateDoc.data().stats || {}
+    const currentClicks = currentStats.totalClicks || 0
+    const newClicks = currentClicks + 1
+
+    console.log('📊 Updating partner stats:', {
+      affiliateId,
+      currentClicks,
+      newClicks,
+      hasStats: !!affiliateDoc.data().stats
+    })
+
     await updateDoc(doc(db, 'affiliatePartners', affiliateId), {
-      'stats.totalClicks': currentClicks + 1,
+      stats: {
+        ...currentStats,
+        totalClicks: newClicks
+      },
       lastActivityAt: Timestamp.now(),
       updatedAt: Timestamp.now()
     })
@@ -142,7 +155,7 @@ export async function trackAffiliateClick(
       }))
     }
 
-    console.log('✅ Affiliate click tracked successfully:', { affiliateCode, affiliateId, clicks: currentClicks + 1 })
+    console.log('✅ Affiliate click tracked successfully:', { affiliateCode, affiliateId, clicks: newClicks })
   } catch (err) {
     console.error('❌ Error tracking affiliate click:', err)
   }

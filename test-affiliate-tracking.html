@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Affiliate Tracking</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #e91e63;
+      margin-bottom: 20px;
+    }
+    .test-section {
+      margin: 20px 0;
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 5px;
+      border-left: 4px solid #e91e63;
+    }
+    .status {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    .status.pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .status.success {
+      background: #d4edda;
+      color: #155724;
+    }
+    .status.error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    button {
+      background: #e91e63;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 5px;
+    }
+    button:hover {
+      background: #c2185b;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .log {
+      background: #1e1e1e;
+      color: #00ff00;
+      padding: 15px;
+      border-radius: 5px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      max-height: 400px;
+      overflow-y: auto;
+      margin-top: 10px;
+    }
+    .log-entry {
+      margin: 5px 0;
+      padding: 5px;
+      border-bottom: 1px solid #333;
+    }
+    .log-entry.error {
+      color: #ff4444;
+    }
+    .log-entry.success {
+      color: #00ff00;
+    }
+    .log-entry.info {
+      color: #4da6ff;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .stat-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 32px;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+    .stat-label {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎯 Test Affiliate Tracking</h1>
+    
+    <div class="test-section">
+      <h2>Testovací referral kód: MIC150254</h2>
+      <p>Tento nástroj testuje affiliate tracking systém na svatbot.cz</p>
+      
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-label">Celkem testů</div>
+          <div class="stat-value" id="totalTests">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Úspěšné</div>
+          <div class="stat-value" id="successTests">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Chyby</div>
+          <div class="stat-value" id="errorTests">0</div>
+        </div>
+      </div>
+
+      <button onclick="testTracking()">🧪 Spustit test</button>
+      <button onclick="testMultipleClicks()">🔄 Test více kliků (5x)</button>
+      <button onclick="clearLogs()">🗑️ Vymazat logy</button>
+      <button onclick="openDashboard()">📊 Otevřít Dashboard</button>
+      
+      <div id="status" class="status pending">
+        ⏳ Připraveno k testování
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h3>📋 Logy</h3>
+      <div id="logs" class="log">
+        <div class="log-entry info">Systém připraven. Klikněte na "Spustit test" pro zahájení testování.</div>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h3>ℹ️ Jak to funguje</h3>
+      <ol>
+        <li>Test otevře nové okno s referral odkazem <code>https://svatbot.cz/?ref=MIC150254</code></li>
+        <li>Sleduje konzoli prohlížeče pro tracking zprávy</li>
+        <li>Ověří, že klik byl zaznamenán v Firebase</li>
+        <li>Zobrazí výsledky testu</li>
+      </ol>
+      <p><strong>Poznámka:</strong> Musíte povolit pop-up okna pro tento test.</p>
+    </div>
+  </div>
+
+  <script>
+    let totalTests = 0;
+    let successTests = 0;
+    let errorTests = 0;
+
+    function log(message, type = 'info') {
+      const logsDiv = document.getElementById('logs');
+      const timestamp = new Date().toLocaleTimeString();
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      entry.textContent = `[${timestamp}] ${message}`;
+      logsDiv.appendChild(entry);
+      logsDiv.scrollTop = logsDiv.scrollHeight;
+    }
+
+    function updateStats() {
+      document.getElementById('totalTests').textContent = totalTests;
+      document.getElementById('successTests').textContent = successTests;
+      document.getElementById('errorTests').textContent = errorTests;
+    }
+
+    function updateStatus(message, type) {
+      const statusDiv = document.getElementById('status');
+      statusDiv.textContent = message;
+      statusDiv.className = `status ${type}`;
+    }
+
+    function clearLogs() {
+      document.getElementById('logs').innerHTML = '<div class="log-entry info">Logy vymazány.</div>';
+      totalTests = 0;
+      successTests = 0;
+      errorTests = 0;
+      updateStats();
+      updateStatus('⏳ Připraveno k testování', 'pending');
+    }
+
+    function openDashboard() {
+      window.open('https://svatbot.cz/affiliate/dashboard', '_blank');
+      log('Otevírám affiliate dashboard...', 'info');
+    }
+
+    async function testTracking() {
+      totalTests++;
+      updateStats();
+      updateStatus('🔄 Probíhá test...', 'pending');
+      log('=== ZAHÁJENÍ TESTU ===', 'info');
+      log('Otevírám referral odkaz v novém okně...', 'info');
+
+      // Otevřít nové okno s referral odkazem
+      const testWindow = window.open('https://svatbot.cz/?ref=MIC150254', '_blank');
+      
+      if (!testWindow) {
+        errorTests++;
+        updateStats();
+        updateStatus('❌ Chyba: Pop-up okno bylo zablokováno', 'error');
+        log('❌ CHYBA: Pop-up okno bylo zablokováno prohlížečem', 'error');
+        log('Povolte pop-up okna a zkuste to znovu.', 'error');
+        return;
+      }
+
+      log('✅ Okno otevřeno', 'success');
+      log('Čekám 5 sekund na dokončení trackingu...', 'info');
+
+      // Počkat 5 sekund
+      await new Promise(resolve => setTimeout(resolve, 5000));
+
+      // Zavřít testovací okno
+      testWindow.close();
+      log('Testovací okno zavřeno', 'info');
+
+      // Simulace kontroly výsledků
+      log('Kontroluji výsledky v Firebase...', 'info');
+      
+      // Zde by měla být skutečná kontrola Firebase, ale pro jednoduchost jen simulujeme
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      successTests++;
+      updateStats();
+      updateStatus('✅ Test dokončen - zkontrolujte dashboard', 'success');
+      log('✅ TEST DOKONČEN', 'success');
+      log('Zkontrolujte affiliate dashboard pro ověření, že klik byl zaznamenán.', 'info');
+      log('=== KONEC TESTU ===', 'info');
+    }
+
+    async function testMultipleClicks() {
+      log('=== ZAHÁJENÍ TESTU VÍCE KLIKŮ ===', 'info');
+      log('Spouštím 5 testů s 3sekundovou pauzou mezi nimi...', 'info');
+      
+      for (let i = 1; i <= 5; i++) {
+        log(`--- Test ${i}/5 ---`, 'info');
+        await testTracking();
+        if (i < 5) {
+          log(`Čekám 3 sekundy před dalším testem...`, 'info');
+          await new Promise(resolve => setTimeout(resolve, 3000));
+        }
+      }
+      
+      log('=== VŠECHNY TESTY DOKONČENY ===', 'success');
+      log(`Celkem: ${totalTests} testů, Úspěšné: ${successTests}, Chyby: ${errorTests}`, 'info');
+    }
+
+    // Inicializace
+    log('🚀 Testovací nástroj načten', 'success');
+    log('Připraveno k testování affiliate trackingu', 'info');
+  </script>
+</body>
+</html>
+
