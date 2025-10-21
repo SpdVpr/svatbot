@@ -46,6 +46,16 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
   } = useSeating()
   const { guests } = useGuest()
 
+  // Debug: Log tables and seats
+  console.log('🎨 SeatingPlanEditor render:', {
+    currentPlanId: currentPlan.id,
+    currentPlanName: currentPlan.name,
+    tablesFromHook: tables.length,
+    seatsFromHook: seats.length,
+    tablesFromProp: currentPlan.tables?.length || 0,
+    seatsFromProp: currentPlan.seats?.length || 0
+  })
+
   const canvasRef = useRef<HTMLDivElement>(null)
   const [selectedTable, setSelectedTable] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
@@ -404,8 +414,15 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     try {
       // Create new venueLayout without danceFloor
       const { danceFloor, ...venueLayoutWithoutDanceFloor } = currentPlan.venueLayout
+
+      // Use shallow merge for venueLayout to ensure danceFloor is removed
       await updateSeatingPlan(currentPlan.id, {
-        venueLayout: venueLayoutWithoutDanceFloor
+        venueLayout: {
+          width: venueLayoutWithoutDanceFloor.width,
+          height: venueLayoutWithoutDanceFloor.height,
+          // Explicitly set danceFloor to undefined to remove it
+          danceFloor: undefined as any
+        }
       })
       setEditingDanceFloor(false)
     } catch (error) {

@@ -23,7 +23,7 @@ import Link from 'next/link'
 export default function SeatingPage() {
   const { user } = useAuth()
   const { wedding } = useWedding()
-  const { seatingPlans, currentPlan, loading, createSeatingPlan, setCurrentPlan } = useSeating()
+  const { seatingPlans, currentPlan, loading, createSeatingPlan, setCurrentPlan, deleteSeatingPlan } = useSeating()
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
@@ -55,6 +55,39 @@ export default function SeatingPage() {
     } catch (error) {
       console.error('Error creating seating plan:', error)
       alert('Chyba při vytváření plánu: ' + (error as Error).message)
+    }
+  }
+
+  // Handle delete seating plan with double confirmation
+  const handleDeletePlan = async () => {
+    if (!currentPlan) return
+
+    // First confirmation
+    const firstConfirm = confirm(
+      `Opravdu chcete smazat plán "${currentPlan.name}"?\n\n` +
+      `Tento plán obsahuje:\n` +
+      `• ${currentPlan.tables?.length || 0} stolů\n` +
+      `• ${currentPlan.seats?.length || 0} židlí\n` +
+      `• ${currentPlan.seats?.filter(s => s.guestId).length || 0} přiřazených hostů\n\n` +
+      `Tato akce je nevratná!`
+    )
+
+    if (!firstConfirm) return
+
+    // Second confirmation
+    const secondConfirm = confirm(
+      `⚠️ POSLEDNÍ VAROVÁNÍ ⚠️\n\n` +
+      `Opravdu chcete TRVALE SMAZAT plán "${currentPlan.name}"?\n\n` +
+      `Všechna data budou ztracena a nelze je obnovit!`
+    )
+
+    if (!secondConfirm) return
+
+    try {
+      await deleteSeatingPlan(currentPlan.id)
+    } catch (error) {
+      console.error('Error deleting seating plan:', error)
+      alert('Chyba při mazání plánu: ' + (error as Error).message)
     }
   }
 
@@ -113,6 +146,18 @@ export default function SeatingPage() {
                     </option>
                   ))}
                 </select>
+              )}
+
+              {/* Delete plan button - only show if a plan is selected */}
+              {currentPlan && (
+                <button
+                  onClick={handleDeletePlan}
+                  className="px-3 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors flex items-center space-x-2"
+                  title="Smazat plán"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span className="hidden sm:inline">Smazat plán</span>
+                </button>
               )}
 
               {/* Action buttons */}
@@ -244,7 +289,7 @@ export default function SeatingPage() {
               </div>
             </div>
 
-            <SeatingPlanEditor currentPlan={currentPlan} />
+            <SeatingPlanEditor key={currentPlan.id} currentPlan={currentPlan} />
           </>
         ) : (
           /* Plan selection */

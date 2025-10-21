@@ -12,7 +12,8 @@ import {
   where,
   orderBy,
   onSnapshot,
-  Timestamp
+  Timestamp,
+  deleteField
 } from 'firebase/firestore'
 import { db } from '@/config/firebase'
 import { useAuth } from './useAuth'
@@ -79,7 +80,7 @@ export function useSeating(): UseSeatingReturn {
   const { wedding } = useWedding()
   const { guests } = useGuest()
   const [seatingPlans, setSeatingPlans] = useState<SeatingPlan[]>([])
-  const [currentPlan, setCurrentPlanState] = useState<SeatingPlan | null>(null)
+  const [currentPlan, _setCurrentPlanState] = useState<SeatingPlan | null>(null)
   const [tables, setTables] = useState<Table[]>([])
   const [seats, setSeats] = useState<Seat[]>([])
   const [assignments, setAssignments] = useState<SeatingAssignment[]>([])
@@ -87,59 +88,110 @@ export function useSeating(): UseSeatingReturn {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Track if we've already set the initial current plan
-  const hasSetInitialPlan = useRef(false)
+  // Use ref to persist current plan ID across re-renders and Firebase listener calls
+  const currentPlanIdRef = useRef<string | null>(null)
+
+  // Wrapper for setCurrentPlanState that also updates ref and localStorage
+  const setCurrentPlanState = (planOrUpdater: SeatingPlan | null | ((prev: SeatingPlan | null) => SeatingPlan | null)) => {
+    // Handle callback function
+    if (typeof planOrUpdater === 'function') {
+      _setCurrentPlanState((prev: SeatingPlan | null) => {
+        const plan = planOrUpdater(prev)
+
+        console.log('🎯 setCurrentPlanState called (callback):', {
+          from: prev?.id || 'null',
+          to: plan?.id || 'null',
+          fromName: prev?.name || 'null',
+          toName: plan?.name || 'null'
+        })
+
+        // Update ref immediately to prevent race conditions
+        currentPlanIdRef.current = plan?.id || null
+
+        // Save to localStorage
+        if (wedding && plan) {
+          localStorage.setItem(`currentSeatingPlanId_${wedding.id}`, plan.id)
+        } else if (wedding) {
+          localStorage.removeItem(`currentSeatingPlanId_${wedding.id}`)
+        }
+
+        return plan
+      })
+    } else {
+      // Handle direct value
+      const plan = planOrUpdater
+
+      console.log('🎯 setCurrentPlanState called:', {
+        from: currentPlan?.id || 'null',
+        to: plan?.id || 'null',
+        fromName: currentPlan?.name || 'null',
+        toName: plan?.name || 'null'
+      })
+
+      // Update ref immediately to prevent race conditions
+      currentPlanIdRef.current = plan?.id || null
+
+      // Save to localStorage
+      if (wedding && plan) {
+        localStorage.setItem(`currentSeatingPlanId_${wedding.id}`, plan.id)
+      } else if (wedding) {
+        localStorage.removeItem(`currentSeatingPlanId_${wedding.id}`)
+      }
+
+      _setCurrentPlanState(plan)
+    }
+  }
 
   // Update tables and seats when currentPlan changes
+  // Use callback form to ensure state updates are not batched incorrectly
   useEffect(() => {
     if (currentPlan) {
+      const newTables = currentPlan.tables || []
+      const newSeats = currentPlan.seats || []
+
       console.log(`📊 Updating tables and seats for plan ${currentPlan.id}:`, {
         name: currentPlan.name,
-        tablesCount: currentPlan.tables?.length || 0,
-        seatsCount: currentPlan.seats?.length || 0,
-        sampleTable: currentPlan.tables?.[0] ? {
-          id: currentPlan.tables[0].id,
-          name: currentPlan.tables[0].name
+        tablesCount: newTables.length,
+        seatsCount: newSeats.length,
+        sampleTable: newTables[0] ? {
+          id: newTables[0].id,
+          name: newTables[0].name
         } : null
       })
-      setTables(currentPlan.tables || [])
-      setSeats(currentPlan.seats || [])
+
+      // Use callback form to ensure correct state updates even when batched
+      setTables(prev => {
+        console.log(`  ↳ setTables: ${prev.length} → ${newTables.length}`)
+        return newTables
+      })
+      setSeats(prev => {
+        console.log(`  ↳ setSeats: ${prev.length} → ${newSeats.length}`)
+        return newSeats
+      })
     } else {
       console.log('📊 Clearing tables and seats (no current plan)')
-      setTables([])
-      setSeats([])
+      setTables(prev => {
+        console.log(`  ↳ setTables: ${prev.length} → 0`)
+        return []
+      })
+      setSeats(prev => {
+        console.log(`  ↳ setSeats: ${prev.length} → 0`)
+        return []
+      })
     }
   }, [currentPlan])
 
-  // Update currentPlan when seatingPlans change (to reflect updates)
-  useEffect(() => {
-    if (currentPlan && seatingPlans.length > 0) {
-      const updatedPlan = seatingPlans.find(p => p.id === currentPlan.id)
-      if (updatedPlan) {
-        // Always update to get the latest data from Firebase
-        // Check if there are actual changes to avoid infinite loops
-        const hasChanges =
-          JSON.stringify(updatedPlan.tables) !== JSON.stringify(currentPlan.tables) ||
-          JSON.stringify(updatedPlan.seats) !== JSON.stringify(currentPlan.seats) ||
-          updatedPlan.venueLayout !== currentPlan.venueLayout
-
-        if (hasChanges) {
-          console.log('🔄 Updating currentPlan with fresh data from Firebase')
-          setCurrentPlanState(updatedPlan)
-        }
-      }
-    }
-  }, [seatingPlans])
+  // DON'T automatically update currentPlan from seatingPlans
+  // This causes race conditions and unpredictable behavior
+  // Instead, let the user explicitly select a plan or let the initial auto-select handle it
 
   // Load seating plans when wedding changes
   useEffect(() => {
     if (!wedding) {
-      hasSetInitialPlan.current = false
       return
     }
 
     setLoading(true)
-    hasSetInitialPlan.current = false
 
     // Set up Firestore real-time listener
     try {
@@ -160,28 +212,40 @@ export function useSeating(): UseSeatingReturn {
           console.log('📦 Loaded seating plans from Firebase:', {
             count: plansData.length,
             planIds: plansData.map(p => p.id),
-            currentPlanId: currentPlan?.id
+            currentPlanIdRef: currentPlanIdRef.current
           })
 
           setSeatingPlans(plansData)
 
-          // Automatically set a plan as current if none is set
-          // Prefer plans with tables, otherwise take the first one
-          if (plansData.length > 0 && !currentPlan) {
-            // Find plan with most tables
-            const planWithTables = plansData.reduce((best, plan) => {
-              const tablesCount = plan.tables?.length || 0
-              const bestTablesCount = best?.tables?.length || 0
-              return tablesCount > bestTablesCount ? plan : best
-            }, plansData[0])
+          // Check if a plan is already selected (using ref to avoid closure issues)
+          const selectedPlanId = currentPlanIdRef.current ||
+                                 (wedding ? localStorage.getItem(`currentSeatingPlanId_${wedding.id}`) : null)
 
-            console.log('🎯 Auto-selecting plan:', {
-              id: planWithTables.id,
-              name: planWithTables.name,
-              tablesCount: planWithTables.tables?.length || 0
+          if (selectedPlanId) {
+            // If a plan is already selected, update it with fresh data from Firebase
+            const updatedCurrentPlan = plansData.find(p => p.id === selectedPlanId)
+            if (updatedCurrentPlan) {
+              console.log('🔄 Updating current plan with fresh Firebase data:', {
+                id: updatedCurrentPlan.id,
+                name: updatedCurrentPlan.name,
+                tablesCount: updatedCurrentPlan.tables?.length || 0,
+                seatsCount: updatedCurrentPlan.seats?.length || 0
+              })
+              setCurrentPlanState(updatedCurrentPlan)
+            } else {
+              console.warn('⚠️ Current plan not found in Firebase data, clearing selection:', selectedPlanId)
+              setCurrentPlanState(null)
+            }
+          } else if (plansData.length > 0) {
+            // Automatically set first plan as current ONLY if no plan is currently selected
+            const firstPlan = plansData[0]
+
+            console.log('🎯 Auto-selecting first plan (no current plan):', {
+              id: firstPlan.id,
+              name: firstPlan.name,
+              tablesCount: firstPlan.tables?.length || 0
             })
-            setCurrentPlanState(planWithTables)
-            hasSetInitialPlan.current = true
+            setCurrentPlanState(firstPlan)
           }
 
           // Save to localStorage as backup
@@ -198,9 +262,8 @@ export function useSeating(): UseSeatingReturn {
             const existingPlans = JSON.parse(savedPlans)
             setSeatingPlans(existingPlans)
 
-            if (existingPlans.length > 0 && !hasSetInitialPlan.current) {
+            if (existingPlans.length > 0 && !currentPlan) {
               setCurrentPlanState(existingPlans[0])
-              hasSetInitialPlan.current = true
             }
           } catch (parseError) {
             console.error('Error parsing localStorage seating plans:', parseError)
@@ -221,9 +284,8 @@ export function useSeating(): UseSeatingReturn {
         const existingPlans = JSON.parse(savedPlans)
         setSeatingPlans(existingPlans)
 
-        if (existingPlans.length > 0 && !hasSetInitialPlan.current) {
+        if (existingPlans.length > 0 && !currentPlan) {
           setCurrentPlanState(existingPlans[0])
-          hasSetInitialPlan.current = true
         }
       } catch (parseError) {
         console.error('Error parsing localStorage seating plans:', parseError)
@@ -345,7 +407,6 @@ export function useSeating(): UseSeatingReturn {
       // This prevents the Firebase listener from auto-selecting a different plan
       console.log('🎯 Setting new plan as current (before Firebase save)')
       setCurrentPlanState(newPlan)
-      hasSetInitialPlan.current = true
 
       // Save to Firebase (the listener will update seatingPlans array)
       try {
@@ -487,7 +548,6 @@ export function useSeating(): UseSeatingReturn {
     if (plan) {
       console.log('✅ Found plan, setting as current:', { id: plan.id, name: plan.name })
       setCurrentPlanState(plan)
-      hasSetInitialPlan.current = true
     } else {
       console.warn('❌ Plan not found:', planId, 'Available plans:', seatingPlans.map(p => p.id))
     }
@@ -519,7 +579,7 @@ export function useSeating(): UseSeatingReturn {
       ))
 
       // Update current plan if it's the one being updated
-      setCurrentPlanState(prev => {
+      setCurrentPlanState((prev: SeatingPlan | null) => {
         if (prev?.id === planId) {
           const updated = deepMerge(prev, { ...updates, updatedAt: new Date() })
           return updated
@@ -545,13 +605,19 @@ export function useSeating(): UseSeatingReturn {
         const { id, createdAt, updatedAt, ...restUpdates } = updates as any
 
         // Deep clean undefined values from the data
-        const cleanForFirestore = (obj: any): any => {
-          if (obj === undefined || obj === null) {
+        // Special handling: undefined values should use deleteField() to remove from Firestore
+        const cleanForFirestore = (obj: any, path: string = ''): any => {
+          if (obj === undefined) {
+            // Return deleteField() marker for undefined values
+            return deleteField()
+          }
+
+          if (obj === null) {
             return null
           }
 
           if (Array.isArray(obj)) {
-            return obj.map(item => cleanForFirestore(item)).filter(item => item !== null)
+            return obj.map(item => cleanForFirestore(item, path)).filter(item => item !== null)
           }
 
           if (obj instanceof Date) {
@@ -561,11 +627,10 @@ export function useSeating(): UseSeatingReturn {
           if (typeof obj === 'object') {
             const cleaned: any = {}
             for (const [key, value] of Object.entries(obj)) {
-              if (value !== undefined) {
-                const cleanedValue = cleanForFirestore(value)
-                if (cleanedValue !== null || typeof cleanedValue === 'boolean' || typeof cleanedValue === 'number') {
-                  cleaned[key] = cleanedValue
-                }
+              const cleanedValue = cleanForFirestore(value, path ? `${path}.${key}` : key)
+              // Include deleteField() markers, null, booleans, and numbers
+              if (cleanedValue !== undefined) {
+                cleaned[key] = cleanedValue
               }
             }
             return cleaned
@@ -592,7 +657,51 @@ export function useSeating(): UseSeatingReturn {
   }
 
   const deleteSeatingPlan = async (planId: string) => {
-    // TODO: Implement
+    if (!wedding) {
+      throw new Error('Žádná svatba není vybrána')
+    }
+
+    try {
+      setError(null)
+
+      // Remove from Firebase
+      try {
+        const planRef = doc(db, 'seatingPlans', planId)
+        await deleteDoc(planRef)
+        console.log('✅ Deleted seating plan from Firebase:', planId)
+      } catch (firebaseError) {
+        console.error('❌ Firebase delete failed:', firebaseError)
+        // Continue with local deletion
+      }
+
+      // Remove from state
+      setSeatingPlans(prev => prev.filter(plan => plan.id !== planId))
+
+      // If deleted plan was current, select another plan or clear
+      if (currentPlan?.id === planId) {
+        const remainingPlans = seatingPlans.filter(plan => plan.id !== planId)
+        if (remainingPlans.length > 0) {
+          setCurrentPlanState(remainingPlans[0])
+        } else {
+          setCurrentPlanState(null)
+        }
+      }
+
+      // Remove from localStorage
+      const savedPlans = localStorage.getItem(`seatingPlans_${wedding.id}`) || '[]'
+      const existingPlans = JSON.parse(savedPlans)
+      const filteredPlans = existingPlans.filter((plan: SeatingPlan) => plan.id !== planId)
+      localStorage.setItem(`seatingPlans_${wedding.id}`, JSON.stringify(filteredPlans))
+
+      // Clear current plan ID from localStorage if it was deleted
+      const currentPlanId = localStorage.getItem(`currentSeatingPlanId_${wedding.id}`)
+      if (currentPlanId === planId) {
+        localStorage.removeItem(`currentSeatingPlanId_${wedding.id}`)
+      }
+    } catch (error) {
+      console.error('Error deleting seating plan:', error)
+      throw error
+    }
   }
 
   const updateTable = async (tableId: string, updates: Partial<Table>) => {
