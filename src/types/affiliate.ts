@@ -80,14 +80,25 @@ export interface AffiliatePartner {
     bankCode?: string
     iban?: string
     swift?: string
-    
+
     // PayPal
     paypalEmail?: string
-    
+
     // Stripe
     stripeAccountId?: string
   }
   minPayoutAmount: number  // Minimální částka pro výplatu (default 1000 CZK)
+
+  // Billing Address
+  billingAddress?: {
+    name: string           // Jméno/název firmy
+    street: string         // Ulice a číslo popisné
+    city: string           // Město
+    postalCode: string     // PSČ
+    country: string        // Země (default 'CZ')
+    ico?: string           // IČO (pro firmy)
+    dic?: string           // DIČ (pro firmy)
+  }
   
   // Marketing Materials
   notes?: string

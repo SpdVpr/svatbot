@@ -100,7 +100,9 @@ export function useAffiliate() {
 
       // Generate unique referral code
       const referralCode = `${application.firstName.substring(0, 3).toUpperCase()}${Date.now().toString().slice(-6)}`
-      const referralLink = `${window.location.origin}?ref=${referralCode}`
+      // Always use production URL for referral links
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://svatbot.cz'
+      const referralLink = `${baseUrl}?ref=${referralCode}`
 
       // Create affiliate partner directly (auto-approved)
       const partnerData: any = {

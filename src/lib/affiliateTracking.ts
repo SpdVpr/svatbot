@@ -320,10 +320,19 @@ export function initAffiliateTracking(): void {
   if (typeof window === 'undefined') return
 
   const affiliateCode = getAffiliateCode()
-  
+
+  console.log('🔍 Affiliate tracking initialized:', {
+    affiliateCode,
+    url: window.location.href,
+    hasRefParam: new URLSearchParams(window.location.search).has('ref')
+  })
+
   if (affiliateCode) {
     const landingPage = window.location.pathname + window.location.search
+    console.log('✅ Tracking affiliate click:', { affiliateCode, landingPage })
     trackAffiliateClick(affiliateCode, landingPage)
+  } else {
+    console.log('ℹ️ No affiliate code found')
   }
 }
 

@@ -31,12 +31,35 @@ export default function AffiliateDashboardPage() {
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
   const [requestingPayout, setRequestingPayout] = useState(false)
+  const [editingBilling, setEditingBilling] = useState(false)
+  const [savingBilling, setSavingBilling] = useState(false)
+  const [billingForm, setBillingForm] = useState({
+    name: '',
+    street: '',
+    city: '',
+    postalCode: '',
+    country: 'CZ',
+    ico: '',
+    dic: ''
+  })
   const hasCheckedAuth = useRef(false)
 
   // Load data when partner is available
   useEffect(() => {
     if (partner && isAffiliate && !partnerLoading) {
       loadData()
+      // Load billing address if exists
+      if (partner.billingAddress) {
+        setBillingForm({
+          name: partner.billingAddress.name || '',
+          street: partner.billingAddress.street || '',
+          city: partner.billingAddress.city || '',
+          postalCode: partner.billingAddress.postalCode || '',
+          country: partner.billingAddress.country || 'CZ',
+          ico: partner.billingAddress.ico || '',
+          dic: partner.billingAddress.dic || ''
+        })
+      }
     }
   }, [partner, isAffiliate, partnerLoading])
 
@@ -92,6 +115,40 @@ export default function AffiliateDashboardPage() {
       alert(err.message)
     } finally {
       setRequestingPayout(false)
+    }
+  }
+
+  const handleSaveBillingAddress = async () => {
+    if (!partner) return
+
+    // Validate required fields
+    if (!billingForm.name || !billingForm.street || !billingForm.city || !billingForm.postalCode) {
+      alert('Vyplňte prosím všechna povinná pole')
+      return
+    }
+
+    try {
+      setSavingBilling(true)
+
+      // Update partner with billing address
+      const { doc, updateDoc } = await import('firebase/firestore')
+      const { db } = await import('@/lib/firebase')
+
+      await updateDoc(doc(db, 'affiliatePartners', partner.id), {
+        billingAddress: billingForm,
+        updatedAt: new Date()
+      })
+
+      setEditingBilling(false)
+      alert('Fakturační adresa byla úspěšně uložena')
+
+      // Reload data to get updated partner info
+      await loadData()
+    } catch (err: any) {
+      console.error('Error saving billing address:', err)
+      alert('Chyba při ukládání fakturační adresy: ' + err.message)
+    } finally {
+      setSavingBilling(false)
     }
   }
 
@@ -502,6 +559,183 @@ export default function AffiliateDashboardPage() {
 
             {activeTab === 'settings' && (
               <div className="space-y-6">
+                {/* Billing Address */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Fakturační adresa</h3>
+                    {!editingBilling && (
+                      <button
+                        onClick={() => setEditingBilling(true)}
+                        className="px-4 py-2 text-sm bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors"
+                      >
+                        {partner.billingAddress ? 'Upravit' : 'Přidat'}
+                      </button>
+                    )}
+                  </div>
+
+                  {editingBilling ? (
+                    <div className="bg-gray-50 rounded-lg p-6">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="md:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Jméno / Název firmy *
+                          </label>
+                          <input
+                            type="text"
+                            value={billingForm.name}
+                            onChange={(e) => setBillingForm({ ...billingForm, name: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                            placeholder="Jan Novák / Firma s.r.o."
+                          />
+                        </div>
+
+                        <div className="md:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Ulice a číslo popisné *
+                          </label>
+                          <input
+                            type="text"
+                            value={billingForm.street}
+                            onChange={(e) => setBillingForm({ ...billingForm, street: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                            placeholder="Hlavní 123"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Město *
+                          </label>
+                          <input
+                            type="text"
+                            value={billingForm.city}
+                            onChange={(e) => setBillingForm({ ...billingForm, city: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                            placeholder="Praha"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            PSČ *
+                          </label>
+                          <input
+                            type="text"
+                            value={billingForm.postalCode}
+                            onChange={(e) => setBillingForm({ ...billingForm, postalCode: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                            placeholder="110 00"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Země *
+                          </label>
+                          <select
+                            value={billingForm.country}
+                            onChange={(e) => setBillingForm({ ...billingForm, country: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                          >
+                            <option value="CZ">Česká republika</option>
+                            <option value="SK">Slovensko</option>
+                            <option value="AT">Rakousko</option>
+                            <option value="DE">Německo</option>
+                            <option value="PL">Polsko</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            IČO (pro firmy)
+                          </label>
+                          <input
+                            type="text"
+                            value={billingForm.ico}
+                            onChange={(e) => setBillingForm({ ...billingForm, ico: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                            placeholder="12345678"
+                          />
+                        </div>
+
+                        <div className="md:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            DIČ (pro firmy)
+                          </label>
+                          <input
+                            type="text"
+                            value={billingForm.dic}
+                            onChange={(e) => setBillingForm({ ...billingForm, dic: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                            placeholder="CZ12345678"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3 mt-6">
+                        <button
+                          onClick={handleSaveBillingAddress}
+                          disabled={savingBilling}
+                          className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                        >
+                          {savingBilling ? (
+                            <>
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              <span>Ukládám...</span>
+                            </>
+                          ) : (
+                            <span>Uložit</span>
+                          )}
+                        </button>
+                        <button
+                          onClick={() => {
+                            setEditingBilling(false)
+                            // Reset form to current values
+                            if (partner.billingAddress) {
+                              setBillingForm({
+                                name: partner.billingAddress.name || '',
+                                street: partner.billingAddress.street || '',
+                                city: partner.billingAddress.city || '',
+                                postalCode: partner.billingAddress.postalCode || '',
+                                country: partner.billingAddress.country || 'CZ',
+                                ico: partner.billingAddress.ico || '',
+                                dic: partner.billingAddress.dic || ''
+                              })
+                            }
+                          }}
+                          disabled={savingBilling}
+                          className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Zrušit
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-gray-50 rounded-lg p-6">
+                      {partner.billingAddress ? (
+                        <div className="space-y-2">
+                          <div className="font-semibold text-gray-900">{partner.billingAddress.name}</div>
+                          <div className="text-sm text-gray-600">{partner.billingAddress.street}</div>
+                          <div className="text-sm text-gray-600">
+                            {partner.billingAddress.postalCode} {partner.billingAddress.city}
+                          </div>
+                          <div className="text-sm text-gray-600">{partner.billingAddress.country}</div>
+                          {partner.billingAddress.ico && (
+                            <div className="text-sm text-gray-600">IČO: {partner.billingAddress.ico}</div>
+                          )}
+                          {partner.billingAddress.dic && (
+                            <div className="text-sm text-gray-600">DIČ: {partner.billingAddress.dic}</div>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-gray-600">
+                          Fakturační adresa není vyplněna. Klikněte na "Přidat" pro vyplnění.
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Platební údaje</h3>
                   <div className="bg-gray-50 rounded-lg p-6">
