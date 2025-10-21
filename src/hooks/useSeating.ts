@@ -341,7 +341,13 @@ export function useSeating(): UseSeatingReturn {
         seatsCount: newPlan.seats.length
       })
 
-      // Save to Firebase first (so the listener will pick it up)
+      // Set as current plan BEFORE saving to Firebase
+      // This prevents the Firebase listener from auto-selecting a different plan
+      console.log('🎯 Setting new plan as current (before Firebase save)')
+      setCurrentPlanState(newPlan)
+      hasSetInitialPlan.current = true
+
+      // Save to Firebase (the listener will update seatingPlans array)
       try {
         const planRef = doc(db, 'seatingPlans', localId)
         const firestoreData = {
@@ -355,11 +361,6 @@ export function useSeating(): UseSeatingReturn {
         console.error('❌ Firebase sync failed for seating plan:', firebaseError)
         throw firebaseError
       }
-
-      // The Firebase listener will automatically:
-      // 1. Add the plan to seatingPlans
-      // 2. Set it as currentPlan (since it will be the only plan or the newest one)
-      // We don't need to manually update state here
 
       // Save to localStorage as backup
       const savedPlans = localStorage.getItem(`seatingPlans_${wedding.id}`) || '[]'
