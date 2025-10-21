@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { useAffiliate } from '@/hooks/useAffiliate'
+import AffiliateAnalytics from '@/components/affiliate/AffiliateAnalytics'
 import type { Commission, Payout } from '@/types/affiliate'
 import {
   DollarSign,
@@ -27,7 +28,7 @@ export default function AffiliateDashboardPage() {
   const { user } = useAuth()
   const { partner, loading: partnerLoading, isAffiliate, getCommissions, getPayouts, requestPayout } = useAffiliate()
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'commissions' | 'payouts' | 'settings'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'commissions' | 'payouts' | 'settings'>('overview')
   const [commissions, setCommissions] = useState<Commission[]>([])
   const [payouts, setPayouts] = useState<Payout[]>([])
   const [loading, setLoading] = useState(true)
@@ -316,6 +317,16 @@ export default function AffiliateDashboardPage() {
                 Přehled
               </button>
               <button
+                onClick={() => setActiveTab('analytics')}
+                className={`py-4 border-b-2 font-semibold transition-colors ${
+                  activeTab === 'analytics'
+                    ? 'border-pink-500 text-pink-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                Analytika
+              </button>
+              <button
                 onClick={() => setActiveTab('commissions')}
                 className={`py-4 border-b-2 font-semibold transition-colors ${
                   activeTab === 'commissions'
@@ -444,6 +455,18 @@ export default function AffiliateDashboardPage() {
                     ))}
                   </div>
                 </div>
+              </div>
+            )}
+
+            {activeTab === 'analytics' && (
+              <div>
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Analytika prokliků</h3>
+                  <p className="text-sm text-gray-600">
+                    Detailní přehled zdrojů návštěvnosti, zařízení a kampaní za posledních 30 dní
+                  </p>
+                </div>
+                <AffiliateAnalytics affiliateId={partner.id} days={30} />
               </div>
             )}
 
