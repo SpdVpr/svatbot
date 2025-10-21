@@ -823,12 +823,15 @@ service cloud.firestore {
 
     // Affiliate Partners
     match /affiliatePartners/{affiliateId} {
-      // Partner can read their own data
-      allow read: if isAuthenticated() &&
-                     (isAffiliatePartner(affiliateId) || isAdmin());
+      // Allow public read for active partners (needed for tracking by referral code)
+      allow read: if resource.data.status == 'active' ||
+                     (isAuthenticated() && (isAffiliatePartner(affiliateId) || isAdmin()));
 
-      // Only admins can create/update partners
-      allow create, update: if isAdmin();
+      // Only admins can create partners
+      allow create: if isAdmin();
+
+      // Admins can update everything
+      allow update: if isAdmin();
 
       // Partner can update their own payout details, contact info, and billing address
       allow update: if isAuthenticated() &&
@@ -839,8 +842,8 @@ service cloud.firestore {
       // Allow anyone to increment click stats (for tracking)
       // When using increment() on nested fields like stats.totalClicks,
       // we need to allow updates without strict key checking
-      allow update: if request.resource.data.keys().hasAll(['userId', 'status', 'referralCode']) &&
-                       request.resource.data.userId == resource.data.userId &&
+      // Just verify that critical fields don't change
+      allow update: if request.resource.data.userId == resource.data.userId &&
                        request.resource.data.status == resource.data.status &&
                        request.resource.data.referralCode == resource.data.referralCode;
 
