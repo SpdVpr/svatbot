@@ -11,9 +11,9 @@ export default function TimelinePlanningModule() {
   return (
     <div className="wedding-card">
       <Link href="/calendar" className="block mb-4">
-        <h3 className="text-lg font-semibold flex items-center justify-center space-x-2 hover:text-primary-600 transition-colors">
-          <Calendar className="w-5 h-5 text-purple-600" />
-          <span>Kalendář událostí</span>
+        <h3 className="text-base sm:text-lg font-semibold flex items-center justify-start sm:justify-center space-x-2 hover:text-primary-600 transition-colors">
+          <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 flex-shrink-0" />
+          <span className="truncate">Kalendář událostí</span>
         </h3>
       </Link>
 

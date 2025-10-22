@@ -32,9 +32,9 @@ export default function UpcomingTasksModule() {
   return (
     <div className="wedding-card h-full flex flex-col">
       <Link href="/tasks" className="block mb-6">
-        <h3 className="text-lg font-semibold flex items-center justify-center space-x-2 hover:text-primary-600 transition-colors">
-          <Clock className="w-5 h-5 text-blue-600" />
-          <span>Nadcházející úkoly</span>
+        <h3 className="text-base sm:text-lg font-semibold flex items-center justify-start sm:justify-center space-x-2 hover:text-primary-600 transition-colors">
+          <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0" />
+          <span className="truncate">Nadcházející úkoly</span>
         </h3>
       </Link>
 

@@ -16,9 +16,9 @@ export default function GuestManagementModule() {
   return (
     <div className="wedding-card">
       <Link href="/guests" className="block mb-4">
-        <h3 className="text-lg font-semibold flex items-center justify-center space-x-2 hover:text-primary-600 transition-colors">
-          <Users className="w-5 h-5 text-primary-600" />
-          <span>Správa hostů</span>
+        <h3 className="text-base sm:text-lg font-semibold flex items-center justify-start sm:justify-center space-x-2 hover:text-primary-600 transition-colors">
+          <Users className="w-4 h-4 sm:w-5 sm:h-5 text-primary-600 flex-shrink-0" />
+          <span className="truncate">Správa hostů</span>
         </h3>
       </Link>
 

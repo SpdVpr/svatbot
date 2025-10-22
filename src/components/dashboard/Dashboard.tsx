@@ -14,13 +14,15 @@ import {
   Edit,
   StickyNote,
   Crown,
-  Clock
+  Clock,
+  Menu
 } from 'lucide-react'
 import Link from 'next/link'
 import WeddingSettings from '@/components/wedding/WeddingSettings'
 import AccountModal from '@/components/account/AccountModal'
 import AIAssistant from '@/components/ai/AIAssistant'
 import NotesModal from '@/components/notes/NotesModal'
+import MobileMenu from '@/components/navigation/MobileMenu'
 import LiveNotifications, { LiveToastNotifications } from '@/components/notifications/LiveNotifications'
 import SimpleToastContainer, { showSimpleToast } from '@/components/notifications/SimpleToast'
 // import { useNotificationTriggers } from '@/hooks/useNotificationTriggers'
@@ -40,6 +42,7 @@ function DashboardContent() {
   const [showWeddingSettings, setShowWeddingSettings] = useState(false)
   const [showNotesModal, setShowNotesModal] = useState(false)
   const [showAccountModal, setShowAccountModal] = useState(false)
+  const [showMobileMenu, setShowMobileMenu] = useState(false)
   const searchParams = useSearchParams()
 
   // Initialize auto-notifications system
@@ -142,7 +145,14 @@ function DashboardContent() {
         {/* Mobile Header */}
         <div className="sm:hidden">
           <div className="mobile-header">
-            <div className="flex items-center">
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setShowMobileMenu(true)}
+                className="mobile-nav-button text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                title="Menu"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
               <img
                 src="/logo2.png"
                 alt="SvatBot.cz"
@@ -358,6 +368,12 @@ function DashboardContent() {
       {showAccountModal && (
         <AccountModal onClose={() => setShowAccountModal(false)} />
       )}
+
+      {/* Mobile Menu */}
+      <MobileMenu
+        isOpen={showMobileMenu}
+        onClose={() => setShowMobileMenu(false)}
+      />
     </div>
   )
 }

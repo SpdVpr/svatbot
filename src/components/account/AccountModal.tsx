@@ -54,79 +54,79 @@ export default function AccountModal({ onClose }: AccountModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+      <div className="bg-white rounded-xl max-w-5xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-primary-50 to-primary-100">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-primary-600 flex items-center justify-center text-white font-bold text-xl">
+        <div className="flex items-center justify-between p-3 sm:p-6 border-b border-gray-200 bg-gradient-to-r from-primary-50 to-primary-100">
+          <div className="flex items-center space-x-2 sm:space-x-4 min-w-0 flex-1">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary-600 flex items-center justify-center text-white font-bold text-lg sm:text-xl flex-shrink-0">
               {user?.displayName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
             </div>
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 flex items-center space-x-2">
-                <span>{user?.displayName || 'Můj účet'}</span>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-base sm:text-xl font-semibold text-gray-900 flex items-center space-x-2">
+                <span className="truncate">{user?.displayName || 'Můj účet'}</span>
                 {hasPremiumAccess && (
-                  <Crown className="w-5 h-5 text-yellow-500" fill="currentColor" />
+                  <Crown className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500 flex-shrink-0" fill="currentColor" />
                 )}
               </h2>
-              <p className="text-sm text-gray-600">{user?.email}</p>
+              <p className="text-xs sm:text-sm text-gray-600 truncate">{user?.email}</p>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
             <button
               onClick={handleLogout}
-              className="btn-outline flex items-center space-x-2"
+              className="btn-outline flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm px-2 py-1 sm:px-3 sm:py-2"
             >
-              <LogOut className="w-4 h-4" />
-              <span>Odhlásit</span>
+              <LogOut className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Odhlásit</span>
             </button>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <X className="w-5 h-5 text-gray-400" />
+              <X className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
             </button>
           </div>
         </div>
 
         {/* Subscription Status Banner */}
         {subscription && (
-          <div className="px-6 py-3 border-b border-gray-200">
+          <div className="px-3 sm:px-6 py-2 sm:py-3 border-b border-gray-200">
             {subscription.status === 'trialing' && subscription.isTrialActive && (
-              <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg px-4 py-2">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-blue-50 border border-blue-200 rounded-lg px-3 sm:px-4 py-2 gap-2">
                 <div className="flex items-center space-x-2">
-                  <Clock className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm text-blue-800">
+                  <Clock className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                  <span className="text-xs sm:text-sm text-blue-800">
                     Zkušební období: Zbývá {trialDaysRemaining} {trialDaysRemaining === 1 ? 'den' : trialDaysRemaining < 5 ? 'dny' : 'dní'}
                   </span>
                 </div>
                 <button
                   onClick={() => setActiveTab('subscription')}
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  className="text-xs sm:text-sm text-blue-600 hover:text-blue-700 font-medium whitespace-nowrap"
                 >
                   Upgradovat nyní
                 </button>
               </div>
             )}
             {subscription.status === 'active' && (
-              <div className="flex items-center space-x-2 bg-green-50 border border-green-200 rounded-lg px-4 py-2">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span className="text-sm text-green-800">
+              <div className="flex items-center space-x-2 bg-green-50 border border-green-200 rounded-lg px-3 sm:px-4 py-2">
+                <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                <span className="text-xs sm:text-sm text-green-800">
                   Aktivní předplatné: {subscription.plan === 'premium_monthly' ? 'Premium měsíční' : 'Premium roční'}
                 </span>
               </div>
             )}
             {subscription.status === 'expired' && (
-              <div className="flex items-center justify-between bg-red-50 border border-red-200 rounded-lg px-4 py-2">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-red-50 border border-red-200 rounded-lg px-3 sm:px-4 py-2 gap-2">
                 <div className="flex items-center space-x-2">
-                  <AlertCircle className="w-4 h-4 text-red-600" />
-                  <span className="text-sm text-red-800">
+                  <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
+                  <span className="text-xs sm:text-sm text-red-800">
                     Předplatné vypršelo. Obnovte pro pokračování.
                   </span>
                 </div>
                 <button
                   onClick={() => setActiveTab('subscription')}
-                  className="text-sm text-red-600 hover:text-red-700 font-medium"
+                  className="text-xs sm:text-sm text-red-600 hover:text-red-700 font-medium whitespace-nowrap"
                 >
                   Obnovit předplatné
                 </button>
@@ -136,20 +136,20 @@ export default function AccountModal({ onClose }: AccountModalProps) {
         )}
 
         {/* Tabs */}
-        <div className="flex border-b border-gray-200 px-6 overflow-x-auto">
+        <div className="flex border-b border-gray-200 px-3 sm:px-6 overflow-x-auto scrollbar-hide">
           {tabs.map(tab => {
             const Icon = tab.icon
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 px-4 py-3 border-b-2 transition-colors whitespace-nowrap ${
+                className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-2 sm:py-3 border-b-2 transition-colors whitespace-nowrap text-xs sm:text-base ${
                   activeTab === tab.id
                     ? 'border-primary-600 text-primary-600'
                     : 'border-transparent text-gray-600 hover:text-gray-900'
                 }`}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                 <span className="font-medium">{tab.label}</span>
               </button>
             )
@@ -157,7 +157,7 @@ export default function AccountModal({ onClose }: AccountModalProps) {
         </div>
 
         {/* Tab Content with smooth transitions */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-6">
           {activeTab === 'profile' && <ProfileTab />}
           {activeTab === 'subscription' && <SubscriptionTab subscriptionData={subscriptionData} />}
           {activeTab === 'payments' && <PaymentsTab subscriptionData={subscriptionData} />}

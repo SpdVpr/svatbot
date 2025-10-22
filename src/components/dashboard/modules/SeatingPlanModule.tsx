@@ -25,9 +25,9 @@ export default function SeatingPlanModule() {
   return (
     <div className="wedding-card">
       <Link href="/seating" className="block mb-4">
-        <h3 className="text-lg font-semibold flex items-center justify-center space-x-2 hover:text-primary-600 transition-colors">
-          <Grid3X3 className="w-5 h-5 text-indigo-600" />
-          <span>Zasedací pořádek</span>
+        <h3 className="text-base sm:text-lg font-semibold flex items-center justify-start sm:justify-center space-x-2 hover:text-primary-600 transition-colors">
+          <Grid3X3 className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600 flex-shrink-0" />
+          <span className="truncate">Zasedací pořádek</span>
         </h3>
       </Link>
 

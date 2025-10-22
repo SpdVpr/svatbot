@@ -10,9 +10,9 @@ export default function MusicPlaylistModule() {
   return (
     <div className="wedding-card">
       <Link href="/music" className="block mb-4">
-        <h3 className="text-lg font-semibold flex items-center justify-center space-x-2 hover:text-primary-600 transition-colors">
-          <Music className="w-5 h-5 text-purple-600" />
-          <span>Svatební hudba</span>
+        <h3 className="text-base sm:text-lg font-semibold flex items-center justify-start sm:justify-center space-x-2 hover:text-primary-600 transition-colors">
+          <Music className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 flex-shrink-0" />
+          <span className="truncate">Svatební hudba</span>
         </h3>
       </Link>
 

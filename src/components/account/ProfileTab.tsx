@@ -172,7 +172,7 @@ function ProfileTab() {
     <div className="space-y-6">
       {/* Message */}
       {message && (
-        <div className={`p-4 rounded-lg flex items-center space-x-2 ${
+        <div className={`p-3 sm:p-4 rounded-lg flex items-center space-x-2 ${
           message.type === 'success'
             ? 'bg-green-50 border border-green-200'
             : message.type === 'warning'
@@ -180,36 +180,38 @@ function ProfileTab() {
             : 'bg-red-50 border border-red-200'
         }`}>
           {message.type === 'success' ? (
-            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" />
           ) : message.type === 'warning' ? (
-            <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0" />
+            <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600 flex-shrink-0" />
           ) : (
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+            <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 flex-shrink-0" />
           )}
-          <span className={
+          <span className={cn(
+            'text-xs sm:text-sm',
             message.type === 'success' ? 'text-green-800' :
             message.type === 'warning' ? 'text-yellow-800' :
             'text-red-800'
-          }>
+          )}>
             {message.text}
           </span>
         </div>
       )}
 
       {/* Profile Information */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
-            <User className="w-5 h-5 text-primary-600" />
+      <div className="bg-white border border-gray-200 rounded-lg p-3 sm:p-6">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 flex items-center space-x-2">
+            <User className="w-4 h-4 sm:w-5 sm:h-5 text-primary-600 flex-shrink-0" />
             <span>Osobní údaje</span>
           </h3>
           {!isEditing && (
             <button
               onClick={() => setIsEditing(true)}
-              className="btn-outline flex items-center space-x-2"
+              className="btn-outline flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm px-2 py-1 sm:px-3 sm:py-2"
             >
-              <Edit className="w-4 h-4" />
-              <span>Upravit</span>
+              <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Upravit</span>
+              <span className="sm:hidden">Edit</span>
             </button>
           )}
         </div>
@@ -239,12 +241,12 @@ function ProfileTab() {
               Pohlaví
             </label>
             {isEditing ? (
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, gender: 'female' })}
                   className={cn(
-                    'py-3 px-4 rounded-lg border-2 transition-all text-sm font-medium',
+                    'py-2 sm:py-3 px-2 sm:px-4 rounded-lg border-2 transition-all text-xs sm:text-sm font-medium',
                     formData.gender === 'female'
                       ? 'border-primary-500 bg-primary-50 text-primary-700'
                       : 'border-gray-300 bg-white text-gray-700 hover:border-primary-300'
@@ -256,7 +258,7 @@ function ProfileTab() {
                   type="button"
                   onClick={() => setFormData({ ...formData, gender: 'male' })}
                   className={cn(
-                    'py-3 px-4 rounded-lg border-2 transition-all text-sm font-medium',
+                    'py-2 sm:py-3 px-2 sm:px-4 rounded-lg border-2 transition-all text-xs sm:text-sm font-medium',
                     formData.gender === 'male'
                       ? 'border-primary-500 bg-primary-50 text-primary-700'
                       : 'border-gray-300 bg-white text-gray-700 hover:border-primary-300'
@@ -268,7 +270,7 @@ function ProfileTab() {
                   type="button"
                   onClick={() => setFormData({ ...formData, gender: 'other' })}
                   className={cn(
-                    'py-3 px-4 rounded-lg border-2 transition-all text-sm font-medium',
+                    'py-2 sm:py-3 px-2 sm:px-4 rounded-lg border-2 transition-all text-xs sm:text-sm font-medium',
                     formData.gender === 'other'
                       ? 'border-primary-500 bg-primary-50 text-primary-700'
                       : 'border-gray-300 bg-white text-gray-700 hover:border-primary-300'
@@ -378,11 +380,11 @@ function ProfileTab() {
 
         {/* Edit Actions */}
         {isEditing && (
-          <div className="flex space-x-3 mt-6 pt-6 border-t border-gray-200">
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200">
             <button
               onClick={handleCancel}
               disabled={loading}
-              className="flex-1 btn-outline flex items-center justify-center space-x-2"
+              className="flex-1 btn-outline flex items-center justify-center space-x-2 text-sm"
             >
               <X className="w-4 h-4" />
               <span>Zrušit</span>
@@ -390,7 +392,7 @@ function ProfileTab() {
             <button
               onClick={handleSave}
               disabled={loading}
-              className="flex-1 btn-primary flex items-center justify-center space-x-2"
+              className="flex-1 btn-primary flex items-center justify-center space-x-2 text-sm"
             >
               {loading ? (
                 <>
@@ -409,9 +411,9 @@ function ProfileTab() {
       </div>
 
       {/* Affiliate Program Section */}
-      <div className="bg-gradient-to-br from-pink-50 to-purple-50 border-2 border-pink-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2 mb-4">
-          <DollarSign className="w-5 h-5 text-pink-600" />
+      <div className="bg-gradient-to-br from-pink-50 to-purple-50 border-2 border-pink-200 rounded-lg p-3 sm:p-6">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900 flex items-center space-x-2 mb-3 sm:mb-4">
+          <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-pink-600 flex-shrink-0" />
           <span>Affiliate Program</span>
         </h3>
 

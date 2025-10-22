@@ -1,8 +1,10 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Home, LucideIcon } from 'lucide-react'
+import { ArrowLeft, Home, LucideIcon, Menu } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
+import MobileMenu from '@/components/navigation/MobileMenu'
 
 interface ModuleHeaderProps {
   /** Icon component from lucide-react */
@@ -31,30 +33,41 @@ export default function ModuleHeader({
   stats
 }: ModuleHeaderProps) {
   const router = useRouter()
+  const [showMobileMenu, setShowMobileMenu] = useState(false)
 
   return (
-    <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-      <div className="container-desktop py-4">
-        <div className="flex items-center justify-between">
-          {/* Left side - Navigation and Title */}
-          <div className="flex items-center space-x-3">
-            {/* Back button */}
-            <button
-              onClick={() => router.push('/')}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors group flex-shrink-0"
-              title="Zpět na dashboard"
-            >
-              <ArrowLeft className="w-5 h-5 text-gray-600 group-hover:text-gray-900" />
-            </button>
+    <>
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="container-desktop py-4">
+          <div className="flex items-center justify-between">
+            {/* Left side - Navigation and Title */}
+            <div className="flex items-center space-x-3">
+              {/* Mobile Menu button (visible only on mobile) */}
+              <button
+                onClick={() => setShowMobileMenu(true)}
+                className="sm:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors group flex-shrink-0"
+                title="Menu"
+              >
+                <Menu className="w-5 h-5 text-gray-600 group-hover:text-gray-900" />
+              </button>
 
-            {/* Home icon */}
-            <Link
-              href="/"
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
-              title="Dashboard"
-            >
-              <Home className="w-4 h-4 text-gray-400 hover:text-gray-600" />
-            </Link>
+              {/* Back button (visible only on desktop) */}
+              <button
+                onClick={() => router.push('/')}
+                className="hidden sm:block p-2 hover:bg-gray-100 rounded-lg transition-colors group flex-shrink-0"
+                title="Zpět na dashboard"
+              >
+                <ArrowLeft className="w-5 h-5 text-gray-600 group-hover:text-gray-900" />
+              </button>
+
+              {/* Home icon */}
+              <Link
+                href="/"
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+                title="Dashboard"
+              >
+                <Home className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+              </Link>
 
             {/* Module icon in square */}
             <div
@@ -80,6 +93,13 @@ export default function ModuleHeader({
         </div>
       </div>
     </div>
+
+    {/* Mobile Menu */}
+    <MobileMenu
+      isOpen={showMobileMenu}
+      onClose={() => setShowMobileMenu(false)}
+    />
+  </>
   )
 }
 

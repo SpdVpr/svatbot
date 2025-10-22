@@ -11,9 +11,9 @@ export default function TaskManagementModule() {
   return (
     <div className="wedding-card">
       <Link href="/tasks" className="block mb-4">
-        <h3 className="text-lg font-semibold flex items-center justify-center space-x-2 hover:text-primary-600 transition-colors">
-          <List className="w-5 h-5 text-blue-600" />
-          <span>Správa úkolů</span>
+        <h3 className="text-base sm:text-lg font-semibold flex items-center justify-start sm:justify-center space-x-2 hover:text-primary-600 transition-colors">
+          <List className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0" />
+          <span className="truncate">Správa úkolů</span>
         </h3>
       </Link>
 

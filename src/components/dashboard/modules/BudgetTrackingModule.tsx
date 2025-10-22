@@ -12,9 +12,9 @@ export default function BudgetTrackingModule() {
   return (
     <div className="wedding-card">
       <Link href="/budget" className="block mb-4">
-        <h3 className="text-lg font-semibold flex items-center justify-center space-x-2 hover:text-primary-600 transition-colors">
-          <span className="text-green-600 font-bold">Kč</span>
-          <span>Rozpočet</span>
+        <h3 className="text-base sm:text-lg font-semibold flex items-center justify-start sm:justify-center space-x-2 hover:text-primary-600 transition-colors">
+          <span className="text-sm sm:text-base text-green-600 font-bold flex-shrink-0">Kč</span>
+          <span className="truncate">Rozpočet</span>
         </h3>
       </Link>
 
