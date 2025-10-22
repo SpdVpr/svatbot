@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Sparkles, FolderInput, X, Heart, Trash2, Calendar } from 'lucide-react'
+import { Palette, Sparkles, FolderInput, X, Heart, Trash2, Calendar } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useMoodboard, MoodboardFolder, MoodboardImage } from '@/hooks/useMoodboard'
@@ -10,6 +10,7 @@ import FolderModal from '@/components/moodboard/FolderModal'
 import FolderView from '@/components/moodboard/FolderView'
 import AIMoodboardGenerator from '@/components/moodboard/AIMoodboardGenerator'
 import ImageManager from '@/components/moodboard/ImageManager'
+import ModuleHeader from '@/components/common/ModuleHeader'
 
 export default function MoodboardPage() {
   const {
@@ -132,49 +133,23 @@ export default function MoodboardPage() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <Link
-                href="/"
-                className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Zpět na dashboard
-              </Link>
-              <div className="h-6 w-px bg-gray-300" />
-              <h1 className="text-2xl font-bold text-gray-900">Moodboard</h1>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              {view === 'folders' && (
-                <>
-                  <span className="text-sm text-gray-600">
-                    {folders.length} {folders.length === 1 ? 'složka' : folders.length < 5 ? 'složky' : 'složek'}
-                  </span>
-                  <span className="text-sm text-gray-400">•</span>
-                  <span className="text-sm text-gray-600">
-                    {images.length} {images.length === 1 ? 'obrázek' : images.length < 5 ? 'obrázky' : 'obrázků'}
-                  </span>
-                  {unassignedImages.length > 0 && (
-                    <>
-                      <span className="text-sm text-gray-400">•</span>
-                      <button
-                        onClick={() => setShowImageManager(true)}
-                        className="inline-flex items-center px-3 py-1.5 bg-amber-50 text-amber-700 text-sm font-medium rounded-lg hover:bg-amber-100 transition-colors border border-amber-200"
-                      >
-                        <FolderInput className="w-4 h-4 mr-2" />
-                        {unassignedImages.length} nepřiřazených
-                      </button>
-                    </>
-                  )}
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+      <ModuleHeader
+        icon={Palette}
+        title="Moodboard"
+        subtitle={`${folders.length} složek • ${images.length} obrázků`}
+        iconGradient="from-pink-500 to-purple-500"
+        actions={
+          view === 'folders' && unassignedImages.length > 0 ? (
+            <button
+              onClick={() => setShowImageManager(true)}
+              className="inline-flex items-center px-3 py-1.5 bg-amber-50 text-amber-700 text-sm font-medium rounded-lg hover:bg-amber-100 transition-colors border border-amber-200"
+            >
+              <FolderInput className="w-4 h-4 mr-2" />
+              {unassignedImages.length} nepřiřazených
+            </button>
+          ) : undefined
+        }
+      />
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

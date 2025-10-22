@@ -5,11 +5,12 @@ import { useAuth } from '@/hooks/useAuth'
 import { useWedding } from '@/hooks/useWedding'
 import { useSeating } from '@/hooks/useSeating'
 import SeatingPlanEditor from '@/components/seating/SeatingPlanEditor'
+import ModuleHeader from '@/components/common/ModuleHeader'
 import {
-  ArrowLeft,
   Plus,
   Grid3X3,
   Users,
+  Users2,
   BarChart3,
   Home,
   MousePointer2,
@@ -99,79 +100,52 @@ export default function SeatingPage() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        {/* Breadcrumb */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center space-x-2 py-2 text-sm text-gray-500">
-            <Link href="/" className="hover:text-gray-700 transition-colors">
-              Dashboard
-            </Link>
-            <span>/</span>
-            <span className="text-gray-900 font-medium">Zasedací pořádek</span>
-          </div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Back button and Title */}
-            <div className="flex items-center space-x-4">
-              <Link
-                href="/"
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+      <ModuleHeader
+        icon={Users2}
+        title="Zasedací pořádek"
+        subtitle={`${currentPlan?.tables?.length || 0} stolů • ${currentPlan?.seats?.filter(s => s.guestId).length || 0} přiřazených hostů`}
+        iconGradient="from-cyan-500 to-blue-500"
+        actions={
+          <div className="flex items-center space-x-3">
+            {/* Plan selector */}
+            {seatingPlans.length > 0 && (
+              <select
+                value={currentPlan?.id || ''}
+                onChange={(e) => setCurrentPlan(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >
-                <ArrowLeft className="w-5 h-5" />
-                <span className="hidden sm:inline">Zpět na dashboard</span>
-              </Link>
-              <div className="border-l border-gray-300 pl-4">
-                <h1 className="text-2xl font-bold text-gray-900">Zasedací pořádek</h1>
-                <p className="text-sm text-text-muted">
-                  Plánování zasedacího pořádku pro svatbu {wedding.brideName} & {wedding.groomName}
-                </p>
-              </div>
-            </div>
+                <option value="">Vyberte plán</option>
+                {seatingPlans.map(plan => (
+                  <option key={plan.id} value={plan.id}>
+                    {plan.name}
+                  </option>
+                ))}
+              </select>
+            )}
 
-            {/* Actions */}
-            <div className="flex items-center space-x-3">
-              {/* Plan selector */}
-              {seatingPlans.length > 0 && (
-                <select
-                  value={currentPlan?.id || ''}
-                  onChange={(e) => setCurrentPlan(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                >
-                  <option value="">Vyberte plán</option>
-                  {seatingPlans.map(plan => (
-                    <option key={plan.id} value={plan.id}>
-                      {plan.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-
-              {/* Delete plan button - only show if a plan is selected */}
-              {currentPlan && (
-                <button
-                  onClick={handleDeletePlan}
-                  className="px-3 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors flex items-center space-x-2"
-                  title="Smazat plán"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  <span className="hidden sm:inline">Smazat plán</span>
-                </button>
-              )}
-
-              {/* Action buttons */}
+            {/* Delete plan button - only show if a plan is selected */}
+            {currentPlan && (
               <button
-                onClick={() => setShowCreateForm(true)}
-                className="btn-primary flex items-center space-x-2"
+                onClick={handleDeletePlan}
+                className="px-3 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors flex items-center space-x-2"
+                title="Smazat plán"
               >
-                <Plus className="w-4 h-4" />
-                <span>Nový plán</span>
+                <Trash2 className="w-4 h-4" />
+                <span className="hidden sm:inline">Smazat plán</span>
               </button>
-            </div>
+            )}
+
+            {/* Action buttons */}
+            <button
+              onClick={() => setShowCreateForm(true)}
+              className="btn-primary flex items-center space-x-2"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Nový plán</span>
+            </button>
           </div>
-        </div>
-      </div>
+        }
+      />
 
       {/* Main content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

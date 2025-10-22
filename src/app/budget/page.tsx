@@ -9,28 +9,24 @@ import BudgetStats from '@/components/budget/BudgetStats'
 import BudgetForm from '@/components/budget/BudgetForm'
 import BudgetTemplates from '@/components/budget/BudgetTemplates'
 import SimpleCalculator from '@/components/budget/SimpleCalculator'
+import ModuleHeader from '@/components/common/ModuleHeader'
+import Link from 'next/link'
 import { BudgetFormData, BudgetItem, BudgetTemplate } from '@/types/budget'
 import {
   Plus,
   Download,
-  Upload,
-  Settings,
-  BarChart3,
-  List,
-  Grid3X3,
   DollarSign,
-  ArrowLeft,
-  Home,
   Calculator,
   FileText,
-  Target
+  Target,
+  Home,
+  BarChart3
 } from 'lucide-react'
-import Link from 'next/link'
 
 export default function BudgetPage() {
   const { user } = useAuth()
   const { wedding } = useWedding()
-  const { budgetItems, loading, createBudgetItem, updateBudgetItem, error } = useBudget()
+  const { budgetItems, loading, createBudgetItem, updateBudgetItem, error, stats } = useBudget()
   // Removed viewMode - using stats view as default (most informative)
   const [showBudgetForm, setShowBudgetForm] = useState(false)
   const [showTemplates, setShowTemplates] = useState(false)
@@ -169,97 +165,30 @@ export default function BudgetPage() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        {/* Breadcrumb - Hidden on mobile */}
-        <div className="hidden sm:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center space-x-2 py-2 text-sm text-gray-500">
-            <Link href="/" className="hover:text-gray-700 transition-colors">
-              Dashboard
-            </Link>
-            <span>/</span>
-            <span className="text-gray-900 font-medium">Rozpočet</span>
+      <ModuleHeader
+        icon={DollarSign}
+        title="Rozpočet"
+        subtitle={`${Math.round(stats.totalBudget / 1000)}k Kč rozpočet • ${stats.budgetUsed}% využito`}
+        iconGradient="from-green-500 to-emerald-500"
+        actions={
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setShowCalculator(true)}
+              className="btn-outline flex items-center space-x-2"
+            >
+              <Calculator className="w-4 h-4" />
+              <span className="hidden lg:inline">Kalkulačka</span>
+            </button>
+            <button
+              onClick={() => setShowBudgetForm(true)}
+              className="btn-primary flex items-center space-x-2"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Přidat položku</span>
+            </button>
           </div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Mobile header */}
-          <div className="sm:hidden space-y-4 py-4">
-            {/* Top row - Back button and title */}
-            <div className="flex items-center space-x-3">
-              <Link
-                href="/"
-                className="flex items-center justify-center w-8 h-8 text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Link>
-              <div>
-                <h1 className="text-lg font-bold text-gray-900">Rozpočet</h1>
-              </div>
-            </div>
-
-            {/* Main action button - prominent placement */}
-            <div className="flex justify-center">
-              <button
-                onClick={() => setShowBudgetForm(true)}
-                className="btn-primary flex items-center space-x-2 px-6 py-3 text-base font-medium"
-              >
-                <Plus className="w-5 h-5" />
-                <span>Přidat položku</span>
-              </button>
-            </div>
-
-            {/* Stats view indicator */}
-            <div className="flex items-center justify-center">
-              <div className="flex items-center bg-primary-100 rounded-lg px-3 py-2">
-                <BarChart3 className="w-4 h-4 text-primary-600 mr-2" />
-                <span className="text-sm font-medium text-primary-700">Statistiky a přehled</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Desktop header */}
-          <div className="hidden sm:flex items-center justify-between h-16">
-            {/* Back button and Title */}
-            <div className="flex items-center space-x-4">
-              <Link
-                href="/"
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-                <span>Zpět na dashboard</span>
-              </Link>
-              <div className="border-l border-gray-300 pl-4">
-                <h1 className="text-2xl font-bold text-gray-900">Rozpočet</h1>
-                <p className="text-sm text-text-muted">
-                  Finanční plánování svatby {wedding.brideName} & {wedding.groomName}
-                </p>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center space-x-3">
-
-
-              {/* Action buttons */}
-              <button
-                onClick={() => setShowCalculator(true)}
-                className="btn-outline flex items-center space-x-2"
-              >
-                <Calculator className="w-4 h-4" />
-                <span className="hidden lg:inline">Kalkulačka</span>
-              </button>
-
-              <button
-                onClick={() => setShowBudgetForm(true)}
-                className="btn-primary flex items-center space-x-2"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Přidat položku</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+        }
+      />
 
       {/* Main content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

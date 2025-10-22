@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Clock, Calendar, ArrowLeft, Plus, Trash2, X, Heart, Edit2 } from 'lucide-react'
+import { Clock, Calendar, Plus, Trash2, X, Heart, Edit2 } from 'lucide-react'
 import Link from 'next/link'
 import { useWeddingDayTimeline } from '@/hooks/useWeddingDayTimeline'
+import ModuleHeader from '@/components/common/ModuleHeader'
 
 const PREDEFINED_ACTIVITIES = [
   { name: 'Příjezd hostů', category: 'ceremony', duration: '30 min', icon: '🚗' },
@@ -174,26 +175,12 @@ export default function SvatebniDenPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <Link
-                href="/"
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-                <span>Zpět na dashboard</span>
-              </Link>
-              <div className="h-6 w-px bg-gray-300" />
-              <div className="flex items-center space-x-2">
-                <Calendar className="w-5 h-5 text-purple-600" />
-                <h1 className="text-xl font-bold text-gray-900">Harmonogram svatebního dne</h1>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <ModuleHeader
+        icon={Calendar}
+        title="Harmonogram svatebního dne"
+        subtitle={`${timeline.length} aktivit naplánováno`}
+        iconGradient="from-purple-500 to-pink-500"
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Elegant Header with decorative elements */}

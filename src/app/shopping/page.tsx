@@ -12,13 +12,13 @@ import {
   Filter,
   Search,
   Grid3X3,
-  List,
-  ArrowLeft
+  List
 } from 'lucide-react'
 import { useShopping } from '@/hooks/useShopping'
 import { currencyUtils } from '@/utils'
 import ShoppingItemCard from '@/components/shopping/ShoppingItemCard'
 import ShoppingItemForm from '@/components/shopping/ShoppingItemForm'
+import ModuleHeader from '@/components/common/ModuleHeader'
 import { ShoppingCategory, SHOPPING_CATEGORIES } from '@/types/shopping'
 
 export default function ShoppingPage() {
@@ -53,81 +53,21 @@ export default function ShoppingPage() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        {/* Breadcrumb - Hidden on mobile */}
-        <div className="hidden sm:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center space-x-2 py-2 text-sm text-gray-500">
-            <button
-              onClick={() => router.push('/')}
-              className="hover:text-gray-700 transition-colors"
-            >
-              Dashboard
-            </button>
-            <span>/</span>
-            <span className="text-gray-900 font-medium">Nákupní seznam</span>
-          </div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          {/* Mobile header */}
-          <div className="sm:hidden space-y-4">
-            {/* Top row - Back button and title */}
-            <div className="flex items-center space-x-3">
-              <button
-                onClick={() => router.push('/')}
-                className="flex items-center justify-center w-8 h-8 text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <div>
-                <h1 className="text-lg font-bold text-gray-900">Nákupní seznam</h1>
-              </div>
-            </div>
-
-            {/* Main action button - prominent placement */}
-            <div className="flex justify-center">
-              <button
-                onClick={() => setShowForm(true)}
-                className="btn-primary flex items-center space-x-2 px-6 py-3 text-base font-medium"
-              >
-                <Plus className="w-5 h-5" />
-                <span>Přidat produkt</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Desktop header */}
-          <div className="hidden sm:flex items-center justify-between">
-            <div className="flex items-start gap-6">
-              {/* Back button */}
-              <button
-                onClick={() => router.push('/')}
-                className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors pt-1"
-              >
-                <ArrowLeft className="w-5 h-5" />
-                <span className="text-sm font-medium">Zpět na dashboard</span>
-              </button>
-
-              {/* Title and description */}
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 mb-1">Nákupní seznam</h1>
-                <p className="text-sm text-gray-600">
-                  Produkty a zboží, které chcete na svatbu pořídit
-                </p>
-              </div>
-            </div>
-
-            {/* Action button */}
-            <button
-              onClick={() => setShowForm(true)}
-              className="btn-primary flex items-center space-x-2"
-            >
-              <Plus className="w-5 h-5" />
-              <span>Přidat produkt</span>
-            </button>
-          </div>
-        </div>
-      </div>
+      <ModuleHeader
+        icon={ShoppingCart}
+        title="Nákupní seznam"
+        subtitle={`${stats.totalItems} produktů • ${stats.purchasedItems} zakoupeno • ${currencyUtils.format(stats.totalValue)} Kč`}
+        iconGradient="from-amber-500 to-orange-500"
+        actions={
+          <button
+            onClick={() => setShowForm(true)}
+            className="btn-primary flex items-center space-x-2"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Přidat produkt</span>
+          </button>
+        }
+      />
 
       {/* Main content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">

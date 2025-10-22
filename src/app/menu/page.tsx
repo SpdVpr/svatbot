@@ -7,12 +7,11 @@ import { useMenu } from '@/hooks/useMenu'
 import { MenuItem, DrinkItem, MenuFormData, DrinkFormData } from '@/types/menu'
 import MenuItemForm from '@/components/menu/MenuItemForm'
 import DrinkItemForm from '@/components/menu/DrinkItemForm'
+import ModuleHeader from '@/components/common/ModuleHeader'
 import {
   Plus,
   UtensilsCrossed,
   Wine,
-  ArrowLeft,
-  Home,
   Filter,
   Search,
   Download,
@@ -159,38 +158,21 @@ export default function MenuPage() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link
-                href="/"
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                title="Zpět na dashboard"
-              >
-                <Home className="w-5 h-5 text-gray-600" />
-              </Link>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
-                  <UtensilsCrossed className="w-6 h-6 text-pink-600" />
-                  <span>Jídlo a Pití</span>
-                </h1>
-                <p className="text-sm text-gray-600">Plánování svatebního menu</p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => activeTab === 'food' ? setShowFoodForm(true) : setShowDrinkForm(true)}
-                className="btn-primary flex items-center space-x-2"
-              >
-                <Plus className="w-4 h-4" />
-                <span>{activeTab === 'food' ? 'Přidat jídlo' : 'Přidat nápoj'}</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <ModuleHeader
+        icon={UtensilsCrossed}
+        title="Jídlo a Pití"
+        subtitle={`${stats.totalMenuItems} jídel • ${stats.totalDrinkItems} nápojů • ${(stats.totalEstimatedCost / 1000).toFixed(0)}k Kč`}
+        iconGradient="from-red-500 to-pink-500"
+        actions={
+          <button
+            onClick={() => activeTab === 'food' ? setShowFoodForm(true) : setShowDrinkForm(true)}
+            className="btn-primary flex items-center space-x-2"
+          >
+            <Plus className="w-4 h-4" />
+            <span>{activeTab === 'food' ? 'Přidat jídlo' : 'Přidat nápoj'}</span>
+          </button>
+        }
+      />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Overview */}

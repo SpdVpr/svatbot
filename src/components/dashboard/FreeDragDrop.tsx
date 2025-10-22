@@ -243,7 +243,13 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
     <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-[2000px]">
       <div className="space-y-6">
         {/* Dashboard Controls */}
-        <div className="bg-white p-4 rounded-xl border border-gray-200 mx-auto" style={{ maxWidth: '1240px' }}>
+        <div
+          className="bg-gray-50/95 backdrop-blur-xl p-5 rounded-3xl border border-gray-100/60 mx-auto shadow-lg"
+          style={{
+            maxWidth: '1240px',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
+          }}
+        >
           <div className="flex items-center justify-between">
             {/* Left Side - Empty or Edit Mode Controls */}
             <div className="flex items-center space-x-2">
@@ -260,34 +266,45 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
 
             {/* Center - Layout Mode Switcher (only in edit mode) OR Onboarding Guide */}
             {layout.isEditMode ? (
-              <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
+              <div className="flex items-center space-x-2 bg-gray-100/80 backdrop-blur-xl rounded-2xl p-1.5 border border-gray-200/50">
                 <button
                   onClick={() => setLayoutMode('grid')}
-                  className={`flex items-center space-x-1 px-2 py-1.5 rounded-md transition-colors ${
+                  className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl transition-all duration-300 ${
                     layoutMode === 'grid'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-white text-primary-600 shadow-lg scale-105'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
                   }`}
+                  style={layoutMode === 'grid' ? {
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+                  } : {}}
                   title="Grid layout"
                 >
                   <Grid3x3 className="w-4 h-4" />
-                  <span className="hidden lg:inline text-sm">Grid</span>
+                  <span className="hidden lg:inline text-sm font-medium">Grid</span>
                 </button>
                 <button
                   onClick={() => setLayoutMode('free')}
-                  className={`flex items-center space-x-1 px-2 py-1.5 rounded-md transition-colors ${
+                  className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl transition-all duration-300 ${
                     layoutMode === 'free'
-                      ? 'bg-white text-primary-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-white text-primary-600 shadow-lg scale-105'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
                   }`}
+                  style={layoutMode === 'free' ? {
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+                  } : {}}
                   title="Volný layout"
                 >
                   <Maximize2 className="w-4 h-4" />
-                  <span className="hidden lg:inline text-sm">Volný</span>
+                  <span className="hidden lg:inline text-sm font-medium">Volný</span>
                 </button>
               </div>
             ) : (
-              <div className="flex items-center space-x-3 px-4 py-2 bg-gradient-to-r from-primary-50 to-pink-50 rounded-lg border border-primary-200">
+              <div
+                className="flex items-center space-x-3 px-5 py-3 bg-gradient-to-r from-primary-50 to-pink-50 rounded-2xl border border-primary-200/50 backdrop-blur-xl shadow-lg"
+                style={{
+                  boxShadow: '0 4px 12px rgba(251, 113, 133, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+                }}
+              >
                 <div className="flex items-center space-x-2">
                   <Sparkles className="w-5 h-5 text-primary-600" />
                   <div>
@@ -301,7 +318,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
                 </div>
                 <button
                   onClick={() => setShowOnboardingWizard(true)}
-                  className="btn-primary flex items-center space-x-1 text-sm px-3 py-1.5"
+                  className="btn-primary flex items-center space-x-1 text-sm px-4 py-2"
                 >
                   <BookOpen className="w-4 h-4" />
                   <span className="hidden sm:inline">Otevřít</span>
@@ -325,10 +342,15 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
                 </button>
 
                 {showCanvasMenu && (
-                  <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-                    <div className="p-3">
-                      <p className="text-sm font-semibold text-gray-700 mb-2">Šířka plochy</p>
-                      <div className="space-y-1">
+                  <div
+                    className="absolute right-0 top-full mt-2 w-72 bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg border border-white/60 z-50"
+                    style={{
+                      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+                    }}
+                  >
+                    <div className="p-4">
+                      <p className="text-sm font-semibold text-gray-700 mb-3">Šířka plochy</p>
+                      <div className="space-y-2">
                         {(Object.keys(CANVAS_WIDTHS) as CanvasWidth[]).map((width) => (
                           <button
                             key={width}
@@ -336,16 +358,16 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
                               setCanvasWidth(width)
                               setShowCanvasMenu(false)
                             }}
-                            className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                            className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-300 ${
                               canvasWidth === width
-                                ? 'bg-primary-50 text-primary-700 font-medium'
-                                : 'hover:bg-gray-50 text-gray-700'
+                                ? 'bg-primary-50 text-primary-700 font-medium shadow-sm scale-105'
+                                : 'hover:bg-gray-50 text-gray-700 hover:scale-102'
                             }`}
                           >
                             <div className="flex items-center justify-between">
                               <span className="text-sm">{CANVAS_WIDTHS[width].label}</span>
                               {canvasWidth === width && (
-                                <span className="text-primary-600">✓</span>
+                                <span className="text-primary-600 text-lg">✓</span>
                               )}
                             </div>
                             <span className="text-xs text-gray-500">{CANVAS_WIDTHS[width].description}</span>
@@ -372,16 +394,21 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
           </div>
 
           {layout.isEditMode && (
-            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="flex items-start space-x-2">
-                <span className="text-lg">💡</span>
+            <div
+              className="mt-4 p-5 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200/50 rounded-2xl backdrop-blur-xl shadow-lg"
+              style={{
+                boxShadow: '0 4px 12px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+              }}
+            >
+              <div className="flex items-start space-x-3">
+                <span className="text-2xl">💡</span>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-blue-900 mb-2">
+                  <p className="text-sm font-semibold text-blue-900 mb-3">
                     {layoutMode === 'grid' ? 'Grid layout s přichytáváním:' : 'Volný layout:'}
                   </p>
-                  <ul className="text-sm text-blue-800 space-y-1.5">
+                  <ul className="text-sm text-blue-800 space-y-2">
                     <li className="flex items-start">
-                      <span className="mr-2">•</span>
+                      <span className="mr-2 text-blue-600">•</span>
                       <span>
                         <strong>Přesunout modul:</strong> Klikněte a táhněte modul
                         {layoutMode === 'grid' && ' - automaticky se přichytí k mřížce'}
@@ -389,20 +416,20 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
                     </li>
                     {layoutMode === 'grid' && (
                       <li className="flex items-start">
-                        <span className="mr-2">•</span>
+                        <span className="mr-2 text-blue-600">•</span>
                         <span><strong>Vodící čáry:</strong> Modré čáry se zobrazí při přetahování pro snadné zarovnání</span>
                       </li>
                     )}
                     <li className="flex items-start">
-                      <span className="mr-2">•</span>
+                      <span className="mr-2 text-blue-600">•</span>
                       <span><strong>Změnit velikost:</strong> Táhněte za pravý dolní roh modulu</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="mr-2">•</span>
+                      <span className="mr-2 text-blue-600">•</span>
                       <span><strong>Skrýt/Zobrazit:</strong> Klikněte na ikonu oka</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="mr-2">•</span>
+                      <span className="mr-2 text-blue-600">•</span>
                       <span><strong>Zamknout:</strong> Klikněte na ikonu zámku</span>
                     </li>
                   </ul>
@@ -415,7 +442,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
         {/* Free Canvas with Absolute Positioning */}
         <div
           ref={containerRef}
-          className="relative bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden touch-none mx-auto"
+          className="relative rounded-3xl overflow-hidden touch-none mx-auto bg-gray-50"
           style={{
             width: `${canvasSize.width}px`,
             maxWidth: '100%',
@@ -428,8 +455,10 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
               ? `radial-gradient(circle at 1px 1px, rgba(147,51,234,0.08) 1px, transparent 0)`
               : 'none',
             backgroundSize: layout.isEditMode && layoutMode === 'grid'
-              ? `${GRID_SIZE}px ${GRID_SIZE}px`
-              : layout.isEditMode ? '40px 40px' : 'auto'
+              ? `${GRID_SIZE}px ${GRID_SIZE}px, ${GRID_SIZE}px ${GRID_SIZE}px`
+              : layout.isEditMode ? '40px 40px' : 'auto',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06), inset 0 1px 2px rgba(0, 0, 0, 0.03)',
+            border: '1px solid rgba(0, 0, 0, 0.05)'
           }}
         >
           {/* Snap Guide Lines (only in grid mode) */}
@@ -487,18 +516,25 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
 
         {/* Hidden Modules Panel */}
         {layout.isEditMode && allModules.some(m => !m.isVisible) && (
-          <div className="bg-white p-4 rounded-xl border border-gray-200">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">
+          <div className="bg-gray-50/95 backdrop-blur-xl p-6 rounded-3xl border border-gray-100/60 shadow-lg"
+            style={{
+              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
+            }}
+          >
+            <h3 className="text-sm font-semibold text-gray-700 mb-4">
               Skryté moduly (klikněte pro zobrazení)
             </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
               {allModules
                 .filter(m => !m.isVisible)
                 .map((module) => (
                   <button
                     key={module.id}
                     onClick={() => toggleModuleVisibility(module.id)}
-                    className="flex items-center space-x-2 px-3 py-2 bg-white border border-gray-200 rounded-lg hover:border-primary-400 shadow-2xl hover:bg-primary-50 transition-colors"
+                    className="flex items-center space-x-2 px-4 py-3 bg-white/90 backdrop-blur-xl border border-white/60 rounded-2xl hover:scale-105 hover:shadow-lg transition-all duration-300"
+                    style={{
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+                    }}
                     title="Klikněte pro zobrazení modulu"
                   >
                     <EyeOff className="w-4 h-4 text-gray-400" />
@@ -751,12 +787,12 @@ function DraggableModule({
   return (
     <div
       ref={dragRef}
-      className={`absolute group select-none rounded-xl ${
+      className={`absolute group select-none rounded-3xl ${
         isDragging || isResizing
           ? 'z-50 scale-105 cursor-grabbing'
           : isEditMode && !module.isLocked
-          ? 'z-10 hover:z-20 cursor-grab hover:scale-[1.01] transition-all duration-300 ease-out'
-          : 'z-10 hover:scale-[1.01] transition-all duration-300 ease-out'
+          ? 'z-10 hover:z-20 cursor-grab hover:scale-[1.03] transition-all duration-500 ease-out'
+          : 'z-10 hover:scale-[1.03] transition-all duration-500 ease-out'
       } ${isHidden && isEditMode ? 'opacity-40' : ''}`}
       style={{
         left: position.x,
@@ -770,24 +806,49 @@ function DraggableModule({
       onMouseEnter={() => !isDragging && !isResizing && setIsHovered(true)}
       onMouseLeave={() => !isDragging && !isResizing && setIsHovered(false)}
     >
-      <div className={`relative w-full h-full rounded-xl overflow-hidden bg-white border transition-all shadow-sm hover:shadow-xl ${
-        isDragging
-          ? 'border-primary-400 shadow-2xl'
-          : module.isLocked
-          ? 'border-gray-200'
-          : isEditMode
-          ? 'border-primary-100'
-          : 'border-gray-100 hover:border-primary-200'
-      }`}>
+      <div
+        className={`relative w-full h-full rounded-3xl overflow-hidden backdrop-blur-xl transition-all duration-500 ease-out ${
+          isDragging
+            ? 'border-primary-400'
+            : module.isLocked
+            ? 'border-gray-200'
+            : isEditMode
+            ? 'border-primary-100'
+            : 'border-white/60'
+        }`}
+        style={{
+          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%)',
+          border: '1px solid rgba(255, 255, 255, 0.6)',
+          boxShadow: isDragging || isResizing
+            ? '0 2px 4px rgba(0, 0, 0, 0.03), 0 8px 16px rgba(0, 0, 0, 0.06), 0 20px 40px rgba(0, 0, 0, 0.08), 0 40px 80px rgba(248, 187, 217, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.9)'
+            : isHovered
+            ? '0 2px 4px rgba(0, 0, 0, 0.03), 0 8px 16px rgba(0, 0, 0, 0.06), 0 20px 40px rgba(0, 0, 0, 0.08), 0 40px 80px rgba(248, 187, 217, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.9)'
+            : '0 1px 2px rgba(0, 0, 0, 0.02), 0 4px 8px rgba(0, 0, 0, 0.04), 0 12px 24px rgba(0, 0, 0, 0.06), 0 24px 48px rgba(248, 187, 217, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+        }}
+      >
+        {/* Shimmer effect on hover - iOS style */}
+        {isHovered && !isDragging && !isResizing && (
+          <div
+            className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl"
+            style={{
+              background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent)',
+              animation: 'shimmer 0.6s ease-in-out'
+            }}
+          />
+        )}
+
         {/* Edit Mode Controls */}
         {isEditMode && (
-          <div className="absolute top-2 right-2 z-10 flex space-x-1">
+          <div className="absolute top-3 right-3 z-10 flex space-x-2">
             <button
               onClick={(e) => {
                 e.stopPropagation()
                 onToggleVisibility(module.id)
               }}
-              className="p-1 bg-white rounded shadow-md hover:bg-gray-50 transition-colors"
+              className="p-2 bg-white/90 backdrop-blur-xl rounded-xl shadow-lg hover:bg-white hover:scale-110 transition-all duration-300 border border-white/60"
+              style={{
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+              }}
               title={module.isVisible ? 'Skrýt modul' : 'Zobrazit modul'}
             >
               {module.isVisible ? (
@@ -801,7 +862,10 @@ function DraggableModule({
                 e.stopPropagation()
                 onToggleLock(module.id)
               }}
-              className="p-1 bg-white rounded shadow-md hover:bg-gray-50 transition-colors"
+              className="p-2 bg-white/90 backdrop-blur-xl rounded-xl shadow-lg hover:bg-white hover:scale-110 transition-all duration-300 border border-white/60"
+              style={{
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+              }}
               title={module.isLocked ? 'Odemknout modul' : 'Zamknout modul'}
             >
               {module.isLocked ? (
@@ -816,7 +880,10 @@ function DraggableModule({
         {/* Drag Handle */}
         {isEditMode && !module.isLocked && (
           <div
-            className="absolute top-2 left-2 z-10 p-1 bg-white rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+            className="absolute top-3 left-3 z-10 p-2 bg-white/90 backdrop-blur-xl rounded-xl shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none border border-white/60"
+            style={{
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+            }}
             title="Přetáhnout modul"
           >
             <GripVertical className="w-4 h-4 text-gray-600" />
@@ -840,8 +907,12 @@ function DraggableModule({
 
         {/* Locked Overlay */}
         {module.isLocked && isEditMode && (
-          <div className="absolute inset-0 bg-gray-100 bg-opacity-50 flex items-center justify-center rounded-lg">
-            <div className="bg-white p-2 rounded-lg shadow-md">
+          <div className="absolute inset-0 bg-gray-100 bg-opacity-50 flex items-center justify-center rounded-3xl backdrop-blur-sm">
+            <div className="bg-white/90 backdrop-blur-xl p-3 rounded-2xl shadow-lg border border-white/60"
+              style={{
+                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+              }}
+            >
               <Lock className="w-6 h-6 text-gray-500" />
             </div>
           </div>
@@ -851,7 +922,10 @@ function DraggableModule({
         {isEditMode && !module.isLocked && (
           <div
             onMouseDown={handleResizeStart}
-            className="absolute bottom-1 right-1 w-7 h-7 cursor-nwse-resize opacity-0 group-hover:opacity-100 transition-opacity z-20 flex items-center justify-center bg-white rounded shadow-md hover:bg-primary-50 hover:border hover:border-primary-400 shadow-2xl"
+            className="absolute bottom-2 right-2 w-8 h-8 cursor-nwse-resize opacity-0 group-hover:opacity-100 transition-all duration-300 z-20 flex items-center justify-center bg-white/90 backdrop-blur-xl rounded-xl shadow-lg hover:bg-white hover:scale-110 border border-white/60"
+            style={{
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+            }}
             title="Změnit velikost modulu - klikněte a táhněte pro zvětšení nebo zmenšení"
           >
             <Maximize className="w-4 h-4 text-gray-600" />

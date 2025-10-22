@@ -8,21 +8,19 @@ import TaskList from '@/components/tasks/TaskList'
 import TaskStats from '@/components/tasks/TaskStats'
 import TaskForm from '@/components/tasks/TaskForm'
 import TaskDebug from '@/components/debug/TaskDebug'
+import ModuleHeader from '@/components/common/ModuleHeader'
+import Link from 'next/link'
 
 import { TaskFormData, Task } from '@/types/task'
 import {
   Plus,
   Download,
-  Upload,
-  Settings,
-  BarChart3,
+  CheckSquare,
   List,
-  Grid3X3,
-  Filter,
-  ArrowLeft,
-  Home
+  Home,
+  BarChart3,
+  Filter
 } from 'lucide-react'
-import Link from 'next/link'
 
 export default function TasksPage() {
   const { user } = useAuth()
@@ -128,86 +126,21 @@ export default function TasksPage() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        {/* Breadcrumb - Hidden on mobile */}
-        <div className="hidden sm:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center space-x-2 py-2 text-sm text-gray-500">
-            <Link href="/" className="hover:text-gray-700 transition-colors">
-              Dashboard
-            </Link>
-            <span>/</span>
-            <span className="text-gray-900 font-medium">Úkoly</span>
-          </div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Mobile header */}
-          <div className="sm:hidden space-y-4 py-4">
-            {/* Top row - Back button and title */}
-            <div className="flex items-center space-x-3">
-              <Link
-                href="/"
-                className="flex items-center justify-center w-8 h-8 text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Link>
-              <div>
-                <h1 className="text-lg font-bold text-gray-900">Úkoly</h1>
-              </div>
-            </div>
-
-            {/* Main action button - prominent placement */}
-            <div className="flex justify-center">
-              <button
-                onClick={() => setShowTaskForm(true)}
-                className="btn-primary flex items-center space-x-2 px-6 py-3 text-base font-medium"
-              >
-                <Plus className="w-5 h-5" />
-                <span>Nový úkol</span>
-              </button>
-            </div>
-
-            {/* Stats view indicator */}
-            <div className="flex items-center justify-center">
-              <div className="flex items-center bg-primary-100 rounded-lg px-3 py-2">
-                <BarChart3 className="w-4 h-4 text-primary-600 mr-2" />
-                <span className="text-sm font-medium text-primary-700">Statistiky a přehled</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Desktop header */}
-          <div className="hidden sm:flex items-center justify-between h-16">
-            {/* Back button and Title */}
-            <div className="flex items-center space-x-4">
-              <Link
-                href="/"
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-                <span>Zpět na dashboard</span>
-              </Link>
-              <div className="border-l border-gray-300 pl-4">
-                <h1 className="text-2xl font-bold text-gray-900">Úkoly</h1>
-                <p className="text-sm text-text-muted">
-                  Plánování svatby {wedding.brideName} & {wedding.groomName}
-                </p>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center space-x-3">
-              <button
-                onClick={() => setShowTaskForm(true)}
-                className="btn-primary flex items-center space-x-2"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Nový úkol</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <ModuleHeader
+        icon={CheckSquare}
+        title="Úkoly"
+        subtitle={`${stats.total} úkolů • ${stats.completed} dokončeno`}
+        iconGradient="from-blue-500 to-indigo-500"
+        actions={
+          <button
+            onClick={() => setShowTaskForm(true)}
+            className="btn-primary flex items-center space-x-2"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Nový úkol</span>
+          </button>
+        }
+      />
 
       {/* Main content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

@@ -20,18 +20,12 @@ export default function MoodboardModule() {
 
   return (
     <div className="wedding-card h-full">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-2">
-          <Heart className="w-5 h-5 text-pink-600" />
-          <h3 className="text-lg font-semibold text-gray-900">Moodboard</h3>
-        </div>
-        <Link
-          href="/moodboard"
-          className="text-pink-600 hover:text-pink-700 transition-colors"
-        >
-          <ArrowRight className="w-4 h-4" />
-        </Link>
-      </div>
+      <Link href="/moodboard" className="block mb-4">
+        <h3 className="text-lg font-semibold flex items-center justify-center space-x-2 hover:text-primary-600 transition-colors">
+          <Palette className="w-5 h-5 text-pink-600" />
+          <span>Moodboard</span>
+        </h3>
+      </Link>
 
       {isLoading ? (
         <div className="flex items-center justify-center h-32">
@@ -46,11 +40,10 @@ export default function MoodboardModule() {
           </p>
           <Link
             href="/moodboard"
-            className="btn-primary inline-flex items-center space-x-2"
+            className="btn-primary inline-flex items-center justify-center space-x-2"
           >
             <Palette className="w-4 h-4" />
             <span>Spravovat moodboard</span>
-            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       ) : (

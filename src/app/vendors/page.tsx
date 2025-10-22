@@ -6,10 +6,10 @@ import { useVendor } from '@/hooks/useVendor'
 import { Vendor, VendorFormData } from '@/types/vendor'
 import VendorStats from '@/components/vendors/VendorStats'
 import VendorForm from '@/components/vendor/VendorForm'
+import ModuleHeader from '@/components/common/ModuleHeader'
 
 import {
-  Building,
-  ArrowLeft,
+  Briefcase,
   AlertCircle,
   Plus
 } from 'lucide-react'
@@ -133,82 +133,21 @@ export default function VendorsPage() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        {/* Breadcrumb - Hidden on mobile */}
-        <div className="hidden sm:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center space-x-2 py-2 text-sm text-gray-500">
-            <Link href="/" className="hover:text-gray-700 transition-colors">
-              Dashboard
-            </Link>
-            <span>/</span>
-            <span className="text-gray-900 font-medium">Dodavatelé</span>
-          </div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Mobile header */}
-          <div className="sm:hidden space-y-4 py-4">
-            {/* Top row - Back button and title */}
-            <div className="flex items-center space-x-3">
-              <Link
-                href="/"
-                className="flex items-center justify-center w-8 h-8 text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Link>
-              <div>
-                <h1 className="text-lg font-bold text-gray-900">Dodavatelé</h1>
-              </div>
-            </div>
-
-            {/* Main action button - prominent placement */}
-            <div className="flex justify-center">
-              <button
-                onClick={handleAddVendor}
-                className="btn-primary flex items-center space-x-2 px-6 py-3 text-base font-medium"
-              >
-                <Plus className="w-5 h-5" />
-                <span>Přidat dodavatele</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Desktop header */}
-          <div className="hidden sm:flex items-center justify-between py-6">
-            <div className="flex items-center space-x-4">
-              <Link
-                href="/"
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
-              </Link>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
-                  <Building className="w-6 h-6 text-primary-600" />
-                  <span>Správa dodavatelů</span>
-                </h1>
-                <p className="text-sm text-text-muted">
-                  Spravujte všechny dodavatele pro vaši svatbu
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <div className="text-right">
-                <div className="text-2xl font-bold text-primary-600">{vendors.length}</div>
-                <div className="text-sm text-gray-600">Dodavatelů</div>
-              </div>
-              <button
-                onClick={handleAddVendor}
-                className="btn-primary flex items-center space-x-2"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Přidat dodavatele</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <ModuleHeader
+        icon={Briefcase}
+        title="Dodavatelé"
+        subtitle={`${vendors.length} dodavatelů • ${stats.byStatus.contracted || 0} potvrzeno`}
+        iconGradient="from-orange-500 to-amber-500"
+        actions={
+          <button
+            onClick={handleAddVendor}
+            className="btn-primary flex items-center space-x-2"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Přidat dodavatele</span>
+          </button>
+        }
+      />
 
       {/* Main Content */}
       <main className="container-desktop py-8">

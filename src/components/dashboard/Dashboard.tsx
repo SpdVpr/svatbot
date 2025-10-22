@@ -133,12 +133,12 @@ function DashboardContent() {
 
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'rgb(253, 242, 248)' }}>
       {/* Scroll Progress Indicator */}
       <ScrollProgress />
 
       {/* Glassmorphism Header */}
-      <header className="bg-white/80 backdrop-blur-xl border-b border-white/20 shadow-sm sticky top-0 z-50">
+      <header className="bg-gray-50/95 backdrop-blur-xl border-b border-gray-100/50 shadow-sm sticky top-0 z-50">
         {/* Mobile Header */}
         <div className="sm:hidden">
           <div className="mobile-header">

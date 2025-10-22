@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { CheckCircle, Camera, Music, Flower, MapPin } from 'lucide-react'
+import { CheckCircle, Camera, Music, Flower, MapPin, Clock, ArrowRight } from 'lucide-react'
 import { useTask } from '@/hooks/useTask'
 import { dateUtils } from '@/utils'
 
@@ -30,15 +30,15 @@ export default function UpcomingTasksModule() {
   }
 
   return (
-    <div className="wedding-card">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold">Nadcházející úkoly</h2>
-        <Link href="/tasks" className="text-sm text-primary-600 hover:underline">
-          Zobrazit všechny
-        </Link>
-      </div>
+    <div className="wedding-card h-full flex flex-col">
+      <Link href="/tasks" className="block mb-6">
+        <h3 className="text-lg font-semibold flex items-center justify-center space-x-2 hover:text-primary-600 transition-colors">
+          <Clock className="w-5 h-5 text-blue-600" />
+          <span>Nadcházející úkoly</span>
+        </h3>
+      </Link>
 
-      <div className="space-y-4">
+      <div className="flex-1 overflow-y-auto space-y-4">
         {upcomingTasks.length > 0 ? (
           upcomingTasks.map((task) => {
             const TaskIcon = getTaskIcon(task.category)
@@ -85,9 +85,11 @@ export default function UpcomingTasksModule() {
       </div>
 
       {upcomingTasks.length > 0 && (
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <Link href="/tasks" className="btn-primary w-full block text-center">
-            Spravovat úkoly
+        <div className="mt-4 pt-4 border-t border-gray-200">
+          <Link href="/tasks" className="btn-primary w-full flex items-center justify-center space-x-2">
+            <Clock className="w-4 h-4" />
+            <span>Spravovat úkoly</span>
+            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       )}

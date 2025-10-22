@@ -6,6 +6,7 @@ import { useWedding } from '@/hooks/useWedding'
 import { useCalendar } from '@/hooks/useCalendar'
 import CalendarView from '@/components/calendar/CalendarView'
 import EventDetailModal from '@/components/calendar/EventDetailModal'
+import ModuleHeader from '@/components/common/ModuleHeader'
 import { generateICalendar, downloadICalFile, generateCSV, downloadCSVFile, openInGoogleCalendar } from '@/lib/calendarExport'
 import { AggregatedEvent, CalendarEvent } from '@/types/calendar'
 import {
@@ -14,8 +15,6 @@ import {
   Plus,
   List,
   Grid,
-  ArrowLeft,
-  Home,
   Clock,
   CheckCircle,
   AlertCircle,
@@ -159,92 +158,75 @@ export default function CalendarPage() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link
-                href="/"
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                aria-label="Zpět na dashboard"
+      <ModuleHeader
+        icon={Calendar}
+        title="Kalendář"
+        subtitle={`${stats.totalEvents} událostí • ${stats.upcomingEvents} nadcházejících`}
+        iconGradient="from-purple-500 to-violet-500"
+        actions={
+          <div className="flex items-center space-x-3">
+            {/* View Toggle */}
+            <div className="flex items-center bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setViewMode('calendar')}
+                className={`
+                  px-3 py-1.5 rounded-md text-sm font-medium transition-colors
+                  ${viewMode === 'calendar' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}
+                `}
               >
-                <Home className="w-5 h-5 text-gray-600" />
-              </Link>
-              <div>
-                <h1 className="heading-2 flex items-center space-x-2">
-                  <Calendar className="w-8 h-8 text-primary-500" />
-                  <span>Kalendář</span>
-                </h1>
-                <p className="body-small text-text-muted mt-1">
-                  Všechny události a úkoly na jednom místě
-                </p>
-              </div>
+                <Grid className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`
+                  px-3 py-1.5 rounded-md text-sm font-medium transition-colors
+                  ${viewMode === 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}
+                `}
+              >
+                <List className="w-4 h-4" />
+              </button>
             </div>
 
-            <div className="flex items-center space-x-3">
-              {/* View Toggle */}
-              <div className="flex items-center bg-gray-100 rounded-lg p-1">
-                <button
-                  onClick={() => setViewMode('calendar')}
-                  className={`
-                    px-3 py-1.5 rounded-md text-sm font-medium transition-colors
-                    ${viewMode === 'calendar' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}
-                  `}
-                >
-                  <Grid className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`
-                    px-3 py-1.5 rounded-md text-sm font-medium transition-colors
-                    ${viewMode === 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}
-                  `}
-                >
-                  <List className="w-4 h-4" />
-                </button>
-              </div>
+            {/* Export Menu */}
+            <div className="relative">
+              <button
+                onClick={() => setShowExportMenu(!showExportMenu)}
+                className="btn-secondary flex items-center space-x-2"
+              >
+                <Download className="w-4 h-4" />
+                <span>Export</span>
+              </button>
 
-              {/* Export Menu */}
-              <div className="relative">
-                <button
-                  onClick={() => setShowExportMenu(!showExportMenu)}
-                  className="btn-secondary flex items-center space-x-2"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Export</span>
-                </button>
-
-                {showExportMenu && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
-                    <button
-                      onClick={handleExportICalendar}
-                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
-                    >
-                      <Download className="w-4 h-4" />
-                      <span>iCalendar (.ics)</span>
-                    </button>
-                    <button
-                      onClick={handleExportCSV}
-                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
-                    >
-                      <Download className="w-4 h-4" />
-                      <span>CSV</span>
-                    </button>
-                    <button
-                      onClick={handleExportGoogleCalendar}
-                      disabled={!selectedEvent}
-                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <Calendar className="w-4 h-4" />
-                      <span>Google Calendar</span>
-                    </button>
-                  </div>
-                )}
-              </div>
+              {showExportMenu && (
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+                  <button
+                    onClick={handleExportICalendar}
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>iCalendar (.ics)</span>
+                  </button>
+                  <button
+                    onClick={handleExportCSV}
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>CSV</span>
+                  </button>
+                  <button
+                    onClick={handleExportGoogleCalendar}
+                    disabled={!selectedEvent}
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    <span>Google Calendar</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
-        </div>
-      </header>
+        }
+      />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

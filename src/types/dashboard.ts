@@ -173,6 +173,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     title: 'Nadcházející úkoly',
     size: 'medium',
     position: { x: 840, y: 2000 },
+    customSize: { width: 360, height: 940 }, // 2 moduly vysoké (stejně jako wedding-checklist)
     gridPosition: { row: 4, column: 2 },
     isVisible: true,
     isLocked: false,
