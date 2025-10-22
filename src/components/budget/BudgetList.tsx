@@ -307,10 +307,13 @@ export default function BudgetList({
                   </label>
                   <select
                     value={filters.category?.[0] || ''}
-                    onChange={(e) => setFilters(prev => ({
-                      ...prev,
-                      category: e.target.value ? [e.target.value as any] : undefined
-                    }))}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      setFilters(prev => ({
+                        ...prev,
+                        category: value && value !== '' ? [value as any] : undefined
+                      }))
+                    }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                   >
                     <option value="">Všechny kategorie</option>
@@ -329,10 +332,13 @@ export default function BudgetList({
                   </label>
                   <select
                     value={filters.paymentStatus?.[0] || ''}
-                    onChange={(e) => setFilters(prev => ({
-                      ...prev,
-                      paymentStatus: e.target.value ? [e.target.value as any] : undefined
-                    }))}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      setFilters(prev => ({
+                        ...prev,
+                        paymentStatus: value && value !== '' ? [value as any] : undefined
+                      }))
+                    }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                   >
                     <option value="">Všechny stavy</option>
@@ -351,10 +357,13 @@ export default function BudgetList({
                   </label>
                   <select
                     value={filters.priority?.[0] || ''}
-                    onChange={(e) => setFilters(prev => ({
-                      ...prev,
-                      priority: e.target.value ? [e.target.value as any] : undefined
-                    }))}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      setFilters(prev => ({
+                        ...prev,
+                        priority: value && value !== '' ? [value as any] : undefined
+                      }))
+                    }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                   >
                     <option value="">Všechny priority</option>

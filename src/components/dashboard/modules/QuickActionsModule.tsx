@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Zap, Plus, Users, DollarSign, Search, ListChecks } from 'lucide-react'
+import { Zap, Plus, Users, DollarSign, ListChecks } from 'lucide-react'
 
 export default function QuickActionsModule() {
   const quickActions = [
@@ -32,13 +32,6 @@ export default function QuickActionsModule() {
       description: 'Nová položka rozpočtu',
       href: '/budget',
       color: 'text-white bg-green-600 hover:bg-green-500'
-    },
-    {
-      icon: Search,
-      title: 'Najít dodavatele',
-      description: 'Procházet marketplace',
-      href: '/marketplace',
-      color: 'text-white bg-purple-600 hover:bg-purple-500'
     }
   ]
 

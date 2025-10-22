@@ -249,49 +249,6 @@ export default function TaskStats({
         </div>
       )}
 
-      {/* Quick insights */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Today's tasks */}
-        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-          <div className="flex items-center space-x-2 mb-2">
-            <Calendar className="w-5 h-5 text-blue-600" />
-            <h4 className="font-medium text-blue-900">Dnes</h4>
-          </div>
-          <p className="text-2xl font-bold text-blue-600">{todayTasks.length}</p>
-          <p className="text-sm text-blue-700">
-            {todayTasks.filter(t => t.status === 'completed').length} z {todayTasks.length} dokončeno
-          </p>
-        </div>
-
-        {/* This week's tasks */}
-        <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-          <div className="flex items-center space-x-2 mb-2">
-            <Clock className="w-5 h-5 text-green-600" />
-            <h4 className="font-medium text-green-900">Tento týden</h4>
-          </div>
-          <p className="text-2xl font-bold text-green-600">{thisWeekTasks.length}</p>
-          <p className="text-sm text-green-700">
-            {thisWeekTasks.filter(t => t.status === 'completed').length} z {thisWeekTasks.length} dokončeno
-          </p>
-        </div>
-
-        {/* Productivity tip */}
-        <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-          <div className="flex items-center space-x-2 mb-2">
-            <TrendingUp className="w-5 h-5 text-purple-600" />
-            <h4 className="font-medium text-purple-900">Tip</h4>
-          </div>
-          <p className="text-sm text-purple-700">
-            {stats.completionRate >= 80 
-              ? 'Skvělá práce! Udržujte tempo.'
-              : stats.overdue > 0
-              ? 'Zaměřte se na prošlé úkoly.'
-              : 'Dokončete dnes alespoň 1 úkol.'
-            }
-          </p>
-        </div>
-      </div>
-
       {/* Task List */}
       {showTaskList && (
         <div className="mt-8">
