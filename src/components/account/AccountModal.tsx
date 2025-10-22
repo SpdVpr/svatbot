@@ -19,7 +19,8 @@ import {
   Crown,
   AlertCircle,
   CheckCircle,
-  Clock
+  Clock,
+  ChevronDown
 } from 'lucide-react'
 import ProfileTab from './ProfileTab'
 import SubscriptionTab from './SubscriptionTab'
@@ -39,6 +40,7 @@ export default function AccountModal({ onClose }: AccountModalProps) {
   const subscriptionData = useSubscription()
   const { subscription, hasPremiumAccess, trialDaysRemaining } = subscriptionData
   const [activeTab, setActiveTab] = useState<TabType>('profile')
+  const [showMobileMenu, setShowMobileMenu] = useState(false)
 
   const tabs = [
     { id: 'profile' as TabType, label: 'Profil', icon: User },
@@ -47,6 +49,8 @@ export default function AccountModal({ onClose }: AccountModalProps) {
     { id: 'statistics' as TabType, label: 'Statistiky', icon: BarChart3 },
     { id: 'settings' as TabType, label: 'Nastavení', icon: Settings }
   ]
+
+  const activeTabData = tabs.find(tab => tab.id === activeTab)!
 
   const handleLogout = async () => {
     await logout()
@@ -135,21 +139,60 @@ export default function AccountModal({ onClose }: AccountModalProps) {
           </div>
         )}
 
-        {/* Tabs */}
-        <div className="flex border-b border-gray-200 px-3 sm:px-6 overflow-x-auto scrollbar-hide">
+        {/* Mobile Dropdown Menu */}
+        <div className="sm:hidden border-b border-gray-200 px-3 py-2 relative">
+          <button
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+            className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <div className="flex items-center space-x-2">
+              <activeTabData.icon className="w-5 h-5 text-primary-600" />
+              <span className="font-medium text-gray-900">{activeTabData.label}</span>
+            </div>
+            <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${showMobileMenu ? 'rotate-180' : ''}`} />
+          </button>
+
+          {showMobileMenu && (
+            <div className="absolute left-3 right-3 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-hidden">
+              {tabs.map(tab => {
+                const Icon = tab.icon
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      setActiveTab(tab.id)
+                      setShowMobileMenu(false)
+                    }}
+                    className={`w-full flex items-center space-x-3 px-4 py-3 transition-colors ${
+                      activeTab === tab.id
+                        ? 'bg-primary-50 text-primary-600'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    <Icon className="w-5 h-5 flex-shrink-0" />
+                    <span className="font-medium">{tab.label}</span>
+                  </button>
+                )
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Desktop Tabs */}
+        <div className="hidden sm:flex border-b border-gray-200 px-6 overflow-x-auto scrollbar-hide">
           {tabs.map(tab => {
             const Icon = tab.icon
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-2 sm:py-3 border-b-2 transition-colors whitespace-nowrap text-xs sm:text-base ${
+                className={`flex items-center space-x-2 px-4 py-3 border-b-2 transition-colors whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'border-primary-600 text-primary-600'
                     : 'border-transparent text-gray-600 hover:text-gray-900'
                 }`}
               >
-                <Icon className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                <Icon className="w-4 h-4 flex-shrink-0" />
                 <span className="font-medium">{tab.label}</span>
               </button>
             )

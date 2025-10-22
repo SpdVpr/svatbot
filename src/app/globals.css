@@ -194,7 +194,8 @@
 
   /* Button variants - iOS 2025 inspired */
   .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-500 text-white font-button font-medium px-6 py-3 rounded-2xl transition-all duration-300 active:scale-95;
+    @apply bg-primary-600 hover:bg-primary-500 text-white font-button font-medium rounded-2xl transition-all duration-300 active:scale-95;
+    @apply px-2 py-2 sm:px-6 sm:py-3;
     box-shadow:
       0 2px 8px rgba(251, 113, 133, 0.25),
       0 4px 16px rgba(251, 113, 133, 0.15),
@@ -207,6 +208,14 @@
       0 8px 24px rgba(251, 113, 133, 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.3);
     transform: translateY(-2px);
+  }
+
+  /* Hide button text on mobile, show only icons */
+  @media (max-width: 640px) {
+    .btn-primary span,
+    .btn-outline span {
+      @apply hidden;
+    }
   }
 
   .btn-secondary {
@@ -224,7 +233,8 @@
   }
 
   .btn-outline {
-    @apply text-primary-600 hover:bg-primary-50 font-button font-medium px-6 py-3 rounded-2xl transition-all duration-300 backdrop-blur-xl;
+    @apply text-primary-600 hover:bg-primary-50 font-button font-medium rounded-2xl transition-all duration-300 backdrop-blur-xl;
+    @apply px-2 py-2 sm:px-6 sm:py-3;
     background: rgba(255, 255, 255, 0.9);
     border: 1px solid rgba(251, 113, 133, 0.3);
     box-shadow:

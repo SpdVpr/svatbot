@@ -175,8 +175,8 @@ export default function AIAssistant({
       {/* AI Assistant Panel */}
       {isOpen && (
         <div className={`
-          ${compact 
-            ? 'fixed bottom-6 right-6 z-40 w-96 h-[600px]' 
+          ${compact
+            ? 'fixed bottom-2 right-2 left-2 sm:bottom-6 sm:right-6 sm:left-auto z-40 sm:w-96 h-[85vh] sm:h-[600px]'
             : 'w-full h-full'
           }
           bg-white rounded-lg shadow-xl border border-gray-200 flex flex-col
@@ -184,21 +184,21 @@ export default function AIAssistant({
           ${className}
         `}>
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-primary-50 to-pink-50">
-            <div className="flex items-center space-x-3">
-              <div className="relative">
-                <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-pink-500 rounded-full flex items-center justify-center">
-                  <span className="text-xl">🤖</span>
+          <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 bg-gradient-to-r from-primary-50 to-pink-50">
+            <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+              <div className="relative flex-shrink-0">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-primary-500 to-pink-500 rounded-full flex items-center justify-center">
+                  <span className="text-lg sm:text-xl">🤖</span>
                 </div>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse" />
+                <div className="absolute -top-1 -right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-400 rounded-full animate-pulse" />
               </div>
-              <div>
-                <h3 className="font-bold text-gray-900">{svatbot.name}</h3>
-                <p className="text-xs text-gray-600">{svatbot.tagline}</p>
+              <div className="min-w-0 flex-1">
+                <h3 className="font-bold text-sm sm:text-base text-gray-900 truncate">{svatbot.name}</h3>
+                <p className="text-xs text-gray-600 truncate hidden sm:block">{svatbot.tagline}</p>
               </div>
             </div>
-            
-            <div className="flex items-center space-x-2">
+
+            <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
               {chatHistory.length > 0 && (
                 <button
                   onClick={handleClearChat}
@@ -208,12 +208,12 @@ export default function AIAssistant({
                   <RotateCcw className="w-4 h-4" />
                 </button>
               )}
-              
+
               {compact && (
                 <>
                   <button
                     onClick={toggleMinimize}
-                    className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="p-1 text-gray-400 hover:text-gray-600 transition-colors hidden sm:block"
                     title={isMinimized ? "Maximalizovat" : "Minimalizovat"}
                   >
                     {isMinimized ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
@@ -233,20 +233,20 @@ export default function AIAssistant({
           {!isMinimized && (
             <>
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
                 {chatHistory.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Sparkles className="w-12 h-12 text-primary-300 mx-auto mb-4" />
-                    <h4 className="font-medium text-gray-900 mb-2">Vítejte u AI asistenta!</h4>
-                    <p className="text-sm text-gray-500 mb-6">
+                  <div className="text-center py-4 sm:py-8">
+                    <Sparkles className="w-10 h-10 sm:w-12 sm:h-12 text-primary-300 mx-auto mb-3 sm:mb-4" />
+                    <h4 className="font-medium text-sm sm:text-base text-gray-900 mb-2">Vítejte u AI asistenta!</h4>
+                    <p className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6 px-4">
                       Zeptejte se mě na cokoliv ohledně plánování vaší svatby
                     </p>
-                    
+
                     {/* Quick Suggestions */}
                     {loadingSuggestions ? (
                       <div className="flex items-center justify-center">
                         <Loader2 className="w-4 h-4 animate-spin text-primary-500" />
-                        <span className="ml-2 text-sm text-gray-500">Načítám návrhy...</span>
+                        <span className="ml-2 text-xs sm:text-sm text-gray-500">Načítám návrhy...</span>
                       </div>
                     ) : (
                       <div className="space-y-2">
@@ -258,7 +258,7 @@ export default function AIAssistant({
                           <button
                             key={index}
                             onClick={() => handleSuggestionClick(suggestion)}
-                            className="block w-full text-left p-3 text-sm bg-gray-50 hover:bg-primary-50 rounded-lg transition-colors border border-transparent hover:border-primary-200"
+                            className="block w-full text-left p-2 sm:p-3 text-xs sm:text-sm bg-gray-50 hover:bg-primary-50 rounded-lg transition-colors border border-transparent hover:border-primary-200"
                           >
                             {suggestion}
                           </button>
@@ -274,25 +274,25 @@ export default function AIAssistant({
                         className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
                         <div className={`
-                          max-w-[80%] space-y-2
+                          max-w-[85%] sm:max-w-[80%] space-y-2
                         `}>
                           <div className={`
-                            p-3 rounded-lg
+                            p-2 sm:p-3 rounded-lg
                             ${msg.role === 'user'
                               ? 'bg-primary-500 text-white'
                               : 'bg-gray-100 text-gray-900'
                             }
                           `}>
                             {msg.role === 'user' ? (
-                              <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                              <p className="text-xs sm:text-sm whitespace-pre-wrap">{msg.content}</p>
                             ) : (
-                              <div className="text-sm prose prose-sm max-w-none
-                                prose-headings:text-gray-900 prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2
-                                prose-h3:text-base prose-h3:flex prose-h3:items-center prose-h3:gap-2
-                                prose-p:text-gray-700 prose-p:my-2
+                              <div className="text-xs sm:text-sm prose prose-sm max-w-none
+                                prose-headings:text-gray-900 prose-headings:font-semibold prose-headings:mt-3 prose-headings:mb-1.5
+                                prose-h3:text-sm prose-h3:flex prose-h3:items-center prose-h3:gap-2
+                                prose-p:text-gray-700 prose-p:my-1.5
                                 prose-strong:text-gray-900 prose-strong:font-semibold
-                                prose-ul:my-2 prose-ul:list-none prose-ul:pl-0
-                                prose-li:text-gray-700 prose-li:my-1 prose-li:pl-0
+                                prose-ul:my-1.5 prose-ul:list-none prose-ul:pl-0
+                                prose-li:text-gray-700 prose-li:my-0.5 prose-li:pl-0
                                 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline
                               ">
                                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -300,7 +300,7 @@ export default function AIAssistant({
                                 </ReactMarkdown>
                               </div>
                             )}
-                            <div className="flex items-center justify-between mt-2">
+                            <div className="flex items-center justify-between mt-1.5 sm:mt-2">
                               <p className={`text-xs ${
                                 msg.role === 'user' ? 'text-primary-100' : 'text-gray-500'
                               }`}>
@@ -317,7 +317,7 @@ export default function AIAssistant({
 
                           {/* Show sources for assistant messages */}
                           {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
-                            <div className="ml-2">
+                            <div className="ml-1 sm:ml-2">
                               <AISourcesList
                                 sources={msg.sources}
                                 compact={true}
@@ -352,7 +352,7 @@ export default function AIAssistant({
               )}
 
               {/* Input */}
-              <div className="p-4 border-t border-gray-200">
+              <div className="p-3 sm:p-4 border-t border-gray-200">
                 <div className="flex space-x-2">
                   <input
                     ref={inputRef}
@@ -360,14 +360,14 @@ export default function AIAssistant({
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder="Zeptejte se na cokoliv o svatbě..."
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                    placeholder="Zeptejte se..."
+                    className="flex-1 px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-xs sm:text-sm"
                     disabled={loading}
                   />
                   <button
                     onClick={() => handleSendMessage()}
                     disabled={!message.trim() || loading}
-                    className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="px-3 sm:px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0"
                   >
                     {loading ? (
                       <Loader2 className="w-4 h-4 animate-spin" />

@@ -38,17 +38,17 @@ export default function ModuleHeader({
   return (
     <>
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="container-desktop py-4">
-          <div className="flex items-center justify-between">
+        <div className="container-desktop py-2 sm:py-4">
+          <div className="flex items-center justify-between gap-2 sm:gap-4">
             {/* Left side - Navigation and Title */}
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center gap-1 sm:gap-3 min-w-0 flex-1">
               {/* Mobile Menu button (visible only on mobile) */}
               <button
                 onClick={() => setShowMobileMenu(true)}
-                className="sm:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors group flex-shrink-0"
+                className="sm:hidden p-1.5 hover:bg-gray-100 rounded-lg transition-colors group flex-shrink-0"
                 title="Menu"
               >
-                <Menu className="w-5 h-5 text-gray-600 group-hover:text-gray-900" />
+                <Menu className="w-4 h-4 text-gray-600 group-hover:text-gray-900" />
               </button>
 
               {/* Back button (visible only on desktop) */}
@@ -63,43 +63,43 @@ export default function ModuleHeader({
               {/* Home icon */}
               <Link
                 href="/"
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+                className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
                 title="Dashboard"
               >
-                <Home className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+                <Home className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400 hover:text-gray-600" />
               </Link>
 
-            {/* Module icon in square */}
-            <div
-              className={`w-12 h-12 ${
-                iconGradient ? `bg-gradient-to-br ${iconGradient}` : 'bg-gray-100'
-              } rounded-lg flex items-center justify-center flex-shrink-0`}
-            >
-              <Icon className={`w-6 h-6 ${iconColor || 'text-white'}`} />
+              {/* Module icon in square */}
+              <div
+                className={`w-8 h-8 sm:w-12 sm:h-12 ${
+                  iconGradient ? `bg-gradient-to-br ${iconGradient}` : 'bg-gray-100'
+                } rounded-lg flex items-center justify-center flex-shrink-0`}
+              >
+                <Icon className={`w-4 h-4 sm:w-6 sm:h-6 ${iconColor || 'text-white'}`} />
+              </div>
+
+              {/* Title and subtitle */}
+              <div className="min-w-0 flex-1">
+                <h1 className="text-sm sm:text-xl lg:text-2xl font-bold text-gray-900 truncate">{title}</h1>
+                <p className="text-xs sm:text-sm text-gray-600 truncate hidden sm:block">{subtitle}</p>
+              </div>
             </div>
 
-            {/* Title and subtitle */}
-            <div className="min-w-0">
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">{title}</h1>
-              <p className="text-xs sm:text-sm text-gray-600 truncate">{subtitle}</p>
+            {/* Right side - Stats and Actions */}
+            <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+              {stats && <div className="hidden lg:block">{stats}</div>}
+              {actions && <div className="flex-shrink-0">{actions}</div>}
             </div>
-          </div>
-
-          {/* Right side - Stats and Actions */}
-          <div className="flex items-center space-x-4 flex-shrink-0">
-            {stats && <div className="hidden lg:block">{stats}</div>}
-            {actions && <div>{actions}</div>}
           </div>
         </div>
       </div>
-    </div>
 
-    {/* Mobile Menu */}
-    <MobileMenu
-      isOpen={showMobileMenu}
-      onClose={() => setShowMobileMenu(false)}
-    />
-  </>
+      {/* Mobile Menu */}
+      <MobileMenu
+        isOpen={showMobileMenu}
+        onClose={() => setShowMobileMenu(false)}
+      />
+    </>
   )
 }
 
