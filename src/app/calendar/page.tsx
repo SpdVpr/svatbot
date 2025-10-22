@@ -30,12 +30,22 @@ import { cs } from 'date-fns/locale'
 export default function CalendarPage() {
   const { user } = useAuth()
   const { wedding } = useWedding()
-  const { events, stats, loading, error } = useCalendar()
-  
+  const { events, stats, loading, error, createEvent } = useCalendar()
+
   const [selectedDate, setSelectedDate] = useState<Date | undefined>()
   const [selectedEvent, setSelectedEvent] = useState<AggregatedEvent | null>(null)
   const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar')
   const [showExportMenu, setShowExportMenu] = useState(false)
+  const [showCreateEventModal, setShowCreateEventModal] = useState(false)
+  const [newEventData, setNewEventData] = useState({
+    title: '',
+    description: '',
+    type: 'other' as const,
+    startTime: '',
+    endTime: '',
+    location: '',
+    isAllDay: true
+  })
 
   if (!user) {
     return (
@@ -58,8 +68,61 @@ export default function CalendarPage() {
     setSelectedDate(date)
   }
 
+  const handleCreateEventClick = () => {
+    if (!selectedDate) {
+      alert('Nejprve vyberte datum v kalendáři')
+      return
+    }
+    setShowCreateEventModal(true)
+  }
+
   const handleEventClick = (event: AggregatedEvent) => {
     setSelectedEvent(event)
+  }
+
+  const handleCreateEvent = async () => {
+    if (!selectedDate || !newEventData.title.trim()) {
+      alert('Vyplňte prosím název události')
+      return
+    }
+
+    try {
+      await createEvent({
+        title: newEventData.title,
+        description: newEventData.description,
+        type: newEventData.type,
+        startDate: selectedDate,
+        endDate: selectedDate,
+        startTime: newEventData.isAllDay ? undefined : newEventData.startTime,
+        endTime: newEventData.isAllDay ? undefined : newEventData.endTime,
+        location: newEventData.location || undefined,
+        isAllDay: newEventData.isAllDay,
+        priority: 'medium',
+        notes: '',
+        tags: [],
+        reminders: [
+          { type: 'notification', minutesBefore: 1440 }, // 24 hodin před událostí
+          { type: 'notification', minutesBefore: 60 }    // 1 hodinu před událostí
+        ],
+        recurrence: 'none',
+        isOnline: false
+      })
+
+      // Reset form
+      setShowCreateEventModal(false)
+      setNewEventData({
+        title: '',
+        description: '',
+        type: 'other',
+        startTime: '',
+        endTime: '',
+        location: '',
+        isAllDay: true
+      })
+    } catch (error) {
+      console.error('Error creating event:', error)
+      alert('❌ Chyba při vytváření události')
+    }
   }
 
   const handleExportICalendar = () => {
@@ -242,11 +305,23 @@ export default function CalendarPage() {
 
             {/* Sidebar - Selected Date Events */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <h3 className="font-semibold text-gray-900 mb-4">
-                {selectedDate
-                  ? format(selectedDate, 'd. MMMM yyyy', { locale: cs })
-                  : 'Vyberte datum'}
-              </h3>
+              <div className="mb-4">
+                <h3 className="font-semibold text-gray-900 mb-3">
+                  {selectedDate
+                    ? format(selectedDate, 'd. MMMM yyyy', { locale: cs })
+                    : 'Vyberte datum'}
+                </h3>
+                {selectedDate && (
+                  <button
+                    onClick={handleCreateEventClick}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white text-base font-semibold rounded-lg hover:from-primary-600 hover:to-primary-700 shadow-md hover:shadow-lg transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+                    title="Vytvořit novou událost"
+                  >
+                    <Plus className="w-5 h-5" />
+                    <span>Vytvořit novou událost</span>
+                  </button>
+                )}
+              </div>
 
               {selectedDateEvents.length > 0 ? (
                 <div className="space-y-3">
@@ -344,6 +419,163 @@ export default function CalendarPage() {
             event={selectedEvent}
             onClose={() => setSelectedEvent(null)}
           />
+        )}
+
+        {/* Create Event Modal */}
+        {showCreateEventModal && selectedDate && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowCreateEventModal(false)}
+          >
+            <div
+              className="bg-white rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="sticky top-0 bg-gradient-to-r from-primary-500 to-primary-600 text-white p-6 rounded-t-xl">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h2 className="text-xl font-bold mb-1">Nová událost</h2>
+                    <p className="text-sm text-white/80">
+                      {format(selectedDate, 'd. MMMM yyyy', { locale: cs })}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowCreateEventModal(false)}
+                    className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-6 space-y-4">
+                {/* Title */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Název události *
+                  </label>
+                  <input
+                    type="text"
+                    value={newEventData.title}
+                    onChange={(e) => setNewEventData(prev => ({ ...prev, title: e.target.value }))}
+                    placeholder="např. Schůzka s fotografem"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    autoFocus
+                  />
+                </div>
+
+                {/* Type */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Typ události
+                  </label>
+                  <select
+                    value={newEventData.type}
+                    onChange={(e) => setNewEventData(prev => ({ ...prev, type: e.target.value as any }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  >
+                    <option value="other">Ostatní</option>
+                    <option value="task">Úkol</option>
+                    <option value="appointment">Schůzka</option>
+                    <option value="deadline">Termín</option>
+                    <option value="vendor-meeting">Schůzka s dodavatelem</option>
+                    <option value="venue-visit">Návštěva místa</option>
+                    <option value="tasting">Ochutnávka</option>
+                    <option value="fitting">Zkouška</option>
+                    <option value="rehearsal">Zkouška obřadu</option>
+                  </select>
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Popis
+                  </label>
+                  <textarea
+                    value={newEventData.description}
+                    onChange={(e) => setNewEventData(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder="Podrobnosti o události..."
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* All day toggle */}
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="isAllDay"
+                    checked={newEventData.isAllDay}
+                    onChange={(e) => setNewEventData(prev => ({ ...prev, isAllDay: e.target.checked }))}
+                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                  />
+                  <label htmlFor="isAllDay" className="text-sm font-medium text-gray-700">
+                    Celodenní událost
+                  </label>
+                </div>
+
+                {/* Time fields */}
+                {!newEventData.isAllDay && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Začátek
+                      </label>
+                      <input
+                        type="time"
+                        value={newEventData.startTime}
+                        onChange={(e) => setNewEventData(prev => ({ ...prev, startTime: e.target.value }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Konec
+                      </label>
+                      <input
+                        type="time"
+                        value={newEventData.endTime}
+                        onChange={(e) => setNewEventData(prev => ({ ...prev, endTime: e.target.value }))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Location */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Místo
+                  </label>
+                  <input
+                    type="text"
+                    value={newEventData.location}
+                    onChange={(e) => setNewEventData(prev => ({ ...prev, location: e.target.value }))}
+                    placeholder="např. Kavárna U Anděla"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="sticky bottom-0 bg-gray-50 px-6 py-4 rounded-b-xl border-t border-gray-200 flex items-center justify-end space-x-3">
+                <button
+                  onClick={() => setShowCreateEventModal(false)}
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                >
+                  Zrušit
+                </button>
+                <button
+                  onClick={handleCreateEvent}
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                >
+                  Vytvořit událost
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </main>
     </div>

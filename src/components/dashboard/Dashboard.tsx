@@ -27,6 +27,7 @@ import SimpleToastContainer, { showSimpleToast } from '@/components/notification
 import { useWeddingNotifications, useLiveToastNotifications } from '@/hooks/useWeddingNotifications'
 import { createDemoNotifications, createTestToast } from '@/utils/demoNotifications'
 import { useAutoNotifications } from '@/hooks/useAutoNotifications'
+import { useCalendarReminders } from '@/hooks/useCalendarReminders'
 import OnboardingWizard from '@/components/onboarding/OnboardingWizard'
 import ScrollProgress from '@/components/animations/ScrollProgress'
 import { useSearchParams } from 'next/navigation'
@@ -43,6 +44,9 @@ function DashboardContent() {
 
   // Initialize auto-notifications system
   useAutoNotifications()
+
+  // Initialize calendar reminders system
+  const { testNotifications } = useCalendarReminders()
 
   // Check for payment success/cancel in URL
   useEffect(() => {
@@ -294,6 +298,13 @@ function DashboardContent() {
                     title="Test Notifications"
                   >
                     🔔
+                  </button>
+                  <button
+                    onClick={() => testNotifications()}
+                    className="btn-outline text-xs px-2 py-1"
+                    title="Test Calendar Reminders"
+                  >
+                    📅
                   </button>
                   <button
                     onClick={handleDeleteAllNotifications}

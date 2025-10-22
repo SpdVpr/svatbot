@@ -23,10 +23,13 @@ import {
   SeatingPlan,
   Table,
   Seat,
+  ChairRow,
+  ChairSeat,
   SeatingAssignment,
   SeatingConstraint,
   SeatingStats,
   TableFormData,
+  ChairRowFormData,
   SeatingPlanFormData,
   AutoAssignmentOptions,
   AutoAssignmentResult
@@ -37,6 +40,8 @@ interface UseSeatingReturn {
   currentPlan: SeatingPlan | null
   tables: Table[]
   seats: Seat[]
+  chairRows: ChairRow[]
+  chairSeats: ChairSeat[]
   assignments: SeatingAssignment[]
   constraints: SeatingConstraint[]
   loading: boolean
@@ -55,9 +60,17 @@ interface UseSeatingReturn {
   deleteTable: (tableId: string) => Promise<void>
   moveTable: (tableId: string, position: { x: number; y: number }) => Promise<void>
 
+  // Chair row management
+  createChairRow: (data: ChairRowFormData, planId?: string) => Promise<ChairRow>
+  updateChairRow: (chairRowId: string, updates: Partial<ChairRow>) => Promise<void>
+  deleteChairRow: (chairRowId: string) => Promise<void>
+  moveChairRow: (chairRowId: string, position: { x: number; y: number }) => Promise<void>
+
   // Seat assignment
   assignGuestToSeat: (guestId: string, seatId: string) => Promise<void>
   unassignGuestFromSeat: (seatId: string) => Promise<void>
+  assignGuestToChairSeat: (guestId: string, chairSeatId: string) => Promise<void>
+  unassignGuestFromChairSeat: (chairSeatId: string) => Promise<void>
   swapGuestSeats: (seatId1: string, seatId2: string) => Promise<void>
   deleteSeat: (seatId: string) => Promise<void>
 
@@ -83,6 +96,8 @@ export function useSeating(): UseSeatingReturn {
   const [currentPlan, _setCurrentPlanState] = useState<SeatingPlan | null>(null)
   const [tables, setTables] = useState<Table[]>([])
   const [seats, setSeats] = useState<Seat[]>([])
+  const [chairRows, setChairRows] = useState<ChairRow[]>([])
+  const [chairSeats, setChairSeats] = useState<ChairSeat[]>([])
   const [assignments, setAssignments] = useState<SeatingAssignment[]>([])
   const [constraints, setConstraints] = useState<SeatingConstraint[]>([])
   const [loading, setLoading] = useState(false)
@@ -97,13 +112,6 @@ export function useSeating(): UseSeatingReturn {
     if (typeof planOrUpdater === 'function') {
       _setCurrentPlanState((prev: SeatingPlan | null) => {
         const plan = planOrUpdater(prev)
-
-        console.log('🎯 setCurrentPlanState called (callback):', {
-          from: prev?.id || 'null',
-          to: plan?.id || 'null',
-          fromName: prev?.name || 'null',
-          toName: plan?.name || 'null'
-        })
 
         // Update ref immediately to prevent race conditions
         currentPlanIdRef.current = plan?.id || null
@@ -121,13 +129,6 @@ export function useSeating(): UseSeatingReturn {
       // Handle direct value
       const plan = planOrUpdater
 
-      console.log('🎯 setCurrentPlanState called:', {
-        from: currentPlan?.id || 'null',
-        to: plan?.id || 'null',
-        fromName: currentPlan?.name || 'null',
-        toName: plan?.name || 'null'
-      })
-
       // Update ref immediately to prevent race conditions
       currentPlanIdRef.current = plan?.id || null
 
@@ -142,42 +143,25 @@ export function useSeating(): UseSeatingReturn {
     }
   }
 
-  // Update tables and seats when currentPlan changes
+  // Update tables, seats, chairRows, and chairSeats when currentPlan changes
   // Use callback form to ensure state updates are not batched incorrectly
   useEffect(() => {
     if (currentPlan) {
       const newTables = currentPlan.tables || []
       const newSeats = currentPlan.seats || []
-
-      console.log(`📊 Updating tables and seats for plan ${currentPlan.id}:`, {
-        name: currentPlan.name,
-        tablesCount: newTables.length,
-        seatsCount: newSeats.length,
-        sampleTable: newTables[0] ? {
-          id: newTables[0].id,
-          name: newTables[0].name
-        } : null
-      })
+      const newChairRows = currentPlan.chairRows || []
+      const newChairSeats = currentPlan.chairSeats || []
 
       // Use callback form to ensure correct state updates even when batched
-      setTables(prev => {
-        console.log(`  ↳ setTables: ${prev.length} → ${newTables.length}`)
-        return newTables
-      })
-      setSeats(prev => {
-        console.log(`  ↳ setSeats: ${prev.length} → ${newSeats.length}`)
-        return newSeats
-      })
+      setTables(newTables)
+      setSeats(newSeats)
+      setChairRows(newChairRows)
+      setChairSeats(newChairSeats)
     } else {
-      console.log('📊 Clearing tables and seats (no current plan)')
-      setTables(prev => {
-        console.log(`  ↳ setTables: ${prev.length} → 0`)
-        return []
-      })
-      setSeats(prev => {
-        console.log(`  ↳ setSeats: ${prev.length} → 0`)
-        return []
-      })
+      setTables([])
+      setSeats([])
+      setChairRows([])
+      setChairSeats([])
     }
   }, [currentPlan])
 
@@ -209,12 +193,6 @@ export function useSeating(): UseSeatingReturn {
             return convertFirestoreSeatingPlan(doc.id, data)
           })
 
-          console.log('📦 Loaded seating plans from Firebase:', {
-            count: plansData.length,
-            planIds: plansData.map(p => p.id),
-            currentPlanIdRef: currentPlanIdRef.current
-          })
-
           setSeatingPlans(plansData)
 
           // Check if a plan is already selected (using ref to avoid closure issues)
@@ -225,26 +203,13 @@ export function useSeating(): UseSeatingReturn {
             // If a plan is already selected, update it with fresh data from Firebase
             const updatedCurrentPlan = plansData.find(p => p.id === selectedPlanId)
             if (updatedCurrentPlan) {
-              console.log('🔄 Updating current plan with fresh Firebase data:', {
-                id: updatedCurrentPlan.id,
-                name: updatedCurrentPlan.name,
-                tablesCount: updatedCurrentPlan.tables?.length || 0,
-                seatsCount: updatedCurrentPlan.seats?.length || 0
-              })
               setCurrentPlanState(updatedCurrentPlan)
             } else {
-              console.warn('⚠️ Current plan not found in Firebase data, clearing selection:', selectedPlanId)
               setCurrentPlanState(null)
             }
           } else if (plansData.length > 0) {
             // Automatically set first plan as current ONLY if no plan is currently selected
             const firstPlan = plansData[0]
-
-            console.log('🎯 Auto-selecting first plan (no current plan):', {
-              id: firstPlan.id,
-              name: firstPlan.name,
-              tablesCount: firstPlan.tables?.length || 0
-            })
             setCurrentPlanState(firstPlan)
           }
 
@@ -322,12 +287,23 @@ export function useSeating(): UseSeatingReturn {
                  seat.updatedAt ? new Date(seat.updatedAt) : new Date()
     }))
 
-    console.log(`📋 Converting seating plan ${id}:`, {
-      name: data.name,
-      tablesCount: tables.length,
-      seatsCount: seats.length,
-      sampleTable: tables[0] ? { id: tables[0].id, name: tables[0].name, capacity: tables[0].capacity } : null
-    })
+    // Convert chair rows with proper date handling
+    const chairRows = (data.chairRows || []).map((row: any) => ({
+      ...row,
+      createdAt: row.createdAt?.toDate ? row.createdAt.toDate() :
+                 row.createdAt ? new Date(row.createdAt) : new Date(),
+      updatedAt: row.updatedAt?.toDate ? row.updatedAt.toDate() :
+                 row.updatedAt ? new Date(row.updatedAt) : new Date()
+    }))
+
+    // Convert chair seats with proper date handling
+    const chairSeats = (data.chairSeats || []).map((seat: any) => ({
+      ...seat,
+      createdAt: seat.createdAt?.toDate ? seat.createdAt.toDate() :
+                 seat.createdAt ? new Date(seat.createdAt) : new Date(),
+      updatedAt: seat.updatedAt?.toDate ? seat.updatedAt.toDate() :
+                 seat.updatedAt ? new Date(seat.updatedAt) : new Date()
+    }))
 
     return {
       id,
@@ -337,6 +313,8 @@ export function useSeating(): UseSeatingReturn {
       venueLayout: data.venueLayout,
       tables,
       seats,
+      chairRows,
+      chairSeats,
       isActive: data.isActive,
       isPublished: data.isPublished,
       totalSeats: data.totalSeats,
@@ -396,16 +374,8 @@ export function useSeating(): UseSeatingReturn {
 
       const newPlan: SeatingPlan = { id: localId, ...planData }
 
-      console.log('✨ Creating new seating plan:', {
-        id: newPlan.id,
-        name: newPlan.name,
-        tablesCount: newPlan.tables.length,
-        seatsCount: newPlan.seats.length
-      })
-
       // Set as current plan BEFORE saving to Firebase
       // This prevents the Firebase listener from auto-selecting a different plan
-      console.log('🎯 Setting new plan as current (before Firebase save)')
       setCurrentPlanState(newPlan)
 
       // Save to Firebase (the listener will update seatingPlans array)
@@ -417,7 +387,6 @@ export function useSeating(): UseSeatingReturn {
           updatedAt: Timestamp.now()
         }
         await setDoc(planRef, firestoreData)
-        console.log('✅ Saved new plan to Firebase:', localId)
       } catch (firebaseError) {
         console.error('❌ Firebase sync failed for seating plan:', firebaseError)
         throw firebaseError
@@ -538,18 +507,9 @@ export function useSeating(): UseSeatingReturn {
 
   // Set current plan
   const setCurrentPlan = (planId: string) => {
-    console.log('🔍 setCurrentPlan called with:', {
-      planId,
-      availablePlans: seatingPlans.map(p => ({ id: p.id, name: p.name })),
-      seatingPlansLength: seatingPlans.length
-    })
-
     const plan = seatingPlans.find(p => p.id === planId)
     if (plan) {
-      console.log('✅ Found plan, setting as current:', { id: plan.id, name: plan.name })
       setCurrentPlanState(plan)
-    } else {
-      console.warn('❌ Plan not found:', planId, 'Available plans:', seatingPlans.map(p => p.id))
     }
   }
 
@@ -606,9 +566,14 @@ export function useSeating(): UseSeatingReturn {
 
         // Deep clean undefined values from the data
         // Special handling: undefined values should use deleteField() to remove from Firestore
-        const cleanForFirestore = (obj: any, path: string = ''): any => {
+        // BUT: deleteField() cannot be used inside arrays
+        const cleanForFirestore = (obj: any, isInArray: boolean = false): any => {
           if (obj === undefined) {
-            // Return deleteField() marker for undefined values
+            // Cannot use deleteField() inside arrays
+            if (isInArray) {
+              return null
+            }
+            // Return deleteField() marker for undefined values at top level
             return deleteField()
           }
 
@@ -617,7 +582,8 @@ export function useSeating(): UseSeatingReturn {
           }
 
           if (Array.isArray(obj)) {
-            return obj.map(item => cleanForFirestore(item, path)).filter(item => item !== null)
+            // Clean items in array, but don't use deleteField() inside
+            return obj.map(item => cleanForFirestore(item, true)).filter(item => item !== null)
           }
 
           if (obj instanceof Date) {
@@ -627,7 +593,7 @@ export function useSeating(): UseSeatingReturn {
           if (typeof obj === 'object') {
             const cleaned: any = {}
             for (const [key, value] of Object.entries(obj)) {
-              const cleanedValue = cleanForFirestore(value, path ? `${path}.${key}` : key)
+              const cleanedValue = cleanForFirestore(value, isInArray)
               // Include deleteField() markers, null, booleans, and numbers
               if (cleanedValue !== undefined) {
                 cleaned[key] = cleanedValue
@@ -668,7 +634,6 @@ export function useSeating(): UseSeatingReturn {
       try {
         const planRef = doc(db, 'seatingPlans', planId)
         await deleteDoc(planRef)
-        console.log('✅ Deleted seating plan from Firebase:', planId)
       } catch (firebaseError) {
         console.error('❌ Firebase delete failed:', firebaseError)
         // Continue with local deletion
@@ -817,6 +782,204 @@ export function useSeating(): UseSeatingReturn {
     }
   }
 
+  // Chair row management functions
+  const createChairRow = async (data: ChairRowFormData, planId?: string): Promise<ChairRow> => {
+    const activePlan = planId ? seatingPlans.find(p => p.id === planId) : currentPlan
+
+    if (!wedding || !user || !activePlan) {
+      throw new Error('Žádná svatba, uživatel nebo plán není vybrán')
+    }
+
+    try {
+      setError(null)
+
+      // Create chair row with local ID
+      const localId = `chairrow_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+
+      const newChairRow: ChairRow = {
+        id: localId,
+        weddingId: wedding.id,
+        name: data.name,
+        chairCount: data.chairCount,
+        orientation: data.orientation,
+        position: data.position,
+        rotation: data.rotation,
+        color: data.color,
+        spacing: data.spacing || 40,
+        isHighlighted: false,
+        notes: data.notes,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+
+      // Create seats for the chair row
+      const newChairSeats: ChairSeat[] = []
+      for (let i = 1; i <= data.chairCount; i++) {
+        newChairSeats.push({
+          id: `chairseat_${localId}_${i}`,
+          chairRowId: localId,
+          position: i,
+          isReserved: false,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        })
+      }
+
+      // Update the seating plan
+      const updatedChairRows = [...(activePlan.chairRows || []), newChairRow]
+      const updatedChairSeats = [...(activePlan.chairSeats || []), ...newChairSeats]
+
+      await updateSeatingPlan(activePlan.id, {
+        chairRows: updatedChairRows,
+        chairSeats: updatedChairSeats,
+        totalSeats: (activePlan.totalSeats || 0) + data.chairCount
+      })
+
+      return newChairRow
+    } catch (error: any) {
+      console.error('❌ Error creating chair row:', error)
+      setError('Chyba při vytváření řady židlí: ' + error.message)
+      throw error
+    }
+  }
+
+  const updateChairRow = async (chairRowId: string, updates: Partial<ChairRow>) => {
+    if (!wedding || !currentPlan) return
+
+    try {
+      // Update chair row in the seating plan
+      const updatedChairRows = (currentPlan.chairRows || []).map(row =>
+        row.id === chairRowId
+          ? { ...row, ...updates, updatedAt: new Date() }
+          : row
+      )
+
+      // If chair count changed, update seats
+      let updatedChairSeats = currentPlan.chairSeats || []
+      if (updates.chairCount !== undefined) {
+        const chairRow = currentPlan.chairRows?.find(r => r.id === chairRowId)
+        if (chairRow && chairRow.chairCount !== updates.chairCount) {
+          // Remove old seats
+          updatedChairSeats = updatedChairSeats.filter(s => s.chairRowId !== chairRowId)
+
+          // Create new seats
+          const newSeats: ChairSeat[] = []
+          for (let i = 1; i <= updates.chairCount; i++) {
+            newSeats.push({
+              id: `chairseat_${chairRowId}_${i}`,
+              chairRowId: chairRowId,
+              position: i,
+              isReserved: false,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            })
+          }
+          updatedChairSeats = [...updatedChairSeats, ...newSeats]
+        }
+      }
+
+      await updateSeatingPlan(currentPlan.id, {
+        chairRows: updatedChairRows,
+        chairSeats: updatedChairSeats
+      })
+    } catch (error) {
+      console.error('Error updating chair row:', error)
+      throw error
+    }
+  }
+
+  const deleteChairRow = async (chairRowId: string) => {
+    if (!wedding || !currentPlan) return
+
+    try {
+      // Remove chair row from current plan
+      const updatedChairRows = (currentPlan.chairRows || []).filter(row => row.id !== chairRowId)
+
+      // Remove seats associated with this chair row
+      const updatedChairSeats = (currentPlan.chairSeats || []).filter(seat => seat.chairRowId !== chairRowId)
+
+      // Calculate total seats
+      const tableTotalSeats = currentPlan.tables.reduce((sum, t) => sum + t.capacity, 0)
+      const chairRowTotalSeats = updatedChairRows.reduce((sum, r) => sum + r.chairCount, 0)
+
+      await updateSeatingPlan(currentPlan.id, {
+        chairRows: updatedChairRows,
+        chairSeats: updatedChairSeats,
+        totalSeats: tableTotalSeats + chairRowTotalSeats
+      })
+    } catch (error) {
+      console.error('Error deleting chair row:', error)
+      throw error
+    }
+  }
+
+  const moveChairRow = async (chairRowId: string, position: { x: number; y: number }) => {
+    if (!wedding || !currentPlan) return
+
+    try {
+      // Update chair row position in the seating plan
+      const updatedChairRows = (currentPlan.chairRows || []).map(row =>
+        row.id === chairRowId
+          ? { ...row, position, updatedAt: new Date() }
+          : row
+      )
+
+      await updateSeatingPlan(currentPlan.id, {
+        chairRows: updatedChairRows
+      })
+    } catch (error) {
+      console.error('Error moving chair row:', error)
+    }
+  }
+
+  const assignGuestToChairSeat = async (personId: string, chairSeatId: string) => {
+    if (!wedding || !currentPlan) return
+
+    try {
+      // Update the chair seat with the person ID
+      const updatedChairSeats = (currentPlan.chairSeats || []).map(seat =>
+        seat.id === chairSeatId
+          ? { ...seat, guestId: personId, updatedAt: new Date() }
+          : seat
+      )
+
+      const assignedTableSeats = currentPlan.seats.filter(s => s.guestId).length
+      const assignedChairSeats = updatedChairSeats.filter(s => s.guestId).length
+
+      await updateSeatingPlan(currentPlan.id, {
+        chairSeats: updatedChairSeats,
+        assignedSeats: assignedTableSeats + assignedChairSeats
+      })
+    } catch (error) {
+      console.error('Error assigning person to chair seat:', error)
+      throw error
+    }
+  }
+
+  const unassignGuestFromChairSeat = async (chairSeatId: string) => {
+    if (!wedding || !currentPlan) return
+
+    try {
+      // Update chair seat in the seating plan
+      const updatedChairSeats = (currentPlan.chairSeats || []).map(seat =>
+        seat.id === chairSeatId
+          ? { ...seat, guestId: undefined, updatedAt: new Date() }
+          : seat
+      )
+
+      const assignedTableSeats = currentPlan.seats.filter(s => s.guestId).length
+      const assignedChairSeats = updatedChairSeats.filter(s => s.guestId).length
+
+      await updateSeatingPlan(currentPlan.id, {
+        chairSeats: updatedChairSeats,
+        assignedSeats: assignedTableSeats + assignedChairSeats
+      })
+    } catch (error) {
+      console.error('Error unassigning person from chair seat:', error)
+      throw error
+    }
+  }
+
   const assignGuestToSeat = async (personId: string, seatId: string) => {
     if (!wedding || !currentPlan) return
 
@@ -939,6 +1102,8 @@ export function useSeating(): UseSeatingReturn {
     currentPlan,
     tables,
     seats,
+    chairRows,
+    chairSeats,
     assignments,
     constraints,
     loading,
@@ -952,8 +1117,14 @@ export function useSeating(): UseSeatingReturn {
     updateTable,
     deleteTable,
     moveTable,
+    createChairRow,
+    updateChairRow,
+    deleteChairRow,
+    moveChairRow,
     assignGuestToSeat,
     unassignGuestFromSeat,
+    assignGuestToChairSeat,
+    unassignGuestFromChairSeat,
     swapGuestSeats,
     deleteSeat,
     addConstraint,

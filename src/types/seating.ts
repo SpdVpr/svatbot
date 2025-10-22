@@ -2,6 +2,7 @@
 
 export type TableShape = 'round' | 'rectangular' | 'square' | 'oval'
 export type TableSize = 'small' | 'medium' | 'large' | 'xl'
+export type ChairRowOrientation = 'horizontal' | 'vertical'
 
 export interface TablePosition {
   x: number // X coordinate in pixels
@@ -54,26 +55,67 @@ export interface Seat {
   updatedAt: Date
 }
 
+// Standalone chair row (not attached to a table)
+export interface ChairRow {
+  id: string
+  weddingId: string
+  name: string // "Řada 1", "Ceremonie - levá strana", etc.
+  chairCount: number // Number of chairs in the row
+  orientation: ChairRowOrientation // horizontal or vertical
+  position: TablePosition
+  rotation: number // Rotation in degrees (0-360)
+
+  // Visual properties
+  color?: string
+  spacing?: number // Space between chairs in pixels (default: 40)
+  isHighlighted?: boolean
+
+  // Metadata
+  notes?: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+// Seat for standalone chair row
+export interface ChairSeat {
+  id: string
+  chairRowId: string
+  position: number // Position in row (1-N)
+  guestId?: string // Assigned guest
+  isReserved: boolean
+
+  // Special seats
+  isHostSeat?: boolean
+  isVipSeat?: boolean
+
+  // Metadata
+  notes?: string
+  createdAt: Date
+  updatedAt: Date
+}
+
 export interface SeatingPlan {
   id: string
   weddingId: string
   name: string
   description?: string
-  
+
   // Plan properties
   venueLayout: VenueLayout
   tables: Table[]
   seats: Seat[]
-  
+  chairRows?: ChairRow[] // Standalone chair rows
+  chairSeats?: ChairSeat[] // Seats for standalone chair rows
+
   // Status
   isActive: boolean
   isPublished: boolean
-  
+
   // Statistics
   totalSeats: number
   assignedSeats: number
   availableSeats: number
-  
+
   // Metadata
   createdAt: Date
   updatedAt: Date
@@ -91,6 +133,7 @@ export interface VenueLayout {
     y: number
     width: number
     height: number
+    rotation?: number
   }
   
   stage?: {
@@ -178,6 +221,17 @@ export interface TableFormData {
   notes?: string
 }
 
+export interface ChairRowFormData {
+  name: string
+  chairCount: number
+  orientation: ChairRowOrientation
+  position: TablePosition
+  rotation: number
+  color?: string
+  spacing?: number
+  notes?: string
+}
+
 export interface SeatingPlanFormData {
   name: string
   description?: string
@@ -197,13 +251,13 @@ export interface SeatingViewOptions {
 
 // Drag and drop
 export interface DragItem {
-  type: 'guest' | 'table'
+  type: 'guest' | 'table' | 'chairRow'
   id: string
   data: any
 }
 
 export interface DropTarget {
-  type: 'seat' | 'table' | 'canvas'
+  type: 'seat' | 'table' | 'canvas' | 'chairSeat'
   id: string
   accepts: string[]
 }

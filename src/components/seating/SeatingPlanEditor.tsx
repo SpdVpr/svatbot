@@ -21,7 +21,7 @@ import {
   X,
   Printer
 } from 'lucide-react'
-import { Table, Seat, SeatingViewOptions, SeatingPlan, TableShape, TableSize } from '@/types/seating'
+import { Table, Seat, ChairRow, ChairSeat, SeatingViewOptions, SeatingPlan, TableShape, TableSize, ChairRowOrientation } from '@/types/seating'
 import { GUEST_CATEGORY_LABELS, GUEST_CATEGORY_COLORS } from '@/utils/guestCategories'
 
 interface SeatingPlanEditorProps {
@@ -29,32 +29,39 @@ interface SeatingPlanEditorProps {
   currentPlan: SeatingPlan
 }
 
+type PersonToSeat = {
+  id: string
+  displayName: string
+  type: 'guest' | 'plusOne' | 'child'
+  parentGuestId?: string
+  category: string
+  childAge?: number
+}
+
 export default function SeatingPlanEditor({ className = '', currentPlan }: SeatingPlanEditorProps) {
   const {
     tables,
     seats,
+    chairRows,
+    chairSeats,
     stats,
     createTable,
     updateTable,
     deleteTable,
     updateSeatingPlan,
     moveTable,
+    createChairRow,
+    updateChairRow,
+    deleteChairRow,
+    moveChairRow,
     assignGuestToSeat,
     unassignGuestFromSeat,
+    assignGuestToChairSeat,
+    unassignGuestFromChairSeat,
     deleteSeat,
     getUnassignedGuests
   } = useSeating()
   const { guests } = useGuest()
-
-  // Debug: Log tables and seats
-  console.log('🎨 SeatingPlanEditor render:', {
-    currentPlanId: currentPlan.id,
-    currentPlanName: currentPlan.name,
-    tablesFromHook: tables.length,
-    seatsFromHook: seats.length,
-    tablesFromProp: currentPlan.tables?.length || 0,
-    seatsFromProp: currentPlan.seats?.length || 0
-  })
 
   const canvasRef = useRef<HTMLDivElement>(null)
   const [selectedTable, setSelectedTable] = useState<string | null>(null)
@@ -68,10 +75,12 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     x: currentPlan.venueLayout.danceFloor?.x || 500,
     y: currentPlan.venueLayout.danceFloor?.y || 300,
     width: currentPlan.venueLayout.danceFloor?.width || 200,
-    height: currentPlan.venueLayout.danceFloor?.height || 200
+    height: currentPlan.venueLayout.danceFloor?.height || 200,
+    rotation: currentPlan.venueLayout.danceFloor?.rotation || 0
   })
   const [showGuestAssignment, setShowGuestAssignment] = useState(false)
   const [selectedSeat, setSelectedSeat] = useState<string | null>(null)
+  const [selectedSeatType, setSelectedSeatType] = useState<'table' | 'chair'>('table')
   const [isDraggingDanceFloor, setIsDraggingDanceFloor] = useState(false)
   const [danceFloorDragOffset, setDanceFloorDragOffset] = useState({ x: 0, y: 0 })
   const [draggedDanceFloorPosition, setDraggedDanceFloorPosition] = useState<{ x: number; y: number } | null>(null)
@@ -83,6 +92,14 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
   const [isRotating, setIsRotating] = useState(false)
   const [rotatingTable, setRotatingTable] = useState<string | null>(null)
   const [rotationStartAngle, setRotationStartAngle] = useState(0)
+  const [tempRotation, setTempRotation] = useState<{ [key: string]: number }>({})
+  const [isRotatingChairRow, setIsRotatingChairRow] = useState(false)
+  const [rotatingChairRow, setRotatingChairRow] = useState<string | null>(null)
+  const [chairRowRotationStartAngle, setChairRowRotationStartAngle] = useState(0)
+  const [tempChairRowRotation, setTempChairRowRotation] = useState<{ [key: string]: number }>({})
+  const [isRotatingDanceFloor, setIsRotatingDanceFloor] = useState(false)
+  const [danceFloorRotationStartAngle, setDanceFloorRotationStartAngle] = useState(0)
+  const [tempDanceFloorRotation, setTempDanceFloorRotation] = useState<number | null>(null)
 
   // Mobile long press detection
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null)
@@ -117,7 +134,116 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
   })
   const [guestSearchQuery, setGuestSearchQuery] = useState('')
 
+  // Chair row form state
+  const [showChairRowForm, setShowChairRowForm] = useState(false)
+  const [editingChairRow, setEditingChairRow] = useState<ChairRow | null>(null)
+  const [chairRowFormData, setChairRowFormData] = useState<{
+    name: string
+    chairCount: number
+    orientation: ChairRowOrientation
+    color: string
+    spacing: number
+  }>({
+    name: '',
+    chairCount: 6,
+    orientation: 'horizontal',
+    color: '#8B5CF6',
+    spacing: 40
+  })
+  const [selectedChairRow, setSelectedChairRow] = useState<string | null>(null)
+  const [isDraggingChairRow, setIsDraggingChairRow] = useState(false)
+  const [chairRowDragOffset, setChairRowDragOffset] = useState({ x: 0, y: 0 })
+  const [draggedChairRowPosition, setDraggedChairRowPosition] = useState<{ x: number; y: number } | null>(null)
+
+  // Dance floor form state
+  const [showDanceFloorForm, setShowDanceFloorForm] = useState(false)
+  const [danceFloorFormData, setDanceFloorFormData] = useState({
+    width: 200,
+    height: 200,
+    color: '#FCD34D'
+  })
+
   const unassignedGuests = getUnassignedGuests()
+
+  // Generate consistent avatar for a person based on their ID
+  const getAvatarForPerson = (personId: string) => {
+    // Use personId to generate a consistent random number
+    let hash = 0
+    for (let i = 0; i < personId.length; i++) {
+      hash = personId.charCodeAt(i) + ((hash << 5) - hash)
+    }
+    const avatarIndex = Math.abs(hash) % 6 // 6 different avatar styles
+
+    return avatarIndex
+  }
+
+  // Render avatar SVG based on avatar index
+  const renderAvatar = (avatarIndex: number, size: number = 24) => {
+    const avatarStyles = [
+      // Style 0: Simple face with smile
+      (s: number) => (
+        <svg width={s} height={s} viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" fill="#FED7AA" stroke="#F97316" strokeWidth="1.5"/>
+          <circle cx="9" cy="10" r="1.5" fill="#92400E"/>
+          <circle cx="15" cy="10" r="1.5" fill="#92400E"/>
+          <path d="M8 14 Q12 16 16 14" stroke="#92400E" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+        </svg>
+      ),
+      // Style 1: Face with glasses
+      (s: number) => (
+        <svg width={s} height={s} viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" fill="#DBEAFE" stroke="#3B82F6" strokeWidth="1.5"/>
+          <circle cx="9" cy="10" r="1.5" fill="#1E3A8A"/>
+          <circle cx="15" cy="10" r="1.5" fill="#1E3A8A"/>
+          <rect x="7" y="8.5" width="4" height="3" rx="1.5" stroke="#1E3A8A" strokeWidth="1" fill="none"/>
+          <rect x="13" y="8.5" width="4" height="3" rx="1.5" stroke="#1E3A8A" strokeWidth="1" fill="none"/>
+          <line x1="11" y1="10" x2="13" y2="10" stroke="#1E3A8A" strokeWidth="1"/>
+          <path d="M8 14 Q12 16 16 14" stroke="#1E3A8A" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+        </svg>
+      ),
+      // Style 2: Face with beard
+      (s: number) => (
+        <svg width={s} height={s} viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" fill="#FEE2E2" stroke="#EF4444" strokeWidth="1.5"/>
+          <circle cx="9" cy="10" r="1.5" fill="#7F1D1D"/>
+          <circle cx="15" cy="10" r="1.5" fill="#7F1D1D"/>
+          <path d="M8 14 Q12 16 16 14" stroke="#7F1D1D" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+          <path d="M8 15 Q8 17 10 18 Q12 19 14 18 Q16 17 16 15" fill="#92400E" opacity="0.6"/>
+        </svg>
+      ),
+      // Style 3: Face with hair
+      (s: number) => (
+        <svg width={s} height={s} viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" fill="#FCE7F3" stroke="#EC4899" strokeWidth="1.5"/>
+          <path d="M6 10 Q6 6 12 6 Q18 6 18 10" fill="#92400E" stroke="#92400E" strokeWidth="1"/>
+          <circle cx="9" cy="11" r="1.5" fill="#831843"/>
+          <circle cx="15" cy="11" r="1.5" fill="#831843"/>
+          <path d="M8 15 Q12 17 16 15" stroke="#831843" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+        </svg>
+      ),
+      // Style 4: Simple round face
+      (s: number) => (
+        <svg width={s} height={s} viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" fill="#E0E7FF" stroke="#6366F1" strokeWidth="1.5"/>
+          <circle cx="9" cy="10" r="1.5" fill="#312E81"/>
+          <circle cx="15" cy="10" r="1.5" fill="#312E81"/>
+          <path d="M9 14 Q12 16 15 14" stroke="#312E81" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+        </svg>
+      ),
+      // Style 5: Face with cap
+      (s: number) => (
+        <svg width={s} height={s} viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" fill="#D1FAE5" stroke="#10B981" strokeWidth="1.5"/>
+          <path d="M6 9 L18 9 L18 7 Q18 5 12 5 Q6 5 6 7 Z" fill="#065F46" stroke="#065F46" strokeWidth="1"/>
+          <circle cx="9" cy="11" r="1.5" fill="#064E3B"/>
+          <circle cx="15" cy="11" r="1.5" fill="#064E3B"/>
+          <path d="M8 15 Q12 17 16 15" stroke="#064E3B" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+        </svg>
+      )
+    ]
+
+    return avatarStyles[avatarIndex](size)
+  }
 
   // Calculate total unassigned people (guests + plus ones)
   const totalUnassignedPeople = unassignedGuests.reduce((total, guest) => {
@@ -311,7 +437,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     }
   }
 
-  // Table rotation handlers - NOVÁ LOGIKA jako drag & drop
+  // Table rotation handlers - improved smooth rotation
   const handleRotationStart = (tableId: string, e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -320,11 +446,24 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     setRotatingTable(tableId)
 
     const table = tables.find(t => t.id === tableId)
-    if (table) {
-      setRotationStartAngle(table.rotation)
-    }
+    if (!table) return
 
-    // Přidat event listenery přímo zde
+    const tableElement = document.querySelector(`[data-table-id="${tableId}"]`)
+    if (!tableElement) return
+
+    const rect = tableElement.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+
+    // Calculate initial angle from mouse position
+    const startAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI)
+    const initialRotation = table.rotation
+
+    setRotationStartAngle(startAngle)
+
+    // Store final rotation in closure
+    let finalRotation = initialRotation
+
     const handleMouseMove = (moveEvent: MouseEvent) => {
       if (!tableId) return
 
@@ -335,24 +474,44 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
       const centerX = rect.left + rect.width / 2
       const centerY = rect.top + rect.height / 2
 
-      const angle = Math.atan2(moveEvent.clientY - centerY, moveEvent.clientX - centerX) * (180 / Math.PI) + 90
-      const normalizedAngle = ((angle % 360) + 360) % 360
+      // Calculate current angle
+      const currentAngle = Math.atan2(moveEvent.clientY - centerY, moveEvent.clientX - centerX) * (180 / Math.PI)
 
-      // Update table rotation
-      updateTable(tableId, { rotation: normalizedAngle })
+      // Calculate angle difference
+      let angleDiff = currentAngle - startAngle
+
+      // Normalize angle difference to -180 to 180 range
+      while (angleDiff > 180) angleDiff -= 360
+      while (angleDiff < -180) angleDiff += 360
+
+      // Apply rotation
+      let newRotation = initialRotation + angleDiff
+
+      // Normalize to 0-360 range
+      newRotation = ((newRotation % 360) + 360) % 360
+
+      // Store in closure and temp state
+      finalRotation = newRotation
+      setTempRotation(prev => ({ ...prev, [tableId]: newRotation }))
     }
 
-    const handleMouseUp = () => {
+    const handleMouseUp = async () => {
+      // Save final rotation to Firebase
+      await updateTable(tableId, { rotation: finalRotation })
+
       setIsRotating(false)
       setRotatingTable(null)
       setRotationStartAngle(0)
+      setTempRotation(prev => {
+        const newTemp = { ...prev }
+        delete newTemp[tableId]
+        return newTemp
+      })
 
-      // Odstranit event listenery
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('mouseup', handleMouseUp)
     }
 
-    // Přidat event listenery
     document.addEventListener('mousemove', handleMouseMove)
     document.addEventListener('mouseup', handleMouseUp)
   }
@@ -360,6 +519,165 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
   // Tyto funkce už nepotřebujeme - vše je v handleRotationStart
   const handleRotationMove = useCallback(() => {}, [])
   const handleRotationEnd = useCallback(() => {}, [])
+
+  // Chair row rotation handlers - improved smooth rotation
+  const handleChairRowRotationStart = (chairRowId: string, e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    setIsRotatingChairRow(true)
+    setRotatingChairRow(chairRowId)
+
+    const chairRow = chairRows?.find(r => r.id === chairRowId)
+    if (!chairRow) return
+
+    const chairRowElement = document.querySelector(`[data-chairrow-id="${chairRowId}"]`)
+    if (!chairRowElement) return
+
+    const rect = chairRowElement.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+
+    // Calculate initial angle from mouse position
+    const startAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI)
+    const initialRotation = chairRow.rotation
+
+    setChairRowRotationStartAngle(startAngle)
+
+    // Store final rotation in closure
+    let finalRotation = initialRotation
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      if (!chairRowId) return
+
+      const chairRowElement = document.querySelector(`[data-chairrow-id="${chairRowId}"]`)
+      if (!chairRowElement) return
+
+      const rect = chairRowElement.getBoundingClientRect()
+      const centerX = rect.left + rect.width / 2
+      const centerY = rect.top + rect.height / 2
+
+      // Calculate current angle
+      const currentAngle = Math.atan2(moveEvent.clientY - centerY, moveEvent.clientX - centerX) * (180 / Math.PI)
+
+      // Calculate angle difference
+      let angleDiff = currentAngle - startAngle
+
+      // Normalize angle difference to -180 to 180 range
+      while (angleDiff > 180) angleDiff -= 360
+      while (angleDiff < -180) angleDiff += 360
+
+      // Apply rotation
+      let newRotation = initialRotation + angleDiff
+
+      // Normalize to 0-360 range
+      newRotation = ((newRotation % 360) + 360) % 360
+
+      // Store in closure and temp state
+      finalRotation = newRotation
+      setTempChairRowRotation(prev => ({ ...prev, [chairRowId]: newRotation }))
+    }
+
+    const handleMouseUp = async () => {
+      // Save final rotation to Firebase
+      await updateChairRow(chairRowId, { rotation: finalRotation })
+
+      setIsRotatingChairRow(false)
+      setRotatingChairRow(null)
+      setChairRowRotationStartAngle(0)
+      setTempChairRowRotation(prev => {
+        const newTemp = { ...prev }
+        delete newTemp[chairRowId]
+        return newTemp
+      })
+
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+  }
+
+  // Dance floor rotation handler - improved smooth rotation
+  const handleDanceFloorRotationStart = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    setIsRotatingDanceFloor(true)
+
+    const danceFloorElement = document.querySelector('[data-dancefloor="true"]')
+    if (!danceFloorElement) return
+
+    const rect = danceFloorElement.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+
+    // Calculate initial angle from mouse position
+    const startAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI)
+    const initialRotation = danceFloorData.rotation || 0
+
+    setDanceFloorRotationStartAngle(startAngle)
+
+    // Store final rotation in closure
+    let finalRotation = initialRotation
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      const danceFloorElement = document.querySelector('[data-dancefloor="true"]')
+      if (!danceFloorElement) return
+
+      const rect = danceFloorElement.getBoundingClientRect()
+      const centerX = rect.left + rect.width / 2
+      const centerY = rect.top + rect.height / 2
+
+      // Calculate current angle
+      const currentAngle = Math.atan2(moveEvent.clientY - centerY, moveEvent.clientX - centerX) * (180 / Math.PI)
+
+      // Calculate angle difference
+      let angleDiff = currentAngle - startAngle
+
+      // Normalize angle difference to -180 to 180 range
+      while (angleDiff > 180) angleDiff -= 360
+      while (angleDiff < -180) angleDiff += 360
+
+      // Apply rotation
+      let newRotation = initialRotation + angleDiff
+
+      // Normalize to 0-360 range
+      newRotation = ((newRotation % 360) + 360) % 360
+
+      // Store in closure and temp state
+      finalRotation = newRotation
+      setTempDanceFloorRotation(newRotation)
+    }
+
+    const handleMouseUp = async () => {
+      // Save final rotation to Firebase
+      const updatedDanceFloor = {
+        ...danceFloorData,
+        rotation: finalRotation
+      }
+
+      await updateSeatingPlan(currentPlan.id, {
+        venueLayout: {
+          ...currentPlan.venueLayout,
+          danceFloor: updatedDanceFloor
+        }
+      })
+
+      setDanceFloorData(updatedDanceFloor)
+
+      setIsRotatingDanceFloor(false)
+      setDanceFloorRotationStartAngle(0)
+      setTempDanceFloorRotation(null)
+
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+  }
 
   // Rotate table by specific degrees
   const rotateTable = async (tableId: string, degrees: number) => {
@@ -382,11 +700,173 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     }
   }
 
+  // Chair row handlers
+  const handleAddChairRow = async () => {
+    try {
+      if (!currentPlan) {
+        alert('Nejdříve vyberte nebo vytvořte plán usazení')
+        return
+      }
+
+      await createChairRow({
+        name: chairRowFormData.name || `Řada ${(chairRows?.length || 0) + 1}`,
+        chairCount: chairRowFormData.chairCount,
+        orientation: chairRowFormData.orientation,
+        position: { x: 300, y: 300 },
+        rotation: 0,
+        color: chairRowFormData.color,
+        spacing: chairRowFormData.spacing
+      }, currentPlan.id)
+
+      setShowChairRowForm(false)
+      setChairRowFormData({
+        name: '',
+        chairCount: 6,
+        orientation: 'horizontal',
+        color: '#8B5CF6',
+        spacing: 40
+      })
+    } catch (error) {
+      console.error('Error adding chair row:', error)
+      alert('Chyba při přidávání řady židlí: ' + (error as Error).message)
+    }
+  }
+
+  const handleEditChairRow = (chairRow: ChairRow) => {
+    setEditingChairRow(chairRow)
+    setChairRowFormData({
+      name: chairRow.name,
+      chairCount: chairRow.chairCount,
+      orientation: chairRow.orientation,
+      color: chairRow.color || '#8B5CF6',
+      spacing: chairRow.spacing || 40
+    })
+    setShowChairRowForm(true)
+  }
+
+  const handleSaveChairRow = async () => {
+    if (!editingChairRow) return
+
+    try {
+      await updateChairRow(editingChairRow.id, {
+        name: chairRowFormData.name,
+        chairCount: chairRowFormData.chairCount,
+        orientation: chairRowFormData.orientation,
+        color: chairRowFormData.color,
+        spacing: chairRowFormData.spacing
+      })
+      setShowChairRowForm(false)
+      setEditingChairRow(null)
+      setChairRowFormData({
+        name: '',
+        chairCount: 6,
+        orientation: 'horizontal',
+        color: '#8B5CF6',
+        spacing: 40
+      })
+    } catch (error) {
+      console.error('Error updating chair row:', error)
+      alert('Chyba při úpravě řady židlí: ' + (error as Error).message)
+    }
+  }
+
+  const handleDeleteChairRow = async (chairRowId: string) => {
+    if (confirm('Opravdu chcete smazat tuto řadu židlí?')) {
+      try {
+        await deleteChairRow(chairRowId)
+      } catch (error) {
+        console.error('Error deleting chair row:', error)
+        alert('Chyba při mazání řady židlí: ' + (error as Error).message)
+      }
+    }
+  }
+
+  // Chair row drag handlers
+  const handleChairRowDragStart = useCallback((chairRowId: string, event: React.MouseEvent) => {
+    event.preventDefault()
+    setSelectedChairRow(chairRowId)
+    setIsDraggingChairRow(true)
+
+    const chairRow = chairRows?.find(r => r.id === chairRowId)
+    if (chairRow && canvasRef.current) {
+      const rect = canvasRef.current.getBoundingClientRect()
+      const zoom = viewOptions.zoom
+
+      const offsetX = (event.clientX - rect.left) / zoom - chairRow.position.x
+      const offsetY = (event.clientY - rect.top) / zoom - chairRow.position.y
+
+      setChairRowDragOffset({ x: offsetX, y: offsetY })
+    }
+  }, [chairRows, viewOptions.zoom])
+
+  const handleChairRowDrag = useCallback((event: React.MouseEvent) => {
+    if (!isDraggingChairRow || !selectedChairRow || !canvasRef.current) return
+
+    const rect = canvasRef.current.getBoundingClientRect()
+    const zoom = viewOptions.zoom
+
+    const x = Math.max(0, Math.min(
+      currentPlan.venueLayout.width - 100,
+      (event.clientX - rect.left) / zoom - chairRowDragOffset.x
+    ))
+    const y = Math.max(0, Math.min(
+      currentPlan.venueLayout.height - 50,
+      (event.clientY - rect.top) / zoom - chairRowDragOffset.y
+    ))
+
+    setDraggedChairRowPosition({ x, y })
+  }, [isDraggingChairRow, selectedChairRow, chairRowDragOffset, viewOptions.zoom, currentPlan.venueLayout])
+
+  const handleChairRowDragEnd = useCallback(async () => {
+    if (isDraggingChairRow && selectedChairRow && draggedChairRowPosition) {
+      try {
+        await moveChairRow(selectedChairRow, draggedChairRowPosition)
+      } catch (error) {
+        console.error('Error moving chair row:', error)
+      }
+    }
+
+    setIsDraggingChairRow(false)
+    setSelectedChairRow(null)
+    setDraggedChairRowPosition(null)
+  }, [isDraggingChairRow, selectedChairRow, draggedChairRowPosition, moveChairRow])
+
   // Rotation event listeners - ODSTRANĚNO, nyní se používá přímá logika v handleRotationStart
 
   // Edit dance floor
   const handleEditDanceFloor = () => {
     setEditingDanceFloor(true)
+  }
+
+  // Add dance floor
+  const handleAddDanceFloor = async () => {
+    try {
+      const newDanceFloor = {
+        x: 500,
+        y: 300,
+        width: danceFloorFormData.width,
+        height: danceFloorFormData.height,
+        rotation: 0
+      }
+
+      await updateSeatingPlan(currentPlan.id, {
+        venueLayout: {
+          ...currentPlan.venueLayout,
+          danceFloor: newDanceFloor
+        }
+      })
+
+      setDanceFloorData(newDanceFloor)
+      setShowDanceFloorForm(false)
+      setDanceFloorFormData({
+        width: 200,
+        height: 200,
+        color: '#FCD34D'
+      })
+    } catch (error) {
+      console.error('Error adding dance floor:', error)
+      alert('Chyba při přidání tanečního parketu: ' + (error as Error).message)
+    }
   }
 
   // Save dance floor changes
@@ -1006,8 +1486,9 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
   }
 
   // Handle seat click for guest assignment
-  const handleSeatClick = (seatId: string) => {
+  const handleSeatClick = (seatId: string, seatType: 'table' | 'chair' = 'table') => {
     setSelectedSeat(seatId)
+    setSelectedSeatType(seatType)
     setShowGuestAssignment(true)
   }
 
@@ -1018,9 +1499,14 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     try {
       // PersonId can be: "guest_id", "guest_id_plusone", or "guest_id_child_0"
       // We store the full personId in the seat's guestId field
-      await assignGuestToSeat(personId, selectedSeat)
+      if (selectedSeatType === 'chair') {
+        await assignGuestToChairSeat(personId, selectedSeat)
+      } else {
+        await assignGuestToSeat(personId, selectedSeat)
+      }
       setShowGuestAssignment(false)
       setSelectedSeat(null)
+      setSelectedSeatType('table')
     } catch (error) {
       console.error('Error assigning person:', error)
       alert('Chyba při přiřazování osoby: ' + (error as Error).message)
@@ -1030,7 +1516,14 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
   // Unassign guest from seat
   const handleUnassignGuest = async (seatId: string) => {
     try {
-      await unassignGuestFromSeat(seatId)
+      // Check if it's a chair seat or table seat
+      const isChairSeat = (chairSeats || []).some(s => s.id === seatId)
+
+      if (isChairSeat) {
+        await unassignGuestFromChairSeat(seatId)
+      } else {
+        await unassignGuestFromSeat(seatId)
+      }
     } catch (error) {
       console.error('Error unassigning guest:', error)
       alert('Chyba při odebírání hosta: ' + (error as Error).message)
@@ -1054,8 +1547,12 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     event.preventDefault()
     const guestId = event.dataTransfer.getData('text/plain')
     if (guestId) {
-      handleAssignGuest(guestId)
+      // Detect if it's a chair seat or table seat
+      const isChairSeat = (chairSeats || []).some(s => s.id === seatId)
+
       setSelectedSeat(seatId)
+      setSelectedSeatType(isChairSeat ? 'chair' : 'table')
+      handleAssignGuest(guestId)
     }
   }
 
@@ -1226,11 +1723,9 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     return adjusted
   }
 
-  // Get person name for seat - handles guests, plus ones, and children
-  const getGuestName = (seat: Seat) => {
-    if (!seat.guestId) return null
-
-    const personId = seat.guestId
+  // Get person name by guestId - handles guests, plus ones, and children
+  const getGuestNameByPersonId = (personId: string | undefined) => {
+    if (!personId) return null
 
     // Check if it's a plus one (format: "guestId_plusone")
     if (personId.includes('_plusone')) {
@@ -1278,29 +1773,42 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     }
   }
 
+  // Get person name for seat - handles guests, plus ones, and children
+  const getGuestName = (seat: Seat) => {
+    return getGuestNameByPersonId(seat.guestId)
+  }
+
+  // Get person name for chair seat - handles guests, plus ones, and children
+  const getGuestNameForChairSeat = (chairSeat: ChairSeat) => {
+    return getGuestNameByPersonId(chairSeat.guestId)
+  }
+
   // Check if guest has assigned seat
   const isGuestAssigned = (guestId: string) => {
-    return seats.some(seat => seat.guestId === guestId)
+    return seats.some(seat => seat.guestId === guestId) ||
+           (chairSeats || []).some(seat => seat.guestId === guestId)
   }
 
   // Get assigned seat info for guest
   const getGuestSeatInfo = (guestId: string) => {
+    // Check table seats first
     const seat = seats.find(s => s.guestId === guestId)
-    if (!seat) return null
-    const table = tables.find(t => t.id === seat.tableId)
-    return table ? { tableName: table.name, seatPosition: seat.position } : null
+    if (seat) {
+      const table = tables.find(t => t.id === seat.tableId)
+      return table ? { tableName: table.name, seatPosition: seat.position } : null
+    }
+
+    // Check chair seats
+    const chairSeat = (chairSeats || []).find(s => s.guestId === guestId)
+    if (chairSeat) {
+      const chairRow = (chairRows || []).find(r => r.id === chairSeat.chairRowId)
+      return chairRow ? { tableName: chairRow.name, seatPosition: chairSeat.position } : null
+    }
+
+    return null
   }
 
   // Create extended list of people to seat (guests + plus ones + children)
-  type PersonToSeat = {
-    id: string
-    displayName: string
-    type: 'guest' | 'plusOne' | 'child'
-    parentGuestId?: string
-    category: string
-    childAge?: number
-  }
-
   const getAllPeopleToSeat = (): PersonToSeat[] => {
     const people: PersonToSeat[] = []
 
@@ -1433,11 +1941,13 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
           x: currentPlan.venueLayout.danceFloor!.x,
           y: currentPlan.venueLayout.danceFloor!.y,
           width: currentPlan.venueLayout.danceFloor!.width,
-          height: currentPlan.venueLayout.danceFloor!.height
+          height: currentPlan.venueLayout.danceFloor!.height,
+          rotation: currentPlan.venueLayout.danceFloor!.rotation || 0
         }
         // Only update if values actually changed
         if (prev.x === newData.x && prev.y === newData.y &&
-            prev.width === newData.width && prev.height === newData.height) {
+            prev.width === newData.width && prev.height === newData.height &&
+            prev.rotation === newData.rotation) {
           return prev
         }
         return newData
@@ -1472,12 +1982,53 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
             <div className="flex items-center space-x-2">
               <button
-                onClick={handleAddTable}
+                onClick={() => {
+                  setEditingTable(null)
+                  setTableFormData({
+                    name: '',
+                    shape: 'round',
+                    size: 'medium',
+                    capacity: 8,
+                    color: '#F8BBD9',
+                    headSeats: 0,
+                    seatSides: 'all',
+                    oneSidePosition: 'bottom'
+                  })
+                  setShowTableForm(true)
+                }}
                 className="btn-outline flex items-center space-x-2"
               >
                 <Plus className="w-4 h-4" />
                 <span>Přidat stůl</span>
               </button>
+
+              <button
+                onClick={() => {
+                  setEditingChairRow(null)
+                  setChairRowFormData({
+                    name: '',
+                    chairCount: 6,
+                    orientation: 'horizontal',
+                    color: '#8B5CF6',
+                    spacing: 40
+                  })
+                  setShowChairRowForm(true)
+                }}
+                className="btn-outline flex items-center space-x-2"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Přidat židle</span>
+              </button>
+
+              {!currentPlan.venueLayout.danceFloor && (
+                <button
+                  onClick={() => setShowDanceFloorForm(true)}
+                  className="btn-outline flex items-center space-x-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Přidat taneční parket</span>
+                </button>
+              )}
 
               <button
                 onClick={handleEditVenue}
@@ -1551,10 +2102,12 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
               onMouseMove={(e) => {
                 handleTableDrag(e)
                 handleDanceFloorDrag(e)
+                handleChairRowDrag(e)
               }}
               onMouseUp={() => {
                 handleTableDragEnd()
                 handleDanceFloorDragEnd()
+                handleChairRowDragEnd()
               }}
               onMouseLeave={() => {
                 handleTableDragEnd()
@@ -1573,17 +2126,21 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                   x: danceFloorData.x,
                   y: danceFloorData.y
                 }
+                const rotation = tempDanceFloorRotation !== null ? tempDanceFloorRotation : (danceFloorData.rotation || 0)
 
                 return (
                   <div
-                    className={`absolute bg-yellow-200 border-2 border-yellow-400 rounded-lg flex items-center justify-center cursor-move hover:bg-yellow-300 ${
+                    data-dancefloor="true"
+                    className={`group absolute bg-yellow-200 border-2 border-yellow-400 rounded-lg flex items-center justify-center cursor-move hover:bg-yellow-300 ${
                       !isDraggedDanceFloor ? 'transition-colors' : ''
                     } ${isDraggingDanceFloor ? 'z-20 scale-105' : 'z-10'}`}
                     style={{
                       left: position.x,
                       top: position.y,
                       width: danceFloorData.width,
-                      height: danceFloorData.height
+                      height: danceFloorData.height,
+                      transform: `rotate(${rotation}deg)`,
+                      transformOrigin: 'center'
                     }}
                     onMouseDown={handleDanceFloorDragStart}
                     onDoubleClick={(e) => {
@@ -1592,6 +2149,25 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                     }}
                     title="Táhněte pro přesun, dvojklik pro úpravu velikosti"
                   >
+                    {/* Rotation handle - visible on hover */}
+                    <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity z-30">
+                      <button
+                        className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors"
+                        onMouseDown={(e) => handleDanceFloorRotationStart(e)}
+                        onClick={(e) => e.stopPropagation()}
+                        title="Táhněte pro rotaci"
+                      >
+                        <RotateCw className="w-3 h-3" />
+                      </button>
+                    </div>
+
+                    {/* Info on hover - above dance floor */}
+                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-20 pointer-events-none">
+                      <div className="bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                        Dvojklik pro úpravu
+                      </div>
+                    </div>
+
                     <span className="text-sm font-medium text-yellow-800">Taneční parket</span>
                   </div>
                 )
@@ -1603,6 +2179,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                 const isSelected = selectedTable === table.id
                 const isDraggedTable = isSelected && isDragging && draggedTablePosition
                 const position = isDraggedTable ? draggedTablePosition : table.position
+                const rotation = tempRotation[table.id] !== undefined ? tempRotation[table.id] : table.rotation
 
                 return (
                   <div
@@ -1620,7 +2197,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                     <div
                       className="relative cursor-move"
                       style={{
-                        transform: `rotate(${table.rotation}deg)`
+                        transform: `rotate(${rotation}deg)`
                       }}
                       onMouseDown={(e) => handleTableDragStart(table.id, e)}
                       onDoubleClick={() => handleEditTable(table)}
@@ -1765,9 +2342,9 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                         return (
                           <div
                             key={seat.id}
-                            className={`absolute w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-medium transition-colors cursor-pointer ${
+                            className={`absolute w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-medium transition-colors cursor-pointer overflow-hidden ${
                               seat.guestId
-                                ? 'bg-green-100 border-green-400 text-green-800 hover:bg-green-200'
+                                ? 'bg-white border-green-400 hover:border-green-500'
                                 : seat.isReserved
                                 ? 'bg-yellow-100 border-yellow-400 text-yellow-800 hover:bg-yellow-200'
                                 : 'bg-gray-100 border-gray-300 text-gray-600 hover:bg-primary-100 hover:border-primary-400'
@@ -1793,7 +2370,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                             onDrop={(e) => handleGuestDrop(e, seat.id)}
                             onDragOver={(e) => e.preventDefault()}
                           >
-                            {seat.position}
+                            {seat.guestId ? renderAvatar(getAvatarForPerson(seat.guestId), 24) : seat.position}
                           </div>
                         )
                       })}
@@ -2007,6 +2584,172 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                         )
                       })
                     })()}
+                  </div>
+                )
+              })}
+
+              {/* Chair Rows */}
+              {(chairRows || []).map(chairRow => {
+                const isSelected = selectedChairRow === chairRow.id
+                const isDraggedChairRow = isSelected && isDraggingChairRow && draggedChairRowPosition
+                const position = isDraggedChairRow ? draggedChairRowPosition : chairRow.position
+                const rotation = tempChairRowRotation[chairRow.id] !== undefined ? tempChairRowRotation[chairRow.id] : chairRow.rotation
+
+                const chairWidth = 30
+                const chairHeight = 30
+                const spacing = chairRow.spacing || 40
+                const totalWidth = chairRow.orientation === 'horizontal'
+                  ? chairRow.chairCount * spacing
+                  : chairWidth
+                const totalHeight = chairRow.orientation === 'vertical'
+                  ? chairRow.chairCount * spacing
+                  : chairHeight
+
+                const rowChairSeats = (chairSeats || []).filter(s => s.chairRowId === chairRow.id)
+
+                return (
+                  <div
+                    key={chairRow.id}
+                    data-chairrow-id={chairRow.id}
+                    className={`group absolute cursor-move transition-shadow ${
+                      isSelected ? 'ring-2 ring-primary-500 shadow-lg' : ''
+                    }`}
+                    style={{
+                      left: position.x,
+                      top: position.y,
+                      width: totalWidth,
+                      height: totalHeight,
+                      transform: `rotate(${rotation}deg)`,
+                      transformOrigin: 'center'
+                    }}
+                    onMouseDown={(e) => handleChairRowDragStart(chairRow.id, e)}
+                    onDoubleClick={() => handleEditChairRow(chairRow)}
+                  >
+                    {/* Rotation handle - visible on hover */}
+                    <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity z-30">
+                      <button
+                        className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors"
+                        onMouseDown={(e) => handleChairRowRotationStart(chairRow.id, e)}
+                        onClick={(e) => e.stopPropagation()}
+                        title="Táhněte pro rotaci"
+                      >
+                        <RotateCw className="w-3 h-3" />
+                      </button>
+                    </div>
+
+                    {/* Info on hover - above chair row */}
+                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-20 pointer-events-none">
+                      <div className="bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                        Dvojklik pro úpravu
+                      </div>
+                    </div>
+
+                    {/* Individual chairs */}
+                    {Array.from({ length: chairRow.chairCount }).map((_, index) => {
+                      const chairSeat = rowChairSeats.find(s => s.position === index + 1)
+
+                      const chairX = chairRow.orientation === 'horizontal' ? index * spacing : 0
+                      const chairY = chairRow.orientation === 'vertical' ? index * spacing : 0
+
+                      const guestNameData = chairSeat ? getGuestNameForChairSeat(chairSeat) : null
+                      const guestNameTooltip = guestNameData?.fullName || null
+
+                      return (
+                        <div
+                          key={index}
+                          className={`absolute w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-medium transition-colors cursor-pointer overflow-hidden ${
+                            chairSeat?.guestId
+                              ? 'bg-white border-green-400 hover:border-green-500'
+                              : chairSeat?.isReserved
+                              ? 'bg-yellow-100 border-yellow-400 text-yellow-800 hover:bg-yellow-200'
+                              : 'bg-gray-100 border-gray-300 text-gray-600 hover:bg-primary-100 hover:border-primary-400'
+                          }`}
+                          style={{
+                            left: chairX,
+                            top: chairY
+                          }}
+                          title={guestNameTooltip || `Místo ${index + 1} - levé tlačítko: přiřadit hosta`}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            if (chairSeat) {
+                              if (chairSeat.guestId) {
+                                handleUnassignGuest(chairSeat.id)
+                              } else {
+                                handleSeatClick(chairSeat.id, 'chair')
+                              }
+                            }
+                          }}
+                          onDrop={(e) => handleGuestDrop(e, chairSeat?.id || '')}
+                          onDragOver={(e) => e.preventDefault()}
+                        >
+                          {chairSeat?.guestId ? renderAvatar(getAvatarForPerson(chairSeat.guestId), 24) : (index + 1)}
+                        </div>
+                      )
+                    })}
+
+                    {/* Guest names positioned around chairs */}
+                    {viewOptions.showGuestNames && rowChairSeats
+                      .filter(s => s.guestId)
+                      .map((chairSeat) => {
+                        const guestName = getGuestNameForChairSeat(chairSeat)
+                        if (!guestName) return null
+
+                        const seatIndex = chairSeat.position - 1
+                        const chairX = chairRow.orientation === 'horizontal' ? seatIndex * spacing : 0
+                        const chairY = chairRow.orientation === 'vertical' ? seatIndex * spacing : 0
+
+                        // Position name below or to the side based on orientation
+                        const nameOffset = 25
+                        const nameX = chairRow.orientation === 'horizontal' ? chairX : chairX + nameOffset
+                        const nameY = chairRow.orientation === 'horizontal' ? chairY + nameOffset : chairY
+
+                        return (
+                          <div
+                            key={chairSeat.id}
+                            className="absolute whitespace-nowrap pointer-events-none"
+                            style={{
+                              left: nameX,
+                              top: nameY,
+                              transform: 'translate(-50%, 0)'
+                            }}
+                          >
+                            <span className="text-xs font-medium text-gray-700 bg-white px-1 rounded shadow-sm">
+                              {guestName.firstName}
+                            </span>
+                          </div>
+                        )
+                      })}
+
+                    {/* Chair row label */}
+                    <div className="absolute -top-6 left-0 bg-white px-2 py-1 rounded shadow-sm border border-gray-200">
+                      <span className="text-xs font-medium text-gray-700">
+                        {chairRow.name}
+                      </span>
+                    </div>
+
+                    {/* Edit/Delete buttons */}
+                    {isSelected && (
+                      <div className="absolute -right-2 -top-2 flex space-x-1">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleEditChairRow(chairRow)
+                          }}
+                          className="p-1 bg-blue-500 text-white rounded-full hover:bg-blue-600 shadow-lg"
+                        >
+                          <Edit3 className="w-3 h-3" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleDeleteChairRow(chairRow.id)
+                          }}
+                          className="p-1 bg-red-500 text-white rounded-full hover:bg-red-600 shadow-lg"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )
               })}
@@ -2383,39 +3126,228 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
         </div>
       )}
 
+      {/* Chair row form modal */}
+      {showChairRowForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              {editingChairRow ? 'Upravit řadu židlí' : 'Přidat řadu židlí'}
+            </h3>
+            <p className="text-sm text-gray-600 mb-6">
+              Vytvořte řadu samostatných židlí pro ceremonie nebo jiné účely
+            </p>
+
+            <div className="space-y-4">
+              {/* Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Název řady
+                </label>
+                <input
+                  type="text"
+                  value={chairRowFormData.name}
+                  onChange={(e) => setChairRowFormData(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="např. Ceremonie - levá strana"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+
+              {/* Chair count */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Počet židlí
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="50"
+                  value={chairRowFormData.chairCount}
+                  onChange={(e) => setChairRowFormData(prev => ({ ...prev, chairCount: parseInt(e.target.value) || 1 }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+
+              {/* Orientation */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Orientace
+                </label>
+                <select
+                  value={chairRowFormData.orientation}
+                  onChange={(e) => setChairRowFormData(prev => ({ ...prev, orientation: e.target.value as ChairRowOrientation }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                >
+                  <option value="horizontal">Horizontální (vedle sebe)</option>
+                  <option value="vertical">Vertikální (za sebou)</option>
+                </select>
+              </div>
+
+              {/* Spacing */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Rozestup židlí (px)
+                </label>
+                <input
+                  type="number"
+                  min="30"
+                  max="100"
+                  value={chairRowFormData.spacing}
+                  onChange={(e) => setChairRowFormData(prev => ({ ...prev, spacing: parseInt(e.target.value) || 40 }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+
+              {/* Color */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Barva
+                </label>
+                <div className="flex space-x-2">
+                  {['#8B5CF6', '#EC4899', '#3B82F6', '#10B981', '#F59E0B', '#EF4444'].map(color => (
+                    <button
+                      key={color}
+                      type="button"
+                      onClick={() => setChairRowFormData(prev => ({ ...prev, color }))}
+                      className={`w-10 h-10 rounded-lg border-2 transition-all ${
+                        chairRowFormData.color === color ? 'border-gray-900 scale-110' : 'border-gray-300'
+                      }`}
+                      style={{ backgroundColor: color }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Actions */}
+              {editingChairRow && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (editingChairRow) {
+                      handleDeleteChairRow(editingChairRow.id)
+                      setShowChairRowForm(false)
+                      setEditingChairRow(null)
+                    }
+                  }}
+                  className="w-full btn-outline text-red-600 border-red-300 hover:bg-red-50 flex items-center justify-center space-x-2"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span>Smazat řadu židlí</span>
+                </button>
+              )}
+              <div className="flex space-x-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowChairRowForm(false)
+                    setEditingChairRow(null)
+                    setChairRowFormData({
+                      name: '',
+                      chairCount: 6,
+                      orientation: 'horizontal',
+                      color: '#8B5CF6',
+                      spacing: 40
+                    })
+                  }}
+                  className="flex-1 btn-outline"
+                >
+                  Zrušit
+                </button>
+                <button
+                  type="button"
+                  onClick={editingChairRow ? handleSaveChairRow : handleAddChairRow}
+                  className="flex-1 btn-primary"
+                >
+                  {editingChairRow ? 'Uložit změny' : 'Přidat řadu'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Dance floor form modal */}
+      {showDanceFloorForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Přidat taneční parket
+            </h3>
+            <p className="text-sm text-gray-600 mb-6">
+              Vytvořte taneční parket pro vaši svatbu
+            </p>
+
+            <div className="space-y-4">
+              {/* Width */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Šířka (px)
+                </label>
+                <input
+                  type="number"
+                  min="100"
+                  max="800"
+                  value={danceFloorFormData.width}
+                  onChange={(e) => setDanceFloorFormData(prev => ({ ...prev, width: parseInt(e.target.value) || 200 }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+
+              {/* Height */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Výška (px)
+                </label>
+                <input
+                  type="number"
+                  min="100"
+                  max="800"
+                  value={danceFloorFormData.height}
+                  onChange={(e) => setDanceFloorFormData(prev => ({ ...prev, height: parseInt(e.target.value) || 200 }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+
+              {/* Actions */}
+              <div className="flex space-x-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowDanceFloorForm(false)
+                    setDanceFloorFormData({
+                      width: 200,
+                      height: 200,
+                      color: '#FCD34D'
+                    })
+                  }}
+                  className="flex-1 btn-outline"
+                >
+                  Zrušit
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAddDanceFloor}
+                  className="flex-1 btn-primary"
+                >
+                  Přidat parket
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Dance floor edit modal */}
       {editingDanceFloor && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Upravit taneční parket
             </h3>
+            <p className="text-sm text-gray-600 mb-6">
+              Upravte velikost tanečního parketu
+            </p>
 
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Pozice X
-                  </label>
-                  <input
-                    type="number"
-                    value={danceFloorData.x}
-                    onChange={(e) => setDanceFloorData(prev => ({ ...prev, x: parseInt(e.target.value) || 0 }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Pozice Y
-                  </label>
-                  <input
-                    type="number"
-                    value={danceFloorData.y}
-                    onChange={(e) => setDanceFloorData(prev => ({ ...prev, y: parseInt(e.target.value) || 0 }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -2442,7 +3374,18 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
               </div>
             </div>
 
-            <div className="flex flex-col space-y-3 pt-6">
+            <div className="space-y-4 pt-6">
+              {/* Delete button */}
+              <button
+                type="button"
+                onClick={handleDeleteDanceFloor}
+                className="w-full btn-outline text-red-600 border-red-300 hover:bg-red-50 flex items-center justify-center space-x-2"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>Smazat taneční parket</span>
+              </button>
+
+              {/* Action buttons */}
               <div className="flex space-x-3">
                 <button
                   type="button"
@@ -2459,14 +3402,6 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                   Uložit změny
                 </button>
               </div>
-              <button
-                type="button"
-                onClick={handleDeleteDanceFloor}
-                className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center space-x-2"
-              >
-                <Trash2 className="w-4 h-4" />
-                <span>Smazat taneční parket</span>
-              </button>
             </div>
           </div>
         </div>

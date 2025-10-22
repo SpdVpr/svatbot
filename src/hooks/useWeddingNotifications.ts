@@ -39,28 +39,29 @@ export enum WeddingNotificationType {
   TASK_OVERDUE = 'task_overdue',
   TASK_COMPLETED = 'task_completed',
   TASK_ASSIGNED = 'task_assigned',
-  
+
   // Timeline notifications
   TIMELINE_REMINDER = 'timeline_reminder',
   TIMELINE_CONFLICT = 'timeline_conflict',
   TIMELINE_UPDATED = 'timeline_updated',
-  
+  CALENDAR_REMINDER = 'calendar_reminder',
+
   // Budget notifications
   BUDGET_EXCEEDED = 'budget_exceeded',
   BUDGET_WARNING = 'budget_warning',
   PAYMENT_DUE = 'payment_due',
   PAYMENT_OVERDUE = 'payment_overdue',
-  
+
   // Guest notifications
   RSVP_RECEIVED = 'rsvp_received',
   RSVP_REMINDER = 'rsvp_reminder',
   GUEST_DIETARY_UPDATE = 'guest_dietary_update',
-  
+
   // Vendor notifications
   VENDOR_MESSAGE = 'vendor_message',
   VENDOR_MEETING_REMINDER = 'vendor_meeting_reminder',
   VENDOR_CONTRACT_EXPIRING = 'vendor_contract_expiring',
-  
+
   // System notifications
   WEDDING_COUNTDOWN = 'wedding_countdown',
   BACKUP_REMINDER = 'backup_reminder',
