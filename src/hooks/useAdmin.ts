@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect, createContext, useContext } from 'react'
+import { useState, useEffect, createContext, useContext, useRef } from 'react'
 import { AdminUser, AdminSession, AdminStats } from '@/types/admin'
 import { auth, db } from '@/lib/firebase'
-import { signInWithEmailAndPassword, signOut } from 'firebase/auth'
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth'
 import { doc, getDoc } from 'firebase/firestore'
 
 interface AdminContextType {
@@ -129,123 +129,118 @@ export function useAdmin() {
   const [user, setUser] = useState<AdminUser | null>(null)
   const [session, setSession] = useState<AdminSession | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const isInitialized = useRef(false)
 
   useEffect(() => {
-    // Check for existing session
-    const savedSession = localStorage.getItem('admin_session')
-    if (savedSession) {
-      try {
-        const parsedSession = JSON.parse(savedSession)
-        if (new Date(parsedSession.expiresAt) > new Date()) {
-          // Convert date strings back to Date objects
-          const user = {
-            ...parsedSession.user,
-            createdAt: new Date(parsedSession.user.createdAt),
-            lastLogin: parsedSession.user.lastLogin ? new Date(parsedSession.user.lastLogin) : undefined
-          }
-          setSession({ ...parsedSession, user })
-          setUser(user)
-        } else {
-          localStorage.removeItem('admin_session')
-        }
-      } catch (error) {
-        console.error('Error loading admin session:', error)
+    // Prevent multiple initializations
+    if (isInitialized.current) return
+    isInitialized.current = true
+
+    // Set up Firebase auth state listener
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (!firebaseUser) {
+        // User is signed out
+        setUser(null)
+        setSession(null)
         localStorage.removeItem('admin_session')
+        setIsLoading(false)
+        return
       }
-    }
-    setIsLoading(false)
+
+      try {
+        // Check if user has admin role
+        const idTokenResult = await firebaseUser.getIdTokenResult()
+        const role = idTokenResult.claims.role as string
+        const isAdmin = idTokenResult.claims.admin as boolean
+
+        if (!isAdmin || !role) {
+          // Not an admin, sign out
+          await signOut(auth)
+          setUser(null)
+          setSession(null)
+          localStorage.removeItem('admin_session')
+          setIsLoading(false)
+          return
+        }
+
+        // Get admin user data from Firestore
+        const adminUserDoc = await getDoc(doc(db, 'adminUsers', firebaseUser.uid))
+
+        if (!adminUserDoc.exists() || !adminUserDoc.data().isActive) {
+          // Admin document doesn't exist or is not active
+          await signOut(auth)
+          setUser(null)
+          setSession(null)
+          localStorage.removeItem('admin_session')
+          setIsLoading(false)
+          return
+        }
+
+        const adminData = adminUserDoc.data()
+
+        // Create admin user object
+        const adminUser: AdminUser = {
+          id: firebaseUser.uid,
+          email: adminData.email,
+          name: adminData.name || 'Admin',
+          role: adminData.role,
+          permissions: getPermissionsForRole(adminData.role),
+          createdAt: adminData.createdAt?.toDate() || new Date(),
+          lastLogin: new Date(),
+          isActive: adminData.isActive
+        }
+
+        // Create session
+        const newSession: AdminSession = {
+          user: adminUser,
+          token: await firebaseUser.getIdToken(),
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+        }
+
+        setSession(newSession)
+        setUser(adminUser)
+        localStorage.setItem('admin_session', JSON.stringify({
+          ...newSession,
+          user: {
+            ...adminUser,
+            createdAt: adminUser.createdAt.toISOString(),
+            lastLogin: adminUser.lastLogin?.toISOString()
+          }
+        }))
+        setIsLoading(false)
+      } catch (error) {
+        console.error('Error loading admin user:', error)
+        setUser(null)
+        setSession(null)
+        localStorage.removeItem('admin_session')
+        setIsLoading(false)
+      }
+    })
+
+    return () => unsubscribe()
   }, [])
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    setIsLoading(true)
-
     try {
+      console.log('🔐 Login attempt:', { email })
+
       // Sign in with Firebase Authentication
-      const userCredential = await signInWithEmailAndPassword(auth, email, password)
-      const firebaseUser = userCredential.user
+      // The onAuthStateChanged listener will handle setting the user state
+      await signInWithEmailAndPassword(auth, email, password)
 
-      // Get ID token to check custom claims
-      const idTokenResult = await firebaseUser.getIdTokenResult()
-      const role = idTokenResult.claims.role as string
-      const isAdmin = idTokenResult.claims.admin as boolean
-
-      console.log('🔐 Login attempt:', { email, role, isAdmin })
-
-      // Check if user has admin role
-      if (!isAdmin || !role) {
-        console.error('❌ User is not an admin')
-        await signOut(auth)
-        setIsLoading(false)
-        return false
-      }
-
-      // Get admin user data from Firestore
-      const adminUserDoc = await getDoc(doc(db, 'adminUsers', firebaseUser.uid))
-
-      if (!adminUserDoc.exists()) {
-        console.error('❌ Admin user document not found')
-        await signOut(auth)
-        setIsLoading(false)
-        return false
-      }
-
-      const adminData = adminUserDoc.data()
-
-      // Check if admin is active
-      if (!adminData.isActive) {
-        console.error('❌ Admin account is not active')
-        await signOut(auth)
-        setIsLoading(false)
-        return false
-      }
-
-      // Create admin user object
-      const adminUser: AdminUser = {
-        id: firebaseUser.uid,
-        email: adminData.email,
-        name: adminData.name || 'Admin',
-        role: adminData.role,
-        permissions: getPermissionsForRole(adminData.role),
-        createdAt: adminData.createdAt?.toDate() || new Date(),
-        lastLogin: new Date(),
-        isActive: adminData.isActive
-      }
-
-      // Create session
-      const newSession: AdminSession = {
-        user: adminUser,
-        token: await firebaseUser.getIdToken(),
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
-      }
-
-      setSession(newSession)
-      setUser(adminUser)
-      localStorage.setItem('admin_session', JSON.stringify({
-        ...newSession,
-        user: {
-          ...adminUser,
-          createdAt: adminUser.createdAt.toISOString(),
-          lastLogin: adminUser.lastLogin?.toISOString()
-        }
-      }))
-
-      console.log('✅ Admin login successful:', adminUser)
-      setIsLoading(false)
+      console.log('✅ Admin login successful')
       return true
 
     } catch (error: any) {
       console.error('❌ Login error:', error)
-      setIsLoading(false)
       return false
     }
   }
 
   const logout = async () => {
     try {
+      // signOut will trigger onAuthStateChanged which will clean up the state
       await signOut(auth)
-      setUser(null)
-      setSession(null)
-      localStorage.removeItem('admin_session')
     } catch (error) {
       console.error('Logout error:', error)
     }

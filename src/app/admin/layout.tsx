@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useAdmin, AdminProvider } from '@/hooks/useAdmin'
 import AdminSidebar from '@/components/admin/AdminSidebar'
@@ -9,15 +9,22 @@ import { Loader2 } from 'lucide-react'
 
 function AdminLayoutContent({
   children,
+  adminHook,
 }: {
   children: React.ReactNode
+  adminHook: ReturnType<typeof useAdmin>
 }) {
-  const { isAuthenticated, isLoading } = useAdmin()
+  const { isAuthenticated, isLoading } = adminHook
   const router = useRouter()
   const pathname = usePathname()
+  const hasRedirected = useRef(false)
 
   useEffect(() => {
+    // Prevent multiple redirects
+    if (hasRedirected.current) return
+
     if (!isLoading && !isAuthenticated && pathname !== '/admin/login') {
+      hasRedirected.current = true
       router.push('/admin/login')
     }
   }, [isAuthenticated, isLoading, pathname, router])
@@ -70,7 +77,7 @@ export default function AdminLayout({
 
   return (
     <AdminProvider value={adminHook}>
-      <AdminLayoutContent>{children}</AdminLayoutContent>
+      <AdminLayoutContent adminHook={adminHook}>{children}</AdminLayoutContent>
     </AdminProvider>
   )
 }

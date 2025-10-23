@@ -3,16 +3,16 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
-import { useAdmin } from '@/hooks/useAdmin'
-import { 
-  collection, 
-  getDocs, 
-  doc, 
-  updateDoc, 
-  query, 
+import { useAdminContext } from '@/hooks/useAdmin'
+import {
+  collection,
+  getDocs,
+  doc,
+  updateDoc,
+  query,
   orderBy,
   where,
-  Timestamp 
+  Timestamp
 } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import type { AffiliatePartner, Commission, Payout } from '@/types/affiliate'
@@ -43,7 +43,7 @@ const convertTimestamps = (data: any) => {
 export default function AdminAffiliatesPage() {
   const router = useRouter()
   const { user } = useAuth()
-  const { isAuthenticated: isAdmin } = useAdmin()
+  const { isAuthenticated: isAdmin } = useAdminContext()
   
   const [activeTab, setActiveTab] = useState<'partners' | 'commissions' | 'payouts'>('partners')
   const [loading, setLoading] = useState(true)

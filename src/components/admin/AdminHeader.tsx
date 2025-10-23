@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useAdmin } from '@/hooks/useAdmin'
+import { useAdminContext } from '@/hooks/useAdmin'
 import {
   Bell,
   Search,
@@ -13,7 +13,7 @@ import {
 
 export default function AdminHeader() {
   const [showUserMenu, setShowUserMenu] = useState(false)
-  const { user, logout } = useAdmin()
+  const { user, logout } = useAdminContext()
 
   const handleLogout = () => {
     logout()

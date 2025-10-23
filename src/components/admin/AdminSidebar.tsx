@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useAdmin } from '@/hooks/useAdmin'
+import { useAdminContext } from '@/hooks/useAdmin'
 import {
   LayoutDashboard,
   Store,
@@ -62,7 +62,7 @@ const navigation: NavigationItem[] = [
 export default function AdminSidebar() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = usePathname()
-  const { checkPermission } = useAdmin()
+  const { checkPermission } = useAdminContext()
 
   const filteredNavigation = navigation.filter(item =>
     checkPermission(item.permission.resource, item.permission.action)

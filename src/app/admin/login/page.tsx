@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAdmin } from '@/hooks/useAdmin'
+import { useAdminContext } from '@/hooks/useAdmin'
 import {
   Lock,
   Mail,
@@ -21,7 +21,7 @@ export default function AdminLoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const hasRedirected = useRef(false)
 
-  const { user, login, isLoading, isAuthenticated } = useAdmin()
+  const { user, login, isLoading, isAuthenticated } = useAdminContext()
   const router = useRouter()
 
   useEffect(() => {
