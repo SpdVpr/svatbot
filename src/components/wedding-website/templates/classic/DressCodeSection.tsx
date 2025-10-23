@@ -63,7 +63,7 @@ export default function DressCodeSection({ content }: DressCodeSectionProps) {
                   )}
                 </div>
 
-                {/* Color Images - Max 3 per row with fixed aspect ratio */}
+                {/* Color Images - Max 3 per row with rectangular aspect ratio */}
                 {colorItem.images && colorItem.images.length > 0 && (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {colorItem.images.map((image, imageIndex) => (
@@ -71,7 +71,7 @@ export default function DressCodeSection({ content }: DressCodeSectionProps) {
                         key={imageIndex}
                         className="group relative bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300"
                       >
-                        <div className="relative w-full" style={{ paddingBottom: '100%' }}>
+                        <div className="relative w-full" style={{ paddingBottom: '75%' }}>
                           <img
                             src={image}
                             alt={`${colorItem.name || 'Color'} inspirace ${imageIndex + 1}`}
