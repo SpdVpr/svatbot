@@ -1,18 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getFunctions, httpsCallable } from 'firebase/functions'
-import { initializeApp, getApps } from 'firebase/app'
-
-// Initialize Firebase if not already initialized
-if (getApps().length === 0) {
-  initializeApp({
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-  })
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,34 +12,41 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Call Firebase Function to set admin role
-    const functions = getFunctions(undefined, 'europe-west1')
-    const setAdminRoleFunction = httpsCallable(functions, 'setAdminRole')
-    
-    const result = await setAdminRoleFunction({
-      userId,
-      role,
-      secretKey
+    // Call Firebase Cloud Function directly via HTTP
+    const functionUrl = 'https://europe-west1-svatbot-app.cloudfunctions.net/setAdminRole'
+
+    const response = await fetch(functionUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        data: {
+          userId,
+          role,
+          secretKey
+        }
+      })
     })
 
-    const data = result.data as { success: boolean; message: string }
+    const result = await response.json()
 
-    if (data.success) {
+    if (result.result?.success) {
       return NextResponse.json({
         success: true,
-        message: data.message
+        message: result.result.message
       })
     } else {
       return NextResponse.json(
-        { success: false, message: data.message },
+        { success: false, message: result.result?.message || result.error?.message || 'Failed to set admin role' },
         { status: 400 }
       )
     }
   } catch (error: any) {
     console.error('Error setting admin role:', error)
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         message: error.message || 'Failed to set admin role'
       },
       { status: 500 }
