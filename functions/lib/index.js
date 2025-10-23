@@ -67,10 +67,11 @@ const vendorRoutes_1 = __importDefault(require("./routes/vendorRoutes"));
 const adminRoutes_1 = __importDefault(require("./routes/adminRoutes"));
 const uploadRoutes_1 = __importDefault(require("./routes/uploadRoutes"));
 // API routes
-app.use('/api/v1/auth', authRoutes_1.default);
-app.use('/api/v1/vendors', vendorRoutes_1.default);
-app.use('/api/v1/admin', adminRoutes_1.default);
-app.use('/api/v1/upload', uploadRoutes_1.default);
+// Note: The Firebase Function is already named 'api', so we don't need /api prefix here
+app.use('/v1/auth', authRoutes_1.default);
+app.use('/v1/vendors', vendorRoutes_1.default);
+app.use('/v1/admin', adminRoutes_1.default);
+app.use('/v1/upload', uploadRoutes_1.default);
 // Health check
 app.get('/health', (req, res) => {
     res.json({
@@ -81,7 +82,7 @@ app.get('/health', (req, res) => {
     });
 });
 // API documentation
-app.get('/api/v1/docs', (req, res) => {
+app.get('/v1/docs', (req, res) => {
     res.json({
         name: 'SvatBot Firebase API',
         version: '1.0.0',

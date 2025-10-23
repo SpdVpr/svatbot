@@ -34,10 +34,11 @@ import adminRoutes from './routes/adminRoutes'
 import uploadRoutes from './routes/uploadRoutes'
 
 // API routes
-app.use('/api/v1/auth', authRoutes)
-app.use('/api/v1/vendors', vendorRoutes)
-app.use('/api/v1/admin', adminRoutes)
-app.use('/api/v1/upload', uploadRoutes)
+// Note: The Firebase Function is already named 'api', so we don't need /api prefix here
+app.use('/v1/auth', authRoutes)
+app.use('/v1/vendors', vendorRoutes)
+app.use('/v1/admin', adminRoutes)
+app.use('/v1/upload', uploadRoutes)
 
 // Health check
 app.get('/health', (req, res) => {
@@ -50,7 +51,7 @@ app.get('/health', (req, res) => {
 })
 
 // API documentation
-app.get('/api/v1/docs', (req, res) => {
+app.get('/v1/docs', (req, res) => {
   res.json({
     name: 'SvatBot Firebase API',
     version: '1.0.0',
