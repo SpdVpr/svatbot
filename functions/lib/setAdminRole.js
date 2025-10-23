@@ -55,16 +55,17 @@ if (!admin.apps.length) {
 exports.setAdminRole = functions
     .region('europe-west1')
     .https.onCall(async (data, context) => {
-    var _a, _b;
+    var _a, _b, _c;
     try {
         const { userId, role, secretKey } = data;
         // Security: Require a secret key for first-time setup
         // After first admin is created, this function should check for super_admin role
-        const SETUP_SECRET = 'svatbot-admin-setup-2025'; // Change this!
+        const SETUP_SECRET = ((_a = functions.config().admin) === null || _a === void 0 ? void 0 : _a.secret_key) || 'svatbot_admin_2024_secure_key';
         // Check if caller is already a super admin
-        const isExistingAdmin = ((_b = (_a = context.auth) === null || _a === void 0 ? void 0 : _a.token) === null || _b === void 0 ? void 0 : _b.role) === 'super_admin';
+        const isExistingAdmin = ((_c = (_b = context.auth) === null || _b === void 0 ? void 0 : _b.token) === null || _c === void 0 ? void 0 : _c.role) === 'super_admin';
         // For first-time setup, require secret key
         if (!isExistingAdmin && secretKey !== SETUP_SECRET) {
+            console.error('Invalid secret key:', { provided: secretKey, expected: SETUP_SECRET });
             throw new functions.https.HttpsError('permission-denied', 'Invalid secret key or insufficient permissions');
         }
         // Validate inputs

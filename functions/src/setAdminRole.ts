@@ -26,13 +26,14 @@ export const setAdminRole = functions
 
       // Security: Require a secret key for first-time setup
       // After first admin is created, this function should check for super_admin role
-      const SETUP_SECRET = 'svatbot-admin-setup-2025' // Change this!
+      const SETUP_SECRET = functions.config().admin?.secret_key || 'svatbot_admin_2024_secure_key'
 
       // Check if caller is already a super admin
       const isExistingAdmin = context.auth?.token?.role === 'super_admin'
 
       // For first-time setup, require secret key
       if (!isExistingAdmin && secretKey !== SETUP_SECRET) {
+        console.error('Invalid secret key:', { provided: secretKey, expected: SETUP_SECRET })
         throw new functions.https.HttpsError(
           'permission-denied',
           'Invalid secret key or insufficient permissions'

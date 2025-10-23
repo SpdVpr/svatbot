@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { initAffiliateTracking, linkUserToAffiliate, getAffiliateCookie } from '@/lib/affiliateTracking'
 import { useAuth } from '@/hooks/useAuth'
@@ -20,11 +20,21 @@ export default function AffiliateTracker() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const { user } = useAuth()
+  const lastTrackedPath = useRef<string>('')
 
   // Track URL changes for affiliate clicks
   useEffect(() => {
+    // Create a unique key for this path + search params
+    const currentPath = `${pathname}${searchParams?.toString() ? `?${searchParams.toString()}` : ''}`
+
+    // Skip if we already tracked this exact path
+    if (lastTrackedPath.current === currentPath) {
+      return
+    }
+
     // Initialize affiliate tracking on mount and when URL changes
     initAffiliateTracking()
+    lastTrackedPath.current = currentPath
   }, [pathname, searchParams])
 
   // Link user to affiliate only once when user logs in
