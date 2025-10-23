@@ -25,8 +25,24 @@ export default function EmailTestPanel() {
   const [result, setResult] = useState<EmailTestResult | null>(null)
   const [status, setStatus] = useState<EmailServiceStatus | null>(null)
   const [statusLoading, setStatusLoading] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://europe-west1-svatbot-app.cloudfunctions.net/api'
+
+  // Check authentication on mount
+  useState(() => {
+    const checkAuth = async () => {
+      try {
+        const { auth } = await import('@/config/firebase')
+        const user = auth.currentUser
+        setIsAuthenticated(!!user)
+      } catch (error) {
+        console.error('Error checking auth:', error)
+        setIsAuthenticated(false)
+      }
+    }
+    checkAuth()
+  })
 
   const getAuthToken = async () => {
     const { auth } = await import('@/config/firebase')
@@ -36,6 +52,14 @@ export default function EmailTestPanel() {
   }
 
   const fetchEmailStatus = async () => {
+    if (!isAuthenticated) {
+      setResult({
+        success: false,
+        message: 'Nejste přihlášeni. Prosím přihlaste se jako admin.'
+      })
+      return
+    }
+
     try {
       setStatusLoading(true)
       const token = await getAuthToken()
@@ -58,6 +82,14 @@ export default function EmailTestPanel() {
   }
 
   const testEmail = async (type: 'registration' | 'payment' | 'trial-reminder') => {
+    if (!isAuthenticated) {
+      setResult({
+        success: false,
+        message: 'Nejste přihlášeni. Prosím přihlaste se jako admin.'
+      })
+      return
+    }
+
     if (!email) {
       setResult({
         success: false,
