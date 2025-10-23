@@ -47,6 +47,8 @@ const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 admin.initializeApp();
 // Initialize Express app
 const app = (0, express_1.default)();
+// Trust proxy - required for Firebase Functions and rate limiting
+app.set('trust proxy', true);
 // Security middleware
 app.use((0, helmet_1.default)());
 app.use((0, cors_1.default)({ origin: true }));

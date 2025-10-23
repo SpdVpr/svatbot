@@ -55,7 +55,7 @@ export default function EmailStatsPanel() {
       const token = await user.getIdToken()
 
       const response = await fetch(
-        'https://europe-west1-svatbot-app.cloudfunctions.net/api/api/v1/admin/email-stats/summary',
+        'https://europe-west1-svatbot-app.cloudfunctions.net/api/v1/admin/email-stats/summary',
         {
           headers: {
             'Authorization': `Bearer ${token}`

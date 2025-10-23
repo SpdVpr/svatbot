@@ -134,12 +134,18 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       throw new Error('Missing period start/end in checkout subscription')
     }
 
+    // Calculate amount based on plan
+    const amount = plan === 'premium_monthly' ? 29900 : 299900 // in cents (299 CZK or 2999 CZK)
+    const currency = 'CZK'
+
     // Update subscription in Firestore using Admin SDK
     const adminDb = getAdminDb()
     const subscriptionRef = adminDb.collection('subscriptions').doc(userId)
     await subscriptionRef.update({
       plan,
       status: 'active',
+      amount, // Add amount in cents
+      currency, // Add currency
       stripeCustomerId: session.customer as string,
       stripeSubscriptionId: subscriptionData.id,
       currentPeriodStart: stripeTimestampToFirestore(periodStart),
@@ -158,13 +164,14 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
 async function handleSubscriptionUpdate(subscription: any) {
   const userId = subscription.metadata?.userId
+  const plan = subscription.metadata?.plan
 
   if (!userId) {
     console.error('No userId in subscription metadata')
     return
   }
 
-  console.log('🔄 Subscription updated:', { userId, status: subscription.status })
+  console.log('🔄 Subscription updated:', { userId, status: subscription.status, plan })
   console.log('📥 Subscription timestamp data:', {
     current_period_start: subscription.current_period_start,
     current_period_end: subscription.current_period_end,
@@ -188,10 +195,16 @@ async function handleSubscriptionUpdate(subscription: any) {
     throw new Error('Missing period start/end in subscription')
   }
 
+  // Calculate amount based on plan
+  const amount = plan === 'premium_monthly' ? 29900 : 299900 // in cents (299 CZK or 2999 CZK)
+  const currency = 'CZK'
+
   const adminDb = getAdminDb()
   const subscriptionRef = adminDb.collection('subscriptions').doc(userId)
   await subscriptionRef.update({
     status: subscription.status,
+    amount, // Add amount in cents
+    currency, // Add currency
     currentPeriodStart: stripeTimestampToFirestore(periodStart),
     currentPeriodEnd: stripeTimestampToFirestore(periodEnd),
     cancelAtPeriodEnd: subscription.cancel_at_period_end,

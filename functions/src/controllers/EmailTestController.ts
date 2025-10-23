@@ -70,13 +70,14 @@ export class EmailTestController {
 
       const testFirstName = firstName || email.split('@')[0] || 'Testovací uživatel'
       const testPlan = plan || 'premium_yearly'
-      const testAmount = testPlan === 'premium_monthly' ? 299 : 2990
+      const testAmount = testPlan === 'premium_monthly' ? 29900 : 299900 // Amount in cents (299 CZK or 2999 CZK)
       const testCurrency = 'CZK'
       const testUserId = 'test-user-' + Date.now()
+      const testInvoiceUrl = 'https://svatbot.cz/profile/payments' // Test URL - v produkci bude Stripe invoice URL
 
       console.log('🧪 Testing payment email:', { email, firstName: testFirstName, plan: testPlan, amount: testAmount })
 
-      const success = await sendPaymentSuccessEmail(email, testFirstName, testUserId, testPlan, testAmount, testCurrency)
+      const success = await sendPaymentSuccessEmail(email, testFirstName, testUserId, testPlan, testAmount, testCurrency, testInvoiceUrl)
 
       if (success) {
         res.status(200).json({
@@ -128,9 +129,13 @@ export class EmailTestController {
       const testDaysLeft = daysLeft || 2
       const testUserId = 'test-user-' + Date.now()
 
+      // Calculate trial end date based on daysLeft
+      const trialEndDate = new Date()
+      trialEndDate.setDate(trialEndDate.getDate() + testDaysLeft)
+
       console.log('🧪 Testing trial reminder email:', { email, firstName: testFirstName, daysLeft: testDaysLeft })
 
-      const success = await sendTrialReminderEmail(email, testFirstName, testUserId, testDaysLeft)
+      const success = await sendTrialReminderEmail(email, testFirstName, testUserId, trialEndDate)
 
       if (success) {
         res.status(200).json({

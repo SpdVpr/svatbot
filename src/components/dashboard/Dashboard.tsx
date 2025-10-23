@@ -32,7 +32,10 @@ import { useAutoNotifications } from '@/hooks/useAutoNotifications'
 import { useCalendarReminders } from '@/hooks/useCalendarReminders'
 import OnboardingWizard from '@/components/onboarding/OnboardingWizard'
 import ScrollProgress from '@/components/animations/ScrollProgress'
+import TrialExpiredModal from '@/components/subscription/TrialExpiredModal'
 import { useSearchParams } from 'next/navigation'
+// Import test utilities (only in development)
+import '@/utils/testTrialExpiry'
 
 function DashboardContent() {
   const { currentWedding } = useWeddingStore()
@@ -43,7 +46,25 @@ function DashboardContent() {
   const [showNotesModal, setShowNotesModal] = useState(false)
   const [showAccountModal, setShowAccountModal] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
+  const [showTrialExpiredModal, setShowTrialExpiredModal] = useState(false)
   const searchParams = useSearchParams()
+
+  // Check if trial has expired
+  const isTrialExpired = subscription &&
+    subscription.status === 'trialing' &&
+    (
+      // Either isTrialActive is false OR trial end date has passed
+      !subscription.isTrialActive ||
+      new Date() > subscription.trialEndDate
+    ) &&
+    !hasPremiumAccess
+
+  // Show trial expired modal when trial expires
+  useEffect(() => {
+    if (isTrialExpired && user?.email !== 'demo@svatbot.cz') {
+      setShowTrialExpiredModal(true)
+    }
+  }, [isTrialExpired, user])
 
   // Initialize auto-notifications system
   useAutoNotifications()
@@ -137,8 +158,20 @@ function DashboardContent() {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'rgb(253, 242, 248)' }}>
-      {/* Scroll Progress Indicator */}
-      <ScrollProgress />
+      {/* Trial Expired Modal - Blocks access */}
+      {showTrialExpiredModal && (
+        <TrialExpiredModal
+          onUpgrade={() => {
+            // Modal will close automatically after successful payment
+            setShowTrialExpiredModal(false)
+          }}
+        />
+      )}
+
+      {/* Main content with blur when trial expired */}
+      <div className={showTrialExpiredModal ? 'filter blur-sm pointer-events-none' : ''}>
+        {/* Scroll Progress Indicator */}
+        <ScrollProgress />
 
       {/* Glassmorphism Header */}
       <header className="bg-gray-50/95 backdrop-blur-xl border-b border-gray-100/50 shadow-sm sticky top-0 z-50">
@@ -374,6 +407,8 @@ function DashboardContent() {
         isOpen={showMobileMenu}
         onClose={() => setShowMobileMenu(false)}
       />
+      </div>
+      {/* End of blurred content wrapper */}
     </div>
   )
 }

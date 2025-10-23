@@ -21,9 +21,15 @@ export default function AffiliateTracker() {
   const searchParams = useSearchParams()
   const { user } = useAuth()
   const lastTrackedPath = useRef<string>('')
+  const lastTrackTime = useRef<number>(0)
 
   // Track URL changes for affiliate clicks
   useEffect(() => {
+    // Skip affiliate tracking for admin pages
+    if (pathname?.startsWith('/admin')) {
+      return
+    }
+
     // Create a unique key for this path + search params
     const currentPath = `${pathname}${searchParams?.toString() ? `?${searchParams.toString()}` : ''}`
 
@@ -32,13 +38,25 @@ export default function AffiliateTracker() {
       return
     }
 
+    // Throttle: Skip if called within last 1 second
+    const now = Date.now()
+    if (now - lastTrackTime.current < 1000) {
+      return
+    }
+
     // Initialize affiliate tracking on mount and when URL changes
     initAffiliateTracking()
     lastTrackedPath.current = currentPath
+    lastTrackTime.current = now
   }, [pathname, searchParams])
 
   // Link user to affiliate only once when user logs in
   useEffect(() => {
+    // Skip affiliate tracking for admin pages
+    if (pathname?.startsWith('/admin')) {
+      return
+    }
+
     // Skip if no user
     if (!user?.id || !user?.email) return
 
@@ -66,7 +84,7 @@ export default function AffiliateTracker() {
       .catch(err => {
         console.error('Error linking user to affiliate:', err)
       })
-  }, [user?.id]) // Only run when user ID changes (login/logout)
+  }, [user?.id, pathname]) // Only run when user ID or pathname changes
 
   // This component doesn't render anything
   return null

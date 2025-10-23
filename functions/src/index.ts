@@ -11,6 +11,9 @@ admin.initializeApp()
 // Initialize Express app
 const app = express()
 
+// Trust proxy - required for Firebase Functions and rate limiting
+app.set('trust proxy', true)
+
 // Security middleware
 app.use(helmet())
 app.use(cors({ origin: true }))
