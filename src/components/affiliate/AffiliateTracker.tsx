@@ -21,21 +21,42 @@ export default function AffiliateTracker() {
   const searchParams = useSearchParams()
   const { user } = useAuth()
 
+  // Track URL changes for affiliate clicks
   useEffect(() => {
     // Initialize affiliate tracking on mount and when URL changes
     initAffiliateTracking()
+  }, [pathname, searchParams])
 
-    // If user is logged in and has affiliate cookie, link them to affiliate
-    if (user?.id && user?.email) {
-      const affiliateCode = getAffiliateCookie()
-      if (affiliateCode) {
-        console.log('🔗 Linking existing user to affiliate:', { userId: user.id, affiliateCode })
-        linkUserToAffiliate(user.id, user.email).catch(err => {
-          console.error('Error linking user to affiliate:', err)
-        })
+  // Link user to affiliate only once when user logs in
+  useEffect(() => {
+    // Skip if no user
+    if (!user?.id || !user?.email) return
+
+    const affiliateCode = getAffiliateCookie()
+    if (!affiliateCode) return
+
+    // Check if we already linked this user to this affiliate
+    const linkedKey = `affiliate_linked_${user.id}_${affiliateCode}`
+    if (typeof window !== 'undefined') {
+      const alreadyLinked = sessionStorage.getItem(linkedKey)
+      if (alreadyLinked) {
+        console.log('ℹ️ User already linked to affiliate in this session')
+        return
       }
     }
-  }, [pathname, searchParams, user?.id, user?.email])
+
+    console.log('🔗 Linking existing user to affiliate:', { userId: user.id, affiliateCode })
+    linkUserToAffiliate(user.id, user.email)
+      .then(() => {
+        // Mark as linked in this session to prevent re-linking
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem(linkedKey, 'true')
+        }
+      })
+      .catch(err => {
+        console.error('Error linking user to affiliate:', err)
+      })
+  }, [user?.id]) // Only run when user ID changes (login/logout)
 
   // This component doesn't render anything
   return null

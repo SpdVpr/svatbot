@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { auth } from '@/config/firebase'
-import { getFunctions, httpsCallable } from 'firebase/functions'
 import { User } from 'firebase/auth'
 
 export default function AdminSetupPage() {
@@ -37,25 +36,29 @@ export default function AdminSetupPage() {
       setSettingRole(true)
       setResult(null)
 
-      const functions = getFunctions(undefined, 'europe-west1')
-      const setAdminRoleFunction = httpsCallable(functions, 'setAdminRole')
-      
-      const response = await setAdminRoleFunction({
-        userId: user.uid,
-        role: selectedRole,
-        secretKey: secretKey
+      // Call our API endpoint which will call the Firebase Function
+      const response = await fetch('/api/admin/set-role', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId: user.uid,
+          role: selectedRole,
+          secretKey: secretKey
+        })
       })
 
-      const data = response.data as { success: boolean; message: string }
+      const data = await response.json()
       setResult(data)
 
       if (data.success) {
         // Force token refresh to get new custom claims
         await user.getIdToken(true)
-        
+
         // Reload user to get updated custom claims
         await auth.currentUser?.reload()
-        
+
         setTimeout(() => {
           window.location.href = '/admin/dashboard'
         }, 2000)

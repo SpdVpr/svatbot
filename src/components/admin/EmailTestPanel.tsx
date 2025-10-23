@@ -27,7 +27,8 @@ export default function EmailTestPanel() {
   const [statusLoading, setStatusLoading] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://europe-west1-svatbot-app.cloudfunctions.net/api'
+  // Firebase Functions URL - the function name is 'api' and it handles /v1/admin routes internally
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://europe-west1-svatbot-app.cloudfunctions.net/api/v1'
 
   // Check authentication on mount
   useState(() => {
@@ -64,7 +65,7 @@ export default function EmailTestPanel() {
       setStatusLoading(true)
       const token = await getAuthToken()
       
-      const response = await fetch(`${API_BASE}/v1/admin/email-test/status`, {
+      const response = await fetch(`${API_BASE}/admin/email-test/status`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -113,7 +114,7 @@ export default function EmailTestPanel() {
         body.daysLeft = 2
       }
 
-      const response = await fetch(`${API_BASE}/v1/admin/email-test/${type}`, {
+      const response = await fetch(`${API_BASE}/admin/email-test/${type}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
