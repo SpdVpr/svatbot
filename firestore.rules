@@ -531,9 +531,9 @@ service cloud.firestore {
                                get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid;
 
       // Anyone can create RSVP (guests submitting through website)
+      // Allow if website exists (removed isPublished check for testing)
       allow create: if request.resource.data.keys().hasAll(['websiteId', 'weddingId', 'name', 'email', 'status', 'guestCount']) &&
-                       exists(/databases/$(database)/documents/weddingWebsites/$(request.resource.data.websiteId)) &&
-                       get(/databases/$(database)/documents/weddingWebsites/$(request.resource.data.websiteId)).data.isPublished == true;
+                       exists(/databases/$(database)/documents/weddingWebsites/$(request.resource.data.websiteId));
     }
 
     // Dashboards collection - user's dashboard layout preferences

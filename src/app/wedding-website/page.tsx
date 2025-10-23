@@ -262,21 +262,30 @@ export default function WeddingWebsitePage() {
             <h3 className="font-semibold text-gray-900">
               Náhled webu
             </h3>
-            <Link
-              href={previewUrl}
-              target="_blank"
-              className="inline-flex items-center gap-2 text-pink-600 hover:text-pink-700 text-sm font-medium"
-            >
-              <Eye className="w-4 h-4" />
-              Otevřít v novém okně
-            </Link>
           </div>
-          <div className="border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
-            <iframe
-              src={previewUrl}
-              className="w-full h-[600px]"
-              title="Náhled svatebního webu"
-            />
+          <div className="border border-gray-200 rounded-lg overflow-hidden bg-gradient-to-br from-pink-50 to-purple-50 p-12">
+            <div className="text-center">
+              <div className="mb-6">
+                <Eye className="w-16 h-16 text-pink-500 mx-auto mb-4" />
+                <h4 className="text-xl font-semibold text-gray-900 mb-2">
+                  Váš svatební web je připraven!
+                </h4>
+                <p className="text-gray-600 mb-2">
+                  URL: <span className="font-mono text-pink-600">{previewUrl}</span>
+                </p>
+                <p className="text-sm text-gray-500">
+                  Klikněte na tlačítko níže pro zobrazení webu v novém okně
+                </p>
+              </div>
+              <Link
+                href={previewUrl}
+                target="_blank"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white px-8 py-4 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all"
+              >
+                <Eye className="w-5 h-5" />
+                Zobrazit svatební web
+              </Link>
+            </div>
           </div>
         </div>
 
