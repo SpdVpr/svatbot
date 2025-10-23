@@ -1,10 +1,140 @@
 import { Request, Response } from 'express'
-import { collections, serverTimestamp, FieldValue } from '../config/firebase'
+import { collections, serverTimestamp, FieldValue, firestore } from '../config/firebase'
 import { AuthenticatedRequest } from '../middleware/auth'
 import { AdminStats, VendorCategory, UserRole } from '../types'
 
 export class AdminController {
-  // Get admin dashboard statistics
+  // Get dashboard statistics with real data
+  static async getDashboardStats(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      const now = new Date()
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+      const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+
+      // Get all users
+      const usersSnapshot = await firestore.collection('users').get()
+      const users = usersSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }))
+
+      // Calculate user statistics
+      const totalUsers = users.length
+      const newUsersToday = users.filter(user => {
+        const createdAt = user.createdAt?.toDate()
+        return createdAt && createdAt >= todayStart
+      }).length
+
+      const newUsersThisWeek = users.filter(user => {
+        const createdAt = user.createdAt?.toDate()
+        return createdAt && createdAt >= weekAgo
+      }).length
+
+      const newUsersThisMonth = users.filter(user => {
+        const createdAt = user.createdAt?.toDate()
+        return createdAt && createdAt >= monthAgo
+      }).length
+
+      // Active users (logged in within last 30 days)
+      const activeUsers = users.filter(user => {
+        const lastLoginAt = user.lastLoginAt?.toDate()
+        return lastLoginAt && lastLoginAt >= monthAgo
+      }).length
+
+      // Online users (logged in today)
+      const onlineUsers = users.filter(user => {
+        const lastLoginAt = user.lastLoginAt?.toDate()
+        return lastLoginAt && lastLoginAt >= todayStart
+      }).length
+
+      // Get subscriptions
+      const subscriptionsSnapshot = await firestore.collection('subscriptions').get()
+      const subscriptions = subscriptionsSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }))
+
+      const activeSubscriptions = subscriptions.filter(sub =>
+        sub.status === 'active' || sub.status === 'trialing'
+      ).length
+
+      const trialUsers = subscriptions.filter(sub =>
+        sub.status === 'trialing' && sub.isTrialActive === true
+      ).length
+
+      // Get payments
+      const paymentsSnapshot = await firestore.collection('payments').get()
+      const payments = paymentsSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }))
+
+      const successfulPayments = payments.filter(p => p.status === 'succeeded')
+
+      // Calculate revenue
+      const totalRevenue = successfulPayments.reduce((sum, p) => sum + (p.amount || 0), 0)
+
+      const monthlyPayments = successfulPayments.filter(p => {
+        const createdAt = p.createdAt?.toDate()
+        return createdAt && createdAt >= monthAgo
+      })
+      const monthlyRevenue = monthlyPayments.reduce((sum, p) => sum + (p.amount || 0), 0)
+
+      // Calculate average session time (mock for now - would need analytics collection)
+      const avgSessionTime = 24.5
+
+      // Total sessions (mock for now - would need analytics collection)
+      const totalSessions = users.length * 10 // Rough estimate
+
+      // Churn rate calculation (simplified)
+      const canceledSubscriptions = subscriptions.filter(sub => sub.status === 'canceled').length
+      const churnRate = subscriptions.length > 0
+        ? (canceledSubscriptions / subscriptions.length) * 100
+        : 0
+
+      const stats = {
+        // User metrics
+        totalUsers,
+        activeUsers,
+        onlineUsers,
+        newUsersToday,
+        newUsersThisWeek,
+        newUsersThisMonth,
+
+        // Subscription metrics
+        activeSubscriptions,
+        trialUsers,
+
+        // Revenue metrics
+        monthlyRevenue: Math.round(monthlyRevenue),
+        totalRevenue: Math.round(totalRevenue),
+
+        // Engagement metrics
+        avgSessionTime,
+        totalSessions,
+        churnRate: Math.round(churnRate * 10) / 10,
+
+        // Vendor metrics (for vendors tab)
+        totalVendors: 0,
+        activeVendors: 0,
+        pendingApprovals: 0
+      }
+
+      res.status(200).json({
+        success: true,
+        data: stats
+      })
+    } catch (error) {
+      console.error('Error fetching dashboard stats:', error)
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch dashboard statistics'
+      })
+    }
+  }
+
+  // Get admin dashboard statistics (legacy)
   static async getStats(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       // Get user statistics

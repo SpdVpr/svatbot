@@ -267,61 +267,78 @@ export function useAdmin() {
 export function useAdminStats() {
   const [stats, setStats] = useState<AdminStats | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // Mock stats - in production, this would fetch from API
-    setTimeout(() => {
-      setStats({
-        // Users
-        totalUsers: 1247,
-        activeUsers: 856,
-        onlineUsers: 42,
-        newUsersToday: 12,
-        newUsersThisWeek: 87,
-        newUsersThisMonth: 342,
+    const fetchStats = async () => {
+      try {
+        setLoading(true)
+        setError(null)
 
-        // Vendors
-        totalVendors: 11,
-        activeVendors: 11,
-        pendingApprovals: 3,
+        // Get Firebase auth token
+        const user = auth.currentUser
+        if (!user) {
+          throw new Error('Not authenticated')
+        }
 
-        // Finance
-        monthlyRevenue: 45600,
-        totalRevenue: 234500,
-        activeSubscriptions: 156,
-        trialUsers: 89,
-        churnRate: 3.2,
+        const token = await user.getIdToken()
 
-        // Engagement
-        avgSessionTime: 24.5,
-        totalSessions: 5432,
-        avgSessionsPerUser: 4.3,
+        // Fetch real stats from API
+        const response = await fetch(
+          'https://europe-west1-svatbot-app.cloudfunctions.net/api/v1/admin/dashboard/stats',
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          }
+        )
 
-        // Support
-        openConversations: 8,
-        pendingFeedback: 5,
-        avgResponseTime: 2.4,
+        if (!response.ok) {
+          throw new Error('Failed to fetch stats')
+        }
 
-        // Top Categories
-        topCategories: [
-          { category: 'photographer', count: 6 },
-          { category: 'venue', count: 1 },
-          { category: 'catering', count: 1 },
-          { category: 'music', count: 1 },
-          { category: 'flowers', count: 1 },
-          { category: 'dress', count: 1 }
-        ],
+        const data = await response.json()
+        setStats(data.data)
+      } catch (err) {
+        console.error('Error fetching admin stats:', err)
+        setError(err instanceof Error ? err.message : 'Failed to load statistics')
 
-        // Charts Data
-        userGrowth: [],
-        revenueGrowth: [],
-        engagementTrend: []
-      })
-      setLoading(false)
-    }, 500)
+        // Fallback to empty stats on error
+        setStats({
+          totalUsers: 0,
+          activeUsers: 0,
+          onlineUsers: 0,
+          newUsersToday: 0,
+          newUsersThisWeek: 0,
+          newUsersThisMonth: 0,
+          totalVendors: 0,
+          activeVendors: 0,
+          pendingApprovals: 0,
+          monthlyRevenue: 0,
+          totalRevenue: 0,
+          activeSubscriptions: 0,
+          trialUsers: 0,
+          churnRate: 0,
+          avgSessionTime: 0,
+          totalSessions: 0,
+          avgSessionsPerUser: 0,
+          openConversations: 0,
+          pendingFeedback: 0,
+          avgResponseTime: 0,
+          topCategories: [],
+          userGrowth: [],
+          revenueGrowth: [],
+          engagementTrend: []
+        })
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchStats()
   }, [])
 
-  return { stats, loading }
+  return { stats, loading, error }
 }
 
 export const AdminProvider = AdminContext.Provider

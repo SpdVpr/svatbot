@@ -12,6 +12,11 @@ const router = Router()
 router.use(verifyToken)
 
 // Dashboard and statistics
+router.get('/dashboard/stats',
+  requireAdmin,
+  AdminController.getDashboardStats
+)
+
 router.get('/stats',
   requireAdmin,
   AdminController.getStats
