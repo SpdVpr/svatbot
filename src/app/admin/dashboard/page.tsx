@@ -7,6 +7,7 @@ import UserAnalyticsTable from '@/components/admin/UserAnalyticsTable'
 import AdminMessaging from '@/components/admin/AdminMessaging'
 import FeedbackManagement from '@/components/admin/FeedbackManagement'
 import PaymentsTab from '@/components/admin/PaymentsTab'
+import EmailStatsPanel from '@/components/admin/EmailStatsPanel'
 import {
   Store,
   Users,
@@ -144,6 +145,9 @@ function OverviewTab({ stats }: { stats: any }) {
           change="+24%"
         />
       </div>
+
+      {/* Email Statistics Panel */}
+      <EmailStatsPanel />
 
       {/* Revenue Card */}
       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">

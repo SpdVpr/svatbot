@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { AdminController } from '../controllers/AdminController'
+import { EmailStatsController } from '../controllers/EmailStatsController'
 import { verifyToken, requireAdmin, requireSuperAdmin } from '../middleware/auth'
 import { validateRequest, validatePagination } from '../middleware/validation'
 import { body, query } from 'express-validator'
@@ -247,6 +248,32 @@ router.post('/notifications/send',
   ],
   validateRequest,
   AdminController.sendNotification
+)
+
+// Email statistics
+router.get('/email-stats',
+  requireAdmin,
+  [
+    query('startDate').optional().isISO8601().withMessage('Invalid start date'),
+    query('endDate').optional().isISO8601().withMessage('Invalid end date'),
+    query('type').optional().isIn(['registration', 'payment_success', 'trial_reminder', 'trial_expired', 'other']).withMessage('Invalid email type')
+  ],
+  validateRequest,
+  EmailStatsController.getEmailStats
+)
+
+router.get('/email-stats/summary',
+  requireAdmin,
+  EmailStatsController.getEmailStatsSummary
+)
+
+router.get('/email-stats/daily',
+  requireAdmin,
+  [
+    query('days').optional().isInt({ min: 1, max: 365 }).withMessage('Days must be 1-365')
+  ],
+  validateRequest,
+  EmailStatsController.getDailyEmailStats
 )
 
 export default router

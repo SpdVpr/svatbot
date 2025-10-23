@@ -36,8 +36,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const functions = __importStar(require("firebase-functions"));
 const firebase_1 = require("../config/firebase");
 const types_1 = require("../types");
+const emailService_1 = require("../services/emailService");
 // Trigger when a new user is created in Firebase Auth
-const onUserCreate = functions.auth.user().onCreate(async (user) => {
+const onUserCreate = functions.region('europe-west1').auth.user().onCreate(async (user) => {
     var _a, _b;
     try {
         console.log('New user created:', user.uid, user.email);
@@ -75,6 +76,17 @@ const onUserCreate = functions.auth.user().onCreate(async (user) => {
             read: false,
             createdAt: (0, firebase_1.serverTimestamp)()
         });
+        // Send registration email
+        if (user.email && userData.firstName) {
+            try {
+                await (0, emailService_1.sendRegistrationEmail)(user.email, userData.firstName, user.uid);
+                console.log('Registration email sent to:', user.email);
+            }
+            catch (emailError) {
+                console.error('Error sending registration email:', emailError);
+                // Don't fail user creation if email fails
+            }
+        }
         console.log('User document created successfully:', user.uid);
     }
     catch (error) {

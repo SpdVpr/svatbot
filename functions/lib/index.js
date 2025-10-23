@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setAdminRole = exports.createVendor = exports.getVendors = exports.scheduledCleanup = exports.onInquiryCreate = exports.onReviewCreate = exports.onVendorUpdate = exports.onUserCreate = exports.api = void 0;
+exports.setAdminRole = exports.createVendor = exports.getVendors = exports.checkTrialExpiry = exports.onPaymentSuccess = exports.scheduledCleanup = exports.onInquiryCreate = exports.onReviewCreate = exports.onVendorUpdate = exports.onUserCreate = exports.api = void 0;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const express_1 = __importDefault(require("express"));
@@ -146,6 +146,11 @@ var onInquiryCreate_1 = require("./triggers/onInquiryCreate");
 Object.defineProperty(exports, "onInquiryCreate", { enumerable: true, get: function () { return __importDefault(onInquiryCreate_1).default; } });
 var scheduledCleanup_1 = require("./triggers/scheduledCleanup");
 Object.defineProperty(exports, "scheduledCleanup", { enumerable: true, get: function () { return __importDefault(scheduledCleanup_1).default; } });
+// Email triggers
+var onPaymentSuccess_1 = require("./triggers/onPaymentSuccess");
+Object.defineProperty(exports, "onPaymentSuccess", { enumerable: true, get: function () { return __importDefault(onPaymentSuccess_1).default; } });
+var checkTrialExpiry_1 = require("./triggers/checkTrialExpiry");
+Object.defineProperty(exports, "checkTrialExpiry", { enumerable: true, get: function () { return __importDefault(checkTrialExpiry_1).default; } });
 // Callable functions for client-side
 var getVendors_1 = require("./callable/getVendors");
 Object.defineProperty(exports, "getVendors", { enumerable: true, get: function () { return __importDefault(getVendors_1).default; } });

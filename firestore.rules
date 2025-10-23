@@ -985,6 +985,24 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Email Logs - Admin only read, system write
+    match /emailLogs/{logId} {
+      // Only admins can read email logs
+      allow read: if isAdmin();
+
+      // Only system/cloud functions can write
+      allow write: if false;
+    }
+
+    // Email Stats - Admin only read, system write
+    match /emailStats/{statsId} {
+      // Only admins can read email stats
+      allow read: if isAdmin();
+
+      // Only system/cloud functions can write
+      allow write: if false;
+    }
+
     // Deny all other access
     match /{document=**} {
       allow read, write: if false;

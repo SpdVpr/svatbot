@@ -115,6 +115,10 @@ export { default as onReviewCreate } from './triggers/onReviewCreate'
 export { default as onInquiryCreate } from './triggers/onInquiryCreate'
 export { default as scheduledCleanup } from './triggers/scheduledCleanup'
 
+// Email triggers
+export { default as onPaymentSuccess } from './triggers/onPaymentSuccess'
+export { default as checkTrialExpiry } from './triggers/checkTrialExpiry'
+
 // Callable functions for client-side
 export { default as getVendors } from './callable/getVendors'
 export { default as createVendor } from './callable/createVendor'

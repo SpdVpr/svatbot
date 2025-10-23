@@ -15,6 +15,7 @@
     "declarationMap": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "noEmitOnError": false,
     "baseUrl": "./src",
     "paths": {
       "@/*": ["./*"],

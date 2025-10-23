@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const AdminController_1 = require("../controllers/AdminController");
+const EmailStatsController_1 = require("../controllers/EmailStatsController");
 const auth_1 = require("../middleware/auth");
 const validation_1 = require("../middleware/validation");
 const express_validator_1 = require("express-validator");
@@ -94,5 +95,15 @@ router.post('/notifications/send', auth_1.requireAdmin, [
     (0, express_validator_1.body)('userIds').optional().isArray().withMessage('User IDs must be an array'),
     (0, express_validator_1.body)('sendToAll').optional().isBoolean().withMessage('Send to all must be a boolean')
 ], validation_1.validateRequest, AdminController_1.AdminController.sendNotification);
+// Email statistics
+router.get('/email-stats', auth_1.requireAdmin, [
+    (0, express_validator_1.query)('startDate').optional().isISO8601().withMessage('Invalid start date'),
+    (0, express_validator_1.query)('endDate').optional().isISO8601().withMessage('Invalid end date'),
+    (0, express_validator_1.query)('type').optional().isIn(['registration', 'payment_success', 'trial_reminder', 'trial_expired', 'other']).withMessage('Invalid email type')
+], validation_1.validateRequest, EmailStatsController_1.EmailStatsController.getEmailStats);
+router.get('/email-stats/summary', auth_1.requireAdmin, EmailStatsController_1.EmailStatsController.getEmailStatsSummary);
+router.get('/email-stats/daily', auth_1.requireAdmin, [
+    (0, express_validator_1.query)('days').optional().isInt({ min: 1, max: 365 }).withMessage('Days must be 1-365')
+], validation_1.validateRequest, EmailStatsController_1.EmailStatsController.getDailyEmailStats);
 exports.default = router;
 //# sourceMappingURL=adminRoutes.js.map
