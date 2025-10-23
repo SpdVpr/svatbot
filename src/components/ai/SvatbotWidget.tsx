@@ -58,14 +58,21 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
     return (
       <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border-2 border-primary-500 p-1.5">
-            <Image
-              src="/logo.svg"
-              alt="Svatbot"
-              width={32}
-              height={32}
+          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border-2 border-primary-500 p-1.5 overflow-hidden">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
               className="w-full h-full object-contain"
-            />
+              style={{
+                imageRendering: 'crisp-edges',
+                filter: 'contrast(1.05) brightness(1.02)',
+                transform: 'translateZ(0)'
+              }}
+            >
+              <source src="/animated.webm" type="video/webm" />
+            </video>
           </div>
           <div>
             <h3 className="font-bold text-gray-900">Svatbot - tvůj plánovací parťák</h3>
@@ -133,14 +140,21 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
       {/* Svatbot Header */}
       <div className="bg-gradient-to-r from-primary-500 to-pink-500 rounded-xl p-6 text-white shadow-lg">
         <div className="flex items-start gap-4">
-          <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-md flex-shrink-0 p-2">
-            <Image
-              src="/logo.svg"
-              alt="Svatbot"
-              width={48}
-              height={48}
+          <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-md flex-shrink-0 p-2 overflow-hidden">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
               className="w-full h-full object-contain"
-            />
+              style={{
+                imageRendering: 'crisp-edges',
+                filter: 'contrast(1.05) brightness(1.02)',
+                transform: 'translateZ(0)'
+              }}
+            >
+              <source src="/animated.webm" type="video/webm" />
+            </video>
           </div>
           <div className="flex-1 min-w-0">
             <h2 className="text-2xl font-bold mb-2 leading-tight">Svatbot - tvůj plánovací parťák 💕</h2>

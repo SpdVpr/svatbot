@@ -133,24 +133,13 @@ export default function WeddingWebsitePage() {
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
-              <Link
-                href={previewUrl}
-                target="_blank"
-                className="inline-flex items-center gap-2 bg-white text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors border border-gray-300"
-              >
-                <Eye className="w-4 h-4" />
-                Náhled
-              </Link>
-
-              <Link
-                href="/wedding-website/builder"
-                className="inline-flex items-center gap-2 bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 transition-colors"
-              >
-                <Edit className="w-4 h-4" />
-                Upravit
-              </Link>
-            </div>
+            <Link
+              href="/wedding-website/builder"
+              className="inline-flex items-center gap-2 bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 transition-colors"
+            >
+              <Edit className="w-4 h-4" />
+              Upravit
+            </Link>
           </div>
 
           {/* Status badge */}
@@ -241,7 +230,7 @@ export default function WeddingWebsitePage() {
           </Link>
 
           <Link
-            href="/admin/wedding-website/rsvp"
+            href="/wedding-website/rsvp"
             className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
           >
             <MessageSquare className="w-8 h-8 text-blue-500 mb-3" />
@@ -254,7 +243,7 @@ export default function WeddingWebsitePage() {
           </Link>
 
           <Link
-            href="/admin/wedding-website/analytics"
+            href="/wedding-website/analytics"
             className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
           >
             <BarChart3 className="w-8 h-8 text-green-500 mb-3" />
@@ -265,6 +254,30 @@ export default function WeddingWebsitePage() {
               Sledujte návštěvnost a aktivitu
             </p>
           </Link>
+        </div>
+
+        {/* Website Preview */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-8 border border-gray-200">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-gray-900">
+              Náhled webu
+            </h3>
+            <Link
+              href={previewUrl}
+              target="_blank"
+              className="inline-flex items-center gap-2 text-pink-600 hover:text-pink-700 text-sm font-medium"
+            >
+              <Eye className="w-4 h-4" />
+              Otevřít v novém okně
+            </Link>
+          </div>
+          <div className="border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
+            <iframe
+              src={previewUrl}
+              className="w-full h-[600px]"
+              title="Náhled svatebního webu"
+            />
+          </div>
         </div>
 
         {/* Danger zone */}

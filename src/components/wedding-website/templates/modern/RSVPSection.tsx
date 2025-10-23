@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { Calendar, Users, Utensils, Music, Send, CheckCircle, Phone, Mail } from 'lucide-react'
+import { collection, addDoc, Timestamp } from 'firebase/firestore'
+import { db } from '@/config/firebase'
 import type { RSVPContent } from '@/types/wedding-website'
 
 interface RSVPSectionProps {
@@ -13,6 +15,7 @@ interface RSVPSectionProps {
 interface RSVPFormData {
   name: string
   email: string
+  phone?: string
   attendance: 'yes' | 'no' | ''
   guestCount: number
   mealChoice?: string
@@ -25,6 +28,7 @@ export default function ModernRSVPSection({ content, websiteId, weddingId }: RSV
   const [formData, setFormData] = useState<RSVPFormData>({
     name: '',
     email: '',
+    phone: '',
     attendance: '',
     guestCount: 1,
     mealChoice: '',
@@ -44,7 +48,7 @@ export default function ModernRSVPSection({ content, websiteId, weddingId }: RSV
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!formData.name || !formData.email || !formData.attendance) {
       alert('Prosím vyplňte všechna povinná pole')
       return
@@ -53,17 +57,25 @@ export default function ModernRSVPSection({ content, websiteId, weddingId }: RSV
     setIsSubmitting(true)
 
     try {
-      // TODO: Implement RSVP submission to Firestore
-      console.log('RSVP Data:', {
-        ...formData,
+      // Save RSVP to Firestore
+      const rsvpData = {
         websiteId,
         weddingId,
-        submittedAt: new Date()
-      })
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || null,
+        status: formData.attendance === 'yes' ? 'attending' : formData.attendance === 'no' ? 'declined' : 'maybe',
+        guestCount: formData.guestCount,
+        mealChoice: formData.mealChoice || null,
+        dietaryRestrictions: formData.dietaryRestrictions || null,
+        songRequest: formData.songRequest || null,
+        message: formData.message || null,
+        submittedAt: Timestamp.now(),
+        confirmed: false
+      }
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
+      await addDoc(collection(db, 'weddingWebsiteRSVPs'), rsvpData)
+
       setIsSubmitted(true)
     } catch (error) {
       console.error('Error submitting RSVP:', error)
@@ -165,6 +177,19 @@ export default function ModernRSVPSection({ content, websiteId, weddingId }: RSV
                   placeholder="vas@email.cz"
                   className="w-full px-0 py-3 border-0 border-b border-gray-300 focus:border-gray-900 focus:ring-0 bg-transparent"
                   required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-900 mb-3 tracking-wide">
+                  TELEFON
+                </label>
+                <input
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  placeholder="+420 123 456 789"
+                  className="w-full px-0 py-3 border-0 border-b border-gray-300 focus:border-gray-900 focus:ring-0 bg-transparent"
                 />
               </div>
             </div>
