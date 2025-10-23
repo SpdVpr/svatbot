@@ -117,14 +117,6 @@ export default function EmailStatsPanel() {
     return null
   }
 
-  const emailTypes = [
-    { key: 'registration', label: 'Registrace', color: 'bg-blue-100 text-blue-800' },
-    { key: 'payment_success', label: 'Platby', color: 'bg-green-100 text-green-800' },
-    { key: 'trial_reminder', label: 'Trial upozornění', color: 'bg-yellow-100 text-yellow-800' },
-    { key: 'trial_expired', label: 'Trial vypršel', color: 'bg-red-100 text-red-800' },
-    { key: 'other', label: 'Ostatní', color: 'bg-gray-100 text-gray-800' }
-  ]
-
   return (
     <div className="bg-white rounded-lg shadow">
       {/* Header */}
@@ -204,39 +196,6 @@ export default function EmailStatsPanel() {
               </div>
               <p className="text-2xl font-bold text-blue-900">{stats.last30Days.successRate}%</p>
             </div>
-          </div>
-        </div>
-
-        {/* By Type */}
-        <div>
-          <h3 className="text-sm font-medium text-gray-500 mb-3">Podle typu (30 dní)</h3>
-          <div className="space-y-2">
-            {emailTypes.map((type) => {
-              const count = stats.byType[type.key as keyof typeof stats.byType]
-              const percentage = stats.last30Days.total > 0 
-                ? Math.round((count / stats.last30Days.total) * 100)
-                : 0
-
-              return (
-                <div key={type.key} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3 flex-1">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${type.color}`}>
-                      {type.label}
-                    </span>
-                    <div className="flex-1 bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-purple-600 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${percentage}%` }}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2 ml-4">
-                    <span className="text-sm font-medium text-gray-900">{count}</span>
-                    <span className="text-xs text-gray-500">({percentage}%)</span>
-                  </div>
-                </div>
-              )
-            })}
           </div>
         </div>
 
