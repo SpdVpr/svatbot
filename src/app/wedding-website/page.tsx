@@ -5,8 +5,11 @@ import { useRouter } from 'next/navigation'
 import { useWeddingWebsite } from '@/hooks/useWeddingWebsite'
 import { useAuthStore } from '@/stores/authStore'
 import { useWeddingStore } from '@/stores/weddingStore'
-import { ExternalLink, Eye, Settings, BarChart3, MessageSquare, Plus, Edit, Trash2 } from 'lucide-react'
+import { ExternalLink, Eye, Settings, BarChart3, MessageSquare, Plus, Edit, Trash2, Globe } from 'lucide-react'
 import Link from 'next/link'
+import ModuleHeader from '@/components/common/ModuleHeader'
+import { collection, query, where, getDocs } from 'firebase/firestore'
+import { db } from '@/config/firebase'
 
 export default function WeddingWebsitePage() {
   const router = useRouter()
@@ -14,12 +17,40 @@ export default function WeddingWebsitePage() {
   const { currentWedding: wedding } = useWeddingStore()
   const { website, loading, deleteWebsite } = useWeddingWebsite()
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [rsvpCount, setRsvpCount] = useState(0)
+  const [statsLoading, setStatsLoading] = useState(true)
 
   useEffect(() => {
     if (!user) {
       router.push('/login')
     }
   }, [user, router])
+
+  // Load RSVP count
+  useEffect(() => {
+    const loadRsvpCount = async () => {
+      if (!website || !wedding) {
+        setStatsLoading(false)
+        return
+      }
+
+      try {
+        const rsvpsQuery = query(
+          collection(db, 'weddingWebsiteRSVPs'),
+          where('websiteId', '==', website.id),
+          where('weddingId', '==', wedding.id)
+        )
+        const snapshot = await getDocs(rsvpsQuery)
+        setRsvpCount(snapshot.size)
+      } catch (error) {
+        console.error('Error loading RSVP count:', error)
+      } finally {
+        setStatsLoading(false)
+      }
+    }
+
+    loadRsvpCount()
+  }, [website, wedding])
 
   if (loading) {
     return (
@@ -119,56 +150,52 @@ export default function WeddingWebsitePage() {
   }
 
   return (
-    <div className="min-h-screen py-8">
-      <div className="max-w-6xl mx-auto px-4">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Svatební web
-              </h1>
-              <p className="text-gray-600">
-                Spravujte svůj svatební web pro hosty
-              </p>
-            </div>
+    <div className="min-h-screen">
+      {/* Header */}
+      <ModuleHeader
+        icon={Globe}
+        title="Svatební web"
+        subtitle={`${website.customUrl}.svatbot.cz • ${website.isPublished ? 'Publikováno' : 'Koncept'} • ${rsvpCount} RSVP`}
+        iconGradient="from-pink-500 to-purple-500"
+        actions={
+          <Link
+            href="/wedding-website/builder"
+            className="btn-primary flex items-center space-x-2"
+          >
+            <Edit className="w-4 h-4" />
+            <span>Upravit</span>
+          </Link>
+        }
+      />
 
-            <Link
-              href="/wedding-website/builder"
-              className="inline-flex items-center gap-2 bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 transition-colors"
+      <div className="max-w-6xl mx-auto px-4 py-8">
+
+        {/* Status badge and URL */}
+        <div className="flex items-center gap-4 mb-8">
+          <span
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium ${
+              website.isPublished
+                ? 'bg-green-100 text-green-800'
+                : 'bg-yellow-100 text-yellow-800'
+            }`}
+          >
+            <span className={`w-2 h-2 rounded-full ${
+              website.isPublished ? 'bg-green-500' : 'bg-yellow-500'
+            }`}></span>
+            {website.isPublished ? 'Publikováno' : 'Koncept'}
+          </span>
+
+          {website.isPublished && (
+            <a
+              href={websiteUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm text-pink-600 hover:text-pink-700 font-medium"
             >
-              <Edit className="w-4 h-4" />
-              Upravit
-            </Link>
-          </div>
-
-          {/* Status badge */}
-          <div className="flex items-center gap-2">
-            <span
-              className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
-                website.isPublished
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-yellow-100 text-yellow-800'
-              }`}
-            >
-              <span className={`w-2 h-2 rounded-full ${
-                website.isPublished ? 'bg-green-500' : 'bg-yellow-500'
-              }`}></span>
-              {website.isPublished ? 'Publikováno' : 'Koncept'}
-            </span>
-
-            {website.isPublished && (
-              <a
-                href={websiteUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-sm text-pink-600 hover:text-pink-700"
-              >
-                {website.customUrl}.svatbot.cz
-                <ExternalLink className="w-3 h-3" />
-              </a>
-            )}
-          </div>
+              {website.customUrl}.svatbot.cz
+              <ExternalLink className="w-4 h-4" />
+            </a>
+          )}
         </div>
 
         {/* Stats */}
@@ -179,7 +206,7 @@ export default function WeddingWebsitePage() {
               <Eye className="w-5 h-5 text-gray-400" />
             </div>
             <div className="text-3xl font-bold text-gray-900">
-              {website.analytics.views}
+              {website.analytics?.views || 0}
             </div>
           </div>
 
@@ -189,7 +216,7 @@ export default function WeddingWebsitePage() {
               <BarChart3 className="w-5 h-5 text-gray-400" />
             </div>
             <div className="text-3xl font-bold text-gray-900">
-              {website.analytics.uniqueVisitors}
+              {website.analytics?.uniqueVisitors || 0}
             </div>
           </div>
 
@@ -199,7 +226,11 @@ export default function WeddingWebsitePage() {
               <MessageSquare className="w-5 h-5 text-gray-400" />
             </div>
             <div className="text-3xl font-bold text-gray-900">
-              0
+              {statsLoading ? (
+                <div className="animate-pulse bg-gray-200 h-8 w-12 rounded"></div>
+              ) : (
+                rsvpCount
+              )}
             </div>
           </div>
 
