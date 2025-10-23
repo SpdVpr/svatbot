@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth';
 export declare class AdminController {
+    static getDashboardStats(req: AuthenticatedRequest, res: Response): Promise<void>;
     static getStats(req: AuthenticatedRequest, res: Response): Promise<void>;
     static getAnalytics(req: AuthenticatedRequest, res: Response): Promise<void>;
     static getVendors(req: AuthenticatedRequest, res: Response): Promise<void>;

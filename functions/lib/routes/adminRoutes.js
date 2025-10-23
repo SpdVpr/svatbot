@@ -11,6 +11,7 @@ const router = (0, express_1.Router)();
 // All admin routes require authentication
 router.use(auth_1.verifyToken);
 // Dashboard and statistics
+router.get('/dashboard/stats', auth_1.requireAdmin, AdminController_1.AdminController.getDashboardStats);
 router.get('/stats', auth_1.requireAdmin, AdminController_1.AdminController.getStats);
 router.get('/analytics', auth_1.requireAdmin, [
     (0, express_validator_1.query)('period').optional().isIn(['7d', '30d', '90d', '1y']).withMessage('Invalid period'),

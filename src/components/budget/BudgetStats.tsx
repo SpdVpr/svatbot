@@ -63,6 +63,37 @@ export default function BudgetStats({
     }
   }).filter(stat => stat.itemCount > 0 || stat.budgeted > 0)
 
+  // Calculate payment period statistics
+  const paymentPeriodStats = {
+    beforeWedding: {
+      planned: budgetItems
+        .filter(item => item.paymentPeriod === 'before-wedding')
+        .reduce((sum, item) => sum + item.actualAmount, 0),
+      paid: budgetItems
+        .filter(item => item.paymentPeriod === 'before-wedding')
+        .reduce((sum, item) => sum + item.paidAmount, 0),
+      count: budgetItems.filter(item => item.paymentPeriod === 'before-wedding').length
+    },
+    atWedding: {
+      planned: budgetItems
+        .filter(item => item.paymentPeriod === 'at-wedding')
+        .reduce((sum, item) => sum + item.actualAmount, 0),
+      paid: budgetItems
+        .filter(item => item.paymentPeriod === 'at-wedding')
+        .reduce((sum, item) => sum + item.paidAmount, 0),
+      count: budgetItems.filter(item => item.paymentPeriod === 'at-wedding').length
+    },
+    afterWedding: {
+      planned: budgetItems
+        .filter(item => item.paymentPeriod === 'after-wedding')
+        .reduce((sum, item) => sum + item.actualAmount, 0),
+      paid: budgetItems
+        .filter(item => item.paymentPeriod === 'after-wedding')
+        .reduce((sum, item) => sum + item.paidAmount, 0),
+      count: budgetItems.filter(item => item.paymentPeriod === 'after-wedding').length
+    }
+  }
+
   // Get budget health color
   const getBudgetHealthColor = (percentage: number) => {
     if (percentage <= 80) return 'text-green-600 bg-green-100'
@@ -254,59 +285,203 @@ export default function BudgetStats({
         </div>
       )}
 
-      {/* Category breakdown with pie chart */}
+      {/* Payment Period Statistics */}
       <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
         <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center space-x-2">
-          <PieChart className="w-5 h-5" />
-          <span>Předběžné částky podle kategorií</span>
+          <Clock className="w-5 h-5" />
+          <span>Platby podle období</span>
         </h3>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Pie Chart */}
-          <div className="flex justify-center">
-            <BudgetPieChart categoryStats={categoryStats} />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Before Wedding */}
+          <div className="space-y-3">
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+              <h4 className="font-medium text-gray-900">Před svatbou</h4>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-text-muted">Plánováno:</span>
+                <span className="font-semibold text-gray-900">
+                  {formatCurrency(paymentPeriodStats.beforeWedding.planned)}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-text-muted">Zaplaceno:</span>
+                <span className="font-semibold text-green-600">
+                  {formatCurrency(paymentPeriodStats.beforeWedding.paid)}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-text-muted">Zbývá:</span>
+                <span className="font-semibold text-orange-600">
+                  {formatCurrency(paymentPeriodStats.beforeWedding.planned - paymentPeriodStats.beforeWedding.paid)}
+                </span>
+              </div>
+              <div className="mt-3 w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="bg-green-500 h-2 rounded-full transition-all"
+                  style={{
+                    width: `${paymentPeriodStats.beforeWedding.planned > 0
+                      ? (paymentPeriodStats.beforeWedding.paid / paymentPeriodStats.beforeWedding.planned) * 100
+                      : 0}%`
+                  }}
+                ></div>
+              </div>
+              <p className="text-xs text-text-muted text-center">
+                {paymentPeriodStats.beforeWedding.count} položek
+              </p>
+            </div>
           </div>
 
-          {/* Category Details */}
-          <div className="space-y-4">
+          {/* At Wedding */}
+          <div className="space-y-3">
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+              <h4 className="font-medium text-gray-900">Na svatbě</h4>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-text-muted">Plánováno:</span>
+                <span className="font-semibold text-gray-900">
+                  {formatCurrency(paymentPeriodStats.atWedding.planned)}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-text-muted">Zaplaceno:</span>
+                <span className="font-semibold text-green-600">
+                  {formatCurrency(paymentPeriodStats.atWedding.paid)}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-text-muted">Zbývá:</span>
+                <span className="font-semibold text-orange-600">
+                  {formatCurrency(paymentPeriodStats.atWedding.planned - paymentPeriodStats.atWedding.paid)}
+                </span>
+              </div>
+              <div className="mt-3 w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="bg-green-500 h-2 rounded-full transition-all"
+                  style={{
+                    width: `${paymentPeriodStats.atWedding.planned > 0
+                      ? (paymentPeriodStats.atWedding.paid / paymentPeriodStats.atWedding.planned) * 100
+                      : 0}%`
+                  }}
+                ></div>
+              </div>
+              <p className="text-xs text-text-muted text-center">
+                {paymentPeriodStats.atWedding.count} položek
+              </p>
+            </div>
+          </div>
+
+          {/* After Wedding */}
+          <div className="space-y-3">
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 rounded-full bg-amber-500"></div>
+              <h4 className="font-medium text-gray-900">Po svatbě</h4>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-text-muted">Plánováno:</span>
+                <span className="font-semibold text-gray-900">
+                  {formatCurrency(paymentPeriodStats.afterWedding.planned)}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-text-muted">Zaplaceno:</span>
+                <span className="font-semibold text-green-600">
+                  {formatCurrency(paymentPeriodStats.afterWedding.paid)}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-text-muted">Zbývá:</span>
+                <span className="font-semibold text-orange-600">
+                  {formatCurrency(paymentPeriodStats.afterWedding.planned - paymentPeriodStats.afterWedding.paid)}
+                </span>
+              </div>
+              <div className="mt-3 w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="bg-green-500 h-2 rounded-full transition-all"
+                  style={{
+                    width: `${paymentPeriodStats.afterWedding.planned > 0
+                      ? (paymentPeriodStats.afterWedding.paid / paymentPeriodStats.afterWedding.planned) * 100
+                      : 0}%`
+                  }}
+                ></div>
+              </div>
+              <p className="text-xs text-text-muted text-center">
+                {paymentPeriodStats.afterWedding.count} položek
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Category breakdown - Compact version */}
+      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
+          <BarChart3 className="w-5 h-5" />
+          <span>Rozpočet podle kategorií</span>
+        </h3>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Compact Pie Chart */}
+          <div className="flex flex-col items-center justify-center">
+            <div className="scale-75">
+              <BudgetPieChart categoryStats={categoryStats} />
+            </div>
+          </div>
+
+          {/* Category Grid - Compact Cards */}
+          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
             {categoryStats.map((stat) => (
-              <div key={stat.key} className="space-y-2">
-                <div className="flex items-center justify-between">
+              <div
+                key={stat.key}
+                className="p-3 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
+              >
+                <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center space-x-2">
-                    <span className="text-lg">{stat.category.icon}</span>
-                    <span className="font-medium text-gray-900">{stat.category.name}</span>
+                    <span className="text-base">{stat.category.icon}</span>
+                    <span className="text-sm font-medium text-gray-900">{stat.category.name}</span>
                     {stat.isOverBudget && (
-                      <div title="Překročena předběžná částka">
-                        <AlertTriangle className="w-4 h-4 text-red-500" />
+                      <div title="Překročen rozpočet">
+                        <AlertTriangle className="w-3 h-3 text-red-500" />
                       </div>
                     )}
                   </div>
-                  <div className="text-right">
-                    <p className="font-medium">
-                      {formatCurrency(stat.actual)} / {formatCurrency(stat.budgeted)}
-                    </p>
-                    <p className="text-sm text-text-muted">
-                      {stat.percentage.toFixed(1)}% rozpočtu
-                    </p>
-                  </div>
+                  <span className="text-xs text-text-muted">{stat.itemCount}×</span>
                 </div>
 
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="flex h-2 rounded-full overflow-hidden">
-                    <div
-                      className="bg-green-500"
-                      style={{ width: `${Math.min((stat.paid / stat.budgeted) * 100, 100)}%` }}
-                    ></div>
-                    <div
-                      className={stat.isOverBudget ? "bg-red-500" : "bg-orange-500"}
-                      style={{ width: `${Math.min(((stat.actual - stat.paid) / stat.budgeted) * 100, 100)}%` }}
-                    ></div>
+                <div className="space-y-1.5">
+                  <div className="flex justify-between items-baseline">
+                    <span className="text-xs text-text-muted">Rozpočet:</span>
+                    <span className="text-sm font-semibold text-gray-900">
+                      {formatCurrency(stat.budgeted)}
+                    </span>
                   </div>
-                </div>
 
-                <div className="flex justify-between text-xs text-text-muted">
-                  <span>Zaplaceno: {formatCurrency(stat.paid)}</span>
-                  <span>Zbývá: {formatCurrency(stat.remaining)}</span>
+                  <div className="w-full bg-gray-200 rounded-full h-1.5">
+                    <div className="flex h-1.5 rounded-full overflow-hidden">
+                      <div
+                        className="bg-green-500"
+                        style={{ width: `${Math.min((stat.paid / stat.budgeted) * 100, 100)}%` }}
+                        title={`Zaplaceno: ${formatCurrency(stat.paid)}`}
+                      ></div>
+                      <div
+                        className={stat.isOverBudget ? "bg-red-500" : "bg-orange-500"}
+                        style={{ width: `${Math.min(((stat.actual - stat.paid) / stat.budgeted) * 100, 100)}%` }}
+                        title={`Nezaplaceno: ${formatCurrency(stat.actual - stat.paid)}`}
+                      ></div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between text-xs">
+                    <span className="text-green-600">✓ {formatCurrency(stat.paid)}</span>
+                    <span className={stat.isOverBudget ? "text-red-600" : "text-orange-600"}>
+                      ⏳ {formatCurrency(stat.remaining)}
+                    </span>
+                  </div>
                 </div>
               </div>
             ))}
