@@ -77,15 +77,20 @@ const onUserCreate = functions.region('europe-west1').auth.user().onCreate(async
             createdAt: (0, firebase_1.serverTimestamp)()
         });
         // Send registration email
-        if (user.email && userData.firstName) {
+        if (user.email) {
             try {
-                await (0, emailService_1.sendRegistrationEmail)(user.email, userData.firstName, user.uid);
-                console.log('Registration email sent to:', user.email);
+                // Use firstName if available, otherwise use email prefix or "uživateli"
+                const firstName = userData.firstName || user.email.split('@')[0] || 'uživateli';
+                await (0, emailService_1.sendRegistrationEmail)(user.email, firstName, user.uid);
+                console.log('✅ Registration email sent to:', user.email, 'firstName:', firstName);
             }
             catch (emailError) {
-                console.error('Error sending registration email:', emailError);
+                console.error('❌ Error sending registration email:', emailError);
                 // Don't fail user creation if email fails
             }
+        }
+        else {
+            console.warn('⚠️ No email address for user:', user.uid, '- skipping registration email');
         }
         console.log('User document created successfully:', user.uid);
     }

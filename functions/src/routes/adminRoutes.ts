@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { AdminController } from '../controllers/AdminController'
 import { EmailStatsController } from '../controllers/EmailStatsController'
+import { EmailTestController } from '../controllers/EmailTestController'
 import { verifyToken, requireAdmin, requireSuperAdmin } from '../middleware/auth'
 import { validateRequest, validatePagination } from '../middleware/validation'
 import { body, query } from 'express-validator'
@@ -274,6 +275,44 @@ router.get('/email-stats/daily',
   ],
   validateRequest,
   EmailStatsController.getDailyEmailStats
+)
+
+// Email testing endpoints
+router.get('/email-test/status',
+  requireAdmin,
+  EmailTestController.getEmailServiceStatus
+)
+
+router.post('/email-test/registration',
+  requireAdmin,
+  [
+    body('email').isEmail().withMessage('Valid email required'),
+    body('firstName').optional().trim().isLength({ min: 1, max: 100 }).withMessage('First name must be 1-100 characters')
+  ],
+  validateRequest,
+  EmailTestController.testRegistrationEmail
+)
+
+router.post('/email-test/payment',
+  requireAdmin,
+  [
+    body('email').isEmail().withMessage('Valid email required'),
+    body('firstName').optional().trim().isLength({ min: 1, max: 100 }).withMessage('First name must be 1-100 characters'),
+    body('plan').optional().trim().isLength({ min: 1, max: 100 }).withMessage('Plan must be 1-100 characters')
+  ],
+  validateRequest,
+  EmailTestController.testPaymentEmail
+)
+
+router.post('/email-test/trial-reminder',
+  requireAdmin,
+  [
+    body('email').isEmail().withMessage('Valid email required'),
+    body('firstName').optional().trim().isLength({ min: 1, max: 100 }).withMessage('First name must be 1-100 characters'),
+    body('daysLeft').optional().isInt({ min: 1, max: 30 }).withMessage('Days left must be 1-30')
+  ],
+  validateRequest,
+  EmailTestController.testTrialReminderEmail
 )
 
 export default router

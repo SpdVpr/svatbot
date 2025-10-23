@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const AdminController_1 = require("../controllers/AdminController");
 const EmailStatsController_1 = require("../controllers/EmailStatsController");
+const EmailTestController_1 = require("../controllers/EmailTestController");
 const auth_1 = require("../middleware/auth");
 const validation_1 = require("../middleware/validation");
 const express_validator_1 = require("express-validator");
@@ -105,5 +106,21 @@ router.get('/email-stats/summary', auth_1.requireAdmin, EmailStatsController_1.E
 router.get('/email-stats/daily', auth_1.requireAdmin, [
     (0, express_validator_1.query)('days').optional().isInt({ min: 1, max: 365 }).withMessage('Days must be 1-365')
 ], validation_1.validateRequest, EmailStatsController_1.EmailStatsController.getDailyEmailStats);
+// Email testing endpoints
+router.get('/email-test/status', auth_1.requireAdmin, EmailTestController_1.EmailTestController.getEmailServiceStatus);
+router.post('/email-test/registration', auth_1.requireAdmin, [
+    (0, express_validator_1.body)('email').isEmail().withMessage('Valid email required'),
+    (0, express_validator_1.body)('firstName').optional().trim().isLength({ min: 1, max: 100 }).withMessage('First name must be 1-100 characters')
+], validation_1.validateRequest, EmailTestController_1.EmailTestController.testRegistrationEmail);
+router.post('/email-test/payment', auth_1.requireAdmin, [
+    (0, express_validator_1.body)('email').isEmail().withMessage('Valid email required'),
+    (0, express_validator_1.body)('firstName').optional().trim().isLength({ min: 1, max: 100 }).withMessage('First name must be 1-100 characters'),
+    (0, express_validator_1.body)('plan').optional().trim().isLength({ min: 1, max: 100 }).withMessage('Plan must be 1-100 characters')
+], validation_1.validateRequest, EmailTestController_1.EmailTestController.testPaymentEmail);
+router.post('/email-test/trial-reminder', auth_1.requireAdmin, [
+    (0, express_validator_1.body)('email').isEmail().withMessage('Valid email required'),
+    (0, express_validator_1.body)('firstName').optional().trim().isLength({ min: 1, max: 100 }).withMessage('First name must be 1-100 characters'),
+    (0, express_validator_1.body)('daysLeft').optional().isInt({ min: 1, max: 30 }).withMessage('Days left must be 1-30')
+], validation_1.validateRequest, EmailTestController_1.EmailTestController.testTrialReminderEmail);
 exports.default = router;
 //# sourceMappingURL=adminRoutes.js.map
