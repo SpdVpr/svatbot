@@ -25,8 +25,18 @@ interface EventDetailModalProps {
 }
 
 export default function EventDetailModal({ event, onClose }: EventDetailModalProps) {
-  const { deleteEvent } = useCalendar()
+  const { deleteEvent, updateEvent } = useCalendar()
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [editData, setEditData] = useState({
+    title: event.event.title,
+    description: event.event.description || '',
+    location: event.event.location || '',
+    startTime: event.event.startTime || '',
+    endTime: event.event.endTime || '',
+    isAllDay: event.event.isAllDay
+  })
 
   const handleDelete = async () => {
     if (!confirm('Opravdu chcete smazat tuto událost z kalendáře?')) {
@@ -36,13 +46,45 @@ export default function EventDetailModal({ event, onClose }: EventDetailModalPro
     setIsDeleting(true)
     try {
       await deleteEvent(event.event.id)
-      alert('✅ Událost byla smazána z kalendáře')
       onClose()
     } catch (error) {
       console.error('Error deleting event:', error)
-      alert('❌ Chyba při mazání události')
     } finally {
       setIsDeleting(false)
+    }
+  }
+
+  const handleSave = async () => {
+    if (!editData.title.trim()) {
+      return
+    }
+
+    setIsSaving(true)
+    try {
+      const updateData: any = {
+        title: editData.title,
+        description: editData.description,
+        isAllDay: editData.isAllDay
+      }
+
+      // Only add optional fields if they have values
+      if (editData.location) {
+        updateData.location = editData.location
+      }
+      if (!editData.isAllDay && editData.startTime) {
+        updateData.startTime = editData.startTime
+      }
+      if (!editData.isAllDay && editData.endTime) {
+        updateData.endTime = editData.endTime
+      }
+
+      await updateEvent(event.event.id, updateData)
+      setIsEditing(false)
+      onClose()
+    } catch (error) {
+      console.error('Error updating event:', error)
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -99,18 +141,108 @@ export default function EventDetailModal({ event, onClose }: EventDetailModalPro
 
         {/* Content */}
         <div className="p-6 space-y-6">
-          {/* Date and Time */}
-          <div className="space-y-3">
-            <div className="flex items-start space-x-3">
-              <Calendar className="w-5 h-5 text-gray-400 mt-0.5" />
+          {isEditing ? (
+            /* Edit Mode */
+            <>
+              {/* Title */}
               <div>
-                <p className="font-medium text-gray-900">
-                  {format(event.event.startDate, 'd. MMMM yyyy', { locale: cs })}
-                </p>
-                {event.event.endDate && (
-                  <p className="text-sm text-gray-500">
-                    do {format(event.event.endDate, 'd. MMMM yyyy', { locale: cs })}
-                  </p>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Název události *
+                </label>
+                <input
+                  type="text"
+                  value={editData.title}
+                  onChange={(e) => setEditData(prev => ({ ...prev, title: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Název události"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Popis
+                </label>
+                <textarea
+                  value={editData.description}
+                  onChange={(e) => setEditData(prev => ({ ...prev, description: e.target.value }))}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Popis události"
+                />
+              </div>
+
+              {/* Location */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Místo
+                </label>
+                <input
+                  type="text"
+                  value={editData.location}
+                  onChange={(e) => setEditData(prev => ({ ...prev, location: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Místo konání"
+                />
+              </div>
+
+              {/* All Day Toggle */}
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="isAllDay"
+                  checked={editData.isAllDay}
+                  onChange={(e) => setEditData(prev => ({ ...prev, isAllDay: e.target.checked }))}
+                  className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                />
+                <label htmlFor="isAllDay" className="text-sm font-medium text-gray-700">
+                  Celodenní událost
+                </label>
+              </div>
+
+              {/* Time fields - only if not all day */}
+              {!editData.isAllDay && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Začátek
+                    </label>
+                    <input
+                      type="time"
+                      value={editData.startTime}
+                      onChange={(e) => setEditData(prev => ({ ...prev, startTime: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Konec
+                    </label>
+                    <input
+                      type="time"
+                      value={editData.endTime}
+                      onChange={(e) => setEditData(prev => ({ ...prev, endTime: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            /* View Mode */
+            <>
+              {/* Date and Time */}
+              <div className="space-y-3">
+                <div className="flex items-start space-x-3">
+                  <Calendar className="w-5 h-5 text-gray-400 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-gray-900">
+                      {format(event.event.startDate, 'd. MMMM yyyy', { locale: cs })}
+                    </p>
+                    {event.event.endDate && (
+                      <p className="text-sm text-gray-500">
+                        do {format(event.event.endDate, 'd. MMMM yyyy', { locale: cs })}
+                      </p>
                 )}
               </div>
             </div>
@@ -216,25 +348,72 @@ export default function EventDetailModal({ event, onClose }: EventDetailModalPro
               Zdroj: <span className="font-medium">{event.event.source === 'custom' ? 'Vlastní událost' : event.event.source}</span>
             </p>
           </div>
+            </>
+          )}
         </div>
 
         {/* Footer with actions */}
         <div className="sticky bottom-0 bg-gray-50 px-6 py-4 rounded-b-xl border-t border-gray-200 flex items-center justify-between">
-          <button
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Trash2 className="w-4 h-4" />
-            <span>{isDeleting ? 'Mazání...' : 'Smazat událost'}</span>
-          </button>
-          
-          <button
-            onClick={onClose}
-            className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
-          >
-            Zavřít
-          </button>
+          {isEditing ? (
+            /* Edit mode buttons */
+            <>
+              <button
+                onClick={() => {
+                  setIsEditing(false)
+                  setEditData({
+                    title: event.event.title,
+                    description: event.event.description || '',
+                    location: event.event.location || '',
+                    startTime: event.event.startTime || '',
+                    endTime: event.event.endTime || '',
+                    isAllDay: event.event.isAllDay
+                  })
+                }}
+                disabled={isSaving}
+                className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50"
+              >
+                Zrušit
+              </button>
+
+              <button
+                onClick={handleSave}
+                disabled={isSaving}
+                className="flex items-center space-x-2 px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <CheckCircle className="w-4 h-4" />
+                <span>{isSaving ? 'Ukládání...' : 'Uložit změny'}</span>
+              </button>
+            </>
+          ) : (
+            /* View mode buttons */
+            <>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span>{isDeleting ? 'Mazání...' : 'Smazat'}</span>
+                </button>
+
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <Edit2 className="w-4 h-4" />
+                  <span>Upravit</span>
+                </button>
+              </div>
+
+              <button
+                onClick={onClose}
+                className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                Zavřít
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -122,12 +122,27 @@ export interface SeatingPlan {
   createdBy: string
 }
 
+// Custom area (dance floor, bar, stage, etc.)
+export interface CustomArea {
+  id: string
+  name: string // "Taneční parket", "Bar", "Pódium", etc.
+  x: number
+  y: number
+  width: number
+  height: number
+  rotation?: number
+  color?: string // Custom color for the area
+}
+
 export interface VenueLayout {
   width: number // Canvas width in pixels
   height: number // Canvas height in pixels
   backgroundImage?: string
-  
+
   // Venue features
+  customAreas?: CustomArea[] // Custom areas like dance floor, bar, stage, etc.
+
+  // Legacy support - will be migrated to customAreas
   danceFloor?: {
     x: number
     y: number
@@ -135,21 +150,21 @@ export interface VenueLayout {
     height: number
     rotation?: number
   }
-  
+
   stage?: {
     x: number
     y: number
     width: number
     height: number
   }
-  
+
   bar?: {
     x: number
     y: number
     width: number
     height: number
   }
-  
+
   entrance?: {
     x: number
     y: number

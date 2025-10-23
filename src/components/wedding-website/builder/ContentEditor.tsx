@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ChevronDown, Image, Calendar, MapPin, Users, MessageSquare, Gift, Camera, Phone, HelpCircle, Building2, UtensilsCrossed, Shirt } from 'lucide-react'
+import { ChevronDown, Image, Calendar, MapPin, Users, MessageSquare, Gift, Camera, Phone, HelpCircle, Building2, UtensilsCrossed, Shirt, Save } from 'lucide-react'
 import HeroSectionEditor from './sections/HeroSectionEditor'
 import InfoSectionEditor from './sections/InfoSectionEditor'
 import DressCodeSectionEditor from './sections/DressCodeSectionEditor'
@@ -20,6 +20,8 @@ import type { WebsiteContent, SectionType } from '@/types/wedding-website'
 interface ContentEditorProps {
   content: WebsiteContent
   onContentChange: (content: WebsiteContent) => void
+  onSave?: () => Promise<void>
+  onExpandedChange?: (expanded: boolean) => void
 }
 
 interface Section {
@@ -31,8 +33,16 @@ interface Section {
   enabled: boolean
 }
 
-export default function ContentEditor({ content, onContentChange }: ContentEditorProps) {
+export default function ContentEditor({ content, onContentChange, onSave, onExpandedChange }: ContentEditorProps) {
   const [expandedSection, setExpandedSection] = useState<SectionType | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
+
+  // Notify parent when expanded state changes
+  useEffect(() => {
+    if (onExpandedChange) {
+      onExpandedChange(expandedSection !== null)
+    }
+  }, [expandedSection, onExpandedChange])
 
   // Default section order
   const DEFAULT_SECTION_ORDER: SectionType[] = [
@@ -212,6 +222,27 @@ export default function ContentEditor({ content, onContentChange }: ContentEdito
       ...content,
       sectionOrder: newOrder
     })
+  }
+
+  const handleSaveSection = async () => {
+    if (onSave) {
+      setIsSaving(true)
+      try {
+        await onSave()
+        setExpandedSection(null) // Close the expanded section after saving
+        // Scroll to top to show section selection
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      } catch (error) {
+        console.error('Error saving section:', error)
+      } finally {
+        setIsSaving(false)
+      }
+    } else {
+      // If no onSave callback, just close the section
+      setExpandedSection(null)
+      // Scroll to top to show section selection
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
   }
 
   const getEnabledSections = (): Set<SectionType> => {
@@ -475,23 +506,51 @@ export default function ContentEditor({ content, onContentChange }: ContentEdito
 
             if (section.enabled) {
               return (
-                <div className="p-6">
-                  {renderSectionEditor(section.id)}
-                </div>
+                <>
+                  <div className="p-6">
+                    {renderSectionEditor(section.id)}
+                  </div>
+
+                  {/* Save Button */}
+                  <div className="border-t border-gray-200 p-6 bg-gray-50 flex justify-end">
+                    <button
+                      onClick={handleSaveSection}
+                      disabled={isSaving}
+                      className="inline-flex items-center gap-2 bg-pink-500 text-white px-6 py-3 rounded-lg hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Save className="w-5 h-5" />
+                      {isSaving ? 'Ukládání...' : 'Uložit'}
+                    </button>
+                  </div>
+                </>
               )
             } else if (!section.required) {
               return (
-                <div className="p-12 text-center bg-gray-50">
-                  <div className="text-gray-400 mb-4">
-                    <section.icon className="w-16 h-16 mx-auto" />
+                <>
+                  <div className="p-12 text-center bg-gray-50">
+                    <div className="text-gray-400 mb-4">
+                      <section.icon className="w-16 h-16 mx-auto" />
+                    </div>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-2">
+                      Tato sekce je vypnutá
+                    </h4>
+                    <p className="text-gray-600 mb-4">
+                      Zapněte ji pomocí přepínače výše, aby se zobrazila na vašem svatebním webu.
+                    </p>
                   </div>
-                  <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                    Tato sekce je vypnutá
-                  </h4>
-                  <p className="text-gray-600 mb-4">
-                    Zapněte ji pomocí přepínače výše, aby se zobrazila na vašem svatebním webu.
-                  </p>
-                </div>
+
+                  {/* Save Button */}
+                  <div className="border-t border-gray-200 p-6 bg-gray-50 flex justify-end">
+                    <button
+                      onClick={handleSaveSection}
+                      disabled={isSaving}
+                      className="inline-flex items-center gap-2 bg-pink-500 text-white px-6 py-3 rounded-lg hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Save className="w-5 h-5" />
+                      {isSaving ? 'Uložit' : 'Zavřít'}
+                    </button>
+                  </div>
+                </>
               )
             }
           })()}

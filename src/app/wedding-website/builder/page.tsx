@@ -60,6 +60,7 @@ export default function WeddingWebsiteBuilderPage() {
   })
   const [isSaving, setIsSaving] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)
+  const [isSectionExpanded, setIsSectionExpanded] = useState(false)
 
   useEffect(() => {
     if (!user) {
@@ -112,7 +113,6 @@ export default function WeddingWebsiteBuilderPage() {
         setCurrentStep('template')
       } catch (error) {
         console.error('Error creating website:', error)
-        alert('Chyba při vytváření webu')
       } finally {
         setIsSaving(false)
       }
@@ -158,11 +158,8 @@ export default function WeddingWebsiteBuilderPage() {
           content,
         })
       }
-
-      alert('Web byl úspěšně uložen!')
     } catch (error) {
       console.error('Error saving website:', error)
-      alert('Chyba při ukládání webu')
     } finally {
       setIsSaving(false)
     }
@@ -181,10 +178,8 @@ export default function WeddingWebsiteBuilderPage() {
           customUrl,
           content,
         })
-        alert('Šablona byla úspěšně změněna!')
       } catch (error) {
         console.error('Error updating template:', error)
-        alert('Chyba při změně šablony')
       } finally {
         setIsSaving(false)
       }
@@ -193,7 +188,6 @@ export default function WeddingWebsiteBuilderPage() {
 
   const handlePublish = async () => {
     if (!website) {
-      alert('Nejdříve uložte web')
       return
     }
 
@@ -206,12 +200,10 @@ export default function WeddingWebsiteBuilderPage() {
       console.log('📞 Calling publishWebsite hook...')
       await publishWebsite()
       console.log('✅ Website published successfully!')
-      alert('Web byl úspěšně publikován! Nyní je dostupný na adrese: ' + customUrl + '.svatbot.cz')
       // Přejdi na preview krok po publikování
       setCurrentStep('preview')
     } catch (error) {
       console.error('❌ Error publishing website:', error)
-      alert('Chyba při publikování webu')
     } finally {
       setIsPublishing(false)
     }
@@ -350,6 +342,8 @@ export default function WeddingWebsiteBuilderPage() {
           <ContentEditor
             content={content}
             onContentChange={setContent}
+            onSave={handleSave}
+            onExpandedChange={setIsSectionExpanded}
           />
         )}
 
@@ -454,51 +448,54 @@ export default function WeddingWebsiteBuilderPage() {
         )}
 
         {/* Navigation buttons */}
-        <div className="flex items-center justify-between mt-8">
-          <button
-            onClick={handlePrevious}
-            disabled={currentStepIndex === 0}
-            className="inline-flex items-center gap-2 bg-white text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            Zpět
-          </button>
-
-          {currentStepIndex === steps.length - 1 ? (
-            <div className="flex items-center gap-3">
-              {!website?.isPublished && (
-                <button
-                  onClick={handlePublish}
-                  disabled={isPublishing || !canGoNext()}
-                  className="inline-flex items-center gap-2 bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Rocket className="w-5 h-5" />
-                  {isPublishing ? 'Publikování...' : 'Publikovat web'}
-                </button>
-              )}
-
-              {website?.isPublished && (
-                <div className="flex items-center gap-2 text-green-600">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="font-medium">Web je publikován</span>
-                </div>
-              )}
-            </div>
-          ) : (
+        {/* Hide navigation buttons when a section is expanded in content editor */}
+        {!isSectionExpanded && (
+          <div className="flex items-center justify-between mt-8">
             <button
-              onClick={handleNext}
-              disabled={!canGoNext() || isSaving}
-              className="inline-flex items-center gap-2 bg-pink-500 text-white px-6 py-3 rounded-lg hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={handlePrevious}
+              disabled={currentStepIndex === 0}
+              className="inline-flex items-center gap-2 bg-white text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {currentStep === 'url' && !website ? (
-                isSaving ? 'Ukládání...' : 'Pokračovat'
-              ) : (
-                'Další'
-              )}
-              <ArrowRight className="w-5 h-5" />
+              <ArrowLeft className="w-5 h-5" />
+              Zpět
             </button>
-          )}
-        </div>
+
+            {currentStepIndex === steps.length - 1 ? (
+              <div className="flex items-center gap-3">
+                {!website?.isPublished && (
+                  <button
+                    onClick={handlePublish}
+                    disabled={isPublishing || !canGoNext()}
+                    className="inline-flex items-center gap-2 bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Rocket className="w-5 h-5" />
+                    {isPublishing ? 'Publikování...' : 'Publikovat web'}
+                  </button>
+                )}
+
+                {website?.isPublished && (
+                  <div className="flex items-center gap-2 text-green-600">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="font-medium">Web je publikován</span>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={handleNext}
+                disabled={!canGoNext() || isSaving}
+                className="inline-flex items-center gap-2 bg-pink-500 text-white px-6 py-3 rounded-lg hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {currentStep === 'url' && !website ? (
+                  isSaving ? 'Ukládání...' : 'Pokračovat'
+                ) : (
+                  'Další'
+                )}
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )

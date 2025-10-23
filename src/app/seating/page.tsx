@@ -103,7 +103,7 @@ export default function SeatingPage() {
       <ModuleHeader
         icon={Users2}
         title="Zasedací pořádek"
-        subtitle={`${currentPlan?.tables?.length || 0} stolů • ${currentPlan?.seats?.filter(s => s.guestId).length || 0} přiřazených hostů`}
+        subtitle={`${currentPlan?.tables?.length || 0} stolů • ${(currentPlan?.seats?.filter(s => s.guestId).length || 0) + (currentPlan?.chairSeats?.filter(s => s.guestId).length || 0)} přiřazených hostů`}
         iconGradient="from-cyan-500 to-blue-500"
         actions={
           <div className="flex items-center space-x-3">

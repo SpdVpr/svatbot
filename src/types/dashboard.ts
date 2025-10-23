@@ -1,6 +1,6 @@
 export interface DashboardModule {
   id: string
-  type: 'wedding-countdown' | 'quick-actions' | 'main-features' | 'upcoming-tasks' | 'marketplace' | 'task-management' | 'guest-management' | 'budget-tracking' | 'timeline-planning' | 'vendor-management' | 'seating-plan' | 'wedding-day-timeline' | 'moodboard' | 'wedding-checklist' | 'music-playlist' | 'food-drinks' | 'wedding-website' | 'accommodation-management' | 'shopping-list' | 'svatbot-coach'
+  type: 'wedding-countdown' | 'quick-actions' | 'main-features' | 'marketplace' | 'task-management' | 'guest-management' | 'budget-tracking' | 'timeline-planning' | 'vendor-management' | 'seating-plan' | 'wedding-day-timeline' | 'moodboard' | 'wedding-checklist' | 'music-playlist' | 'food-drinks' | 'wedding-website' | 'accommodation-management' | 'shopping-list' | 'svatbot-coach'
   title: string
   size: 'small' | 'medium' | 'large' | 'full'
   position?: {
@@ -81,12 +81,24 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     title: 'Správa úkolů',
     size: 'medium',
     position: { x: 440, y: 530 },
+    customSize: { width: 360, height: 940 }, // 2 modules tall - same as wedding-checklist
     gridPosition: { row: 1, column: 1 },
     isVisible: true,
     isLocked: false,
     order: 3
   },
-  // Row 2 - 3 modules (svatbot-coach ends here, so all 3 columns available)
+  {
+    id: 'vendor-management',
+    type: 'vendor-management',
+    title: 'Dodavatelé',
+    size: 'medium',
+    position: { x: 840, y: 530 },
+    gridPosition: { row: 1, column: 2 },
+    isVisible: true,
+    isLocked: false,
+    order: 4
+  },
+  // Row 2 - 2 modules (svatbot-coach ends here, vendor-management continues from row 1)
   {
     id: 'guest-management',
     type: 'guest-management',
@@ -96,17 +108,6 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     gridPosition: { row: 2, column: 0 },
     isVisible: true,
     isLocked: false,
-    order: 4
-  },
-  {
-    id: 'vendor-management',
-    type: 'vendor-management',
-    title: 'Dodavatelé',
-    size: 'medium',
-    position: { x: 440, y: 1020 },
-    gridPosition: { row: 2, column: 1 },
-    isVisible: true,
-    isLocked: false,
     order: 5
   },
   {
@@ -114,8 +115,8 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     type: 'seating-plan',
     title: 'Rozmístění hostů',
     size: 'medium',
-    position: { x: 840, y: 1020 },
-    gridPosition: { row: 2, column: 2 },
+    position: { x: 440, y: 1020 },
+    gridPosition: { row: 2, column: 1 },
     isVisible: true,
     isLocked: false,
     order: 6
@@ -167,18 +168,6 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     isLocked: false,
     order: 10
   },
-  {
-    id: 'upcoming-tasks',
-    type: 'upcoming-tasks',
-    title: 'Nadcházející úkoly',
-    size: 'medium',
-    position: { x: 840, y: 2000 },
-    customSize: { width: 360, height: 940 }, // 2 moduly vysoké (stejně jako wedding-checklist)
-    gridPosition: { row: 4, column: 2 },
-    isVisible: true,
-    isLocked: false,
-    order: 11
-  },
   // Row 5 - Harmonogram svatebního dne pod "Jídlo a pití" + 2 další moduly
   {
     id: 'wedding-day-timeline',
@@ -190,7 +179,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     gridPosition: { row: 5, column: 0 },
     isVisible: true,
     isLocked: false,
-    order: 12
+    order: 11
   },
   {
     id: 'food-drinks',
@@ -201,7 +190,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     gridPosition: { row: 5, column: 2 },
     isVisible: true,
     isLocked: false,
-    order: 13
+    order: 12
   },
   // Row 6 - 3 modules
   {
@@ -213,7 +202,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     gridPosition: { row: 6, column: 0 },
     isVisible: true,
     isLocked: false,
-    order: 14
+    order: 13
   },
   {
     id: 'shopping-list',
@@ -224,7 +213,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     gridPosition: { row: 6, column: 1 },
     isVisible: true,
     isLocked: false,
-    order: 15
+    order: 14
   },
   {
     id: 'accommodation-management',
@@ -235,7 +224,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     gridPosition: { row: 6, column: 2 },
     isVisible: true,
     isLocked: false,
-    order: 16
+    order: 15
   },
   // Row 7 - 3 modules
   {
@@ -247,7 +236,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     gridPosition: { row: 7, column: 0 },
     isVisible: true,
     isLocked: false,
-    order: 17
+    order: 16
   },
   {
     id: 'moodboard',
@@ -258,6 +247,6 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     gridPosition: { row: 7, column: 1 },
     isVisible: true,
     isLocked: false,
-    order: 18
+    order: 17
   }
 ]

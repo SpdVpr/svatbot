@@ -1,15 +1,37 @@
 'use client'
 
 import Link from 'next/link'
-import { List, CheckCircle, Clock, AlertTriangle, ArrowRight } from 'lucide-react'
+import { List, CheckCircle, Clock, AlertTriangle, ArrowRight, Camera, Music, Flower, MapPin } from 'lucide-react'
 import { useTask } from '@/hooks/useTask'
 import NumberCounter from '@/components/animations/NumberCounter'
+import { dateUtils } from '@/utils'
 
 export default function TaskManagementModule() {
-  const { stats } = useTask()
+  const { stats, tasks } = useTask()
+
+  // Get upcoming tasks (next 5)
+  const upcomingTasks = tasks
+    .filter(task => task.status !== 'completed')
+    .sort((a, b) => {
+      if (!a.dueDate && !b.dueDate) return 0
+      if (!a.dueDate) return 1
+      if (!b.dueDate) return -1
+      return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+    })
+    .slice(0, 5)
+
+  const getTaskIcon = (category: string) => {
+    switch (category) {
+      case 'photography': return Camera
+      case 'music': return Music
+      case 'flowers': return Flower
+      case 'venue': return MapPin
+      default: return CheckCircle
+    }
+  }
 
   return (
-    <div className="wedding-card">
+    <div className="wedding-card h-full flex flex-col">
       <Link href="/tasks" className="block mb-4">
         <h3 className="text-base sm:text-lg font-semibold flex items-center justify-start sm:justify-center space-x-2 hover:text-primary-600 transition-colors">
           <List className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0" />
@@ -17,26 +39,7 @@ export default function TaskManagementModule() {
         </h3>
       </Link>
 
-      <div className="space-y-4">
-        {/* Progress Overview */}
-        <div className="bg-blue-50 p-4 rounded-lg glass-morphism">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-blue-900">Celkový pokrok</span>
-            <span className="text-lg font-bold text-blue-600">
-              <NumberCounter end={stats.completionRate} duration={1500} suffix="%" />
-            </span>
-          </div>
-          <div className="w-full bg-blue-200 rounded-full h-2">
-            <div
-              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${stats.completionRate}%` }}
-            />
-          </div>
-          <div className="text-xs text-blue-700 mt-1">
-            <NumberCounter end={stats.completed} duration={1200} className="inline-block" /> z <NumberCounter end={stats.total} duration={1200} className="inline-block" /> úkolů dokončeno
-          </div>
-        </div>
-
+      <div className="space-y-4 flex-1 flex flex-col">
         {/* Quick Stats */}
         <div className="grid grid-cols-3 gap-3">
           <div className="text-center hover-lift">
@@ -67,11 +70,62 @@ export default function TaskManagementModule() {
             <div className="text-xs text-gray-500">Po termínu</div>
           </div>
         </div>
+
+        {/* Upcoming Tasks Section */}
+        <div className="flex-1 flex flex-col min-h-0">
+          <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center space-x-2">
+            <Clock className="w-4 h-4 text-blue-600" />
+            <span>Nadcházející úkoly</span>
+          </h4>
+
+          <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+            {upcomingTasks.length > 0 ? (
+              upcomingTasks.map((task) => {
+                const TaskIcon = getTaskIcon(task.category)
+                return (
+                  <div
+                    key={task.id}
+                    className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:border-primary-300 transition-colors cursor-pointer bg-white"
+                  >
+                    <div className="p-1.5 bg-primary-100 rounded-lg flex-shrink-0">
+                      <TaskIcon className="w-4 h-4 text-primary-600" />
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <h5 className="font-medium text-sm text-text-primary truncate">
+                        {task.title}
+                      </h5>
+                      <p className="text-xs text-text-muted">
+                        {task.dueDate ? dateUtils.format(new Date(task.dueDate)) : 'Bez termínu'}
+                      </p>
+                    </div>
+
+                    <div className={`px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${
+                      task.priority === 'high'
+                        ? 'bg-red-100 text-red-700'
+                        : task.priority === 'medium'
+                          ? 'bg-yellow-100 text-yellow-700'
+                          : 'bg-green-100 text-green-700'
+                    }`}>
+                      {task.priority === 'high' ? 'Vysoká' :
+                       task.priority === 'medium' ? 'Střední' : 'Nízká'}
+                    </div>
+                  </div>
+                )
+              })
+            ) : (
+              <div className="text-center py-6">
+                <CheckCircle className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+                <p className="text-sm text-gray-500">Žádné nadcházející úkoly</p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="mt-4 pt-4 border-t border-gray-200">
-        <Link 
-          href="/tasks" 
+        <Link
+          href="/tasks"
           className="btn-primary w-full flex items-center justify-center space-x-2"
         >
           <List className="w-4 h-4" />

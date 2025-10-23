@@ -8,7 +8,6 @@ import { DashboardModule } from '@/types/dashboard'
 // Import module components
 import WeddingCountdownModule from './modules/WeddingCountdownModule'
 import QuickActionsModule from './modules/QuickActionsModule'
-import UpcomingTasksModule from './modules/UpcomingTasksModule'
 import MainFeaturesModule from './modules/MainFeaturesModule'
 import MarketplaceModule from './modules/MarketplaceModule'
 
@@ -182,8 +181,6 @@ export default function SimpleDragDrop({ onWeddingSettingsClick }: SimpleDragDro
         return <WeddingCountdownModule onWeddingSettingsClick={onWeddingSettingsClick} />
       case 'quick-actions':
         return <QuickActionsModule />
-      case 'upcoming-tasks':
-        return <UpcomingTasksModule />
       case 'main-features':
         return <MainFeaturesModule />
       case 'marketplace':

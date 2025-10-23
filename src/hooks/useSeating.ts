@@ -486,13 +486,25 @@ export function useSeating(): UseSeatingReturn {
     })
   }
 
-  // Calculate statistics
+  // Calculate statistics - include both table seats and chair seats
+  const totalTableSeats = seats.length
+  const totalChairSeats = chairSeats?.length || 0
+  const totalAllSeats = totalTableSeats + totalChairSeats
+
+  const assignedTableSeats = seats.filter(s => s.guestId).length
+  const assignedChairSeats = chairSeats?.filter(s => s.guestId).length || 0
+  const totalAssignedSeats = assignedTableSeats + assignedChairSeats
+
+  const availableTableSeats = seats.filter(s => !s.guestId && !s.isReserved).length
+  const availableChairSeats = chairSeats?.filter(s => !s.guestId && !s.isReserved).length || 0
+  const totalAvailableSeats = availableTableSeats + availableChairSeats
+
   const stats: SeatingStats = {
     totalTables: tables.length,
-    totalSeats: seats.length,
-    assignedSeats: seats.filter(s => s.guestId).length,
-    availableSeats: seats.filter(s => !s.guestId && !s.isReserved).length,
-    occupancyRate: seats.length > 0 ? Math.round((seats.filter(s => s.guestId).length / seats.length) * 100) : 0,
+    totalSeats: totalAllSeats, // Include both table and chair seats
+    assignedSeats: totalAssignedSeats, // Include both table and chair seats
+    availableSeats: totalAvailableSeats, // Include both table and chair seats
+    occupancyRate: totalAllSeats > 0 ? Math.round((totalAssignedSeats / totalAllSeats) * 100) : 0,
     byTableSize: {} as any, // Will be calculated separately
     satisfiedConstraints: constraints.filter(c => c.isActive).length,
     violatedConstraints: 0, // TODO: Calculate violations

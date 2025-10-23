@@ -81,22 +81,17 @@ export default function CalendarPage() {
 
   const handleCreateEvent = async () => {
     if (!selectedDate || !newEventData.title.trim()) {
-      alert('Vyplňte prosím název události')
       return
     }
 
     try {
-      await createEvent({
+      const eventData: any = {
         title: newEventData.title,
         description: newEventData.description,
         type: newEventData.type,
         startDate: selectedDate,
         endDate: selectedDate,
-        startTime: newEventData.isAllDay ? undefined : newEventData.startTime,
-        endTime: newEventData.isAllDay ? undefined : newEventData.endTime,
-        location: newEventData.location || undefined,
         isAllDay: newEventData.isAllDay,
-        priority: 'medium',
         notes: '',
         tags: [],
         reminders: [
@@ -105,7 +100,20 @@ export default function CalendarPage() {
         ],
         recurrence: 'none',
         isOnline: false
-      })
+      }
+
+      // Only add optional fields if they have values
+      if (!newEventData.isAllDay && newEventData.startTime) {
+        eventData.startTime = newEventData.startTime
+      }
+      if (!newEventData.isAllDay && newEventData.endTime) {
+        eventData.endTime = newEventData.endTime
+      }
+      if (newEventData.location) {
+        eventData.location = newEventData.location
+      }
+
+      await createEvent(eventData)
 
       // Reset form
       setShowCreateEventModal(false)
@@ -120,7 +128,6 @@ export default function CalendarPage() {
       })
     } catch (error) {
       console.error('Error creating event:', error)
-      alert('❌ Chyba při vytváření události')
     }
   }
 
@@ -231,7 +238,7 @@ export default function CalendarPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <div className="flex items-center justify-between">
               <div>
@@ -259,16 +266,6 @@ export default function CalendarPage() {
                 <p className="text-2xl font-bold text-gray-900 mt-1">{stats.thisWeekEvents}</p>
               </div>
               <TrendingUp className="w-8 h-8 text-purple-500" />
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Po termínu</p>
-                <p className="text-2xl font-bold text-red-600 mt-1">{stats.overdueEvents}</p>
-              </div>
-              <AlertCircle className="w-8 h-8 text-red-500" />
             </div>
           </div>
         </div>

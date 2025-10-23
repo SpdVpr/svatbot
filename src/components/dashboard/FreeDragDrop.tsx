@@ -10,7 +10,6 @@ import OnboardingWizard from '../onboarding/OnboardingWizard'
 // Module components
 import WeddingCountdownModule from './modules/WeddingCountdownModule'
 import QuickActionsModule from './modules/QuickActionsModule'
-import UpcomingTasksModule from './modules/UpcomingTasksModule'
 import MarketplaceModule from './modules/MarketplaceModule'
 import TaskManagementModule from './modules/TaskManagementModule'
 import GuestManagementModule from './modules/GuestManagementModule'
@@ -115,8 +114,6 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
         return <WeddingCountdownModule onWeddingSettingsClick={onWeddingSettingsClick || (() => {})} />
       case 'quick-actions':
         return <QuickActionsModule />
-      case 'upcoming-tasks':
-        return <UpcomingTasksModule />
       case 'marketplace':
         return <MarketplaceModule />
       case 'task-management':

@@ -238,7 +238,7 @@ export function useCalendar() {
       throw new Error('User or wedding not found')
     }
 
-    const newEvent = {
+    const newEvent: any = {
       weddingId: wedding.id,
       userId: user.id,
       title: data.title,
@@ -255,7 +255,6 @@ export function useCalendar() {
       isOnline: data.isOnline,
       meetingUrl: data.meetingUrl || null,
       status: 'upcoming' as EventStatus,
-      priority: data.priority,
       isCompleted: false,
       attendees: data.attendees || [],
       vendorIds: data.vendorIds || [],
@@ -275,6 +274,11 @@ export function useCalendar() {
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
       createdBy: user.id
+    }
+
+    // Only add priority if it's defined
+    if (data.priority) {
+      newEvent.priority = data.priority
     }
 
     const docRef = await addDoc(collection(db, 'calendarEvents'), newEvent)

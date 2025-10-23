@@ -21,7 +21,7 @@ import {
   X,
   Printer
 } from 'lucide-react'
-import { Table, Seat, ChairRow, ChairSeat, SeatingViewOptions, SeatingPlan, TableShape, TableSize, ChairRowOrientation } from '@/types/seating'
+import { Table, Seat, ChairRow, ChairSeat, SeatingViewOptions, SeatingPlan, TableShape, TableSize, ChairRowOrientation, CustomArea } from '@/types/seating'
 import { GUEST_CATEGORY_LABELS, GUEST_CATEGORY_COLORS } from '@/utils/guestCategories'
 
 interface SeatingPlanEditorProps {
@@ -104,6 +104,10 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
   // Mobile long press detection
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null)
   const [isLongPress, setIsLongPress] = useState(false)
+
+  // Seat click detection (to distinguish from drag)
+  const [seatMouseDownTime, setSeatMouseDownTime] = useState<number>(0)
+  const [seatMouseDownPos, setSeatMouseDownPos] = useState<{ x: number; y: number } | null>(null)
   const [tableFormData, setTableFormData] = useState<{
     name: string
     shape: TableShape
@@ -155,7 +159,25 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
   const [chairRowDragOffset, setChairRowDragOffset] = useState({ x: 0, y: 0 })
   const [draggedChairRowPosition, setDraggedChairRowPosition] = useState<{ x: number; y: number } | null>(null)
 
-  // Dance floor form state
+  // Custom area form state (replaces dance floor)
+  const [showCustomAreaForm, setShowCustomAreaForm] = useState(false)
+  const [editingCustomArea, setEditingCustomArea] = useState<CustomArea | null>(null)
+  const [customAreaFormData, setCustomAreaFormData] = useState({
+    name: '',
+    width: 200,
+    height: 200,
+    color: '#FCD34D'
+  })
+  const [isDraggingCustomArea, setIsDraggingCustomArea] = useState(false)
+  const [draggingCustomAreaId, setDraggingCustomAreaId] = useState<string | null>(null)
+  const [customAreaDragOffset, setCustomAreaDragOffset] = useState({ x: 0, y: 0 })
+  const [draggedCustomAreaPosition, setDraggedCustomAreaPosition] = useState<{ x: number; y: number } | null>(null)
+  const [isRotatingCustomArea, setIsRotatingCustomArea] = useState(false)
+  const [rotatingCustomAreaId, setRotatingCustomAreaId] = useState<string | null>(null)
+  const [customAreaRotationStartAngle, setCustomAreaRotationStartAngle] = useState(0)
+  const [tempCustomAreaRotation, setTempCustomAreaRotation] = useState<{ [key: string]: number }>({})
+
+  // Legacy dance floor form state (for backward compatibility)
   const [showDanceFloorForm, setShowDanceFloorForm] = useState(false)
   const [danceFloorFormData, setDanceFloorFormData] = useState({
     width: 200,
@@ -833,6 +855,111 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
   // Rotation event listeners - ODSTRANĚNO, nyní se používá přímá logika v handleRotationStart
 
+  // Custom area handlers
+  const handleAddCustomArea = async () => {
+    try {
+      const newCustomArea: CustomArea = {
+        id: `customarea_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        name: customAreaFormData.name || 'Nová plocha',
+        x: 500,
+        y: 300,
+        width: customAreaFormData.width,
+        height: customAreaFormData.height,
+        rotation: 0,
+        color: customAreaFormData.color
+      }
+
+      const existingAreas = currentPlan.venueLayout.customAreas || []
+      await updateSeatingPlan(currentPlan.id, {
+        venueLayout: {
+          ...currentPlan.venueLayout,
+          customAreas: [...existingAreas, newCustomArea]
+        }
+      })
+
+      setShowCustomAreaForm(false)
+      setCustomAreaFormData({
+        name: '',
+        width: 200,
+        height: 200,
+        color: '#FCD34D'
+      })
+    } catch (error) {
+      console.error('Error adding custom area:', error)
+      alert('Chyba při přidání plochy: ' + (error as Error).message)
+    }
+  }
+
+  const handleEditCustomArea = (area: CustomArea) => {
+    setEditingCustomArea(area)
+    setCustomAreaFormData({
+      name: area.name,
+      width: area.width,
+      height: area.height,
+      color: area.color || '#FCD34D'
+    })
+    setShowCustomAreaForm(true)
+  }
+
+  const handleSaveCustomArea = async () => {
+    if (!editingCustomArea) return
+
+    try {
+      const existingAreas = currentPlan.venueLayout.customAreas || []
+      const updatedAreas = existingAreas.map(area =>
+        area.id === editingCustomArea.id
+          ? {
+              ...area,
+              name: customAreaFormData.name,
+              width: customAreaFormData.width,
+              height: customAreaFormData.height,
+              color: customAreaFormData.color
+            }
+          : area
+      )
+
+      await updateSeatingPlan(currentPlan.id, {
+        venueLayout: {
+          ...currentPlan.venueLayout,
+          customAreas: updatedAreas
+        }
+      })
+
+      setEditingCustomArea(null)
+      setShowCustomAreaForm(false)
+      setCustomAreaFormData({
+        name: '',
+        width: 200,
+        height: 200,
+        color: '#FCD34D'
+      })
+    } catch (error) {
+      console.error('Error updating custom area:', error)
+      alert('Chyba při úpravě plochy: ' + (error as Error).message)
+    }
+  }
+
+  const handleDeleteCustomArea = async (areaId: string) => {
+    if (!confirm('Opravdu chcete smazat tuto plochu?')) {
+      return
+    }
+
+    try {
+      const existingAreas = currentPlan.venueLayout.customAreas || []
+      const updatedAreas = existingAreas.filter(area => area.id !== areaId)
+
+      await updateSeatingPlan(currentPlan.id, {
+        venueLayout: {
+          ...currentPlan.venueLayout,
+          customAreas: updatedAreas
+        }
+      })
+    } catch (error) {
+      console.error('Error deleting custom area:', error)
+      alert('Chyba při mazání plochy: ' + (error as Error).message)
+    }
+  }
+
   // Edit dance floor
   const handleEditDanceFloor = () => {
     setEditingDanceFloor(true)
@@ -1283,9 +1410,9 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     const scaledWidth = venueWidth * scale
     const scaledHeight = venueHeight * scale
 
-    // Calculate statistics
-    const totalAssignedGuests = seats.filter(s => s.guestId).length
-    const totalSeats = seats.length
+    // Calculate statistics - include both table seats and chair seats
+    const totalAssignedGuests = seats.filter(s => s.guestId).length + (chairSeats?.filter(s => s.guestId).length || 0)
+    const totalSeats = seats.length + (chairSeats?.length || 0)
     const occupancyRate = totalSeats > 0 ? Math.round((totalAssignedGuests / totalSeats) * 100) : 0
 
     // Generate guest list by table
@@ -1543,7 +1670,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
   }
 
   // Handle drag and drop for guest assignment
-  const handleGuestDrop = (event: React.DragEvent, seatId: string) => {
+  const handleGuestDrop = async (event: React.DragEvent, seatId: string) => {
     event.preventDefault()
     const guestId = event.dataTransfer.getData('text/plain')
     if (guestId) {
@@ -1552,13 +1679,84 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
       setSelectedSeat(seatId)
       setSelectedSeatType(isChairSeat ? 'chair' : 'table')
-      handleAssignGuest(guestId)
+
+      // Wait for assignment to complete before clearing state
+      await handleAssignGuest(guestId)
     }
   }
 
   const handleGuestDragStart = (event: React.DragEvent, guestId: string) => {
     event.dataTransfer.setData('text/plain', guestId)
   }
+
+  // Custom area drag functions
+  const handleCustomAreaDragStart = useCallback((event: React.MouseEvent, areaId: string) => {
+    const area = currentPlan.venueLayout.customAreas?.find(a => a.id === areaId)
+    if (!area || !canvasRef.current) return
+
+    event.preventDefault()
+    event.stopPropagation()
+    setIsDraggingCustomArea(true)
+    setDraggingCustomAreaId(areaId)
+
+    const rect = canvasRef.current.getBoundingClientRect()
+    const zoom = viewOptions.zoom
+    const mouseX = (event.clientX - rect.left) / zoom
+    const mouseY = (event.clientY - rect.top) / zoom
+
+    setCustomAreaDragOffset({
+      x: mouseX - area.x,
+      y: mouseY - area.y
+    })
+  }, [currentPlan.venueLayout.customAreas, viewOptions.zoom])
+
+  const handleCustomAreaDrag = useCallback((event: React.MouseEvent) => {
+    if (!isDraggingCustomArea || !draggingCustomAreaId || !canvasRef.current) return
+
+    const area = currentPlan.venueLayout.customAreas?.find(a => a.id === draggingCustomAreaId)
+    if (!area) return
+
+    event.preventDefault()
+    const rect = canvasRef.current.getBoundingClientRect()
+    const zoom = viewOptions.zoom
+    const mouseX = (event.clientX - rect.left) / zoom
+    const mouseY = (event.clientY - rect.top) / zoom
+
+    const newPosition = {
+      x: Math.max(0, Math.min(currentPlan.venueLayout.width - area.width,
+          mouseX - customAreaDragOffset.x)),
+      y: Math.max(0, Math.min(currentPlan.venueLayout.height - area.height,
+          mouseY - customAreaDragOffset.y))
+    }
+
+    setDraggedCustomAreaPosition(newPosition)
+  }, [isDraggingCustomArea, draggingCustomAreaId, currentPlan.venueLayout, customAreaDragOffset, viewOptions.zoom])
+
+  const handleCustomAreaDragEnd = useCallback(async () => {
+    if (isDraggingCustomArea && draggingCustomAreaId && draggedCustomAreaPosition) {
+      const existingAreas = currentPlan.venueLayout.customAreas || []
+      const updatedAreas = existingAreas.map(area =>
+        area.id === draggingCustomAreaId
+          ? { ...area, x: draggedCustomAreaPosition.x, y: draggedCustomAreaPosition.y }
+          : area
+      )
+
+      try {
+        await updateSeatingPlan(currentPlan.id, {
+          venueLayout: {
+            ...currentPlan.venueLayout,
+            customAreas: updatedAreas
+          }
+        })
+      } catch (error) {
+        console.error('Error saving custom area position:', error)
+      }
+    }
+    setIsDraggingCustomArea(false)
+    setDraggingCustomAreaId(null)
+    setCustomAreaDragOffset({ x: 0, y: 0 })
+    setDraggedCustomAreaPosition(null)
+  }, [isDraggingCustomArea, draggingCustomAreaId, draggedCustomAreaPosition, currentPlan, updateSeatingPlan])
 
   // Dance floor drag functions
   const handleDanceFloorDragStart = useCallback((event: React.MouseEvent) => {
@@ -2020,15 +2218,22 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                 <span>Přidat židle</span>
               </button>
 
-              {!currentPlan.venueLayout.danceFloor && (
-                <button
-                  onClick={() => setShowDanceFloorForm(true)}
-                  className="btn-outline flex items-center space-x-2"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Přidat taneční parket</span>
-                </button>
-              )}
+              <button
+                onClick={() => {
+                  setEditingCustomArea(null)
+                  setCustomAreaFormData({
+                    name: '',
+                    width: 200,
+                    height: 200,
+                    color: '#FCD34D'
+                  })
+                  setShowCustomAreaForm(true)
+                }}
+                className="btn-outline flex items-center space-x-2"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Přidat plochu</span>
+              </button>
 
               <button
                 onClick={handleEditVenue}
@@ -2101,16 +2306,19 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
               }}
               onMouseMove={(e) => {
                 handleTableDrag(e)
+                handleCustomAreaDrag(e)
                 handleDanceFloorDrag(e)
                 handleChairRowDrag(e)
               }}
               onMouseUp={() => {
                 handleTableDragEnd()
+                handleCustomAreaDragEnd()
                 handleDanceFloorDragEnd()
                 handleChairRowDragEnd()
               }}
               onMouseLeave={() => {
                 handleTableDragEnd()
+                handleCustomAreaDragEnd()
                 handleDanceFloorDragEnd()
               }}
 
@@ -2119,6 +2327,65 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
               <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded shadow-md pointer-events-none z-50">
                 {currentPlan.venueLayout.width} × {currentPlan.venueLayout.height} px
               </div>
+
+              {/* Custom areas */}
+              {currentPlan.venueLayout.customAreas?.map(area => {
+                const isDragged = isDraggingCustomArea && draggingCustomAreaId === area.id && draggedCustomAreaPosition
+                const position = isDragged ? draggedCustomAreaPosition : { x: area.x, y: area.y }
+                const rotation = tempCustomAreaRotation[area.id] !== undefined ? tempCustomAreaRotation[area.id] : (area.rotation || 0)
+
+                return (
+                  <div
+                    key={area.id}
+                    data-customarea={area.id}
+                    className={`group absolute border-2 rounded-lg flex items-center justify-center cursor-move ${
+                      !isDragged ? 'transition-colors' : ''
+                    } ${isDraggingCustomArea && draggingCustomAreaId === area.id ? 'z-20 scale-105' : 'z-10'}`}
+                    style={{
+                      left: position.x,
+                      top: position.y,
+                      width: area.width,
+                      height: area.height,
+                      backgroundColor: area.color || '#FCD34D',
+                      borderColor: area.color ? `${area.color}CC` : '#F59E0B',
+                      transform: `rotate(${rotation}deg)`,
+                      transformOrigin: 'center'
+                    }}
+                    onMouseDown={(e) => handleCustomAreaDragStart(e, area.id)}
+                    onDoubleClick={(e) => {
+                      e.stopPropagation()
+                      handleEditCustomArea(area)
+                    }}
+                    title="Táhněte pro přesun, dvojklik pro úpravu"
+                  >
+                    {/* Delete button - visible on hover */}
+                    <div className="absolute -top-2 -left-2 opacity-0 group-hover:opacity-100 transition-opacity z-30">
+                      <button
+                        className="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleDeleteCustomArea(area.id)
+                        }}
+                        title="Smazat plochu"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+
+                    {/* Info on hover - above area */}
+                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-20 pointer-events-none">
+                      <div className="bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                        Dvojklik pro úpravu
+                      </div>
+                    </div>
+
+                    <span className="text-sm font-medium" style={{ color: area.color ? '#000' : '#92400E' }}>
+                      {area.name}
+                    </span>
+                  </div>
+                )
+              })}
+
               {/* Venue features */}
               {currentPlan.venueLayout.danceFloor && (() => {
                 const isDraggedDanceFloor = isDraggingDanceFloor && draggedDanceFloorPosition
@@ -2354,12 +2621,33 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                               top: `calc(50% + ${seatY}px - 12px)`
                             }}
                             title={guestNameTooltip || `Místo ${seat.position} - levé tlačítko: přiřadit hosta, pravé tlačítko: smazat židli`}
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              if (seat.guestId) {
-                                handleUnassignGuest(seat.id)
-                              } else {
-                                handleSeatClick(seat.id)
+                            onMouseDown={(e) => {
+                              if (e.button === 0) { // Left click only
+                                e.stopPropagation() // Prevent table drag from starting
+                                setSeatMouseDownTime(Date.now())
+                                setSeatMouseDownPos({ x: e.clientX, y: e.clientY })
+                              }
+                            }}
+                            onMouseUp={(e) => {
+                              if (e.button === 0) { // Left click only
+                                e.stopPropagation() // Prevent table drag from starting
+                                const timeDiff = Date.now() - seatMouseDownTime
+                                const posChanged = seatMouseDownPos && (
+                                  Math.abs(e.clientX - seatMouseDownPos.x) > 5 ||
+                                  Math.abs(e.clientY - seatMouseDownPos.y) > 5
+                                )
+
+                                // Only trigger click if it was quick and mouse didn't move much (not a drag)
+                                if (timeDiff < 300 && !posChanged) {
+                                  if (seat.guestId) {
+                                    handleUnassignGuest(seat.id)
+                                  } else {
+                                    handleSeatClick(seat.id)
+                                  }
+                                }
+
+                                setSeatMouseDownTime(0)
+                                setSeatMouseDownPos(null)
                               }
                             }}
                             onContextMenu={(e) => {
@@ -2669,14 +2957,33 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                             top: chairY
                           }}
                           title={guestNameTooltip || `Místo ${index + 1} - levé tlačítko: přiřadit hosta`}
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            if (chairSeat) {
-                              if (chairSeat.guestId) {
-                                handleUnassignGuest(chairSeat.id)
-                              } else {
-                                handleSeatClick(chairSeat.id, 'chair')
+                          onMouseDown={(e) => {
+                            if (e.button === 0) { // Left click only
+                              e.stopPropagation() // Prevent chair row drag from starting
+                              setSeatMouseDownTime(Date.now())
+                              setSeatMouseDownPos({ x: e.clientX, y: e.clientY })
+                            }
+                          }}
+                          onMouseUp={(e) => {
+                            if (e.button === 0 && chairSeat) { // Left click only
+                              e.stopPropagation() // Prevent chair row drag from starting
+                              const timeDiff = Date.now() - seatMouseDownTime
+                              const posChanged = seatMouseDownPos && (
+                                Math.abs(e.clientX - seatMouseDownPos.x) > 5 ||
+                                Math.abs(e.clientY - seatMouseDownPos.y) > 5
+                              )
+
+                              // Only trigger click if it was quick and mouse didn't move much (not a drag)
+                              if (timeDiff < 300 && !posChanged) {
+                                if (chairSeat.guestId) {
+                                  handleUnassignGuest(chairSeat.id)
+                                } else {
+                                  handleSeatClick(chairSeat.id, 'chair')
+                                }
                               }
+
+                              setSeatMouseDownTime(0)
+                              setSeatMouseDownPos(null)
                             }
                           }}
                           onDrop={(e) => handleGuestDrop(e, chairSeat?.id || '')}
@@ -2687,7 +2994,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                       )
                     })}
 
-                    {/* Guest names positioned around chairs */}
+                    {/* Guest names positioned around chairs - same style as tables */}
                     {viewOptions.showGuestNames && rowChairSeats
                       .filter(s => s.guestId)
                       .map((chairSeat) => {
@@ -2698,31 +3005,83 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                         const chairX = chairRow.orientation === 'horizontal' ? seatIndex * spacing : 0
                         const chairY = chairRow.orientation === 'vertical' ? seatIndex * spacing : 0
 
-                        // Position name below or to the side based on orientation
-                        const nameOffset = 25
-                        const nameX = chairRow.orientation === 'horizontal' ? chairX : chairX + nameOffset
-                        const nameY = chairRow.orientation === 'horizontal' ? chairY + nameOffset : chairY
+                        // Chair dimensions (w-6 h-6 = 24px)
+                        const chairSize = 24
+                        const chairCenterOffset = chairSize / 2 // 12px to get to center of chair
+
+                        // Alternate names above and below (or left/right for vertical)
+                        const isEven = seatIndex % 2 === 0
+                        const nameOffset = 35 // Same distance for both above and below
+
+                        let nameX = chairX + chairCenterOffset // Start from center of chair
+                        let nameY = chairY + chairCenterOffset // Start from center of chair
+                        let textRotation = 0
+
+                        if (chairRow.orientation === 'horizontal') {
+                          // For horizontal rows: alternate above and below
+                          const effectiveRotation = (chairRow.rotation || 0) % 360
+                          const isUpsideDown = effectiveRotation > 90 && effectiveRotation < 270
+
+                          if (isUpsideDown) {
+                            // Flip the alternation when row is upside down
+                            nameY = nameY + (isEven ? nameOffset : -nameOffset)
+                            textRotation = 180 // Flip text to keep it readable
+                          } else {
+                            nameY = nameY + (isEven ? -nameOffset : nameOffset)
+                            textRotation = 0
+                          }
+                        } else {
+                          // For vertical rows: alternate left and right
+                          const effectiveRotation = (chairRow.rotation || 0) % 360
+                          const isUpsideDown = effectiveRotation > 90 && effectiveRotation < 270
+
+                          if (isUpsideDown) {
+                            // Flip the alternation when row is upside down
+                            nameX = nameX + (isEven ? -nameOffset : nameOffset)
+                            textRotation = 180 // Flip text to keep it readable
+                          } else {
+                            nameX = nameX + (isEven ? nameOffset : -nameOffset)
+                            textRotation = 0
+                          }
+                        }
+
+                        // Check if this is a plus one based on guestId format
+                        const isPlusOne = chairSeat.guestId?.includes('_plusone') || false
 
                         return (
                           <div
                             key={chairSeat.id}
-                            className="absolute whitespace-nowrap pointer-events-none"
+                            className={`absolute text-[10px] px-2 py-1 rounded border shadow-md pointer-events-none text-center leading-tight ${
+                              isPlusOne
+                                ? 'bg-blue-50 border-blue-300 text-blue-800'
+                                : 'bg-white border-gray-300 text-gray-700'
+                            }`}
                             style={{
                               left: nameX,
                               top: nameY,
-                              transform: 'translate(-50%, 0)'
+                              transform: `translate(-50%, -50%) rotate(${textRotation}deg)`,
+                              zIndex: 10 + seatIndex
                             }}
                           >
-                            <span className="text-xs font-medium text-gray-700 bg-white px-1 rounded shadow-sm">
-                              {guestName.firstName}
-                            </span>
+                            <div className="font-medium">{guestName.firstName}</div>
+                            <div>{guestName.lastName}</div>
                           </div>
                         )
                       })}
 
-                    {/* Chair row label */}
-                    <div className="absolute -top-6 left-0 bg-white px-2 py-1 rounded shadow-sm border border-gray-200">
-                      <span className="text-xs font-medium text-gray-700">
+                    {/* Chair row label - positioned based on orientation */}
+                    <div
+                      className="absolute bg-white px-2 py-1 rounded shadow-sm border border-gray-200 pointer-events-none"
+                      style={{
+                        left: chairRow.orientation === 'horizontal' ? '-10px' : '50%',
+                        top: chairRow.orientation === 'horizontal' ? '50%' : '-40px',
+                        transform: chairRow.orientation === 'horizontal'
+                          ? 'translate(-100%, -50%)'
+                          : 'translate(-50%, 0)',
+                        zIndex: 5
+                      }}
+                    >
+                      <span className="text-xs font-medium text-gray-700 whitespace-nowrap">
                         {chairRow.name}
                       </span>
                     </div>
@@ -3258,6 +3617,114 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                   className="flex-1 btn-primary"
                 >
                   {editingChairRow ? 'Uložit změny' : 'Přidat řadu'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom area form modal */}
+      {showCustomAreaForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              {editingCustomArea ? 'Upravit plochu' : 'Přidat plochu'}
+            </h3>
+            <p className="text-sm text-gray-600 mb-6">
+              {editingCustomArea ? 'Upravte vlastní plochu' : 'Vytvořte vlastní plochu (taneční parket, bar, pódium, atd.)'}
+            </p>
+
+            <div className="space-y-4">
+              {/* Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Název plochy *
+                </label>
+                <input
+                  type="text"
+                  placeholder="např. Taneční parket, Bar, Pódium..."
+                  value={customAreaFormData.name}
+                  onChange={(e) => setCustomAreaFormData(prev => ({ ...prev, name: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+
+              {/* Width */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Šířka (px)
+                </label>
+                <input
+                  type="number"
+                  min="100"
+                  max="800"
+                  value={customAreaFormData.width}
+                  onChange={(e) => setCustomAreaFormData(prev => ({ ...prev, width: parseInt(e.target.value) || 200 }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+
+              {/* Height */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Výška (px)
+                </label>
+                <input
+                  type="number"
+                  min="100"
+                  max="800"
+                  value={customAreaFormData.height}
+                  onChange={(e) => setCustomAreaFormData(prev => ({ ...prev, height: parseInt(e.target.value) || 200 }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+
+              {/* Color */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Barva
+                </label>
+                <div className="flex space-x-2">
+                  {['#FCD34D', '#8B5CF6', '#EC4899', '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#6B7280'].map(color => (
+                    <button
+                      key={color}
+                      type="button"
+                      onClick={() => setCustomAreaFormData(prev => ({ ...prev, color }))}
+                      className={`w-10 h-10 rounded-lg border-2 transition-all ${
+                        customAreaFormData.color === color ? 'border-gray-900 scale-110' : 'border-gray-300'
+                      }`}
+                      style={{ backgroundColor: color }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex space-x-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCustomAreaForm(false)
+                    setEditingCustomArea(null)
+                    setCustomAreaFormData({
+                      name: '',
+                      width: 200,
+                      height: 200,
+                      color: '#FCD34D'
+                    })
+                  }}
+                  className="flex-1 btn-outline"
+                >
+                  Zrušit
+                </button>
+                <button
+                  type="button"
+                  onClick={editingCustomArea ? handleSaveCustomArea : handleAddCustomArea}
+                  disabled={!customAreaFormData.name.trim()}
+                  className="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {editingCustomArea ? 'Uložit změny' : 'Přidat plochu'}
                 </button>
               </div>
             </div>
