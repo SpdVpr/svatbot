@@ -94,8 +94,7 @@ export default function AccommodationSection({ content }: AccommodationSectionPr
 
                 {/* Price Range */}
                 {content.showPrices && accommodation.rooms.length > 0 && (
-                  <div className="flex items-center gap-2 text-primary-600 font-medium mb-6">
-                    <DollarSign className="w-4 h-4" />
+                  <div className="text-primary-600 font-medium mb-6">
                     <span>
                       {Math.min(...accommodation.rooms.map(r => r.pricePerNight)).toLocaleString()} - {' '}
                       {Math.max(...accommodation.rooms.map(r => r.pricePerNight)).toLocaleString()} Kč/noc

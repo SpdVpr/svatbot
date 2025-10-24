@@ -5,6 +5,11 @@ import { db } from '@/config/firebase'
 import type { WeddingWebsite } from '@/types/wedding-website'
 import ClassicEleganceTemplate from '@/components/wedding-website/templates/ClassicEleganceTemplate'
 import ModernMinimalistTemplate from '@/components/wedding-website/templates/ModernMinimalistTemplate'
+import RomanticBohoTemplate from '@/components/wedding-website/templates/RomanticBohoTemplate'
+
+// Disable static generation and caching for this page
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 interface PageProps {
   params: {
@@ -80,6 +85,7 @@ export default async function WeddingWebsitePage({ params }: PageProps) {
       isPublished: website.isPublished,
       template: website.template
     })
+    console.log('🎨 Template being used:', website.template)
     console.log('🎨 DressCode data:', {
       enabled: website.content?.dressCode?.enabled,
       imagesCount: website.content?.dressCode?.images?.length || 0,
@@ -117,6 +123,12 @@ export default async function WeddingWebsitePage({ params }: PageProps) {
         return <ClassicEleganceTemplate website={website} />
       case 'modern-minimalist':
         return <ModernMinimalistTemplate website={website} />
+      case 'romantic-boho':
+        return <RomanticBohoTemplate website={website} />
+      case 'luxury-gold':
+      case 'garden-fresh':
+        // Fallback to classic for templates in development
+        return <ClassicEleganceTemplate website={website} />
       default:
         return <ClassicEleganceTemplate website={website} />
     }

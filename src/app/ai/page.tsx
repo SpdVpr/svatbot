@@ -16,6 +16,29 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import AIAssistant from '@/components/ai/AIAssistant'
+import { Timestamp } from 'firebase/firestore'
+
+// Helper funkce pro formátování data z Firebase
+const formatDate = (date: any): string => {
+  if (!date) return 'Neurčeno'
+
+  let dateObj: Date
+
+  if (date instanceof Date) {
+    dateObj = date
+  } else if (date instanceof Timestamp) {
+    dateObj = date.toDate()
+  } else if (typeof date === 'string') {
+    dateObj = new Date(date)
+  } else if (date.seconds) {
+    // Firestore Timestamp object
+    dateObj = new Date(date.seconds * 1000)
+  } else {
+    return 'Neurčeno'
+  }
+
+  return dateObj.toLocaleDateString('cs-CZ')
+}
 
 function AIPageContent() {
   const { user } = useAuth()
@@ -152,10 +175,7 @@ function AIPageContent() {
                 <div>
                   <span className="text-gray-500">Datum:</span>
                   <div className="font-medium">
-                    {wedding.weddingDate
-                      ? wedding.weddingDate.toLocaleDateString('cs-CZ')
-                      : 'Neurčeno'
-                    }
+                    {formatDate(wedding.weddingDate)}
                   </div>
                 </div>
                 <div>

@@ -12,6 +12,7 @@ import ContentEditor from '@/components/wedding-website/builder/ContentEditor'
 import DomainStatus from '@/components/wedding-website/DomainStatus'
 import ClassicEleganceTemplate from '@/components/wedding-website/templates/ClassicEleganceTemplate'
 import ModernMinimalistTemplate from '@/components/wedding-website/templates/ModernMinimalistTemplate'
+import RomanticBohoTemplate from '@/components/wedding-website/templates/RomanticBohoTemplate'
 import type { TemplateType, WebsiteContent, WeddingWebsite } from '@/types/wedding-website'
 
 type Step = 'url' | 'template' | 'content' | 'preview'
@@ -55,7 +56,9 @@ export default function WeddingWebsiteBuilderPage() {
       description: 'Připravili jsme pro vás výběr chutných jídel a nápojů.',
       showCategories: true,
       showDietaryInfo: true,
-      showDrinks: true
+      showDrinks: true,
+      showSideDishes: true,
+      showDesserts: true
     },
   })
   const [isSaving, setIsSaving] = useState(false)
@@ -119,6 +122,22 @@ export default function WeddingWebsiteBuilderPage() {
       return
     }
 
+    // Automaticky uložit před přechodem na další krok (pokud už web existuje)
+    if (website && selectedTemplate && customUrl) {
+      setIsSaving(true)
+      try {
+        await updateWebsite({
+          template: selectedTemplate,
+          customUrl,
+          content,
+        })
+      } catch (error) {
+        console.error('Error saving before next step:', error)
+      } finally {
+        setIsSaving(false)
+      }
+    }
+
     const nextIndex = currentStepIndex + 1
     if (nextIndex < steps.length) {
       setCurrentStep(steps[nextIndex].id)
@@ -173,13 +192,16 @@ export default function WeddingWebsiteBuilderPage() {
     if (website) {
       setIsSaving(true)
       try {
+        console.log('💾 Saving template change:', template)
         await updateWebsite({
           template,
           customUrl,
           content,
         })
+        console.log('✅ Template saved successfully')
       } catch (error) {
-        console.error('Error updating template:', error)
+        console.error('❌ Error updating template:', error)
+        alert('Chyba při ukládání šablony. Zkuste to prosím znovu.')
       } finally {
         setIsSaving(false)
       }
@@ -271,8 +293,8 @@ export default function WeddingWebsiteBuilderPage() {
           {/* Progress steps */}
           <div className="mt-6 flex items-center justify-center">
             {steps.map((step, index) => {
-              // Umožnit kliknutí na kroky, které už byly dokončeny, nebo na template krok pokud už web existuje
-              const isClickable = index <= currentStepIndex || (step.id === 'template' && website)
+              // Umožnit kliknutí na všechny kroky pokud už web existuje
+              const isClickable = website || index === 0
 
               return (
                 <div key={step.id} className="flex items-center">
@@ -282,8 +304,8 @@ export default function WeddingWebsiteBuilderPage() {
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                       currentStep === step.id
                         ? 'bg-pink-100 text-pink-700'
-                        : index < currentStepIndex || (step.id === 'template' && website)
-                        ? 'text-green-600 hover:bg-green-50 cursor-pointer'
+                        : isClickable
+                        ? 'text-gray-700 hover:bg-gray-100 cursor-pointer'
                         : 'text-gray-400 cursor-not-allowed'
                     }`}
                   >
@@ -291,8 +313,8 @@ export default function WeddingWebsiteBuilderPage() {
                       className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
                         currentStep === step.id
                           ? 'bg-pink-500 text-white'
-                          : index < currentStepIndex || (step.id === 'template' && website)
-                          ? 'bg-green-500 text-white'
+                          : isClickable
+                          ? 'bg-gray-300 text-gray-700 hover:bg-gray-400'
                           : 'bg-gray-200 text-gray-600'
                       }`}
                     >
@@ -323,7 +345,17 @@ export default function WeddingWebsiteBuilderPage() {
 
         {currentStep === 'template' && (
           <div className="space-y-6">
-            {website && (
+            {isSaving && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="flex items-center gap-3">
+                  <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-yellow-600"></div>
+                  <p className="text-sm text-yellow-800">
+                    <strong>Ukládám šablonu...</strong>
+                  </p>
+                </div>
+              </div>
+            )}
+            {website && !isSaving && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <p className="text-sm text-blue-800">
                   <strong>Tip:</strong> Změna šablony zachová všechna vaše data a nastavení.
@@ -441,6 +473,34 @@ export default function WeddingWebsiteBuilderPage() {
                       updatedAt: new Date()
                     } as WeddingWebsite}
                   />
+                )}
+
+                {selectedTemplate === 'romantic-boho' && (
+                  <RomanticBohoTemplate
+                    website={{
+                      id: 'preview',
+                      weddingId: wedding?.id || 'preview',
+                      customUrl,
+                      template: selectedTemplate,
+                      content,
+                      isPublished: false,
+                      createdAt: new Date(),
+                      updatedAt: new Date()
+                    } as WeddingWebsite}
+                  />
+                )}
+
+                {(selectedTemplate === 'luxury-gold' || selectedTemplate === 'garden-fresh') && (
+                  <div className="flex items-center justify-center min-h-screen bg-gray-50">
+                    <div className="text-center p-8">
+                      <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                        Šablona se připravuje
+                      </h3>
+                      <p className="text-gray-600">
+                        Tato šablona bude brzy k dispozici. Zatím můžete použít jinou šablonu.
+                      </p>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>

@@ -302,7 +302,7 @@ export default function DressCodeSectionEditor({ content, onChange }: DressCodeS
                   <img
                     src={imageUrl}
                     alt={`Dress code inspiration ${index + 1}`}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover object-top"
                   />
 
                   {/* Overlay */}

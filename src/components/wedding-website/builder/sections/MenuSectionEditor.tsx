@@ -29,7 +29,9 @@ export default function MenuSectionEditor({ content, onChange }: MenuSectionEdit
     description: content?.description || 'Připravili jsme pro vás výběr chutných jídel a nápojů.',
     showCategories: content?.showCategories ?? true,
     showDietaryInfo: content?.showDietaryInfo ?? true,
-    showDrinks: content?.showDrinks ?? true
+    showDrinks: content?.showDrinks ?? true,
+    showSideDishes: content?.showSideDishes ?? true,
+    showDesserts: content?.showDesserts ?? true
   }
 
   const updateContent = (updates: Partial<MenuContent>) => {
@@ -228,6 +230,44 @@ export default function MenuSectionEditor({ content, onChange }: MenuSectionEdit
                     type="checkbox"
                     checked={content?.showDietaryInfo ?? true}
                     onChange={(e) => updateContent({ showDietaryInfo: e.target.checked })}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                </label>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <UtensilsCrossed className="w-5 h-5 text-gray-400" />
+                  <div>
+                    <p className="font-medium text-gray-900">Zobrazit přílohy</p>
+                    <p className="text-sm text-gray-600">Ukázat přílohy v menu</p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={content?.showSideDishes ?? true}
+                    onChange={(e) => updateContent({ showSideDishes: e.target.checked })}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                </label>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <UtensilsCrossed className="w-5 h-5 text-gray-400" />
+                  <div>
+                    <p className="font-medium text-gray-900">Zobrazit dezerty</p>
+                    <p className="text-sm text-gray-600">Ukázat dezerty v menu</p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={content?.showDesserts ?? true}
+                    onChange={(e) => updateContent({ showDesserts: e.target.checked })}
                     className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>

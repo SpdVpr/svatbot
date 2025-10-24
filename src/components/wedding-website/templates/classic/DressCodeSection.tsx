@@ -71,11 +71,11 @@ export default function DressCodeSection({ content }: DressCodeSectionProps) {
                         key={imageIndex}
                         className="group relative bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300"
                       >
-                        <div className="relative w-full" style={{ paddingBottom: '125%' }}>
+                        <div className="relative w-full" style={{ paddingBottom: '140%' }}>
                           <img
                             src={image}
                             alt={`${colorItem.name || 'Color'} inspirace ${imageIndex + 1}`}
-                            className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            className="absolute inset-0 w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500"
                           />
                         </div>
                       </div>

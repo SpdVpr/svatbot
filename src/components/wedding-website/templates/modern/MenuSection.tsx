@@ -24,14 +24,21 @@ export default function MenuSection({ content }: MenuSectionProps) {
     )
   }
 
+  // Filter menu items based on settings
+  const filteredMenuItems = menuItems.filter(item => {
+    if (!content.showSideDishes && item.category === 'side-dish') return false
+    if (!content.showDesserts && item.category === 'dessert') return false
+    return true
+  })
+
   // Group menu items by category
-  const groupedMenuItems = menuItems.reduce((acc, item) => {
+  const groupedMenuItems = filteredMenuItems.reduce((acc, item) => {
     if (!acc[item.category]) {
       acc[item.category] = []
     }
     acc[item.category].push(item)
     return acc
-  }, {} as Record<FoodCategory, typeof menuItems>)
+  }, {} as Record<FoodCategory, typeof filteredMenuItems>)
 
   // Group drink items by category
   const groupedDrinkItems = drinkItems.reduce((acc, item) => {
@@ -42,7 +49,7 @@ export default function MenuSection({ content }: MenuSectionProps) {
     return acc
   }, {} as Record<DrinkCategory, typeof drinkItems>)
 
-  const hasMenuItems = menuItems.length > 0
+  const hasMenuItems = filteredMenuItems.length > 0
   const hasDrinkItems = drinkItems.length > 0 && content.showDrinks
 
   if (!hasMenuItems && !hasDrinkItems) {
@@ -84,7 +91,7 @@ export default function MenuSection({ content }: MenuSectionProps) {
                     <h4 className="text-lg font-medium text-gray-900 mb-6 text-center tracking-wide uppercase">
                       {FOOD_CATEGORY_LABELS[category as FoodCategory]}
                     </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 gap-6">
                       {items.map((item) => (
                         <div key={item.id} className="border border-gray-200 rounded-none p-6 hover:border-gray-900 transition-colors">
                           <div className="flex justify-between items-start mb-2">
@@ -120,8 +127,8 @@ export default function MenuSection({ content }: MenuSectionProps) {
               </div>
             ) : (
               // Show all items without categories
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {menuItems.map((item) => (
+              <div className="grid grid-cols-1 gap-6">
+                {filteredMenuItems.map((item) => (
                   <div key={item.id} className="border border-gray-200 rounded-none p-6 hover:border-gray-900 transition-colors">
                     <div className="flex justify-between items-start mb-2">
                       <h5 className="font-medium text-gray-900">{item.name}</h5>

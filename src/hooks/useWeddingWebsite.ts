@@ -394,7 +394,7 @@ export function useWeddingWebsite(customUrl?: string) {
 
     try {
       const docRef = doc(db, 'weddingWebsites', website.id)
-      
+
       // Vyčistíme updates pro Firestore
       const cleanedUpdates = cleanForFirestore({
         ...updates,
@@ -402,6 +402,13 @@ export function useWeddingWebsite(customUrl?: string) {
       }, 0, 'updates')
 
       await updateDoc(docRef, cleanedUpdates)
+
+      // Aktualizujeme lokální state
+      setWebsite({
+        ...website,
+        ...updates,
+        updatedAt: new Date(),
+      } as WeddingWebsite)
     } catch (err: any) {
       console.error('Error updating wedding website:', err)
       throw new Error('Chyba při aktualizaci svatebního webu')

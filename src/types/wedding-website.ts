@@ -1,8 +1,11 @@
 // Wedding Website Types
 
-export type TemplateType = 
+export type TemplateType =
   | 'classic-elegance'
   | 'modern-minimalist'
+  | 'romantic-boho'
+  | 'luxury-gold'
+  | 'garden-fresh'
   | 'rustic-romance'
   | 'bohemian-dream'
   | 'garden-party'
@@ -224,6 +227,8 @@ export interface MenuContent {
   showCategories: boolean
   showDietaryInfo: boolean
   showDrinks: boolean
+  showSideDishes: boolean
+  showDesserts: boolean
 }
 
 // Section order type

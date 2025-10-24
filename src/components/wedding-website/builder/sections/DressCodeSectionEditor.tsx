@@ -295,7 +295,7 @@ export default function DressCodeSectionEditor({ content, onChange }: DressCodeS
                       <img
                         src={imageUrl}
                         alt={`${colorItem.name || 'Color'} inspiration ${imageIndex + 1}`}
-                        className="w-full h-full object-cover rounded-lg"
+                        className="w-full h-full object-cover object-top rounded-lg"
                       />
                       <button
                         onClick={() => removeImage(colorIndex, imageIndex)}
