@@ -96,6 +96,7 @@ export function useTask(): UseTaskReturn {
       notes: data.notes || '',
       isTemplate: data.isTemplate || false,
       templateId: data.templateId,
+      checklistItemId: data.checklistItemId,
       order: data.order || 0,
       createdAt: data.createdAt?.toDate() || new Date(),
       updatedAt: data.updatedAt?.toDate() || new Date()
@@ -117,6 +118,7 @@ export function useTask(): UseTaskReturn {
       notes: task.notes || null,
       isTemplate: task.isTemplate,
       templateId: task.templateId || null,
+      checklistItemId: task.checklistItemId || null,
       order: task.order,
       createdAt: Timestamp.fromDate(task.createdAt),
       updatedAt: Timestamp.fromDate(task.updatedAt)
@@ -152,6 +154,7 @@ export function useTask(): UseTaskReturn {
         dueDate: data.dueDate,
         assignedTo: data.assignedTo,
         notes: data.notes,
+        checklistItemId: data.checklistItemId,
         isTemplate: false,
         order: tasks.filter(t => t.category === data.category).length,
         createdAt: new Date(),

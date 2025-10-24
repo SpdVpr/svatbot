@@ -284,10 +284,10 @@ export default function FolderView({
           {images.map((image) => (
             <div
               key={image.id}
-              className="group relative break-inside-avoid mb-4 cursor-pointer"
+              className="group relative break-inside-avoid mb-4"
               onClick={() => onImageClick(image)}
             >
-              <div className="relative rounded-xl overflow-hidden bg-gray-100 shadow-sm hover:shadow-md transition-all">
+              <div className="wedding-card relative overflow-hidden bg-gray-100 !p-0">
                 <Image
                   src={image.url}
                   alt={image.title}

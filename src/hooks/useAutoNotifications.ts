@@ -35,13 +35,29 @@ export function useAutoNotifications() {
   const lastCheckRef = useRef<Date | null>(null)
   const hasShownWelcomeRef = useRef(false)
 
+  // Load last check date from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem('svatbot_last_notification_check')
+    if (stored) {
+      lastCheckRef.current = new Date(stored)
+    }
+  }, [])
+
   // Check if it's a new day
   const isNewDay = useCallback(() => {
-    if (!lastCheckRef.current) return true
-    
+    if (!lastCheckRef.current) {
+      // First time - load from localStorage
+      const stored = localStorage.getItem('svatbot_last_notification_check')
+      if (stored) {
+        lastCheckRef.current = new Date(stored)
+      } else {
+        return true // First ever check
+      }
+    }
+
     const now = new Date()
     const lastCheck = lastCheckRef.current
-    
+
     return (
       now.getDate() !== lastCheck.getDate() ||
       now.getMonth() !== lastCheck.getMonth() ||
@@ -225,15 +241,17 @@ export function useAutoNotifications() {
       // Check for new day
       if (isNewDay()) {
         console.log('📅 New day detected - running daily checks')
-        
+
         await sendDailyNotification()
         await checkMilestones()
         await checkOverdueTasks()
         await checkUpcomingTasks()
         await sendRandomTip()
         await sendRandomRelationshipReminder()
-        
-        lastCheckRef.current = new Date()
+
+        const now = new Date()
+        lastCheckRef.current = now
+        localStorage.setItem('svatbot_last_notification_check', now.toISOString())
       }
 
       // Always check for recent task completions
@@ -258,6 +276,20 @@ export function useAutoNotifications() {
   useEffect(() => {
     if (!user?.id) return
 
+    // Prevent multiple initial runs using localStorage
+    const sessionKey = `svatbot_auto_check_session_${user.id}`
+    const lastSession = localStorage.getItem(sessionKey)
+    const now = Date.now()
+
+    // If last session was less than 1 minute ago, skip
+    if (lastSession && (now - parseInt(lastSession)) < 60000) {
+      console.log('⏭️ Skipping auto-checks - already ran recently')
+      return
+    }
+
+    // Mark this session
+    localStorage.setItem(sessionKey, now.toString())
+
     // Send welcome notification for new users
     sendWelcomeNotification()
 
@@ -269,7 +301,9 @@ export function useAutoNotifications() {
       runAutoChecks()
     }, 5 * 60 * 1000)
 
-    return () => clearInterval(interval)
+    return () => {
+      clearInterval(interval)
+    }
   }, [user?.id, runAutoChecks, sendWelcomeNotification])
 
   // Manual trigger for testing

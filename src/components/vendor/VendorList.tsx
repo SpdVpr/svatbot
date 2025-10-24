@@ -326,7 +326,7 @@ export default function VendorList({
             const primaryContact = getPrimaryContact(vendor)
 
             return (
-              <div key={vendor.id} className="wedding-card hover:shadow-md transition-shadow">
+              <div key={vendor.id} className="wedding-card">
                 <div className="flex items-start justify-between">
                   {/* Main Content */}
                   <div className="flex-1">

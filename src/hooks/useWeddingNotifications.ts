@@ -232,20 +232,26 @@ export function useWeddingNotifications() {
     if (!user?.id) return
 
     try {
-      const notification: Omit<WeddingNotification, 'id'> = {
+      const notification: any = {
         userId: user.id,
         type,
         title,
         message,
         priority: options?.priority || 'medium',
         category: options?.category || 'system',
-        data: options?.data,
-        actionUrl: options?.actionUrl,
         read: false,
         createdAt: serverTimestamp()
       }
 
-      // Only add expiresAt if expiresIn is provided
+      // Only add optional fields if they are provided (avoid undefined values in Firestore)
+      if (options?.data !== undefined) {
+        notification.data = options.data
+      }
+
+      if (options?.actionUrl) {
+        notification.actionUrl = options.actionUrl
+      }
+
       if (options?.expiresIn) {
         notification.expiresAt = new Date(Date.now() + options.expiresIn * 60 * 1000)
       }

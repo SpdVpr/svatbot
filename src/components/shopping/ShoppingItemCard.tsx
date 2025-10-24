@@ -50,7 +50,7 @@ export default function ShoppingItemCard({ item, viewMode }: ShoppingItemCardPro
   if (viewMode === 'list') {
     return (
       <>
-        <div className="wedding-card flex items-center gap-4 hover:shadow-lg transition-all">
+        <div className="wedding-card flex items-center gap-4">
           {/* Checkbox */}
           <button
             onClick={handleTogglePurchased}

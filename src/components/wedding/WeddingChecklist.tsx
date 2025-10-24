@@ -134,10 +134,22 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
     )
   }, [tasks])
 
-  // Check if item is completed - only check local state (not tasks database)
+  // Check if item is completed - check task status if item is in tasks, otherwise check local state
   const isItemCompleted = useCallback((item: ChecklistItem): boolean => {
+    // First check if this item has a corresponding task
+    const correspondingTask = tasks.find(task =>
+      task.checklistItemId === item.id ||
+      task.title.toLowerCase() === item.title.toLowerCase()
+    )
+
+    // If task exists, use its completion status
+    if (correspondingTask) {
+      return correspondingTask.status === 'completed'
+    }
+
+    // Otherwise, check local checklist completion state
     return completedItems.has(item.id)
-  }, [completedItems])
+  }, [completedItems, tasks])
 
   // Check if item is hidden
   const isItemHidden = useCallback((item: ChecklistItem): boolean => {
@@ -178,7 +190,8 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
         category: categoryMap[item.category],
         priority: undefined,
         dueDate: undefined,
-        notes: item.tips?.join('\n') || ''
+        notes: item.tips?.join('\n') || '',
+        checklistItemId: item.id // Link task to checklist item
       }
 
       await createTask(taskData)
@@ -246,12 +259,24 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
     try {
       setMarkingComplete(item.id)
 
-      // Update local state immediately for instant UI feedback
-      const newCompletedItems = new Set(completedItems).add(item.id)
-      setCompletedItems(newCompletedItems)
+      // Check if this item has a corresponding task
+      const correspondingTask = tasks.find(task =>
+        task.checklistItemId === item.id ||
+        task.title.toLowerCase() === item.title.toLowerCase()
+      )
 
-      // Save to storage (Firebase or sessionStorage)
-      await saveChecklistData(newCompletedItems, hiddenItems)
+      if (correspondingTask && correspondingTask.status !== 'completed') {
+        // If task exists and is not completed, mark it as completed
+        await updateTask(correspondingTask.id, {
+          status: 'completed',
+          completedAt: new Date()
+        })
+      } else {
+        // If no task exists, update local checklist state
+        const newCompletedItems = new Set(completedItems).add(item.id)
+        setCompletedItems(newCompletedItems)
+        await saveChecklistData(newCompletedItems, hiddenItems)
+      }
 
       // Show success message
       setShowSuccess(item.id)
@@ -259,12 +284,18 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
     } catch (error) {
       console.error('Error marking complete:', error)
       alert('Chyba při označování jako hotovo')
-      // Revert local state on error
-      setCompletedItems(prev => {
-        const newSet = new Set(prev)
-        newSet.delete(item.id)
-        return newSet
-      })
+      // Revert local state on error if we updated it
+      const correspondingTask = tasks.find(task =>
+        task.checklistItemId === item.id ||
+        task.title.toLowerCase() === item.title.toLowerCase()
+      )
+      if (!correspondingTask) {
+        setCompletedItems(prev => {
+          const newSet = new Set(prev)
+          newSet.delete(item.id)
+          return newSet
+        })
+      }
     } finally {
       setMarkingComplete(null)
     }
@@ -275,18 +306,36 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
     try {
       setMarkingComplete(item.id)
 
-      // Update local state immediately for instant UI feedback
-      const newCompletedItems = new Set(completedItems)
-      newCompletedItems.delete(item.id)
-      setCompletedItems(newCompletedItems)
+      // Check if this item has a corresponding task
+      const correspondingTask = tasks.find(task =>
+        task.checklistItemId === item.id ||
+        task.title.toLowerCase() === item.title.toLowerCase()
+      )
 
-      // Save to storage (Firebase or sessionStorage)
-      await saveChecklistData(newCompletedItems, hiddenItems)
+      if (correspondingTask && correspondingTask.status === 'completed') {
+        // If task exists and is completed, mark it as pending
+        await updateTask(correspondingTask.id, {
+          status: 'pending',
+          completedAt: undefined
+        })
+      } else {
+        // If no task exists, update local checklist state
+        const newCompletedItems = new Set(completedItems)
+        newCompletedItems.delete(item.id)
+        setCompletedItems(newCompletedItems)
+        await saveChecklistData(newCompletedItems, hiddenItems)
+      }
     } catch (error) {
       console.error('Error unmarking complete:', error)
       alert('Chyba při rušení dokončení')
-      // Revert local state on error
-      setCompletedItems(prev => new Set(prev).add(item.id))
+      // Revert local state on error if we updated it
+      const correspondingTask = tasks.find(task =>
+        task.checklistItemId === item.id ||
+        task.title.toLowerCase() === item.title.toLowerCase()
+      )
+      if (!correspondingTask) {
+        setCompletedItems(prev => new Set(prev).add(item.id))
+      }
     } finally {
       setMarkingComplete(null)
     }

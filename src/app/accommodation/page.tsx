@@ -183,7 +183,7 @@ export default function AccommodationPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredAccommodations.map((accommodation) => (
-              <div key={accommodation.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
+              <div key={accommodation.id} className="wedding-card overflow-hidden !p-0">
                 {/* Image */}
                 <div
                   className="h-48 bg-gray-200 relative cursor-pointer hover:opacity-90 transition-opacity"

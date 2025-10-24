@@ -828,10 +828,10 @@ export default function GuestList({
                     data-testid={`guest-item-${guest.id}`}
                     title={viewMode === 'list' ? 'Klikněte a přetáhněte pro změnu pořadí' : undefined}
                     className={`
-                      p-4 border rounded-lg bg-white guest-list-item touch-drag-item touch-feedback
-                      ${isDraggedItem ? 'dragging' : 'hover:shadow-sm'}
-                      ${isDragOver ? 'drag-over' : 'border-gray-200'}
-                      ${viewMode === 'list' ? 'cursor-move select-none hover:border-gray-300' : ''}
+                      wedding-card p-4 guest-list-item touch-drag-item touch-feedback
+                      ${isDraggedItem ? 'dragging' : ''}
+                      ${isDragOver ? 'drag-over' : ''}
+                      ${viewMode === 'list' ? 'cursor-move select-none' : ''}
                       ${isDragging && !isDraggedItem ? 'moving' : ''}
                     `}
                     draggable={viewMode === 'list'}

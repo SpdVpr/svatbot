@@ -148,11 +148,10 @@ export default function GuestCard({
 
   return (
     <div
-      className={`
-        relative group border rounded-lg transition-all duration-200 cursor-pointer
-        border-gray-200 bg-white hover:border-primary-300 hover:shadow-sm
-        ${compact ? 'p-3' : 'p-4'}
-      `}
+      className="wedding-card group p-4"
+      style={{
+        ...(compact && { padding: '0.75rem' })
+      }}
       onClick={onClick}
     >
 

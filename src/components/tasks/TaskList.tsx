@@ -443,13 +443,11 @@ export default function TaskList({
                 return (
                   <div
                     key={task.id}
-                    className={`p-4 border rounded-lg transition-all hover:shadow-sm ${
-                      task.status === 'completed'
-                        ? 'bg-gray-50 border-gray-200'
-                        : isOverdue
-                        ? 'bg-red-50 border-red-200'
-                        : 'bg-white border-gray-200 hover:border-primary-300'
-                    }`}
+                    className="wedding-card p-4"
+                    style={{
+                      ...(task.status === 'completed' && { opacity: 0.75, background: 'rgba(249, 250, 251, 0.95)' }),
+                      ...(isOverdue && task.status !== 'completed' && { background: 'rgba(254, 242, 242, 0.95)' })
+                    }}
                   >
                     <div className="flex items-start space-x-3">
                       {/* Status checkbox */}

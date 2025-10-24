@@ -28,6 +28,7 @@ export interface Task {
   notes?: string
   isTemplate: boolean // True for predefined tasks
   templateId?: string // Reference to template task
+  checklistItemId?: string // Reference to checklist item if created from checklist
   order: number // For sorting within category
   createdAt: Date
   updatedAt: Date
@@ -143,6 +144,7 @@ export interface TaskFormData {
   dueDate?: Date
   assignedTo?: string
   notes?: string
+  checklistItemId?: string // Reference to checklist item if created from checklist
 }
 
 export interface TaskFormProps {

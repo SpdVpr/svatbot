@@ -353,7 +353,7 @@ export default function MenuPage() {
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                           {items.map((item) => (
-                            <div key={item.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow relative">
+                            <div key={item.id} className="wedding-card p-4 relative">
                               <div className="absolute top-2 right-2 flex space-x-1">
                                 <button
                                   onClick={() => handleEditMenuItem(item)}
@@ -440,7 +440,7 @@ export default function MenuPage() {
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                           {items.map((item) => (
-                            <div key={item.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow relative">
+                            <div key={item.id} className="wedding-card p-4 relative">
                               <div className="absolute top-2 right-2 flex space-x-1">
                                 <button
                                   onClick={() => handleEditDrinkItem(item)}

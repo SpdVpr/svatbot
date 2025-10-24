@@ -182,49 +182,55 @@ export default function VendorStats({
         </div>
       </div>
 
-      {/* Category breakdown */}
+      {/* Category breakdown - Compact version */}
       <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center space-x-2">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
           <PieChart className="w-5 h-5" />
           <span>Dodavatelé podle kategorií</span>
         </h3>
 
-        <div className="space-y-4">
+        {/* Category Grid - Compact Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {categoryStats.map((stat) => (
-            <div key={stat.key} className="space-y-2">
-              <div className="flex items-center justify-between">
+            <div
+              key={stat.key}
+              className="p-3 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
+            >
+              <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center space-x-2">
-                  <span className="text-lg">{stat.category.icon}</span>
-                  <span className="font-medium text-gray-900">{stat.category.name}</span>
+                  <span className="text-base">{stat.category.icon}</span>
+                  <span className="text-sm font-medium text-gray-900">{stat.category.name}</span>
                 </div>
-                <div className="text-right">
-                  <p className="font-medium">
+                <span className="text-xs text-text-muted">{stat.total}×</span>
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex justify-between items-baseline">
+                  <span className="text-xs text-text-muted">Stav:</span>
+                  <span className="text-sm font-semibold text-gray-900">
                     {stat.confirmed + stat.booked} / {stat.total}
-                  </p>
-                  <p className="text-sm text-text-muted">
-                    {stat.percentage.toFixed(1)}% všech
-                  </p>
+                  </span>
                 </div>
-              </div>
 
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="flex h-2 rounded-full overflow-hidden">
-                  <div
-                    className="bg-green-500"
-                    style={{ width: `${Math.min((stat.confirmed / stat.total) * 100, 100)}%` }}
-                    title={`Potvrzeno: ${stat.confirmed}`}
-                  ></div>
-                  <div
-                    className="bg-yellow-500"
-                    style={{ width: `${Math.min((stat.booked / stat.total) * 100, 100)}%` }}
-                    title={`Rezervováno: ${stat.booked}`}
-                  ></div>
+                <div className="w-full bg-gray-200 rounded-full h-1.5">
+                  <div className="flex h-1.5 rounded-full overflow-hidden">
+                    <div
+                      className="bg-green-500"
+                      style={{ width: `${Math.min((stat.confirmed / stat.total) * 100, 100)}%` }}
+                      title={`Potvrzeno: ${stat.confirmed}`}
+                    ></div>
+                    <div
+                      className="bg-yellow-500"
+                      style={{ width: `${Math.min((stat.booked / stat.total) * 100, 100)}%` }}
+                      title={`Rezervováno: ${stat.booked}`}
+                    ></div>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex justify-between text-xs text-text-muted">
-                <span>Potvrzeno: {stat.confirmed}</span>
-                <span>Rezervováno: {stat.booked}</span>
+                <div className="flex justify-between text-xs">
+                  <span className="text-green-600">✓ {stat.confirmed}</span>
+                  <span className="text-yellow-600">⏳ {stat.booked}</span>
+                </div>
               </div>
             </div>
           ))}

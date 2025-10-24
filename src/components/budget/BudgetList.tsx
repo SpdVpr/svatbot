@@ -439,7 +439,7 @@ export default function BudgetList({
                 return (
                   <div
                     key={item.id}
-                    className="p-4 border rounded-lg bg-white hover:shadow-sm transition-shadow"
+                    className="wedding-card !p-4"
                   >
                     <div className="flex items-start justify-between">
                       {/* Item info */}
