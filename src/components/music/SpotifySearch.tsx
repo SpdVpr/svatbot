@@ -40,7 +40,7 @@ export default function SpotifySearch({ onSelectTrack, placeholder }: SpotifySea
     setShowResults(true)
 
     try {
-      const tracks = await spotifyClient.search(searchQuery, 8)
+      const tracks = await spotifyClient.search(searchQuery, 20)
       setResults(tracks)
     } catch (error) {
       console.error('Search error:', error)
@@ -103,6 +103,12 @@ export default function SpotifySearch({ onSelectTrack, placeholder }: SpotifySea
     setShowResults(false)
   }
 
+  const handleFocus = () => {
+    if (query && results.length > 0) {
+      setShowResults(true)
+    }
+  }
+
   return (
     <div className="relative">
       {/* Search Input */}
@@ -112,7 +118,7 @@ export default function SpotifySearch({ onSelectTrack, placeholder }: SpotifySea
           type="text"
           value={query}
           onChange={(e) => handleInputChange(e.target.value)}
-          onFocus={() => query && setShowResults(true)}
+          onFocus={handleFocus}
           placeholder={placeholder || "Vyhledat píseň na Spotify..."}
           className="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
         />
@@ -121,17 +127,31 @@ export default function SpotifySearch({ onSelectTrack, placeholder }: SpotifySea
         )}
       </div>
 
-      {/* Search Results Dropdown */}
+      {/* Search Results Modal - Fullscreen */}
       {showResults && (
-        <>
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 z-10"
-            onClick={() => setShowResults(false)}
-          />
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60">
+          {/* Modal Container */}
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[85vh] flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">Vyhledat na Spotify</h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  {results.length > 0 ? `Nalezeno ${results.length} výsledků` : 'Zadejte název písně nebo interpreta'}
+                </p>
+              </div>
+              <button
+                onClick={() => setShowResults(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <svg className="w-6 h-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
 
-          {/* Results */}
-          <div className="absolute top-full mt-2 w-full bg-white rounded-lg shadow-2xl border border-gray-200 z-20 max-h-[500px] overflow-y-auto">
+            {/* Scrollable Results */}
+            <div className="flex-1 overflow-y-auto p-4">
             {loading ? (
               <div className="p-8 text-center">
                 <Loader2 className="w-8 h-8 text-purple-500 animate-spin mx-auto mb-2" />
@@ -218,9 +238,15 @@ export default function SpotifySearch({ onSelectTrack, placeholder }: SpotifySea
                 <Music className="w-12 h-12 text-gray-300 mx-auto mb-2" />
                 <p className="text-sm text-gray-600">Žádné výsledky pro "{query}"</p>
               </div>
-            ) : null}
+            ) : (
+              <div className="p-8 text-center">
+                <Search className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+                <p className="text-sm text-gray-600">Začněte psát pro vyhledávání...</p>
+              </div>
+            )}
+            </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   )

@@ -513,7 +513,10 @@ export function useSeating(): UseSeatingReturn {
 
   // Get unassigned guests
   const getUnassignedGuests = () => {
-    const assignedGuestIds = new Set(seats.filter(s => s.guestId).map(s => s.guestId))
+    // Include both table seats and chair seats in assigned IDs
+    const assignedTableIds = seats.filter(s => s.guestId).map(s => s.guestId)
+    const assignedChairIds = (chairSeats || []).filter(s => s.guestId).map(s => s.guestId)
+    const assignedGuestIds = new Set([...assignedTableIds, ...assignedChairIds])
     return guests.filter(guest => !assignedGuestIds.has(guest.id))
   }
 
@@ -814,6 +817,10 @@ export function useSeating(): UseSeatingReturn {
         name: data.name,
         chairCount: data.chairCount,
         orientation: data.orientation,
+        rows: data.rows,
+        columns: data.columns,
+        hasAisle: data.hasAisle,
+        aisleWidth: data.aisleWidth,
         position: data.position,
         rotation: data.rotation,
         color: data.color,

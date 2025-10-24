@@ -165,9 +165,16 @@ export function useBudget(): UseBudgetReturn {
     if (item.vendorId !== undefined) result.vendorId = item.vendorId || null
     if (item.vendorName !== undefined) result.vendorName = item.vendorName || null
     if (item.paymentStatus !== undefined) result.paymentStatus = item.paymentStatus
-    if (item.paymentMethod !== undefined) result.paymentMethod = item.paymentMethod || null
-    if (item.paymentPeriod !== undefined) {
-      result.paymentPeriod = item.paymentPeriod || null
+
+    // Handle paymentMethod - explicitly set to null if undefined
+    if ('paymentMethod' in item) {
+      result.paymentMethod = item.paymentMethod ?? null
+      console.log('💰 Converting paymentMethod:', item.paymentMethod, '→', result.paymentMethod)
+    }
+
+    // Handle paymentPeriod - explicitly set to null if undefined
+    if ('paymentPeriod' in item) {
+      result.paymentPeriod = item.paymentPeriod ?? null
       console.log('💰 Converting paymentPeriod:', item.paymentPeriod, '→', result.paymentPeriod)
     }
     if (item.dueDate !== undefined) result.dueDate = item.dueDate ? Timestamp.fromDate(item.dueDate) : null

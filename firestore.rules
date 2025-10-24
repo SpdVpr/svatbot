@@ -1021,6 +1021,21 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // Shared Playlists - Public read, authenticated write
+    match /sharedPlaylists/{shareId} {
+      // Anyone can read shared playlists (for DJ access)
+      allow read: if true;
+
+      // Only authenticated users can create shared playlists
+      allow create: if isAuthenticated() &&
+                       request.resource.data.keys().hasAll(['weddingId', 'categories', 'createdAt', 'createdBy']) &&
+                       request.auth.uid == request.resource.data.createdBy;
+
+      // Only creator can update/delete
+      allow update, delete: if isAuthenticated() &&
+                               resource.data.createdBy == request.auth.uid;
+    }
+
     // Deny all other access
     match /{document=**} {
       allow read, write: if false;

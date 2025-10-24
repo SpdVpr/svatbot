@@ -9,6 +9,7 @@ import { MusicPlayerProvider, useMusicPlayer } from '@/components/music/MusicPla
 import { SpotifyTrack, spotifyClient } from '@/lib/spotify'
 import { useMusic, Song } from '@/hooks/useMusic'
 import ModuleHeader from '@/components/common/ModuleHeader'
+import SharePlaylistButton from '@/components/music/SharePlaylistButton'
 
 function MusicPageContent() {
   const router = useRouter()
@@ -236,6 +237,9 @@ function MusicPageContent() {
                 </div>
               </div>
             </div>
+
+            {/* Share Playlist Button */}
+            <SharePlaylistButton totalSongs={totalSongs} />
           </div>
 
           {/* Right Column - Categories */}

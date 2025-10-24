@@ -7,11 +7,13 @@ import { useGuest } from '@/hooks/useGuest'
 import NumberCounter from '@/components/animations/NumberCounter'
 
 export default function SeatingPlanModule() {
-  const { tables, seats, stats } = useSeating()
+  const { tables, seats, chairSeats, stats } = useSeating()
   const { guests } = useGuest()
 
-  // Calculate assigned and unassigned guests
-  const assignedGuestIds = new Set(seats.filter(s => s.guestId).map(s => s.guestId))
+  // Calculate assigned and unassigned guests - include both table seats and chair seats
+  const assignedTableIds = seats.filter(s => s.guestId).map(s => s.guestId)
+  const assignedChairIds = (chairSeats || []).filter(s => s.guestId).map(s => s.guestId)
+  const assignedGuestIds = new Set([...assignedTableIds, ...assignedChairIds])
   const assignedGuests = assignedGuestIds.size
   const unassignedGuests = guests.filter(g => !assignedGuestIds.has(g.id)).length
 

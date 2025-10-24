@@ -65,6 +65,12 @@ export interface ChairRow {
   position: TablePosition
   rotation: number // Rotation in degrees (0-360)
 
+  // Grid layout properties (for multiple rows/columns)
+  rows?: number // Number of rows in grid (default: 1)
+  columns?: number // Number of columns in grid (default: chairCount)
+  hasAisle?: boolean // Whether to have an aisle in the middle
+  aisleWidth?: number // Width of aisle in pixels (default: 80)
+
   // Visual properties
   color?: string
   spacing?: number // Space between chairs in pixels (default: 40)
@@ -242,6 +248,10 @@ export interface ChairRowFormData {
   orientation: ChairRowOrientation
   position: TablePosition
   rotation: number
+  rows?: number
+  columns?: number
+  hasAisle?: boolean
+  aisleWidth?: number
   color?: string
   spacing?: number
   notes?: string

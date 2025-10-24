@@ -114,6 +114,13 @@ const DEFAULT_CATEGORIES: MusicCategory[] = [
     songs: []
   },
   {
+    id: 'bouquet-toss',
+    name: 'Házení kyticí/vyplétání kytice',
+    description: 'Hudba při házení kyticí nebo vyplétání kytice',
+    icon: '💐',
+    songs: []
+  },
+  {
     id: 'cake-cutting',
     name: 'Krájení dortu',
     description: 'Hudba při krájení svatebního dortu',
@@ -159,6 +166,7 @@ export function useMusic() {
   const [saving, setSaving] = useState(false)
   const [musicId, setMusicId] = useState<string | null>(null)
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const lastLocalChangeRef = useRef<number>(0) // Timestamp of last local change
 
   // Migrate old categories to new format
   const migrateCategories = (oldCategories: MusicCategory[]): MusicCategory[] => {
@@ -262,6 +270,33 @@ export function useMusic() {
     return categories
   }
 
+  // Add bouquet-toss category if missing
+  const ensureBouquetTossCategory = (categories: MusicCategory[]): MusicCategory[] => {
+    const hasBouquetToss = categories.some(cat => cat.id === 'bouquet-toss')
+    if (!hasBouquetToss) {
+      // Find sparkler-dance index to insert after it
+      const sparklerDanceIndex = categories.findIndex(cat => cat.id === 'sparkler-dance')
+      const newCategory: MusicCategory = {
+        id: 'bouquet-toss',
+        name: 'Házení kyticí/vyplétání kytice',
+        description: 'Hudba při házení kyticí nebo vyplétání kytice',
+        icon: '💐',
+        songs: []
+      }
+
+      if (sparklerDanceIndex >= 0) {
+        // Insert after sparkler-dance
+        const newCategories = [...categories]
+        newCategories.splice(sparklerDanceIndex + 1, 0, newCategory)
+        return newCategories
+      } else {
+        // Add at the end if sparkler-dance not found
+        return [...categories, newCategory]
+      }
+    }
+    return categories
+  }
+
   // Load music data from Firestore with real-time updates
   useEffect(() => {
     if (!wedding?.id) {
@@ -275,6 +310,17 @@ export function useMusic() {
     )
 
     const unsubscribe = onSnapshot(musicQuery, (snapshot) => {
+      // Skip updates while saving to prevent overwriting local changes
+      if (saving) {
+        return
+      }
+
+      // Skip updates for 5 seconds after local change to prevent race conditions
+      const timeSinceLastChange = Date.now() - lastLocalChangeRef.current
+      if (timeSinceLastChange < 5000 && lastLocalChangeRef.current > 0) {
+        return
+      }
+
       if (!snapshot.empty) {
         const musicDoc = snapshot.docs[0]
         const data = musicDoc.data()
@@ -293,11 +339,12 @@ export function useMusic() {
           setVendors(data.vendors || [])
         }
 
-        // Migrate old categories and ensure ring-exchange and sparkler-dance exist
+        // Migrate old categories and ensure ring-exchange, sparkler-dance, and bouquet-toss exist
         let loadedCategories = data.categories || DEFAULT_CATEGORIES
         loadedCategories = migrateCategories(loadedCategories)
         loadedCategories = ensureRingExchangeCategory(loadedCategories)
         loadedCategories = ensureSparklerDanceCategory(loadedCategories)
+        loadedCategories = ensureBouquetTossCategory(loadedCategories)
         setCategories(loadedCategories)
       } else {
         setMusicId(null)
@@ -311,7 +358,7 @@ export function useMusic() {
     })
 
     return () => unsubscribe()
-  }, [wedding?.id])
+  }, [wedding?.id, saving])
 
   // Clean data - convert undefined to null (Firebase doesn't support undefined)
   const cleanData = (obj: any): any => {
@@ -373,7 +420,6 @@ export function useMusic() {
     }
 
     saveTimeoutRef.current = setTimeout(async () => {
-
       setSaving(true)
       try {
         // Clean data to remove undefined values
@@ -409,8 +455,13 @@ export function useMusic() {
           await setDoc(musicRef, cleanedData)
           setMusicId(musicRef.id)
         }
+
+        // Reset local change timestamp after successful save
+        setTimeout(() => {
+          lastLocalChangeRef.current = 0
+        }, 1000)
       } catch (error) {
-        console.error('Error saving music data:', error)
+        console.error('❌ Error saving music data:', error)
       } finally {
         setSaving(false)
       }
@@ -424,6 +475,7 @@ export function useMusic() {
   }, [vendors, categories, wedding, user, loading, musicId])
 
   const addVendor = (vendor: Omit<MusicVendor, 'id'>) => {
+    lastLocalChangeRef.current = Date.now()
     const newVendor: MusicVendor = {
       ...vendor,
       id: `vendor-${Date.now()}`
@@ -432,14 +484,17 @@ export function useMusic() {
   }
 
   const updateVendor = (vendorId: string, updates: Partial<MusicVendor>) => {
+    lastLocalChangeRef.current = Date.now()
     setVendors(prev => prev.map(v => v.id === vendorId ? { ...v, ...updates } : v))
   }
 
   const removeVendor = (vendorId: string) => {
+    lastLocalChangeRef.current = Date.now()
     setVendors(prev => prev.filter(v => v.id !== vendorId))
   }
 
   const addSong = (categoryId: string, song: Song) => {
+    lastLocalChangeRef.current = Date.now()
     setCategories(prev => prev.map(cat => {
       if (cat.id === categoryId) {
         return {
@@ -452,6 +507,7 @@ export function useMusic() {
   }
 
   const removeSong = (categoryId: string, songId: string) => {
+    lastLocalChangeRef.current = Date.now()
     setCategories(prev => prev.map(cat => {
       if (cat.id === categoryId) {
         return {
@@ -464,6 +520,7 @@ export function useMusic() {
   }
 
   const updateSong = (categoryId: string, songId: string, updates: Partial<Song>) => {
+    lastLocalChangeRef.current = Date.now()
     setCategories(prev => prev.map(cat => {
       if (cat.id === categoryId) {
         return {
@@ -476,6 +533,7 @@ export function useMusic() {
   }
 
   const toggleCategoryVisibility = (categoryId: string) => {
+    lastLocalChangeRef.current = Date.now()
     setCategories(prev => prev.map(cat => {
       if (cat.id === categoryId) {
         return {
@@ -485,6 +543,53 @@ export function useMusic() {
       }
       return cat
     }))
+  }
+
+  const createShareLink = async (expiresInDays: number = 30): Promise<string> => {
+    if (!wedding?.id) {
+      throw new Error('Svatba nebyla nalezena. Zkuste to prosím znovu.')
+    }
+
+    // Get current user from Firebase Auth directly
+    const { auth } = await import('@/config/firebase')
+    const currentUser = auth.currentUser
+
+    if (!currentUser) {
+      throw new Error('Nejste přihlášeni. Zkuste se prosím odhlásit a znovu přihlásit.')
+    }
+
+    try {
+      // Generate unique share ID
+      const shareId = `playlist_${wedding.id}_${Date.now()}`
+
+      // Calculate expiration date
+      const expiresAt = new Date()
+      expiresAt.setDate(expiresAt.getDate() + expiresInDays)
+
+      // Create shared playlist document
+      const shareDocRef = doc(db, 'sharedPlaylists', shareId)
+      await setDoc(shareDocRef, {
+        weddingId: wedding.id,
+        brideName: wedding.brideName || null,
+        groomName: wedding.groomName || null,
+        weddingDate: wedding.weddingDate || null,
+        categories: categories.filter(cat => cat.songs.length > 0), // Only categories with songs
+        vendors: vendors,
+        createdAt: new Date(),
+        expiresAt: expiresAt,
+        createdBy: currentUser.uid
+      })
+
+      // Generate share URL
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://svatbot.cz'
+      const shareUrl = `${baseUrl}/share/playlist/${shareId}`
+
+      console.log('✅ Share link created:', shareUrl)
+      return shareUrl
+    } catch (err) {
+      console.error('Error creating share link:', err)
+      throw new Error('Chyba při vytváření sdíleného odkazu')
+    }
   }
 
   const totalSongs = categories.reduce((sum, cat) => sum + cat.songs.length, 0)
@@ -504,6 +609,7 @@ export function useMusic() {
     updateSong,
     toggleCategoryVisibility,
     saveMusicData,
+    createShareLink,
     totalSongs,
     requiredCategories,
     completedRequired

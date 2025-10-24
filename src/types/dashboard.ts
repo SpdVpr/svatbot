@@ -81,7 +81,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     title: 'Správa úkolů',
     size: 'medium',
     position: { x: 440, y: 530 },
-    customSize: { width: 360, height: 940 }, // 2 modules tall - same as wedding-checklist
+    customSize: { width: 360, height: 450 }, // 1 module tall - same as quick-actions and guest-management
     gridPosition: { row: 1, column: 1 },
     isVisible: true,
     isLocked: false,

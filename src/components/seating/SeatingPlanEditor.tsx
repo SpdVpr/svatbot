@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { useSeating } from '@/hooks/useSeating'
 import { useGuest } from '@/hooks/useGuest'
 import {
@@ -145,12 +145,20 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     name: string
     chairCount: number
     orientation: ChairRowOrientation
+    rows: number
+    columns: number
+    hasAisle: boolean
+    aisleWidth: number
     color: string
     spacing: number
   }>({
     name: '',
     chairCount: 6,
     orientation: 'horizontal',
+    rows: 1,
+    columns: 6,
+    hasAisle: false,
+    aisleWidth: 80,
     color: '#8B5CF6',
     spacing: 40
   })
@@ -186,6 +194,75 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
   })
 
   const unassignedGuests = getUnassignedGuests()
+
+  // Generate random position within visible canvas area (left half only)
+  const getRandomPosition = (objectWidth: number = 120, objectHeight: number = 120) => {
+    const canvasWidth = currentPlan.venueLayout.width
+    const canvasHeight = currentPlan.venueLayout.height
+
+    // Add some margin from edges (50px)
+    const margin = 50
+    // Limit to left half of canvas
+    const maxX = Math.max(margin, (canvasWidth / 2) - objectWidth - margin)
+    const maxY = Math.max(margin, canvasHeight - objectHeight - margin)
+
+    // Try to find a position with minimal overlap (max 10 attempts)
+    let bestPosition = { x: 0, y: 0 }
+    let minOverlap = Infinity
+
+    for (let attempt = 0; attempt < 10; attempt++) {
+      const x = margin + Math.random() * (maxX - margin)
+      const y = margin + Math.random() * (maxY - margin)
+
+      // Check overlap with existing objects
+      let overlapCount = 0
+
+      // Check tables
+      tables.forEach(table => {
+        const tableSize = table.size === 'small' ? 100 : table.size === 'medium' ? 140 : table.size === 'large' ? 180 : 220
+        if (Math.abs(x - table.position.x) < (objectWidth + tableSize) / 2 + 30 &&
+            Math.abs(y - table.position.y) < (objectHeight + tableSize) / 2 + 30) {
+          overlapCount++
+        }
+      })
+
+      // Check chair rows
+      chairRows?.forEach(row => {
+        if (Math.abs(x - row.position.x) < (objectWidth + 100) / 2 + 30 &&
+            Math.abs(y - row.position.y) < (objectHeight + 50) / 2 + 30) {
+          overlapCount++
+        }
+      })
+
+      // Check dance floor
+      if (currentPlan.venueLayout.danceFloor) {
+        const df = currentPlan.venueLayout.danceFloor
+        if (Math.abs(x - df.x) < (objectWidth + df.width) / 2 + 30 &&
+            Math.abs(y - df.y) < (objectHeight + df.height) / 2 + 30) {
+          overlapCount++
+        }
+      }
+
+      // Check custom areas
+      currentPlan.venueLayout.customAreas?.forEach(area => {
+        if (Math.abs(x - area.x) < (objectWidth + area.width) / 2 + 30 &&
+            Math.abs(y - area.y) < (objectHeight + area.height) / 2 + 30) {
+          overlapCount++
+        }
+      })
+
+      // Update best position if this has less overlap
+      if (overlapCount < minOverlap) {
+        minOverlap = overlapCount
+        bestPosition = { x: Math.round(x), y: Math.round(y) }
+      }
+
+      // If we found a position with no overlap, use it immediately
+      if (overlapCount === 0) break
+    }
+
+    return bestPosition
+  }
 
   // Generate consistent avatar for a person based on their ID
   const getAvatarForPerson = (personId: string) => {
@@ -267,14 +344,31 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     return avatarStyles[avatarIndex](size)
   }
 
-  // Calculate total unassigned people (guests + plus ones)
-  const totalUnassignedPeople = unassignedGuests.reduce((total, guest) => {
-    let count = 1 // The guest themselves
-    if (guest.hasPlusOne && guest.plusOneName) {
-      count += 1 // Plus one
-    }
-    return total + count
-  }, 0)
+  // Calculate total unassigned people (guests + plus ones + children)
+  // We need to calculate this inline to avoid calling getGroupedUnassignedGuests before it's defined
+  const totalUnassignedPeople = useMemo(() => {
+    // Create list of all people (guests + plus ones + children)
+    const allPeople: string[] = []
+    guests.forEach(guest => {
+      allPeople.push(guest.id)
+      if (guest.hasPlusOne && guest.plusOneName) {
+        allPeople.push(`${guest.id}_plusone`)
+      }
+      if (guest.hasChildren && guest.children) {
+        guest.children.forEach((_, index) => {
+          allPeople.push(`${guest.id}_child_${index}`)
+        })
+      }
+    })
+
+    // Get all assigned IDs from both table seats and chair seats
+    const assignedTableIds = seats.filter(s => s.guestId).map(s => s.guestId)
+    const assignedChairIds = (chairSeats || []).filter(s => s.guestId).map(s => s.guestId)
+    const assignedIds = new Set([...assignedTableIds, ...assignedChairIds])
+
+    // Count unassigned people
+    return allPeople.filter(personId => !assignedIds.has(personId)).length
+  }, [guests, seats, chairSeats])
 
   // Handle table drag start
   const handleTableDragStart = useCallback((tableId: string, event: React.MouseEvent) => {
@@ -380,12 +474,15 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
         return
       }
 
+      // Generate random position for new table
+      const randomPosition = getRandomPosition(120, 120)
+
       await createTable({
         name: tableFormData.name || `Stůl ${tables.length + 1}`,
         shape: tableFormData.shape,
         size: tableFormData.size,
         capacity: tableFormData.capacity,
-        position: { x: 200, y: 200 },
+        position: randomPosition,
         rotation: 0,
         color: tableFormData.color,
         headSeats: tableFormData.headSeats,
@@ -730,11 +827,26 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
         return
       }
 
+      // Calculate total chair count based on rows and columns
+      const totalChairs = chairRowFormData.rows * chairRowFormData.columns
+
+      // Generate random position for new chair row
+      // Calculate estimated size based on grid layout
+      const spacing = chairRowFormData.spacing || 40
+      const aisleWidth = chairRowFormData.hasAisle ? (chairRowFormData.aisleWidth || 80) : 0
+      const estimatedWidth = chairRowFormData.columns * spacing + aisleWidth
+      const estimatedHeight = chairRowFormData.rows * spacing
+      const randomPosition = getRandomPosition(estimatedWidth, estimatedHeight)
+
       await createChairRow({
         name: chairRowFormData.name || `Řada ${(chairRows?.length || 0) + 1}`,
-        chairCount: chairRowFormData.chairCount,
+        chairCount: totalChairs,
         orientation: chairRowFormData.orientation,
-        position: { x: 300, y: 300 },
+        rows: chairRowFormData.rows,
+        columns: chairRowFormData.columns,
+        hasAisle: chairRowFormData.hasAisle,
+        aisleWidth: chairRowFormData.aisleWidth,
+        position: randomPosition,
         rotation: 0,
         color: chairRowFormData.color,
         spacing: chairRowFormData.spacing
@@ -745,6 +857,10 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
         name: '',
         chairCount: 6,
         orientation: 'horizontal',
+        rows: 1,
+        columns: 6,
+        hasAisle: false,
+        aisleWidth: 80,
         color: '#8B5CF6',
         spacing: 40
       })
@@ -760,6 +876,10 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
       name: chairRow.name,
       chairCount: chairRow.chairCount,
       orientation: chairRow.orientation,
+      rows: chairRow.rows || 1,
+      columns: chairRow.columns || chairRow.chairCount,
+      hasAisle: chairRow.hasAisle || false,
+      aisleWidth: chairRow.aisleWidth || 80,
       color: chairRow.color || '#8B5CF6',
       spacing: chairRow.spacing || 40
     })
@@ -770,10 +890,16 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     if (!editingChairRow) return
 
     try {
+      const totalChairs = chairRowFormData.rows * chairRowFormData.columns
+
       await updateChairRow(editingChairRow.id, {
         name: chairRowFormData.name,
-        chairCount: chairRowFormData.chairCount,
+        chairCount: totalChairs,
         orientation: chairRowFormData.orientation,
+        rows: chairRowFormData.rows,
+        columns: chairRowFormData.columns,
+        hasAisle: chairRowFormData.hasAisle,
+        aisleWidth: chairRowFormData.aisleWidth,
         color: chairRowFormData.color,
         spacing: chairRowFormData.spacing
       })
@@ -783,6 +909,10 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
         name: '',
         chairCount: 6,
         orientation: 'horizontal',
+        rows: 1,
+        columns: 6,
+        hasAisle: false,
+        aisleWidth: 80,
         color: '#8B5CF6',
         spacing: 40
       })
@@ -858,11 +988,14 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
   // Custom area handlers
   const handleAddCustomArea = async () => {
     try {
+      // Generate random position for custom area
+      const randomPosition = getRandomPosition(customAreaFormData.width, customAreaFormData.height)
+
       const newCustomArea: CustomArea = {
         id: `customarea_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         name: customAreaFormData.name || 'Nová plocha',
-        x: 500,
-        y: 300,
+        x: randomPosition.x,
+        y: randomPosition.y,
         width: customAreaFormData.width,
         height: customAreaFormData.height,
         rotation: 0,
@@ -968,9 +1101,12 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
   // Add dance floor
   const handleAddDanceFloor = async () => {
     try {
+      // Generate random position for dance floor
+      const randomPosition = getRandomPosition(danceFloorFormData.width, danceFloorFormData.height)
+
       const newDanceFloor = {
-        x: 500,
-        y: 300,
+        x: randomPosition.x,
+        y: randomPosition.y,
         width: danceFloorFormData.width,
         height: danceFloorFormData.height,
         rotation: 0
@@ -2051,7 +2187,10 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
   // Group unassigned people by category
   const getGroupedUnassignedGuests = () => {
     const allPeople = getAllPeopleToSeat()
-    const assignedIds = new Set(seats.filter(s => s.guestId).map(s => s.guestId))
+    // Include both table seats and chair seats in assigned IDs
+    const assignedTableIds = seats.filter(s => s.guestId).map(s => s.guestId)
+    const assignedChairIds = (chairSeats || []).filter(s => s.guestId).map(s => s.guestId)
+    const assignedIds = new Set([...assignedTableIds, ...assignedChairIds])
     const unassignedPeople = allPeople.filter(person => !assignedIds.has(person.id))
 
     const grouped: Record<string, PersonToSeat[]> = {}
@@ -2207,6 +2346,10 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                     name: '',
                     chairCount: 6,
                     orientation: 'horizontal',
+                    rows: 1,
+                    columns: 6,
+                    hasAisle: false,
+                    aisleWidth: 80,
                     color: '#8B5CF6',
                     spacing: 40
                   })
@@ -2886,12 +3029,14 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                 const chairWidth = 30
                 const chairHeight = 30
                 const spacing = chairRow.spacing || 40
-                const totalWidth = chairRow.orientation === 'horizontal'
-                  ? chairRow.chairCount * spacing
-                  : chairWidth
-                const totalHeight = chairRow.orientation === 'vertical'
-                  ? chairRow.chairCount * spacing
-                  : chairHeight
+                const rows = chairRow.rows || 1
+                const columns = chairRow.columns || chairRow.chairCount
+                const hasAisle = chairRow.hasAisle || false
+                const aisleWidth = chairRow.aisleWidth || 80
+
+                // Calculate total dimensions including aisle
+                const totalWidth = columns * spacing + (hasAisle ? aisleWidth : 0)
+                const totalHeight = rows * spacing
 
                 const rowChairSeats = (chairSeats || []).filter(s => s.chairRowId === chairRow.id)
 
@@ -2932,12 +3077,33 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                       </div>
                     </div>
 
-                    {/* Individual chairs */}
+                    {/* Background fill with color */}
+                    <div
+                      className="absolute inset-0 rounded-lg opacity-20"
+                      style={{
+                        backgroundColor: chairRow.color || '#8B5CF6',
+                        pointerEvents: 'none'
+                      }}
+                    />
+
+                    {/* Individual chairs in grid */}
                     {Array.from({ length: chairRow.chairCount }).map((_, index) => {
                       const chairSeat = rowChairSeats.find(s => s.position === index + 1)
 
-                      const chairX = chairRow.orientation === 'horizontal' ? index * spacing : 0
-                      const chairY = chairRow.orientation === 'vertical' ? index * spacing : 0
+                      // Calculate row and column position in grid
+                      const row = Math.floor(index / columns)
+                      const col = index % columns
+
+                      // Calculate position with aisle consideration
+                      const halfColumns = Math.floor(columns / 2)
+                      let chairX = col * spacing
+
+                      // Add aisle offset if chair is in right half and aisle is enabled
+                      if (hasAisle && col >= halfColumns) {
+                        chairX += aisleWidth
+                      }
+
+                      const chairY = row * spacing
 
                       const guestNameData = chairSeat ? getGuestNameForChairSeat(chairSeat) : null
                       const guestNameTooltip = guestNameData?.fullName || null
@@ -3002,47 +3168,45 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                         if (!guestName) return null
 
                         const seatIndex = chairSeat.position - 1
-                        const chairX = chairRow.orientation === 'horizontal' ? seatIndex * spacing : 0
-                        const chairY = chairRow.orientation === 'vertical' ? seatIndex * spacing : 0
+
+                        // Calculate row and column position in grid
+                        const row = Math.floor(seatIndex / columns)
+                        const col = seatIndex % columns
+
+                        // Calculate position with aisle consideration
+                        const halfColumns = Math.floor(columns / 2)
+                        let chairX = col * spacing
+
+                        // Add aisle offset if chair is in right half and aisle is enabled
+                        if (hasAisle && col >= halfColumns) {
+                          chairX += aisleWidth
+                        }
+
+                        const chairY = row * spacing
 
                         // Chair dimensions (w-6 h-6 = 24px)
                         const chairSize = 24
                         const chairCenterOffset = chairSize / 2 // 12px to get to center of chair
 
-                        // Alternate names above and below (or left/right for vertical)
-                        const isEven = seatIndex % 2 === 0
+                        // Alternate names above and below based on row position
+                        const isEvenRow = row % 2 === 0
                         const nameOffset = 35 // Same distance for both above and below
 
                         let nameX = chairX + chairCenterOffset // Start from center of chair
                         let nameY = chairY + chairCenterOffset // Start from center of chair
                         let textRotation = 0
 
-                        if (chairRow.orientation === 'horizontal') {
-                          // For horizontal rows: alternate above and below
-                          const effectiveRotation = (chairRow.rotation || 0) % 360
-                          const isUpsideDown = effectiveRotation > 90 && effectiveRotation < 270
+                        // For grid layout: alternate above and below based on row
+                        const effectiveRotation = (chairRow.rotation || 0) % 360
+                        const isUpsideDown = effectiveRotation > 90 && effectiveRotation < 270
 
-                          if (isUpsideDown) {
-                            // Flip the alternation when row is upside down
-                            nameY = nameY + (isEven ? nameOffset : -nameOffset)
-                            textRotation = 180 // Flip text to keep it readable
-                          } else {
-                            nameY = nameY + (isEven ? -nameOffset : nameOffset)
-                            textRotation = 0
-                          }
+                        if (isUpsideDown) {
+                          // Flip the alternation when row is upside down
+                          nameY = nameY + (isEvenRow ? nameOffset : -nameOffset)
+                          textRotation = 180 // Flip text to keep it readable
                         } else {
-                          // For vertical rows: alternate left and right
-                          const effectiveRotation = (chairRow.rotation || 0) % 360
-                          const isUpsideDown = effectiveRotation > 90 && effectiveRotation < 270
-
-                          if (isUpsideDown) {
-                            // Flip the alternation when row is upside down
-                            nameX = nameX + (isEven ? -nameOffset : nameOffset)
-                            textRotation = 180 // Flip text to keep it readable
-                          } else {
-                            nameX = nameX + (isEven ? nameOffset : -nameOffset)
-                            textRotation = 0
-                          }
+                          nameY = nameY + (isEvenRow ? -nameOffset : nameOffset)
+                          textRotation = 0
                         }
 
                         // Check if this is a plus one based on guestId format
@@ -3511,35 +3675,75 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                 />
               </div>
 
-              {/* Chair count */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Počet židlí
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  max="50"
-                  value={chairRowFormData.chairCount}
-                  onChange={(e) => setChairRowFormData(prev => ({ ...prev, chairCount: parseInt(e.target.value) || 1 }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
+              {/* Grid layout */}
+              <div className="grid grid-cols-2 gap-4">
+                {/* Rows */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Počet řad (výška)
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="20"
+                    value={chairRowFormData.rows}
+                    onChange={(e) => setChairRowFormData(prev => ({ ...prev, rows: parseInt(e.target.value) || 1 }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* Columns */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Počet sloupců (šířka)
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="20"
+                    value={chairRowFormData.columns}
+                    onChange={(e) => setChairRowFormData(prev => ({ ...prev, columns: parseInt(e.target.value) || 1 }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
               </div>
 
-              {/* Orientation */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Orientace
-                </label>
-                <select
-                  value={chairRowFormData.orientation}
-                  onChange={(e) => setChairRowFormData(prev => ({ ...prev, orientation: e.target.value as ChairRowOrientation }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                >
-                  <option value="horizontal">Horizontální (vedle sebe)</option>
-                  <option value="vertical">Vertikální (za sebou)</option>
-                </select>
+              {/* Total chairs display */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-sm text-blue-800">
+                  <span className="font-semibold">Celkem židlí:</span> {chairRowFormData.rows * chairRowFormData.columns}
+                </p>
               </div>
+
+              {/* Aisle option */}
+              <div>
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={chairRowFormData.hasAisle}
+                    onChange={(e) => setChairRowFormData(prev => ({ ...prev, hasAisle: e.target.checked }))}
+                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                  />
+                  <span className="text-sm font-medium text-gray-700">Přidat uličku uprostřed</span>
+                </label>
+              </div>
+
+              {/* Aisle width */}
+              {chairRowFormData.hasAisle && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Šířka uličky (px)
+                  </label>
+                  <input
+                    type="number"
+                    min="40"
+                    max="200"
+                    value={chairRowFormData.aisleWidth}
+                    onChange={(e) => setChairRowFormData(prev => ({ ...prev, aisleWidth: parseInt(e.target.value) || 80 }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+              )}
 
               {/* Spacing */}
               <div>
@@ -3559,7 +3763,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
               {/* Color */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Barva
+                  Barva pozadí (vyplní prostor mezi židlemi)
                 </label>
                 <div className="flex space-x-2">
                   {['#8B5CF6', '#EC4899', '#3B82F6', '#10B981', '#F59E0B', '#EF4444'].map(color => (
@@ -3603,6 +3807,10 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                       name: '',
                       chairCount: 6,
                       orientation: 'horizontal',
+                      rows: 1,
+                      columns: 6,
+                      hasAisle: false,
+                      aisleWidth: 80,
                       color: '#8B5CF6',
                       spacing: 40
                     })

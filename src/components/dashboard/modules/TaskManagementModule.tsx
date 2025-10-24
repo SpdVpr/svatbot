@@ -9,7 +9,7 @@ import { dateUtils } from '@/utils'
 export default function TaskManagementModule() {
   const { stats, tasks } = useTask()
 
-  // Get upcoming tasks (next 5)
+  // Get upcoming tasks (all incomplete tasks)
   const upcomingTasks = tasks
     .filter(task => task.status !== 'completed')
     .sort((a, b) => {
@@ -18,7 +18,10 @@ export default function TaskManagementModule() {
       if (!b.dueDate) return -1
       return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
     })
-    .slice(0, 5)
+
+  // Show only 3 tasks initially
+  const displayedTasks = upcomingTasks.slice(0, 3)
+  const remainingTasksCount = upcomingTasks.length - 3
 
   const getTaskIcon = (category: string) => {
     switch (category) {
@@ -73,46 +76,53 @@ export default function TaskManagementModule() {
 
         {/* Upcoming Tasks Section */}
         <div className="flex-1 flex flex-col min-h-0">
-          <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center space-x-2">
-            <Clock className="w-4 h-4 text-blue-600" />
-            <span>Nadcházející úkoly</span>
-          </h4>
-
-          <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+          <div className="space-y-2">
             {upcomingTasks.length > 0 ? (
-              upcomingTasks.map((task) => {
-                const TaskIcon = getTaskIcon(task.category)
-                return (
-                  <div
-                    key={task.id}
-                    className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:border-primary-300 transition-colors cursor-pointer bg-white"
+              <>
+                {displayedTasks.map((task) => {
+                  const TaskIcon = getTaskIcon(task.category)
+                  return (
+                    <div
+                      key={task.id}
+                      className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:border-primary-300 transition-colors cursor-pointer bg-white"
+                    >
+                      <div className="p-1.5 bg-primary-100 rounded-lg flex-shrink-0">
+                        <TaskIcon className="w-4 h-4 text-primary-600" />
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <h5 className="font-medium text-sm text-text-primary truncate">
+                          {task.title}
+                        </h5>
+                        <p className="text-xs text-text-muted">
+                          {task.dueDate ? dateUtils.format(new Date(task.dueDate)) : 'Bez termínu'}
+                        </p>
+                      </div>
+
+                      <div className={`px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${
+                        task.priority === 'high'
+                          ? 'bg-red-100 text-red-700'
+                          : task.priority === 'medium'
+                            ? 'bg-yellow-100 text-yellow-700'
+                            : 'bg-green-100 text-green-700'
+                      }`}>
+                        {task.priority === 'high' ? 'Vysoká' :
+                         task.priority === 'medium' ? 'Střední' : 'Nízká'}
+                      </div>
+                    </div>
+                  )
+                })}
+
+                {remainingTasksCount > 0 && (
+                  <Link
+                    href="/tasks"
+                    className="w-full text-sm text-primary-600 hover:text-primary-700 font-medium py-3 border border-primary-200 rounded-lg hover:bg-primary-50 transition-colors flex items-center justify-center space-x-2"
                   >
-                    <div className="p-1.5 bg-primary-100 rounded-lg flex-shrink-0">
-                      <TaskIcon className="w-4 h-4 text-primary-600" />
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <h5 className="font-medium text-sm text-text-primary truncate">
-                        {task.title}
-                      </h5>
-                      <p className="text-xs text-text-muted">
-                        {task.dueDate ? dateUtils.format(new Date(task.dueDate)) : 'Bez termínu'}
-                      </p>
-                    </div>
-
-                    <div className={`px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${
-                      task.priority === 'high'
-                        ? 'bg-red-100 text-red-700'
-                        : task.priority === 'medium'
-                          ? 'bg-yellow-100 text-yellow-700'
-                          : 'bg-green-100 text-green-700'
-                    }`}>
-                      {task.priority === 'high' ? 'Vysoká' :
-                       task.priority === 'medium' ? 'Střední' : 'Nízká'}
-                    </div>
-                  </div>
-                )
-              })
+                    <span>Zobrazit více ({remainingTasksCount} {remainingTasksCount === 1 ? 'další' : remainingTasksCount < 5 ? 'další' : 'dalších'})</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                )}
+              </>
             ) : (
               <div className="text-center py-6">
                 <CheckCircle className="w-10 h-10 text-gray-300 mx-auto mb-2" />

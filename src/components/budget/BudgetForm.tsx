@@ -687,7 +687,7 @@ export default function BudgetForm({
                 </label>
                 <select
                   value={formData.paymentPeriod || ''}
-                  onChange={(e) => handleChange('paymentPeriod', e.target.value ? e.target.value as PaymentPeriod : undefined)}
+                  onChange={(e) => handleChange('paymentPeriod', e.target.value === '' ? undefined : e.target.value as PaymentPeriod)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   disabled={loading}
                 >
@@ -707,7 +707,7 @@ export default function BudgetForm({
                 </label>
                 <select
                   value={formData.paymentMethod || ''}
-                  onChange={(e) => handleChange('paymentMethod', e.target.value ? e.target.value as PaymentMethod : undefined)}
+                  onChange={(e) => handleChange('paymentMethod', e.target.value === '' ? undefined : e.target.value as PaymentMethod)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   disabled={loading}
                 >
