@@ -197,13 +197,22 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData 
       })
     }
 
+    if (step === 4) {
+      // Portfolio and availability - optional but recommended
+      if (formData.images.length === 0) {
+        newErrors.images = 'Doporučujeme nahrát alespoň 1 hlavní obrázek'
+      }
+    }
+
+    // Step 5 is summary - no validation needed
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
   const handleNext = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep(prev => Math.min(prev + 1, 4))
+      setCurrentStep(prev => Math.min(prev + 1, 5)) // Changed to 5 steps
     }
   }
 
@@ -214,7 +223,8 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!validateStep(currentStep)) {
+    // Only submit on step 5 (summary)
+    if (currentStep !== 5) {
       return
     }
 
@@ -290,7 +300,8 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData 
     { number: 1, title: 'Základní informace', icon: Building },
     { number: 2, title: 'Kontakt a adresa', icon: MapPin },
     { number: 3, title: 'Služby a ceny', icon: DollarSign },
-    { number: 4, title: 'Portfolio a dostupnost', icon: Upload }
+    { number: 4, title: 'Portfolio a dostupnost', icon: Upload },
+    { number: 5, title: 'Souhrn a odeslání', icon: CheckCircle }
   ]
 
   return (
@@ -969,14 +980,133 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData 
                   </div>
                 </div>
 
-                <div className="border-t border-gray-200 pt-4">
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <div className="flex items-start space-x-3">
-                      <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                      <div className="text-sm text-blue-800">
-                        <p className="font-medium mb-1">Váš inzerát bude zkontrolován</p>
-                        <p>Po odeslání formuláře náš tým zkontroluje vaše údaje. Inzerát bude zveřejněn do 24-48 hodin.</p>
+              </div>
+            )}
+
+            {/* Step 5: Summary */}
+            {currentStep === 5 && (
+              <div className="space-y-6">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                  <div className="flex items-start space-x-3">
+                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <div className="text-sm text-green-800">
+                      <p className="font-medium mb-1">Téměř hotovo!</p>
+                      <p>Zkontrolujte prosím všechny údaje před odesláním inzerátu.</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Basic Information Summary */}
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                    <Building className="w-5 h-5 mr-2 text-primary-600" />
+                    Základní informace
+                  </h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Kategorie:</span>
+                      <span className="font-medium">{VENDOR_CATEGORIES[formData.category].name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Název:</span>
+                      <span className="font-medium">{formData.name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Roky v oboru:</span>
+                      <span className="font-medium">{formData.yearsInBusiness}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Pracovní rádius:</span>
+                      <span className="font-medium">{formData.workingRadius} km</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Contact Summary */}
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                    <MapPin className="w-5 h-5 mr-2 text-primary-600" />
+                    Kontakt a adresa
+                  </h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Email:</span>
+                      <span className="font-medium">{formData.email}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Telefon:</span>
+                      <span className="font-medium">{formData.phone}</span>
+                    </div>
+                    {formData.website && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Web:</span>
+                        <span className="font-medium">{formData.website}</span>
                       </div>
+                    )}
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Město:</span>
+                      <span className="font-medium">{formData.address.city}, {formData.address.region}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Services Summary */}
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                    <DollarSign className="w-5 h-5 mr-2 text-primary-600" />
+                    Služby a ceny
+                  </h3>
+                  <div className="space-y-3">
+                    {formData.services.map((service, index) => (
+                      <div key={index} className="bg-gray-50 rounded p-3">
+                        <div className="font-medium text-gray-900">{service.name}</div>
+                        {service.price && (
+                          <div className="text-sm text-gray-600 mt-1">
+                            {service.price} Kč ({service.priceType})
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-gray-200">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Cenové rozpětí:</span>
+                      <span className="font-medium">
+                        {formData.priceRange.min} - {formData.priceRange.max} {formData.priceRange.currency}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Portfolio Summary */}
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                    <Upload className="w-5 h-5 mr-2 text-primary-600" />
+                    Portfolio a dostupnost
+                  </h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Hlavní obrázky:</span>
+                      <span className="font-medium">{formData.images.length} obrázků</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Portfolio:</span>
+                      <span className="font-medium">{formData.portfolioImages.length} obrázků</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Doba odezvy:</span>
+                      <span className="font-medium">{formData.responseTime}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Final Notice */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-start space-x-3">
+                    <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <div className="text-sm text-blue-800">
+                      <p className="font-medium mb-1">Váš inzerát bude zkontrolován</p>
+                      <p>Po odeslání formuláře náš tým zkontroluje vaše údaje. Inzerát bude zveřejněn do 24-48 hodin. O schválení vás budeme informovat emailem.</p>
                     </div>
                   </div>
                 </div>
@@ -995,7 +1125,7 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData 
               {currentStep === 1 ? 'Zrušit' : 'Zpět'}
             </button>
 
-            {currentStep < 4 ? (
+            {currentStep < 5 ? (
               <button
                 type="button"
                 onClick={handleNext}
