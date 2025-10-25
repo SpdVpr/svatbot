@@ -103,12 +103,9 @@ export default function ImageUploadSection({
   }
 
   const uploadImage = async (pendingImage: PendingImage, index: number) => {
-    if (!user) {
-      setPendingImages(prev => prev.map((img, i) =>
-        i === index ? { ...img, uploading: false, error: 'Musíte být přihlášeni' } : img
-      ))
-      return
-    }
+    // Allow upload without authentication for marketplace vendor registration
+    // Use 'anonymous' as userId if not authenticated
+    const userId = user?.id || 'anonymous'
 
     try {
       // Update status to uploading
@@ -130,7 +127,6 @@ export default function ImageUploadSection({
       // Create unique filename
       const timestamp = Date.now()
       const folder = type === 'main' ? 'svatbot' : 'portfolio'
-      const userId = user?.id || 'anonymous'
       const filename = `${folder}/${userId}/${timestamp}_${pendingImage.file.name.replace(/\s+/g, '_')}`
 
       // Upload to Firebase Storage
