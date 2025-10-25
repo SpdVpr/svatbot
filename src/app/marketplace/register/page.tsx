@@ -17,9 +17,14 @@ export default function MarketplaceRegisterPage() {
   const handleSubmit = async (data: MarketplaceVendorFormData) => {
     setSubmitting(true)
     try {
+      // Remove undefined values from data (Firestore doesn't accept undefined)
+      const cleanData = Object.fromEntries(
+        Object.entries(data).filter(([_, value]) => value !== undefined)
+      ) as MarketplaceVendorFormData
+
       // Prepare data for Firestore
       const vendorData = {
-        ...data,
+        ...cleanData,
         // Default values for new registrations
         verified: false,
         featured: false,

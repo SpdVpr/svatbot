@@ -17,6 +17,7 @@ interface ImageUploadSectionProps {
 }
 
 interface PendingImage {
+  id: string // Unique ID for tracking
   file: File
   preview: string
   uploading: boolean
@@ -86,8 +87,9 @@ export default function ImageUploadSection({
       return
     }
 
-    // Create pending images
+    // Create pending images with unique IDs
     const newPendingImages: PendingImage[] = imageFiles.map(file => ({
+      id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`, // Unique ID
       file,
       preview: URL.createObjectURL(file),
       uploading: false,
@@ -97,20 +99,20 @@ export default function ImageUploadSection({
     setPendingImages(prev => [...prev, ...newPendingImages])
 
     // Auto-upload images
-    newPendingImages.forEach((img, index) => {
-      uploadImage(img, pendingImages.length + index)
+    newPendingImages.forEach((img) => {
+      uploadImage(img)
     })
   }
 
-  const uploadImage = async (pendingImage: PendingImage, index: number) => {
+  const uploadImage = async (pendingImage: PendingImage) => {
     // Allow upload without authentication for marketplace vendor registration
     // Use 'anonymous' as userId if not authenticated
     const userId = user?.id || 'anonymous'
 
     try {
       // Update status to uploading
-      setPendingImages(prev => prev.map((img, i) =>
-        i === index ? { ...img, uploading: true, error: undefined } : img
+      setPendingImages(prev => prev.map(img =>
+        img.id === pendingImage.id ? { ...img, uploading: true, error: undefined } : img
       ))
 
       console.log(`📸 Komprese obrázku: ${pendingImage.file.name} (${formatFileSize(pendingImage.file.size)})`)
@@ -137,8 +139,8 @@ export default function ImageUploadSection({
       console.log(`🔥 Nahrán do Firebase Storage: ${filename}`)
 
       // Update pending image as uploaded
-      setPendingImages(prev => prev.map((img, i) =>
-        i === index ? {
+      setPendingImages(prev => prev.map(img =>
+        img.id === pendingImage.id ? {
           ...img,
           uploading: false,
           uploaded: true,
@@ -154,12 +156,12 @@ export default function ImageUploadSection({
 
       // Remove from pending after a short delay
       setTimeout(() => {
-        setPendingImages(prev => prev.filter((_, i) => i !== index))
+        setPendingImages(prev => prev.filter(img => img.id !== pendingImage.id))
       }, 1000)
     } catch (error) {
       console.error('Upload error:', error)
-      setPendingImages(prev => prev.map((img, i) =>
-        i === index ? {
+      setPendingImages(prev => prev.map(img =>
+        img.id === pendingImage.id ? {
           ...img,
           uploading: false,
           error: error instanceof Error ? error.message : 'Chyba při nahrávání'
@@ -173,11 +175,13 @@ export default function ImageUploadSection({
     onImagesChange(newImages)
   }
 
-  const removePendingImage = (index: number) => {
+  const removePendingImage = (id: string) => {
     setPendingImages(prev => {
-      const img = prev[index]
-      URL.revokeObjectURL(img.preview)
-      return prev.filter((_, i) => i !== index)
+      const img = prev.find(img => img.id === id)
+      if (img) {
+        URL.revokeObjectURL(img.preview)
+      }
+      return prev.filter(img => img.id !== id)
     })
   }
 
@@ -229,8 +233,8 @@ export default function ImageUploadSection({
       {/* Pending Images */}
       {pendingImages.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {pendingImages.map((img, index) => (
-            <div key={index} className="relative group">
+          {pendingImages.map((img) => (
+            <div key={img.id} className="relative group">
               <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 border-2 border-gray-200">
                 <img
                   src={img.preview}
@@ -283,7 +287,7 @@ export default function ImageUploadSection({
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation()
-                    removePendingImage(index)
+                    removePendingImage(img.id)
                   }}
                   className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-600"
                 >
