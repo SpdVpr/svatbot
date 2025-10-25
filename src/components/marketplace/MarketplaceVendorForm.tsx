@@ -945,7 +945,13 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData 
                 <div className="border-t border-gray-200 pt-4">
                   <ImageUploadSection
                     images={formData.images}
-                    onImagesChange={(images) => handleChange('images', images)}
+                    onImagesChange={(images) => {
+                      if (typeof images === 'function') {
+                        handleChange('images', images(formData.images))
+                      } else {
+                        handleChange('images', images)
+                      }
+                    }}
                     maxImages={5}
                     title="Hlavní obrázky"
                     description="Nahrájte hlavní fotografie vaší firmy, vybavení nebo prostoru (max 5 obrázků)"
@@ -956,7 +962,13 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData 
                 <div className="border-t border-gray-200 pt-4">
                   <ImageUploadSection
                     images={formData.portfolioImages}
-                    onImagesChange={(images) => handleChange('portfolioImages', images)}
+                    onImagesChange={(images) => {
+                      if (typeof images === 'function') {
+                        handleChange('portfolioImages', images(formData.portfolioImages))
+                      } else {
+                        handleChange('portfolioImages', images)
+                      }
+                    }}
                     maxImages={15}
                     title="Portfolio"
                     description="Ukažte svou práci! Nahrájte fotografie z vašich svateb nebo projektů (max 15 obrázků)"

@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/useAuth'
 
 interface ImageUploadSectionProps {
   images: string[]
-  onImagesChange: (images: string[]) => void
+  onImagesChange: (images: string[] | ((prev: string[]) => string[])) => void
   maxImages?: number
   title: string
   description: string
