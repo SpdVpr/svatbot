@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import {
   X,
   Save,
@@ -97,6 +97,7 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData 
   const [currentStep, setCurrentStep] = useState(1)
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const justMovedToStep5Ref = useRef(false)
 
   const [formData, setFormData] = useState<MarketplaceVendorFormData>({
     name: initialData?.name || '',
@@ -213,6 +214,18 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData 
     if (validateStep(currentStep)) {
       const nextStep = Math.min(currentStep + 1, 5)
       console.log('✅ Validation passed, moving to step:', nextStep)
+
+      // If moving to step 5, set flag to prevent immediate submit
+      if (nextStep === 5) {
+        justMovedToStep5Ref.current = true
+        console.log('🛡️ Set justMovedToStep5 flag to prevent immediate submit')
+        // Clear flag after a short delay
+        setTimeout(() => {
+          justMovedToStep5Ref.current = false
+          console.log('✅ Cleared justMovedToStep5 flag')
+        }, 100)
+      }
+
       setCurrentStep(nextStep)
     } else {
       console.log('❌ Validation failed for step:', currentStep)
@@ -225,7 +238,13 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('🔴 handleSubmit called, currentStep:', currentStep)
+    console.log('🔴 handleSubmit called, currentStep:', currentStep, 'justMovedToStep5:', justMovedToStep5Ref.current)
+
+    // Prevent submit if we just moved to step 5
+    if (justMovedToStep5Ref.current) {
+      console.log('🛡️ Just moved to step 5, preventing immediate submit')
+      return
+    }
 
     // Only submit on step 5 (summary)
     if (currentStep !== 5) {
@@ -360,7 +379,16 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData 
           </div>
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <form
+          onSubmit={handleSubmit}
+          onKeyDown={(e) => {
+            // Prevent Enter key from submitting form on steps 1-4
+            if (e.key === 'Enter' && currentStep < 5) {
+              e.preventDefault()
+              console.log('⚠️ Enter key pressed on step', currentStep, '- prevented default submit')
+            }
+          }}
+        >
           <div className="p-6 max-h-[60vh] overflow-y-auto">
             {errors.general && (
               <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start space-x-2">

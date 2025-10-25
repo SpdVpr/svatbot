@@ -2,11 +2,15 @@
 
 import { MarketplaceVendor } from '@/types/vendor'
 import { marketplaceVendors } from '@/data/marketplaceVendors'
+import { db } from '@/lib/firebase'
+import { collection, query, where, onSnapshot, Timestamp } from 'firebase/firestore'
 
 // Global vendor store for real-time updates
 class VendorStore {
   private vendors: MarketplaceVendor[] = [...marketplaceVendors]
   private listeners: Set<() => void> = new Set()
+  private unsubscribe: (() => void) | null = null
+  private isInitialized = false
 
   // Get all vendors
   getVendors(): MarketplaceVendor[] {
@@ -79,32 +83,103 @@ class VendorStore {
     }
   }
 
-  // Load from localStorage
-  loadFromLocalStorage(): void {
+  // Initialize Firestore listener for real-time updates
+  initializeFirestore(): void {
+    if (this.isInitialized) {
+      console.log('📦 VendorStore already initialized')
+      return
+    }
+
+    console.log('🔥 Initializing VendorStore with Firestore...')
+    this.isInitialized = true
+
     try {
-      const saved = localStorage.getItem('marketplace_vendors')
-      if (saved) {
-        const parsedVendors = JSON.parse(saved)
-        // Validate and merge with default data
-        if (Array.isArray(parsedVendors) && parsedVendors.length > 0) {
-          this.vendors = parsedVendors.map(vendor => ({
-            ...vendor,
-            createdAt: new Date(vendor.createdAt),
-            updatedAt: new Date(vendor.updatedAt),
-            lastActive: vendor.lastActive ? new Date(vendor.lastActive) : new Date(),
-            // Fix testimonial dates
-            testimonials: vendor.testimonials?.map((testimonial: any) => ({
-              ...testimonial,
-              date: new Date(testimonial.date),
-              weddingDate: new Date(testimonial.weddingDate)
-            })) || []
-          }))
+      // Query only approved vendors
+      const vendorsRef = collection(db, 'marketplaceVendors')
+      const q = query(vendorsRef, where('status', '==', 'approved'))
+
+      // Set up real-time listener
+      this.unsubscribe = onSnapshot(q,
+        (snapshot) => {
+          console.log('📦 Firestore vendors snapshot:', snapshot.size, 'approved vendors')
+
+          const firestoreVendors: MarketplaceVendor[] = []
+          snapshot.forEach((doc) => {
+            const data = doc.data()
+
+            // Convert Firestore data to MarketplaceVendor
+            const vendor: MarketplaceVendor = {
+              id: doc.id,
+              name: data.name || '',
+              category: data.category,
+              description: data.description || '',
+              shortDescription: data.shortDescription || '',
+              images: data.images || [],
+              portfolioImages: data.portfolioImages || [],
+              email: data.email || '',
+              phone: data.phone || '',
+              website: data.website || '',
+              address: data.address || { city: '', region: '', street: '', postalCode: '', country: 'Czech Republic' },
+              workingRadius: data.workingRadius || 50,
+              priceRange: data.priceRange || { min: 0, max: 0, currency: 'CZK', unit: 'per-event' },
+              services: data.services || [],
+              features: data.features || [],
+              specialties: data.specialties || [],
+              availability: data.availability || {
+                workingDays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
+                workingHours: { start: '09:00', end: '18:00' }
+              },
+              yearsInBusiness: data.yearsInBusiness || 0,
+              responseTime: data.responseTime || '24 hodin',
+              verified: data.verified || false,
+              featured: data.featured || false,
+              premium: data.premium || false,
+              rating: data.rating || { overall: 0, count: 0, breakdown: { quality: 0, communication: 0, value: 0, professionalism: 0 } },
+              testimonials: data.testimonials || [],
+              awards: data.awards || [],
+              certifications: data.certifications || [],
+              tags: data.tags || [],
+              keywords: data.keywords || [],
+              createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
+              updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate() : new Date(),
+              lastActive: data.lastActive instanceof Timestamp ? data.lastActive.toDate() : new Date()
+            }
+
+            firestoreVendors.push(vendor)
+          })
+
+          // Merge with mock data (keep mock data for now, but Firestore takes priority)
+          const mockVendorIds = marketplaceVendors.map(v => v.id)
+          const firestoreVendorIds = firestoreVendors.map(v => v.id)
+
+          // Keep mock vendors that don't conflict with Firestore
+          const nonConflictingMockVendors = marketplaceVendors.filter(
+            v => !firestoreVendorIds.includes(v.id)
+          )
+
+          this.vendors = [...firestoreVendors, ...nonConflictingMockVendors]
+          console.log('✅ VendorStore updated:', this.vendors.length, 'total vendors')
+          this.notifyListeners()
+        },
+        (error) => {
+          console.error('❌ Firestore vendors listener error:', error)
+          // Fall back to mock data on error
+          this.vendors = [...marketplaceVendors]
           this.notifyListeners()
         }
-      }
+      )
     } catch (error) {
-      console.warn('Failed to load vendors from localStorage:', error)
+      console.error('❌ Failed to initialize Firestore listener:', error)
+      // Fall back to mock data
+      this.vendors = [...marketplaceVendors]
+      this.notifyListeners()
     }
+  }
+
+  // Load from localStorage (deprecated - now using Firestore)
+  loadFromLocalStorage(): void {
+    console.warn('⚠️ loadFromLocalStorage is deprecated, using Firestore instead')
+    this.initializeFirestore()
   }
 
   // Reset to default data
@@ -113,12 +188,21 @@ class VendorStore {
     this.notifyListeners()
     localStorage.removeItem('marketplace_vendors')
   }
+
+  // Cleanup
+  destroy(): void {
+    if (this.unsubscribe) {
+      this.unsubscribe()
+      this.unsubscribe = null
+    }
+    this.isInitialized = false
+  }
 }
 
 // Create singleton instance
 export const vendorStore = new VendorStore()
 
-// Initialize from localStorage on client side
+// Initialize from Firestore on client side
 if (typeof window !== 'undefined') {
-  vendorStore.loadFromLocalStorage()
+  vendorStore.initializeFirestore()
 }
