@@ -198,10 +198,8 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData 
     }
 
     if (step === 4) {
-      // Portfolio and availability - optional but recommended
-      if (formData.images.length === 0) {
-        newErrors.images = 'Doporučujeme nahrát alespoň 1 hlavní obrázek'
-      }
+      // Portfolio and availability - optional, no blocking validation
+      // Users can proceed to summary even without images
     }
 
     // Step 5 is summary - no validation needed
@@ -447,18 +445,22 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData 
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Pracovní rádius (km)
-                    </label>
-                    <input
-                      type="number"
-                      value={formData.workingRadius}
-                      onChange={(e) => handleChange('workingRadius', parseInt(e.target.value) || 50)}
-                      min="0"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    />
-                  </div>
+                  {/* Hide working radius for categories where it doesn't make sense */}
+                  {!['venue', 'accommodation', 'printing', 'other'].includes(formData.category) && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Pracovní rádius (km)
+                      </label>
+                      <input
+                        type="number"
+                        value={formData.workingRadius || ''}
+                        onChange={(e) => handleChange('workingRadius', e.target.value === '' ? 0 : parseInt(e.target.value))}
+                        min="0"
+                        placeholder="např. 50"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             )}

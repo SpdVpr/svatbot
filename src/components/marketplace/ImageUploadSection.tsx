@@ -151,8 +151,8 @@ export default function ImageUploadSection({
         } : img
       ))
 
-      // Add to images array
-      onImagesChange([...images, downloadURL])
+      // Add to images array - use callback to avoid race conditions
+      onImagesChange(prevImages => [...prevImages, downloadURL])
 
       // Remove from pending after a short delay
       setTimeout(() => {

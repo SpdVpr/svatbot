@@ -466,7 +466,7 @@ service cloud.firestore {
                        request.resource.data.status == 'pending';
 
       // Only admins can update/delete (handled by admin panel)
-      allow update, delete: if false;
+      allow update, delete: if isAdmin();
     }
 
     // Wedding websites collection

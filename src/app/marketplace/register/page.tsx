@@ -52,16 +52,16 @@ export default function MarketplaceRegisterPage() {
 
       // Save to Firestore
       const docRef = await addDoc(collection(db, 'marketplaceVendors'), vendorData)
-      
+
       console.log('✅ Vendor registration submitted:', docRef.id)
-      
+
       setSubmitted(true)
       setShowForm(false)
 
-      // Redirect to success page after 3 seconds
+      // Redirect to marketplace after 5 seconds
       setTimeout(() => {
         router.push('/marketplace')
-      }, 3000)
+      }, 5000)
     } catch (error) {
       console.error('Error submitting vendor registration:', error)
       throw error
@@ -74,16 +74,21 @@ export default function MarketplaceRegisterPage() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
             <CheckCircle className="w-10 h-10 text-green-600" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Děkujeme za registraci!</h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-4">
             Váš inzerát byl úspěšně odeslán. Náš tým ho zkontroluje a zveřejní do 24-48 hodin.
           </p>
           <p className="text-sm text-gray-500 mb-6">
             O schválení vás budeme informovat emailem.
           </p>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <p className="text-sm text-blue-800">
+              Budete automaticky přesměrováni na marketplace za 5 sekund...
+            </p>
+          </div>
           <Link href="/marketplace" className="btn-primary inline-flex items-center">
             Zpět na marketplace
           </Link>
