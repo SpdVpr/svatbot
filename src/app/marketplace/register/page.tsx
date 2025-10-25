@@ -118,7 +118,7 @@ export default function MarketplaceRegisterPage() {
             Staňte se součástí SvatBot Marketplace
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Oslovte tisíce párů, které plánují svatbu. Prezentujte své služby a získejte nové zákazníky.
+            Oslovte stovky párů, které plánují svatbu. Prezentujte své služby a získejte nové zákazníky.
           </p>
         </div>
 
@@ -129,7 +129,7 @@ export default function MarketplaceRegisterPage() {
               <Users className="w-6 h-6 text-primary-600" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Tisíce zákazníků
+              Stovky zákazníků
             </h3>
             <p className="text-gray-600 text-sm">
               Oslovte páry, které aktivně hledají svatební služby ve vašem regionu.
@@ -212,7 +212,7 @@ export default function MarketplaceRegisterPage() {
                 Získávejte zákazníky
               </h3>
               <p className="text-gray-600">
-                Váš profil bude viditelný pro tisíce párů a začnete dostávat poptávky.
+                Váš profil bude viditelný pro stovky párů a začnete dostávat poptávky.
               </p>
             </div>
           </div>

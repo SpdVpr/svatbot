@@ -53,6 +53,12 @@ service cloud.firestore {
         // User can delete their own settings
         allow delete: if isAuthenticated() && isOwner(userId);
       }
+
+      // Favorite vendors subcollection
+      match /favoriteVendors/{vendorId} {
+        // User can read, write, create, and delete their own favorite vendors
+        allow read, write, create, delete: if isAuthenticated() && isOwner(userId);
+      }
     }
 
     // Weddings collection
@@ -1034,6 +1040,54 @@ service cloud.firestore {
       // Only creator can update/delete
       allow update, delete: if isAuthenticated() &&
                                resource.data.createdBy == request.auth.uid;
+    }
+
+    // Vendor Reviews - Users can review vendors, admins moderate
+    match /vendorReviews/{reviewId} {
+      // Reading:
+      // - Anyone can read approved reviews
+      // - Authors can read their own reviews (any status)
+      // - Admins can read all reviews
+      allow read: if resource.data.status == 'approved' 
+        || (isAuthenticated() && resource.data.userId == request.auth.uid)
+        || isAdmin();
+      
+      // Creating:
+      // - Only authenticated users can create reviews
+      // - User must be the author (userId matches auth.uid)
+      // - Initial status must be 'pending'
+      // - Rating must be between 1-5
+      // - Text must be at least 1 character
+      allow create: if isAuthenticated()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.rating >= 1 
+        && request.resource.data.rating <= 5
+        && request.resource.data.text.size() >= 1
+        && request.resource.data.ratings.quality >= 1
+        && request.resource.data.ratings.quality <= 5
+        && request.resource.data.ratings.communication >= 1
+        && request.resource.data.ratings.communication <= 5
+        && request.resource.data.ratings.value >= 1
+        && request.resource.data.ratings.value <= 5
+        && request.resource.data.ratings.professionalism >= 1
+        && request.resource.data.ratings.professionalism <= 5;
+      
+      // Updating:
+      // - Authors can update their own pending reviews
+      // - Admins can update any review (for moderation)
+      allow update: if isAuthenticated() && (
+        (request.auth.uid == resource.data.userId && resource.data.status == 'pending')
+        || isAdmin()
+      );
+      
+      // Deleting:
+      // - Authors can delete their own reviews
+      // - Admins can delete any review
+      allow delete: if isAuthenticated() && (
+        request.auth.uid == resource.data.userId
+        || isAdmin()
+      );
     }
 
     // Deny all other access

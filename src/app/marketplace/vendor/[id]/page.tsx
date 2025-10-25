@@ -23,10 +23,15 @@ import {
   Users,
   DollarSign,
   Plus,
-  Check
+  Check,
+  Edit3
 } from 'lucide-react'
 import { useVendor } from '@/hooks/useVendor'
 import { useAuth } from '@/hooks/useAuth'
+import { useFavoriteVendors } from '@/hooks/useFavoriteVendors'
+import { useVendorReviews } from '@/hooks/useVendorReviews'
+import ReviewForm from '@/components/marketplace/ReviewForm'
+import ReviewList from '@/components/marketplace/ReviewList'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 
@@ -37,14 +42,18 @@ export default function VendorDetailPage() {
   const { getVendorById } = useMarketplace()
   const { user } = useAuth()
   const { vendors, createVendor } = useVendor()
+  const { isFavorite, toggleFavorite } = useFavoriteVendors()
 
   const [showContactForm, setShowContactForm] = useState(false)
-  const [isFavorite, setIsFavorite] = useState(false)
   const [isAdding, setIsAdding] = useState(false)
   const [isAdded, setIsAdded] = useState(false)
+  const [showReviewForm, setShowReviewForm] = useState(false)
 
   const vendorId = params.id as string
   const vendor = getVendorById(vendorId)
+  
+  // Load reviews for this vendor
+  const { reviews, stats, hasUserReviewed, createReview, loading: reviewsLoading } = useVendorReviews(vendorId)
 
   // Check if vendor is already in user's list
   const isVendorInList = vendor ? vendors.some(v =>
@@ -149,14 +158,14 @@ export default function VendorDetailPage() {
 
             <div className="flex items-center space-x-3">
               <button
-                onClick={() => setIsFavorite(!isFavorite)}
+                onClick={() => toggleFavorite(vendorId)}
                 className={`p-2 rounded-lg transition-colors ${
-                  isFavorite
+                  isFavorite(vendorId)
                     ? 'bg-red-100 text-red-600'
                     : 'bg-gray-600 text-white hover:bg-gray-500'
                 }`}
               >
-                <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
+                <Heart className={`w-5 h-5 ${isFavorite(vendorId) ? 'fill-current' : ''}`} />
               </button>
               <button className="p-2 bg-gray-600 text-white hover:bg-gray-500 rounded-lg transition-colors">
                 <Share2 className="w-5 h-5" />
@@ -281,14 +290,6 @@ export default function VendorDetailPage() {
                 </div>
               </div>
 
-              {/* Response Time */}
-              <div className="flex items-center justify-between">
-                <span className="text-gray-600">Doba odezvy:</span>
-                <span className="font-medium text-green-600">
-                  {vendor.responseTime}
-                </span>
-              </div>
-
               {/* Add to my vendors button */}
               {user && (
                 <button
@@ -330,14 +331,10 @@ export default function VendorDetailPage() {
               <div className="flex space-x-3">
                 <button
                   onClick={() => setShowContactForm(true)}
-                  className="flex-1 btn-primary flex items-center justify-center space-x-2"
+                  className="w-full btn-primary flex items-center justify-center space-x-2"
                 >
                   <MessageCircle className="w-5 h-5" />
                   <span>Kontaktovat</span>
-                </button>
-                <button className="flex-1 btn-outline flex items-center justify-center space-x-2">
-                  <Calendar className="w-5 h-5" />
-                  <span>Rezervovat schůzku</span>
                 </button>
               </div>
             </div>
@@ -427,74 +424,43 @@ export default function VendorDetailPage() {
               </div>
             </div>
 
-            {/* Reviews */}
+            {/* Reviews Section */}
             <div className="wedding-card">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Recenze</h2>
-
-              {/* Rating breakdown */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div className="text-center">
-                  <div className="text-lg font-semibold text-gray-900">
-                    {vendor.rating.breakdown.quality.toFixed(1)}
-                  </div>
-                  <div className="text-sm text-gray-600">Kvalita</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-lg font-semibold text-gray-900">
-                    {vendor.rating.breakdown.communication.toFixed(1)}
-                  </div>
-                  <div className="text-sm text-gray-600">Komunikace</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-lg font-semibold text-gray-900">
-                    {vendor.rating.breakdown.value.toFixed(1)}
-                  </div>
-                  <div className="text-sm text-gray-600">Hodnota</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-lg font-semibold text-gray-900">
-                    {vendor.rating.breakdown.professionalism.toFixed(1)}
-                  </div>
-                  <div className="text-sm text-gray-600">Profesionalita</div>
-                </div>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">Recenze a hodnocení</h2>
+                {user && !hasUserReviewed(vendorId) && (
+                  <button
+                    onClick={() => setShowReviewForm(true)}
+                    className="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                    <span>Napsat recenzi</span>
+                  </button>
+                )}
+                {user && hasUserReviewed(vendorId) && (
+                  <span className="flex items-center space-x-2 text-sm text-gray-600">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span>Již jste recenzovali</span>
+                  </span>
+                )}
+                {!user && (
+                  <Link
+                    href="/auth/login"
+                    className="text-sm text-primary-600 hover:underline"
+                  >
+                    Přihlaste se pro napsání recenze
+                  </Link>
+                )}
               </div>
 
-              {/* Testimonials */}
-              <div className="space-y-4">
-                {vendor.testimonials.map((testimonial) => (
-                  <div key={testimonial.id} className="border border-gray-200 rounded-lg p-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <h4 className="font-medium text-gray-900">{testimonial.author}</h4>
-                        <div className="flex items-center space-x-1 mt-1">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`w-4 h-4 ${
-                                i < testimonial.rating
-                                  ? 'text-yellow-400 fill-current'
-                                  : 'text-gray-300'
-                              }`}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                      {testimonial.verified && (
-                        <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
-                          Ověřeno
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-gray-700">{testimonial.text}</p>
-                    <div className="text-sm text-gray-500 mt-2">
-                      {typeof testimonial.date === 'string'
-                        ? testimonial.date
-                        : testimonial.date.toLocaleDateString('cs-CZ')
-                      }
-                    </div>
-                  </div>
-                ))}
-              </div>
+              {reviewsLoading ? (
+                <div className="text-center py-8">
+                  <div className="w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                  <p className="text-gray-500 mt-4">Načítání recenzí...</p>
+                </div>
+              ) : (
+                <ReviewList reviews={reviews} stats={stats} showStats={true} />
+              )}
             </div>
           </div>
 
@@ -663,6 +629,20 @@ export default function VendorDetailPage() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Review Form Modal */}
+      {showReviewForm && vendor && (
+        <ReviewForm
+          vendorId={vendorId}
+          vendorName={vendor.name}
+          onSubmit={async (data) => {
+            await createReview(data)
+            setShowReviewForm(false)
+            alert('Děkujeme za vaši recenzi! Bude zveřejněna po schválení administrátorem.')
+          }}
+          onCancel={() => setShowReviewForm(false)}
+        />
       )}
     </div>
   )

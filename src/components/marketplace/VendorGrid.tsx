@@ -13,9 +13,11 @@ interface VendorGridProps {
   loading?: boolean
   error?: string | null
   emptyMessage?: string
+  isFavorite?: (vendorId: string) => boolean
+  toggleFavorite?: (vendorId: string) => Promise<boolean>
 }
 
-export default function VendorGrid({ vendors, loading = false, error, emptyMessage }: VendorGridProps) {
+export default function VendorGrid({ vendors, loading = false, error, emptyMessage, isFavorite, toggleFavorite }: VendorGridProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -83,7 +85,12 @@ export default function VendorGrid({ vendors, loading = false, error, emptyMessa
       {/* Vendor grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {vendors.map((vendor) => (
-          <VendorCard key={vendor.id} vendor={vendor} />
+          <VendorCard 
+            key={vendor.id} 
+            vendor={vendor}
+            isFavorite={isFavorite}
+            toggleFavorite={toggleFavorite}
+          />
         ))}
       </div>
 

@@ -19,15 +19,24 @@ function AdminLayoutContent({
   const pathname = usePathname()
   const hasRedirected = useRef(false)
 
+  // Always call hooks in the same order - redirect effect runs for all pages
   useEffect(() => {
+    // Login page doesn't need redirect
+    if (pathname === '/admin/login') return
+    
     // Prevent multiple redirects
     if (hasRedirected.current) return
 
-    if (!isLoading && !isAuthenticated && pathname !== '/admin/login') {
+    if (!isLoading && !isAuthenticated) {
       hasRedirected.current = true
       router.push('/admin/login')
     }
   }, [isAuthenticated, isLoading, pathname, router])
+
+  // Login page renders immediately without auth checks
+  if (pathname === '/admin/login') {
+    return <>{children}</>
+  }
 
   // Show loading spinner while checking authentication
   if (isLoading) {
@@ -36,11 +45,6 @@ function AdminLayoutContent({
         <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
       </div>
     )
-  }
-
-  // Show login page
-  if (!isAuthenticated && pathname === '/admin/login') {
-    return children
   }
 
   // Show admin dashboard layout

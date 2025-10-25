@@ -7,8 +7,9 @@ import FeaturedVendors from '@/components/marketplace/FeaturedVendors'
 import CategoryGrid from '@/components/marketplace/CategoryGrid'
 import VendorGrid from '@/components/marketplace/VendorGrid'
 import MarketplaceFilters from '@/components/marketplace/MarketplaceFilters'
-import { Search, Filter, TrendingUp, ArrowLeft, Home, Plus } from 'lucide-react'
+import { Search, Filter, TrendingUp, ArrowLeft, Home, Plus, Heart } from 'lucide-react'
 import Link from 'next/link'
+import { useFavoriteVendors } from '@/hooks/useFavoriteVendors'
 
 export default function MarketplacePage() {
   const {
@@ -26,12 +27,20 @@ export default function MarketplacePage() {
   // Removed viewMode - using browse view as default (most comprehensive)
   const [showFilters, setShowFilters] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<VendorCategory | null>(null)
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false)
 
+  const { favorites, isFavorite, toggleFavorite } = useFavoriteVendors()
   const featuredVendors = getFeaturedVendors(6)
+  
+  // Filter vendors to show only favorites if active
+  const displayVendors = showFavoritesOnly 
+    ? filteredVendors.filter(vendor => favorites.includes(vendor.id))
+    : filteredVendors
 
   // Handle category selection
   const handleCategorySelect = (category: VendorCategory) => {
     setSelectedCategory(category)
+    setShowFavoritesOnly(false)
     // Clear all filters and set only the selected category
     setFilters({ category: [category] })
   }
@@ -44,7 +53,16 @@ export default function MarketplacePage() {
   // Clear all filters
   const handleClearFilters = () => {
     setSelectedCategory(null)
+    setShowFavoritesOnly(false)
     setFilters({})
+  }
+
+  // Toggle favorites filter
+  const handleToggleFavorites = () => {
+    setShowFavoritesOnly(!showFavoritesOnly)
+    if (!showFavoritesOnly) {
+      setSelectedCategory(null)
+    }
   }
 
   return (
@@ -132,6 +150,58 @@ export default function MarketplacePage() {
             </div>
           )}
 
+          {/* Category Quick Filter */}
+          <div className="mt-6">
+            <div className="grid grid-cols-5 md:grid-cols-7 lg:grid-cols-10 gap-2 md:gap-3">
+              {/* All Categories Button */}
+              <button
+                onClick={handleClearFilters}
+                className={`flex flex-col items-center justify-center px-2 py-3 rounded-xl transition-all ${
+                  !selectedCategory && !showFavoritesOnly
+                    ? 'bg-primary-500 text-white shadow-lg scale-105'
+                    : 'bg-white border border-neutral-200 hover:border-primary-300 hover:shadow-md'
+                }`}
+              >
+                <span className="text-2xl mb-1">🎯</span>
+                <span className="text-xs font-medium text-center">Vše</span>
+              </button>
+
+              {/* Favorites Button */}
+              <button
+                onClick={handleToggleFavorites}
+                className={`flex flex-col items-center justify-center px-2 py-3 rounded-xl transition-all ${
+                  showFavoritesOnly
+                    ? 'bg-red-500 text-white shadow-lg scale-105'
+                    : 'bg-white border border-neutral-200 hover:border-red-300 hover:shadow-md'
+                }`}
+              >
+                <Heart className={`w-6 h-6 mb-1 ${showFavoritesOnly ? 'fill-current' : ''}`} />
+                <span className="text-xs font-medium text-center">Oblíbené</span>
+                {favorites.length > 0 && (
+                  <span className="text-[10px] text-gray-500 mt-0.5">({favorites.length})</span>
+                )}
+              </button>
+
+              {/* Category Buttons */}
+              {Object.entries(VENDOR_CATEGORIES).map(([key, category]) => (
+                <button
+                  key={key}
+                  onClick={() => handleCategorySelect(key as VendorCategory)}
+                  className={`flex flex-col items-center justify-center px-2 py-3 rounded-xl transition-all ${
+                    selectedCategory === key
+                      ? 'bg-primary-500 text-white shadow-lg scale-105'
+                      : 'bg-white border border-neutral-200 hover:border-primary-300 hover:shadow-md'
+                  }`}
+                >
+                  <span className="text-2xl mb-1">{category.icon}</span>
+                  <span className="text-xs font-medium text-center leading-tight">
+                    {category.name}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Active Filters */}
           {Object.keys(filters).length > 0 && (
             <div className="mt-4 flex items-center space-x-2">
@@ -187,23 +257,29 @@ export default function MarketplacePage() {
 
         {/* Browse View - comprehensive display */}
         <div className="space-y-8">
-          {/* Featured Section (only if no filters) */}
-          {Object.keys(filters).length === 0 && (
+          {/* Featured Section - Hidden but kept for future use */}
+          {false && Object.keys(filters).length === 0 && (
             <div>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="heading-3">Doporučení dodavatelé</h2>
               </div>
-              <FeaturedVendors vendors={featuredVendors.slice(0, 3)} />
+              <FeaturedVendors 
+                vendors={featuredVendors.slice(0, 3)}
+                isFavorite={isFavorite}
+                toggleFavorite={toggleFavorite}
+              />
             </div>
           )}
 
-          {/* All Vendors */}
+          {/* Vendors View - Always show vendor grid */}
           <div>
             <div className="flex items-center justify-between mb-6">
               <h2 className="heading-3">
-                {selectedCategory
-                  ? `${VENDOR_CATEGORIES[selectedCategory].name} (${filteredVendors.length})`
-                  : `Všichni dodavatelé (${filteredVendors.length})`
+                {showFavoritesOnly
+                  ? `Oblíbení dodavatelé (${displayVendors.length})`
+                  : selectedCategory
+                    ? `${VENDOR_CATEGORIES[selectedCategory].name} (${displayVendors.length})`
+                    : `Všichni dodavatelé (${displayVendors.length})`
                 }
               </h2>
 
@@ -215,18 +291,22 @@ export default function MarketplacePage() {
                   }}
                   className="btn-ghost text-sm"
                 >
-                  Zobrazit všechny kategorie
+                  Zobrazit všechny dodavatele
                 </button>
               )}
             </div>
 
             <VendorGrid
-              vendors={filteredVendors}
+              vendors={displayVendors}
               loading={loading}
+              isFavorite={isFavorite}
+              toggleFavorite={toggleFavorite}
               emptyMessage={
-                Object.keys(filters).length > 0
-                  ? "Žádní dodavatelé nevyhovují zadaným filtrům"
-                  : "Zatím nejsou k dispozici žádní dodavatelé"
+                showFavoritesOnly
+                  ? "Zatím nemáte žádné oblíbené dodavatele"
+                  : Object.keys(filters).length > 0
+                    ? "Žádní dodavatelé nevyhovují zadaným filtrům"
+                    : "Zatím nejsou k dispozici žádní dodavatelé"
               }
             />
           </div>

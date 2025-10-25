@@ -2,9 +2,8 @@
 
 import { useState, useEffect, createContext, useContext, useRef } from 'react'
 import { AdminUser, AdminSession, AdminStats } from '@/types/admin'
-import { auth, db } from '@/lib/firebase'
+import { auth } from '@/lib/firebase'
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth'
-import { doc, getDoc } from 'firebase/firestore'
 
 interface AdminContextType {
   user: AdminUser | null
@@ -163,31 +162,16 @@ export function useAdmin() {
           return
         }
 
-        // Get admin user data from Firestore
-        const adminUserDoc = await getDoc(doc(db, 'adminUsers', firebaseUser.uid))
-
-        if (!adminUserDoc.exists() || !adminUserDoc.data().isActive) {
-          // Admin document doesn't exist or is not active
-          await signOut(auth)
-          setUser(null)
-          setSession(null)
-          localStorage.removeItem('admin_session')
-          setIsLoading(false)
-          return
-        }
-
-        const adminData = adminUserDoc.data()
-
-        // Create admin user object
+        // Create admin user object from Firebase Auth claims
         const adminUser: AdminUser = {
           id: firebaseUser.uid,
-          email: adminData.email,
-          name: adminData.name || 'Admin',
-          role: adminData.role,
-          permissions: getPermissionsForRole(adminData.role),
-          createdAt: adminData.createdAt?.toDate() || new Date(),
+          email: firebaseUser.email || '',
+          name: firebaseUser.displayName || 'Admin',
+          role: role as 'super_admin' | 'admin' | 'moderator',
+          permissions: getPermissionsForRole(role),
+          createdAt: new Date(firebaseUser.metadata.creationTime || Date.now()),
           lastLogin: new Date(),
-          isActive: adminData.isActive
+          isActive: true
         }
 
         // Create session

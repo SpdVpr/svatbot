@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAdminContext } from '@/hooks/useAdmin'
+import { auth } from '@/lib/firebase'
+import { signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth'
 import {
   Lock,
   Mail,
@@ -19,18 +20,36 @@ export default function AdminLoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const hasRedirected = useRef(false)
-
-  const { user, login, isLoading, isAuthenticated } = useAdminContext()
   const router = useRouter()
 
   useEffect(() => {
-    // Only redirect once when authenticated
-    if (isAuthenticated && !isLoading && !hasRedirected.current) {
-      hasRedirected.current = true
-      router.replace('/admin/dashboard')
-    }
-  }, [isAuthenticated, isLoading, router])
+    // Check if user is already authenticated
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user && !hasRedirected.current) {
+        // Check if user has admin role
+        try {
+          const idTokenResult = await user.getIdTokenResult()
+          const isAdmin = idTokenResult.claims.admin as boolean
+          
+          if (isAdmin) {
+            hasRedirected.current = true
+            router.replace('/admin/dashboard')
+          } else {
+            setIsLoading(false)
+          }
+        } catch (error) {
+          console.error('Error checking admin status:', error)
+          setIsLoading(false)
+        }
+      } else {
+        setIsLoading(false)
+      }
+    })
+
+    return () => unsubscribe()
+  }, [router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -38,15 +57,29 @@ export default function AdminLoginPage() {
     setIsSubmitting(true)
 
     try {
-      const success = await login(email, password)
-
-      if (!success) {
-        setError('Neplatné přihlašovací údaje nebo nemáte admin oprávnění')
+      // Sign in with Firebase Authentication
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      
+      // Check if user has admin role
+      const idTokenResult = await userCredential.user.getIdTokenResult()
+      const isAdmin = idTokenResult.claims.admin as boolean
+      
+      if (!isAdmin) {
+        setError('Nemáte admin oprávnění')
+        await auth.signOut()
+      } else {
+        // Redirect will happen in useEffect
+        router.replace('/admin/dashboard')
       }
-      // If successful, useEffect will redirect to /admin/dashboard
     } catch (err: any) {
       console.error('Login error:', err)
-      setError('Chyba při přihlašování: ' + (err.message || 'Neznámá chyba'))
+      if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
+        setError('Neplatné přihlašovací údaje')
+      } else if (err.code === 'auth/too-many-requests') {
+        setError('Příliš mnoho pokusů. Zkuste to prosím později.')
+      } else {
+        setError('Chyba při přihlašování: ' + (err.message || 'Neznámá chyba'))
+      }
     } finally {
       setIsSubmitting(false)
     }

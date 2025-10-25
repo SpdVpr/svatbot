@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Heart, Sparkles, CheckSquare, Users, CreditCard, Clock, Calendar, CheckCircle, Wallet, UserPlus, TrendingUp, Smartphone, Zap, Shield, Star, Store, Briefcase, Eye, Image, Award, ArrowRight, Lock, BarChart2, Cloud, Mail, Grip, RefreshCw } from 'lucide-react'
 import { cn } from '@/utils'
 import { useAuth } from '@/hooks/useAuth'
@@ -9,6 +10,7 @@ import ScrollProgress from '@/components/animations/ScrollProgress'
 import NumberCounter from '@/components/animations/NumberCounter'
 
 export default function WelcomeScreen() {
+  const router = useRouter()
   const { login, clearError } = useAuth()
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'register'>('register')
@@ -22,6 +24,10 @@ export default function WelcomeScreen() {
   const handleLogin = () => {
     setAuthMode('login')
     setShowAuthModal(true)
+  }
+
+  const handleVendorRegister = () => {
+    router.push('/marketplace/register')
   }
 
   const handleDemoLogin = async () => {
@@ -495,27 +501,27 @@ export default function WelcomeScreen() {
                 <p className="text-sm md:text-base text-gray-600 mb-6 md:mb-8 leading-relaxed">
                   Vyplňte jednoduchý formulář, nahrajte úžasné fotografie z vašich předchozích svateb a začněte získávat nové klienty.
                 </p>
-                <button className="w-full flex items-center justify-center space-x-2 md:space-x-3 px-6 py-3 md:px-8 md:py-5 text-base md:text-lg font-semibold rounded-full bg-rose-500 text-white shadow-lg hover:bg-rose-600 transition-all duration-300 button-glow mb-4 md:mb-6">
+                <button onClick={handleVendorRegister} className="w-full flex items-center justify-center space-x-2 md:space-x-3 px-6 py-3 md:px-8 md:py-5 text-base md:text-lg font-semibold rounded-full bg-rose-500 text-white shadow-lg hover:bg-rose-600 transition-all duration-300 button-glow mb-4 md:mb-6">
                   <Award className="w-5 h-5 md:w-6 md:h-6" />
                   <span>Registrovat se jako dodavatel</span>
                   <ArrowRight className="w-5 h-5 md:w-6 md:h-6" />
                 </button>
                 <div className="text-center">
-                  <p className="text-xs md:text-sm text-gray-500">Už máte účet? <button className="text-rose-600 hover:text-rose-700 font-medium">Přihlásit se</button></p>
+                  <p className="text-xs md:text-sm text-gray-500">Už máte účet? <button onClick={handleLogin} className="text-rose-600 hover:text-rose-700 font-medium">Přihlásit se</button></p>
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-3 md:gap-4 pt-6 md:pt-8 border-t border-gray-100">
                 <div className="text-center">
-                  <div className="text-xl md:text-2xl font-bold text-orange-600 mb-1">500+</div>
-                  <div className="text-xs text-gray-600">Aktivních párů</div>
+                  <div className="text-xl md:text-2xl font-bold text-orange-600 mb-1">Moderní</div>
+                  <div className="text-xs text-gray-600">Platforma</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-xl md:text-2xl font-bold text-rose-600 mb-1">200+</div>
-                  <div className="text-xs text-gray-600">Dodavatelů</div>
+                  <div className="text-xl md:text-2xl font-bold text-rose-600 mb-1">100%</div>
+                  <div className="text-xs text-gray-600">Zdarma</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-xl md:text-2xl font-bold text-purple-600 mb-1">4.9★</div>
-                  <div className="text-xs text-gray-600">Hodnocení</div>
+                  <div className="text-xl md:text-2xl font-bold text-purple-600 mb-1">24-48h</div>
+                  <div className="text-xs text-gray-600">Schválení</div>
                 </div>
               </div>
             </div>

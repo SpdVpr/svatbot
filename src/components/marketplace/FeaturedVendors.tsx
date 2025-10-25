@@ -11,9 +11,11 @@ import {
 
 interface FeaturedVendorsProps {
   vendors: MarketplaceVendor[]
+  isFavorite?: (vendorId: string) => boolean
+  toggleFavorite?: (vendorId: string) => Promise<boolean>
 }
 
-export default function FeaturedVendors({ vendors }: FeaturedVendorsProps) {
+export default function FeaturedVendors({ vendors, isFavorite, toggleFavorite }: FeaturedVendorsProps) {
   // Group vendors by category for better organization
   const vendorsByCategory = vendors.reduce((acc, vendor) => {
     if (!acc[vendor.category]) {
@@ -81,7 +83,11 @@ export default function FeaturedVendors({ vendors }: FeaturedVendorsProps) {
           
           <div className="bg-gradient-to-r from-orange-100 to-yellow-100 rounded-xl p-1">
             <div className="bg-white rounded-lg">
-              <VendorCard vendor={vendors[0]} />
+              <VendorCard 
+                vendor={vendors[0]}
+                isFavorite={isFavorite}
+                toggleFavorite={toggleFavorite}
+              />
             </div>
           </div>
         </div>
@@ -95,7 +101,12 @@ export default function FeaturedVendors({ vendors }: FeaturedVendorsProps) {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {vendors.map((vendor) => (
-            <VendorCard key={vendor.id} vendor={vendor} />
+            <VendorCard 
+              key={vendor.id} 
+              vendor={vendor}
+              isFavorite={isFavorite}
+              toggleFavorite={toggleFavorite}
+            />
           ))}
         </div>
       </div>
