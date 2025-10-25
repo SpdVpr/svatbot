@@ -128,17 +128,25 @@ export function useAdmin() {
   const [user, setUser] = useState<AdminUser | null>(null)
   const [session, setSession] = useState<AdminSession | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const isInitialized = useRef(false)
 
   useEffect(() => {
-    // Prevent multiple initializations
-    if (isInitialized.current) return
-    isInitialized.current = true
+    console.log('🚀 useAdmin effect running')
+
+    // Set timeout to prevent infinite loading
+    const loadingTimeout = setTimeout(() => {
+      console.warn('⚠️ Admin auth check timeout (5s) - stopping loading state')
+      setIsLoading(false)
+    }, 5000) // 5 seconds timeout
 
     // Set up Firebase auth state listener
+    console.log('📡 Setting up Firebase auth listener')
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      console.log('🔄 Auth state changed, user:', firebaseUser?.uid || 'none')
+      clearTimeout(loadingTimeout) // Clear timeout when auth state changes
+
       if (!firebaseUser) {
         // User is signed out
+        console.log('👤 No user signed in - setting loading to false')
         setUser(null)
         setSession(null)
         localStorage.removeItem('admin_session')
@@ -147,13 +155,30 @@ export function useAdmin() {
       }
 
       try {
-        // Check if user has admin role
-        const idTokenResult = await firebaseUser.getIdTokenResult()
+        console.log('🔍 Checking admin claims for user:', firebaseUser.uid)
+        console.log('📧 User email:', firebaseUser.email)
+
+        // Check if user has admin role with timeout
+        const idTokenResult = await Promise.race([
+          firebaseUser.getIdTokenResult(),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Token fetch timeout')), 3000)
+          )
+        ]) as any
+
         const role = idTokenResult.claims.role as string
         const isAdmin = idTokenResult.claims.admin as boolean
 
+        console.log('📋 User claims:', {
+          role,
+          isAdmin,
+          allClaims: idTokenResult.claims
+        })
+
         if (!isAdmin || !role) {
           // Not an admin, sign out
+          console.warn('❌ User does not have admin claims - signing out')
+          console.warn('💡 To fix: Run "node functions/setAdminClaims.js ' + firebaseUser.uid + ' super_admin"')
           await signOut(auth)
           setUser(null)
           setSession(null)
@@ -161,6 +186,8 @@ export function useAdmin() {
           setIsLoading(false)
           return
         }
+
+        console.log('✅ Admin user authenticated with role:', role)
 
         // Create admin user object from Firebase Auth claims
         const adminUser: AdminUser = {
@@ -191,17 +218,25 @@ export function useAdmin() {
             lastLogin: adminUser.lastLogin?.toISOString()
           }
         }))
+        console.log('✅ Admin session created, setting loading to false')
         setIsLoading(false)
       } catch (error) {
-        console.error('Error loading admin user:', error)
+        console.error('❌ Error loading admin user:', error)
         setUser(null)
         setSession(null)
         localStorage.removeItem('admin_session')
+        console.log('❌ Error occurred, setting loading to false')
         setIsLoading(false)
       }
     })
 
-    return () => unsubscribe()
+    console.log('✅ Firebase auth listener set up')
+
+    return () => {
+      console.log('🧹 Cleaning up useAdmin hook')
+      clearTimeout(loadingTimeout)
+      unsubscribe()
+    }
   }, [])
 
   const login = async (email: string, password: string): Promise<boolean> => {
@@ -267,22 +302,33 @@ export function useAdminStats() {
 
         const token = await user.getIdToken()
 
-        // Fetch real stats from API
-        const response = await fetch(
-          'https://europe-west1-svatbot-app.cloudfunctions.net/api/v1/admin/dashboard/stats',
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`
+        // Fetch real stats from API with timeout
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
+
+        try {
+          const response = await fetch(
+            'https://europe-west1-svatbot-app.cloudfunctions.net/api/v1/admin/dashboard/stats',
+            {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              },
+              signal: controller.signal
             }
+          )
+
+          clearTimeout(timeoutId)
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch stats')
           }
-        )
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch stats')
+          const data = await response.json()
+          setStats(data.data)
+        } catch (fetchError) {
+          clearTimeout(timeoutId)
+          throw fetchError
         }
-
-        const data = await response.json()
-        setStats(data.data)
       } catch (err) {
         console.error('Error fetching admin stats:', err)
         setError(err instanceof Error ? err.message : 'Failed to load statistics')

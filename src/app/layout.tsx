@@ -5,6 +5,7 @@ import './globals.css'
 import { cn } from '@/utils'
 import CookieBanner from '@/components/common/CookieBanner'
 import AffiliateTracker from '@/components/affiliate/AffiliateTracker'
+import GlobalFeedbackButton from '@/components/common/GlobalFeedbackButton'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -128,6 +129,11 @@ export default function RootLayout({
 
         {/* Cookie Banner */}
         <CookieBanner />
+
+        {/* Global Feedback Button */}
+        <Suspense fallback={null}>
+          <GlobalFeedbackButton />
+        </Suspense>
 
         {/* Portal for modals */}
         <div id="modal-root" />

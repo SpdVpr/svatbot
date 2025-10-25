@@ -20,19 +20,21 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
-  ChevronDown
+  ChevronDown,
+  MessageCircle
 } from 'lucide-react'
 import ProfileTab from './ProfileTab'
 import SubscriptionTab from './SubscriptionTab'
 import PaymentsTab from './PaymentsTab'
 import StatisticsTab from './StatisticsTab'
 import SettingsTab from './SettingsTab'
+import FeedbackTab from './FeedbackTab'
 
 interface AccountModalProps {
   onClose: () => void
 }
 
-type TabType = 'profile' | 'subscription' | 'payments' | 'statistics' | 'settings'
+type TabType = 'profile' | 'subscription' | 'payments' | 'statistics' | 'settings' | 'feedback'
 
 export default function AccountModal({ onClose }: AccountModalProps) {
   const { user, logout } = useAuth()
@@ -47,6 +49,7 @@ export default function AccountModal({ onClose }: AccountModalProps) {
     { id: 'subscription' as TabType, label: 'Předplatné', icon: Crown },
     { id: 'payments' as TabType, label: 'Platby', icon: CreditCard },
     { id: 'statistics' as TabType, label: 'Statistiky', icon: BarChart3 },
+    { id: 'feedback' as TabType, label: 'Feedback', icon: MessageCircle },
     { id: 'settings' as TabType, label: 'Nastavení', icon: Settings }
   ]
 
@@ -205,6 +208,7 @@ export default function AccountModal({ onClose }: AccountModalProps) {
           {activeTab === 'subscription' && <SubscriptionTab subscriptionData={subscriptionData} />}
           {activeTab === 'payments' && <PaymentsTab subscriptionData={subscriptionData} />}
           {activeTab === 'statistics' && <StatisticsTab subscriptionData={subscriptionData} />}
+          {activeTab === 'feedback' && <FeedbackTab />}
           {activeTab === 'settings' && <SettingsTab />}
         </div>
       </div>

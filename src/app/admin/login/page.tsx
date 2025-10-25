@@ -25,14 +25,28 @@ export default function AdminLoginPage() {
   const router = useRouter()
 
   useEffect(() => {
+    // Set timeout to prevent infinite loading
+    const loadingTimeout = setTimeout(() => {
+      console.warn('⚠️ Admin login check timeout')
+      setIsLoading(false)
+    }, 3000) // 3 seconds timeout
+
     // Check if user is already authenticated
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      clearTimeout(loadingTimeout)
+
       if (user && !hasRedirected.current) {
         // Check if user has admin role
         try {
-          const idTokenResult = await user.getIdTokenResult()
+          const idTokenResult = await Promise.race([
+            user.getIdTokenResult(),
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error('Token fetch timeout')), 2000)
+            )
+          ]) as any
+
           const isAdmin = idTokenResult.claims.admin as boolean
-          
+
           if (isAdmin) {
             hasRedirected.current = true
             router.replace('/admin/dashboard')
@@ -48,7 +62,10 @@ export default function AdminLoginPage() {
       }
     })
 
-    return () => unsubscribe()
+    return () => {
+      clearTimeout(loadingTimeout)
+      unsubscribe()
+    }
   }, [router])
 
   const handleSubmit = async (e: React.FormEvent) => {

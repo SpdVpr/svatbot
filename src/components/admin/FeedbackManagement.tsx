@@ -3,16 +3,20 @@
 import { useState } from 'react'
 import { useFeedback } from '@/hooks/useAdminDashboard'
 import { UserFeedback } from '@/types/admin'
-import { 
-  MessageCircle, 
-  Bug, 
-  Lightbulb, 
+import { doc, updateDoc, arrayUnion, serverTimestamp } from 'firebase/firestore'
+import { db } from '@/config/firebase'
+import {
+  MessageCircle,
+  Bug,
+  Lightbulb,
   TrendingUp,
   AlertCircle,
   CheckCircle,
   Clock,
   Star,
-  Filter
+  Filter,
+  Send,
+  Loader2
 } from 'lucide-react'
 
 export default function FeedbackManagement() {
@@ -21,6 +25,8 @@ export default function FeedbackManagement() {
   const [filterType, setFilterType] = useState<'all' | UserFeedback['type']>('all')
   const [filterStatus, setFilterStatus] = useState<'all' | UserFeedback['status']>('all')
   const [adminNotes, setAdminNotes] = useState('')
+  const [replyText, setReplyText] = useState('')
+  const [sendingReply, setSendingReply] = useState(false)
 
   const filteredFeedback = feedback.filter(item => {
     const matchesType = filterType === 'all' || item.type === filterType
@@ -64,9 +70,71 @@ export default function FeedbackManagement() {
   }
 
   const handleUpdateStatus = async (feedbackId: string, status: UserFeedback['status']) => {
-    await updateFeedbackStatus(feedbackId, status, adminNotes || undefined)
-    setAdminNotes('')
-    setSelectedFeedback(null)
+    const success = await updateFeedbackStatus(feedbackId, status, adminNotes || undefined)
+    if (success) {
+      setAdminNotes('')
+      setSelectedFeedback(null)
+    }
+  }
+
+  const handleSaveNote = async () => {
+    if (!selectedFeedback || !adminNotes.trim()) return
+
+    const success = await updateFeedbackStatus(
+      selectedFeedback.id,
+      selectedFeedback.status,
+      adminNotes.trim()
+    )
+
+    if (success) {
+      // Update local state to show the saved note
+      setSelectedFeedback({
+        ...selectedFeedback,
+        adminNotes: adminNotes.trim()
+      })
+      setAdminNotes('')
+    }
+  }
+
+  const handleSendReply = async () => {
+    if (!selectedFeedback || !replyText.trim()) return
+
+    setSendingReply(true)
+
+    try {
+      const feedbackRef = doc(db, 'feedback', selectedFeedback.id)
+
+      await updateDoc(feedbackRef, {
+        conversation: arrayUnion({
+          from: 'admin',
+          message: replyText.trim(),
+          timestamp: serverTimestamp(),
+          userName: 'Admin'
+        }),
+        updatedAt: serverTimestamp()
+      })
+
+      // Update local state
+      setSelectedFeedback({
+        ...selectedFeedback,
+        conversation: [
+          ...(selectedFeedback.conversation || []),
+          {
+            from: 'admin',
+            message: replyText.trim(),
+            timestamp: serverTimestamp() as any,
+            userName: 'Admin'
+          }
+        ]
+      })
+
+      setReplyText('')
+    } catch (error) {
+      console.error('Error sending reply:', error)
+      alert('Nepodařilo se odeslat odpověď. Zkuste to prosím znovu.')
+    } finally {
+      setSendingReply(false)
+    }
   }
 
   const formatDate = (timestamp: any) => {
@@ -266,38 +334,131 @@ export default function FeedbackManagement() {
                 </div>
               </div>
 
-              {/* Admin Notes */}
+              {/* Conversation Thread */}
               <div>
-                <h3 className="text-sm font-medium text-gray-700 mb-2">Admin poznámky</h3>
-                <textarea
-                  value={adminNotes || selectedFeedback.adminNotes || ''}
-                  onChange={(e) => setAdminNotes(e.target.value)}
-                  placeholder="Přidat poznámku..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  rows={3}
-                />
+                <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                  <MessageCircle className="w-4 h-4 text-blue-600" />
+                  Konverzace
+                </h3>
+                <div className="space-y-3 bg-gray-50 rounded-lg p-4 max-h-96 overflow-y-auto">
+                  {/* Initial admin response */}
+                  {selectedFeedback.adminNotes && (
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-medium">
+                        A
+                      </div>
+                      <div className="flex-1">
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                          <p className="text-sm font-medium text-blue-900 mb-1">Admin</p>
+                          <p className="text-gray-900 whitespace-pre-wrap text-sm">
+                            {selectedFeedback.adminNotes}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Conversation messages */}
+                  {selectedFeedback.conversation && selectedFeedback.conversation.map((msg: any, idx: number) => (
+                    <div key={idx} className={`flex gap-3 ${msg.from === 'admin' ? '' : 'flex-row-reverse'}`}>
+                      <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium ${
+                        msg.from === 'admin' ? 'bg-blue-600' : 'bg-primary-600'
+                      }`}>
+                        {msg.from === 'admin' ? 'A' : 'U'}
+                      </div>
+                      <div className="flex-1">
+                        <div className={`rounded-lg p-3 ${
+                          msg.from === 'admin'
+                            ? 'bg-blue-50 border border-blue-200'
+                            : 'bg-primary-50 border border-primary-200'
+                        }`}>
+                          <p className={`text-sm font-medium mb-1 ${
+                            msg.from === 'admin' ? 'text-blue-900' : 'text-primary-900'
+                          }`}>
+                            {msg.from === 'admin' ? 'Admin' : (msg.userName || selectedFeedback.userName || 'Uživatel')}
+                          </p>
+                          <p className="text-gray-900 whitespace-pre-wrap text-sm">
+                            {msg.message}
+                          </p>
+                          {msg.timestamp && (
+                            <p className="text-xs text-gray-500 mt-1">
+                              {formatDate(msg.timestamp)}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* No messages yet */}
+                  {!selectedFeedback.adminNotes && (!selectedFeedback.conversation || selectedFeedback.conversation.length === 0) && (
+                    <div className="text-center py-8 text-gray-500 text-sm">
+                      Zatím žádná konverzace. Napište první odpověď níže.
+                    </div>
+                  )}
+                </div>
+
+                {/* Reply input */}
+                {selectedFeedback.status !== 'closed' && (
+                  <div className="mt-4">
+                    <div className="flex gap-2">
+                      <textarea
+                        value={replyText}
+                        onChange={(e) => setReplyText(e.target.value)}
+                        placeholder="Napište odpověď..."
+                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                        rows={3}
+                        disabled={sendingReply}
+                      />
+                      <button
+                        onClick={handleSendReply}
+                        disabled={!replyText.trim() || sendingReply}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 self-end"
+                      >
+                        {sendingReply ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <>
+                            <Send className="w-4 h-4" />
+                            <span>Odeslat</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {selectedFeedback.status === 'closed' && (
+                  <div className="mt-4 flex items-center gap-2 text-sm text-gray-600 bg-gray-100 rounded-lg p-3">
+                    <AlertCircle className="w-4 h-4" />
+                    <span>Tato konverzace byla uzavřena</span>
+                  </div>
+                )}
               </div>
 
-              {/* Actions */}
-              <div className="flex gap-2">
-                <button
-                  onClick={() => handleUpdateStatus(selectedFeedback.id, 'in-progress')}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Začít řešit
-                </button>
-                <button
-                  onClick={() => handleUpdateStatus(selectedFeedback.id, 'resolved')}
-                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                >
-                  Vyřešit
-                </button>
-                <button
-                  onClick={() => handleUpdateStatus(selectedFeedback.id, 'closed')}
-                  className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-                >
-                  Uzavřít
-                </button>
+              {/* Status Actions */}
+              <div className="pt-4 border-t border-gray-200">
+                <h3 className="text-sm font-medium text-gray-700 mb-3">Změnit stav</h3>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleUpdateStatus(selectedFeedback.id, 'in-progress')}
+                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                  >
+                    🔄 Začít řešit
+                  </button>
+                  <button
+                    onClick={() => handleUpdateStatus(selectedFeedback.id, 'resolved')}
+                    className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                  >
+                    ✅ Vyřešit
+                  </button>
+                  <button
+                    onClick={() => handleUpdateStatus(selectedFeedback.id, 'closed')}
+                    className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
+                  >
+                    🔒 Uzavřít
+                  </button>
+                </div>
               </div>
             </div>
           </div>

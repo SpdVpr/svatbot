@@ -62,7 +62,7 @@ export default function FeedbackButton() {
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-all hover:scale-110 z-40"
+        className="fixed bottom-6 right-24 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-all hover:scale-110 z-50"
         title="Napsat feedback nebo zprávu adminovi"
       >
         <MessageCircle className="w-6 h-6" />

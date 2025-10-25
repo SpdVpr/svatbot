@@ -73,6 +73,13 @@ export interface AdminMessage {
 }
 
 // Feedback System
+export interface FeedbackMessage {
+  from: 'user' | 'admin'
+  message: string
+  timestamp: Timestamp
+  userName?: string
+}
+
 export interface UserFeedback {
   id: string
   userId: string
@@ -87,9 +94,11 @@ export interface UserFeedback {
   status: 'new' | 'in-progress' | 'resolved' | 'closed'
   priority: 'low' | 'medium' | 'high'
   createdAt: Timestamp
+  updatedAt?: Timestamp
   resolvedAt?: Timestamp
   adminNotes?: string
   assignedTo?: string
+  conversation?: FeedbackMessage[]
 }
 
 // Subscription & Finance
