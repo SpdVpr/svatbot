@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import React, { useState, useRef } from 'react'
 import { Upload, X, Image as ImageIcon, Loader2, AlertCircle } from 'lucide-react'
 import { compressImage, formatFileSize } from '@/utils/imageCompression'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/useAuth'
 
 interface ImageUploadSectionProps {
   images: string[]
-  onImagesChange: (images: string[] | ((prev: string[]) => string[])) => void
+  onImagesChange: (images: string[]) => void
   maxImages?: number
   title: string
   description: string
@@ -40,7 +40,13 @@ export default function ImageUploadSection({
   const [pendingImages, setPendingImages] = useState<PendingImage[]>([])
   const [dragActive, setDragActive] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const imagesRef = useRef<string[]>(images) // Track current images to avoid race conditions
   const { user } = useAuth()
+
+  // Update ref when images prop changes
+  React.useEffect(() => {
+    imagesRef.current = images
+  }, [images])
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault()
@@ -151,8 +157,10 @@ export default function ImageUploadSection({
         } : img
       ))
 
-      // Add to images array - use callback to avoid race conditions
-      onImagesChange(prevImages => [...prevImages, downloadURL])
+      // Add to images array - use ref to get latest images to avoid race conditions
+      const newImages = [...imagesRef.current, downloadURL]
+      imagesRef.current = newImages // Update ref immediately
+      onImagesChange(newImages)
 
       // Remove from pending after a short delay
       setTimeout(() => {

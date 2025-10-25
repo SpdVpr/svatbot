@@ -209,8 +209,13 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData 
   }
 
   const handleNext = () => {
+    console.log('🔵 handleNext called, currentStep:', currentStep)
     if (validateStep(currentStep)) {
-      setCurrentStep(prev => Math.min(prev + 1, 5)) // Changed to 5 steps
+      const nextStep = Math.min(currentStep + 1, 5)
+      console.log('✅ Validation passed, moving to step:', nextStep)
+      setCurrentStep(nextStep)
+    } else {
+      console.log('❌ Validation failed for step:', currentStep)
     }
   }
 
@@ -220,12 +225,15 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    console.log('🔴 handleSubmit called, currentStep:', currentStep)
 
     // Only submit on step 5 (summary)
     if (currentStep !== 5) {
+      console.log('⚠️ Not on step 5, ignoring submit')
       return
     }
 
+    console.log('✅ On step 5, proceeding with submit')
     try {
       setSaving(true)
       // Ensure URLs have protocol before submitting
@@ -945,13 +953,7 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData 
                 <div className="border-t border-gray-200 pt-4">
                   <ImageUploadSection
                     images={formData.images}
-                    onImagesChange={(images) => {
-                      if (typeof images === 'function') {
-                        handleChange('images', images(formData.images))
-                      } else {
-                        handleChange('images', images)
-                      }
-                    }}
+                    onImagesChange={(images) => handleChange('images', images)}
                     maxImages={5}
                     title="Hlavní obrázky"
                     description="Nahrájte hlavní fotografie vaší firmy, vybavení nebo prostoru (max 5 obrázků)"
@@ -962,13 +964,7 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData 
                 <div className="border-t border-gray-200 pt-4">
                   <ImageUploadSection
                     images={formData.portfolioImages}
-                    onImagesChange={(images) => {
-                      if (typeof images === 'function') {
-                        handleChange('portfolioImages', images(formData.portfolioImages))
-                      } else {
-                        handleChange('portfolioImages', images)
-                      }
-                    }}
+                    onImagesChange={(images) => handleChange('portfolioImages', images)}
                     maxImages={15}
                     title="Portfolio"
                     description="Ukažte svou práci! Nahrájte fotografie z vašich svateb nebo projektů (max 15 obrázků)"
