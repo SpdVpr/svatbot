@@ -85,6 +85,10 @@ export interface MarketplaceVendorFormData {
 
   // Response time
   responseTime: string
+
+  // SEO and discovery
+  tags: string[]
+  keywords: string[]
 }
 
 interface MarketplaceVendorFormProps {
@@ -144,7 +148,9 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData 
     images: initialData?.images || [],
     portfolioImages: initialData?.portfolioImages || [],
     videoUrl: initialData?.videoUrl || '',
-    responseTime: initialData?.responseTime || '< 24 hours'
+    responseTime: initialData?.responseTime || '< 24 hours',
+    tags: initialData?.tags || [],
+    keywords: initialData?.keywords || []
   })
 
   const handleChange = (field: string, value: any) => {
@@ -318,6 +324,72 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData 
     setFormData(prev => ({
       ...prev,
       features: prev.features.filter((_, i) => i !== index)
+    }))
+  }
+
+  // Specialties management
+  const addSpecialty = () => {
+    setFormData(prev => ({
+      ...prev,
+      specialties: [...prev.specialties, '']
+    }))
+  }
+
+  const updateSpecialty = (index: number, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      specialties: prev.specialties.map((s, i) => i === index ? value : s)
+    }))
+  }
+
+  const removeSpecialty = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      specialties: prev.specialties.filter((_, i) => i !== index)
+    }))
+  }
+
+  // Tags management
+  const addTag = () => {
+    setFormData(prev => ({
+      ...prev,
+      tags: [...prev.tags, '']
+    }))
+  }
+
+  const updateTag = (index: number, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      tags: prev.tags.map((t, i) => i === index ? value : t)
+    }))
+  }
+
+  const removeTag = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      tags: prev.tags.filter((_, i) => i !== index)
+    }))
+  }
+
+  // Keywords management
+  const addKeyword = () => {
+    setFormData(prev => ({
+      ...prev,
+      keywords: [...prev.keywords, '']
+    }))
+  }
+
+  const updateKeyword = (index: number, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      keywords: prev.keywords.map((k, i) => i === index ? value : k)
+    }))
+  }
+
+  const removeKeyword = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      keywords: prev.keywords.filter((_, i) => i !== index)
     }))
   }
 
@@ -885,6 +957,117 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData 
                         </button>
                       </div>
                     </div>
+
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Specializace
+                      </label>
+                      <p className="text-xs text-gray-500 mb-2">
+                        V čem se specializujete? (např. Vintage svatby, Venkovní focení, Moderní design)
+                      </p>
+                      <div className="space-y-2">
+                        {formData.specialties.map((specialty, index) => (
+                          <div key={index} className="flex items-center space-x-2">
+                            <input
+                              type="text"
+                              value={specialty}
+                              onChange={(e) => updateSpecialty(index, e.target.value)}
+                              placeholder="např. Vintage svatby"
+                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeSpecialty(index)}
+                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                        <button
+                          type="button"
+                          onClick={addSpecialty}
+                          className="btn-ghost text-sm w-full"
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          Přidat specializaci
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Tagy
+                      </label>
+                      <p className="text-xs text-gray-500 mb-2">
+                        Klíčová slova pro vyhledávání (např. luxusní, dostupné, kreativní)
+                      </p>
+                      <div className="space-y-2">
+                        {formData.tags.map((tag, index) => (
+                          <div key={index} className="flex items-center space-x-2">
+                            <input
+                              type="text"
+                              value={tag}
+                              onChange={(e) => updateTag(index, e.target.value)}
+                              placeholder="např. luxusní"
+                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeTag(index)}
+                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                        <button
+                          type="button"
+                          onClick={addTag}
+                          className="btn-ghost text-sm w-full"
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          Přidat tag
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Klíčová slova (SEO)
+                      </label>
+                      <p className="text-xs text-gray-500 mb-2">
+                        Slova pro vyhledávače (např. svatební fotograf Praha, levné svatby)
+                      </p>
+                      <div className="space-y-2">
+                        {formData.keywords.map((keyword, index) => (
+                          <div key={index} className="flex items-center space-x-2">
+                            <input
+                              type="text"
+                              value={keyword}
+                              onChange={(e) => updateKeyword(index, e.target.value)}
+                              placeholder="např. svatební fotograf Praha"
+                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeKeyword(index)}
+                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                        <button
+                          type="button"
+                          onClick={addKeyword}
+                          className="btn-ghost text-sm w-full"
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          Přidat klíčové slovo
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -1135,6 +1318,54 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData 
                       <span className="text-gray-600">Doba odezvy:</span>
                       <span className="font-medium">{formData.responseTime}</span>
                     </div>
+                    {formData.features.length > 0 && (
+                      <div>
+                        <span className="text-gray-600">Klíčové vlastnosti:</span>
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          {formData.features.filter(f => f.trim()).map((feature, index) => (
+                            <span key={index} className="inline-block bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
+                              {feature}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {formData.specialties.length > 0 && (
+                      <div>
+                        <span className="text-gray-600">Specializace:</span>
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          {formData.specialties.filter(s => s.trim()).map((specialty, index) => (
+                            <span key={index} className="inline-block bg-primary-100 text-primary-700 px-2 py-1 rounded text-xs">
+                              {specialty}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {formData.tags.length > 0 && (
+                      <div>
+                        <span className="text-gray-600">Tagy:</span>
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          {formData.tags.filter(t => t.trim()).map((tag, index) => (
+                            <span key={index} className="inline-block bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {formData.keywords.length > 0 && (
+                      <div>
+                        <span className="text-gray-600">Klíčová slova (SEO):</span>
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          {formData.keywords.filter(k => k.trim()).map((keyword, index) => (
+                            <span key={index} className="inline-block bg-green-100 text-green-700 px-2 py-1 rounded text-xs">
+                              {keyword}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 

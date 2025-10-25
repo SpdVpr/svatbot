@@ -42,8 +42,22 @@ export default function MarketplaceRegisterPage() {
         testimonials: [],
         awards: [],
         certifications: [],
-        tags: [data.category, data.address.city.toLowerCase()],
-        keywords: [data.category, data.name.toLowerCase(), data.address.city.toLowerCase()],
+        // Merge user-provided tags/keywords with auto-generated ones
+        tags: [
+          ...new Set([
+            ...(data.tags || []).filter(t => t.trim()),
+            data.category,
+            data.address.city.toLowerCase()
+          ])
+        ],
+        keywords: [
+          ...new Set([
+            ...(data.keywords || []).filter(k => k.trim()),
+            data.category,
+            data.name.toLowerCase(),
+            data.address.city.toLowerCase()
+          ])
+        ],
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
         lastActive: serverTimestamp(),
