@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setAdminRole = exports.createVendor = exports.getVendors = exports.sendVendorContactEmails = exports.onMarketplaceVendorUpdate = exports.onMarketplaceVendorCreate = exports.checkTrialExpiry = exports.onPaymentSuccess = exports.scheduledCleanup = exports.onInquiryCreate = exports.onReviewCreate = exports.onVendorUpdate = exports.onUserCreate = exports.api = void 0;
+exports.setAdminRole = exports.createVendor = exports.getVendors = exports.sendVendorContactEmails = exports.onMarketplaceVendorUpdate = exports.onMarketplaceVendorCreate = exports.checkTrialExpiry = exports.onPaymentSuccess = exports.scheduledCleanup = exports.onInquiryCreate = exports.onReviewUpdate = exports.onReviewCreate = exports.onVendorUpdate = exports.onUserCreate = exports.api = void 0;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const express_1 = __importDefault(require("express"));
@@ -145,6 +145,8 @@ var onVendorUpdate_1 = require("./triggers/onVendorUpdate");
 Object.defineProperty(exports, "onVendorUpdate", { enumerable: true, get: function () { return __importDefault(onVendorUpdate_1).default; } });
 var onReviewCreate_1 = require("./triggers/onReviewCreate");
 Object.defineProperty(exports, "onReviewCreate", { enumerable: true, get: function () { return __importDefault(onReviewCreate_1).default; } });
+var onReviewUpdate_1 = require("./triggers/onReviewUpdate");
+Object.defineProperty(exports, "onReviewUpdate", { enumerable: true, get: function () { return __importDefault(onReviewUpdate_1).default; } });
 var onInquiryCreate_1 = require("./triggers/onInquiryCreate");
 Object.defineProperty(exports, "onInquiryCreate", { enumerable: true, get: function () { return __importDefault(onInquiryCreate_1).default; } });
 var scheduledCleanup_1 = require("./triggers/scheduledCleanup");

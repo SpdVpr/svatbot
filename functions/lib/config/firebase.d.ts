@@ -13,6 +13,8 @@ export declare const collections: {
     analytics: admin.firestore.CollectionReference<admin.firestore.DocumentData>;
     notifications: admin.firestore.CollectionReference<admin.firestore.DocumentData>;
     adminLogs: admin.firestore.CollectionReference<admin.firestore.DocumentData>;
+    vendorReviews: admin.firestore.CollectionReference<admin.firestore.DocumentData>;
+    marketplaceVendors: admin.firestore.CollectionReference<admin.firestore.DocumentData>;
 };
 export declare const bucket: import("@google-cloud/storage").Bucket;
 export declare const FieldValue: typeof FirebaseFirestore.FieldValue;

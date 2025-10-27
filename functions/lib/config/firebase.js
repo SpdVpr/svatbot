@@ -58,7 +58,9 @@ exports.collections = {
     favorites: exports.firestore.collection('favorites'),
     analytics: exports.firestore.collection('analytics'),
     notifications: exports.firestore.collection('notifications'),
-    adminLogs: exports.firestore.collection('adminLogs')
+    adminLogs: exports.firestore.collection('adminLogs'),
+    vendorReviews: exports.firestore.collection('vendorReviews'),
+    marketplaceVendors: exports.firestore.collection('marketplaceVendors')
 };
 // Storage bucket
 exports.bucket = exports.storage.bucket();

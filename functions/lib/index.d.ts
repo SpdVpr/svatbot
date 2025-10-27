@@ -3,6 +3,7 @@ export declare const api: functions.HttpsFunction;
 export { default as onUserCreate } from './triggers/onUserCreate';
 export { default as onVendorUpdate } from './triggers/onVendorUpdate';
 export { default as onReviewCreate } from './triggers/onReviewCreate';
+export { default as onReviewUpdate } from './triggers/onReviewUpdate';
 export { default as onInquiryCreate } from './triggers/onInquiryCreate';
 export { default as scheduledCleanup } from './triggers/scheduledCleanup';
 export { default as onPaymentSuccess } from './triggers/onPaymentSuccess';

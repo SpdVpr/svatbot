@@ -116,6 +116,7 @@ export const api = functions.region('europe-west1').https.onRequest(app)
 export { default as onUserCreate } from './triggers/onUserCreate'
 export { default as onVendorUpdate } from './triggers/onVendorUpdate'
 export { default as onReviewCreate } from './triggers/onReviewCreate'
+export { default as onReviewUpdate } from './triggers/onReviewUpdate'
 export { default as onInquiryCreate } from './triggers/onInquiryCreate'
 export { default as scheduledCleanup } from './triggers/scheduledCleanup'
 

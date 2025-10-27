@@ -26,7 +26,9 @@ export const collections = {
   favorites: firestore.collection('favorites'),
   analytics: firestore.collection('analytics'),
   notifications: firestore.collection('notifications'),
-  adminLogs: firestore.collection('adminLogs')
+  adminLogs: firestore.collection('adminLogs'),
+  vendorReviews: firestore.collection('vendorReviews'),
+  marketplaceVendors: firestore.collection('marketplaceVendors')
 }
 
 // Storage bucket
