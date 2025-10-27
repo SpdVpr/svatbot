@@ -74,21 +74,21 @@ export default function MarketplacePage() {
     <div className="min-h-screen">
       {/* Header */}
       <div className="bg-white border-b border-neutral-200">
-        <div className="container-desktop py-6">
-          <div className="flex items-center justify-between mb-6">
+        <div className="container-desktop py-4 md:py-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             <div className="flex items-center space-x-4">
               <Link href="/" className="btn-ghost p-2">
                 <ArrowLeft className="w-5 h-5" />
               </Link>
               <div>
                 <h1 className="heading-2">Marketplace</h1>
-                <p className="body-normal text-text-secondary">
+                <p className="body-normal text-text-secondary hidden sm:block">
                   Najděte perfektní dodavatele pro váš velký den
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center justify-between md:justify-end space-x-3">
               <div className="flex items-center space-x-2 text-text-muted">
                 <TrendingUp className="w-4 h-4" />
                 <span className="body-small">{stats.totalVendors} dodavatelů</span>
@@ -96,39 +96,40 @@ export default function MarketplacePage() {
 
               <Link
                 href="/marketplace/register"
-                className="btn-primary flex items-center space-x-2"
+                className="btn-primary flex items-center space-x-2 whitespace-nowrap"
               >
                 <Plus className="w-4 h-4" />
-                <span>Přidat inzerát</span>
+                <span className="hidden sm:inline">Přidat inzerát</span>
+                <span className="sm:hidden">Přidat</span>
               </Link>
             </div>
           </div>
 
           {/* Search and View Toggle */}
           <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
-            <div className="flex-1 max-w-md">
+            <div className="flex-1 w-full lg:max-w-md">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted w-4 h-4" />
                 <input
                   type="text"
                   placeholder="Hledat dodavatele..."
-                  className="input-field pl-10"
+                  className="input-field pl-10 w-full"
                   value={filters.search || ''}
                   onChange={(e) => handleSearch(e.target.value)}
                 />
               </div>
             </div>
 
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center gap-2 md:gap-3 w-full lg:w-auto">
               {/* Browse view indicator */}
-              <div className="flex bg-primary-100 rounded-lg px-3 py-2">
-                <span className="text-sm font-medium text-primary-700">Procházet všechny dodavatele</span>
+              <div className="hidden md:flex bg-primary-100 rounded-lg px-3 py-2">
+                <span className="text-sm font-medium text-primary-700 whitespace-nowrap">Procházet všechny dodavatele</span>
               </div>
 
               {/* Filters Toggle */}
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className={`btn-outline flex items-center space-x-2 ${
+                className={`btn-outline flex items-center space-x-2 whitespace-nowrap ${
                   showFilters ? 'bg-primary-50 border-primary-200' : ''
                 }`}
               >

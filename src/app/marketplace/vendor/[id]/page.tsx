@@ -211,8 +211,8 @@ export default function VendorDetailPage() {
     <div className="min-h-screen">
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
-        <div className="container-desktop py-6">
-          <div className="flex items-center justify-between mb-6">
+        <div className="container-desktop py-4 md:py-6">
+          <div className="flex items-center justify-between">
             <button
               onClick={() => router.back()}
               className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
@@ -221,7 +221,7 @@ export default function VendorDetailPage() {
               <span>Zpět</span>
             </button>
 
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 md:space-x-3">
               <button
                 onClick={() => toggleFavorite(vendorId)}
                 className={`p-2 rounded-lg transition-colors ${
@@ -230,10 +230,10 @@ export default function VendorDetailPage() {
                     : 'bg-gray-600 text-white hover:bg-gray-500'
                 }`}
               >
-                <Heart className={`w-5 h-5 ${isFavorite(vendorId) ? 'fill-current' : ''}`} />
+                <Heart className={`w-4 h-4 md:w-5 md:h-5 ${isFavorite(vendorId) ? 'fill-current' : ''}`} />
               </button>
               <button className="p-2 bg-gray-600 text-white hover:bg-gray-500 rounded-lg transition-colors">
-                <Share2 className="w-5 h-5" />
+                <Share2 className="w-4 h-4 md:w-5 md:h-5" />
               </button>
             </div>
           </div>
@@ -289,7 +289,7 @@ export default function VendorDetailPage() {
               </div>
 
               {/* Rating */}
-              <div className="flex items-center space-x-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                 <div className="flex items-center space-x-2">
                   <div className="flex items-center space-x-1">
                     <Star className="w-5 h-5 text-yellow-400 fill-current" />
@@ -393,7 +393,7 @@ export default function VendorDetailPage() {
               )}
 
               {/* Action Buttons */}
-              <div className="flex space-x-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={() => setShowContactForm(true)}
                   className="w-full btn-primary flex items-center justify-center space-x-2"
@@ -491,12 +491,12 @@ export default function VendorDetailPage() {
 
             {/* Reviews Section */}
             <div className="wedding-card">
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-6">
                 <h2 className="text-xl font-semibold text-gray-900">Recenze a hodnocení</h2>
                 {user && !hasUserReviewed(vendorId) && (
                   <button
                     onClick={() => setShowReviewForm(true)}
-                    className="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                    className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors whitespace-nowrap"
                   >
                     <Edit3 className="w-4 h-4" />
                     <span>Napsat recenzi</span>
@@ -511,7 +511,7 @@ export default function VendorDetailPage() {
                 {!user && (
                   <Link
                     href="/auth/login"
-                    className="text-sm text-primary-600 hover:underline"
+                    className="text-sm text-primary-600 hover:underline text-center sm:text-left"
                   >
                     Přihlaste se pro napsání recenze
                   </Link>

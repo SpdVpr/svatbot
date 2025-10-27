@@ -50,18 +50,18 @@ export default function ReviewList({ reviews, stats, showStats = true }: ReviewL
       )}
 
       <div className="wedding-card">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <h2 className="text-xl font-semibold text-gray-900">
             Recenze ({reviews.length})
           </h2>
 
-          <div className="flex items-center space-x-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
             {/* Rating Filter */}
-            <div className="relative">
+            <div className="relative flex-1 sm:flex-initial">
               <select
                 value={filterRating || ''}
                 onChange={(e) => setFilterRating(e.target.value ? parseInt(e.target.value) : null)}
-                className="pl-4 pr-10 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent appearance-none bg-white"
+                className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent appearance-none bg-white"
               >
                 <option value="">Všechna hodnocení</option>
                 <option value="5">5 hvězdiček</option>
@@ -77,7 +77,7 @@ export default function ReviewList({ reviews, stats, showStats = true }: ReviewL
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+              className="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
             >
               <option value="newest">Nejnovější</option>
               <option value="oldest">Nejstarší</option>
