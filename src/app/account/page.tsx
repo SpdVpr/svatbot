@@ -12,7 +12,6 @@ function AccountPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { user, isLoading } = useAuth()
-  const [showModal, setShowModal] = useState(false)
   const [initialTab, setInitialTab] = useState<TabType>('profile')
 
   useEffect(() => {
@@ -21,15 +20,16 @@ function AccountPageContent() {
     if (tab && ['profile', 'subscription', 'payments', 'statistics', 'settings', 'feedback'].includes(tab)) {
       setInitialTab(tab)
     }
+  }, [searchParams])
 
-    // Show modal once user is loaded
-    if (user && !isLoading) {
-      setShowModal(true)
+  // Redirect to login if not authenticated (after loading completes)
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push('/')
     }
-  }, [user, isLoading, searchParams])
+  }, [user, isLoading, router])
 
   const handleClose = () => {
-    setShowModal(false)
     // Redirect to dashboard after closing
     router.push('/')
   }
@@ -46,20 +46,17 @@ function AccountPageContent() {
     )
   }
 
-  // Redirect to login if not authenticated
+  // Don't render anything if not authenticated (will redirect)
   if (!user) {
-    router.push('/')
     return null
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
-      {showModal && (
-        <AccountModalWrapper
-          onClose={handleClose}
-          initialTab={initialTab}
-        />
-      )}
+      <AccountModalWrapper
+        onClose={handleClose}
+        initialTab={initialTab}
+      />
     </div>
   )
 }
