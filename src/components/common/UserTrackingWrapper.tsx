@@ -1,8 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
 import { useUserTracking } from '@/hooks/useUserTracking'
-import FeedbackButton from './FeedbackButton'
 
 /**
  * Wrapper component that initializes user tracking
@@ -12,11 +10,6 @@ export default function UserTrackingWrapper({ children }: { children: React.Reac
   // Initialize user tracking
   useUserTracking()
 
-  return (
-    <>
-      {children}
-      <FeedbackButton />
-    </>
-  )
+  return <>{children}</>
 }
 

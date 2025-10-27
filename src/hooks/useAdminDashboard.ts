@@ -191,36 +191,59 @@ export function useUserAnalytics() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Load from 'users' collection instead of 'userAnalytics'
+    // Load from 'userAnalytics' collection where tracking data is stored
     const q = query(
-      collection(db, 'users'),
+      collection(db, 'userAnalytics'),
       limit(100)
     )
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const userData = snapshot.docs.map(doc => {
+    const unsubscribe = onSnapshot(q, async (snapshot) => {
+      // Load userAnalytics data
+      const analyticsData = snapshot.docs.map(doc => {
         const data = doc.data()
         return {
           id: doc.id,
-          userId: doc.id,
+          userId: data.userId || doc.id,
           email: data.email || '',
           displayName: data.displayName || data.email?.split('@')[0] || 'Unknown',
-          registeredAt: data.createdAt || Timestamp.now(),
-          lastLoginAt: data.lastLoginAt || data.createdAt || Timestamp.now(),
-          lastActivityAt: data.updatedAt || data.createdAt || Timestamp.now(),
-          isOnline: false, // TODO: Implement online tracking
-          loginCount: 0, // TODO: Implement login tracking
-          totalSessionTime: 0, // TODO: Implement session tracking
-          sessions: [],
-          pageViews: {},
-          featuresUsed: []
+          registeredAt: data.registeredAt || Timestamp.now(),
+          lastLoginAt: data.lastLoginAt || Timestamp.now(),
+          lastActivityAt: data.lastActivityAt || Timestamp.now(),
+          isOnline: data.isOnline || false,
+          loginCount: data.loginCount || 0,
+          totalSessionTime: data.totalSessionTime || 0,
+          sessions: data.sessions || [],
+          pageViews: data.pageViews || {},
+          featuresUsed: data.featuresUsed || []
         } as UserAnalytics
       })
 
-      setUsers(userData)
+      // Load AI queries from usageStats for each user
+      const usersWithAIStats = await Promise.all(
+        analyticsData.map(async (user) => {
+          try {
+            const statsDoc = await getDoc(doc(db, 'usageStats', user.userId))
+            if (statsDoc.exists()) {
+              const statsData = statsDoc.data()
+              return {
+                ...user,
+                aiQueriesCount: statsData.aiQueriesCount || 0
+              }
+            }
+          } catch (error) {
+            console.error(`Error loading stats for user ${user.userId}:`, error)
+          }
+          return {
+            ...user,
+            aiQueriesCount: 0
+          }
+        })
+      )
+
+      setUsers(usersWithAIStats as UserAnalytics[])
       setLoading(false)
     }, (error) => {
-      console.error('Error loading users:', error)
+      console.error('Error loading user analytics:', error)
       setLoading(false)
     })
 

@@ -37,6 +37,7 @@ export interface UserAnalytics {
   sessions: UserSession[]
   pageViews: Record<string, number>
   featuresUsed: string[]
+  aiQueriesCount?: number // Total AI queries from usageStats
 }
 
 export interface UserSession {

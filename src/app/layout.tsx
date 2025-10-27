@@ -6,6 +6,7 @@ import { cn } from '@/utils'
 import CookieBanner from '@/components/common/CookieBanner'
 import AffiliateTracker from '@/components/affiliate/AffiliateTracker'
 import GlobalFeedbackButton from '@/components/common/GlobalFeedbackButton'
+import UserTrackingWrapper from '@/components/common/UserTrackingWrapper'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -118,22 +119,24 @@ export default function RootLayout({
         'min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 font-sans antialiased',
         'selection:bg-primary-200 selection:text-primary-800'
       )}>
-        <div id="root" className="relative">
-          {children}
-        </div>
+        <UserTrackingWrapper>
+          <div id="root" className="relative">
+            {children}
+          </div>
 
-        {/* Affiliate Tracking */}
-        <Suspense fallback={null}>
-          <AffiliateTracker />
-        </Suspense>
+          {/* Affiliate Tracking */}
+          <Suspense fallback={null}>
+            <AffiliateTracker />
+          </Suspense>
 
-        {/* Cookie Banner */}
-        <CookieBanner />
+          {/* Cookie Banner */}
+          <CookieBanner />
 
-        {/* Global Feedback Button */}
-        <Suspense fallback={null}>
-          <GlobalFeedbackButton />
-        </Suspense>
+          {/* Global Feedback Button */}
+          <Suspense fallback={null}>
+            <GlobalFeedbackButton />
+          </Suspense>
+        </UserTrackingWrapper>
 
         {/* Portal for modals */}
         <div id="modal-root" />

@@ -597,8 +597,8 @@ service cloud.firestore {
 
     // Usage Stats collection - user's usage statistics
     match /usageStats/{userId} {
-      // User can read their own stats
-      allow read: if isAuthenticated() && isOwner(userId);
+      // User can read their own stats, admins can read all
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
 
       // User can create/update their own stats
       allow create, update: if isAuthenticated() &&

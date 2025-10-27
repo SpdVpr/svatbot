@@ -3,46 +3,75 @@
 import { useState } from 'react'
 import { useUserAnalytics } from '@/hooks/useAdminDashboard'
 import { UserAnalytics } from '@/types/admin'
-import { 
-  User, 
-  Clock, 
-  Activity, 
+import {
+  User,
+  Clock,
+  Activity,
   Calendar,
   Search,
   Filter,
-  Download
+  Download,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  Sparkles
 } from 'lucide-react'
+
+type SortField = 'lastActivity' | 'loginCount' | 'sessionTime' | 'aiQueries'
+type SortDirection = 'asc' | 'desc'
 
 export default function UserAnalyticsTable() {
   const { users, loading } = useUserAnalytics()
   const [searchTerm, setSearchTerm] = useState('')
   const [filterOnline, setFilterOnline] = useState<'all' | 'online' | 'offline'>('all')
-  const [sortBy, setSortBy] = useState<'lastActivity' | 'loginCount' | 'sessionTime'>('lastActivity')
+  const [sortBy, setSortBy] = useState<SortField>('lastActivity')
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
+
+  const handleSort = (field: SortField) => {
+    if (sortBy === field) {
+      // Toggle direction if clicking the same field
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+    } else {
+      // Set new field with default desc direction
+      setSortBy(field)
+      setSortDirection('desc')
+    }
+  }
 
   const filteredUsers = users
     .filter(user => {
-      const matchesSearch = 
+      const matchesSearch =
         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.displayName.toLowerCase().includes(searchTerm.toLowerCase())
-      
-      const matchesFilter = 
+
+      const matchesFilter =
         filterOnline === 'all' ||
         (filterOnline === 'online' && user.isOnline) ||
         (filterOnline === 'offline' && !user.isOnline)
-      
+
       return matchesSearch && matchesFilter
     })
     .sort((a, b) => {
+      let comparison = 0
+
       switch (sortBy) {
         case 'lastActivity':
-          return (b.lastActivityAt?.toMillis() || 0) - (a.lastActivityAt?.toMillis() || 0)
+          comparison = (b.lastActivityAt?.toMillis() || 0) - (a.lastActivityAt?.toMillis() || 0)
+          break
         case 'loginCount':
-          return (b.loginCount || 0) - (a.loginCount || 0)
+          comparison = (b.loginCount || 0) - (a.loginCount || 0)
+          break
         case 'sessionTime':
-          return (b.totalSessionTime || 0) - (a.totalSessionTime || 0)
+          comparison = (b.totalSessionTime || 0) - (a.totalSessionTime || 0)
+          break
+        case 'aiQueries':
+          comparison = (b.aiQueriesCount || 0) - (a.aiQueriesCount || 0)
+          break
         default:
-          return 0
+          comparison = 0
       }
+
+      return sortDirection === 'asc' ? -comparison : comparison
     })
 
   const formatDate = (timestamp: any) => {
@@ -71,7 +100,7 @@ export default function UserAnalyticsTable() {
   }
 
   const exportToCSV = () => {
-    const headers = ['Email', 'Jméno', 'Registrace', 'Poslední aktivita', 'Počet přihlášení', 'Celkový čas', 'Online']
+    const headers = ['Email', 'Jméno', 'Registrace', 'Poslední aktivita', 'Počet přihlášení', 'Celkový čas', 'Sessions', 'AI dotazy', 'Online']
     const rows = filteredUsers.map(user => [
       user.email,
       user.displayName,
@@ -79,6 +108,8 @@ export default function UserAnalyticsTable() {
       user.lastActivityAt?.toDate().toLocaleDateString('cs-CZ') || '',
       user.loginCount || 0,
       user.totalSessionTime || 0,
+      user.sessions?.length || 0,
+      user.aiQueriesCount || 0,
       user.isOnline ? 'Ano' : 'Ne'
     ])
 
@@ -144,16 +175,6 @@ export default function UserAnalyticsTable() {
               <option value="online">Online</option>
               <option value="offline">Offline</option>
             </select>
-
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="lastActivity">Poslední aktivita</option>
-              <option value="loginCount">Počet přihlášení</option>
-              <option value="sessionTime">Celkový čas</option>
-            </select>
           </div>
         </div>
       </div>
@@ -169,17 +190,60 @@ export default function UserAnalyticsTable() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Poslední aktivita
+              <th
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                onClick={() => handleSort('lastActivity')}
+              >
+                <div className="flex items-center gap-2">
+                  Poslední aktivita
+                  {sortBy === 'lastActivity' ? (
+                    sortDirection === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />
+                  ) : (
+                    <ArrowUpDown className="w-4 h-4 opacity-30" />
+                  )}
+                </div>
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Přihlášení
+              <th
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                onClick={() => handleSort('loginCount')}
+              >
+                <div className="flex items-center gap-2">
+                  Přihlášení
+                  {sortBy === 'loginCount' ? (
+                    sortDirection === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />
+                  ) : (
+                    <ArrowUpDown className="w-4 h-4 opacity-30" />
+                  )}
+                </div>
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Celkový čas
+              <th
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                onClick={() => handleSort('sessionTime')}
+              >
+                <div className="flex items-center gap-2">
+                  Celkový čas
+                  {sortBy === 'sessionTime' ? (
+                    sortDirection === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />
+                  ) : (
+                    <ArrowUpDown className="w-4 h-4 opacity-30" />
+                  )}
+                </div>
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Sessions
+              </th>
+              <th
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                onClick={() => handleSort('aiQueries')}
+              >
+                <div className="flex items-center gap-2">
+                  AI dotazy
+                  {sortBy === 'aiQueries' ? (
+                    sortDirection === 'asc' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />
+                  ) : (
+                    <ArrowUpDown className="w-4 h-4 opacity-30" />
+                  )}
+                </div>
               </th>
             </tr>
           </thead>
@@ -232,6 +296,12 @@ export default function UserAnalyticsTable() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {user.sessions?.length || 0}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-amber-500" />
+                    {user.aiQueriesCount || 0}
+                  </div>
                 </td>
               </tr>
             ))}
