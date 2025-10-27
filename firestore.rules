@@ -706,10 +706,17 @@ service cloud.firestore {
 
     // Admin Collections
 
-    // User Analytics - Admin only read, system write
-    match /userAnalytics/{analyticsId} {
+    // User Analytics - Users can write their own, admins can read all
+    match /userAnalytics/{userId} {
+      // Admins can read all analytics
       allow read: if isAdmin();
-      allow write: if false; // Only system/cloud functions can write
+
+      // Users can create and update their own analytics
+      allow create: if isAuthenticated() && isOwner(userId);
+      allow update: if isAuthenticated() && isOwner(userId);
+
+      // Users cannot delete analytics
+      allow delete: if false;
     }
 
     // Admin Messages - Bidirectional communication
