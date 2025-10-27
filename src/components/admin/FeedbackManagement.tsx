@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { useFeedback } from '@/hooks/useAdminDashboard'
 import { UserFeedback } from '@/types/admin'
-import { doc, updateDoc, arrayUnion, serverTimestamp } from 'firebase/firestore'
+import { doc, updateDoc, arrayUnion, serverTimestamp, addDoc, collection, increment, Timestamp } from 'firebase/firestore'
 import { db } from '@/config/firebase'
+import { WeddingNotificationType } from '@/hooks/useWeddingNotifications'
 import {
   MessageCircle,
   Bug,
@@ -16,7 +17,8 @@ import {
   Star,
   Filter,
   Send,
-  Loader2
+  Loader2,
+  Bell
 } from 'lucide-react'
 
 export default function FeedbackManagement() {
@@ -77,6 +79,24 @@ export default function FeedbackManagement() {
     }
   }
 
+  // Mark feedback as read by admin when opened
+  const handleSelectFeedback = async (item: UserFeedback) => {
+    setSelectedFeedback(item)
+
+    // If there are unread user replies, mark as read
+    if (item.unreadUserReplies && item.unreadUserReplies > 0) {
+      try {
+        const feedbackRef = doc(db, 'feedback', item.id)
+        await updateDoc(feedbackRef, {
+          unreadUserReplies: 0,
+          lastReadByAdmin: serverTimestamp()
+        })
+      } catch (error) {
+        console.error('Error marking feedback as read:', error)
+      }
+    }
+  }
+
   const handleSaveNote = async () => {
     if (!selectedFeedback || !adminNotes.trim()) return
 
@@ -104,14 +124,39 @@ export default function FeedbackManagement() {
     try {
       const feedbackRef = doc(db, 'feedback', selectedFeedback.id)
 
+      // Create timestamp for the message (can't use serverTimestamp inside arrayUnion)
+      const messageTimestamp = Timestamp.now()
+
+      // Update feedback with new reply and increment unread counter for user
+      // Also reset unread user replies since admin is responding (has seen the messages)
       await updateDoc(feedbackRef, {
         conversation: arrayUnion({
           from: 'admin',
           message: replyText.trim(),
-          timestamp: serverTimestamp(),
+          timestamp: messageTimestamp,
           userName: 'Admin'
         }),
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
+        unreadAdminReplies: increment(1),
+        unreadUserReplies: 0,  // Reset since admin is responding
+        lastReadByAdmin: serverTimestamp()
+      })
+
+      // Create notification for user
+      await addDoc(collection(db, 'weddingNotifications'), {
+        userId: selectedFeedback.userId,
+        type: WeddingNotificationType.FEEDBACK_REPLY,
+        title: 'Nová odpověď na váš feedback',
+        message: `Admin odpověděl na váš feedback: "${selectedFeedback.subject}"`,
+        priority: 'medium',
+        category: 'system',
+        actionUrl: '/account?tab=feedback',
+        data: {
+          feedbackId: selectedFeedback.id,
+          feedbackSubject: selectedFeedback.subject
+        },
+        read: false,
+        createdAt: serverTimestamp()
       })
 
       // Update local state
@@ -122,7 +167,7 @@ export default function FeedbackManagement() {
           {
             from: 'admin',
             message: replyText.trim(),
-            timestamp: serverTimestamp() as any,
+            timestamp: messageTimestamp,
             userName: 'Admin'
           }
         ]
@@ -161,14 +206,25 @@ export default function FeedbackManagement() {
     )
   }
 
+  // Calculate total unread user replies
+  const totalUnreadUserReplies = feedback.reduce((sum, item) => sum + (item.unreadUserReplies || 0), 0)
+
   return (
     <div className="space-y-6">
       {/* Header & Filters */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-gray-900">
-            Feedback Management
-          </h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-xl font-semibold text-gray-900">
+              Feedback Management
+            </h2>
+            {totalUnreadUserReplies > 0 && (
+              <span className="flex items-center gap-1 px-3 py-1 bg-red-500 text-white text-sm font-medium rounded-full">
+                <Bell className="w-4 h-4" />
+                {totalUnreadUserReplies} {totalUnreadUserReplies === 1 ? 'nová zpráva' : totalUnreadUserReplies < 5 ? 'nové zprávy' : 'nových zpráv'}
+              </span>
+            )}
+          </div>
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-600">
               {filteredFeedback.length} položek
@@ -207,30 +263,44 @@ export default function FeedbackManagement() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {filteredFeedback.map((item) => {
           const TypeIcon = getTypeIcon(item.type)
-          
+          const hasUnreadMessages = item.unreadUserReplies && item.unreadUserReplies > 0
+
           return (
             <div
               key={item.id}
-              className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow cursor-pointer"
-              onClick={() => setSelectedFeedback(item)}
+              className={`bg-white rounded-xl shadow-sm border p-6 hover:shadow-md transition-all cursor-pointer ${
+                hasUnreadMessages
+                  ? 'border-red-300 bg-red-50 ring-2 ring-red-200'
+                  : 'border-gray-100'
+              }`}
+              onClick={() => handleSelectFeedback(item)}
             >
               {/* Header */}
               <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-1">
                   <div className={`p-2 rounded-lg ${getTypeColor(item.type)}`}>
                     <TypeIcon className="w-5 h-5" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">
-                      {item.subject}
-                    </h3>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-gray-900 truncate">
+                        {item.subject}
+                      </h3>
+                      {/* Unread badge */}
+                      {hasUnreadMessages && (
+                        <span className="flex items-center gap-1 px-2 py-0.5 bg-red-500 text-white text-xs font-medium rounded-full animate-pulse flex-shrink-0">
+                          <Bell className="w-3 h-3" />
+                          {item.unreadUserReplies}
+                        </span>
+                      )}
+                    </div>
                     <p className="text-sm text-gray-500">
                       {item.userEmail}
                     </p>
                   </div>
                 </div>
-                
-                <div className="flex flex-col items-end gap-2">
+
+                <div className="flex flex-col items-end gap-2 flex-shrink-0">
                   <span className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(item.status)}`}>
                     {item.status === 'new' ? 'Nové' :
                      item.status === 'in-progress' ? 'V řešení' :

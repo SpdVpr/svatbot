@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
-import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, arrayUnion, serverTimestamp } from 'firebase/firestore'
+import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, arrayUnion, serverTimestamp, Timestamp, increment } from 'firebase/firestore'
 import { db } from '@/config/firebase'
 import { UserFeedback } from '@/types/admin'
 import {
@@ -17,7 +17,8 @@ import {
   ChevronDown,
   ChevronUp,
   Send,
-  Loader2
+  Loader2,
+  Bell
 } from 'lucide-react'
 
 export default function FeedbackTab() {
@@ -42,13 +43,35 @@ export default function FeedbackTab() {
         id: doc.id,
         ...doc.data()
       })) as UserFeedback[]
-      
+
       setFeedback(feedbackData)
       setLoading(false)
     })
 
     return () => unsubscribe()
   }, [user])
+
+  // Mark feedback as read when expanded
+  const handleExpandFeedback = async (feedbackId: string, isCurrentlyExpanded: boolean) => {
+    const newExpandedId = isCurrentlyExpanded ? null : feedbackId
+    setExpandedId(newExpandedId)
+
+    // If expanding and there are unread admin replies, mark as read
+    if (!isCurrentlyExpanded) {
+      const feedbackItem = feedback.find(f => f.id === feedbackId)
+      if (feedbackItem && feedbackItem.unreadAdminReplies && feedbackItem.unreadAdminReplies > 0) {
+        try {
+          const feedbackRef = doc(db, 'feedback', feedbackId)
+          await updateDoc(feedbackRef, {
+            unreadAdminReplies: 0,
+            lastReadByUser: serverTimestamp()
+          })
+        } catch (error) {
+          console.error('Error marking feedback as read:', error)
+        }
+      }
+    }
+  }
 
   const getTypeIcon = (type: UserFeedback['type']) => {
     switch (type) {
@@ -115,14 +138,19 @@ export default function FeedbackTab() {
     try {
       const feedbackRef = doc(db, 'feedback', feedbackId)
 
+      // Create timestamp for the message (can't use serverTimestamp inside arrayUnion)
+      const messageTimestamp = Timestamp.now()
+
+      // Update feedback with new reply and increment unread counter for admin
       await updateDoc(feedbackRef, {
         conversation: arrayUnion({
           from: 'user',
           message: reply,
-          timestamp: serverTimestamp(),
+          timestamp: messageTimestamp,
           userName: user.displayName || user.email
         }),
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
+        unreadUserReplies: increment(1)  // Notify admin about new user reply
       })
 
       // Clear reply text
@@ -165,15 +193,26 @@ export default function FeedbackTab() {
     )
   }
 
+  // Calculate total unread replies
+  const totalUnreadReplies = feedback.reduce((sum, item) => sum + (item.unreadAdminReplies || 0), 0)
+
   return (
     <div className="space-y-4">
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <div className="flex items-start gap-3">
           <MessageCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <h3 className="font-medium text-blue-900 mb-1">
-              Váš feedback
-            </h3>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="font-medium text-blue-900">
+                Váš feedback
+              </h3>
+              {totalUnreadReplies > 0 && (
+                <span className="flex items-center gap-1 px-2 py-0.5 bg-red-500 text-white text-xs font-medium rounded-full">
+                  <Bell className="w-3 h-3" />
+                  {totalUnreadReplies} {totalUnreadReplies === 1 ? 'nová odpověď' : totalUnreadReplies < 5 ? 'nové odpovědi' : 'nových odpovědí'}
+                </span>
+              )}
+            </div>
             <p className="text-sm text-blue-700">
               Zde najdete všechny vaše odeslané zprávy a odpovědi od našeho týmu.
             </p>
@@ -194,7 +233,7 @@ export default function FeedbackTab() {
             {/* Header - Always visible */}
             <div
               className="p-4 cursor-pointer"
-              onClick={() => setExpandedId(isExpanded ? null : item.id)}
+              onClick={() => handleExpandFeedback(item.id, isExpanded)}
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3 flex-1">
@@ -202,9 +241,18 @@ export default function FeedbackTab() {
                     <TypeIcon className="w-4 h-4" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 truncate">
-                      {item.subject}
-                    </h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-gray-900 truncate">
+                        {item.subject}
+                      </h3>
+                      {/* Unread badge */}
+                      {item.unreadAdminReplies && item.unreadAdminReplies > 0 && (
+                        <span className="flex items-center gap-1 px-2 py-0.5 bg-red-500 text-white text-xs font-medium rounded-full animate-pulse">
+                          <Bell className="w-3 h-3" />
+                          {item.unreadAdminReplies}
+                        </span>
+                      )}
+                    </div>
                     <p className="text-sm text-gray-500">
                       {formatDate(item.createdAt)}
                     </p>

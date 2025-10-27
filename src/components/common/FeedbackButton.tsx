@@ -35,7 +35,9 @@ export default function FeedbackButton() {
         page: window.location.pathname,
         status: 'new',
         priority: type === 'bug' ? 'high' : 'medium',
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
+        unreadAdminReplies: 0,
+        unreadUserReplies: 0
       })
 
       setSuccess(true)

@@ -424,12 +424,13 @@ service cloud.firestore {
 
     // Wedding notifications collection
     match /weddingNotifications/{notificationId} {
-      allow read: if isAuthenticated() && isOwner(resource.data.userId);
-      allow update: if isAuthenticated() && isOwner(resource.data.userId); // For marking as read
+      allow read: if isAuthenticated() && (isOwner(resource.data.userId) || isAdmin());
+      allow update: if isAuthenticated() && (isOwner(resource.data.userId) || isAdmin()); // For marking as read
+      // Users can create notifications for themselves, admins can create for anyone
       allow create: if isAuthenticated() &&
-                       request.auth.uid == request.resource.data.userId &&
+                       (request.auth.uid == request.resource.data.userId || isAdmin()) &&
                        request.resource.data.keys().hasAll(['userId', 'type', 'title', 'message', 'priority', 'category', 'read']);
-      allow delete: if isAuthenticated() && isOwner(resource.data.userId);
+      allow delete: if isAuthenticated() && (isOwner(resource.data.userId) || isAdmin());
     }
 
     // Admin logs collection
@@ -740,8 +741,18 @@ service cloud.firestore {
                        request.resource.data.userId == request.auth.uid &&
                        request.resource.data.keys().hasAll(['userId', 'userEmail', 'type', 'subject', 'message', 'status']);
 
-      // Only admins can update (change status, add notes)
+      // Admins can update everything
       allow update: if isAdmin();
+
+      // Users can only update their own feedback to:
+      // - Add messages to conversation
+      // - Mark as read (unreadAdminReplies, lastReadByUser)
+      // - Notify admin about new messages (unreadUserReplies)
+      // - Update updatedAt timestamp
+      allow update: if isAuthenticated() &&
+                       resource.data.userId == request.auth.uid &&
+                       // Get the changed fields
+                       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['conversation', 'unreadAdminReplies', 'lastReadByUser', 'unreadUserReplies', 'updatedAt']);
 
       // Only admins can delete
       allow delete: if isAdmin();

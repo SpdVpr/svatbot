@@ -99,6 +99,10 @@ export interface UserFeedback {
   adminNotes?: string
   assignedTo?: string
   conversation?: FeedbackMessage[]
+  unreadAdminReplies?: number  // Number of unread admin replies (for user)
+  lastReadByUser?: Timestamp   // Last time user read the conversation
+  unreadUserReplies?: number   // Number of unread user replies (for admin)
+  lastReadByAdmin?: Timestamp  // Last time admin read the conversation
 }
 
 // Subscription & Finance

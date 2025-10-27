@@ -65,7 +65,10 @@ export enum WeddingNotificationType {
   // System notifications
   WEDDING_COUNTDOWN = 'wedding_countdown',
   BACKUP_REMINDER = 'backup_reminder',
-  SYSTEM_UPDATE = 'system_update'
+  SYSTEM_UPDATE = 'system_update',
+
+  // Feedback notifications
+  FEEDBACK_REPLY = 'feedback_reply'
 }
 
 export function useWeddingNotifications() {
