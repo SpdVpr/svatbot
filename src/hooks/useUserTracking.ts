@@ -175,11 +175,11 @@ export function useUserTracking() {
     const analyticsRef = doc(db, 'userAnalytics', firebaseUser.uid)
 
     try {
-      await updateDoc(analyticsRef, {
+      await setDoc(analyticsRef, {
         isOnline: false,
         totalSessionTime: increment(sessionDuration),
         lastActivityAt: serverTimestamp()
-      })
+      }, { merge: true })
 
       console.log('✅ Session ended successfully:', sessionIdRef.current, 'Total duration added:', sessionDuration, 'minutes')
     } catch (error) {
@@ -229,9 +229,9 @@ export function useUserTracking() {
     if (timeSinceLastActivity > 5) {
       const analyticsRef = doc(db, 'userAnalytics', firebaseUser.uid)
       try {
-        await updateDoc(analyticsRef, {
+        await setDoc(analyticsRef, {
           isOnline: false
-        })
+        }, { merge: true })
       } catch (error) {
         console.error('Error updating activity:', error)
       }
@@ -239,10 +239,10 @@ export function useUserTracking() {
       // Update last activity
       const analyticsRef = doc(db, 'userAnalytics', firebaseUser.uid)
       try {
-        await updateDoc(analyticsRef, {
+        await setDoc(analyticsRef, {
           isOnline: true,
           lastActivityAt: serverTimestamp()
-        })
+        }, { merge: true })
       } catch (error) {
         console.error('Error updating activity:', error)
       }
@@ -257,9 +257,9 @@ export function useUserTracking() {
     const analyticsRef = doc(db, 'userAnalytics', user.id)
 
     try {
-      await updateDoc(analyticsRef, {
+      await setDoc(analyticsRef, {
         [`pageViews.${page.replace(/\//g, '_')}`]: increment(1)
-      })
+      }, { merge: true })
     } catch (error) {
       console.error('Error tracking page view:', error)
     }
@@ -271,9 +271,9 @@ export function useUserTracking() {
     const analyticsRef = doc(db, 'userAnalytics', user.id)
 
     try {
-      await updateDoc(analyticsRef, {
+      await setDoc(analyticsRef, {
         featuresUsed: arrayUnion(featureName)
-      })
+      }, { merge: true })
     } catch (error) {
       console.error('Error tracking feature usage:', error)
     }
