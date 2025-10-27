@@ -50,11 +50,16 @@ export default function MarketplacePage() {
     setFilters({ ...filters, search: query })
   }
 
+  // Handle sort change
+  const handleSortChange = (sortBy: 'newest' | 'rating' | 'price-low' | 'price-high' | 'reviews') => {
+    setFilters({ ...filters, sortBy })
+  }
+
   // Clear all filters
   const handleClearFilters = () => {
     setSelectedCategory(null)
     setShowFavoritesOnly(false)
-    setFilters({})
+    setFilters({ sortBy: 'newest' })
   }
 
   // Toggle favorites filter
@@ -301,6 +306,8 @@ export default function MarketplacePage() {
               loading={loading}
               isFavorite={isFavorite}
               toggleFavorite={toggleFavorite}
+              sortBy={filters.sortBy}
+              onSortChange={handleSortChange}
               emptyMessage={
                 showFavoritesOnly
                   ? "Zatím nemáte žádné oblíbené dodavatele"

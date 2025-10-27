@@ -4,6 +4,8 @@ import { useState, useEffect, useMemo } from 'react'
 import { MarketplaceVendor, VendorCategory } from '@/types/vendor'
 import { vendorStore } from '@/store/vendorStore'
 
+export type SortOption = 'newest' | 'rating' | 'price-low' | 'price-high' | 'reviews'
+
 export interface MarketplaceFilters {
   category?: VendorCategory[]
   location?: string
@@ -16,6 +18,7 @@ export interface MarketplaceFilters {
   search?: string
   radius?: number // km from user location
   availability?: Date
+  sortBy?: SortOption
 }
 
 export interface MarketplaceStats {
@@ -53,7 +56,7 @@ export function useMarketplace(): UseMarketplaceReturn {
   const [vendors, setVendors] = useState<MarketplaceVendor[]>(vendorStore.getVendors())
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [filters, setFilters] = useState<MarketplaceFilters>({})
+  const [filters, setFilters] = useState<MarketplaceFilters>({ sortBy: 'newest' })
 
   // Subscribe to vendor store changes
   useEffect(() => {
@@ -123,9 +126,11 @@ export function useMarketplace(): UseMarketplaceReturn {
       )
     }
 
-    // Sort by rating and featured status
+    // Sort based on selected option
+    const sortBy = filters.sortBy || 'newest'
+
     filtered.sort((a, b) => {
-      // Featured vendors first
+      // Featured vendors always first
       if (a.featured && !b.featured) return -1
       if (!a.featured && b.featured) return 1
 
@@ -133,8 +138,27 @@ export function useMarketplace(): UseMarketplaceReturn {
       if (a.premium && !b.premium) return -1
       if (!a.premium && b.premium) return 1
 
-      // Then by rating
-      return b.rating.overall - a.rating.overall
+      // Then by selected sort option
+      switch (sortBy) {
+        case 'newest':
+          // Sort by createdAt (newest first)
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+
+        case 'rating':
+          return b.rating.overall - a.rating.overall
+
+        case 'price-low':
+          return a.priceRange.min - b.priceRange.min
+
+        case 'price-high':
+          return b.priceRange.max - a.priceRange.max
+
+        case 'reviews':
+          return b.rating.count - a.rating.count
+
+        default:
+          return 0
+      }
     })
 
     return filtered

@@ -208,16 +208,16 @@ export default function VendorCard({ vendor, compact = false, isFavorite, toggle
           {popularService && (
             <div className="mb-3 p-2 bg-gray-50 rounded-lg">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-900">
+                <span className="text-sm font-medium text-gray-900 line-clamp-1">
                   {popularService.name}
                 </span>
                 {popularService.price && (
-                  <span className="text-sm font-semibold text-primary-600">
+                  <span className="text-sm font-semibold text-primary-600 whitespace-nowrap ml-2">
                     {popularService.price.toLocaleString()} Kč
                   </span>
                 )}
               </div>
-              <p className="text-xs text-gray-600 mt-1">
+              <p className="text-xs text-gray-600 mt-1 line-clamp-2">
                 {popularService.description}
               </p>
             </div>

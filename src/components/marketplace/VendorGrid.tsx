@@ -1,6 +1,7 @@
 'use client'
 
 import { MarketplaceVendor } from '@/types/vendor'
+import { SortOption } from '@/hooks/useMarketplace'
 import VendorCard from './VendorCard'
 import {
   Search,
@@ -15,9 +16,20 @@ interface VendorGridProps {
   emptyMessage?: string
   isFavorite?: (vendorId: string) => boolean
   toggleFavorite?: (vendorId: string) => Promise<boolean>
+  sortBy?: SortOption
+  onSortChange?: (sortBy: SortOption) => void
 }
 
-export default function VendorGrid({ vendors, loading = false, error, emptyMessage, isFavorite, toggleFavorite }: VendorGridProps) {
+export default function VendorGrid({
+  vendors,
+  loading = false,
+  error,
+  emptyMessage,
+  isFavorite,
+  toggleFavorite,
+  sortBy = 'newest',
+  onSortChange
+}: VendorGridProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -72,11 +84,15 @@ export default function VendorGrid({ vendors, loading = false, error, emptyMessa
 
         <div className="flex items-center space-x-2">
           <span className="text-sm text-gray-600">Řadit podle:</span>
-          <select className="text-sm border border-gray-300 rounded-lg px-3 py-1 focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+          <select
+            className="text-sm border border-gray-300 rounded-lg px-3 py-1 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            value={sortBy}
+            onChange={(e) => onSortChange?.(e.target.value as SortOption)}
+          >
+            <option value="newest">Nejnovější</option>
             <option value="rating">Hodnocení</option>
             <option value="price-low">Cena (nejnižší)</option>
             <option value="price-high">Cena (nejvyšší)</option>
-            <option value="distance">Vzdálenost</option>
             <option value="reviews">Počet recenzí</option>
           </select>
         </div>
