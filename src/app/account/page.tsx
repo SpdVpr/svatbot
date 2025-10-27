@@ -72,6 +72,9 @@ function AccountModalWrapper({
   return <AccountModal onClose={onClose} initialTab={initialTab} />
 }
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 // Main component with Suspense boundary
 export default function AccountPage() {
   return (
