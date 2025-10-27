@@ -43,31 +43,30 @@ const convertTimestamps = (data: any) => {
 export default function AdminAffiliatesPage() {
   const router = useRouter()
   const { user } = useAuth()
-  const { isAuthenticated: isAdmin } = useAdminContext()
-  
+  const { isAuthenticated: isAdmin, isLoading: isAdminLoading } = useAdminContext()
+
   const [activeTab, setActiveTab] = useState<'partners' | 'commissions' | 'payouts'>('partners')
   const [loading, setLoading] = useState(true)
-  
+
   const [partners, setPartners] = useState<AffiliatePartner[]>([])
   const [commissions, setCommissions] = useState<Commission[]>([])
   const [payouts, setPayouts] = useState<Payout[]>([])
-  
+
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
 
   useEffect(() => {
-    if (!user) {
+    // Wait for admin loading to complete
+    if (isAdminLoading) return
+
+    // Check authentication
+    if (!isAdmin) {
       router.push('/admin/login')
       return
     }
 
-    if (!isAdmin) {
-      router.push('/')
-      return
-    }
-
     loadData()
-  }, [user, isAdmin])
+  }, [isAdmin, isAdminLoading, router])
 
   const loadData = async () => {
     try {
@@ -169,7 +168,7 @@ export default function AdminAffiliatesPage() {
     }
   }
 
-  if (loading) {
+  if (loading || isAdminLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-pink-500" />
