@@ -4,29 +4,34 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('📧 Vendor contact API called')
     const body = await request.json()
-    const { 
-      vendorId, 
-      vendorName, 
+    console.log('📧 Request body:', body)
+
+    const {
+      vendorId,
+      vendorName,
       vendorEmail,
-      customerName, 
-      customerEmail, 
-      customerPhone, 
-      weddingDate, 
-      message 
+      customerName,
+      customerEmail,
+      customerPhone,
+      weddingDate,
+      message
     } = body
 
     // Validate required fields
     if (!vendorId || !vendorName || !vendorEmail || !customerName || !customerEmail || !message) {
+      console.error('❌ Missing required fields:', { vendorId, vendorName, vendorEmail, customerName, customerEmail, message })
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       )
     }
 
+    console.log('💾 Saving inquiry to Firestore...')
     // Save inquiry to Firestore
     const inquiriesRef = collection(db, 'vendorInquiries')
-    await addDoc(inquiriesRef, {
+    const docRef = await addDoc(inquiriesRef, {
       vendorId,
       vendorName,
       vendorEmail,
@@ -39,33 +44,46 @@ export async function POST(request: NextRequest) {
       createdAt: serverTimestamp(),
       readByVendor: false
     })
+    console.log('✅ Inquiry saved to Firestore with ID:', docRef.id)
 
     // Call Firebase Function to send emails
-    const functionUrl = process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_URL || 
+    console.log('📨 Calling Firebase Function to send emails...')
+    const functionUrl = process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_URL ||
                        'https://europe-west1-svatbot-app.cloudfunctions.net'
-    
+
+    console.log('🔗 Function URL:', `${functionUrl}/sendVendorContactEmails`)
+
     try {
+      const emailPayload = {
+        vendorEmail,
+        vendorName,
+        customerName,
+        customerEmail,
+        customerPhone: customerPhone || '',
+        weddingDate: weddingDate || '',
+        message
+      }
+      console.log('📤 Email payload:', emailPayload)
+
       const response = await fetch(`${functionUrl}/sendVendorContactEmails`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          vendorEmail,
-          vendorName,
-          customerName,
-          customerEmail,
-          customerPhone: customerPhone || '',
-          weddingDate: weddingDate || '',
-          message
-        })
+        body: JSON.stringify(emailPayload)
       })
 
+      console.log('📬 Email function response status:', response.status)
+
       if (!response.ok) {
-        console.error('Failed to send emails via Firebase Function:', await response.text())
+        const errorText = await response.text()
+        console.error('❌ Failed to send emails via Firebase Function:', errorText)
+      } else {
+        const result = await response.json()
+        console.log('✅ Emails sent successfully:', result)
       }
     } catch (emailError) {
-      console.error('Error calling Firebase Function for emails:', emailError)
+      console.error('❌ Error calling Firebase Function for emails:', emailError)
       // Don't fail the request if email sending fails
     }
 

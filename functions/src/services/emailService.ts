@@ -712,7 +712,7 @@ export async function sendVendorContactEmail(
   try {
 
     const mailOptions = {
-      from: `"SvatBot.cz" <${process.env.SMTP_USER}>`,
+      from: `"SvatBot.cz" <${EMAIL_CONFIG.auth.user}>`,
       to: vendorEmail,
       subject: `Nová poptávka od ${inquiry.customerName} - SvatBot.cz`,
       html: `
@@ -803,7 +803,7 @@ export async function sendCustomerContactConfirmationEmail(
   try {
 
     const mailOptions = {
-      from: `"SvatBot.cz" <${process.env.SMTP_USER}>`,
+      from: `"SvatBot.cz" <${EMAIL_CONFIG.auth.user}>`,
       to: customerEmail,
       subject: `Potvrzení odeslání poptávky - ${vendorName}`,
       html: `
