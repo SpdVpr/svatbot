@@ -33,12 +33,15 @@ export function useUserTracking() {
   // Initialize session when user logs in
   useEffect(() => {
     if (!user) {
+      console.log('👤 No user, skipping tracking')
       // User logged out - end session
       if (sessionStartRef.current && sessionIdRef.current) {
         endSession()
       }
       return
     }
+
+    console.log('🚀 Starting user tracking for:', user.email)
 
     // Start new session
     startSession()
@@ -48,6 +51,7 @@ export function useUserTracking() {
 
     // Cleanup on unmount or logout
     return () => {
+      console.log('🛑 Cleaning up tracking for:', user.email)
       if (sessionStartRef.current && sessionIdRef.current) {
         endSession()
       }
@@ -79,6 +83,7 @@ export function useUserTracking() {
 
       if (!analyticsDoc.exists()) {
         // Create new analytics document
+        console.log('📝 Creating new analytics document for:', user.email)
         const now = new Date()
         await setDoc(analyticsRef, {
           userId: user.id,
@@ -99,8 +104,13 @@ export function useUserTracking() {
           pageViews: {},
           featuresUsed: []
         })
+        console.log('✅ Analytics document created')
       } else {
         // Update existing document
+        console.log('🔄 Updating existing analytics for:', user.email)
+        const currentData = analyticsDoc.data()
+        console.log('Current loginCount:', currentData.loginCount)
+
         await updateDoc(analyticsRef, {
           lastLoginAt: serverTimestamp(),
           loginCount: increment(1),
@@ -113,6 +123,7 @@ export function useUserTracking() {
             pages: []
           })
         })
+        console.log('✅ Analytics updated, new loginCount:', (currentData.loginCount || 0) + 1)
       }
 
       console.log('📊 Session started:', sessionId)
@@ -122,10 +133,15 @@ export function useUserTracking() {
   }
 
   const endSession = async () => {
-    if (!user || !sessionStartRef.current || !sessionIdRef.current) return
+    if (!user || !sessionStartRef.current || !sessionIdRef.current) {
+      console.log('⚠️ Cannot end session - missing data')
+      return
+    }
 
     const sessionEnd = new Date()
     const sessionDuration = Math.floor((sessionEnd.getTime() - sessionStartRef.current.getTime()) / 1000 / 60) // minutes
+
+    console.log('🏁 Ending session for:', user.email, 'Duration:', sessionDuration, 'minutes')
 
     const analyticsRef = doc(db, 'userAnalytics', user.id)
 
@@ -136,9 +152,9 @@ export function useUserTracking() {
         lastActivityAt: serverTimestamp()
       })
 
-      console.log('📊 Session ended:', sessionIdRef.current, 'Duration:', sessionDuration, 'minutes')
+      console.log('✅ Session ended successfully:', sessionIdRef.current, 'Total duration added:', sessionDuration, 'minutes')
     } catch (error) {
-      console.error('Error ending session:', error)
+      console.error('❌ Error ending session:', error)
     }
 
     sessionStartRef.current = null
