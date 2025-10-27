@@ -326,29 +326,65 @@ export async function POST(request: NextRequest) {
     // Build detailed context string with all user data
     const contextInfo = buildDetailedContext(context)
 
+    // Add current date to system prompt
+    const today = new Date()
+    const currentDateInfo = `\n\n📅 AKTUÁLNÍ DATUM: ${today.toLocaleDateString('cs-CZ', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })} (${today.toISOString().split('T')[0]})\n`
+
+    const enhancedSystemPrompt = SVATBOT_SYSTEM_PROMPT + currentDateInfo
+
     let content: string
 
     if (!openai) {
       // Mock response when OpenAI is not available
       content = "Omlouvám se, momentálně nejsem dostupný. Zkuste to prosím později. 🤖💕"
     } else {
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content: SVATBOT_SYSTEM_PROMPT
-          },
-          {
-            role: "user",
-            content: `${contextInfo}\n\nOtázka uživatele: ${question}`
-          }
-        ],
-        max_tokens: 1000, // Increased for more detailed responses
-        temperature: 0.7 // Balanced for empathy and accuracy
+      // GPT-5 uses Responses API with built-in web search
+      const inputText = `${enhancedSystemPrompt}\n\n${contextInfo}\n\nOtázka uživatele: ${question}`
+
+      let response = await openai.responses.create({
+        model: "gpt-5-mini",
+        input: inputText,
+        tools: [{ type: "web_search" }], // ✅ Enable built-in web search
+        reasoning: { effort: 'low' }, // Fast responses for chat
+        text: { verbosity: 'medium' },
+        max_output_tokens: 3000 // 3000 tokens for max 3 results
       })
 
-      content = response.choices[0]?.message?.content || 'Omlouvám se, nepodařilo se mi odpovědět na vaši otázku. Zkuste to prosím znovu. 💕'
+      // If response is incomplete, poll for completion
+      if (response.status === 'incomplete') {
+        let attempts = 0
+        const maxAttempts = 20 // Max 40 seconds
+
+        while (response.status === 'incomplete' && attempts < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 2000))
+          response = await openai.responses.retrieve(response.id)
+          attempts++
+        }
+      }
+
+      // Extract text from Responses API output
+      content = ''
+      if (response.output && Array.isArray(response.output)) {
+        const messages = response.output.filter((item: any) => item.type === 'message')
+        for (const msg of messages) {
+          if ('content' in msg && msg.content && Array.isArray(msg.content)) {
+            for (const contentItem of msg.content) {
+              if ('type' in contentItem && contentItem.type === 'output_text' && 'text' in contentItem && contentItem.text) {
+                content += contentItem.text + '\n\n'
+              }
+            }
+          }
+        }
+      }
+
+      if (!content.trim()) {
+        content = 'Omlouvám se, nepodařilo se mi odpovědět na vaši otázku. Zkuste to prosím znovu. 💕'
+      }
     }
 
     return NextResponse.json({ response: content })

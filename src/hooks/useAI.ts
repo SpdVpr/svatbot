@@ -11,6 +11,7 @@ import { useWeddingWebsite } from './useWeddingWebsite'
 import { useAccommodation } from './useAccommodation'
 import { useShopping } from './useShopping'
 import { useCalendar } from './useCalendar'
+import { useAILimits } from './useAILimits'
 
 export interface AIResponse {
   success: boolean
@@ -43,6 +44,7 @@ export function useAI() {
   const { accommodations, stats: accommodationStats } = useAccommodation()
   const { items: shoppingItems, stats: shoppingStats } = useShopping()
   const { events: calendarEvents, stats: calendarStats } = useCalendar()
+  const { canUseFeature, incrementUsage, getLimitMessage } = useAILimits()
 
   // Build AI context from current wedding data
   const buildContext = useCallback((): AIWeddingContext => {
@@ -193,11 +195,22 @@ export function useAI() {
   }, [buildContext])
 
   // AI Wedding Assistant Chat (Hybrid - GPT + Perplexity)
-  const askHybrid = useCallback(async (question: string): Promise<ChatMessage> => {
+  const askHybrid = useCallback(async (question: string, skipLimitCheck: boolean = false): Promise<ChatMessage> => {
     setLoading(true)
     setError(null)
 
     try {
+      // Check AI limits (unless explicitly skipped for internal use)
+      if (!skipLimitCheck) {
+        if (!canUseFeature('chat')) {
+          const limitMsg = getLimitMessage('chat')
+          throw new Error(limitMsg)
+        }
+
+        // Increment usage counter before making the request
+        await incrementUsage('chat')
+      }
+
       // Add user message to chat
       const userMessage: ChatMessage = {
         id: Date.now().toString(),
@@ -238,7 +251,7 @@ export function useAI() {
     } finally {
       setLoading(false)
     }
-  }, [buildContext])
+  }, [buildContext, canUseFeature, incrementUsage, getLimitMessage])
 
   // Search for real-time information
   const searchInfo = useCallback(async (

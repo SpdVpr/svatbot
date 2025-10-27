@@ -9,7 +9,7 @@ const openai = process.env.OPENAI_API_KEY ? new OpenAI({
 const WEDDING_CONTEXT = `
 Jsi expert na svatební plánování v České republice. Znáš:
 - České svatební tradice a zvyky
-- Průměrné ceny služeb v ČR (2024-2025)
+- Průměrné ceny služeb v ČR (aktuální rok 2025-2026)
 - Sezónní faktory (květen-září hlavní sezóna)
 - Regionální rozdíly (Praha dražší než venkov)
 - Právní požadavky (matrika, církevní obřad)
@@ -71,17 +71,22 @@ export async function POST(request: NextRequest) {
         ]
       })
     } else {
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: WEDDING_CONTEXT },
-          { role: "user", content: prompt }
-        ],
-        max_tokens: 800,
-        temperature: 0.4
+      // Add current date to context
+      const today = new Date()
+      const currentDateInfo = `\n\nAktuální datum: ${today.toLocaleDateString('cs-CZ')} (${today.toISOString().split('T')[0]})`
+
+      // GPT-5 uses Responses API
+      const inputText = `${WEDDING_CONTEXT}${currentDateInfo}\n\n${prompt}`
+
+      const response = await openai.responses.create({
+        model: "gpt-5-mini",
+        input: inputText,
+        reasoning: { effort: 'medium' }, // Medium reasoning for timeline planning
+        text: { verbosity: 'medium' },
+        max_output_tokens: 800
       })
 
-      content = response.choices[0]?.message?.content || 'Nepodařilo se vygenerovat časový harmonogram'
+      content = response.output_text || 'Nepodařilo se vygenerovat časový harmonogram'
     }
 
     // Clean up the response - remove markdown code blocks if present

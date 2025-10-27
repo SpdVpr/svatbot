@@ -1,8 +1,11 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { X, Sparkles, Loader2, Check, Image as ImageIcon, Filter, Folder } from 'lucide-react'
+import { X, Sparkles, Loader2, Check, Image as ImageIcon, Filter, Folder, Crown, AlertCircle } from 'lucide-react'
 import { MoodboardImage, MoodboardFolder } from '@/hooks/useMoodboard'
+import { useAILimits } from '@/hooks/useAILimits'
+import { useSubscription } from '@/hooks/useSubscription'
+import Link from 'next/link'
 
 interface AIMoodboardGeneratorProps {
   images: MoodboardImage[]
@@ -22,6 +25,9 @@ export default function AIMoodboardGenerator({
   onClose,
   isLoading: externalLoading
 }: AIMoodboardGeneratorProps) {
+  const { limitsInfo, getLimitMessage, canUseFeature, incrementUsage } = useAILimits()
+  const { hasPremiumAccess } = useSubscription()
+
   const [selectedImageIds, setSelectedImageIds] = useState<string[]>([])
   const [step, setStep] = useState<GenerationStep>('select')
   const [currentPhase, setCurrentPhase] = useState<GenerationPhase>('analyzing')
@@ -109,8 +115,13 @@ export default function AIMoodboardGenerator({
       phaseTimers.push(setTimeout(() => setCurrentPhase('describing'), 35000))
       phaseTimers.push(setTimeout(() => setCurrentPhase('saving'), 45000))
 
-      // Pass user prompt as options
-      const options = userPrompt.trim() ? { userPrompt: userPrompt.trim() } : undefined
+      // Pass user prompt and AI limits functions as options
+      const options = {
+        ...(userPrompt.trim() ? { userPrompt: userPrompt.trim() } : {}),
+        canUseFeature,
+        incrementUsage,
+        getLimitMessage
+      }
       const generatedResult = await onGenerate(selectedImageIds, options)
 
       // Clear timers
@@ -170,6 +181,36 @@ export default function AIMoodboardGenerator({
                   <li>Dostanete popis stylu a doporučení</li>
                 </ol>
               </div>
+
+              {/* AI Limits Info */}
+              {!hasPremiumAccess && (
+                <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <AlertCircle className="w-5 h-5 text-amber-600" />
+                      <div>
+                        <p className="text-sm font-medium text-amber-900">
+                          {getLimitMessage('moodboard')}
+                        </p>
+                        {limitsInfo.moodboardsRemaining === 0 && (
+                          <p className="text-xs text-amber-700 mt-1">
+                            Limity se resetují každý den o půlnoci
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    {limitsInfo.moodboardsRemaining === 0 && (
+                      <Link
+                        href="/account?tab=subscription"
+                        className="flex items-center space-x-1 px-3 py-1.5 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors text-sm font-medium"
+                      >
+                        <Crown className="w-4 h-4" />
+                        <span>Upgrade</span>
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Error message */}
               {error && (
@@ -475,11 +516,14 @@ export default function AIMoodboardGenerator({
               </button>
               <button
                 onClick={handleGenerate}
-                disabled={selectedImageIds.length < 2}
+                disabled={selectedImageIds.length < 2 || !canUseFeature('moodboard')}
                 className="btn-primary inline-flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                title={!canUseFeature('moodboard') ? getLimitMessage('moodboard') : ''}
               >
                 <Sparkles className="w-4 h-4" />
-                <span>Vygenerovat moodboard</span>
+                <span>
+                  {!canUseFeature('moodboard') ? 'Dosažen denní limit' : 'Vygenerovat moodboard'}
+                </span>
               </button>
             </div>
           )}

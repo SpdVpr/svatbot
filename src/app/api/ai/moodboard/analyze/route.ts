@@ -102,18 +102,26 @@ Odpověz ve formátu JSON:
       }
     ]
 
-    console.log('🔍 Analyzing images with GPT-4o-mini Vision...')
+    console.log('🔍 Analyzing images with GPT-5-mini Vision...')
 
+    // GPT-5 with vision uses Chat Completions API with max_completion_tokens
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'gpt-5-mini',
       messages,
-      max_tokens: 1500,
-      temperature: 0.7,
+      max_completion_tokens: 3000, // Increased to allow for reasoning + actual response
+      reasoning_effort: 'low', // Low effort for faster analysis
+    })
+
+    console.log('🔍 Response received:', {
+      choices: response.choices?.length,
+      finishReason: response.choices?.[0]?.finish_reason,
+      hasContent: !!response.choices?.[0]?.message?.content
     })
 
     const content = response.choices[0]?.message?.content
 
     if (!content) {
+      console.error('❌ No content in response:', JSON.stringify(response, null, 2))
       throw new Error('Nepodařilo se získat odpověď od AI')
     }
 

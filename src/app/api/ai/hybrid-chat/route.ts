@@ -59,6 +59,13 @@ Pomůžu ti najít vhodné fotografy! 📸✨"
 - Připomínej work-life balance a čas s partnerem
 - Když používáš aktuální data z internetu, uveď to
 - Buď pozitivní, ale realistický
+
+📋 PRAVIDLO PRO VYHLEDÁVÁNÍ:
+- Při vyhledávání míst, dodavatelů, služeb (hotely, fotografové, salony, catering, atd.) VŽDY uveď MAXIMÁLNĚ 3 VÝSLEDKY
+- Vyber 3 nejlepší/nejrelevantnější možnosti podle kvality, recenzí a ceny
+- Pokud uživatel chce více, může požádat o "další možnosti"
+- Toto pravidlo platí pro: hotely, fotografy, catering, salony, květinářství, hudbu, místa, vizážistky, kadeřnice, atd.
+- Důvod: Rychlejší odpovědi a lepší přehlednost
 `
 
 /**
@@ -158,6 +165,17 @@ export async function POST(request: NextRequest) {
     // Build detailed context string with all user data
     const contextInfo = buildDetailedContext(context)
 
+    // Add current date to system prompt
+    const today = new Date()
+    const currentDateInfo = `\n\n📅 AKTUÁLNÍ DATUM: ${today.toLocaleDateString('cs-CZ', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })} (${today.toISOString().split('T')[0]})\n`
+
+    const enhancedSystemPrompt = SVATBOT_SYSTEM_PROMPT + currentDateInfo
+
     // Use Hybrid AI to route query
     const hybridAI = getHybridAI()
 
@@ -165,7 +183,7 @@ export async function POST(request: NextRequest) {
     const result: HybridAIResponse = await hybridAI.ask(
       question,
       context ? { ...context, contextInfo, chatHistory } : { chatHistory },
-      SVATBOT_SYSTEM_PROMPT
+      enhancedSystemPrompt
     )
 
     return NextResponse.json({

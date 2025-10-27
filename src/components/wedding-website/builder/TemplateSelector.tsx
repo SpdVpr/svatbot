@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Check } from 'lucide-react'
+import { Check, Lock, Crown } from 'lucide-react'
 import type { TemplateType, TemplateConfig } from '@/types/wedding-website'
+import { useSubscription } from '@/hooks/useSubscription'
+import Link from 'next/link'
 
 interface TemplateSelectorProps {
   selectedTemplate: TemplateType | null
@@ -150,6 +152,19 @@ const TEMPLATES: TemplateConfig[] = [
 
 export default function TemplateSelector({ selectedTemplate, onSelect }: TemplateSelectorProps) {
   const [hoveredTemplate, setHoveredTemplate] = useState<TemplateType | null>(null)
+  const { subscription, hasPremiumAccess } = useSubscription()
+
+  // Get subscription plan details
+  const plan = subscription?.plan || 'free_trial'
+  const canAccessAllTemplates = hasPremiumAccess
+
+  // First 2 templates are free (classic-elegance, modern-minimalist)
+  const FREE_TEMPLATES = ['classic-elegance', 'modern-minimalist']
+
+  const isTemplateLocked = (templateId: string) => {
+    if (canAccessAllTemplates) return false
+    return !FREE_TEMPLATES.includes(templateId)
+  }
 
   return (
     <div className="space-y-6">
@@ -162,25 +177,72 @@ export default function TemplateSelector({ selectedTemplate, onSelect }: Templat
         </p>
       </div>
 
+      {/* Premium Info Banner */}
+      {!canAccessAllTemplates && (
+        <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
+                <Crown className="w-5 h-5 text-amber-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-amber-900">
+                  Máte přístup ke 2 základním šablonám
+                </p>
+                <p className="text-xs text-amber-700">
+                  Upgrade na Premium pro přístup ke všem designům
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/account?tab=subscription"
+              className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors text-sm font-medium"
+            >
+              Upgrade
+            </Link>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {TEMPLATES.map((template) => {
           const isSelected = selectedTemplate === template.id
           const isHovered = hoveredTemplate === template.id
+          const isLocked = isTemplateLocked(template.id)
 
           return (
             <div
               key={template.id}
-              className={`relative bg-white rounded-lg border-2 transition-all cursor-pointer ${
+              className={`relative bg-white rounded-lg border-2 transition-all ${
+                isLocked ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'
+              } ${
                 isSelected
                   ? 'border-pink-500 shadow-lg'
                   : 'border-gray-200 hover:border-pink-300 hover:shadow-md'
               }`}
-              onClick={() => onSelect(template.id)}
+              onClick={() => !isLocked && onSelect(template.id)}
               onMouseEnter={() => setHoveredTemplate(template.id)}
               onMouseLeave={() => setHoveredTemplate(null)}
             >
+              {/* Locked overlay */}
+              {isLocked && (
+                <div className="absolute inset-0 bg-gray-900/50 rounded-lg z-20 flex items-center justify-center">
+                  <div className="text-center text-white">
+                    <Lock className="w-12 h-12 mx-auto mb-2" />
+                    <p className="font-semibold">Premium šablona</p>
+                    <Link
+                      href="/account?tab=subscription"
+                      className="inline-flex items-center space-x-1 mt-2 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 rounded-lg text-sm transition-colors"
+                    >
+                      <Crown className="w-4 h-4" />
+                      <span>Odemknout</span>
+                    </Link>
+                  </div>
+                </div>
+              )}
+
               {/* Selected badge */}
-              {isSelected && (
+              {isSelected && !isLocked && (
                 <div className="absolute top-4 right-4 z-10 bg-pink-500 text-white rounded-full p-2">
                   <Check className="w-5 h-5" />
                 </div>

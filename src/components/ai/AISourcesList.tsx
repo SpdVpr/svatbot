@@ -189,7 +189,7 @@ export function AIProviderBadge({
 }) {
   if (!provider) return null
 
-  const config = {
+  const config: Record<string, { icon: any; label: string; color: string }> = {
     perplexity: {
       icon: Globe,
       label: 'Real-time',
@@ -204,10 +204,27 @@ export function AIProviderBadge({
       icon: CheckCircle2,
       label: 'AI',
       color: 'bg-green-100 text-green-700'
+    },
+    'gpt-5': {
+      icon: CheckCircle2,
+      label: 'GPT-5',
+      color: 'bg-emerald-100 text-emerald-700'
     }
   }
 
-  const { icon: Icon, label, color } = config[provider]
+  const providerConfig = config[provider]
+
+  // Fallback if provider not found
+  if (!providerConfig) {
+    return (
+      <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 ${className}`}>
+        <CheckCircle2 className="w-3 h-3" />
+        <span>AI</span>
+      </div>
+    )
+  }
+
+  const { icon: Icon, label, color } = providerConfig
 
   return (
     <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${color} ${className}`}>

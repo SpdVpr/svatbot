@@ -295,6 +295,36 @@ export class WeddingAI {
     )
   }
 
+  // Search accommodation (hotels, pensions, etc.)
+  static async searchAccommodation(
+    location: string,
+    date?: Date,
+    guestCount?: number,
+    radius?: number // in km
+  ): Promise<AIResponse> {
+    let query = `Najdi ubytování (hotely, penziony) v okolí ${location}`
+
+    if (radius) {
+      query += ` v okruhu ${radius} km`
+    }
+
+    if (date) {
+      query += ` na datum ${date.toLocaleDateString('cs-CZ')}`
+    }
+
+    if (guestCount) {
+      query += ` pro ${guestCount} hostů`
+    }
+
+    query += '. Zahrň názvy, adresy, kontakty, ceny a odkazy na rezervaci.'
+
+    return this.search(
+      query,
+      'accommodation',
+      { accommodationLocation: location, accommodationDate: date, accommodationGuests: guestCount, radius }
+    )
+  }
+
   // Get legal information
   static async getLegalInfo(topic: string): Promise<AIResponse> {
     return this.search(
@@ -313,19 +343,6 @@ export class WeddingAI {
       `Tipy pro ${season} svatbu${month ? ` v měsíci ${month}` : ''}`,
       'seasonal',
       { searchSeason: season, month }
-    )
-  }
-
-  // Search accommodation
-  static async searchAccommodation(
-    location: string,
-    guestCount: number,
-    date?: Date
-  ): Promise<AIResponse> {
-    return this.search(
-      `Ubytování pro svatební hosty v okolí ${location}`,
-      'accommodation',
-      { accommodationLocation: location, accommodationGuestCount: guestCount, date: date?.toISOString() }
     )
   }
 

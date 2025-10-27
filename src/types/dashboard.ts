@@ -87,18 +87,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     isLocked: false,
     order: 3
   },
-  {
-    id: 'vendor-management',
-    type: 'vendor-management',
-    title: 'Dodavatelé',
-    size: 'medium',
-    position: { x: 840, y: 530 },
-    gridPosition: { row: 1, column: 2 },
-    isVisible: true,
-    isLocked: false,
-    order: 4
-  },
-  // Row 2 - 2 modules (svatbot-coach ends here, vendor-management continues from row 1)
+  // Row 2 - 3 modules (svatbot-coach ends here)
   {
     id: 'guest-management',
     type: 'guest-management',
@@ -108,7 +97,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     gridPosition: { row: 2, column: 0 },
     isVisible: true,
     isLocked: false,
-    order: 5
+    order: 4
   },
   {
     id: 'seating-plan',
@@ -117,6 +106,17 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     size: 'medium',
     position: { x: 440, y: 1020 },
     gridPosition: { row: 2, column: 1 },
+    isVisible: true,
+    isLocked: false,
+    order: 5
+  },
+  {
+    id: 'vendor-management',
+    type: 'vendor-management',
+    title: 'Dodavatelé',
+    size: 'medium',
+    position: { x: 840, y: 1020 },
+    gridPosition: { row: 2, column: 2 },
     isVisible: true,
     isLocked: false,
     order: 6
@@ -156,7 +156,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     isLocked: false,
     order: 9
   },
-  // Row 4 - 2 moduly (budget-tracking a timeline-planning přesunuty sem)
+  // Row 4 - 2 moduly (marketplace a moodboard)
   {
     id: 'marketplace',
     type: 'marketplace',
@@ -167,6 +167,17 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     isVisible: true,
     isLocked: false,
     order: 10
+  },
+  {
+    id: 'moodboard',
+    type: 'moodboard',
+    title: 'Moodboard',
+    size: 'medium',
+    position: { x: 840, y: 2000 },
+    gridPosition: { row: 4, column: 2 },
+    isVisible: true,
+    isLocked: false,
+    order: 11
   },
   // Row 5 - Harmonogram svatebního dne pod "Jídlo a pití" + 2 další moduly
   {
@@ -179,7 +190,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     gridPosition: { row: 5, column: 0 },
     isVisible: true,
     isLocked: false,
-    order: 11
+    order: 12
   },
   {
     id: 'food-drinks',
@@ -190,7 +201,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     gridPosition: { row: 5, column: 2 },
     isVisible: true,
     isLocked: false,
-    order: 12
+    order: 13
   },
   // Row 6 - 3 modules
   {
@@ -202,7 +213,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     gridPosition: { row: 6, column: 0 },
     isVisible: true,
     isLocked: false,
-    order: 13
+    order: 14
   },
   {
     id: 'shopping-list',
@@ -213,7 +224,7 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     gridPosition: { row: 6, column: 1 },
     isVisible: true,
     isLocked: false,
-    order: 14
+    order: 15
   },
   {
     id: 'accommodation-management',
@@ -224,9 +235,9 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     gridPosition: { row: 6, column: 2 },
     isVisible: true,
     isLocked: false,
-    order: 15
+    order: 16
   },
-  // Row 7 - 3 modules
+  // Row 7 - 1 module
   {
     id: 'wedding-website',
     type: 'wedding-website',
@@ -234,17 +245,6 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     size: 'medium',
     position: { x: 40, y: 3470 },
     gridPosition: { row: 7, column: 0 },
-    isVisible: true,
-    isLocked: false,
-    order: 16
-  },
-  {
-    id: 'moodboard',
-    type: 'moodboard',
-    title: 'Moodboard',
-    size: 'medium',
-    position: { x: 440, y: 3470 },
-    gridPosition: { row: 7, column: 1 },
     isVisible: true,
     isLocked: false,
     order: 17

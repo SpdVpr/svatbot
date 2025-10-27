@@ -214,6 +214,9 @@ export function useSubscription() {
           weddingWebsiteViews: data.weddingWebsiteViews || 0,
           rsvpResponses: data.rsvpResponses || 0,
           aiQueriesCount: data.aiQueriesCount || 0,
+          aiChatQueriesToday: data.aiChatQueriesToday || 0,
+          aiMoodboardsToday: data.aiMoodboardsToday || 0,
+          lastAIResetDate: data.lastAIResetDate || new Date().toISOString().split('T')[0],
           updatedAt: data.updatedAt?.toDate()
         })
       }
@@ -225,22 +228,17 @@ export function useSubscription() {
     }
   }
 
-  // Check if user has premium access
+  // Check if user has premium access (PAID plans only, NOT trial)
   const hasPremiumAccess = (): boolean => {
     if (!subscription) return false
 
-    // Trial is active
-    if (subscription.status === 'trialing' && subscription.isTrialActive) {
-      const now = new Date()
-      return now < subscription.trialEndDate
-    }
-
-    // Active paid subscription
-    if (subscription.status === 'active' && 
+    // Active paid subscription ONLY
+    if (subscription.status === 'active' &&
         (subscription.plan === 'premium_monthly' || subscription.plan === 'premium_yearly')) {
       return true
     }
 
+    // Trial users do NOT have premium access (they have limits)
     return false
   }
 

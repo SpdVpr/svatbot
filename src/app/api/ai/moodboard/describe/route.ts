@@ -75,10 +75,11 @@ Odpověz ve formátu JSON:
   "summary": "Klasická svatba plná elegance, romantiky a nadčasové krásy"
 }`
 
-    console.log('✍️ Generating description with GPT-4o-mini...')
+    console.log('✍️ Generating description with GPT-5-mini...')
 
+    // GPT-5 uses Chat Completions API with max_completion_tokens
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'gpt-5-mini',
       messages: [
         {
           role: 'system',
@@ -89,8 +90,8 @@ Odpověz ve formátu JSON:
           content: prompt
         }
       ],
-      max_tokens: 1200,
-      temperature: 0.8,
+      max_completion_tokens: 2500, // Increased to allow for reasoning + actual response
+      reasoning_effort: 'low', // Low effort for faster generation
     })
 
     const content = response.choices[0]?.message?.content

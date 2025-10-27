@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useAI } from '@/hooks/useAI'
 import { useAICoach } from '@/hooks/useAICoach'
+import { useAILimits } from '@/hooks/useAILimits'
+import { useSubscription } from '@/hooks/useSubscription'
 import {
   Bot,
   Send,
@@ -14,11 +16,14 @@ import {
   Maximize2,
   RotateCcw,
   Lightbulb,
-  Heart
+  Heart,
+  Crown,
+  AlertCircle
 } from 'lucide-react'
 import AISourcesList, { AIProviderBadge } from './AISourcesList'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import Link from 'next/link'
 
 interface AIAssistantProps {
   className?: string
@@ -47,6 +52,8 @@ export default function AIAssistant({
   } = useAI()
 
   const { svatbot } = useAICoach()
+  const { limitsInfo, getLimitMessage, canUseFeature } = useAILimits()
+  const { hasPremiumAccess } = useSubscription()
 
   const [isOpen, setIsOpen] = useState(defaultOpen)
   const [isMinimized, setIsMinimized] = useState(false)
@@ -351,6 +358,29 @@ export default function AIAssistant({
                 </div>
               )}
 
+              {/* AI Limits Info */}
+              {!hasPremiumAccess && (
+                <div className="px-4 py-2 bg-gradient-to-r from-amber-50 to-orange-50 border-t border-amber-200">
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center space-x-2">
+                      <AlertCircle className="w-4 h-4 text-amber-600" />
+                      <span className="text-amber-800">
+                        {getLimitMessage('chat')}
+                      </span>
+                    </div>
+                    {limitsInfo.chatQueriesRemaining === 0 && (
+                      <Link
+                        href="/account?tab=subscription"
+                        className="flex items-center space-x-1 text-amber-700 hover:text-amber-900 font-medium"
+                      >
+                        <Crown className="w-3 h-3" />
+                        <span>Upgrade</span>
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Input */}
               <div className="p-3 sm:p-4 border-t border-gray-200">
                 <div className="flex space-x-2">
@@ -360,13 +390,13 @@ export default function AIAssistant({
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder="Zeptejte se..."
-                    className="flex-1 px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-xs sm:text-sm"
-                    disabled={loading}
+                    placeholder={canUseFeature('chat') ? "Zeptejte se..." : "Dosáhli jste denního limitu"}
+                    className="flex-1 px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-xs sm:text-sm disabled:bg-gray-100"
+                    disabled={loading || !canUseFeature('chat')}
                   />
                   <button
                     onClick={() => handleSendMessage()}
-                    disabled={!message.trim() || loading}
+                    disabled={!message.trim() || loading || !canUseFeature('chat')}
                     className="px-3 sm:px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0"
                   >
                     {loading ? (

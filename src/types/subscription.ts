@@ -72,6 +72,11 @@ export interface SubscriptionLimits {
   prioritySupport: boolean
   aiAssistant: boolean
   advancedAnalytics: boolean
+  // AI Feature Limits (daily)
+  aiChatQueriesPerDay: number | 'unlimited'
+  aiMoodboardsPerDay: number | 'unlimited'
+  // Website Template Limits
+  websiteTemplates: 'basic' | 'all' // 'basic' = first 2 templates, 'all' = all templates
 }
 
 // Subscription plans configuration
@@ -79,17 +84,17 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDetails[] = [
   {
     id: 'free_trial',
     name: 'Zkušební období',
-    description: '30 dní zdarma pro vyzkoušení všech funkcí',
+    description: '30 dní zdarma pro vyzkoušení funkcí',
     price: 0,
     currency: 'CZK',
     interval: 'month',
     intervalCount: 1,
     features: [
-      'Všechny funkce Premium',
       'Neomezený počet hostů',
-      'Svatební web',
+      'Svatební web (2 základní šablony)',
       'Online RSVP',
-      'AI asistent',
+      'AI asistent (3 dotazy denně)',
+      'AI Moodboard (1 denně)',
       'Pokročilá analytika'
     ],
     limits: {
@@ -105,7 +110,10 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDetails[] = [
       customDomain: false,
       prioritySupport: false,
       aiAssistant: true,
-      advancedAnalytics: true
+      advancedAnalytics: true,
+      aiChatQueriesPerDay: 3,
+      aiMoodboardsPerDay: 1,
+      websiteTemplates: 'basic'
     }
   },
   {
@@ -119,9 +127,10 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDetails[] = [
     features: [
       'Všechny funkce aplikace',
       'Neomezený počet hostů',
-      'Svatební web pro hosty',
+      'Svatební web (všechny šablony)',
       'Online RSVP systém',
-      'AI asistent',
+      'AI asistent (neomezené dotazy)',
+      'AI Moodboard (neomezené)',
       'Pokročilá analytika',
       'Email notifikace',
       'Prioritní podpora'
@@ -139,7 +148,10 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDetails[] = [
       customDomain: false,
       prioritySupport: true,
       aiAssistant: true,
-      advancedAnalytics: true
+      advancedAnalytics: true,
+      aiChatQueriesPerDay: 'unlimited',
+      aiMoodboardsPerDay: 'unlimited',
+      websiteTemplates: 'all'
     }
   },
   {
@@ -155,9 +167,10 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDetails[] = [
     features: [
       'Všechny funkce aplikace',
       'Neomezený počet hostů',
-      'Svatební web pro hosty',
+      'Svatební web (všechny šablony)',
       'Online RSVP systém',
-      'AI asistent',
+      'AI asistent (neomezené dotazy)',
+      'AI Moodboard (neomezené)',
       'Pokročilá analytika',
       'Email notifikace',
       'Prioritní podpora',
@@ -176,7 +189,10 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDetails[] = [
       customDomain: true,
       prioritySupport: true,
       aiAssistant: true,
-      advancedAnalytics: true
+      advancedAnalytics: true,
+      aiChatQueriesPerDay: 'unlimited',
+      aiMoodboardsPerDay: 'unlimited',
+      websiteTemplates: 'all'
     }
   }
 ]
@@ -226,23 +242,28 @@ export type PaymentMethod =
 export interface UsageStats {
   userId: string
   weddingId: string
-  
+
   // Current usage
   guestsCount: number
   tasksCount: number
   budgetItemsCount: number
   vendorsCount: number
   photosCount: number
-  
+
   // Activity
   lastLoginAt: Date
   totalLogins: number
-  
+
   // Features usage
   weddingWebsiteViews: number
   rsvpResponses: number
   aiQueriesCount: number
-  
+
+  // AI Daily Usage (resets daily)
+  aiChatQueriesToday: number
+  aiMoodboardsToday: number
+  lastAIResetDate: string // YYYY-MM-DD format for daily reset
+
   // Metadata
   updatedAt: Date
 }

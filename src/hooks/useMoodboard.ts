@@ -572,17 +572,13 @@ export function useMoodboard() {
 
       console.log('✅ Saved to Firestore with ID:', docRef.id)
 
-      const addedImage: MoodboardImage = {
-        ...newImage,
-        id: docRef.id
-      }
-
-      setImages(prev => [addedImage, ...prev])
+      // Don't manually add to state - let Firestore listener handle it to avoid duplicates
+      // The onSnapshot listener will automatically add the new image
 
       // Update folder stats (image count and cover)
       await updateFolderStats(metadata.folderId)
 
-      return addedImage
+      return { id: docRef.id, ...newImage }
     } catch (err) {
       console.error('Error uploading image:', err)
       setError('Nepodařilo se nahrát obrázek')
@@ -615,7 +611,8 @@ export function useMoodboard() {
         }
       }
 
-      setImages(prev => prev.filter(img => img.id !== imageId))
+      // Don't manually remove from state - let Firestore listener handle it to avoid race conditions
+      // The onSnapshot listener will automatically remove the deleted image
 
       // Update folder stats
       if (folderId) {
@@ -720,6 +717,10 @@ export function useMoodboard() {
       style?: string
       seed?: number
       userPrompt?: string
+      // AI limits functions passed from component
+      canUseFeature?: (feature: string) => boolean
+      incrementUsage?: (feature: string) => Promise<void>
+      getLimitMessage?: (feature: string) => string
     }
   ) => {
     if (!user || !wedding?.id) {
@@ -734,10 +735,23 @@ export function useMoodboard() {
       throw new Error('Maximální počet obrázků je 10')
     }
 
+    // Check AI limits if functions provided
+    if (options?.canUseFeature && options?.getLimitMessage) {
+      if (!options.canUseFeature('moodboard')) {
+        const limitMsg = options.getLimitMessage('moodboard')
+        throw new Error(limitMsg)
+      }
+    }
+
     setIsLoading(true)
     setError(null)
 
     try {
+      // Increment usage counter before generating if function provided
+      if (options?.incrementUsage) {
+        await options.incrementUsage('moodboard')
+      }
+
       // Get selected images
       const selectedImages = images.filter(img => selectedImageIds.includes(img.id))
       const imageUrls = selectedImages.map(img => img.url)

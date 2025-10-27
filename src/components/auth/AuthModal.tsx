@@ -384,6 +384,21 @@ export default function AuthModal({ mode, onClose, onSwitchMode, showDemoOption 
             </div>
           )}
 
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={isLoading}
+            className={cn(
+              'w-full btn-primary flex items-center justify-center',
+              isLoading && 'opacity-50 cursor-not-allowed'
+            )}
+          >
+            {isLoading && (
+              <div className="w-4 h-4 mr-2 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            )}
+            {isLogin ? 'Přihlásit se emailem' : 'Vytvořit účet'}
+          </button>
+
           {/* Social Login */}
           <div className="space-y-3">
             <div className="relative">
@@ -437,21 +452,6 @@ export default function AuthModal({ mode, onClose, onSwitchMode, showDemoOption 
               </button>
             )}
           </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={cn(
-              'w-full btn-primary flex items-center justify-center',
-              isLoading && 'opacity-50 cursor-not-allowed'
-            )}
-          >
-            {isLoading && (
-              <div className="w-4 h-4 mr-2 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            )}
-            {isLogin ? 'Přihlásit se' : 'Vytvořit účet'}
-          </button>
 
           {/* Switch mode */}
           <div className="text-center pt-4">

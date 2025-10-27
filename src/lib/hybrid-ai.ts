@@ -46,51 +46,91 @@ export class HybridAI {
   private analyzeQuery(query: string, hasContext: boolean): QueryAnalysis {
     const lowerQuery = query.toLowerCase()
 
-    // Keywords indicating need for real-time data
-    const realTimeKeywords = [
-      'aktuální', 'současný', 'trendy', 'ceny', 'kolik stojí',
-      'najdi', 'hledám', 'doporuč', 'kde', 'kontakt',
-      'recenze', 'hodnocení', 'portfolio', 'fotky',
-      '2025', '2026', 'letos', 'příští rok'
+    // Keywords indicating questions about user's own data (NO web search needed)
+    const personalDataKeywords = [
+      'kolik mám', 'kolik máme', 'kolik je', 'kolik máš',
+      'počet', 'celkem', 'celková', 'celkový',
+      'potvrzeno', 'potvrzených', 'odmítnuto', 'odmítnutých',
+      'zbývá', 'zbývající', 'utraceno', 'utracených',
+      'dokončeno', 'dokončených', 'pending', 'čeká',
+      'moje', 'můj', 'naše', 'náš', 'moji', 'naši',
+      'v aplikaci', 'v systému', 'v databázi',
+      'seznam', 'přehled', 'statistika', 'statistiky'
     ]
 
-    // Keywords indicating need for personal context
-    const personalKeywords = [
-      'moje', 'můj', 'naše', 'náš', 'svatba',
-      'hosté', 'rozpočet', 'úkoly', 'timeline',
-      'plán', 'organizace', 'co mám', 'jak mám'
-    ]
-
-    // Keywords indicating search queries
+    // Keywords indicating need for external search (web search needed)
     const searchKeywords = [
-      'fotograf', 'catering', 'místo', 'lokace', 'hotel',
-      'květiny', 'hudba', 'dj', 'kapela', 'šaty',
-      'oblek', 'vizážistka', 'kadeřnice', 'dort',
-      'dodavatel', 'služba', 'firma'
+      'najdi', 'vyhledej', 'hledám', 'doporuč', 'doporučení',
+      'kde najdu', 'kde sehnat', 'kde koupit',
+      'kontakt na', 'adresa', 'telefon na',
+      'recenze', 'hodnocení', 'portfolio', 'fotky',
+      'aktuální ceny', 'kolik stojí', 'cena za',
+      'trendy', 'novinky', 'současný', 'moderní',
+      'počasí', 'předpověď', 'teplota', 'bude', 'dnes',
+      'zítra', 'víkend', 'prší', 'sněží', 'slunečno',
+      'online', 'internet', 'web', 'stáhni', 'zjisti'
     ]
 
-    const needsRealTimeData = realTimeKeywords.some(kw => lowerQuery.includes(kw))
-    const needsPersonalContext = personalKeywords.some(kw => lowerQuery.includes(kw)) || hasContext
-    const needsExternalSources = searchKeywords.some(kw => lowerQuery.includes(kw))
+    // Vendor/service keywords (usually need search)
+    const vendorKeywords = [
+      'fotograf', 'catering', 'místo', 'lokace', 'hotel', 'ubytování',
+      'květiny', 'hudba', 'dj', 'kapela', 'šaty', 'oblek',
+      'vizážistka', 'kadeřnice', 'dort', 'cukrárna',
+      'dodavatel', 'služba', 'firma', 'salon'
+    ]
+
+    // Explicit search commands (highest priority for search)
+    const explicitSearchCommands = [
+      'vyhledej', 'najdi', 'hledej', 'zjisti', 'stáhni',
+      'online', 'z internetu', 'z webu'
+    ]
+    const hasExplicitSearchCommand = explicitSearchCommands.some(kw => lowerQuery.includes(kw))
+
+    // Check for personal data queries
+    const isPersonalDataQuery = personalDataKeywords.some(kw => lowerQuery.includes(kw))
+
+    // Check for search queries
+    const isSearchQuery = searchKeywords.some(kw => lowerQuery.includes(kw))
+    const mentionsVendors = vendorKeywords.some(kw => lowerQuery.includes(kw))
 
     let queryType: 'personal' | 'search' | 'hybrid' = 'personal'
     let confidence = 0.5
 
-    if (needsRealTimeData && needsExternalSources && !needsPersonalContext) {
+    // Priority 0: Explicit search commands (ALWAYS use web search)
+    if (hasExplicitSearchCommand) {
+      queryType = 'search'
+      confidence = 0.99
+    }
+    // Priority 1: Personal data queries (about user's own data in app)
+    else if (isPersonalDataQuery || (hasContext && !isSearchQuery && !mentionsVendors)) {
+      queryType = 'personal'
+      confidence = 0.95
+    }
+    // Priority 2: Clear search queries
+    else if (isSearchQuery && mentionsVendors) {
       queryType = 'search'
       confidence = 0.9
-    } else if (needsPersonalContext && !needsRealTimeData) {
-      queryType = 'personal'
-      confidence = 0.9
-    } else if (needsRealTimeData || needsExternalSources) {
+    }
+    // Priority 3: Search queries without vendors (weather, etc.)
+    else if (isSearchQuery) {
+      queryType = 'search'
+      confidence = 0.85
+    }
+    // Priority 4: Vendor mentions without clear search intent
+    else if (mentionsVendors) {
       queryType = 'hybrid'
       confidence = 0.7
     }
+    // Default: personal
+    else {
+      queryType = 'personal'
+      confidence = 0.8
+    }
 
     return {
-      needsRealTimeData,
-      needsExternalSources,
-      needsPersonalContext,
+      needsRealTimeData: isSearchQuery,
+      needsExternalSources: isSearchQuery || mentionsVendors,
+      needsPersonalContext: isPersonalDataQuery || hasContext,
       queryType,
       confidence
     }
@@ -104,33 +144,33 @@ export class HybridAI {
     context?: any,
     systemPrompt?: string
   ): Promise<HybridAIResponse> {
+    if (!this.openai) {
+      throw new Error('OpenAI není nakonfigurováno')
+    }
+
+    // Analyze query to determine if web search is needed
     const analysis = this.analyzeQuery(query, !!context)
 
-    console.log('🤖 Hybrid AI Analysis:', {
-      query: query.substring(0, 50) + '...',
-      analysis
-    })
+    // Decide whether to use web search based on query type
+    const useWebSearch = analysis.queryType === 'search' || analysis.queryType === 'hybrid'
 
-    // Route based on analysis
-    if (analysis.queryType === 'search' && this.perplexity.isAvailable()) {
-      return this.usePerplexity(query, systemPrompt)
-    } else if (analysis.queryType === 'personal' && this.openai) {
-      return this.useGPT(query, context, systemPrompt)
-    } else if (analysis.queryType === 'hybrid') {
-      return this.useHybrid(query, context, systemPrompt)
+    if (useWebSearch) {
+      console.log('🤖 AI Routing: Using GPT-5 with web search (query type:', analysis.queryType, ')')
     } else {
-      // Fallback to GPT
-      return this.useGPT(query, context, systemPrompt)
+      console.log('🤖 AI Routing: Using GPT-5 without web search (personal query)')
     }
+
+    return this.useGPT(query, context, systemPrompt, useWebSearch)
   }
 
   /**
-   * Use GPT-4 for personal planning
+   * Use GPT-5 for queries (with or without web search)
    */
   private async useGPT(
     query: string,
     context?: any,
-    systemPrompt?: string
+    systemPrompt?: string,
+    useWebSearch: boolean = false
   ): Promise<HybridAIResponse> {
     if (!this.openai) {
       throw new Error('OpenAI not configured')
@@ -148,9 +188,15 @@ DŮLEŽITÉ PRAVIDLO FORMÁTOVÁNÍ:
 - Používej prázdné řádky mezi sekcemi
 - Pro kontakty a odkazy používej formát: **Web**: [text](url)
 
+DŮLEŽITÉ PRAVIDLO PRO VYHLEDÁVÁNÍ:
+- Při vyhledávání míst, dodavatelů, služeb (hotely, fotografové, salony, atd.) VŽDY uveď MAXIMÁLNĚ 3 VÝSLEDKY
+- Vyber 3 nejlepší/nejrelevantnější možnosti podle kvality, recenzí a ceny
+- Pokud uživatel chce více, může požádat o další
+- Toto pravidlo platí pro: hotely, fotografy, catering, salony, květinářství, hudbu, místa, atd.
+
 Příklad dobře formátované odpovědi:
 
-### 🏨 Doporučené hotely
+### 🏨 Doporučené hotely (TOP 3)
 
 **1. Hotel Grandior**
 • **Adresa**: Hlavní 123, Praha 1
@@ -163,7 +209,15 @@ Příklad dobře formátované odpovědi:
 • **Adresa**: Lipová 45, Praha 5
 • **Kapacita**: 15 pokojů
 • **Cena**: 1 500 - 2 500 Kč/noc
-• **Kontakt**: +420 123 456 789`
+• **Kontakt**: +420 123 456 789
+
+**3. Resort Zahrada**
+• **Adresa**: Zahradní 10, Praha 6
+• **Kapacita**: 30 pokojů
+• **Cena**: 3 000 - 5 000 Kč/noc
+• **Web**: [resortzahrada.cz](https://resortzahrada.cz)
+
+💡 Chcete vidět další možnosti? Napište "další hotely".`
 
     messages.push({
       role: 'system',
@@ -193,19 +247,74 @@ Příklad dobře formátované odpovědi:
       content: userContent
     })
 
-    const response = await this.openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages,
-      temperature: 0.7,
-      max_tokens: 1500
+    // GPT-5 with Responses API
+    // Convert messages to Responses API format
+    const systemMessage = messages.find(m => m.role === 'system')
+    const userMessages = messages.filter(m => m.role !== 'system')
+
+    // Build input text from messages
+    let inputText = typeof systemMessage?.content === 'string' ? systemMessage.content : ''
+    userMessages.forEach(msg => {
+      const content = typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content)
+      inputText += `\n\n${msg.role === 'user' ? 'Uživatel' : 'Asistent'}: ${content}`
     })
 
-    const answer = response.choices[0]?.message?.content || 'Nepodařilo se získat odpověď.'
+    // Configure tools based on whether web search is needed
+    const tools = useWebSearch ? [{ type: 'web_search' as const }] : undefined
+
+    let response = await this.openai.responses.create({
+      model: 'gpt-5-mini',
+      input: inputText,
+      tools, // ✅ Conditionally enable web search
+      reasoning: { effort: 'low' }, // Low effort for faster responses
+      text: { verbosity: 'medium' },
+      max_output_tokens: useWebSearch ? 3000 : 2000 // 3000 for web search (max 3 results), 2000 for personal
+    })
+
+    // If response is incomplete, poll for completion
+    if (response.status === 'incomplete') {
+      console.log('⏳ Response incomplete, polling for completion...')
+      let attempts = 0
+      const maxAttempts = 20 // Max 40 seconds (20 * 2s)
+
+      while (response.status === 'incomplete' && attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 2000)) // Wait 2 seconds
+        response = await this.openai.responses.retrieve(response.id)
+        attempts++
+      }
+
+      console.log(`✅ Polling complete after ${attempts} attempts, status: ${response.status}`)
+    }
+
+    // Extract text from Responses API output
+    let answer = ''
+
+    if (response.output && Array.isArray(response.output)) {
+      const messages = response.output.filter((item: any) => item.type === 'message')
+
+      for (const msg of messages) {
+        if ('content' in msg && msg.content && Array.isArray(msg.content)) {
+          for (const contentItem of msg.content) {
+            if ('type' in contentItem && contentItem.type === 'output_text' && 'text' in contentItem && contentItem.text) {
+              answer += contentItem.text + '\n\n'
+            }
+          }
+        }
+      }
+    }
+
+    if (!answer.trim()) {
+      console.log('⚠️ No answer extracted, response status:', response.status)
+      console.log('⚠️ Output items:', response.output?.map((item: any) => item.type).join(', '))
+      answer = 'Nepodařilo se získat odpověď. Zkuste to prosím znovu.'
+    }
 
     return {
-      answer,
+      answer: answer.trim(),
       provider: 'gpt',
-      reasoning: 'Použit GPT-4 pro personalizované plánování'
+      reasoning: useWebSearch
+        ? 'Použit GPT-5-mini s web search'
+        : 'Použit GPT-5-mini (bez web search)'
     }
   }
 
@@ -311,9 +420,9 @@ Příklad dobře formátované odpovědi:
         const contextWithoutHistory = { ...context }
         delete contextWithoutHistory.chatHistory
 
-        messages.push({
-          role: 'user',
-          content: `
+        // GPT-5 uses Responses API - convert messages to input
+        const systemMessage = messages.find(m => m.role === 'system')
+        const userContent = `
 Uživatel se ptá: ${query}
 
 Aktuální informace z internetu:
@@ -326,23 +435,27 @@ ${JSON.stringify(contextWithoutHistory, null, 2)}
 
 Poskytni personalizovanou odpověď, která kombinuje aktuální informace s kontextem uživatele.
 DŮLEŽITÉ: Použij markdown formátování podle vzoru výše pro maximální čitelnost.
-          `.trim()
+        `.trim()
+
+        const inputText = systemMessage
+          ? `${systemMessage.content}\n\n${userContent}`
+          : userContent
+
+        const response = await this.openai.responses.create({
+          model: 'gpt-5-mini',
+          input: inputText,
+          reasoning: { effort: 'medium' }, // Medium reasoning for hybrid synthesis
+          text: { verbosity: 'medium' },
+          max_output_tokens: 1500
         })
 
-        const response = await this.openai.chat.completions.create({
-          model: 'gpt-4o-mini',
-          messages,
-          temperature: 0.7,
-          max_tokens: 1500
-        })
-
-        const synthesizedAnswer = response.choices[0]?.message?.content || perplexityResult.answer
+        const synthesizedAnswer = response.output_text || perplexityResult.answer
 
         return {
           answer: synthesizedAnswer,
           sources: perplexityResult.sources,
           provider: 'hybrid',
-          reasoning: 'Kombinace Perplexity (aktuální data) a GPT-4 (personalizace)'
+          reasoning: 'Kombinace Perplexity (aktuální data) a GPT-5-mini (personalizace)'
         }
       }
 
