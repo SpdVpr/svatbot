@@ -4,19 +4,33 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import MarketplaceVendorForm, { MarketplaceVendorFormData } from '@/components/marketplace/MarketplaceVendorForm'
-import { ArrowLeft, CheckCircle, Store, Users, TrendingUp, Shield } from 'lucide-react'
+import { ArrowLeft, CheckCircle, Store, Users, TrendingUp, Shield, Copy, Check } from 'lucide-react'
 import { db } from '@/config/firebase'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
+
+// Generate a unique edit token
+function generateEditToken(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0
+    const v = c === 'x' ? r : (r & 0x3 | 0x8)
+    return v.toString(16)
+  })
+}
 
 export default function MarketplaceRegisterPage() {
   const router = useRouter()
   const [showForm, setShowForm] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [editToken, setEditToken] = useState<string>('')
+  const [copied, setCopied] = useState(false)
 
   const handleSubmit = async (data: MarketplaceVendorFormData) => {
     setSubmitting(true)
     try {
+      // Generate unique edit token
+      const token = generateEditToken()
+
       // Remove undefined values from data (Firestore doesn't accept undefined)
       const cleanData = Object.fromEntries(
         Object.entries(data).filter(([_, value]) => value !== undefined)
@@ -25,6 +39,8 @@ export default function MarketplaceRegisterPage() {
       // Prepare data for Firestore
       const vendorData = {
         ...cleanData,
+        // Edit token for future edits
+        editToken: token,
         // Default values for new registrations
         verified: false,
         featured: false,
@@ -69,13 +85,18 @@ export default function MarketplaceRegisterPage() {
 
       console.log('✅ Vendor registration submitted:', docRef.id)
 
+      // Store edit token for success page
+      setEditToken(token)
       setSubmitted(true)
       setShowForm(false)
 
-      // Redirect to marketplace after 5 seconds
+      // TODO: Send email with edit link
+      // sendVendorRegistrationEmail(data.email, token)
+
+      // Redirect to marketplace after 30 seconds (longer to allow copying edit link)
       setTimeout(() => {
         router.push('/marketplace')
-      }, 5000)
+      }, 30000)
     } catch (error) {
       console.error('Error submitting vendor registration:', error)
       throw error
@@ -84,28 +105,89 @@ export default function MarketplaceRegisterPage() {
     }
   }
 
+  const copyEditLink = () => {
+    const editUrl = `${window.location.origin}/marketplace/edit/${editToken}`
+    navigator.clipboard.writeText(editUrl)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   if (submitted) {
+    const editUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/marketplace/edit/${editToken}`
+
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
-            <CheckCircle className="w-10 h-10 text-green-600" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Děkujeme za registraci!</h2>
-          <p className="text-gray-600 mb-4">
-            Váš inzerát byl úspěšně odeslán. Náš tým ho zkontroluje a zveřejní do 24-48 hodin.
-          </p>
-          <p className="text-sm text-gray-500 mb-6">
-            O schválení vás budeme informovat emailem.
-          </p>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <p className="text-sm text-blue-800">
-              Budete automaticky přesměrováni na marketplace za 5 sekund...
+        <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+              <CheckCircle className="w-10 h-10 text-green-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Děkujeme za registraci!</h2>
+            <p className="text-gray-600 mb-2">
+              Váš inzerát byl úspěšně odeslán. Náš tým ho zkontroluje a zveřejní do 24-48 hodin.
+            </p>
+            <p className="text-sm text-gray-500">
+              O schválení vás budeme informovat emailem.
             </p>
           </div>
-          <Link href="/marketplace" className="btn-primary inline-flex items-center">
-            Zpět na marketplace
-          </Link>
+
+          {/* Edit Link Section */}
+          <div className="bg-amber-50 border-2 border-amber-200 rounded-lg p-6 mb-6">
+            <h3 className="text-lg font-semibold text-amber-900 mb-2 flex items-center justify-center">
+              <Shield className="w-5 h-5 mr-2" />
+              Důležité: Uložte si tento odkaz!
+            </h3>
+            <p className="text-sm text-amber-800 mb-4 text-center">
+              Pomocí tohoto odkazu budete moci kdykoliv upravit svůj inzerát. Uložte si ho do záložek nebo poznámek.
+            </p>
+
+            <div className="bg-white rounded-lg p-4 mb-3">
+              <p className="text-xs text-gray-500 mb-2 font-medium">Váš editační odkaz:</p>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={editUrl}
+                  readOnly
+                  className="flex-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded text-sm font-mono text-gray-700"
+                  onClick={(e) => (e.target as HTMLInputElement).select()}
+                />
+                <button
+                  onClick={copyEditLink}
+                  className="px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors flex items-center gap-2 whitespace-nowrap"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="w-4 h-4" />
+                      Zkopírováno
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4" />
+                      Kopírovat
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="text-xs text-amber-700 space-y-1">
+              <p>✓ Tento odkaz vám umožní upravit název, popis, ceny, fotografie a další údaje</p>
+              <p>✓ Odkaz je trvalý a můžete ho použít kdykoliv v budoucnu</p>
+              <p>✓ Odkaz také obdržíte emailem po schválení inzerátu</p>
+            </div>
+          </div>
+
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-center">
+            <p className="text-sm text-blue-800">
+              Budete automaticky přesměrováni na marketplace za 30 sekund...
+            </p>
+          </div>
+
+          <div className="flex justify-center">
+            <Link href="/marketplace" className="btn-primary inline-flex items-center">
+              Zpět na marketplace
+            </Link>
+          </div>
         </div>
       </div>
     )

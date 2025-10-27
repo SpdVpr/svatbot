@@ -123,6 +123,10 @@ export { default as scheduledCleanup } from './triggers/scheduledCleanup'
 export { default as onPaymentSuccess } from './triggers/onPaymentSuccess'
 export { default as checkTrialExpiry } from './triggers/checkTrialExpiry'
 
+// Marketplace vendor triggers
+export { default as onMarketplaceVendorCreate } from './triggers/onMarketplaceVendorCreate'
+export { default as onMarketplaceVendorUpdate } from './triggers/onMarketplaceVendorUpdate'
+
 // Callable functions for client-side
 export { default as getVendors } from './callable/getVendors'
 export { default as createVendor } from './callable/createVendor'

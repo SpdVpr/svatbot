@@ -34,7 +34,7 @@ export interface EmailLog {
   id?: string
   userId: string
   email: string
-  type: 'registration' | 'payment_success' | 'trial_reminder' | 'trial_expired' | 'other'
+  type: 'registration' | 'payment_success' | 'trial_reminder' | 'trial_expired' | 'vendor_registration' | 'vendor_approved' | 'other'
   subject: string
   status: 'sent' | 'failed' | 'pending'
   error?: string
@@ -432,6 +432,265 @@ export async function sendTrialReminderEmail(
       error: error instanceof Error ? error.message : 'Unknown error'
     })
     
+    return false
+  }
+}
+
+/**
+ * Send vendor registration confirmation email with edit link
+ */
+export async function sendVendorRegistrationEmail(
+  email: string,
+  vendorName: string,
+  editToken: string
+): Promise<boolean> {
+  try {
+    const editUrl = `https://svatbot.cz/marketplace/edit/${editToken}`
+
+    const mailOptions = {
+      from: emailConfig.from || '"SvatBot.cz" <info@svatbot.cz>',
+      to: email,
+      subject: '✅ Registrace přijata - SvatBot Marketplace',
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Registrace přijata</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+            <h1 style="margin: 0; font-size: 28px;">✅ Registrace přijata!</h1>
+          </div>
+
+          <div style="background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px;">
+            <p style="font-size: 16px; margin-bottom: 20px;">
+              Dobrý den,
+            </p>
+
+            <p style="font-size: 16px; margin-bottom: 20px;">
+              Děkujeme za registraci <strong>${vendorName}</strong> na SvatBot Marketplace!
+            </p>
+
+            <p style="font-size: 16px; margin-bottom: 20px;">
+              Váš inzerát byl úspěšně přijat a nyní čeká na schválení naším týmem. Proces schválení obvykle trvá 24-48 hodin.
+            </p>
+
+            <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 25px 0; border-radius: 4px;">
+              <p style="margin: 0; font-weight: bold; color: #92400e; font-size: 16px;">
+                🔑 Důležité: Uložte si tento editační odkaz!
+              </p>
+              <p style="margin: 10px 0 0 0; color: #92400e; font-size: 14px;">
+                Pomocí tohoto odkazu budete moci kdykoliv upravit svůj inzerát:
+              </p>
+            </div>
+
+            <div style="background: white; border: 2px solid #667eea; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center;">
+              <p style="margin: 0 0 15px 0; font-size: 14px; color: #666;">
+                Váš editační odkaz:
+              </p>
+              <a href="${editUrl}" style="display: inline-block; background: #667eea; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
+                Upravit můj inzerát
+              </a>
+              <p style="margin: 15px 0 0 0; font-size: 12px; color: #999; word-break: break-all;">
+                ${editUrl}
+              </p>
+            </div>
+
+            <div style="background: #e0e7ff; padding: 15px; border-radius: 8px; margin: 20px 0;">
+              <p style="margin: 0 0 10px 0; font-weight: bold; color: #3730a3;">
+                Co můžete upravit:
+              </p>
+              <ul style="margin: 0; padding-left: 20px; color: #3730a3;">
+                <li>Název a popis služeb</li>
+                <li>Kontaktní údaje</li>
+                <li>Ceny a balíčky</li>
+                <li>Fotografie a portfolio</li>
+                <li>Dostupnost a pracovní dobu</li>
+              </ul>
+            </div>
+
+            <p style="font-size: 16px; margin-bottom: 20px;">
+              <strong>Co bude dál?</strong>
+            </p>
+            <ol style="font-size: 14px; color: #666; padding-left: 20px;">
+              <li>Náš tým zkontroluje váš inzerát do 24-48 hodin</li>
+              <li>Po schválení vám pošleme další email s potvrzením</li>
+              <li>Váš inzerát bude viditelný pro stovky párů plánujících svatbu</li>
+            </ol>
+
+            <p style="font-size: 14px; color: #666; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
+              Máte otázky? Kontaktujte nás na <a href="mailto:info@svatbot.cz" style="color: #667eea;">info@svatbot.cz</a>
+            </p>
+
+            <p style="font-size: 14px; color: #666; margin-top: 20px;">
+              S pozdravem,<br>
+              <strong>Tým SvatBot.cz</strong>
+            </p>
+          </div>
+
+          <div style="text-align: center; padding: 20px; color: #999; font-size: 12px;">
+            <p>© 2024 SvatBot.cz - Váš průvodce svatebním plánováním</p>
+          </div>
+        </body>
+        </html>
+      `
+    }
+
+    await transporter.sendMail(mailOptions)
+
+    await logEmail({
+      userId: 'vendor',
+      email,
+      type: 'vendor_registration',
+      subject: '✅ Registrace přijata - SvatBot Marketplace',
+      status: 'sent',
+      metadata: {
+        vendorName,
+        editToken
+      }
+    })
+
+    console.log('Vendor registration email sent to:', email)
+    return true
+  } catch (error) {
+    console.error('Error sending vendor registration email:', error)
+
+    await logEmail({
+      userId: 'vendor',
+      email,
+      type: 'vendor_registration',
+      subject: '✅ Registrace přijata - SvatBot Marketplace',
+      status: 'failed',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    })
+
+    return false
+  }
+}
+
+/**
+ * Send vendor approval notification email
+ */
+export async function sendVendorApprovalEmail(
+  email: string,
+  vendorName: string,
+  editToken: string
+): Promise<boolean> {
+  try {
+    const editUrl = `https://svatbot.cz/marketplace/edit/${editToken}`
+    const marketplaceUrl = 'https://svatbot.cz/marketplace'
+
+    const mailOptions = {
+      from: emailConfig.from || '"SvatBot.cz" <info@svatbot.cz>',
+      to: email,
+      subject: '🎉 Váš inzerát byl schválen - SvatBot Marketplace',
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Inzerát schválen</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+            <h1 style="margin: 0; font-size: 28px;">🎉 Gratulujeme!</h1>
+            <p style="margin: 10px 0 0 0; font-size: 18px;">Váš inzerát byl schválen</p>
+          </div>
+
+          <div style="background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px;">
+            <p style="font-size: 16px; margin-bottom: 20px;">
+              Dobrý den,
+            </p>
+
+            <p style="font-size: 16px; margin-bottom: 20px;">
+              Skvělá zpráva! Váš inzerát <strong>${vendorName}</strong> byl schválen a je nyní viditelný na SvatBot Marketplace.
+            </p>
+
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${marketplaceUrl}" style="display: inline-block; background: #10b981; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; margin-bottom: 10px;">
+                Zobrazit na Marketplace
+              </a>
+            </div>
+
+            <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 25px 0; border-radius: 4px;">
+              <p style="margin: 0; font-weight: bold; color: #92400e; font-size: 16px;">
+                🔑 Připomínka: Odkaz pro úpravy
+              </p>
+              <p style="margin: 10px 0 0 0; color: #92400e; font-size: 14px;">
+                Kdykoliv můžete upravit svůj inzerát pomocí tohoto odkazu:
+              </p>
+            </div>
+
+            <div style="background: white; border: 2px solid #667eea; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center;">
+              <a href="${editUrl}" style="display: inline-block; background: #667eea; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
+                Upravit inzerát
+              </a>
+              <p style="margin: 15px 0 0 0; font-size: 12px; color: #999; word-break: break-all;">
+                ${editUrl}
+              </p>
+            </div>
+
+            <div style="background: #e0e7ff; padding: 15px; border-radius: 8px; margin: 20px 0;">
+              <p style="margin: 0 0 10px 0; font-weight: bold; color: #3730a3;">
+                💡 Tipy pro úspěch:
+              </p>
+              <ul style="margin: 0; padding-left: 20px; color: #3730a3; font-size: 14px;">
+                <li>Udržujte své portfolio aktuální s nejnovějšími fotografiemi</li>
+                <li>Odpovídejte na poptávky rychle (ideálně do 24 hodin)</li>
+                <li>Aktualizujte dostupnost a ceny podle sezóny</li>
+                <li>Sbírejte recenze od spokojených klientů</li>
+              </ul>
+            </div>
+
+            <p style="font-size: 14px; color: #666; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
+              Máte otázky nebo potřebujete pomoc? Kontaktujte nás na <a href="mailto:info@svatbot.cz" style="color: #667eea;">info@svatbot.cz</a>
+            </p>
+
+            <p style="font-size: 14px; color: #666; margin-top: 20px;">
+              Přejeme hodně úspěchů!<br>
+              <strong>Tým SvatBot.cz</strong>
+            </p>
+          </div>
+
+          <div style="text-align: center; padding: 20px; color: #999; font-size: 12px;">
+            <p>© 2024 SvatBot.cz - Váš průvodce svatebním plánováním</p>
+          </div>
+        </body>
+        </html>
+      `
+    }
+
+    await transporter.sendMail(mailOptions)
+
+    await logEmail({
+      userId: 'vendor',
+      email,
+      type: 'vendor_approved',
+      subject: '🎉 Váš inzerát byl schválen - SvatBot Marketplace',
+      status: 'sent',
+      metadata: {
+        vendorName,
+        editToken
+      }
+    })
+
+    console.log('Vendor approval email sent to:', email)
+    return true
+  } catch (error) {
+    console.error('Error sending vendor approval email:', error)
+
+    await logEmail({
+      userId: 'vendor',
+      email,
+      type: 'vendor_approved',
+      subject: '🎉 Váš inzerát byl schválen - SvatBot Marketplace',
+      status: 'failed',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    })
+
     return false
   }
 }

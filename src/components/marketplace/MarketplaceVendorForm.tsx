@@ -95,9 +95,10 @@ interface MarketplaceVendorFormProps {
   onSubmit: (data: MarketplaceVendorFormData) => Promise<void>
   onCancel: () => void
   initialData?: Partial<MarketplaceVendorFormData>
+  submitButtonText?: string
 }
 
-export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData }: MarketplaceVendorFormProps) {
+export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData, submitButtonText = 'Odeslat registraci' }: MarketplaceVendorFormProps) {
   const [currentStep, setCurrentStep] = useState(1)
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -1412,12 +1413,12 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData 
                 {saving ? (
                   <div className="flex items-center space-x-2">
                     <div className="w-4 h-4 loading-spinner" />
-                    <span>Odesílání...</span>
+                    <span>Ukládání...</span>
                   </div>
                 ) : (
                   <>
                     <Save className="w-4 h-4 mr-2" />
-                    Odeslat inzerát
+                    {submitButtonText}
                   </>
                 )}
               </button>

@@ -1,4 +1,4 @@
-import { Timestamp } from 'firebase-admin/firestore'
+import { Timestamp, FieldValue } from 'firebase-admin/firestore'
 
 // User types
 export interface User {
@@ -10,9 +10,9 @@ export interface User {
   role: UserRole
   verified: boolean
   active: boolean
-  createdAt: Timestamp
-  updatedAt: Timestamp
-  lastLoginAt?: Timestamp
+  createdAt: Timestamp | FieldValue
+  updatedAt: Timestamp | FieldValue
+  lastLoginAt?: Timestamp | FieldValue
   profileImage?: string
   preferences?: UserPreferences
 }
@@ -51,8 +51,8 @@ export interface Vendor {
   featured: boolean
   premium: boolean
   active: boolean
-  createdAt: Timestamp
-  updatedAt: Timestamp
+  createdAt: Timestamp | FieldValue
+  updatedAt: Timestamp | FieldValue
   address: Address
   priceRange: PriceRange
   images: VendorImage[]

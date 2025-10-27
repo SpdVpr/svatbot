@@ -462,11 +462,17 @@ service cloud.firestore {
 
       // Anyone can create a vendor registration (authenticated or not - will be pending approval)
       // This allows vendors to register without creating an account first
-      allow create: if request.resource.data.keys().hasAll(['name', 'category', 'email', 'phone']) &&
+      allow create: if request.resource.data.keys().hasAll(['name', 'category', 'email', 'phone', 'editToken']) &&
                        request.resource.data.verified == false &&
                        request.resource.data.status == 'pending';
 
-      // Only admins can update/delete (handled by admin panel)
+      // Vendors can update their own listing using editToken (no authentication required)
+      // This allows vendors to edit their listing via the edit link
+      allow update: if request.resource.data.editToken == resource.data.editToken &&
+                       resource.data.editToken != null &&
+                       resource.data.editToken != '';
+
+      // Admins can update/delete any vendor
       allow update, delete: if isAdmin();
     }
 
