@@ -2,17 +2,18 @@
 
 import { useEffect, useRef } from 'react'
 import { useAuth } from './useAuth'
-import { 
-  doc, 
-  setDoc, 
-  updateDoc, 
-  serverTimestamp, 
+import {
+  doc,
+  setDoc,
+  updateDoc,
+  serverTimestamp,
   increment,
   arrayUnion,
   getDoc
 } from 'firebase/firestore'
-import { db } from '@/config/firebase'
+import { db, auth } from '@/config/firebase'
 import { usePathname } from 'next/navigation'
+import { onAuthStateChanged } from 'firebase/auth'
 
 /**
  * Hook pro sledování uživatelské aktivity
@@ -29,37 +30,55 @@ export function useUserTracking() {
   const lastActivityRef = useRef<Date>(new Date())
   const activityIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const pageViewsRef = useRef<Set<string>>(new Set())
+  const lastUserIdRef = useRef<string | null>(null)
 
-  // Initialize session when user logs in
+  // Initialize session when user logs in - listen to Firebase Auth directly
   useEffect(() => {
-    if (!user) {
-      console.log('👤 No user, skipping tracking')
-      // User logged out - end session
-      if (sessionStartRef.current && sessionIdRef.current) {
-        endSession()
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (!firebaseUser) {
+        console.log('👤 No Firebase user, skipping tracking')
+        // User logged out - end session
+        if (sessionStartRef.current && sessionIdRef.current) {
+          await endSession()
+        }
+        lastUserIdRef.current = null
+        return
       }
-      return
-    }
 
-    console.log('🚀 Starting user tracking for:', user.email)
+      // Check if this is a new login (different user or first login)
+      const isNewLogin = lastUserIdRef.current !== firebaseUser.uid
 
-    // Start new session
-    startSession()
+      if (isNewLogin) {
+        console.log('🚀 Starting user tracking for:', firebaseUser.email)
+        lastUserIdRef.current = firebaseUser.uid
 
-    // Set up activity tracking
-    setupActivityTracking()
+        // End previous session if exists
+        if (sessionStartRef.current && sessionIdRef.current) {
+          await endSession()
+        }
 
-    // Cleanup on unmount or logout
+        // Start new session
+        await startSession(firebaseUser)
+
+        // Set up activity tracking
+        setupActivityTracking(firebaseUser)
+      } else {
+        console.log('✅ User already tracked, skipping session start')
+      }
+    })
+
+    // Cleanup on unmount
     return () => {
-      console.log('🛑 Cleaning up tracking for:', user.email)
+      console.log('🛑 Cleaning up tracking')
       if (sessionStartRef.current && sessionIdRef.current) {
         endSession()
       }
       if (activityIntervalRef.current) {
         clearInterval(activityIntervalRef.current)
       }
+      unsubscribe()
     }
-  }, [user?.id])
+  }, [])
 
   // Track page views
   useEffect(() => {
@@ -68,14 +87,14 @@ export function useUserTracking() {
     trackPageView(pathname)
   }, [pathname, user?.id])
 
-  const startSession = async () => {
-    if (!user) return
+  const startSession = async (firebaseUser: any) => {
+    if (!firebaseUser) return
 
     const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     sessionIdRef.current = sessionId
     sessionStartRef.current = new Date()
 
-    const analyticsRef = doc(db, 'userAnalytics', user.id)
+    const analyticsRef = doc(db, 'userAnalytics', firebaseUser.uid)
 
     try {
       // Check if document exists
@@ -83,12 +102,12 @@ export function useUserTracking() {
 
       if (!analyticsDoc.exists()) {
         // Create new analytics document
-        console.log('📝 Creating new analytics document for:', user.email)
+        console.log('📝 Creating new analytics document for:', firebaseUser.email)
         const now = new Date()
         await setDoc(analyticsRef, {
-          userId: user.id,
-          email: user.email,
-          displayName: user.displayName || 'Unknown',
+          userId: firebaseUser.uid,
+          email: firebaseUser.email,
+          displayName: firebaseUser.displayName || 'Unknown',
           registeredAt: serverTimestamp(),
           lastLoginAt: serverTimestamp(),
           loginCount: 1,
@@ -107,7 +126,7 @@ export function useUserTracking() {
         console.log('✅ Analytics document created')
       } else {
         // Update existing document
-        console.log('🔄 Updating existing analytics for:', user.email)
+        console.log('🔄 Updating existing analytics for:', firebaseUser.email)
         const currentData = analyticsDoc.data()
         console.log('Current loginCount:', currentData.loginCount)
 
@@ -133,7 +152,8 @@ export function useUserTracking() {
   }
 
   const endSession = async () => {
-    if (!user || !sessionStartRef.current || !sessionIdRef.current) {
+    const firebaseUser = auth.currentUser
+    if (!firebaseUser || !sessionStartRef.current || !sessionIdRef.current) {
       console.log('⚠️ Cannot end session - missing data')
       return
     }
@@ -141,9 +161,9 @@ export function useUserTracking() {
     const sessionEnd = new Date()
     const sessionDuration = Math.floor((sessionEnd.getTime() - sessionStartRef.current.getTime()) / 1000 / 60) // minutes
 
-    console.log('🏁 Ending session for:', user.email, 'Duration:', sessionDuration, 'minutes')
+    console.log('🏁 Ending session for:', firebaseUser.email, 'Duration:', sessionDuration, 'minutes')
 
-    const analyticsRef = doc(db, 'userAnalytics', user.id)
+    const analyticsRef = doc(db, 'userAnalytics', firebaseUser.uid)
 
     try {
       await updateDoc(analyticsRef, {
@@ -161,10 +181,15 @@ export function useUserTracking() {
     sessionIdRef.current = null
   }
 
-  const setupActivityTracking = () => {
+  const setupActivityTracking = (firebaseUser: any) => {
+    // Clear any existing interval
+    if (activityIntervalRef.current) {
+      clearInterval(activityIntervalRef.current)
+    }
+
     // Update activity every 30 seconds
     activityIntervalRef.current = setInterval(() => {
-      updateActivity()
+      updateActivity(firebaseUser)
     }, 30000)
 
     // Track user interactions
@@ -185,15 +210,15 @@ export function useUserTracking() {
     }
   }
 
-  const updateActivity = async () => {
-    if (!user) return
+  const updateActivity = async (firebaseUser: any) => {
+    if (!firebaseUser) return
 
     const now = new Date()
     const timeSinceLastActivity = (now.getTime() - lastActivityRef.current.getTime()) / 1000 / 60 // minutes
 
     // If user has been inactive for more than 5 minutes, mark as offline
     if (timeSinceLastActivity > 5) {
-      const analyticsRef = doc(db, 'userAnalytics', user.id)
+      const analyticsRef = doc(db, 'userAnalytics', firebaseUser.uid)
       try {
         await updateDoc(analyticsRef, {
           isOnline: false
@@ -203,7 +228,7 @@ export function useUserTracking() {
       }
     } else {
       // Update last activity
-      const analyticsRef = doc(db, 'userAnalytics', user.id)
+      const analyticsRef = doc(db, 'userAnalytics', firebaseUser.uid)
       try {
         await updateDoc(analyticsRef, {
           isOnline: true,
