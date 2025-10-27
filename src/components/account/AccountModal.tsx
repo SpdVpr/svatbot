@@ -32,16 +32,17 @@ import FeedbackTab from './FeedbackTab'
 
 interface AccountModalProps {
   onClose: () => void
+  initialTab?: TabType
 }
 
 type TabType = 'profile' | 'subscription' | 'payments' | 'statistics' | 'settings' | 'feedback'
 
-export default function AccountModal({ onClose }: AccountModalProps) {
+export default function AccountModal({ onClose, initialTab = 'profile' }: AccountModalProps) {
   const { user, logout } = useAuth()
   // Load subscription data once at modal level and pass to all tabs
   const subscriptionData = useSubscription()
   const { subscription, hasPremiumAccess, trialDaysRemaining } = subscriptionData
-  const [activeTab, setActiveTab] = useState<TabType>('profile')
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
 
   const tabs = [
