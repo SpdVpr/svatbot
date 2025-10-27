@@ -79,6 +79,7 @@ export function useUserTracking() {
 
       if (!analyticsDoc.exists()) {
         // Create new analytics document
+        const now = new Date()
         await setDoc(analyticsRef, {
           userId: user.id,
           email: user.email,
@@ -91,7 +92,7 @@ export function useUserTracking() {
           lastActivityAt: serverTimestamp(),
           sessions: [{
             sessionId,
-            startTime: serverTimestamp(),
+            startTime: now,
             duration: 0,
             pages: []
           }],

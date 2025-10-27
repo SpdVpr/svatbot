@@ -191,59 +191,89 @@ export function useUserAnalytics() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Load from 'userAnalytics' collection where tracking data is stored
-    const q = query(
-      collection(db, 'userAnalytics'),
+    // Load all users first, then enrich with analytics data
+    const usersQuery = query(
+      collection(db, 'users'),
       limit(100)
     )
 
-    const unsubscribe = onSnapshot(q, async (snapshot) => {
-      // Load userAnalytics data
-      const analyticsData = snapshot.docs.map(doc => {
-        const data = doc.data()
-        return {
+    const unsubscribe = onSnapshot(usersQuery, async (snapshot) => {
+      try {
+        // Get all users
+        const allUsers = snapshot.docs.map(doc => ({
           id: doc.id,
-          userId: data.userId || doc.id,
-          email: data.email || '',
-          displayName: data.displayName || data.email?.split('@')[0] || 'Unknown',
-          registeredAt: data.registeredAt || Timestamp.now(),
-          lastLoginAt: data.lastLoginAt || Timestamp.now(),
-          lastActivityAt: data.lastActivityAt || Timestamp.now(),
-          isOnline: data.isOnline || false,
-          loginCount: data.loginCount || 0,
-          totalSessionTime: data.totalSessionTime || 0,
-          sessions: data.sessions || [],
-          pageViews: data.pageViews || {},
-          featuresUsed: data.featuresUsed || []
-        } as UserAnalytics
-      })
+          email: doc.data().email || '',
+          displayName: doc.data().displayName || doc.data().email?.split('@')[0] || 'Unknown',
+          createdAt: doc.data().createdAt
+        }))
 
-      // Load AI queries from usageStats for each user
-      const usersWithAIStats = await Promise.all(
-        analyticsData.map(async (user) => {
-          try {
-            const statsDoc = await getDoc(doc(db, 'usageStats', user.userId))
-            if (statsDoc.exists()) {
-              const statsData = statsDoc.data()
-              return {
-                ...user,
-                aiQueriesCount: statsData.aiQueriesCount || 0
-              }
+        // Enrich with analytics data
+        const enrichedUsers = await Promise.all(
+          allUsers.map(async (user) => {
+            let analyticsData: any = {
+              userId: user.id,
+              email: user.email,
+              displayName: user.displayName,
+              registeredAt: user.createdAt || Timestamp.now(),
+              lastLoginAt: user.createdAt || Timestamp.now(),
+              lastActivityAt: user.createdAt || Timestamp.now(),
+              isOnline: false,
+              loginCount: 0,
+              totalSessionTime: 0,
+              sessions: [],
+              pageViews: {},
+              featuresUsed: [],
+              aiQueriesCount: 0
             }
-          } catch (error) {
-            console.error(`Error loading stats for user ${user.userId}:`, error)
-          }
-          return {
-            ...user,
-            aiQueriesCount: 0
-          }
-        })
-      )
 
-      setUsers(usersWithAIStats as UserAnalytics[])
-      setLoading(false)
+            // Try to load analytics data
+            try {
+              const analyticsDoc = await getDoc(doc(db, 'userAnalytics', user.id))
+              if (analyticsDoc.exists()) {
+                const data = analyticsDoc.data()
+                analyticsData = {
+                  ...analyticsData,
+                  registeredAt: data.registeredAt || analyticsData.registeredAt,
+                  lastLoginAt: data.lastLoginAt || analyticsData.lastLoginAt,
+                  lastActivityAt: data.lastActivityAt || analyticsData.lastActivityAt,
+                  isOnline: data.isOnline || false,
+                  loginCount: data.loginCount || 0,
+                  totalSessionTime: data.totalSessionTime || 0,
+                  sessions: data.sessions || [],
+                  pageViews: data.pageViews || {},
+                  featuresUsed: data.featuresUsed || []
+                }
+              }
+            } catch (error) {
+              console.error(`Error loading analytics for user ${user.id}:`, error)
+            }
+
+            // Try to load AI queries from usageStats
+            try {
+              const statsDoc = await getDoc(doc(db, 'usageStats', user.id))
+              if (statsDoc.exists()) {
+                const statsData = statsDoc.data()
+                analyticsData.aiQueriesCount = statsData.aiQueriesCount || 0
+              }
+            } catch (error) {
+              console.error(`Error loading stats for user ${user.id}:`, error)
+            }
+
+            return {
+              id: user.id,
+              ...analyticsData
+            } as UserAnalytics
+          })
+        )
+
+        setUsers(enrichedUsers)
+        setLoading(false)
+      } catch (error) {
+        console.error('Error loading user analytics:', error)
+        setLoading(false)
+      }
     }, (error) => {
-      console.error('Error loading user analytics:', error)
+      console.error('Error loading users:', error)
       setLoading(false)
     })
 
