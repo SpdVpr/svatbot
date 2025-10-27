@@ -476,6 +476,18 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
+    // Vendor inquiries collection - contact requests from customers to vendors
+    match /vendorInquiries/{inquiryId} {
+      // Anyone can create an inquiry (customers contacting vendors)
+      allow create: if request.resource.data.keys().hasAll(['vendorId', 'vendorName', 'vendorEmail', 'customerName', 'customerEmail', 'message']);
+
+      // Admins can read all inquiries
+      allow read: if isAdmin();
+
+      // Admins can update/delete inquiries
+      allow update, delete: if isAdmin();
+    }
+
     // Wedding websites collection
     match /weddingWebsites/{websiteId} {
       // Owner can read/write their own website

@@ -127,6 +127,9 @@ export { default as checkTrialExpiry } from './triggers/checkTrialExpiry'
 export { default as onMarketplaceVendorCreate } from './triggers/onMarketplaceVendorCreate'
 export { default as onMarketplaceVendorUpdate } from './triggers/onMarketplaceVendorUpdate'
 
+// HTTPS functions
+export { sendVendorContactEmails } from './https/sendVendorContactEmails'
+
 // Callable functions for client-side
 export { default as getVendors } from './callable/getVendors'
 export { default as createVendor } from './callable/createVendor'

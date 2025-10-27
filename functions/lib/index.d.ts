@@ -9,6 +9,7 @@ export { default as onPaymentSuccess } from './triggers/onPaymentSuccess';
 export { default as checkTrialExpiry } from './triggers/checkTrialExpiry';
 export { default as onMarketplaceVendorCreate } from './triggers/onMarketplaceVendorCreate';
 export { default as onMarketplaceVendorUpdate } from './triggers/onMarketplaceVendorUpdate';
+export { sendVendorContactEmails } from './https/sendVendorContactEmails';
 export { default as getVendors } from './callable/getVendors';
 export { default as createVendor } from './callable/createVendor';
 export { setAdminRole } from './setAdminRole';

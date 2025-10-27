@@ -695,3 +695,181 @@ export async function sendVendorApprovalEmail(
   }
 }
 
+/**
+ * Send vendor contact inquiry email to vendor
+ */
+export async function sendVendorContactEmail(
+  vendorEmail: string,
+  vendorName: string,
+  inquiry: {
+    customerName: string
+    customerEmail: string
+    customerPhone: string
+    weddingDate: string
+    message: string
+  }
+): Promise<boolean> {
+  try {
+
+    const mailOptions = {
+      from: `"SvatBot.cz" <${process.env.SMTP_USER}>`,
+      to: vendorEmail,
+      subject: `Nová poptávka od ${inquiry.customerName} - SvatBot.cz`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+            .info-box { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #667eea; }
+            .info-row { margin: 10px 0; }
+            .label { font-weight: bold; color: #667eea; }
+            .message-box { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+            .button { display: inline-block; padding: 12px 30px; background: #667eea; color: white; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+            .footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>📧 Nová poptávka</h1>
+              <p>Máte novou poptávku od zákazníka přes SvatBot.cz</p>
+            </div>
+
+            <div class="content">
+              <p>Dobrý den,</p>
+              <p>Obdrželi jste novou poptávku od zákazníka, který má zájem o vaše služby pro svou svatbu.</p>
+
+              <div class="info-box">
+                <h3 style="margin-top: 0; color: #667eea;">📋 Informace o zákazníkovi</h3>
+                <div class="info-row">
+                  <span class="label">Jméno:</span> ${inquiry.customerName}
+                </div>
+                <div class="info-row">
+                  <span class="label">Email:</span> <a href="mailto:${inquiry.customerEmail}">${inquiry.customerEmail}</a>
+                </div>
+                <div class="info-row">
+                  <span class="label">Telefon:</span> <a href="tel:${inquiry.customerPhone}">${inquiry.customerPhone}</a>
+                </div>
+                <div class="info-row">
+                  <span class="label">Datum svatby:</span> ${inquiry.weddingDate}
+                </div>
+              </div>
+
+              <div class="message-box">
+                <h3 style="margin-top: 0; color: #667eea;">💬 Zpráva od zákazníka</h3>
+                <p style="white-space: pre-wrap;">${inquiry.message}</p>
+              </div>
+
+              <p><strong>Doporučujeme odpovědět co nejdříve!</strong> Zákazníci obvykle kontaktují více dodavatelů a rychlá odpověď zvyšuje šanci na získání zakázky.</p>
+
+              <div style="text-align: center;">
+                <a href="mailto:${inquiry.customerEmail}" class="button">Odpovědět zákazníkovi</a>
+              </div>
+
+              <div class="footer">
+                <p>Tato poptávka byla odeslána přes <strong>SvatBot.cz</strong></p>
+                <p>Marketplace pro svatební dodavatele</p>
+              </div>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+    }
+
+    await transporter.sendMail(mailOptions)
+    console.log('✅ Vendor contact email sent to:', vendorEmail)
+    return true
+  } catch (error) {
+    console.error('❌ Error sending vendor contact email:', error)
+    return false
+  }
+}
+
+/**
+ * Send contact confirmation email to customer
+ */
+export async function sendCustomerContactConfirmationEmail(
+  customerEmail: string,
+  customerName: string,
+  vendorName: string,
+  vendorEmail: string
+): Promise<boolean> {
+  try {
+
+    const mailOptions = {
+      from: `"SvatBot.cz" <${process.env.SMTP_USER}>`,
+      to: customerEmail,
+      subject: `Potvrzení odeslání poptávky - ${vendorName}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+            .success-box { background: #d1fae5; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10b981; }
+            .info-box { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+            .button { display: inline-block; padding: 12px 30px; background: #667eea; color: white; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+            .footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>✅ Poptávka odeslána</h1>
+              <p>Vaše poptávka byla úspěšně doručena dodavateli</p>
+            </div>
+
+            <div class="content">
+              <p>Dobrý den ${customerName},</p>
+
+              <div class="success-box">
+                <p style="margin: 0;"><strong>✓ Vaše poptávka byla úspěšně odeslána dodavateli ${vendorName}</strong></p>
+              </div>
+
+              <p>Dodavatel obdržel vaše kontaktní údaje a zprávu. Měl by vás kontaktovat v nejbližší době.</p>
+
+              <div class="info-box">
+                <h3 style="margin-top: 0; color: #667eea;">📞 Co dál?</h3>
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                  <li>Dodavatel vás bude kontaktovat na uvedený email nebo telefon</li>
+                  <li>Obvykle odpovídají do 24-48 hodin</li>
+                  <li>Pokud neobdržíte odpověď, můžete dodavatele kontaktovat přímo na: <a href="mailto:${vendorEmail}">${vendorEmail}</a></li>
+                </ul>
+              </div>
+
+              <p><strong>💡 Tip:</strong> Doporučujeme kontaktovat více dodavatelů a porovnat jejich nabídky.</p>
+
+              <div style="text-align: center;">
+                <a href="https://svatbot.cz/marketplace" class="button">Procházet další dodavatele</a>
+              </div>
+
+              <div class="footer">
+                <p>Děkujeme, že používáte <strong>SvatBot.cz</strong></p>
+                <p>Váš pomocník při plánování svatby</p>
+              </div>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+    }
+
+    await transporter.sendMail(mailOptions)
+    console.log('✅ Customer confirmation email sent to:', customerEmail)
+    return true
+  } catch (error) {
+    console.error('❌ Error sending customer confirmation email:', error)
+    return false
+  }
+}
+
