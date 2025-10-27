@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import AccountModal from '@/components/account/AccountModal'
@@ -8,7 +8,7 @@ import { Loader2 } from 'lucide-react'
 
 type TabType = 'profile' | 'subscription' | 'payments' | 'statistics' | 'settings' | 'feedback'
 
-export default function AccountPage() {
+function AccountPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { user, isLoading } = useAuth()
@@ -55,8 +55,8 @@ export default function AccountPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
       {showModal && (
-        <AccountModalWrapper 
-          onClose={handleClose} 
+        <AccountModalWrapper
+          onClose={handleClose}
           initialTab={initialTab}
         />
       )}
@@ -65,13 +65,29 @@ export default function AccountPage() {
 }
 
 // Wrapper component to pass initialTab to AccountModal
-function AccountModalWrapper({ 
-  onClose, 
-  initialTab 
-}: { 
+function AccountModalWrapper({
+  onClose,
+  initialTab
+}: {
   onClose: () => void
-  initialTab: TabType 
+  initialTab: TabType
 }) {
   return <AccountModal onClose={onClose} initialTab={initialTab} />
+}
+
+// Main component with Suspense boundary
+export default function AccountPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 text-primary-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Načítání...</p>
+        </div>
+      </div>
+    }>
+      <AccountPageContent />
+    </Suspense>
+  )
 }
 
