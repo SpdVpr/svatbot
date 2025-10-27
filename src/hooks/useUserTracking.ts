@@ -34,6 +34,8 @@ export function useUserTracking() {
 
   // Initialize session when user logs in - listen to Firebase Auth directly
   useEffect(() => {
+    let currentSessionUserId: string | null = null
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (!firebaseUser) {
         console.log('👤 No Firebase user, skipping tracking')
@@ -41,16 +43,23 @@ export function useUserTracking() {
         if (sessionStartRef.current && sessionIdRef.current) {
           await endSession()
         }
-        lastUserIdRef.current = null
+        currentSessionUserId = null
         return
       }
 
-      // Check if this is a new login (different user or first login)
-      const isNewLogin = lastUserIdRef.current !== firebaseUser.uid
+      // Check if this is a new login (different user or first login in this session)
+      const isNewLogin = currentSessionUserId !== firebaseUser.uid
+
+      console.log('🔍 Auth state check:', {
+        email: firebaseUser.email,
+        uid: firebaseUser.uid,
+        currentSessionUserId,
+        isNewLogin
+      })
 
       if (isNewLogin) {
         console.log('🚀 Starting user tracking for:', firebaseUser.email)
-        lastUserIdRef.current = firebaseUser.uid
+        currentSessionUserId = firebaseUser.uid
 
         // End previous session if exists
         if (sessionStartRef.current && sessionIdRef.current) {
@@ -63,7 +72,7 @@ export function useUserTracking() {
         // Set up activity tracking
         setupActivityTracking(firebaseUser)
       } else {
-        console.log('✅ User already tracked, skipping session start')
+        console.log('✅ User already tracked in this session, skipping session start')
       }
     })
 
