@@ -139,7 +139,7 @@ export function useUserTracking() {
         const currentData = analyticsDoc.data()
         console.log('Current loginCount:', currentData.loginCount)
 
-        await updateDoc(analyticsRef, {
+        await setDoc(analyticsRef, {
           lastLoginAt: serverTimestamp(),
           loginCount: increment(1),
           isOnline: true,
@@ -150,7 +150,7 @@ export function useUserTracking() {
             duration: 0,
             pages: []
           })
-        })
+        }, { merge: true })
         console.log('✅ Analytics updated, new loginCount:', (currentData.loginCount || 0) + 1)
       }
 

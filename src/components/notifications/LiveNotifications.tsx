@@ -65,12 +65,15 @@ export default function LiveNotifications() {
   }
 
   const handleNotificationClick = async (notification: any) => {
+    // Mark as read
     if (!notification.read) {
       await markAsRead(notification.id)
     }
-    
+
+    // Navigate to action URL if present
     if (notification.actionUrl) {
       setIsOpen(false)
+      window.location.href = notification.actionUrl
     }
   }
 
@@ -148,30 +151,15 @@ export default function LiveNotifications() {
 
                           {/* Content */}
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <p className="text-sm font-medium text-gray-900">
-                                  {notification.title}
-                                </p>
-                                <p className="text-sm text-gray-600 mt-1">
-                                  {notification.message}
-                                </p>
-                                <p className="text-xs text-gray-500 mt-2">
-                                  {formatTimeAgo(notification.createdAt)}
-                                </p>
-                              </div>
-                              
-                              {/* Action Link */}
-                              {notification.actionUrl && (
-                                <Link
-                                  href={notification.actionUrl}
-                                  className="flex-shrink-0 ml-2 text-blue-600 hover:text-blue-700"
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <ExternalLink className="w-4 h-4" />
-                                </Link>
-                              )}
-                            </div>
+                            <p className="text-sm font-medium text-gray-900">
+                              {notification.title}
+                            </p>
+                            <p className="text-sm text-gray-600 mt-1">
+                              {notification.message}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-2">
+                              {formatTimeAgo(notification.createdAt)}
+                            </p>
 
                             {/* Priority Badge */}
                             {notification.priority === 'urgent' && (
