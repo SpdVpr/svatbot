@@ -12,26 +12,27 @@ function AccountPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { user, isLoading } = useAuth()
-  const [initialTab, setInitialTab] = useState<TabType>('profile')
 
-  useEffect(() => {
-    // Get tab from URL
-    const tab = searchParams.get('tab') as TabType
-    if (tab && ['profile', 'subscription', 'payments', 'statistics', 'settings', 'feedback'].includes(tab)) {
-      setInitialTab(tab)
-    }
-  }, [searchParams])
+  // Get tab from URL immediately
+  const tab = searchParams.get('tab') as TabType
+  const initialTab = (tab && ['profile', 'subscription', 'payments', 'statistics', 'settings', 'feedback'].includes(tab))
+    ? tab
+    : 'profile'
+
+  console.log('🔍 AccountPage render:', { user: user?.email, isLoading, initialTab })
 
   // Redirect to login if not authenticated (after loading completes)
   useEffect(() => {
+    console.log('🔍 AccountPage useEffect:', { user: user?.email, isLoading })
     if (!isLoading && !user) {
-      router.push('/')
+      console.log('⚠️ No user, redirecting to /')
+      router.replace('/')
     }
   }, [user, isLoading, router])
 
   const handleClose = () => {
     // Redirect to dashboard after closing
-    router.push('/')
+    router.replace('/')
   }
 
   // Show loading while checking auth
