@@ -45,6 +45,7 @@ function DashboardContent() {
   const [showWeddingSettings, setShowWeddingSettings] = useState(false)
   const [showNotesModal, setShowNotesModal] = useState(false)
   const [showAccountModal, setShowAccountModal] = useState(false)
+  const [accountInitialTab, setAccountInitialTab] = useState<'profile' | 'subscription' | 'payments' | 'statistics' | 'settings' | 'feedback'>('profile')
   const [showMobileMenu, setShowMobileMenu] = useState(false)
   const [showTrialExpiredModal, setShowTrialExpiredModal] = useState(false)
   const searchParams = useSearchParams()
@@ -75,6 +76,7 @@ function DashboardContent() {
   // Check for payment success/cancel in URL
   useEffect(() => {
     const payment = searchParams.get('payment')
+    const openAccount = searchParams.get('openAccount') as 'profile' | 'subscription' | 'payments' | 'statistics' | 'settings' | 'feedback' | null
 
     if (payment === 'success') {
       showSimpleToast('success', 'Platba úspěšná! 🎉', 'Vaše předplatné bylo aktivováno. Děkujeme!')
@@ -83,6 +85,15 @@ function DashboardContent() {
     } else if (payment === 'canceled') {
       showSimpleToast('info', 'Platba zrušena', 'Platba byla zrušena. Můžete to zkusit znovu kdykoliv.')
       // Remove payment param from URL
+      window.history.replaceState({}, '', '/')
+    }
+
+    // Check if we should open account modal with specific tab
+    if (openAccount && ['profile', 'subscription', 'payments', 'statistics', 'settings', 'feedback'].includes(openAccount)) {
+      console.log('🔍 Opening account modal with tab:', openAccount)
+      setAccountInitialTab(openAccount)
+      setShowAccountModal(true)
+      // Remove openAccount param from URL
       window.history.replaceState({}, '', '/')
     }
   }, [searchParams])
@@ -399,7 +410,10 @@ function DashboardContent() {
 
       {/* Account Modal */}
       {showAccountModal && (
-        <AccountModal onClose={() => setShowAccountModal(false)} />
+        <AccountModal
+          onClose={() => setShowAccountModal(false)}
+          initialTab={accountInitialTab}
+        />
       )}
 
       {/* Mobile Menu */}

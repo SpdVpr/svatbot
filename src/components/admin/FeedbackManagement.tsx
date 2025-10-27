@@ -150,7 +150,7 @@ export default function FeedbackManagement() {
         message: `Admin odpověděl na váš feedback: "${selectedFeedback.subject}"`,
         priority: 'medium',
         category: 'system',
-        actionUrl: '/account?tab=feedback',
+        actionUrl: '/?openAccount=feedback',
         data: {
           feedbackId: selectedFeedback.id,
           feedbackSubject: selectedFeedback.subject
