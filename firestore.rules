@@ -726,8 +726,8 @@ service cloud.firestore {
 
     // User Analytics - Users can write their own, admins can read and write all
     match /userAnalytics/{userId} {
-      // Admins can read all analytics
-      allow read: if isAdmin();
+      // Users can read their own analytics, admins can read all
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
 
       // Users can create and update their own analytics, admins can update all
       allow create: if isAuthenticated() && (isOwner(userId) || isAdmin());
