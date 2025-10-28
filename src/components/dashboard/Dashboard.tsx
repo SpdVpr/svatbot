@@ -110,7 +110,8 @@ function DashboardContent() {
   }
 
   const openNotesModal = () => {
-    startTransition(() => setShowNotesModal(true))
+    // Set state immediately to hide content, then start transition for modal
+    setShowNotesModal(true)
   }
 
   const closeNotesModal = () => {
@@ -118,10 +119,9 @@ function DashboardContent() {
   }
 
   const openAccountModal = (tab?: typeof accountInitialTab) => {
-    startTransition(() => {
-      if (tab) setAccountInitialTab(tab)
-      setShowAccountModal(true)
-    })
+    // Set state immediately to hide content, then start transition for modal
+    if (tab) setAccountInitialTab(tab)
+    setShowAccountModal(true)
   }
 
   const closeAccountModal = () => {
@@ -222,8 +222,10 @@ function DashboardContent() {
         {/* Scroll Progress Indicator */}
         <ScrollProgress />
 
-      {/* Glassmorphism Header */}
-      <header className="bg-gray-50/95 backdrop-blur-xl border-b border-gray-100/50 shadow-sm sticky top-0 z-50">
+      {/* Glassmorphism Header - hidden when modal is open */}
+      <header className={`bg-gray-50/95 backdrop-blur-xl border-b border-gray-100/50 shadow-sm sticky top-0 z-50 transition-opacity duration-200 ${
+        showNotesModal || showAccountModal ? 'opacity-0 pointer-events-none' : 'opacity-100'
+      }`}>
         {/* Mobile Header */}
         <div className="sm:hidden">
           <div className="mobile-header">
@@ -412,8 +414,10 @@ function DashboardContent() {
         </div>
       </header>
 
-      {/* Main Content - Reduced padding on mobile */}
-      <main className="flex-1 py-2 sm:py-6 px-2 sm:px-6 lg:px-8">
+      {/* Main Content - Reduced padding on mobile, hidden when modal is open */}
+      <main className={`flex-1 py-2 sm:py-6 px-2 sm:px-6 lg:px-8 transition-opacity duration-200 ${
+        showNotesModal || showAccountModal ? 'opacity-0 pointer-events-none' : 'opacity-100'
+      }`}>
         <DragDropWrapper onWeddingSettingsClick={openWeddingSettings} />
       </main>
 
