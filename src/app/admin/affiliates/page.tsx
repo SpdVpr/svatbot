@@ -281,7 +281,9 @@ export default function AdminAffiliatesPage() {
                         <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Kód</th>
                         <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Kliknutí</th>
                         <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Konverze</th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Provize</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Celkem</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Nevyplaceno</th>
+                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Vyplaceno</th>
                         <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Status</th>
                         <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Akce</th>
                       </tr>
@@ -314,6 +316,16 @@ export default function AdminAffiliatesPage() {
                           </td>
                           <td className="py-3 px-4 text-sm font-semibold text-gray-900">
                             {partner.stats.totalCommission.toFixed(0)} Kč
+                          </td>
+                          <td className="py-3 px-4">
+                            <div className="text-sm font-semibold text-orange-600">
+                              {(partner.stats.pendingCommission || 0).toFixed(0)} Kč
+                            </div>
+                          </td>
+                          <td className="py-3 px-4">
+                            <div className="text-sm font-semibold text-green-600">
+                              {(partner.stats.paidCommission || 0).toFixed(0)} Kč
+                            </div>
                           </td>
                           <td className="py-3 px-4">
                             <span className={`px-2 py-1 rounded-full text-xs font-semibold ${

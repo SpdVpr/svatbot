@@ -146,6 +146,22 @@ export default function AffiliateAnalytics({ affiliateId, days = 30 }: Props) {
 
   const totalClicks = Object.values(analytics.sources).reduce((sum, s) => sum + s.clicks, 0)
 
+  // If no data at all, show empty state
+  if (totalClicks === 0) {
+    return (
+      <div className="bg-gray-50 rounded-lg p-8 md:p-12 text-center">
+        <BarChart3 className="w-12 h-12 md:w-16 md:h-16 text-gray-400 mx-auto mb-4" />
+        <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">
+          Zatím žádná data
+        </h3>
+        <p className="text-sm md:text-base text-gray-600 max-w-md mx-auto">
+          Analytická data se zobrazí, jakmile někdo klikne na váš affiliate odkaz.
+          Sdílejte svůj odkaz a sledujte výsledky zde!
+        </p>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-4 md:space-y-6">
       {/* Sources */}
