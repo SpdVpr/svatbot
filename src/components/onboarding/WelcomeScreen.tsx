@@ -17,6 +17,9 @@ export default function WelcomeScreen() {
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'register'>('register')
   const [isDemoLoading, setIsDemoLoading] = useState(false)
+  const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' })
+  const [isContactFormSubmitting, setIsContactFormSubmitting] = useState(false)
+  const [contactFormSuccess, setContactFormSuccess] = useState(false)
 
   const handleGetStarted = () => {
     setAuthMode('register')
@@ -46,6 +49,30 @@ export default function WelcomeScreen() {
       setShowAuthModal(true)
     } finally {
       setIsDemoLoading(false)
+    }
+  }
+
+  const handleContactFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsContactFormSubmitting(true)
+
+    try {
+      // Send email using mailto link as fallback
+      const subject = encodeURIComponent(`Kontakt z webu: ${contactForm.name}`)
+      const body = encodeURIComponent(`Jméno: ${contactForm.name}\nEmail: ${contactForm.email}\n\nZpráva:\n${contactForm.message}`)
+      window.location.href = `mailto:info@svatbot.cz?subject=${subject}&body=${body}`
+
+      // Show success message
+      setContactFormSuccess(true)
+      setContactForm({ name: '', email: '', message: '' })
+
+      // Reset success message after 5 seconds
+      setTimeout(() => setContactFormSuccess(false), 5000)
+    } catch (error) {
+      console.error('Contact form error:', error)
+      alert('Omlouváme se, ale nepodařilo se odeslat zprávu. Prosím kontaktujte nás přímo na info@svatbot.cz nebo zavolejte na +420 732 264 276.')
+    } finally {
+      setIsContactFormSubmitting(false)
     }
   }
 
@@ -89,7 +116,7 @@ export default function WelcomeScreen() {
               <Sparkles className="w-3 h-3 md:w-4 md:h-4 mr-1.5 md:mr-2 text-rose-500" aria-hidden="true" /> Český svatební plánovač s AI
             </span>
             <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-display font-extrabold leading-tight mb-4 md:mb-6 text-gray-900">
-              Naplánujte svatbu <span className="text-gradient-primary">AI SvatBot</span> asistentem
+              Naplánujte svatbu <span className="text-gradient-primary">s SvatBot</span> asistentem
             </h1>
             <p className="text-base md:text-lg lg:text-xl text-gray-600 mb-6 md:mb-10 max-w-lg lg:max-w-xl mx-auto">
               SvatBot.cz kombinuje AI technologie s intuitivními nástroji: inteligentní asistent, rozpočet, timeline, hosté, seating plan, svatební web a marketplace ověřených dodavatelů – vše na jedné platformě.
@@ -944,21 +971,9 @@ export default function WelcomeScreen() {
                   </div>
                   <div>
                     <div className="text-sm text-white/70 mb-1">Telefon</div>
-                    <a href="tel:+420777123456" className="text-lg font-semibold text-white hover:text-yellow-300 transition-colors">
-                      +420 777 123 456
+                    <a href="tel:+420732264276" className="text-lg font-semibold text-white hover:text-yellow-300 transition-colors">
+                      +420 732 264 276
                     </a>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <div className="text-sm text-white/70 mb-1">Adresa</div>
-                    <div className="text-lg font-semibold text-white">
-                      Praha, Česká republika
-                    </div>
                   </div>
                 </div>
 
@@ -992,12 +1007,20 @@ export default function WelcomeScreen() {
             <div className="bg-white rounded-3xl p-8 md:p-10 shadow-2xl animate-fade-in" style={{ animationDelay: '0.5s' }}>
               <h3 className="text-2xl font-display font-bold text-gray-900 mb-6">Napište nám</h3>
 
-              <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); alert('Děkujeme za zprávu! Brzy se vám ozveme.'); }}>
+              {contactFormSuccess && (
+                <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
+                  <p className="text-emerald-800 font-medium">✓ Děkujeme za zprávu! Brzy se vám ozveme.</p>
+                </div>
+              )}
+
+              <form className="space-y-4" onSubmit={handleContactFormSubmit}>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Jméno</label>
                   <input
                     type="text"
                     placeholder="Vaše jméno"
+                    value={contactForm.name}
+                    onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
                     className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-rose-500 focus:outline-none transition-colors"
                     required
                   />
@@ -1008,6 +1031,8 @@ export default function WelcomeScreen() {
                   <input
                     type="email"
                     placeholder="vas@email.cz"
+                    value={contactForm.email}
+                    onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
                     className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-rose-500 focus:outline-none transition-colors"
                     required
                   />
@@ -1018,6 +1043,8 @@ export default function WelcomeScreen() {
                   <textarea
                     placeholder="Jak vám můžeme pomoci?"
                     rows={4}
+                    value={contactForm.message}
+                    onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
                     className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-rose-500 focus:outline-none transition-colors resize-none"
                     required
                   ></textarea>
@@ -1025,10 +1052,11 @@ export default function WelcomeScreen() {
 
                 <button
                   type="submit"
-                  className="w-full px-6 py-4 bg-gradient-to-r from-rose-500 to-purple-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center button-glow"
+                  disabled={isContactFormSubmitting}
+                  className="w-full px-6 py-4 bg-gradient-to-r from-rose-500 to-purple-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center button-glow disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Send className="w-5 h-5 mr-2" />
-                  Odeslat zprávu
+                  {isContactFormSubmitting ? 'Odesílám...' : 'Odeslat zprávu'}
                 </button>
               </form>
 

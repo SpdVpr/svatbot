@@ -145,8 +145,8 @@ export default function PricingSection({ onGetStarted }: PricingSectionProps) {
 
             <div className="mb-8">
               <div className="flex items-baseline gap-2">
-                <span className="text-6xl md:text-7xl font-extrabold text-white">299 Kč</span>
-                <span className="text-gray-400 text-lg">/měsíc</span>
+                <span className="text-5xl md:text-6xl font-extrabold text-white whitespace-nowrap">299 Kč</span>
+                <span className="text-gray-400 text-base md:text-lg">/měsíc</span>
               </div>
               <p className="text-gray-400 text-sm mt-2">Fakturováno měsíčně</p>
             </div>
