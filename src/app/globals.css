@@ -509,3 +509,16 @@
 .animate-fade-in {
   animation: fade-in 200ms ease-out;
 }
+
+/* Custom logo sizing for header */
+.header-logo {
+  width: 2rem;
+  height: 2rem;
+}
+
+@media (min-width: 768px) {
+  .header-logo {
+    width: 2rem;
+    height: 2.8rem;
+  }
+}
