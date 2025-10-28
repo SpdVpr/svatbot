@@ -19,11 +19,12 @@ export default function StaggerContainer({
     <div className={className}>
       {childrenArray.map((child, index) => {
         if (isValidElement(child)) {
-          return cloneElement(child as React.ReactElement<any>, {
+          const childElement = child as React.ReactElement<{ className?: string; style?: React.CSSProperties }>
+          return cloneElement(childElement, {
             key: index,
-            className: `${child.props.className || ''} stagger-item`,
+            className: `${childElement.props.className || ''} stagger-item`,
             style: {
-              ...child.props.style,
+              ...childElement.props.style,
               animationDelay: `${index * staggerDelay}ms`
             }
           })

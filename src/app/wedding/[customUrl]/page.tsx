@@ -12,14 +12,14 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 interface PageProps {
-  params: {
+  params: Promise<{
     customUrl: string
-  }
+  }>
 }
 
 // Generování metadata pro SEO
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { customUrl } = params
+  const { customUrl } = await params
 
   try {
     // TODO: Implement proper query by customUrl
@@ -70,7 +70,7 @@ async function getWeddingWebsite(customUrl: string): Promise<WeddingWebsite | nu
 }
 
 export default async function WeddingWebsitePage({ params }: PageProps) {
-  const { customUrl } = params
+  const { customUrl } = await params
 
   console.log('🌐 Loading wedding website:', customUrl)
 

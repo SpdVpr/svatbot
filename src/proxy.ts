@@ -14,10 +14,10 @@ const EXCLUDED_PATHS = [
   '/sitemap.xml',
 ]
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const url = request.nextUrl.clone()
   const hostname = request.headers.get('host') || ''
-  
+
   // Kontrola, jestli cesta začína na vyloučenou cestu
   const isExcludedPath = EXCLUDED_PATHS.some(path => url.pathname.startsWith(path))
   if (isExcludedPath) {
@@ -26,7 +26,7 @@ export function middleware(request: NextRequest) {
 
   // Extrakce subdomény
   const subdomain = getSubdomain(hostname)
-  
+
   // Pokud je to hlavní doména nebo localhost, pokračuj normálně
   if (!subdomain || MAIN_DOMAINS.includes(subdomain)) {
     return NextResponse.next()
@@ -34,12 +34,12 @@ export function middleware(request: NextRequest) {
 
   // Pokud je to subdoména, rewrite na svatební web
   console.log(`🌐 Subdomain detected: ${subdomain}`)
-  
+
   // Rewrite URL na /wedding/[customUrl]
   url.pathname = `/wedding/${subdomain}${url.pathname}`
-  
+
   console.log(`🔄 Rewriting to: ${url.pathname}`)
-  
+
   return NextResponse.rewrite(url)
 }
 

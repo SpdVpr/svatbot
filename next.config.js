@@ -27,10 +27,14 @@ const nextConfig = {
         hostname: 'images.unsplash.com',
       },
     ],
+    // Configure image quality levels for Next.js 16
+    qualities: [75, 90],
   },
   env: {
     CUSTOM_KEY: process.env.CUSTOM_KEY,
   },
+  // Turbopack configuration (empty = use defaults)
+  turbopack: {},
   // Exclude backend and functions from Next.js compilation
   experimental: {
     externalDir: true,

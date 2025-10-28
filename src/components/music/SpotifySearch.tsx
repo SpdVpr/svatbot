@@ -17,7 +17,7 @@ export default function SpotifySearch({ onSelectTrack, placeholder }: SpotifySea
   const [playingTrack, setPlayingTrack] = useState<string | null>(null)
   const [showResults, setShowResults] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
-  const searchTimeoutRef = useRef<NodeJS.Timeout>()
+  const searchTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   useEffect(() => {
     // Cleanup audio on unmount
