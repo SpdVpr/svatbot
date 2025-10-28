@@ -95,7 +95,7 @@ export default function LiveNotifications() {
 
         {/* Notification Dropdown - Mobile optimized */}
         {isOpen && (
-          <div className="absolute right-0 top-full mt-2 w-[calc(100vw-1rem)] sm:w-96 max-w-md bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-[80vh] sm:max-h-96 overflow-hidden">
+          <div className="fixed sm:absolute left-2 right-2 sm:right-0 sm:left-auto top-[60px] sm:top-full mt-0 sm:mt-2 w-auto sm:w-96 max-w-md bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-[80vh] sm:max-h-96 overflow-hidden">
             {/* Header */}
             <div className="p-3 sm:p-4 border-b border-gray-200 flex items-center justify-between">
               <h3 className="text-base sm:text-lg font-semibold text-gray-900">Notifikace</h3>
