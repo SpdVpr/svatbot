@@ -35,7 +35,7 @@
   "author": "SvatBot.cz Team",
   "license": "MIT",
   "dependencies": {
-    "@headlessui/react": "^1.7.0",
+    "@headlessui/react": "^2.2.9",
     "@heroicons/react": "^2.0.0",
     "@hookform/resolvers": "^3.3.0",
     "@radix-ui/react-slot": "^1.2.3",
@@ -77,7 +77,7 @@
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.19",
     "@testing-library/jest-dom": "^6.1.0",
-    "@testing-library/react": "^13.4.0",
+    "@testing-library/react": "^16.3.0",
     "@types/xlsx": "^0.0.35",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
