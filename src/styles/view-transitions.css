@@ -268,7 +268,7 @@
 
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 250ms;
+  animation-duration: 400ms; /* Increased from 250ms to 400ms for testing */
   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -287,14 +287,14 @@
   }
   to {
     opacity: 0;
-    transform: translateY(-8px);
+    transform: translateY(-12px); /* Increased from -8px to -12px */
   }
 }
 
 @keyframes page-fade-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(12px); /* Increased from 8px to 12px */
   }
   to {
     opacity: 1;

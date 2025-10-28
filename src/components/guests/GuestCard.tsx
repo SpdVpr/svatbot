@@ -149,7 +149,7 @@ export default function GuestCard({
 
   return (
     <div
-      className="wedding-card group p-4"
+      className="wedding-card group p-3 sm:p-4"
       style={{
         ...getViewTransitionName(`guest-card-${guest.id}`),
         ...(compact && { padding: '0.75rem' })
@@ -158,17 +158,17 @@ export default function GuestCard({
     >
 
 
-      {/* Actions menu - Always visible on mobile, hover on desktop */}
-      <div className="absolute top-2 right-2 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-10">
+      {/* Actions menu - Desktop only (hover) */}
+      <div className="hidden sm:block absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
         <div className="relative">
           <button
             onClick={(e) => {
               e.stopPropagation()
               setShowActions(!showActions)
             }}
-            className="p-2 sm:p-1 rounded-full hover:bg-gray-100 transition-colors bg-white shadow-sm sm:shadow-none"
+            className="p-1 rounded-full hover:bg-gray-100 transition-colors"
           >
-            <MoreHorizontal className="w-5 h-5 sm:w-4 sm:h-4 text-gray-600 sm:text-gray-400" />
+            <MoreHorizontal className="w-4 h-4 text-gray-400" />
           </button>
 
           {showActions && (
@@ -265,19 +265,19 @@ export default function GuestCard({
           )}
         </div>
 
-        {/* Contact info */}
+        {/* Contact info - Email and Phone stacked */}
         {showContactInfo && (guest.email || guest.phone) && (
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             {guest.email && (
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                <Mail className="w-3 h-3" />
+              <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-600 min-w-0">
+                <Mail className="w-3 h-3 flex-shrink-0" />
                 <span className="truncate">{guest.email}</span>
               </div>
             )}
             {guest.phone && (
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                <Phone className="w-3 h-3" />
-                <span>{guest.phone}</span>
+              <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-600">
+                <Phone className="w-3 h-3 flex-shrink-0" />
+                <span className="whitespace-nowrap">{guest.phone}</span>
               </div>
             )}
           </div>
@@ -385,8 +385,8 @@ export default function GuestCard({
               }}
               disabled={isUpdating}
               className={`p-1 rounded transition-colors ${
-                guest.rsvpStatus === 'attending' 
-                  ? 'bg-green-100 text-green-600' 
+                guest.rsvpStatus === 'attending'
+                  ? 'bg-green-100 text-green-600'
                   : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
               }`}
               title="Označit jako přijde"
@@ -400,8 +400,8 @@ export default function GuestCard({
               }}
               disabled={isUpdating}
               className={`p-1 rounded transition-colors ${
-                guest.rsvpStatus === 'declined' 
-                  ? 'bg-red-100 text-red-600' 
+                guest.rsvpStatus === 'declined'
+                  ? 'bg-red-100 text-red-600'
                   : 'text-gray-400 hover:text-red-600 hover:bg-red-50'
               }`}
               title="Označit jako nepřijde"
@@ -440,14 +440,36 @@ export default function GuestCard({
             )}
           </div>
 
-          {/* Invitation status */}
-          <div className="text-xs text-gray-500">
+          {/* Invitation status - Hidden on mobile */}
+          <div className="hidden sm:block text-xs text-gray-500">
             {guest.invitationSent ? (
               <span className="text-green-600">✓ Pozván</span>
             ) : (
               <span>Nepozván</span>
             )}
           </div>
+        </div>
+
+        {/* Mobile Action Buttons - Bottom bar like budget module */}
+        <div className="sm:hidden flex items-center justify-end space-x-2 pt-3 mt-3 border-t border-gray-100">
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onEdit?.(guest)
+            }}
+            className="flex items-center space-x-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <Edit className="w-4 h-4" />
+            <span>Upravit</span>
+          </button>
+
+          <button
+            onClick={handleDelete}
+            className="flex items-center space-x-1 px-3 py-1.5 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+          >
+            <Trash2 className="w-4 h-4" />
+            <span>Smazat</span>
+          </button>
         </div>
       </div>
 

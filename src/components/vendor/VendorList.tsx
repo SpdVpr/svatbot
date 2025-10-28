@@ -327,68 +327,73 @@ export default function VendorList({
 
             return (
               <div key={vendor.id} className="wedding-card">
-                <div className="flex items-start justify-between">
+                {/* Mobile: Stack layout, Desktop: Horizontal layout */}
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                   {/* Main Content */}
-                  <div className="flex-1">
-                    <div className="flex items-start space-x-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start space-x-3 sm:space-x-4">
                       {/* Category Icon */}
-                      <div className={`p-3 rounded-xl ${categoryConfig.color} flex-shrink-0`}>
-                        <span className="text-lg">{categoryConfig.icon}</span>
+                      <div className={`p-2 sm:p-3 rounded-xl ${categoryConfig.color} flex-shrink-0`}>
+                        <span className="text-base sm:text-lg">{categoryConfig.icon}</span>
                       </div>
 
                       {/* Vendor Info */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center space-x-3 mb-2">
-                          <h3 className="text-lg font-semibold text-gray-900 truncate">
+                        {/* Header with badges - Stack on mobile */}
+                        <div className="mb-2">
+                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate mb-2">
                             {vendor.name}
                           </h3>
 
-                          {/* Status Badge */}
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusConfig.color}`}>
-                            {statusConfig.name}
-                          </span>
-
-                          {/* Priority Badge */}
-                          {getPriorityColor(vendor.priority) && (
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(vendor.priority)}`}>
-                              {getPriorityLabel(vendor.priority)}
+                          {/* Badges - Wrap on mobile */}
+                          <div className="flex flex-wrap items-center gap-2">
+                            {/* Status Badge */}
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusConfig.color} whitespace-nowrap`}>
+                              {statusConfig.name}
                             </span>
-                          )}
+
+                            {/* Priority Badge */}
+                            {getPriorityColor(vendor.priority) && (
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(vendor.priority)} whitespace-nowrap`}>
+                                {getPriorityLabel(vendor.priority)}
+                              </span>
+                            )}
+                          </div>
                         </div>
 
-                        <p className="text-sm text-gray-600 mb-3">
+                        <p className="text-xs sm:text-sm text-gray-600 mb-3 line-clamp-2">
                           {categoryConfig.name} • {vendor.description || 'Bez popisu'}
                         </p>
 
-                        {/* Contact Info */}
+                        {/* Contact Info - Stack on mobile */}
                         {primaryContact && (
-                          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                          <div className="space-y-1 sm:space-y-0 sm:flex sm:flex-wrap sm:items-center sm:gap-4 text-xs sm:text-sm text-gray-500">
                             <div className="flex items-center space-x-1">
-                              <span className="font-medium">{primaryContact.name}</span>
+                              <span className="font-medium truncate">{primaryContact.name}</span>
                             </div>
 
                             {primaryContact.email && (
-                              <div className="flex items-center space-x-1">
-                                <Mail className="w-4 h-4" />
-                                <span>{primaryContact.email}</span>
+                              <div className="flex items-center space-x-1 min-w-0">
+                                <Mail className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                                <span className="truncate">{primaryContact.email}</span>
                               </div>
                             )}
 
                             {primaryContact.phone && (
                               <div className="flex items-center space-x-1">
-                                <Phone className="w-4 h-4" />
-                                <span>{primaryContact.phone}</span>
+                                <Phone className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                                <span className="whitespace-nowrap">{primaryContact.phone}</span>
                               </div>
                             )}
 
                             {vendor.website && (
                               <div className="flex items-center space-x-1">
-                                <Globe className="w-4 h-4" />
+                                <Globe className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                                 <a
                                   href={vendor.website}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-primary-600 hover:text-primary-700"
+                                  className="text-primary-600 hover:text-primary-700 truncate"
                                 >
                                   Web
                                 </a>
@@ -397,23 +402,23 @@ export default function VendorList({
                           </div>
                         )}
 
-                        {/* Services and Price */}
+                        {/* Services and Price - Stack on mobile */}
                         <div className="mt-3 pt-3 border-t border-gray-200">
-                          <div className="flex items-center justify-between">
-                            <div className="text-sm text-gray-600">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                            <div className="text-xs sm:text-sm text-gray-600 min-w-0">
                               {vendor.services.length > 0 ? (
-                                <>
-                                  <span className="font-medium">{vendor.services.length}</span> služeb
+                                <div className="flex flex-wrap items-center gap-1">
+                                  <span className="font-medium whitespace-nowrap">{vendor.services.length} služeb</span>
                                   {vendor.services[0] && (
-                                    <span className="ml-2">• {vendor.services[0].name}</span>
+                                    <span className="truncate">• {vendor.services[0].name}</span>
                                   )}
-                                </>
+                                </div>
                               ) : (
                                 <span className="text-gray-500">Žádné služby</span>
                               )}
                             </div>
 
-                            <div className="text-right">
+                            <div className="text-left sm:text-right flex-shrink-0">
                               {vendor.priceRange ? (
                                 <div>
                                   {/* Check if any service has discount */}
@@ -515,8 +520,8 @@ export default function VendorList({
                     </div>
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center space-x-2 ml-4">
+                  {/* Actions - Hidden on mobile, shown on desktop in side */}
+                  <div className="hidden sm:flex items-center space-x-2 ml-4 flex-shrink-0">
                     <button
                       onClick={() => onViewVendor(vendor)}
                       className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
@@ -541,6 +546,33 @@ export default function VendorList({
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
+                </div>
+
+                {/* Mobile Actions - Bottom bar like budget module */}
+                <div className="sm:hidden flex items-center justify-end space-x-2 pt-3 mt-3 border-t border-gray-100">
+                  <button
+                    onClick={() => onViewVendor(vendor)}
+                    className="flex items-center space-x-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    <Eye className="w-4 h-4" />
+                    <span>Detail</span>
+                  </button>
+
+                  <button
+                    onClick={() => onEditVendor(vendor)}
+                    className="flex items-center space-x-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    <Edit className="w-4 h-4" />
+                    <span>Upravit</span>
+                  </button>
+
+                  <button
+                    onClick={() => onDeleteVendor(vendor.id)}
+                    className="flex items-center space-x-1 px-3 py-1.5 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    <span>Smazat</span>
+                  </button>
                 </div>
 
                 {/* Tags */}

@@ -32,15 +32,15 @@ export default function AppTemplate({ children }: AppTemplateProps) {
 
   return (
     <>
-      {/* Smooth page content transition */}
+      {/* Smooth page content transition - Slower for testing */}
       <AnimatePresence mode="wait">
         <motion.div
           key={displayPath}
-          initial={{ opacity: 0, y: 8 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
+          exit={{ opacity: 0, y: -12 }}
           transition={{
-            duration: 0.25,
+            duration: 0.4, // Increased from 0.25 to 0.4 for testing
             ease: [0.4, 0, 0.2, 1] // Smooth easing curve
           }}
           className="w-full"
