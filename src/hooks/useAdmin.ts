@@ -176,10 +176,11 @@ export function useAdmin() {
         })
 
         if (!isAdmin || !role) {
-          // Not an admin, sign out
-          console.warn('❌ User does not have admin claims - signing out')
+          // Not an admin, just set loading to false (don't sign out regular users!)
+          console.warn('❌ User does not have admin claims - not an admin')
           console.warn('💡 To fix: Run "node functions/setAdminClaims.js ' + firebaseUser.uid + ' super_admin"')
-          await signOut(auth)
+          // DON'T sign out - this would log out regular users!
+          // await signOut(auth)
           setUser(null)
           setSession(null)
           localStorage.removeItem('admin_session')
