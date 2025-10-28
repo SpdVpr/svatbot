@@ -574,24 +574,32 @@ export async function trackAffiliateConversion(
 
 /**
  * Initialize affiliate tracking on page load
+ * ONLY tracks clicks when ref parameter is in URL (not from cookie)
  */
 export function initAffiliateTracking(): void {
   if (typeof window === 'undefined') return
 
-  const affiliateCode = getAffiliateCode()
+  // Check if ref parameter is in URL (this is a real affiliate click)
+  const urlParams = new URLSearchParams(window.location.search)
+  const refParam = urlParams.get('ref')
 
   logger.log('🔍 Affiliate tracking initialized:', {
-    affiliateCode,
     url: window.location.href,
-    hasRefParam: new URLSearchParams(window.location.search).has('ref')
+    hasRefParam: !!refParam,
+    refParam
   })
 
-  if (affiliateCode) {
+  // ONLY track click if ref parameter is in URL
+  // Don't track clicks from cookie (that would count every page view)
+  if (refParam) {
+    // Store in cookie for later registration/conversion tracking
+    setAffiliateCookie(refParam)
+
     const landingPage = window.location.pathname + window.location.search
-    logger.log('✅ Tracking affiliate click:', { affiliateCode, landingPage })
-    trackAffiliateClick(affiliateCode, landingPage)
+    logger.log('✅ Tracking affiliate click:', { affiliateCode: refParam, landingPage })
+    trackAffiliateClick(refParam, landingPage)
   } else {
-    logger.log('ℹ️ No affiliate code found')
+    logger.log('ℹ️ No ref parameter in URL - not tracking click')
   }
 }
 
