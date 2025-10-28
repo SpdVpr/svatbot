@@ -4,6 +4,9 @@
 /* Import 2025 animation trends */
 @import '../styles/2025-trends.css';
 
+/* Import View Transitions API styles (Next.js 16) */
+@import '../styles/view-transitions.css';
+
 /* Import Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap');
 

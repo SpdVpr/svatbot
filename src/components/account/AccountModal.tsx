@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useSubscription } from '@/hooks/useSubscription'
 import {
@@ -29,6 +29,7 @@ import PaymentsTab from './PaymentsTab'
 import StatisticsTab from './StatisticsTab'
 import SettingsTab from './SettingsTab'
 import FeedbackTab from './FeedbackTab'
+import { getViewTransitionName } from '@/hooks/useViewTransition'
 
 interface AccountModalProps {
   onClose: () => void
@@ -61,9 +62,29 @@ export default function AccountModal({ onClose, initialTab = 'profile' }: Accoun
     onClose()
   }
 
+  // Zabránit scrollování pozadí když je modal otevřený
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [])
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
-      <div className="bg-white rounded-xl max-w-5xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col">
+      {/* Backdrop with View Transition */}
+      <div
+        className="absolute inset-0 backdrop-blur-sm"
+        style={getViewTransitionName('account-modal-backdrop')}
+        onClick={onClose}
+      />
+
+      {/* Modal Content with View Transition */}
+      <div
+        className="bg-white rounded-xl max-w-5xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col relative"
+        style={getViewTransitionName('account-modal')}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-3 sm:p-6 border-b border-gray-200 bg-gradient-to-r from-primary-50 to-primary-100">
           <div className="flex items-center space-x-2 sm:space-x-4 min-w-0 flex-1">

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Edit3, Lock, Unlock, RotateCcw, GripVertical, Eye, EyeOff } from 'lucide-react'
 import { useDashboard } from '@/hooks/useDashboard'
 import { DashboardModule } from '@/types/dashboard'
+import { getViewTransitionName } from '@/hooks/useViewTransition'
 
 // Import module components
 import WeddingCountdownModule from './modules/WeddingCountdownModule'
@@ -304,6 +305,7 @@ export default function SimpleDragDrop({ onWeddingSettingsClick }: SimpleDragDro
               ${isDragging && draggedModule !== module.id ? 'transition-all duration-200 ease-out' : ''}
               relative group
             `}
+            style={getViewTransitionName(`dashboard-module-${module.id}`)}
             draggable={layout.isEditMode && !module.isLocked}
             onDragStart={(e) => handleDragStart(e, module.id, index)}
             onDragEnd={handleDragEnd}

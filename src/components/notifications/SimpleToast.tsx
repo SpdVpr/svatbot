@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { X, CheckCircle, AlertTriangle, Info, AlertCircle } from 'lucide-react'
+import { getViewTransitionName } from '@/hooks/useViewTransition'
 
 interface Toast {
   id: string
@@ -74,11 +75,12 @@ export default function SimpleToastContainer() {
     <div className="fixed top-4 right-4 z-50 space-y-2">
       {toasts.map((toast) => {
         const Icon = toastIcons[toast.type]
-        
+
         return (
           <div
             key={toast.id}
             className={`max-w-sm w-full bg-white shadow-lg rounded-lg border-l-4 p-4 ${toastColors[toast.type]} animate-in slide-in-from-right duration-300`}
+            style={getViewTransitionName(`toast-${toast.id}`)}
           >
             <div className="flex items-start">
               <div className="flex-shrink-0">
@@ -90,7 +92,7 @@ export default function SimpleToastContainer() {
               </div>
               <button
                 onClick={() => removeToast(toast.id)}
-                className="flex-shrink-0 ml-4 text-gray-400 hover:text-gray-600"
+                className="flex-shrink-0 ml-4 text-gray-400 hover:text-gray-600 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>

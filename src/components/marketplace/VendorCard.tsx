@@ -19,6 +19,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { useVendor } from '@/hooks/useVendor'
 import { useAuth } from '@/hooks/useAuth'
+import { getViewTransitionName } from '@/hooks/useViewTransition'
 
 interface VendorCardProps {
   vendor: MarketplaceVendor
@@ -107,7 +108,10 @@ export default function VendorCard({ vendor, compact = false, isFavorite, toggle
 
   return (
     <Link href={`/marketplace/vendor/${vendor.id}`} className="block">
-      <div className="wedding-card group hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer">
+      <div
+        className="wedding-card group hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer"
+        style={getViewTransitionName(`vendor-card-${vendor.id}`)}
+      >
         {/* Image */}
         <div className="relative h-48 overflow-hidden rounded-t-xl">
           <img

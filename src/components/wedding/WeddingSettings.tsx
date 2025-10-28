@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useWedding } from '@/hooks/useWedding'
 import VenueLocationMap from '@/components/wedding/VenueLocationMap'
 import {
@@ -16,6 +16,7 @@ import {
   Coins,
   Sparkles
 } from 'lucide-react'
+import { getViewTransitionName } from '@/hooks/useViewTransition'
 
 interface WeddingSettingsProps {
   onClose: () => void
@@ -151,9 +152,29 @@ export default function WeddingSettings({ onClose, onSave }: WeddingSettingsProp
     }
   }
 
+  // Zabránit scrollování pozadí když je modal otevřený
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [])
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      {/* Backdrop with View Transition */}
+      <div
+        className="absolute inset-0 backdrop-blur-sm"
+        style={getViewTransitionName('wedding-settings-backdrop')}
+        onClick={onClose}
+      />
+
+      {/* Modal Content with View Transition */}
+      <div
+        className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative"
+        style={getViewTransitionName('wedding-settings-modal')}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900 flex items-center space-x-2">

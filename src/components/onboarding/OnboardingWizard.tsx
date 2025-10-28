@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useViewTransition, getViewTransitionName } from '@/hooks/useViewTransition'
 
 interface OnboardingWizardProps {
   onClose?: () => void
@@ -22,9 +23,10 @@ interface OnboardingWizardProps {
 
 export default function OnboardingWizard({ onClose, autoShow = true }: OnboardingWizardProps) {
   const router = useRouter()
-  const { 
-    onboardingState, 
-    steps, 
+  const { startTransition } = useViewTransition()
+  const {
+    onboardingState,
+    steps,
     loading,
     completeStep,
     completeOnboarding,
@@ -75,12 +77,16 @@ export default function OnboardingWizard({ onClose, autoShow = true }: Onboardin
       completeOnboarding()
       handleClose()
     } else {
-      setCurrentStepIndex(prev => Math.min(prev + 1, steps.length - 1))
+      startTransition(() => {
+        setCurrentStepIndex(prev => Math.min(prev + 1, steps.length - 1))
+      })
     }
   }
 
   const handlePrevious = () => {
-    setCurrentStepIndex(prev => Math.max(prev - 1, 0))
+    startTransition(() => {
+      setCurrentStepIndex(prev => Math.max(prev - 1, 0))
+    })
   }
 
   const handleSkip = () => {
@@ -100,7 +106,10 @@ export default function OnboardingWizard({ onClose, autoShow = true }: Onboardin
 
   const modalContent = (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden my-8">
+      <div
+        className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden my-8"
+        style={getViewTransitionName('onboarding-wizard')}
+      >
         {/* Header */}
         <div className="bg-gradient-to-r from-primary-500 to-pink-500 p-6 text-white relative">
           <button

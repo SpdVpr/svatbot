@@ -22,6 +22,7 @@ import WeddingSettings from '@/components/wedding/WeddingSettings'
 import AccountModal from '@/components/account/AccountModal'
 import AIAssistant from '@/components/ai/AIAssistant'
 import NotesModal from '@/components/notes/NotesModal'
+import { useViewTransition } from '@/hooks/useViewTransition'
 import MobileMenu from '@/components/navigation/MobileMenu'
 import LiveNotifications, { LiveToastNotifications } from '@/components/notifications/LiveNotifications'
 import SimpleToastContainer, { showSimpleToast } from '@/components/notifications/SimpleToast'
@@ -42,6 +43,7 @@ function DashboardContent() {
   const { logout, user } = useAuth()
   const { subscription, trialDaysRemaining, hasPremiumAccess } = useSubscription()
   const { getCanvasMaxWidth } = useCanvas()
+  const { startTransition } = useViewTransition()
   const [showWeddingSettings, setShowWeddingSettings] = useState(false)
   const [showNotesModal, setShowNotesModal] = useState(false)
   const [showAccountModal, setShowAccountModal] = useState(false)
@@ -97,6 +99,42 @@ function DashboardContent() {
       window.history.replaceState({}, '', '/')
     }
   }, [searchParams])
+
+  // Helper functions for opening/closing modals with View Transitions
+  const openWeddingSettings = () => {
+    startTransition(() => setShowWeddingSettings(true))
+  }
+
+  const closeWeddingSettings = () => {
+    startTransition(() => setShowWeddingSettings(false))
+  }
+
+  const openNotesModal = () => {
+    startTransition(() => setShowNotesModal(true))
+  }
+
+  const closeNotesModal = () => {
+    startTransition(() => setShowNotesModal(false))
+  }
+
+  const openAccountModal = (tab?: typeof accountInitialTab) => {
+    startTransition(() => {
+      if (tab) setAccountInitialTab(tab)
+      setShowAccountModal(true)
+    })
+  }
+
+  const closeAccountModal = () => {
+    startTransition(() => setShowAccountModal(false))
+  }
+
+  const openMobileMenu = () => {
+    startTransition(() => setShowMobileMenu(true))
+  }
+
+  const closeMobileMenu = () => {
+    startTransition(() => setShowMobileMenu(false))
+  }
 
   // Demo notification hooks (for testing)
   const { createNotification, deleteAllNotifications } = useWeddingNotifications()
@@ -191,7 +229,7 @@ function DashboardContent() {
           <div className="mobile-header">
             <div className="flex items-center space-x-2">
               <button
-                onClick={() => setShowMobileMenu(true)}
+                onClick={openMobileMenu}
                 className="mobile-nav-button text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 title="Menu"
               >
@@ -206,14 +244,14 @@ function DashboardContent() {
             <div className="flex items-center space-x-2">
               <LiveNotifications />
               <button
-                onClick={() => setShowNotesModal(true)}
+                onClick={openNotesModal}
                 className="mobile-nav-button text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 title="Poznámky"
               >
                 <StickyNote className="w-4 h-4" />
               </button>
               <button
-                onClick={() => setShowAccountModal(true)}
+                onClick={() => openAccountModal()}
                 className="mobile-nav-button text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 title="Účet"
               >
@@ -232,7 +270,7 @@ function DashboardContent() {
           {/* Mobile wedding info */}
           <div className="px-4 pb-3 border-t border-gray-100">
             <button
-              onClick={() => setShowWeddingSettings(true)}
+              onClick={openWeddingSettings}
               className="text-left w-full hover:bg-gray-50 p-2 rounded-lg transition-colors"
             >
               <h2 className="text-sm font-semibold text-gray-900">
@@ -274,7 +312,7 @@ function DashboardContent() {
               />
               <div className="border-l border-gray-300 pl-6">
                 <button
-                  onClick={() => setShowWeddingSettings(true)}
+                  onClick={openWeddingSettings}
                   className="text-left hover:text-primary-600 transition-colors group"
                   title="Klikněte pro úpravu"
                 >
@@ -314,7 +352,7 @@ function DashboardContent() {
               </div>
               <LiveNotifications />
               <button
-                onClick={() => setShowNotesModal(true)}
+                onClick={openNotesModal}
                 className="btn-outline flex items-center space-x-2"
                 title="Poznámky"
               >
@@ -322,7 +360,7 @@ function DashboardContent() {
                 <span className="hidden sm:inline">Poznámky</span>
               </button>
               <button
-                onClick={() => setShowAccountModal(true)}
+                onClick={() => openAccountModal()}
                 className="btn-outline flex items-center space-x-2"
                 title="Účet"
               >
@@ -376,13 +414,13 @@ function DashboardContent() {
 
       {/* Main Content */}
       <main className="flex-1 py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
-        <DragDropWrapper onWeddingSettingsClick={() => setShowWeddingSettings(true)} />
+        <DragDropWrapper onWeddingSettingsClick={openWeddingSettings} />
       </main>
 
       {/* Wedding Settings Modal */}
       {showWeddingSettings && (
         <WeddingSettings
-          onClose={() => setShowWeddingSettings(false)}
+          onClose={closeWeddingSettings}
           onSave={() => {
             // Refresh the page or update state as needed
             window.location.reload()
@@ -390,8 +428,8 @@ function DashboardContent() {
         />
       )}
 
-      {/* Floating AI Assistant */}
-      <AIAssistant compact={true} />
+      {/* Floating AI Assistant - Hidden (using Svatbot module in dashboard instead) */}
+      {/* <AIAssistant compact={true} /> */}
 
       {/* Onboarding Wizard */}
       <OnboardingWizard />
@@ -405,13 +443,13 @@ function DashboardContent() {
       {/* Notes Modal */}
       <NotesModal
         isOpen={showNotesModal}
-        onClose={() => setShowNotesModal(false)}
+        onClose={closeNotesModal}
       />
 
       {/* Account Modal */}
       {showAccountModal && (
         <AccountModal
-          onClose={() => setShowAccountModal(false)}
+          onClose={closeAccountModal}
           initialTab={accountInitialTab}
         />
       )}
@@ -419,7 +457,7 @@ function DashboardContent() {
       {/* Mobile Menu */}
       <MobileMenu
         isOpen={showMobileMenu}
-        onClose={() => setShowMobileMenu(false)}
+        onClose={closeMobileMenu}
       />
       </div>
       {/* End of blurred content wrapper */}

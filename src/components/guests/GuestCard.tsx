@@ -27,6 +27,7 @@ import {
   getInvitationTypeIcon,
   getDietaryRestrictionLabel
 } from '@/utils/guestCategories'
+import { getViewTransitionName } from '@/hooks/useViewTransition'
 
 interface GuestCardProps {
   guest: Guest
@@ -150,6 +151,7 @@ export default function GuestCard({
     <div
       className="wedding-card group p-4"
       style={{
+        ...getViewTransitionName(`guest-card-${guest.id}`),
         ...(compact && { padding: '0.75rem' })
       }}
       onClick={onClick}
@@ -207,9 +209,9 @@ export default function GuestCard({
 
       <div className="space-y-3">
         {/* Guest name and status */}
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <h4 className="font-medium text-gray-900 truncate">
                 {guest.firstName} {guest.lastName}
               </h4>
@@ -220,44 +222,45 @@ export default function GuestCard({
                   return room ? (
                     <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 flex items-center space-x-1 flex-shrink-0">
                       <Bed className="w-3 h-3" />
-                      <span>{room.name}</span>
+                      <span className="hidden sm:inline">{room.name}</span>
+                      <span className="sm:hidden">{room.name.length > 10 ? room.name.substring(0, 10) + '...' : room.name}</span>
                     </span>
                   ) : null
                 })()
               )}
             </div>
             {guest.hasPlusOne && (
-              <p className="text-sm text-gray-600 flex items-center space-x-1">
+              <p className="text-sm text-gray-600 flex items-center space-x-1 mt-1">
                 <UserPlus className="w-3 h-3" />
-                <span>+1 {guest.plusOneName && `(${guest.plusOneName})`}</span>
+                <span className="truncate">+1 {guest.plusOneName && `(${guest.plusOneName})`}</span>
               </p>
             )}
           </div>
 
           {/* RSVP Status */}
-          <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${rsvpDisplay.bg}`}>
+          <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${rsvpDisplay.bg} flex-shrink-0 self-start`}>
             <rsvpDisplay.icon className={`w-3 h-3 ${rsvpDisplay.color}`} />
-            <span className={`text-xs font-medium ${rsvpDisplay.color}`}>
+            <span className={`text-xs font-medium ${rsvpDisplay.color} whitespace-nowrap`}>
               {rsvpDisplay.label}
             </span>
           </div>
         </div>
 
         {/* Category and Invitation Type */}
-        <div className="flex items-center space-x-2 flex-wrap gap-1">
+        <div className="flex items-center flex-wrap gap-2">
           <span className={`
-            inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium
+            inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium flex-shrink-0
             ${categoryDisplay.color}
           `}>
             <span>{categoryDisplay.icon}</span>
-            <span>{categoryDisplay.label}</span>
+            <span className="whitespace-nowrap">{categoryDisplay.label}</span>
           </span>
 
           {/* Invitation type indicator */}
           {guest.invitationType && guest.invitationType !== 'ceremony-reception' && (
-            <span className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium ${getInvitationTypeColor(guest.invitationType)}`}>
+            <span className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${getInvitationTypeColor(guest.invitationType)}`}>
               <span>{getInvitationTypeIcon(guest.invitationType)}</span>
-              <span>{getInvitationTypeLabel(guest.invitationType)}</span>
+              <span className="whitespace-nowrap">{getInvitationTypeLabel(guest.invitationType)}</span>
             </span>
           )}
         </div>

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { X, Save, StickyNote, Palette } from 'lucide-react'
 import { useNotes } from '@/hooks/useNotes'
+import { getViewTransitionName } from '@/hooks/useViewTransition'
 
 interface NotesModalProps {
   isOpen: boolean
@@ -73,13 +74,37 @@ export default function NotesModal({ isOpen, onClose }: NotesModalProps) {
     }
   }
 
+  // Zabránit scrollování pozadí když je modal otevřený
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isOpen])
+
   if (!isOpen) return null
 
   const colorConfig = COLORS.find(c => c.name === selectedColor) || COLORS[0]
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl h-[90vh] sm:h-[80vh] flex flex-col">
+      {/* Backdrop with View Transition */}
+      <div
+        className="absolute inset-0 backdrop-blur-sm"
+        style={getViewTransitionName('notes-modal-backdrop')}
+        onClick={onClose}
+      />
+
+      {/* Modal Content with View Transition */}
+      <div
+        className="bg-white rounded-xl shadow-xl w-full max-w-2xl h-[90vh] sm:h-[80vh] flex flex-col relative"
+        style={getViewTransitionName('notes-modal')}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200">
           <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">

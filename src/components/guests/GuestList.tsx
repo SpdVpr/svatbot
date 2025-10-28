@@ -847,8 +847,9 @@ export default function GuestList({
                     <div className="flex items-start justify-between">
                       {/* Guest info */}
                       <div className="flex-1">
-                        <div className="flex items-center space-x-3 mb-2">
-                          <div className="flex items-center space-x-2">
+                        <div className="mb-2">
+                          {/* Name and Room - First Row */}
+                          <div className="flex items-center gap-2 flex-wrap mb-2">
                             <h4 className="font-medium text-gray-900">
                               {guest.firstName} {guest.lastName}
                             </h4>
@@ -859,41 +860,45 @@ export default function GuestList({
                                 return room ? (
                                   <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 flex items-center space-x-1 flex-shrink-0">
                                     <Bed className="w-3 h-3" />
-                                    <span>{room.name}</span>
+                                    <span className="hidden sm:inline">{room.name}</span>
+                                    <span className="sm:hidden">{room.name.length > 8 ? room.name.substring(0, 8) + '...' : room.name}</span>
                                   </span>
                                 ) : null
                               })()
                             )}
                           </div>
 
-                          {/* RSVP Status */}
-                          <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${rsvpDisplay.bg}`}>
-                            <rsvpDisplay.icon className={`w-3 h-3 ${rsvpDisplay.color}`} />
-                            <span className={`text-xs font-medium ${rsvpDisplay.color}`}>
-                              {rsvpDisplay.label}
-                            </span>
+                          {/* Badges - Second Row with wrapping */}
+                          <div className="flex items-center flex-wrap gap-2">
+                            {/* RSVP Status */}
+                            <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${rsvpDisplay.bg} flex-shrink-0`}>
+                              <rsvpDisplay.icon className={`w-3 h-3 ${rsvpDisplay.color}`} />
+                              <span className={`text-xs font-medium ${rsvpDisplay.color} whitespace-nowrap`}>
+                                {rsvpDisplay.label}
+                              </span>
+                            </div>
+
+                            {/* Plus one indicator */}
+                            {guest.hasPlusOne && (
+                              <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full flex-shrink-0 whitespace-nowrap">
+                                +1 {guest.plusOneName && `(${guest.plusOneName})`}
+                              </span>
+                            )}
+
+                            {/* Children indicator */}
+                            {guest.hasChildren && guest.children && guest.children.length > 0 && (
+                              <span className="text-xs bg-rose-100 text-rose-700 px-2 py-1 rounded-full flex-shrink-0 whitespace-nowrap">
+                                {guest.children.length} {guest.children.length === 1 ? 'dítě' : 'děti'}
+                              </span>
+                            )}
+
+                            {/* Invitation type indicator */}
+                            {guest.invitationType && guest.invitationType !== 'ceremony-reception' && (
+                              <span className={`text-xs px-2 py-1 rounded-full flex-shrink-0 whitespace-nowrap ${getInvitationTypeColor(guest.invitationType)}`}>
+                                {getInvitationTypeIcon(guest.invitationType)} {getInvitationTypeLabel(guest.invitationType)}
+                              </span>
+                            )}
                           </div>
-
-                          {/* Plus one indicator */}
-                          {guest.hasPlusOne && (
-                            <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
-                              +1 {guest.plusOneName && `(${guest.plusOneName})`}
-                            </span>
-                          )}
-
-                          {/* Children indicator */}
-                          {guest.hasChildren && guest.children && guest.children.length > 0 && (
-                            <span className="text-xs bg-rose-100 text-rose-700 px-2 py-1 rounded-full">
-                              {guest.children.length} {guest.children.length === 1 ? 'dítě' : 'děti'}
-                            </span>
-                          )}
-
-                          {/* Invitation type indicator */}
-                          {guest.invitationType && guest.invitationType !== 'ceremony-reception' && (
-                            <span className={`text-xs px-2 py-1 rounded-full ${getInvitationTypeColor(guest.invitationType)}`}>
-                              {getInvitationTypeIcon(guest.invitationType)} {getInvitationTypeLabel(guest.invitationType)}
-                            </span>
-                          )}
                         </div>
 
                         {/* Contact info */}

@@ -22,6 +22,7 @@ import {
   Trash2,
   MoreVertical
 } from 'lucide-react'
+import { getViewTransitionName } from '@/hooks/useViewTransition'
 
 interface TaskListProps {
   showHeader?: boolean
@@ -576,7 +577,10 @@ export default function TaskList({
       {/* Delete confirmation modal */}
       {deleteConfirmId && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl p-6 max-w-md w-full">
+          <div
+            className="bg-white rounded-xl p-6 max-w-md w-full"
+            style={getViewTransitionName('task-delete-confirm')}
+          >
             <div className="flex items-center space-x-3 mb-4">
               <div className="p-2 bg-red-100 rounded-full">
                 <AlertTriangle className="w-6 h-6 text-red-600" />

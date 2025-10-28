@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { X, CreditCard, Check, Sparkles, Lock } from 'lucide-react'
 import { useSubscription } from '@/hooks/useSubscription'
 import { useAuth } from '@/hooks/useAuth'
+import { getViewTransitionName } from '@/hooks/useViewTransition'
 
 interface TrialExpiredModalProps {
   onUpgrade?: () => void
@@ -14,6 +15,14 @@ export default function TrialExpiredModal({ onUpgrade }: TrialExpiredModalProps)
   const { user } = useAuth()
   const [selectedPlan, setSelectedPlan] = useState<'premium_monthly' | 'premium_yearly'>('premium_yearly')
   const [isProcessing, setIsProcessing] = useState(false)
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [])
 
   const handleUpgrade = async () => {
     try {
@@ -50,10 +59,16 @@ export default function TrialExpiredModal({ onUpgrade }: TrialExpiredModalProps)
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       {/* Backdrop with blur - cannot be clicked */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-md"
+        style={getViewTransitionName('trial-expired-backdrop')}
+      />
 
       {/* Modal */}
-      <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl">
+      <div
+        className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl"
+        style={getViewTransitionName('trial-expired-modal')}
+      >
         {/* Header */}
         <div className="sticky top-0 z-10 bg-gradient-to-r from-amber-500 to-orange-600 text-white px-6 py-8 text-center">
           <div className="flex justify-center mb-4">

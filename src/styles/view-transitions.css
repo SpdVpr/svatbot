@@ -1,0 +1,287 @@
+/**
+ * View Transitions API Styles for Next.js 16
+ * 
+ * Tyto styly definují animace pro View Transitions API.
+ * View Transitions umožňují plynulé přechody mezi stavy UI
+ * bez nutnosti složitých animačních knihoven.
+ * 
+ * Dokumentace: https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API
+ */
+
+/* ============================================
+   ZÁKLADNÍ VIEW TRANSITION KONFIGURACE
+   ============================================ */
+
+/* CSS proměnné pro customizaci */
+:root {
+  --vt-duration: 300ms;
+  --vt-easing: cubic-bezier(0.4, 0, 0.2, 1);
+  --vt-scale-start: 0.95;
+  --vt-scale-end: 1;
+}
+
+/* Základní view transition pro všechny elementy */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--vt-duration);
+  animation-timing-function: var(--vt-easing);
+}
+
+/* ============================================
+   FLOATING ELEMENTS (Modals, Dialogs, Toasts)
+   ============================================ */
+
+/* Modal / Dialog Transitions */
+::view-transition-old(modal),
+::view-transition-new(modal) {
+  animation-duration: 300ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+::view-transition-old(modal) {
+  animation-name: modal-fade-out;
+}
+
+::view-transition-new(modal) {
+  animation-name: modal-fade-in;
+}
+
+@keyframes modal-fade-out {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+}
+
+@keyframes modal-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Toast Notifications */
+::view-transition-old(toast),
+::view-transition-new(toast) {
+  animation-duration: 250ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::view-transition-old(toast) {
+  animation-name: toast-slide-out;
+}
+
+::view-transition-new(toast) {
+  animation-name: toast-slide-in;
+}
+
+@keyframes toast-slide-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+@keyframes toast-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Floating Button (AI Assistant, Feedback, etc.) */
+::view-transition-old(floating-button),
+::view-transition-new(floating-button) {
+  animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+::view-transition-old(floating-button) {
+  animation-name: float-button-out;
+}
+
+::view-transition-new(floating-button) {
+  animation-name: float-button-in;
+}
+
+@keyframes float-button-out {
+  from {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8) rotate(-90deg);
+  }
+}
+
+@keyframes float-button-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8) rotate(90deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* ============================================
+   DROPDOWN & POPOVER TRANSITIONS
+   ============================================ */
+
+::view-transition-old(dropdown),
+::view-transition-new(dropdown) {
+  animation-duration: 200ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::view-transition-old(dropdown) {
+  animation-name: dropdown-fade-out;
+}
+
+::view-transition-new(dropdown) {
+  animation-name: dropdown-fade-in;
+}
+
+@keyframes dropdown-fade-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+}
+
+@keyframes dropdown-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ============================================
+   SIDEBAR & DRAWER TRANSITIONS
+   ============================================ */
+
+::view-transition-old(sidebar),
+::view-transition-new(sidebar) {
+  animation-duration: 350ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::view-transition-old(sidebar) {
+  animation-name: sidebar-slide-out;
+}
+
+::view-transition-new(sidebar) {
+  animation-name: sidebar-slide-in;
+}
+
+@keyframes sidebar-slide-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes sidebar-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ============================================
+   CARD & LIST ITEM TRANSITIONS
+   ============================================ */
+
+::view-transition-old(card),
+::view-transition-new(card) {
+  animation-duration: 300ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::view-transition-old(card) {
+  animation-name: card-fade-out;
+}
+
+::view-transition-new(card) {
+  animation-name: card-fade-in;
+}
+
+@keyframes card-fade-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
+@keyframes card-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+/* Disable view transitions for specific elements */
+.no-view-transition {
+  view-transition-name: none !important;
+}
+
+/* Enable smooth transitions for all children */
+.view-transition-smooth * {
+  transition: all var(--vt-duration) var(--vt-easing);
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+

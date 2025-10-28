@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { X, Menu, Search } from 'lucide-react'
 import {
@@ -19,6 +19,7 @@ import {
   ShoppingCart,
   MapPin
 } from 'lucide-react'
+import { getViewTransitionName } from '@/hooks/useViewTransition'
 
 interface MobileMenuProps {
   isOpen: boolean
@@ -74,18 +75,34 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     )
   })).filter(category => category.items.length > 0)
 
+  // Zabránit scrollování pozadí když je menu otevřené
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isOpen])
+
   if (!isOpen) return null
 
   return (
     <>
-      {/* Backdrop */}
+      {/* Backdrop with View Transition */}
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 z-50 sm:hidden"
+        className="fixed inset-0 bg-black bg-opacity-50 z-50 sm:hidden backdrop-blur-sm"
+        style={getViewTransitionName('mobile-menu-backdrop')}
         onClick={onClose}
       />
 
-      {/* Slide-in Menu */}
-      <div className="fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-white shadow-xl z-50 sm:hidden transform transition-transform duration-300 ease-in-out">
+      {/* Slide-in Menu with View Transition */}
+      <div
+        className="fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-white shadow-xl z-50 sm:hidden transform transition-transform duration-300 ease-in-out"
+        style={getViewTransitionName('mobile-menu-sidebar')}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-primary-50 to-primary-100">
           <div className="flex items-center space-x-2">

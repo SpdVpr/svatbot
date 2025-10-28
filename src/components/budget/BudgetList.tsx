@@ -21,6 +21,7 @@ import {
   TrendingDown,
   Coins
 } from 'lucide-react'
+import { getViewTransitionName } from '@/hooks/useViewTransition'
 
 interface BudgetListProps {
   showHeader?: boolean
@@ -440,41 +441,44 @@ export default function BudgetList({
                   <div
                     key={item.id}
                     className="wedding-card !p-4"
+                    style={getViewTransitionName(`budget-item-${item.id}`)}
                   >
-                    <div className="flex items-start justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                       {/* Item info */}
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-3 mb-2">
-                          <div className="flex items-center space-x-2">
-                            <input
-                              type="checkbox"
-                              checked={selectedItems.includes(item.id)}
-                              onChange={() => toggleItemSelection(item.id)}
-                              className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                            />
-                            <h4 className="font-medium text-gray-900">
-                              {item.name}
-                              {item.isEstimate && (
-                                <span className="ml-2 text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-                                  Odhad
-                                </span>
-                              )}
-                            </h4>
-                          </div>
+                      <div className="flex-1 min-w-0">
+                        {/* Name and Checkbox - First Row */}
+                        <div className="flex items-center gap-2 mb-2">
+                          <input
+                            type="checkbox"
+                            checked={selectedItems.includes(item.id)}
+                            onChange={() => toggleItemSelection(item.id)}
+                            className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 flex-shrink-0"
+                          />
+                          <h4 className="font-medium text-gray-900 truncate">
+                            {item.name}
+                          </h4>
+                          {item.isEstimate && (
+                            <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full flex-shrink-0 whitespace-nowrap">
+                              Odhad
+                            </span>
+                          )}
+                        </div>
 
+                        {/* Badges - Second Row with wrapping */}
+                        <div className="flex items-center flex-wrap gap-2 mb-2">
                           {/* Payment Status */}
-                          <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${statusDisplay.bg}`}>
+                          <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${statusDisplay.bg} flex-shrink-0`}>
                             <statusDisplay.icon className={`w-3 h-3 ${statusDisplay.color}`} />
-                            <span className={`text-xs font-medium ${statusDisplay.color}`}>
+                            <span className={`text-xs font-medium ${statusDisplay.color} whitespace-nowrap`}>
                               {statusDisplay.label}
                             </span>
                           </div>
 
                           {/* Payment Method */}
                           {item.paymentMethod && getPaymentMethodDisplay(item.paymentMethod) && (
-                            <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${getPaymentMethodDisplay(item.paymentMethod)!.bg}`}>
+                            <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${getPaymentMethodDisplay(item.paymentMethod)!.bg} flex-shrink-0`}>
                               <span>{getPaymentMethodDisplay(item.paymentMethod)!.icon}</span>
-                              <span className={`text-xs font-medium ${getPaymentMethodDisplay(item.paymentMethod)!.color}`}>
+                              <span className={`text-xs font-medium ${getPaymentMethodDisplay(item.paymentMethod)!.color} whitespace-nowrap`}>
                                 {getPaymentMethodDisplay(item.paymentMethod)!.label}
                               </span>
                             </div>
@@ -482,9 +486,9 @@ export default function BudgetList({
 
                           {/* Payment Period */}
                           {item.paymentPeriod && getPaymentPeriodDisplay(item.paymentPeriod) && (
-                            <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${getPaymentPeriodDisplay(item.paymentPeriod)!.bg}`}>
+                            <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${getPaymentPeriodDisplay(item.paymentPeriod)!.bg} flex-shrink-0`}>
                               <span>{getPaymentPeriodDisplay(item.paymentPeriod)!.icon}</span>
-                              <span className={`text-xs font-medium ${getPaymentPeriodDisplay(item.paymentPeriod)!.color}`}>
+                              <span className={`text-xs font-medium ${getPaymentPeriodDisplay(item.paymentPeriod)!.color} whitespace-nowrap`}>
                                 {getPaymentPeriodDisplay(item.paymentPeriod)!.label}
                               </span>
                             </div>
@@ -492,8 +496,8 @@ export default function BudgetList({
 
                           {/* Priority */}
                           {priorityDisplay && (
-                            <div className={`flex items-center px-2 py-1 rounded-full ${priorityDisplay.bg}`}>
-                              <span className={`text-xs font-medium ${priorityDisplay.color}`}>
+                            <div className={`flex items-center px-2 py-1 rounded-full ${priorityDisplay.bg} flex-shrink-0`}>
+                              <span className={`text-xs font-medium ${priorityDisplay.color} whitespace-nowrap`}>
                                 {priorityDisplay.label}
                               </span>
                             </div>
@@ -574,7 +578,7 @@ export default function BudgetList({
                         {/* Payments */}
                         {item.payments && item.payments.length > 0 && (
                           <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                            <div className="flex items-center justify-between mb-2">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-2">
                               <span className="text-sm font-medium text-gray-700">
                                 Platby ({item.payments.length})
                               </span>
@@ -582,17 +586,17 @@ export default function BudgetList({
                                 Celkem: {formatCurrency(item.payments.reduce((sum, p) => sum + p.amount, 0))}
                               </span>
                             </div>
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                               {item.payments.slice(0, 3).map((payment, index) => (
-                                <div key={payment.id} className="flex items-center justify-between text-xs">
-                                  <div className="flex items-center space-x-2">
-                                    <span className={`w-2 h-2 rounded-full ${
+                                <div key={payment.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs">
+                                  <div className="flex items-center space-x-2 flex-wrap">
+                                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${
                                       payment.status === 'completed' ? 'bg-green-500' :
                                       payment.status === 'pending' ? 'bg-yellow-500' :
                                       payment.status === 'failed' ? 'bg-red-500' :
                                       'bg-gray-500'
                                     }`} />
-                                    <span>{formatCurrency(payment.amount, payment.currency)}</span>
+                                    <span className="font-medium">{formatCurrency(payment.amount, payment.currency)}</span>
                                     <span className="text-gray-500">
                                       {payment.date instanceof Date ?
                                         payment.date.toLocaleDateString('cs-CZ') :
@@ -600,7 +604,7 @@ export default function BudgetList({
                                       }
                                     </span>
                                   </div>
-                                  <span className="text-gray-500">
+                                  <span className="text-gray-500 sm:text-right">
                                     {payment.method ? (
                                       getPaymentMethodDisplay(payment.method)?.label || payment.method
                                     ) : 'Neurčeno'}
@@ -632,11 +636,11 @@ export default function BudgetList({
                       </div>
 
                       {/* Actions */}
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0 self-start">
                         {/* Add payment button */}
                         <button
                           onClick={() => handleAddPayment(item)}
-                          className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                          className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
                           title="Přidat platbu"
                         >
                           <Plus className="w-4 h-4" />
@@ -645,7 +649,7 @@ export default function BudgetList({
                         {/* Edit button */}
                         <button
                           onClick={() => onEditItem?.(item)}
-                          className="p-1 text-gray-400 hover:text-gray-600"
+                          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded transition-colors"
                           title="Upravit položku"
                         >
                           <Edit className="w-4 h-4" />
@@ -654,7 +658,7 @@ export default function BudgetList({
                         {/* Delete button */}
                         <button
                           onClick={() => handleDeleteItem(item.id)}
-                          className="p-1 text-gray-400 hover:text-red-600"
+                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                           title="Smazat položku"
                         >
                           <Trash2 className="w-4 h-4" />

@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { useDashboard } from '@/hooks/useDashboard'
 import { useOnboarding } from '@/hooks/useOnboarding'
 import { DashboardModule } from '@/types/dashboard'
 import { Edit3, Lock, Unlock, Eye, EyeOff, RotateCcw, GripVertical, Grid3x3, Maximize2, Maximize, BookOpen, Sparkles } from 'lucide-react'
 import OnboardingWizard from '../onboarding/OnboardingWizard'
+import { getViewTransitionName } from '@/hooks/useViewTransition'
 
 // Module components
 import WeddingCountdownModule from './modules/WeddingCountdownModule'
@@ -594,6 +595,22 @@ function DraggableModule({
   const [dragStartTime, setDragStartTime] = useState(0)
   const lastMoveTime = useRef(0)
 
+  // Use refs to store latest values without triggering re-renders
+  const positionRef = useRef(position)
+  const sizeRef = useRef(size)
+  const dragOffsetRef = useRef(dragOffset)
+  const hasDraggedRef = useRef(hasDragged)
+  const dragStartTimeRef = useRef(dragStartTime)
+  const resizeStartRef = useRef(resizeStart)
+
+  // Update refs when state changes
+  useEffect(() => { positionRef.current = position }, [position])
+  useEffect(() => { sizeRef.current = size }, [size])
+  useEffect(() => { dragOffsetRef.current = dragOffset }, [dragOffset])
+  useEffect(() => { hasDraggedRef.current = hasDragged }, [hasDragged])
+  useEffect(() => { dragStartTimeRef.current = dragStartTime }, [dragStartTime])
+  useEffect(() => { resizeStartRef.current = resizeStart }, [resizeStart])
+
   const isHidden = !module.isVisible
 
   // Snap position to grid
@@ -644,26 +661,27 @@ function DraggableModule({
     }
   }
 
-  const handleMouseMove = (e: MouseEvent) => {
-    if (!isDragging) return
-
+  const handleMouseMove = useCallback((e: MouseEvent) => {
     const now = Date.now()
     if (now - lastMoveTime.current < 16) return
     lastMoveTime.current = now
 
-    if (!hasDragged && now - dragStartTime > 100) {
+    if (!hasDraggedRef.current && now - dragStartTimeRef.current > 100) {
       setHasDragged(true)
     }
 
     const container = dragRef.current?.parentElement?.getBoundingClientRect()
     if (container) {
+      const currentSize = sizeRef.current
+      const currentDragOffset = dragOffsetRef.current
+
       let newX = Math.max(0, Math.min(
-        container.width - size.width,
-        e.clientX - container.left - dragOffset.x
+        container.width - currentSize.width,
+        e.clientX - container.left - currentDragOffset.x
       ))
       let newY = Math.max(0, Math.min(
-        container.height - size.height,
-        e.clientY - container.top - dragOffset.y
+        container.height - currentSize.height,
+        e.clientY - container.top - currentDragOffset.y
       ))
 
       // Apply grid snapping if enabled
@@ -675,11 +693,11 @@ function DraggableModule({
         const guides: { x: number[], y: number[] } = { x: [], y: [] }
         if (isNearGridLine(newX)) {
           newX = snappedX
-          guides.x.push(snappedX, snappedX + size.width)
+          guides.x.push(snappedX, snappedX + currentSize.width)
         }
         if (isNearGridLine(newY)) {
           newY = snappedY
-          guides.y.push(snappedY, snappedY + size.height)
+          guides.y.push(snappedY, snappedY + currentSize.height)
         }
         if (onSnapGuidesChange) {
           onSnapGuidesChange(guides)
@@ -688,7 +706,7 @@ function DraggableModule({
 
       setPosition({ x: newX, y: newY })
     }
-  }
+  }, [enableGridSnap, onSnapGuidesChange])
 
   const handleResizeStart = (e: React.MouseEvent) => {
     if (!isEditMode || module.isLocked) return
@@ -705,14 +723,13 @@ function DraggableModule({
     })
   }
 
-  const handleResizeMove = (e: MouseEvent) => {
-    if (!isResizing) return
+  const handleResizeMove = useCallback((e: MouseEvent) => {
+    const currentResizeStart = resizeStartRef.current
+    const deltaX = e.clientX - currentResizeStart.x
+    const deltaY = e.clientY - currentResizeStart.y
 
-    const deltaX = e.clientX - resizeStart.x
-    const deltaY = e.clientY - resizeStart.y
-
-    let newWidth = Math.max(250, resizeStart.width + deltaX)
-    let newHeight = Math.max(200, resizeStart.height + deltaY)
+    let newWidth = Math.max(250, currentResizeStart.width + deltaX)
+    let newHeight = Math.max(200, currentResizeStart.height + deltaY)
 
     // Apply grid snapping if enabled
     if (enableGridSnap) {
@@ -725,28 +742,28 @@ function DraggableModule({
     }
 
     setSize({ width: newWidth, height: newHeight })
-  }
+  }, [enableGridSnap])
 
-  const handleResizeEnd = () => {
-    if (isResizing) {
-      // Final snap to grid
-      const finalSize = enableGridSnap ? {
-        width: snapToGrid(size.width),
-        height: snapToGrid(size.height)
-      } : size
-      setSize(finalSize)
-      onSizeChange(module.id, finalSize)
-    }
+  const handleResizeEnd = useCallback(() => {
+    const currentSize = sizeRef.current
+    // Final snap to grid
+    const finalSize = enableGridSnap ? {
+      width: snapToGrid(currentSize.width),
+      height: snapToGrid(currentSize.height)
+    } : currentSize
+    setSize(finalSize)
+    onSizeChange(module.id, finalSize)
     setIsResizing(false)
-  }
+  }, [enableGridSnap, module.id, onSizeChange])
 
-  const handleMouseUp = () => {
-    if (isDragging && hasDragged) {
+  const handleMouseUp = useCallback(() => {
+    if (hasDraggedRef.current) {
+      const currentPosition = positionRef.current
       // Final snap to grid
       const finalPosition = enableGridSnap ? {
-        x: snapToGrid(position.x),
-        y: snapToGrid(position.y)
-      } : position
+        x: snapToGrid(currentPosition.x),
+        y: snapToGrid(currentPosition.y)
+      } : currentPosition
       setPosition(finalPosition)
       onPositionChange(module.id, finalPosition)
     }
@@ -755,20 +772,18 @@ function DraggableModule({
     if (onSnapGuidesChange) {
       onSnapGuidesChange({ x: [], y: [] })
     }
-  }
+  }, [enableGridSnap, module.id, onPositionChange, onSnapGuidesChange])
 
   useEffect(() => {
     if (isDragging) {
-      console.log('🖱️ Adding mouse listeners for:', module.id)
       document.addEventListener('mousemove', handleMouseMove)
       document.addEventListener('mouseup', handleMouseUp)
       return () => {
-        console.log('🗑️ Removing mouse listeners for:', module.id)
         document.removeEventListener('mousemove', handleMouseMove)
         document.removeEventListener('mouseup', handleMouseUp)
       }
     }
-  }, [isDragging, dragOffset, size, hasDragged, dragStartTime, position, module.id, onPositionChange])
+  }, [isDragging, handleMouseMove, handleMouseUp])
 
   useEffect(() => {
     if (isResizing) {
@@ -779,7 +794,7 @@ function DraggableModule({
         document.removeEventListener('mouseup', handleResizeEnd)
       }
     }
-  }, [isResizing, resizeStart, size, module.id, onSizeChange])
+  }, [isResizing, handleResizeMove, handleResizeEnd])
 
   return (
     <div
@@ -792,6 +807,7 @@ function DraggableModule({
           : 'z-10 hover:scale-[1.03] transition-all duration-500 ease-out'
       } ${isHidden && isEditMode ? 'opacity-40' : ''}`}
       style={{
+        ...getViewTransitionName(`dashboard-module-${module.id}`),
         left: position.x,
         top: position.y,
         width: size.width,
