@@ -2308,16 +2308,17 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
   }, [currentPlan.id, currentPlan.venueLayout.width, currentPlan.venueLayout.height])
 
   return (
-    <div className={`space-y-6 ${className}`}>
-      {/* Toolbar */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <h2 className="text-lg font-semibold text-gray-900">
+    <div className={`space-y-4 sm:space-y-6 ${className}`}>
+      {/* Toolbar - Responsive */}
+      <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          {/* Title and Add Buttons */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 min-w-0">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
               {currentPlan.name}
             </h2>
 
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto pb-1 sm:pb-0">
               <button
                 onClick={() => {
                   setEditingTable(null)
@@ -2333,10 +2334,11 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                   })
                   setShowTableForm(true)
                 }}
-                className="btn-outline flex items-center space-x-2"
+                className="btn-outline flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap"
               >
-                <Plus className="w-4 h-4" />
-                <span>Přidat stůl</span>
+                <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Přidat stůl</span>
+                <span className="sm:hidden">Stůl</span>
               </button>
 
               <button
@@ -2355,10 +2357,11 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                   })
                   setShowChairRowForm(true)
                 }}
-                className="btn-outline flex items-center space-x-2"
+                className="btn-outline flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap"
               >
-                <Plus className="w-4 h-4" />
-                <span>Přidat židle</span>
+                <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Přidat židle</span>
+                <span className="sm:hidden">Židle</span>
               </button>
 
               <button
@@ -2372,72 +2375,75 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                   })
                   setShowCustomAreaForm(true)
                 }}
-                className="btn-outline flex items-center space-x-2"
+                className="btn-outline flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap"
               >
-                <Plus className="w-4 h-4" />
-                <span>Přidat plochu</span>
+                <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Přidat plochu</span>
+                <span className="sm:hidden">Plocha</span>
               </button>
 
               <button
                 onClick={handleEditVenue}
-                className="btn-outline flex items-center space-x-2"
+                className="btn-outline flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 whitespace-nowrap"
                 title="Nastavit velikost plochy"
               >
-                <Grid className="w-4 h-4" />
+                <Grid className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span>Plocha</span>
               </button>
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
+          {/* View Controls */}
+          <div className="flex items-center gap-1 sm:gap-2">
             {/* Zoom controls */}
-            <div className="flex items-center bg-gray-100 rounded-lg p-1">
+            <div className="flex items-center bg-gray-100 rounded-lg p-0.5 sm:p-1">
               <button
                 onClick={() => setViewOptions(prev => ({ ...prev, zoom: Math.max(0.5, prev.zoom - 0.1) }))}
-                className="p-2 rounded-md hover:bg-white transition-colors"
+                className="p-1.5 sm:p-2 rounded-md hover:bg-white transition-colors"
               >
-                <ZoomOut className="w-4 h-4" />
+                <ZoomOut className="w-3 h-3 sm:w-4 sm:h-4" />
               </button>
-              <span className="px-3 text-sm font-medium">
+              <span className="px-2 sm:px-3 text-xs sm:text-sm font-medium">
                 {Math.round(viewOptions.zoom * 100)}%
               </span>
               <button
                 onClick={() => setViewOptions(prev => ({ ...prev, zoom: Math.min(2.0, prev.zoom + 0.1) }))}
-                className="p-2 rounded-md hover:bg-white transition-colors"
+                className="p-1.5 sm:p-2 rounded-md hover:bg-white transition-colors"
               >
-                <ZoomIn className="w-4 h-4" />
+                <ZoomIn className="w-3 h-3 sm:w-4 sm:h-4" />
               </button>
             </div>
 
             {/* View options */}
             <button
               onClick={() => setViewOptions(prev => ({ ...prev, showGuestNames: !prev.showGuestNames }))}
-              className={`p-2 rounded-md transition-colors ${
+              className={`p-1.5 sm:p-2 rounded-md transition-colors ${
                 viewOptions.showGuestNames ? 'bg-primary-100 text-primary-600' : 'hover:bg-gray-100'
               }`}
+              title="Zobrazit jména hostů"
             >
-              {viewOptions.showGuestNames ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+              {viewOptions.showGuestNames ? <Eye className="w-3 h-3 sm:w-4 sm:h-4" /> : <EyeOff className="w-3 h-3 sm:w-4 sm:h-4" />}
             </button>
 
             <button
               onClick={handlePrint}
-              className="btn-primary flex items-center space-x-2"
+              className="btn-primary flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2"
               title="Vytisknout zasedací pořádek"
             >
-              <Printer className="w-4 h-4" />
-              <span>Tisk</span>
+              <Printer className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Tisk</span>
             </button>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Canvas */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
+        {/* Canvas - Mobile optimized */}
         <div className="lg:col-span-3">
-          <div className="bg-white rounded-xl border border-gray-200 overflow-auto">
+          <div className="bg-white rounded-xl border border-gray-200 overflow-auto max-h-[60vh] sm:max-h-[70vh] lg:max-h-none">
             <div
               ref={canvasRef}
-              className="relative bg-gray-50 cursor-crosshair border-4 border-dashed border-blue-300"
+              className="relative bg-gray-50 cursor-crosshair border-2 sm:border-4 border-dashed border-blue-300 touch-none"
               style={{
                 transform: `scale(${viewOptions.zoom})`,
                 transformOrigin: 'top left',
@@ -2466,9 +2472,9 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
               }}
 
             >
-              {/* Canvas size indicator */}
-              <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded shadow-md pointer-events-none z-50">
-                {currentPlan.venueLayout.width} × {currentPlan.venueLayout.height} px
+              {/* Canvas size indicator - Responsive */}
+              <div className="absolute top-1 sm:top-2 left-1 sm:left-2 bg-blue-500 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded shadow-md pointer-events-none z-50">
+                {currentPlan.venueLayout.width} × {currentPlan.venueLayout.height}
               </div>
 
               {/* Custom areas */}
@@ -3281,35 +3287,35 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
           </div>
         </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
+        {/* Sidebar - Mobile optimized */}
+        <div className="space-y-4 sm:space-y-6">
           {/* Stats */}
           {viewOptions.showStats && (
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Statistiky</h3>
+            <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Statistiky</h3>
 
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Stoly</span>
-                  <span className="text-sm font-medium">{stats.totalTables}</span>
+                  <span className="text-xs sm:text-sm text-gray-600">Stoly</span>
+                  <span className="text-xs sm:text-sm font-medium">{stats.totalTables}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Místa celkem</span>
-                  <span className="text-sm font-medium">{stats.totalSeats}</span>
+                  <span className="text-xs sm:text-sm text-gray-600">Místa celkem</span>
+                  <span className="text-xs sm:text-sm font-medium">{stats.totalSeats}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Obsazeno</span>
-                  <span className="text-sm font-medium text-green-600">{stats.assignedSeats}</span>
+                  <span className="text-xs sm:text-sm text-gray-600">Obsazeno</span>
+                  <span className="text-xs sm:text-sm font-medium text-green-600">{stats.assignedSeats}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Volné</span>
-                  <span className="text-sm font-medium text-gray-600">{stats.availableSeats}</span>
+                  <span className="text-xs sm:text-sm text-gray-600">Volné</span>
+                  <span className="text-xs sm:text-sm font-medium text-gray-600">{stats.availableSeats}</span>
                 </div>
 
                 <div className="pt-2 border-t border-gray-200">
                   <div className="flex justify-between mb-2">
-                    <span className="text-sm text-gray-600">Obsazenost</span>
-                    <span className="text-sm font-medium">{stats.occupancyRate}%</span>
+                    <span className="text-xs sm:text-sm text-gray-600">Obsazenost</span>
+                    <span className="text-xs sm:text-sm font-medium">{stats.occupancyRate}%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
@@ -3323,12 +3329,12 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
           )}
 
           {/* Unassigned guests grouped by category */}
-          <div className="bg-white rounded-xl border border-gray-200 p-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
               Nepřiřazení hosté ({totalUnassignedPeople})
             </h3>
 
-            <div className="space-y-4 max-h-96 overflow-y-auto">
+            <div className="space-y-3 sm:space-y-4 max-h-64 sm:max-h-96 overflow-y-auto">
               {Object.entries(getGroupedUnassignedGuests()).map(([category, people]) => {
                 // Count total people in this category
                 const categoryPeopleCount = people.length

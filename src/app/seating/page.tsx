@@ -227,35 +227,35 @@ export default function SeatingPage() {
         ) : currentPlan ? (
           /* Seating plan editor */
           <>
-            {/* Legend / Instructions */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-              <div className="flex items-start space-x-3">
-                <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                <div className="flex-1">
-                  <h3 className="font-medium text-blue-900 mb-3">Ovládání editoru</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-blue-800">
+            {/* Legend / Instructions - Responsive */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+              <div className="flex items-start space-x-2 sm:space-x-3">
+                <Info className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-medium text-sm sm:text-base text-blue-900 mb-2 sm:mb-3">Ovládání editoru</h3>
+                  <div className="grid grid-cols-1 gap-2 sm:gap-3 text-xs sm:text-sm text-blue-800">
                     <div className="flex items-start space-x-2">
-                      <MousePointerClick className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <span className="font-medium">Dvojklik na stůl:</span> Úprava stolu (název, kapacita, tvar)
+                      <MousePointerClick className="w-3 h-3 sm:w-4 sm:h-4 mt-0.5 flex-shrink-0" />
+                      <div className="min-w-0">
+                        <span className="font-medium">Dvojklik na stůl:</span> Úprava stolu
                       </div>
                     </div>
                     <div className="flex items-start space-x-2">
-                      <MousePointer2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <span className="font-medium">Levý klik na číslo židle:</span> Přiřazení hosta na místo
+                      <MousePointer2 className="w-3 h-3 sm:w-4 sm:h-4 mt-0.5 flex-shrink-0" />
+                      <div className="min-w-0">
+                        <span className="font-medium">Klik na číslo židle:</span> Přiřazení hosta
                       </div>
                     </div>
-                    <div className="flex items-start space-x-2">
+                    <div className="hidden sm:flex items-start space-x-2">
                       <Trash2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
                       <div>
-                        <span className="font-medium">Pravý klik na židli:</span> Smazání židle u stolu
+                        <span className="font-medium">Pravý klik na židli:</span> Smazání židle
                       </div>
                     </div>
                     <div className="flex items-start space-x-2">
-                      <Move className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <span className="font-medium">Tažení stolu:</span> Přesunutí stolu na jiné místo
+                      <Move className="w-3 h-3 sm:w-4 sm:h-4 mt-0.5 flex-shrink-0" />
+                      <div className="min-w-0">
+                        <span className="font-medium">Tažení stolu:</span> Přesunutí
                       </div>
                     </div>
                   </div>

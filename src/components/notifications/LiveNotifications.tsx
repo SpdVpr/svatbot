@@ -93,19 +93,19 @@ export default function LiveNotifications() {
           )}
         </button>
 
-        {/* Notification Dropdown */}
+        {/* Notification Dropdown - Mobile optimized */}
         {isOpen && (
-          <div className="absolute right-0 top-full mt-2 w-96 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden">
+          <div className="absolute right-0 top-full mt-2 w-[calc(100vw-1rem)] sm:w-96 max-w-md bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-[80vh] sm:max-h-96 overflow-hidden">
             {/* Header */}
-            <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Notifikace</h3>
-              <div className="flex items-center space-x-2">
+            <div className="p-3 sm:p-4 border-b border-gray-200 flex items-center justify-between">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900">Notifikace</h3>
+              <div className="flex items-center space-x-1 sm:space-x-2">
                 {unreadCount > 0 && (
                   <button
                     onClick={markAllAsRead}
-                    className="text-sm text-blue-600 hover:text-blue-700"
+                    className="text-xs sm:text-sm text-blue-600 hover:text-blue-700 whitespace-nowrap"
                   >
-                    Označit vše jako přečtené
+                    Označit vše
                   </button>
                 )}
                 <button
@@ -117,16 +117,16 @@ export default function LiveNotifications() {
               </div>
             </div>
 
-            {/* Notifications List */}
-            <div className="max-h-80 overflow-y-auto">
+            {/* Notifications List - Mobile optimized */}
+            <div className="max-h-[60vh] sm:max-h-80 overflow-y-auto">
               {loading ? (
-                <div className="p-4 text-center text-gray-500">
+                <div className="p-3 sm:p-4 text-center text-gray-500 text-sm">
                   Načítání notifikací...
                 </div>
               ) : notifications.length === 0 ? (
-                <div className="p-8 text-center text-gray-500">
-                  <Bell className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-sm">Žádné notifikace</p>
+                <div className="p-6 sm:p-8 text-center text-gray-500">
+                  <Bell className="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-2 sm:mb-3" />
+                  <p className="text-xs sm:text-sm">Žádné notifikace</p>
                 </div>
               ) : (
                 <div className="divide-y divide-gray-100">
@@ -136,34 +136,34 @@ export default function LiveNotifications() {
                     return (
                       <div
                         key={notification.id}
-                        className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
+                        className={`p-3 sm:p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
                           !notification.read ? 'bg-blue-50' : ''
                         }`}
                         onClick={() => handleNotificationClick(notification)}
                       >
-                        <div className="flex items-start space-x-3">
+                        <div className="flex items-start space-x-2 sm:space-x-3">
                           {/* Icon */}
-                          <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                          <div className={`flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center ${
                             priorityColors[notification.priority]
                           }`}>
-                            <CategoryIcon className="w-4 h-4" />
+                            <CategoryIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                           </div>
 
                           {/* Content */}
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900">
+                            <p className="text-xs sm:text-sm font-medium text-gray-900">
                               {notification.title}
                             </p>
-                            <p className="text-sm text-gray-600 mt-1">
+                            <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-2">
                               {notification.message}
                             </p>
-                            <p className="text-xs text-gray-500 mt-2">
+                            <p className="text-[10px] sm:text-xs text-gray-500 mt-1 sm:mt-2">
                               {formatTimeAgo(notification.createdAt)}
                             </p>
 
                             {/* Priority Badge */}
                             {notification.priority === 'urgent' && (
-                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700 mt-2">
+                              <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium bg-red-100 text-red-700 mt-1 sm:mt-2">
                                 Urgentní
                               </span>
                             )}
@@ -183,10 +183,10 @@ export default function LiveNotifications() {
 
             {/* Footer */}
             {notifications.length > 0 && (
-              <div className="p-3 border-t border-gray-200 bg-gray-50">
+              <div className="p-2 sm:p-3 border-t border-gray-200 bg-gray-50">
                 <Link
                   href="/notifications"
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  className="text-xs sm:text-sm text-blue-600 hover:text-blue-700 font-medium"
                   onClick={() => setIsOpen(false)}
                 >
                   Zobrazit všechny notifikace →

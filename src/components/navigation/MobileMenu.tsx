@@ -131,8 +131,8 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           </div>
         </div>
 
-        {/* Menu Items */}
-        <div className="overflow-y-auto h-[calc(100vh-140px)] p-4">
+        {/* Menu Items - Add padding bottom for last item visibility */}
+        <div className="overflow-y-auto h-[calc(100vh-140px)] p-4 pb-8">
           {filteredCategories.length === 0 ? (
             <div className="text-center py-8 text-gray-500 text-sm">
               Žádné výsledky pro "{searchQuery}"

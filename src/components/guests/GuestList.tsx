@@ -828,7 +828,7 @@ export default function GuestList({
                     data-testid={`guest-item-${guest.id}`}
                     title={viewMode === 'list' ? 'Klikněte a přetáhněte pro změnu pořadí' : undefined}
                     className={`
-                      wedding-card p-4 guest-list-item touch-drag-item touch-feedback
+                      wedding-card p-3 sm:p-4 guest-list-item touch-drag-item touch-feedback
                       ${isDraggedItem ? 'dragging' : ''}
                       ${isDragOver ? 'drag-over' : ''}
                       ${viewMode === 'list' ? 'cursor-move select-none' : ''}
@@ -844,13 +844,13 @@ export default function GuestList({
                     onTouchEnd={handleTouchEnd}
                     onMouseDown={() => console.log('🖱️ MOUSE DOWN on guest:', guest.firstName)}
                   >
-                    <div className="flex items-start justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                       {/* Guest info */}
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <div className="mb-2">
                           {/* Name and Room - First Row */}
                           <div className="flex items-center gap-2 flex-wrap mb-2">
-                            <h4 className="font-medium text-gray-900">
+                            <h4 className="font-medium text-gray-900 truncate">
                               {guest.firstName} {guest.lastName}
                             </h4>
                             {guest.accommodationId && guest.roomId && getAccommodationById && (
@@ -901,19 +901,19 @@ export default function GuestList({
                           </div>
                         </div>
 
-                        {/* Contact info */}
+                        {/* Contact info - Stack on mobile */}
                         {viewOptions.showContactInfo && (guest.email || guest.phone) && (
-                          <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
+                          <div className="space-y-1 sm:space-y-0 sm:flex sm:items-center sm:space-x-4 text-xs sm:text-sm text-gray-600 mb-2">
                             {guest.email && (
-                              <div className="flex items-center space-x-1">
-                                <Mail className="w-3 h-3" />
-                                <span>{guest.email}</span>
+                              <div className="flex items-center space-x-1 min-w-0">
+                                <Mail className="w-3 h-3 flex-shrink-0" />
+                                <span className="truncate">{guest.email}</span>
                               </div>
                             )}
                             {guest.phone && (
                               <div className="flex items-center space-x-1">
-                                <Phone className="w-3 h-3" />
-                                <span>{guest.phone}</span>
+                                <Phone className="w-3 h-3 flex-shrink-0" />
+                                <span className="whitespace-nowrap">{guest.phone}</span>
                               </div>
                             )}
                           </div>
@@ -1000,8 +1000,8 @@ export default function GuestList({
 
                       </div>
 
-                      {/* Actions */}
-                      <div className="flex items-center space-x-2">
+                      {/* Actions - Desktop only (side) */}
+                      <div className="hidden sm:flex items-center space-x-2 flex-shrink-0">
                         {/* RSVP Quick Actions */}
                         <div className="flex items-center space-x-1">
                           <button
@@ -1038,6 +1038,43 @@ export default function GuestList({
                           </button>
                         </div>
                       </div>
+                    </div>
+
+                    {/* Mobile Actions - Bottom bar */}
+                    <div className="sm:hidden flex items-center justify-between pt-3 mt-3 border-t border-gray-100">
+                      {/* RSVP Quick Actions */}
+                      <div className="flex items-center space-x-1">
+                        <button
+                          onClick={() => handleRSVPChange(guest.id, 'attending')}
+                          className={`p-1.5 rounded ${guest.rsvpStatus === 'attending' ? 'bg-green-100 text-green-600' : 'text-gray-400 hover:text-green-600'}`}
+                          title="Označit jako přijde"
+                        >
+                          <CheckCircle2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleRSVPChange(guest.id, 'maybe')}
+                          className={`p-1.5 rounded ${guest.rsvpStatus === 'maybe' ? 'bg-yellow-100 text-yellow-600' : 'text-gray-400 hover:text-yellow-600'}`}
+                          title="Označit jako možná"
+                        >
+                          <HelpCircle className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleRSVPChange(guest.id, 'declined')}
+                          className={`p-1.5 rounded ${guest.rsvpStatus === 'declined' ? 'bg-red-100 text-red-600' : 'text-gray-400 hover:text-red-600'}`}
+                          title="Označit jako nepřijde"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      {/* Edit button */}
+                      <button
+                        onClick={() => onEditGuest?.(guest)}
+                        className="flex items-center space-x-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                      >
+                        <Edit className="w-4 h-4" />
+                        <span>Upravit</span>
+                      </button>
                     </div>
                   </div>
                 )

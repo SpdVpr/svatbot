@@ -545,7 +545,7 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
                     return (
                       <div
                         key={item.id}
-                        className={`p-4 rounded-lg border transition-all ${
+                        className={`p-3 sm:p-4 rounded-lg border transition-all ${
                           isCompleted
                             ? 'bg-green-50 border-green-200'
                             : inTasks
@@ -555,49 +555,50 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
                             : 'bg-gray-50 border-gray-200'
                         }`}
                       >
-                        <div className="flex items-center justify-between space-x-4">
-                          {/* Icon and Title - aligned left */}
-                          <div className="flex items-center space-x-3 flex-1 min-w-0">
-                            <span className="text-2xl flex-shrink-0">{item.icon}</span>
-                            <h4 className="font-medium text-gray-900">{item.title}</h4>
+                        {/* Mobile: Stack layout, Desktop: Horizontal */}
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                          {/* Icon and Title */}
+                          <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
+                            <span className="text-xl sm:text-2xl flex-shrink-0">{item.icon}</span>
+                            <h4 className="font-medium text-sm sm:text-base text-gray-900 truncate">{item.title}</h4>
                           </div>
 
-                          {/* Action buttons - side by side */}
-                          <div className="flex-shrink-0">
+                          {/* Action buttons - Stack on mobile, side by side on desktop */}
+                          <div className="flex-shrink-0 w-full sm:w-auto">
                             {isItemCompleted(item) ? (
-                              <div className="flex items-center space-x-2">
+                              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                                 {/* Hotovo badge */}
-                                <div className="flex items-center space-x-2 text-green-600 bg-green-100 px-3 py-2 rounded-lg">
-                                  <Check className="w-5 h-5" />
-                                  <span className="text-sm font-medium">Hotovo</span>
+                                <div className="flex items-center justify-center space-x-2 text-green-600 bg-green-100 px-3 py-2 rounded-lg">
+                                  <Check className="w-4 h-4 sm:w-5 sm:h-5" />
+                                  <span className="text-xs sm:text-sm font-medium">Hotovo</span>
                                 </div>
                                 {/* Zrušit button */}
                                 <button
                                   onClick={() => handleUnmarkComplete(item)}
                                   disabled={markingComplete === item.id}
-                                  className="flex items-center justify-center space-x-1 px-3 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                  className="flex items-center justify-center space-x-1 px-3 py-2 text-xs sm:text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                  <X className="w-4 h-4" />
+                                  <X className="w-3 h-3 sm:w-4 sm:h-4" />
                                   <span>Zrušit</span>
                                 </button>
                               </div>
                             ) : justAdded ? (
-                              <div className="flex items-center space-x-2 text-primary-600 bg-primary-100 px-3 py-2 rounded-lg">
-                                <Check className="w-4 h-4" />
-                                <span className="text-sm font-medium">Přidáno!</span>
+                              <div className="flex items-center justify-center space-x-2 text-primary-600 bg-primary-100 px-3 py-2 rounded-lg">
+                                <Check className="w-3 h-3 sm:w-4 sm:h-4" />
+                                <span className="text-xs sm:text-sm font-medium">Přidáno!</span>
                               </div>
                             ) : inTasks ? (
-                              <div className="flex items-center space-x-2">
+                              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                                 {/* V úkolech badge */}
-                                <div className="flex items-center space-x-2 text-primary-600 bg-primary-100 px-3 py-2 rounded-lg">
-                                  <Check className="w-5 h-5" />
-                                  <span className="text-sm font-medium">V úkolech</span>
+                                <div className="flex items-center justify-center space-x-2 text-primary-600 bg-primary-100 px-3 py-2 rounded-lg">
+                                  <Check className="w-4 h-4 sm:w-5 sm:h-5" />
+                                  <span className="text-xs sm:text-sm font-medium">V úkolech</span>
                                 </div>
                                 {/* Vrátit zpět button */}
                                 <button
                                   onClick={() => handleRemoveFromTasks(item)}
                                   disabled={isAdding}
-                                  className="flex items-center justify-center space-x-1 px-3 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                  className="flex items-center justify-center space-x-1 px-3 py-2 text-xs sm:text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                   {isAdding ? (
                                     <>
@@ -613,22 +614,22 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
                                 </button>
                               </div>
                             ) : (
-                              <div className="flex items-center space-x-2">
+                              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                                 {/* Hotovo button */}
                                 <button
                                   onClick={() => handleMarkComplete(item)}
                                   disabled={markingComplete === item.id}
-                                  className="flex items-center justify-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                  className="flex items-center justify-center space-x-1 sm:space-x-2 px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                   {markingComplete === item.id ? (
                                     <>
-                                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                      <span className="text-sm font-medium">Označuji...</span>
+                                      <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                      <span className="text-xs sm:text-sm font-medium">Označuji...</span>
                                     </>
                                   ) : (
                                     <>
-                                      <Check className="w-4 h-4" />
-                                      <span className="text-sm font-medium">Hotovo</span>
+                                      <Check className="w-3 h-3 sm:w-4 sm:h-4" />
+                                      <span className="text-xs sm:text-sm font-medium">Hotovo</span>
                                     </>
                                   )}
                                 </button>
@@ -637,17 +638,17 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
                                 <button
                                   onClick={() => handleAddToTasks(item)}
                                   disabled={isAdding}
-                                  className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                  className="flex items-center justify-center space-x-1 sm:space-x-2 px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                   {isAdding ? (
                                     <>
-                                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                      <span className="text-sm font-medium">Přidávám...</span>
+                                      <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                      <span className="text-xs sm:text-sm font-medium">Přidávám...</span>
                                     </>
                                   ) : (
                                     <>
-                                      <Plus className="w-4 h-4" />
-                                      <span className="text-sm font-medium">Do úkolů</span>
+                                      <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+                                      <span className="text-xs sm:text-sm font-medium">Do úkolů</span>
                                     </>
                                   )}
                                 </button>
@@ -655,7 +656,7 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
                                 {/* Skrýt button */}
                                 <button
                                   onClick={() => handleHideItem(item)}
-                                  className="flex items-center justify-center space-x-1 px-3 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                                  className="flex items-center justify-center space-x-1 px-3 py-2 text-xs sm:text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                                   title="Skrýt tento úkol"
                                 >
                                   <X className="w-4 h-4" />
