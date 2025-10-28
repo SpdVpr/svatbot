@@ -83,8 +83,8 @@ export default function WelcomeScreen() {
 
       <header className="relative z-20 w-full bg-white bg-opacity-80 backdrop-blur-sm shadow-sm py-3 md:py-4">
         <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Heart className="w-6 h-6 md:w-7 md:h-7 text-rose-500 fill-rose-100" />
+          <div className="flex items-center space-x-2 md:space-x-3">
+            <img src="/logo-mensi.jpg" alt="SvatBot.cz logo" className="w-8 h-8 md:w-10 md:h-10 rounded-lg object-cover" />
             <a href="#" className="font-display text-xl md:text-3xl font-bold text-gray-900">SvatBot.cz</a>
           </div>
           <nav className="hidden lg:flex items-center space-x-8">
@@ -1247,7 +1247,7 @@ export default function WelcomeScreen() {
           <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-8 md:mb-12">
             <div className="md:col-span-2">
               <div className="flex items-center space-x-3 mb-4">
-                <Heart className="w-8 h-8 text-rose-300 fill-rose-900" />
+                <img src="/logo-mensi.jpg" alt="SvatBot.cz logo" className="w-10 h-10 md:w-12 md:h-12 rounded-lg object-cover" />
                 <span className="font-display text-3xl font-bold text-white">SvatBot.cz</span>
               </div>
               <p className="text-gray-300 mb-6 max-w-md leading-relaxed">
@@ -1266,11 +1266,7 @@ export default function WelcomeScreen() {
                 </div>
                 <div className="flex items-center space-x-2">
                   <Phone className="w-4 h-4" />
-                  <a href="tel:+420777123456" className="hover:text-rose-300 transition-colors">+420 777 123 456</a>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <MapPin className="w-4 h-4" />
-                  <span>Praha, Česká republika</span>
+                  <a href="tel:+420732264276" className="hover:text-rose-300 transition-colors">+420 732 264 276</a>
                 </div>
               </div>
             </div>
