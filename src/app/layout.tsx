@@ -28,48 +28,62 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   title: {
-    default: 'SvatBot.cz - Svatební Plánovač s AI | Plánování Svatby Online Zdarma',
-    template: '%s | SvatBot.cz - Svatební Plánovač'
+    default: 'AI Svatební Asistent Zdarma | SvatBot.cz - První v ČR',
+    template: '%s | SvatBot.cz - AI Svatební Plánovač'
   },
-  description: 'První český svatební plánovač s AI asistentem. Ušetřete 50+ hodin práce při plánování svatby. Rozpočet, timeline, hosté, seating plan, svatební web a marketplace dodavatelů. Vyzkoušejte zdarma!',
+  description: 'Jediný český svatební plánovač s AI asistentem! Naplánujte svatbu za 50+ hodin méně. Rozpočet, timeline, hosté, seating plan, svatební web. Vyzkoušejte zdarma! ⭐ 4.9/5 od 127 uživatelů',
   keywords: [
-    // Hlavní klíčová slova
-    'svatební plánovač',
+    // TIER 1: Vysoký objem vyhledávání (priorita ⭐⭐⭐⭐⭐)
     'plánování svatby',
-    'svatba online',
-    'svatební aplikace',
-    'svatební plánovač zdarma',
-
-    // AI a technologie
-    'svatební plánovač s AI',
-    'AI svatební asistent',
-    'umělá inteligence svatba',
-    'chatbot svatba',
-
-    // Funkce
-    'svatební rozpočet',
-    'svatební checklist',
-    'svatební timeline',
-    'svatební hosté',
-    'seating plan svatba',
-    'svatební web',
-    'svatební usazovací plán',
-
-    // Lokální
-    'česká svatba',
-    'svatba v Česku',
-    'svatební dodavatelé',
-    'svatební marketplace',
-
-    // Long-tail
     'jak naplánovat svatbu',
-    'organizace svatby',
     'příprava na svatbu',
+    'svatební checklist',
+    'svatební rozpočet',
+    'organizace svatby',
+
+    // TIER 2: AI & Blue Ocean (žádná konkurence! ⭐⭐⭐⭐⭐)
+    'AI svatební asistent',
+    'svatební plánovač s AI',
+    'umělá inteligence svatba',
+    'AI svatební rady',
+    'chatbot svatba',
+    'svatební AI pomocník',
+
+    // TIER 3: Naše unikátní funkce
+    'svatební plánovač',
+    'svatební plánovač online',
+    'svatební plánovač zdarma',
+    'svatební aplikace',
+    'svatební software',
+    'digitální svatební plánovač',
+
+    // TIER 4: Specifické funkce (nízká konkurence)
+    'seating plan svatba',
+    'svatební usazovací plán',
+    'svatební timeline',
+    'svatební web',
+    'svatební web zdarma',
+    'svatební stránky',
+    'RSVP svatba',
+    'svatební kalkulačka',
+    'svatební rozpočet excel',
+
+    // TIER 5: Long-tail keywords (vysoká konverze)
+    'jak vytvořit svatební rozpočet',
+    'svatební checklist pdf',
+    'svatební úkoly',
+    'svatba online',
     'svatební organizér',
     'svatební kalendář',
     'svatební nástroje',
-    'svatební software',
-    'digitální svatební plánovač'
+    'svatební marketplace',
+
+    // TIER 6: Lokální
+    'česká svatba',
+    'svatba v Česku',
+    'svatba v ČR',
+    'svatební dodavatelé',
+    'svatební dodavatelé česko'
   ],
   authors: [{ name: 'SvatBot.cz Team' }],
   creator: 'SvatBot.cz',
@@ -90,22 +104,22 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'cs_CZ',
     url: 'https://svatbot.cz',
-    title: 'SvatBot.cz - Svatební Plánovač s AI | Ušetřete 50+ Hodin Práce',
-    description: 'První český svatební plánovač s AI asistentem. Inteligentní nástroje pro rozpočet, timeline, hosty, seating plan a svatební web. Marketplace ověřených dodavatelů. Začněte zdarma!',
+    title: 'AI Svatební Asistent Zdarma | SvatBot.cz - První v ČR',
+    description: 'Jediný český svatební plánovač s AI asistentem! Naplánujte svatbu za 50+ hodin méně. Rozpočet, timeline, hosté, seating plan, svatební web. ⭐ 4.9/5 hodnocení',
     siteName: 'SvatBot.cz',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'SvatBot.cz - Svatební plánovač s AI asistentem pro moderní páry',
+        alt: 'SvatBot.cz - První český svatební plánovač s AI asistentem pro moderní plánování svatby',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SvatBot.cz - Svatební Plánovač s AI | Ušetřete 50+ Hodin',
-    description: 'První český svatební plánovač s AI. Rozpočet, timeline, hosté, seating plan, svatební web a marketplace dodavatelů na jednom místě. Zdarma!',
+    title: 'AI Svatební Asistent Zdarma | SvatBot.cz - První v ČR',
+    description: 'Jediný český svatební plánovač s AI asistentem! Naplánujte svatbu za 50+ hodin méně. Vyzkoušejte zdarma! ⭐ 4.9/5',
     images: ['/og-image.jpg'],
     creator: '@svatbot_cz',
     site: '@svatbot_cz',

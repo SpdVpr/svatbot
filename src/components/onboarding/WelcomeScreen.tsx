@@ -89,7 +89,7 @@ export default function WelcomeScreen() {
               <Sparkles className="w-3 h-3 md:w-4 md:h-4 mr-1.5 md:mr-2 text-rose-500" aria-hidden="true" /> První český svatební plánovač s AI
             </span>
             <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-display font-extrabold leading-tight mb-4 md:mb-6 text-gray-900">
-              Plánujte svatbu snů <span className="text-gradient-primary">s AI pomocníkem</span> & bez stresu
+              Naplánujte Svatbu za <span className="text-gradient-primary">50+ Hodin Méně</span> s AI Asistentem
             </h1>
             <p className="text-base md:text-lg lg:text-xl text-gray-600 mb-6 md:mb-10 max-w-lg lg:max-w-xl mx-auto">
               SvatBot.cz kombinuje AI technologie s intuitivními nástroji: inteligentní asistent, rozpočet, timeline, hosté, seating plan, svatební web a marketplace ověřených dodavatelů – vše na jedné platformě.
@@ -1232,6 +1232,84 @@ export default function WelcomeScreen() {
               <div className="mt-4 text-gray-600 leading-relaxed" itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
                 <p itemProp="text">
                   S naším svatebním web builderem vytvoříte krásný svatební web za 10-15 minut! Vyberte si šablonu, přidejte své fotky a informace, a web je hotový. Můžete ho kdykoliv upravovat a sdílet s hosty přes vlastní URL adresu.
+                </p>
+              </div>
+            </details>
+
+            {/* FAQ 7 - SEO: "svatební rozpočet" */}
+            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
+              <summary className="font-semibold text-lg text-gray-900 cursor-pointer flex items-center justify-between" itemProp="name">
+                Kolik stojí plánování svatby v roce 2025?
+                <ChevronDown className="w-5 h-5 text-gray-500" aria-hidden="true" />
+              </summary>
+              <div className="mt-4 text-gray-600 leading-relaxed" itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
+                <p itemProp="text">
+                  Průměrná svatba v České republice stojí 280 000 Kč. S SvatBot.cz můžete ušetřit až 20% díky chytrému rozpočtování a AI asistentovi, který vám poradí, kde optimalizovat náklady. Náš svatební rozpočet kalkulačka vám pomůže sledovat všechny výdaje v reálném čase a vyhnout se překvapením.
+                </p>
+              </div>
+            </details>
+
+            {/* FAQ 8 - SEO: "jak naplánovat svatbu" */}
+            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
+              <summary className="font-semibold text-lg text-gray-900 cursor-pointer flex items-center justify-between" itemProp="name">
+                Jak dlouho trvá naplánovat svatbu?
+                <ChevronDown className="w-5 h-5 text-gray-500" aria-hidden="true" />
+              </summary>
+              <div className="mt-4 text-gray-600 leading-relaxed" itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
+                <p itemProp="text">
+                  Tradiční plánování svatby zabere 100+ hodin práce. S SvatBot.cz to zvládnete za 50 hodin díky AI asistentovi, který vám automaticky vytvoří timeline, doporučí dodavatele a pomůže s organizací. Náš svatební checklist vás provede každým krokem přípravy na svatbu.
+                </p>
+              </div>
+            </details>
+
+            {/* FAQ 9 - SEO: "svatební checklist" */}
+            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
+              <summary className="font-semibold text-lg text-gray-900 cursor-pointer flex items-center justify-between" itemProp="name">
+                Co je svatební checklist a proč ho potřebuji?
+                <ChevronDown className="w-5 h-5 text-gray-500" aria-hidden="true" />
+              </summary>
+              <div className="mt-4 text-gray-600 leading-relaxed" itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
+                <p itemProp="text">
+                  Svatební checklist je seznam všech úkolů před svatbou seřazených podle priority a termínu. SvatBot.cz vám automaticky vytvoří personalizovaný checklist podle data svatby, počtu hostů a stylu. Dostanete upozornění na důležité termíny a nikdy nezapomenete na žádný detail organizace svatby.
+                </p>
+              </div>
+            </details>
+
+            {/* FAQ 10 - SEO: "svatební kalkulačka" */}
+            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
+              <summary className="font-semibold text-lg text-gray-900 cursor-pointer flex items-center justify-between" itemProp="name">
+                Jak vytvořit svatební rozpočet?
+                <ChevronDown className="w-5 h-5 text-gray-500" aria-hidden="true" />
+              </summary>
+              <div className="mt-4 text-gray-600 leading-relaxed" itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
+                <p itemProp="text">
+                  Náš AI asistent vám pomůže sestavit realistický svatební rozpočet podle počtu hostů, lokace a stylu svatby. Svatební kalkulačka automaticky rozdělí náklady do kategorií (místo, catering, fotograf, výzdoba) a sleduje skutečné výdaje. Dostanete přehled v reálném čase a varování při překročení limitu.
+                </p>
+              </div>
+            </details>
+
+            {/* FAQ 11 - SEO: "seating plan" */}
+            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
+              <summary className="font-semibold text-lg text-gray-900 cursor-pointer flex items-center justify-between" itemProp="name">
+                Co je seating plan a jak ho vytvořit?
+                <ChevronDown className="w-5 h-5 text-gray-500" aria-hidden="true" />
+              </summary>
+              <div className="mt-4 text-gray-600 leading-relaxed" itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
+                <p itemProp="text">
+                  Seating plan (usazovací plán) je rozložení hostů u stolů na svatební hostině. SvatBot.cz má jedinečný drag & drop editor, kde můžete vizuálně rozmístit stoly, přiřadit hosty a upravovat kapacity. AI asistent vám poradí optimální rozmístění podle vztahů mezi hosty.
+                </p>
+              </div>
+            </details>
+
+            {/* FAQ 12 - SEO: "svatební web" */}
+            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
+              <summary className="font-semibold text-lg text-gray-900 cursor-pointer flex items-center justify-between" itemProp="name">
+                Potřebuji svatební web?
+                <ChevronDown className="w-5 h-5 text-gray-500" aria-hidden="true" />
+              </summary>
+              <div className="mt-4 text-gray-600 leading-relaxed" itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
+                <p itemProp="text">
+                  Ano! 87% hostů očekává svatební web s informacemi o místě, programu a ubytování. Svatební stránky také usnadňují RSVP potvrzení a sdílení fotek. Vytvořte si svatební web zdarma v SvatBot.cz za 10 minut - žádné programování není potřeba!
                 </p>
               </div>
             </details>
