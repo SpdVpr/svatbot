@@ -305,8 +305,29 @@ export function useAuth() {
               previousUserId = null
             }
           }
-        } catch (error) {
+        } catch (error: any) {
           logger.error('Auth state change error:', error)
+
+          // Don't log out users on Firestore permission errors
+          // These are temporary and don't mean the user is not authenticated
+          if (error?.code === 'permission-denied' || error?.message?.includes('Missing or insufficient permissions')) {
+            logger.warn('⚠️ Firestore permission error, but user is still authenticated. Keeping session.')
+
+            // Still set the user from Firebase Auth data (without Firestore data)
+            if (firebaseUser && isMounted) {
+              const basicUser: User = {
+                id: firebaseUser.uid,
+                email: firebaseUser.email!,
+                displayName: firebaseUser.displayName || '',
+                photoURL: firebaseUser.photoURL || undefined,
+                createdAt: new Date(firebaseUser.metadata.creationTime || Date.now()),
+                updatedAt: new Date()
+              }
+              setUser(basicUser)
+              previousUserId = firebaseUser.uid
+            }
+            return
+          }
 
           // Don't log out demo users even on error
           const currentUser = JSON.parse(localStorage.getItem('auth_user') || 'null')
@@ -315,6 +336,7 @@ export function useAuth() {
             return
           }
 
+          // Only log out on actual auth errors (not Firestore errors)
           if (isMounted) {
             setUser(null)
             previousUserId = null
