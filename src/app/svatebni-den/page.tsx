@@ -540,68 +540,73 @@ export default function SvatebniDenPage() {
 
                 return (
                   <div key={item.id} className="group relative">
-                    {/* Timeline row */}
+                    {/* Timeline row - Responsive layout */}
                     <div className="flex items-start">
-                      {/* Time column */}
-                      <div className="w-32 flex-shrink-0 pt-6">
-                        <div className="text-right pr-8">
-                          <div className="font-display text-2xl font-bold text-primary-600">{item.time}</div>
+                      {/* Time column - Smaller on mobile */}
+                      <div className="w-16 sm:w-32 flex-shrink-0 pt-4 sm:pt-6">
+                        <div className="text-right pr-2 sm:pr-8">
+                          <div className="font-display text-base sm:text-2xl font-bold text-primary-600">{item.time}</div>
                           {item.duration && (
-                            <div className="text-xs text-text-muted mt-1">{item.duration}</div>
+                            <div className="text-xs text-text-muted mt-1 hidden sm:block">{item.duration}</div>
                           )}
                         </div>
                       </div>
 
                       {/* Timeline dot and line */}
                       <div className="relative flex flex-col items-center flex-shrink-0">
-                        <div className="w-4 h-4 rounded-full bg-primary-500 ring-4 ring-primary-100 z-10 mt-7"></div>
+                        <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-primary-500 ring-2 sm:ring-4 ring-primary-100 z-10 mt-5 sm:mt-7"></div>
                         {!isLast && (
-                          <div className="w-0.5 h-full bg-gradient-to-b from-primary-200 to-primary-100 absolute top-11"></div>
+                          <div className="w-0.5 h-full bg-gradient-to-b from-primary-200 to-primary-100 absolute top-8 sm:top-11"></div>
                         )}
                       </div>
 
-                      {/* Content column */}
-                      <div className="flex-1 pl-8 pb-12">
-                        <div className="bg-neutral-50 border border-primary-100 rounded-xl p-6 hover:shadow-soft hover:border-primary-300 transition-all duration-300 group-hover:bg-white">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <h3 className="font-display text-xl font-semibold text-text-primary mb-3 capitalize">
+                      {/* Content column - Reduced padding on mobile */}
+                      <div className="flex-1 pl-3 sm:pl-8 pb-8 sm:pb-12">
+                        <div className="bg-neutral-50 border border-primary-100 rounded-xl p-3 sm:p-6 hover:shadow-soft hover:border-primary-300 transition-all duration-300 group-hover:bg-white">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-display text-base sm:text-xl font-semibold text-text-primary mb-2 sm:mb-3 capitalize">
                                 {item.activity.toLowerCase()}
                               </h3>
 
+                              {/* Duration on mobile (hidden on desktop) */}
+                              {item.duration && (
+                                <div className="text-xs text-text-muted mb-2 sm:hidden">{item.duration}</div>
+                              )}
+
                               {(item.location || item.notes) && (
-                                <div className="space-y-2">
+                                <div className="space-y-1 sm:space-y-2">
                                   {item.location && (
-                                    <div className="flex items-center space-x-2 text-sm text-text-secondary">
-                                      <span className="text-primary-500">📍</span>
-                                      <span>{item.location}</span>
+                                    <div className="flex items-center space-x-2 text-xs sm:text-sm text-text-secondary">
+                                      <span className="text-primary-500 flex-shrink-0">📍</span>
+                                      <span className="truncate">{item.location}</span>
                                     </div>
                                   )}
                                   {item.notes && (
-                                    <div className="flex items-start space-x-2 text-sm text-text-muted">
-                                      <span className="text-accent-500 mt-0.5">💭</span>
-                                      <span className="flex-1 italic">{item.notes}</span>
+                                    <div className="flex items-start space-x-2 text-xs sm:text-sm text-text-muted">
+                                      <span className="text-accent-500 mt-0.5 flex-shrink-0">💭</span>
+                                      <span className="flex-1 italic line-clamp-2 sm:line-clamp-none">{item.notes}</span>
                                     </div>
                                   )}
                                 </div>
                               )}
                             </div>
 
-                            {/* Edit and Delete buttons */}
-                            <div className="ml-4 flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            {/* Edit and Delete buttons - Always visible on mobile, hover on desktop */}
+                            <div className="ml-2 flex items-center space-x-1 sm:space-x-2 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex-shrink-0">
                               <button
                                 onClick={() => handleEdit(item)}
-                                className="p-2 text-text-muted hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200"
+                                className="p-1.5 sm:p-2 text-text-muted hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200"
                                 title="Upravit"
                               >
-                                <Edit2 className="w-5 h-5" />
+                                <Edit2 className="w-4 h-4 sm:w-5 sm:h-5" />
                               </button>
                               <button
                                 onClick={() => handleDelete(item.id)}
-                                className="p-2 text-text-muted hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
+                                className="p-1.5 sm:p-2 text-text-muted hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
                                 title="Smazat"
                               >
-                                <Trash2 className="w-5 h-5" />
+                                <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                               </button>
                             </div>
                           </div>

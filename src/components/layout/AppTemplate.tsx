@@ -10,52 +10,39 @@ interface AppTemplateProps {
 
 export default function AppTemplate({ children }: AppTemplateProps) {
   const pathname = usePathname()
-  const [isNavigating, setIsNavigating] = useState(false)
   const [displayPath, setDisplayPath] = useState(pathname)
 
   useEffect(() => {
-    // Start navigation animation - MUCH FASTER
-    setIsNavigating(true)
-
-    // Update display path after fade out - 50ms instead of 150ms
-    const pathTimer = setTimeout(() => {
+    // Smooth page transition with View Transitions API fallback
+    const updatePath = () => {
       setDisplayPath(pathname)
-    }, 50)
+    }
 
-    // Complete navigation after fade in - 100ms instead of 300ms
-    const timer = setTimeout(() => {
-      setIsNavigating(false)
-    }, 100)
-
-    return () => {
-      clearTimeout(pathTimer)
-      clearTimeout(timer)
+    // Use View Transitions API if available
+    if (typeof document !== 'undefined' && 'startViewTransition' in document) {
+      // @ts-ignore - View Transitions API
+      document.startViewTransition(() => {
+        updatePath()
+      })
+    } else {
+      // Fallback to immediate update
+      updatePath()
     }
   }, [pathname])
 
   return (
     <>
-      {/* Ultra-fast fade overlay - no visible white screen */}
-      <AnimatePresence>
-        {isNavigating && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.05 }}
-            className="fixed inset-0 z-[9998] bg-white pointer-events-none"
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Page content with instant transition */}
+      {/* Smooth page content transition */}
       <AnimatePresence mode="wait">
         <motion.div
           key={displayPath}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.05, ease: 'easeInOut' }}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{
+            duration: 0.25,
+            ease: [0.4, 0, 0.2, 1] // Smooth easing curve
+          }}
           className="w-full"
         >
           {children}

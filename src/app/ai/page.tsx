@@ -121,35 +121,35 @@ function AIPageContent() {
         </div>
       </header>
 
-      {/* Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* Content - Reduced padding on mobile */}
+      <main className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-2 sm:py-6">
 
         {/* Main Chat Section - HERO */}
-        <div className="mb-6">
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-            {/* Chat Header */}
-            <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-4">
+        <div className="mb-4 sm:mb-6">
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+            {/* Chat Header - Compact on mobile */}
+            <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-3 py-3 sm:px-6 sm:py-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
-                    <MessageCircle className="w-6 h-6 text-white" />
+                <div className="flex items-center space-x-2 sm:space-x-3">
+                  <div className="p-1.5 sm:p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                    <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-white">Popovídej si se Svatbotem</h2>
-                    <p className="text-sm text-purple-100">Zeptej se na cokoliv o své svatbě</p>
+                    <h2 className="text-base sm:text-xl font-bold text-white">Popovídej si se Svatbotem</h2>
+                    <p className="text-xs sm:text-sm text-purple-100 hidden sm:block">Zeptej se na cokoliv o své svatbě</p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full">
+                <div className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1 sm:py-1.5 bg-white/20 backdrop-blur-sm rounded-full">
                   <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                   <span className="text-xs font-medium text-white">Online</span>
                 </div>
               </div>
             </div>
 
-            {/* Chat Component */}
-            <div className="p-6">
+            {/* Chat Component - No padding on mobile for full width */}
+            <div className="p-0 sm:p-6">
               <AIAssistant
-                className="h-[600px]"
+                className="h-[500px] sm:h-[600px]"
                 compact={false}
                 defaultOpen={true}
                 prefilledQuestion={prefilledQuestion || quickSearchQuery || undefined}

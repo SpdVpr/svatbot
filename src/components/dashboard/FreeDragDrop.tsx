@@ -160,10 +160,10 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
   // Mobile: Use simple vertical stack layout
   if (isMobile) {
     return (
-      <div className="mx-auto px-4 max-w-full">
-        <div className="space-y-4">
+      <div className="mx-auto px-1 max-w-full">
+        <div className="space-y-3">
           {/* Mobile Controls - Simplified */}
-          <div className="bg-white p-3 rounded-xl border border-gray-200">
+          <div className="bg-white p-2 rounded-xl border border-gray-200">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">Dashboard</h2>
               <button
@@ -213,9 +213,9 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
                     </div>
                   </div>
                 )}
-                {/* Module Content */}
+                {/* Module Content - Reduced padding on mobile */}
                 {module.isVisible && (
-                  <div className="p-4">
+                  <div className="p-2">
                     {renderModule(module)}
                   </div>
                 )}

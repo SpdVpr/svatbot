@@ -158,17 +158,17 @@ export default function GuestCard({
     >
 
 
-      {/* Actions menu */}
-      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+      {/* Actions menu - Always visible on mobile, hover on desktop */}
+      <div className="absolute top-2 right-2 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-10">
         <div className="relative">
           <button
             onClick={(e) => {
               e.stopPropagation()
               setShowActions(!showActions)
             }}
-            className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+            className="p-2 sm:p-1 rounded-full hover:bg-gray-100 transition-colors bg-white shadow-sm sm:shadow-none"
           >
-            <MoreHorizontal className="w-4 h-4 text-gray-400" />
+            <MoreHorizontal className="w-5 h-5 sm:w-4 sm:h-4 text-gray-600 sm:text-gray-400" />
           </button>
 
           {showActions && (

@@ -51,33 +51,33 @@ export default function FolderGrid({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Moje složky</h2>
-          <p className="text-sm text-gray-600 mt-1">
+      {/* Header - Responsive layout */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="min-w-0">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Moje složky</h2>
+          <p className="text-xs sm:text-sm text-gray-600 mt-1">
             Organizujte své svatební inspirace do složek
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
           {/* AI Moodboard Generator Button */}
           {uploadedImagesCount >= 2 && onAIGeneratorClick && (
             <button
               onClick={onAIGeneratorClick}
-              className="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all shadow-sm hover:shadow-md"
+              className="inline-flex items-center px-3 py-2 sm:px-4 sm:py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-medium rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all shadow-sm hover:shadow-md flex-1 sm:flex-initial justify-center"
             >
-              <Sparkles className="w-5 h-5 mr-2" />
-              <span>AI Moodboard</span>
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 sm:mr-2" />
+              <span className="whitespace-nowrap">AI Moodboard</span>
             </button>
           )}
 
           {/* New Folder Button */}
           <button
             onClick={onCreateFolder}
-            className="inline-flex items-center px-4 py-2.5 bg-pink-600 text-white font-medium rounded-lg hover:bg-pink-700 transition-all shadow-sm hover:shadow-md"
+            className="inline-flex items-center px-3 py-2 sm:px-4 sm:py-2.5 bg-pink-600 text-white text-sm font-medium rounded-lg hover:bg-pink-700 transition-all shadow-sm hover:shadow-md flex-1 sm:flex-initial justify-center"
           >
-            <Plus className="w-5 h-5 mr-2" />
-            <span>Nová složka</span>
+            <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 sm:mr-2" />
+            <span className="whitespace-nowrap">Nová složka</span>
           </button>
         </div>
       </div>

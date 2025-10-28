@@ -412,8 +412,8 @@ function DashboardContent() {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
+      {/* Main Content - Reduced padding on mobile */}
+      <main className="flex-1 py-2 sm:py-6 px-2 sm:px-6 lg:px-8">
         <DragDropWrapper onWeddingSettingsClick={openWeddingSettings} />
       </main>
 
