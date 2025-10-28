@@ -5,8 +5,10 @@ import { useAuth } from './useAuth'
 import { useWedding } from './useWedding'
 import { useTask } from './useTask'
 import { useGuest } from './useGuest'
+import { useVendor } from './useVendor'
+import { useSeating } from './useSeating'
 import { db } from '@/config/firebase'
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
+import { doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore'
 
 export interface OnboardingStep {
   id: string
@@ -99,27 +101,13 @@ const ONBOARDING_STEPS: Omit<OnboardingStep, 'completed'>[] = [
     ]
   },
   {
-    id: 'timeline',
-    title: '📅 Časová osa',
-    description: 'Vytvořte si časovou osu příprav. Ukážu vám, co dělat kdy.',
-    icon: '⏰',
-    actionUrl: '/calendar',
-    actionLabel: 'Vytvořit timeline',
-    priority: 6,
-    tips: [
-      'Ideální je začít 12-18 měsíců dopředu',
-      '6 měsíců před: finalizace detailů',
-      '1 měsíc před: potvrzení všech dodavatelů'
-    ]
-  },
-  {
     id: 'vendors',
     title: '🎯 Dodavatelé',
     description: 'Najděte si dodavatele v našem marketplace nebo přidejte vlastní.',
     icon: '🏪',
     actionUrl: '/marketplace',
     actionLabel: 'Prozkoumat marketplace',
-    priority: 7,
+    priority: 6,
     tips: [
       'Začněte s klíčovými dodavateli (místo, fotograf, catering)',
       'Porovnejte nabídky a recenze',
@@ -133,7 +121,7 @@ const ONBOARDING_STEPS: Omit<OnboardingStep, 'completed'>[] = [
     icon: '🗺️',
     actionUrl: '/seating',
     actionLabel: 'Vytvořit plán',
-    priority: 8,
+    priority: 7,
     tips: [
       'Toto můžete udělat 1-2 měsíce před svatbou',
       'Zvažte vztahy mezi hosty',
@@ -141,17 +129,17 @@ const ONBOARDING_STEPS: Omit<OnboardingStep, 'completed'>[] = [
     ]
   },
   {
-    id: 'explore',
-    title: '🚀 Prozkoumejte aplikaci',
-    description: 'Skvělá práce! Teď už znáte základy. Prozkoumejte další funkce jako AI chat, moodboard nebo svatební web.',
-    icon: '✨',
+    id: 'ai-chat',
+    title: '🤖 Vyzkoušejte AI chat',
+    description: 'Zeptejte se mě na cokoliv ohledně svatby! Jsem tu, abych vám pomohl s plánováním.',
+    icon: '💬',
     actionUrl: '/ai',
     actionLabel: 'Otevřít AI chat',
-    priority: 9,
+    priority: 8,
     tips: [
-      'AI chat vám poradí s čímkoliv',
-      'Moodboard pro inspiraci',
-      'Vytvořte si vlastní svatební web'
+      'Zeptejte se na tipy k plánování',
+      'Pomohu vám s časovým harmonogramem',
+      'Poradím s výběrem dodavatelů'
     ]
   }
 ]
@@ -161,7 +149,9 @@ export function useOnboarding() {
   const { wedding } = useWedding()
   const { tasks } = useTask()
   const { guests } = useGuest()
-  
+  const { vendors } = useVendor()
+  const { seatingPlans } = useSeating()
+
   const [onboardingState, setOnboardingState] = useState<OnboardingState>({
     isNewUser: false,
     hasCompletedOnboarding: false,
@@ -170,7 +160,7 @@ export function useOnboarding() {
     showWelcome: false,
     lastInteraction: null
   })
-  
+
   const [loading, setLoading] = useState(true)
   const [steps, setSteps] = useState<OnboardingStep[]>([])
 
@@ -229,41 +219,76 @@ export function useOnboarding() {
   useEffect(() => {
     if (!user || !wedding) return
 
-    const autoCompletedSteps: string[] = [...onboardingState.completedSteps]
+    const checkCompletedSteps = async () => {
+      const autoCompletedSteps: string[] = [...onboardingState.completedSteps]
 
-    // Check if basic info is set
-    if (wedding.weddingDate && wedding.brideName && wedding.groomName) {
-      if (!autoCompletedSteps.includes('basic-info')) {
-        autoCompletedSteps.push('basic-info')
+      // Check if basic info is set
+      if (wedding.weddingDate && wedding.brideName && wedding.groomName) {
+        if (!autoCompletedSteps.includes('basic-info')) {
+          autoCompletedSteps.push('basic-info')
+        }
+      }
+
+      // Check if tasks exist
+      if (tasks && tasks.length > 0) {
+        if (!autoCompletedSteps.includes('first-tasks')) {
+          autoCompletedSteps.push('first-tasks')
+        }
+      }
+
+      // Check if guests exist
+      if (guests && guests.length > 0) {
+        if (!autoCompletedSteps.includes('guest-list')) {
+          autoCompletedSteps.push('guest-list')
+        }
+      }
+
+      // Check if budget is set
+      if (wedding.budget && wedding.budget > 0) {
+        if (!autoCompletedSteps.includes('budget-setup')) {
+          autoCompletedSteps.push('budget-setup')
+        }
+      }
+
+      // Check if vendors exist (1 or more)
+      if (vendors && vendors.length > 0) {
+        if (!autoCompletedSteps.includes('vendors')) {
+          autoCompletedSteps.push('vendors')
+        }
+      }
+
+      // Check if seating plan exists
+      if (seatingPlans && seatingPlans.length > 0) {
+        if (!autoCompletedSteps.includes('seating')) {
+          autoCompletedSteps.push('seating')
+        }
+      }
+
+      // Check if user has sent at least one AI chat message
+      if (!autoCompletedSteps.includes('ai-chat')) {
+        try {
+          const statsRef = doc(db, 'usageStats', user.id)
+          const statsDoc = await getDoc(statsRef)
+          if (statsDoc.exists()) {
+            const data = statsDoc.data()
+            // If user has sent any AI queries, mark as completed
+            if (data.aiQueriesCount && data.aiQueriesCount > 0) {
+              autoCompletedSteps.push('ai-chat')
+            }
+          }
+        } catch (error) {
+          console.error('Error checking AI chat usage:', error)
+        }
+      }
+
+      // Update if changed
+      if (autoCompletedSteps.length !== onboardingState.completedSteps.length) {
+        updateOnboardingState({ completedSteps: autoCompletedSteps })
       }
     }
 
-    // Check if tasks exist
-    if (tasks && tasks.length > 0) {
-      if (!autoCompletedSteps.includes('first-tasks')) {
-        autoCompletedSteps.push('first-tasks')
-      }
-    }
-
-    // Check if guests exist
-    if (guests && guests.length > 0) {
-      if (!autoCompletedSteps.includes('guest-list')) {
-        autoCompletedSteps.push('guest-list')
-      }
-    }
-
-    // Check if budget is set
-    if (wedding.budget && wedding.budget > 0) {
-      if (!autoCompletedSteps.includes('budget-setup')) {
-        autoCompletedSteps.push('budget-setup')
-      }
-    }
-
-    // Update if changed
-    if (autoCompletedSteps.length !== onboardingState.completedSteps.length) {
-      updateOnboardingState({ completedSteps: autoCompletedSteps })
-    }
-  }, [wedding, tasks, guests, onboardingState.completedSteps, user])
+    checkCompletedSteps()
+  }, [wedding, tasks, guests, vendors, seatingPlans, onboardingState.completedSteps, user])
 
   // Generate steps with completion status
   useEffect(() => {
