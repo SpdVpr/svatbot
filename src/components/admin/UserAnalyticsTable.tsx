@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { useUserAnalytics } from '@/hooks/useAdminDashboard'
 import { UserAnalytics } from '@/types/admin'
+import { db } from '@/config/firebase'
+import { collection, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore'
 import {
   User,
   Clock,
@@ -14,7 +16,8 @@ import {
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
-  Sparkles
+  Sparkles,
+  RefreshCw
 } from 'lucide-react'
 
 type SortField = 'lastActivity' | 'loginCount' | 'sessionTime' | 'aiQueries'
@@ -26,6 +29,7 @@ export default function UserAnalyticsTable() {
   const [filterOnline, setFilterOnline] = useState<'all' | 'online' | 'offline'>('all')
   const [sortBy, setSortBy] = useState<SortField>('lastActivity')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
+  const [fixing, setFixing] = useState(false)
 
   const handleSort = (field: SortField) => {
     if (sortBy === field) {
@@ -99,6 +103,66 @@ export default function UserAnalyticsTable() {
     return `${hours}h ${mins}m`
   }
 
+  const fixUserAnalytics = async () => {
+    if (!confirm('Opravit chybějící email a displayName v userAnalytics? Toto může trvat několik sekund.')) {
+      return
+    }
+
+    setFixing(true)
+    try {
+      const analyticsSnapshot = await getDocs(collection(db, 'userAnalytics'))
+      let fixed = 0
+      let skipped = 0
+
+      for (const analyticsDoc of analyticsSnapshot.docs) {
+        const data = analyticsDoc.data()
+        const userId = analyticsDoc.id
+
+        // Check if email or displayName is missing
+        if (!data.email || !data.displayName || data.displayName === 'Unknown') {
+          try {
+            const userDoc = await getDoc(doc(db, 'users', userId))
+
+            if (userDoc.exists()) {
+              const userData = userDoc.data()
+              const updates: any = {}
+
+              if (!data.email && userData.email) {
+                updates.email = userData.email
+              }
+
+              if ((!data.displayName || data.displayName === 'Unknown') && userData.displayName) {
+                updates.displayName = userData.displayName
+              } else if ((!data.displayName || data.displayName === 'Unknown') && userData.email) {
+                updates.displayName = userData.email.split('@')[0]
+              }
+
+              if (Object.keys(updates).length > 0) {
+                await updateDoc(doc(db, 'userAnalytics', userId), updates)
+                fixed++
+              } else {
+                skipped++
+              }
+            } else {
+              skipped++
+            }
+          } catch (error) {
+            console.error(`Error fixing user ${userId}:`, error)
+          }
+        } else {
+          skipped++
+        }
+      }
+
+      alert(`Opraveno: ${fixed} záznamů\nPřeskočeno: ${skipped} záznamů`)
+    } catch (error) {
+      console.error('Error fixing analytics:', error)
+      alert('Chyba při opravě dat')
+    } finally {
+      setFixing(false)
+    }
+  }
+
   const exportToCSV = () => {
     const headers = ['Email', 'Jméno', 'Registrace', 'Poslední aktivita', 'Počet přihlášení', 'Celkový čas', 'Sessions', 'AI dotazy', 'Online']
     const rows = filteredUsers.map(user => [
@@ -143,13 +207,23 @@ export default function UserAnalyticsTable() {
           <h2 className="text-xl font-semibold text-gray-900">
             Uživatelská analytika
           </h2>
-          <button
-            onClick={exportToCSV}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <Download className="w-4 h-4" />
-            Export CSV
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={fixUserAnalytics}
+              disabled={fixing}
+              className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <RefreshCw className={`w-4 h-4 ${fixing ? 'animate-spin' : ''}`} />
+              {fixing ? 'Opravuji...' : 'Opravit data'}
+            </button>
+            <button
+              onClick={exportToCSV}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              Export CSV
+            </button>
+          </div>
         </div>
 
         {/* Filters */}

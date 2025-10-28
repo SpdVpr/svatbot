@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { auth } from '@/lib/firebase'
-import { signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth'
+import { signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged } from 'firebase/auth'
 import {
   Lock,
   Mail,
@@ -11,7 +11,8 @@ import {
   EyeOff,
   Shield,
   AlertCircle,
-  Loader2
+  Loader2,
+  CheckCircle
 } from 'lucide-react'
 
 export default function AdminLoginPage() {
@@ -21,6 +22,10 @@ export default function AdminLoginPage() {
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
+  const [resetEmail, setResetEmail] = useState('')
+  const [resetSuccess, setResetSuccess] = useState(false)
+  const [resetError, setResetError] = useState('')
   const hasRedirected = useRef(false)
   const router = useRouter()
 
@@ -76,11 +81,11 @@ export default function AdminLoginPage() {
     try {
       // Sign in with Firebase Authentication
       const userCredential = await signInWithEmailAndPassword(auth, email, password)
-      
+
       // Check if user has admin role
       const idTokenResult = await userCredential.user.getIdTokenResult()
       const isAdmin = idTokenResult.claims.admin as boolean
-      
+
       if (!isAdmin) {
         setError('Nemáte admin oprávnění')
         await auth.signOut()
@@ -96,6 +101,43 @@ export default function AdminLoginPage() {
         setError('Příliš mnoho pokusů. Zkuste to prosím později.')
       } else {
         setError('Chyba při přihlašování: ' + (err.message || 'Neznámá chyba'))
+      }
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setResetError('')
+    setResetSuccess(false)
+    setIsSubmitting(true)
+
+    try {
+      const actionCodeSettings = {
+        url: `${window.location.origin}/admin/login`,
+        handleCodeInApp: false,
+      }
+
+      await sendPasswordResetEmail(auth, resetEmail, actionCodeSettings)
+      setResetSuccess(true)
+      setResetEmail('')
+
+      // Close modal after 3 seconds
+      setTimeout(() => {
+        setShowForgotPassword(false)
+        setResetSuccess(false)
+      }, 3000)
+    } catch (err: any) {
+      console.error('Password reset error:', err)
+      if (err.code === 'auth/user-not-found') {
+        setResetError('Uživatel s tímto emailem neexistuje')
+      } else if (err.code === 'auth/invalid-email') {
+        setResetError('Neplatný formát emailu')
+      } else if (err.code === 'auth/too-many-requests') {
+        setResetError('Příliš mnoho pokusů. Zkuste to prosím později.')
+      } else {
+        setResetError('Chyba při odesílání emailu: ' + (err.message || 'Neznámá chyba'))
       }
     } finally {
       setIsSubmitting(false)
@@ -204,6 +246,16 @@ export default function AdminLoginPage() {
             </button>
           </div>
 
+          <div className="flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() => setShowForgotPassword(true)}
+              className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+            >
+              Zapomenuté heslo?
+            </button>
+          </div>
+
           <div className="text-center">
             <div className="text-sm text-gray-600 bg-gray-100 p-4 rounded-md">
               <p className="font-medium mb-2">Admin přihlášení:</p>
@@ -212,6 +264,89 @@ export default function AdminLoginPage() {
           </div>
         </form>
       </div>
+
+      {/* Forgot Password Modal */}
+      {showForgotPassword && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">
+              Obnovení hesla
+            </h3>
+
+            {resetSuccess ? (
+              <div className="flex items-start space-x-3 text-green-600 bg-green-50 p-4 rounded-md mb-4">
+                <CheckCircle className="h-6 w-6 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium">Email byl odeslán!</p>
+                  <p className="text-sm mt-1">
+                    Zkontrolujte svou emailovou schránku a postupujte podle instrukcí pro obnovení hesla.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <>
+                <p className="text-gray-600 mb-4">
+                  Zadejte svůj email a my vám pošleme odkaz pro obnovení hesla.
+                </p>
+
+                <form onSubmit={handleForgotPassword}>
+                  <div className="mb-4">
+                    <label htmlFor="reset-email" className="block text-sm font-medium text-gray-700 mb-2">
+                      Email
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Mail className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <input
+                        id="reset-email"
+                        type="email"
+                        required
+                        value={resetEmail}
+                        onChange={(e) => setResetEmail(e.target.value)}
+                        className="appearance-none relative block w-full pl-10 pr-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                        placeholder="admin@svatbot.cz"
+                      />
+                    </div>
+                  </div>
+
+                  {resetError && (
+                    <div className="flex items-center space-x-2 text-red-600 bg-red-50 p-3 rounded-md mb-4">
+                      <AlertCircle className="h-5 w-5" />
+                      <span className="text-sm">{resetError}</span>
+                    </div>
+                  )}
+
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowForgotPassword(false)
+                        setResetEmail('')
+                        setResetError('')
+                      }}
+                      className="flex-1 py-2 px-4 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                    >
+                      Zrušit
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="flex-1 py-2 px-4 border border-transparent rounded-md text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isSubmitting ? (
+                        <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+                      ) : (
+                        'Odeslat'
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

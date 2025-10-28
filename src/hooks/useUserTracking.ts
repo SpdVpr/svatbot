@@ -35,15 +35,17 @@ export function useUserTracking() {
   // Initialize session when user logs in - listen to Firebase Auth directly
   useEffect(() => {
     let currentSessionUserId: string | null = null
+    let previousUserId: string | null = null
 
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (!firebaseUser) {
         console.log('👤 No Firebase user, skipping tracking')
-        // User logged out - end session
-        if (sessionStartRef.current && sessionIdRef.current) {
-          await endSession()
+        // User logged out - end session and mark as offline
+        if (sessionStartRef.current && sessionIdRef.current && previousUserId) {
+          await endSession(previousUserId)
         }
         currentSessionUserId = null
+        previousUserId = null
         return
       }
 
@@ -54,17 +56,21 @@ export function useUserTracking() {
         email: firebaseUser.email,
         uid: firebaseUser.uid,
         currentSessionUserId,
+        previousUserId,
         isNewLogin
       })
 
       if (isNewLogin) {
         console.log('🚀 Starting user tracking for:', firebaseUser.email)
-        currentSessionUserId = firebaseUser.uid
 
-        // End previous session if exists
-        if (sessionStartRef.current && sessionIdRef.current) {
-          await endSession()
+        // End previous user's session if exists (user switching)
+        if (sessionStartRef.current && sessionIdRef.current && previousUserId && previousUserId !== firebaseUser.uid) {
+          console.log('🔄 Switching users - ending previous session for:', previousUserId)
+          await endSession(previousUserId)
         }
+
+        currentSessionUserId = firebaseUser.uid
+        previousUserId = firebaseUser.uid
 
         // Start new session
         await startSession(firebaseUser)
@@ -79,8 +85,8 @@ export function useUserTracking() {
     // Cleanup on unmount
     return () => {
       console.log('🛑 Cleaning up tracking')
-      if (sessionStartRef.current && sessionIdRef.current) {
-        endSession()
+      if (sessionStartRef.current && sessionIdRef.current && previousUserId) {
+        endSession(previousUserId)
       }
       if (activityIntervalRef.current) {
         clearInterval(activityIntervalRef.current)
@@ -140,6 +146,8 @@ export function useUserTracking() {
         console.log('Current loginCount:', currentData.loginCount)
 
         await setDoc(analyticsRef, {
+          email: firebaseUser.email, // Always update email
+          displayName: firebaseUser.displayName || currentData.displayName || 'Unknown', // Update displayName if available
           lastLoginAt: serverTimestamp(),
           loginCount: increment(1),
           isOnline: true,
@@ -160,19 +168,21 @@ export function useUserTracking() {
     }
   }
 
-  const endSession = async () => {
-    const firebaseUser = auth.currentUser
-    if (!firebaseUser || !sessionStartRef.current || !sessionIdRef.current) {
-      console.log('⚠️ Cannot end session - missing data')
+  const endSession = async (userId?: string) => {
+    // Use provided userId or current user
+    const targetUserId = userId || auth.currentUser?.uid
+
+    if (!targetUserId || !sessionStartRef.current || !sessionIdRef.current) {
+      console.log('⚠️ Cannot end session - missing data', { targetUserId, hasSessionStart: !!sessionStartRef.current, hasSessionId: !!sessionIdRef.current })
       return
     }
 
     const sessionEnd = new Date()
     const sessionDuration = Math.floor((sessionEnd.getTime() - sessionStartRef.current.getTime()) / 1000 / 60) // minutes
 
-    console.log('🏁 Ending session for:', firebaseUser.email, 'Duration:', sessionDuration, 'minutes')
+    console.log('🏁 Ending session for userId:', targetUserId, 'Duration:', sessionDuration, 'minutes')
 
-    const analyticsRef = doc(db, 'userAnalytics', firebaseUser.uid)
+    const analyticsRef = doc(db, 'userAnalytics', targetUserId)
 
     try {
       await setDoc(analyticsRef, {

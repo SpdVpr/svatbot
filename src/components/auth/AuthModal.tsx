@@ -1,9 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { X, Mail, Lock, User, Eye, EyeOff, Play } from 'lucide-react'
+import { X, Mail, Lock, User, Eye, EyeOff, Play, AlertCircle, CheckCircle, Loader2 } from 'lucide-react'
 import { cn } from '@/utils'
 import { useAuth } from '@/hooks/useAuth'
+import { auth } from '@/config/firebase'
+import { sendPasswordResetEmail } from 'firebase/auth'
 
 interface AuthModalProps {
   mode: 'login' | 'register'
@@ -26,6 +28,10 @@ export default function AuthModal({ mode, onClose, onSwitchMode, showDemoOption 
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
+  const [resetEmail, setResetEmail] = useState('')
+  const [resetSuccess, setResetSuccess] = useState(false)
+  const [resetError, setResetError] = useState('')
 
   const isLogin = mode === 'login'
 
@@ -118,6 +124,43 @@ export default function AuthModal({ mode, onClose, onSwitchMode, showDemoOption 
     } catch (error: any) {
       console.error('Google login error:', error)
       // Error is already handled by useAuth hook
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setResetError('')
+    setResetSuccess(false)
+    setIsLoading(true)
+
+    try {
+      const actionCodeSettings = {
+        url: `${window.location.origin}/?login=true`,
+        handleCodeInApp: false,
+      }
+
+      await sendPasswordResetEmail(auth, resetEmail, actionCodeSettings)
+      setResetSuccess(true)
+      setResetEmail('')
+
+      // Close modal after 3 seconds
+      setTimeout(() => {
+        setShowForgotPassword(false)
+        setResetSuccess(false)
+      }, 3000)
+    } catch (err: any) {
+      console.error('Password reset error:', err)
+      if (err.code === 'auth/user-not-found') {
+        setResetError('Uživatel s tímto emailem neexistuje')
+      } else if (err.code === 'auth/invalid-email') {
+        setResetError('Neplatný formát emailu')
+      } else if (err.code === 'auth/too-many-requests') {
+        setResetError('Příliš mnoho pokusů. Zkuste to prosím později.')
+      } else {
+        setResetError('Chyba při odesílání emailu: ' + (err.message || 'Neznámá chyba'))
+      }
     } finally {
       setIsLoading(false)
     }
@@ -384,6 +427,19 @@ export default function AuthModal({ mode, onClose, onSwitchMode, showDemoOption 
             </div>
           )}
 
+          {/* Forgot Password Link */}
+          {isLogin && (
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowForgotPassword(true)}
+                className="body-small text-primary-600 hover:text-primary-700 font-medium"
+              >
+                Zapomenuté heslo?
+              </button>
+            </div>
+          )}
+
           {/* Submit Button */}
           <button
             type="submit"
@@ -468,6 +524,89 @@ export default function AuthModal({ mode, onClose, onSwitchMode, showDemoOption 
           </div>
         </form>
       </div>
+
+      {/* Forgot Password Modal */}
+      {showForgotPassword && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+            <h3 className="heading-3 text-text-primary mb-4">
+              Obnovení hesla
+            </h3>
+
+            {resetSuccess ? (
+              <div className="flex items-start space-x-3 text-green-600 bg-green-50 p-4 rounded-lg mb-4">
+                <CheckCircle className="h-6 w-6 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium">Email byl odeslán!</p>
+                  <p className="body-small mt-1">
+                    Zkontrolujte svou emailovou schránku a postupujte podle instrukcí pro obnovení hesla.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <>
+                <p className="body text-text-secondary mb-4">
+                  Zadejte svůj email a my vám pošleme odkaz pro obnovení hesla.
+                </p>
+
+                <form onSubmit={handleForgotPassword}>
+                  <div className="mb-4">
+                    <label className="block body-small font-medium text-text-primary mb-2">
+                      Email
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <input
+                        type="email"
+                        required
+                        value={resetEmail}
+                        onChange={(e) => setResetEmail(e.target.value)}
+                        className="input-field pl-10"
+                        placeholder="jana@email.cz"
+                      />
+                    </div>
+                  </div>
+
+                  {resetError && (
+                    <div className="flex items-center space-x-2 text-red-600 bg-red-50 p-3 rounded-lg mb-4">
+                      <AlertCircle className="h-5 w-5 flex-shrink-0" />
+                      <span className="body-small">{resetError}</span>
+                    </div>
+                  )}
+
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowForgotPassword(false)
+                        setResetEmail('')
+                        setResetError('')
+                      }}
+                      className="flex-1 btn-secondary"
+                    >
+                      Zrušit
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      className={cn(
+                        'flex-1 btn-primary flex items-center justify-center',
+                        isLoading && 'opacity-50 cursor-not-allowed'
+                      )}
+                    >
+                      {isLoading ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : (
+                        'Odeslat'
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

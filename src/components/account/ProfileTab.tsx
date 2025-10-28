@@ -152,16 +152,46 @@ function ProfileTab() {
 
     try {
       setLoading(true)
-      await sendEmailVerification(auth.currentUser)
+
+      // Configure action code settings with proper URL
+      const actionCodeSettings = {
+        url: `${window.location.origin}/profile?verified=true`,
+        handleCodeInApp: false,
+      }
+
+      await sendEmailVerification(auth.currentUser, actionCodeSettings)
+
       setMessage({
         type: 'success',
-        text: 'Ověřovací email byl odeslán'
+        text: 'Ověřovací email byl odeslán. Zkontrolujte prosím svou emailovou schránku.'
       })
     } catch (error: any) {
       console.error('Error sending verification:', error)
+
+      // Better error messages
+      let errorMessage = 'Chyba při odesílání ověřovacího emailu'
+
+      if (error.code === 'auth/too-many-requests') {
+        errorMessage = 'Příliš mnoho pokusů. Zkuste to prosím za chvíli.'
+      } else if (error.code === 'auth/invalid-continue-uri') {
+        errorMessage = 'Chyba konfigurace. Kontaktujte prosím podporu.'
+      } else if (error.code === 'auth/missing-continue-uri') {
+        errorMessage = 'Chyba konfigurace. Kontaktujte prosím podporu.'
+      } else if (error.code === 'auth/unauthorized-continue-uri') {
+        errorMessage = 'Neautorizovaná URL. Kontaktujte prosím podporu.'
+      } else if (error.message) {
+        errorMessage = `Chyba: ${error.message}`
+      }
+
+      console.error('Verification error details:', {
+        code: error.code,
+        message: error.message,
+        stack: error.stack
+      })
+
       setMessage({
         type: 'error',
-        text: 'Chyba při odesílání ověřovacího emailu'
+        text: errorMessage
       })
     } finally {
       setLoading(false)

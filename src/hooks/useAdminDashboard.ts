@@ -191,81 +191,89 @@ export function useUserAnalytics() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Load all users first, then enrich with analytics data
-    const usersQuery = query(
-      collection(db, 'users'),
+    // Listen directly to userAnalytics collection for real-time updates
+    const analyticsQuery = query(
+      collection(db, 'userAnalytics'),
       limit(100)
     )
 
-    const unsubscribe = onSnapshot(usersQuery, async (snapshot) => {
+    const unsubscribe = onSnapshot(analyticsQuery, async (snapshot) => {
       try {
-        // Get all users
-        const allUsers = snapshot.docs.map(doc => ({
-          id: doc.id,
-          email: doc.data().email || '',
-          displayName: doc.data().displayName || doc.data().email?.split('@')[0] || 'Unknown',
-          createdAt: doc.data().createdAt
-        }))
+        console.log('📊 Loading user analytics, found', snapshot.docs.length, 'documents')
 
-        // Enrich with analytics data
+        // Get analytics data with AI queries
         const enrichedUsers = await Promise.all(
-          allUsers.map(async (user) => {
-            let analyticsData: any = {
-              userId: user.id,
-              email: user.email,
-              displayName: user.displayName,
-              registeredAt: user.createdAt || Timestamp.now(),
-              lastLoginAt: user.createdAt || Timestamp.now(),
-              lastActivityAt: user.createdAt || Timestamp.now(),
-              isOnline: false,
-              loginCount: 0,
-              totalSessionTime: 0,
-              sessions: [],
-              pageViews: {},
-              featuresUsed: [],
-              aiQueriesCount: 0
+          snapshot.docs.map(async (analyticsDoc) => {
+            const data = analyticsDoc.data()
+
+            // If email or displayName is missing, try to load from users collection
+            let email = data.email || ''
+            let displayName = data.displayName || ''
+
+            if (!email || !displayName) {
+              try {
+                const userDoc = await getDoc(doc(db, 'users', analyticsDoc.id))
+                if (userDoc.exists()) {
+                  const userData = userDoc.data()
+                  email = email || userData.email || ''
+                  displayName = displayName || userData.displayName || userData.email?.split('@')[0] || 'Unknown'
+                }
+              } catch (error) {
+                console.error(`Error loading user data for ${analyticsDoc.id}:`, error)
+              }
             }
 
-            // Try to load analytics data
-            try {
-              const analyticsDoc = await getDoc(doc(db, 'userAnalytics', user.id))
-              if (analyticsDoc.exists()) {
-                const data = analyticsDoc.data()
-                analyticsData = {
-                  ...analyticsData,
-                  registeredAt: data.registeredAt || analyticsData.registeredAt,
-                  lastLoginAt: data.lastLoginAt || analyticsData.lastLoginAt,
-                  lastActivityAt: data.lastActivityAt || analyticsData.lastActivityAt,
-                  isOnline: data.isOnline || false,
-                  loginCount: data.loginCount || 0,
-                  totalSessionTime: data.totalSessionTime || 0,
-                  sessions: data.sessions || [],
-                  pageViews: data.pageViews || {},
-                  featuresUsed: data.featuresUsed || []
-                }
-              }
-            } catch (error) {
-              console.error(`Error loading analytics for user ${user.id}:`, error)
+            // Check if user is actually online based on last activity
+            const lastActivity = data.lastActivityAt?.toDate()
+            const now = new Date()
+            const isActuallyOnline = data.isOnline === true &&
+                                     lastActivity &&
+                                     (now.getTime() - lastActivity.getTime()) < 5 * 60 * 1000 // 5 minutes
+
+            console.log('User analytics:', {
+              id: analyticsDoc.id,
+              email,
+              displayName,
+              loginCount: data.loginCount,
+              isOnline: data.isOnline,
+              lastActivity: lastActivity?.toISOString(),
+              isActuallyOnline,
+              sessions: data.sessions?.length
+            })
+
+            let analyticsData: any = {
+              id: analyticsDoc.id,
+              userId: data.userId || analyticsDoc.id,
+              email: email || 'Unknown',
+              displayName: displayName || email?.split('@')[0] || 'Unknown',
+              registeredAt: data.registeredAt || Timestamp.now(),
+              lastLoginAt: data.lastLoginAt || Timestamp.now(),
+              lastActivityAt: data.lastActivityAt || Timestamp.now(),
+              isOnline: isActuallyOnline, // Check based on last activity
+              loginCount: data.loginCount || 0,
+              totalSessionTime: data.totalSessionTime || 0,
+              sessions: data.sessions || [],
+              pageViews: data.pageViews || {},
+              featuresUsed: data.featuresUsed || [],
+              aiQueriesCount: 0
             }
 
             // Try to load AI queries from usageStats
             try {
-              const statsDoc = await getDoc(doc(db, 'usageStats', user.id))
+              const statsDoc = await getDoc(doc(db, 'usageStats', analyticsDoc.id))
               if (statsDoc.exists()) {
                 const statsData = statsDoc.data()
                 analyticsData.aiQueriesCount = statsData.aiQueriesCount || 0
               }
             } catch (error) {
-              console.error(`Error loading stats for user ${user.id}:`, error)
+              console.error(`Error loading stats for user ${analyticsDoc.id}:`, error)
             }
 
-            return {
-              id: user.id,
-              ...analyticsData
-            } as UserAnalytics
+            return analyticsData as UserAnalytics
           })
         )
 
+        console.log('✅ Loaded', enrichedUsers.length, 'users with analytics')
         setUsers(enrichedUsers)
         setLoading(false)
       } catch (error) {
@@ -273,7 +281,7 @@ export function useUserAnalytics() {
         setLoading(false)
       }
     }, (error) => {
-      console.error('Error loading users:', error)
+      console.error('Error in analytics snapshot:', error)
       setLoading(false)
     })
 
