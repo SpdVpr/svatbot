@@ -1,0 +1,47 @@
+# robots.txt for SvatBot.cz
+
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow admin and private areas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /tasks/
+Disallow: /budget/
+Disallow: /guests/
+Disallow: /vendors/
+Disallow: /calendar/
+Disallow: /seating/
+Disallow: /music/
+Disallow: /menu/
+Disallow: /moodboard/
+Disallow: /shopping/
+Disallow: /checklist/
+Disallow: /integrations/
+Disallow: /notifications/
+Disallow: /rsvp/
+Disallow: /svatebni-den/
+Disallow: /wedding-website/builder
+Disallow: /wedding-website/analytics
+Disallow: /wedding-website/rsvp
+
+# Allow public pages
+Allow: /marketplace
+Allow: /marketplace/vendor/
+Allow: /w/
+Allow: /wedding/
+Allow: /affiliate
+Allow: /obchodni-podminky
+Allow: /ochrana-soukromi
+Allow: /podminky-sluzby
+Allow: /cookies
+Allow: /gdpr
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://svatbot.cz/sitemap.xml
+
