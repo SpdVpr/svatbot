@@ -86,10 +86,10 @@ export default function WelcomeScreen() {
         <div className="container mx-auto px-4 md:px-6 relative z-10 flex flex-col lg:flex-row items-center justify-between">
           <div className="lg:w-1/2 text-center mb-8 lg:mb-0 animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <span className="inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-rose-100 text-rose-700 text-xs md:text-sm font-semibold rounded-full mb-4 md:mb-6 shadow-sm mx-auto" role="status">
-              <Sparkles className="w-3 h-3 md:w-4 md:h-4 mr-1.5 md:mr-2 text-rose-500" aria-hidden="true" /> První český svatební plánovač s AI
+              <Sparkles className="w-3 h-3 md:w-4 md:h-4 mr-1.5 md:mr-2 text-rose-500" aria-hidden="true" /> Český svatební plánovač s AI
             </span>
             <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-display font-extrabold leading-tight mb-4 md:mb-6 text-gray-900">
-              Naplánujte Svatbu za <span className="text-gradient-primary">50+ Hodin Méně</span> s AI Asistentem
+              Naplánujte svatbu <span className="text-gradient-primary">AI SvatBot</span> asistentem
             </h1>
             <p className="text-base md:text-lg lg:text-xl text-gray-600 mb-6 md:mb-10 max-w-lg lg:max-w-xl mx-auto">
               SvatBot.cz kombinuje AI technologie s intuitivními nástroji: inteligentní asistent, rozpočet, timeline, hosté, seating plan, svatební web a marketplace ověřených dodavatelů – vše na jedné platformě.
@@ -507,7 +507,7 @@ export default function WelcomeScreen() {
               Váš přizpůsobitelný dashboard
             </h2>
             <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
-              Drag & drop dashboard s <NumberCounter end={18} suffix="+" className="text-gradient-accent font-bold" /> moduly včetně AI asistenta. Přesuňte, změňte velikost a skryjte moduly podle vašich potřeb.
+              Drag & drop dashboard s moduly včetně AI asistenta. Přesuňte, změňte velikost a skryjte moduly podle vašich potřeb.
             </p>
           </div>
           <div className="relative max-w-6xl mx-auto animate-fade-in" style={{ animationDelay: '0.3s' }}>
@@ -551,7 +551,7 @@ export default function WelcomeScreen() {
               </div>
               <h3 className="text-2xl md:text-3xl font-display font-bold text-gray-900 mb-4">AI technologie</h3>
               <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-6">
-                První český svatební plánovač s pokročilými AI technologiemi pro inteligentní doporučení a automatizaci.
+                Český svatební plánovač s pokročilými AI technologiemi pro inteligentní doporučení a automatizaci.
               </p>
 
               {/* AI Logo */}
@@ -744,7 +744,7 @@ export default function WelcomeScreen() {
                 Postaveno na <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400">špičkových technologiích</span>
               </h2>
               <p className="text-base md:text-lg text-gray-300 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                První český svatební plánovač využívající nejnovější AI a moderní cloudové technologie
+                Český svatební plánovač využívající nejnovější AI a moderní cloudové technologie
               </p>
             </div>
 
@@ -804,109 +804,6 @@ export default function WelcomeScreen() {
                 <p className="text-sm text-gray-300">Přístup odkudkoliv, kdykoliv</p>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ - Často kladené otázky */}
-      <section className="py-16 md:py-24 lg:py-32 bg-gradient-to-br from-gray-50 via-white to-gray-50 relative overflow-hidden touch-pan-y">
-        <div className="container mx-auto px-4 md:px-6 relative z-10">
-          <div className="text-center mb-12 md:mb-16 lg:mb-20">
-            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full mb-6 animate-fade-in">
-              <MessageSquare className="w-4 h-4 text-blue-600 mr-2" />
-              <span className="text-sm font-semibold text-gray-800">Máte otázky?</span>
-            </div>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-gray-900 mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              Často kladené <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-500 via-purple-500 to-blue-500">otázky</span>
-            </h2>
-            <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              Odpovědi na nejčastější dotazy o SvatBot.cz
-            </p>
-          </div>
-
-          <div className="max-w-4xl mx-auto space-y-6">
-            {/* FAQ 1 */}
-            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border-2 border-gray-100 hover:border-rose-200 transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-              <div className="flex items-start">
-                <div className="w-10 h-10 bg-gradient-to-br from-rose-500 to-pink-500 rounded-full flex items-center justify-center flex-shrink-0 mr-4">
-                  <span className="text-white font-bold">?</span>
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">Je SvatBot.cz zdarma?</h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    Můžete vyzkoušet <strong>30 dní zdarma</strong> bez nutnosti zadávat platební údaje! Po zkušební době je vyžadována platba, ale výhoda je, že si můžete vyzkoušet celou aplikaci bez jakýchkoliv závazků.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* FAQ 2 */}
-            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border-2 border-gray-100 hover:border-purple-200 transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-              <div className="flex items-start">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center flex-shrink-0 mr-4">
-                  <span className="text-white font-bold">?</span>
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">Potřebuji technické znalosti?</h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    <strong>Ne!</strong> SvatBot.cz je navržen tak, aby byl intuitivní a jednoduchý. Vše funguje na principu drag & drop a klikání. Svatební web vytvoříte bez jediného řádku kódu. AI asistent vám pomůže s každým krokem.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* FAQ 3 */}
-            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border-2 border-gray-100 hover:border-green-200 transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-              <div className="flex items-start">
-                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 mr-4">
-                  <span className="text-white font-bold">?</span>
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">Jsou moje data v bezpečí?</h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    <strong>Absolutně!</strong> Používáme Firebase od Google s SSL šifrováním a jsme plně GDPR compliant. Vaše data jsou uložena v zabezpečených evropských serverech a nikdy je nesdílíme s třetími stranami.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* FAQ 4 */}
-            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border-2 border-gray-100 hover:border-orange-200 transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.6s' }}>
-              <div className="flex items-start">
-                <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center flex-shrink-0 mr-4">
-                  <span className="text-white font-bold">?</span>
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">Jak funguje AI asistent?</h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    AI asistent využívá <strong>nejnovější GPT-5</strong> s přístupem k vašim reálným datům (hosté, rozpočet, úkoly). Poskytuje personalizovaná doporučení, pomáhá s výběrem dodavatelů, optimalizuje rozpočet a odpovídá na vaše otázky 24/7.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* FAQ 5 */}
-            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border-2 border-gray-100 hover:border-pink-200 transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.7s' }}>
-              <div className="flex items-start">
-                <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-rose-500 rounded-full flex items-center justify-center flex-shrink-0 mr-4">
-                  <span className="text-white font-bold">?</span>
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">Mohu zrušit kdykoliv?</h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    <strong>Ano!</strong> Žádné závazky, žádné skryté poplatky. Můžete zrušit kdykoliv během zkušební doby nebo po ní. Vaše data zůstanou zachována.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* CTA */}
-          <div className="text-center mt-12 md:mt-16">
-            <p className="text-lg text-gray-600 mb-6">Máte další otázky?</p>
-            <button onClick={handleGetStarted} className="px-8 py-4 bg-gradient-to-r from-rose-500 to-purple-500 text-white font-semibold text-lg rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 button-glow">
-              Kontaktujte nás nebo vyzkoušejte demo
-            </button>
           </div>
         </div>
       </section>
@@ -1157,7 +1054,7 @@ export default function WelcomeScreen() {
             </p>
           </header>
 
-          <div className="max-w-4xl mx-auto space-y-4" itemScope itemType="https://schema.org/FAQPage">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4" itemScope itemType="https://schema.org/FAQPage">
             {/* FAQ 1 */}
             <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
               <summary className="font-semibold text-lg text-gray-900 cursor-pointer flex items-center justify-between" itemProp="name">
@@ -1166,7 +1063,7 @@ export default function WelcomeScreen() {
               </summary>
               <div className="mt-4 text-gray-600 leading-relaxed" itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
                 <p itemProp="text">
-                  SvatBot.cz je první český svatební plánovač s AI asistentem, který vám ušetří 50+ hodin práce při organizaci svatby. Nabízíme kompletní sadu nástrojů: AI chatbot pro rady a tipy, správu rozpočtu, timeline plánování, správu hostů, seating plan editor, svatební web builder, RSVP systém a marketplace ověřených dodavatelů. Vše na jedné platformě, dostupné kdykoliv a odkudkoliv.
+                  SvatBot.cz je český svatební plánovač s AI asistentem, který vám ušetří 50+ hodin práce při organizaci svatby. Nabízíme kompletní sadu nástrojů: AI chatbot pro rady a tipy, správu rozpočtu, timeline plánování, správu hostů, seating plan editor, svatební web builder, RSVP systém a marketplace ověřených dodavatelů. Vše na jedné platformě, dostupné kdykoliv a odkudkoliv.
                 </p>
               </div>
             </details>
@@ -1326,7 +1223,7 @@ export default function WelcomeScreen() {
                 <span className="font-display text-3xl font-bold text-white">SvatBot.cz</span>
               </div>
               <p className="text-gray-300 mb-6 max-w-md leading-relaxed">
-                První český svatební plánovač s AI asistentem. Vše na jednom místě – od hostů po rozpočet, od úkolů po svatební web.
+                Český svatební plánovač s AI asistentem. Vše na jednom místě – od hostů po rozpočet, od úkolů po svatební web.
               </p>
               <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 mb-6">
                 <button onClick={handleGetStarted} className="px-7 py-3 bg-rose-500 text-white rounded-full font-semibold hover:bg-rose-600 transition-colors">Začít zdarma</button>
