@@ -10,7 +10,7 @@ import GuestStats from '@/components/guests/GuestStats'
 import GuestForm from '@/components/guests/GuestForm'
 import ModuleHeader from '@/components/common/ModuleHeader'
 import Link from 'next/link'
-
+import logger from '@/lib/logger'
 import { Guest, GuestFormData } from '@/types/guest'
 import {
   Plus,
@@ -24,7 +24,7 @@ import {
 } from 'lucide-react'
 
 export default function GuestsPage() {
-  console.log('🏠 GuestsPage render START')
+  logger.log('🏠 GuestsPage render START')
   const { user } = useAuth()
   const { wedding } = useWedding()
 
@@ -32,8 +32,8 @@ export default function GuestsPage() {
   const { guests, loading, createGuest, updateGuest, deleteGuest, updateRSVP, error, stats, reorderGuests } = useRobustGuests()
   const { getAccommodationById } = useAccommodation()
 
-  console.log('🏠 Using ROBUST hook')
-  console.log('🏠 useGuest result:', { reorderGuests: !!reorderGuests, type: typeof reorderGuests })
+  logger.log('🏠 Using ROBUST hook')
+  logger.log('🏠 useGuest result:', { reorderGuests: !!reorderGuests, type: typeof reorderGuests })
   // Removed viewMode - using stats view as default (most informative)
   const [showGuestForm, setShowGuestForm] = useState(false)
   const [editingGuest, setEditingGuest] = useState<Guest | null>(null)
@@ -42,7 +42,7 @@ export default function GuestsPage() {
   // Check if user has any guests
   const hasGuests = guests.length > 0
 
-  console.log('🏠 Guests page:', {
+  logger.log('🏠 Guests page:', {
     hasGuests,
     guestsCount: guests.length,
     loading,
@@ -56,7 +56,7 @@ export default function GuestsPage() {
       await createGuest(data)
       setShowGuestForm(false)
     } catch (error) {
-      console.error('Error creating guest:', error)
+      logger.error('Error creating guest:', error)
       throw error // Re-throw to show error in form
     } finally {
       setGuestFormLoading(false)
@@ -71,16 +71,16 @@ export default function GuestsPage() {
 
   // Simple test function
   const handleGuestReorder = async (reorderedGuests: Guest[]) => {
-    console.log('🔄 handleGuestReorder called with:', reorderedGuests.length, 'guests')
+    logger.log('🔄 handleGuestReorder called with:', reorderedGuests.length, 'guests')
     try {
       await reorderGuests(reorderedGuests)
-      console.log('✅ Reorder completed')
+      logger.log('✅ Reorder completed')
     } catch (error) {
-      console.error('❌ Error reordering guests:', error)
+      logger.error('❌ Error reordering guests:', error)
     }
   }
 
-  console.log('🏠 handleGuestReorder created:', {
+  logger.log('🏠 handleGuestReorder created:', {
     handleGuestReorder: !!handleGuestReorder,
     handleGuestReorderType: typeof handleGuestReorder,
     reorderGuests: !!reorderGuests,
@@ -104,7 +104,7 @@ export default function GuestsPage() {
       setShowGuestForm(false)
       setEditingGuest(null)
     } catch (error) {
-      console.error('Error updating guest:', error)
+      logger.error('Error updating guest:', error)
       throw error // Re-throw to show error in form
     } finally {
       setGuestFormLoading(false)

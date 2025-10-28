@@ -17,6 +17,7 @@ import { db } from '@/config/firebase'
 import { useWeddingStore } from '@/stores/weddingStore'
 import { useAuthStore } from '@/stores/authStore'
 import { Wedding, OnboardingData, WeddingProgress } from '@/types'
+import logger from '@/lib/logger'
 
 export function useWedding() {
   const { user } = useAuthStore()
@@ -113,9 +114,9 @@ export function useWedding() {
         // Try to save to Firestore
         const weddingRef = doc(db, 'weddings', weddingId)
         await setDoc(weddingRef, convertToFirestoreData(weddingData))
-        console.log('Wedding saved to Firestore successfully')
+        logger.log('Wedding saved to Firestore successfully')
       } catch (firestoreError) {
-        console.warn('Firestore not available, using local storage fallback:', firestoreError)
+        logger.warn('Firestore not available, using local storage fallback:', firestoreError)
         // Save to localStorage as fallback
         localStorage.setItem(`wedding_${user.id}`, JSON.stringify(wedding))
       }
@@ -123,7 +124,7 @@ export function useWedding() {
       setCurrentWedding(wedding)
       return wedding
     } catch (error: any) {
-      console.error('Error creating wedding:', error)
+      logger.error('Error creating wedding:', error)
       setError('Chyba při vytváření svatby')
       throw error
     } finally {
@@ -145,27 +146,27 @@ export function useWedding() {
         updatedAt: new Date()
       }
 
-      console.log('🔄 Updating wedding with data:', updatedData)
+      logger.log('🔄 Updating wedding with data:', updatedData)
 
       try {
         // Try to update in Firestore
         const weddingRef = doc(db, 'weddings', currentWedding.id)
         await updateDoc(weddingRef, convertToFirestoreData(updatedData))
-        console.log('✅ Wedding updated in Firestore')
+        logger.log('✅ Wedding updated in Firestore')
       } catch (firestoreError) {
-        console.warn('⚠️ Firestore not available, using localStorage fallback')
+        logger.warn('⚠️ Firestore not available, using localStorage fallback')
         // Update in localStorage as fallback
         const updatedWedding = { ...currentWedding, ...updatedData }
         localStorage.setItem(`wedding_${user.id}`, JSON.stringify(updatedWedding))
-        console.log('📦 Wedding updated in localStorage')
+        logger.log('📦 Wedding updated in localStorage')
       }
 
       // Update local state
       const updatedWedding = { ...currentWedding, ...updatedData }
       setCurrentWedding(updatedWedding)
-      console.log('🎯 Local state updated:', updatedWedding)
+      logger.log('🎯 Local state updated:', updatedWedding)
     } catch (error: any) {
-      console.error('Error updating wedding:', error)
+      logger.error('Error updating wedding:', error)
       setError('Chyba při aktualizaci svatby')
       throw error
     }
@@ -198,7 +199,7 @@ export function useWedding() {
 
       await updateWedding({ progress: newProgress })
     } catch (error: any) {
-      console.error('Error updating progress:', error)
+      logger.error('Error updating progress:', error)
       setError('Chyba při aktualizaci pokroku')
     }
   }
@@ -227,10 +228,10 @@ export function useWedding() {
             // Get the most recent wedding (last one created)
             const weddingDoc = querySnapshot.docs[querySnapshot.docs.length - 1]
             const wedding = convertFirestoreWedding(weddingDoc.id, weddingDoc.data())
-            console.log('✅ Demo wedding loaded from Firestore:', wedding)
+            logger.log('✅ Demo wedding loaded from Firestore:', wedding)
             setCurrentWedding(wedding)
           } else {
-            console.error('❌ No demo wedding found in Firestore')
+            logger.error('❌ No demo wedding found in Firestore')
             setCurrentWedding(null)
           }
         } else {
@@ -251,8 +252,8 @@ export function useWedding() {
           }
         }
       } catch (firestoreError) {
-        console.error('❌ Error loading wedding from Firestore:', firestoreError)
-        console.warn('⚠️ Firestore not available, checking localStorage fallback')
+        logger.error('❌ Error loading wedding from Firestore:', firestoreError)
+        logger.warn('⚠️ Firestore not available, checking localStorage fallback')
 
         // Try to load from localStorage
         const savedWedding = localStorage.getItem(`wedding_${user.id}`)
@@ -270,7 +271,7 @@ export function useWedding() {
         }
       }
     } catch (error: any) {
-      console.error('Error loading wedding:', error)
+      logger.error('Error loading wedding:', error)
       setError('Chyba při načítání svatby')
     } finally {
       setLoading(false)
@@ -296,17 +297,17 @@ export function useWedding() {
              wedding.updatedAt.getTime() !== currentWedding.updatedAt.getTime())
 
           if (shouldUpdate) {
-            console.log('📡 Wedding updated from Firestore snapshot')
+            logger.log('📡 Wedding updated from Firestore snapshot')
             setCurrentWedding(wedding)
           }
         }
       }, (error) => {
-        console.warn('Wedding snapshot error (Firestore not available):', error)
+        logger.warn('Wedding snapshot error (Firestore not available):', error)
       })
 
       return () => unsubscribe()
     } catch (error) {
-      console.warn('Real-time updates not available (Firestore not configured)')
+      logger.warn('Real-time updates not available (Firestore not configured)')
       return () => {} // Return empty cleanup function
     }
   }, [user, currentWedding?.id])

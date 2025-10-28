@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { DashboardModule, DashboardLayout, DEFAULT_DASHBOARD_MODULES } from '@/types/dashboard'
 import { useAuth } from './useAuth'
 import { useWedding } from './useWedding'
+import logger from '@/lib/logger'
 
 const DASHBOARD_STORAGE_KEY = 'svatbot-dashboard-layout'
 
@@ -57,7 +58,7 @@ export function useDashboard() {
     import('@/config/firebase').then(({ db }) => {
       import('firebase/firestore').then(({ doc, onSnapshot, getDoc }) => {
         const dashboardRef = doc(db, 'dashboards', `${user.id}_${wedding.id}`)
-        console.log('📄 Loading from document ID:', `${user.id}_${wedding.id}`)
+        logger.log('📄 Loading from document ID:', `${user.id}_${wedding.id}`)
 
         // Setup real-time listener
         const unsubscribe = onSnapshot(
@@ -77,16 +78,16 @@ export function useDashboard() {
               // Only process if data actually changed
               const dataChanged = lastFirebaseDataRef.current !== firebaseDataString
               if (!dataChanged) {
-                console.log('📥 Firebase data unchanged, skipping update')
+                logger.log('📥 Firebase data unchanged, skipping update')
                 return
               }
 
-              console.log('📥 Firebase data changed, updating layout')
+              logger.log('📥 Firebase data changed, updating layout')
               isLoadingFromFirebaseRef.current = true
 
               lastFirebaseDataRef.current = firebaseDataString
 
-              console.log('📥 Raw Firebase data:', {
+              logger.log('📥 Raw Firebase data:', {
                 layoutMode: data.layoutMode,
                 modulesCount: data.modules?.length,
                 sampleModules: data.modules?.slice(0, 3).map((m: DashboardModule) => ({
@@ -112,10 +113,10 @@ export function useDashboard() {
               // If there are new modules or we filtered out invalid ones, update the layout
               if (newModules.length > 0 || validModules.length !== (data.modules || []).length) {
                 if (newModules.length > 0) {
-                  console.log('Adding new modules to dashboard:', newModules.map(m => m.type))
+                  logger.log('Adding new modules to dashboard:', newModules.map(m => m.type))
                 }
                 if (validModules.length !== (data.modules || []).length) {
-                  console.log('Removed invalid modules from dashboard')
+                  logger.log('Removed invalid modules from dashboard')
                 }
                 const updatedLayout = {
                   modules: [...validModules, ...newModules],
@@ -140,7 +141,7 @@ export function useDashboard() {
                   isLocked: data.isLocked || false,
                   layoutMode: data.layoutMode || 'grid'
                 }
-                console.log('📥 Loading layout from Firebase:', {
+                logger.log('📥 Loading layout from Firebase:', {
                   layoutMode: loadedLayout.layoutMode,
                   modulesCount: loadedLayout.modules.length,
                   isEditMode: loadedLayout.isEditMode,
@@ -170,11 +171,11 @@ export function useDashboard() {
             hasLoadedFromFirebaseRef.current = true
 
             // Reset loading flag immediately (no delay needed)
-            console.log('✅ Resetting isLoadingFromFirebase flag')
+            logger.log('✅ Resetting isLoadingFromFirebase flag')
             isLoadingFromFirebaseRef.current = false
           },
           (error) => {
-            console.warn('⚠️ Firebase listener error:', error.message)
+            logger.warn('⚠️ Firebase listener error:', error.message)
 
             // Mark that we've "loaded" from Firebase (even if it failed) so we can start saving
             hasLoadedFromFirebaseRef.current = true
@@ -185,9 +186,9 @@ export function useDashboard() {
               try {
                 const parsedLayout = JSON.parse(savedLayout)
                 setLayout(parsedLayout)
-                console.log('✅ Loaded layout from localStorage fallback')
+                logger.log('✅ Loaded layout from localStorage fallback')
               } catch (e) {
-                console.error('Error parsing localStorage layout:', e)
+                logger.error('Error parsing localStorage layout:', e)
                 setLayout({
                   modules: DEFAULT_DASHBOARD_MODULES,
                   isEditMode: false,
@@ -197,7 +198,7 @@ export function useDashboard() {
               }
             } else {
               // No localStorage data, use defaults
-              console.log('📦 No localStorage data, using defaults')
+              logger.log('📦 No localStorage data, using defaults')
               setLayout({
                 modules: DEFAULT_DASHBOARD_MODULES,
                 isEditMode: false,
@@ -215,7 +216,7 @@ export function useDashboard() {
         unsubscribeRef.current = unsubscribe
       })
     }).catch((error) => {
-      console.warn('⚠️ Failed to load Firebase modules:', error)
+      logger.warn('⚠️ Failed to load Firebase modules:', error)
       setLoading(false)
     })
 
@@ -232,7 +233,7 @@ export function useDashboard() {
   useEffect(() => {
     // Don't save if we haven't loaded from Firebase yet, we're loading, already saving, or loading from Firebase
     if (!user || !wedding?.id || !hasLoadedFromFirebaseRef.current || loading || isSavingRef.current || isLoadingFromFirebaseRef.current) {
-      console.log('⏭️ Skipping save - conditions not met:', {
+      logger.log('⏭️ Skipping save - conditions not met:', {
         hasUser: !!user,
         hasWedding: !!wedding?.id,
         hasLoadedFromFirebase: hasLoadedFromFirebaseRef.current,
@@ -253,18 +254,18 @@ export function useDashboard() {
 
     // If the current data matches what we last loaded from Firebase, don't save
     if (lastFirebaseDataRef.current === currentDataString) {
-      console.log('⏭️ Skipping save - data matches Firebase')
+      logger.log('⏭️ Skipping save - data matches Firebase')
       return
     }
 
-    console.log('💾 Saving layout to Firebase...')
+    logger.log('💾 Saving layout to Firebase...')
     isSavingRef.current = true
 
     // Save to Firebase
     import('@/config/firebase').then(({ db }) => {
       import('firebase/firestore').then(({ doc, setDoc }) => {
         const dashboardRef = doc(db, 'dashboards', `${user.id}_${wedding.id}`)
-        console.log('📄 Saving to document ID:', `${user.id}_${wedding.id}`)
+        logger.log('📄 Saving to document ID:', `${user.id}_${wedding.id}`)
 
         const layoutData = {
           modules: layout.modules,
@@ -276,7 +277,7 @@ export function useDashboard() {
           updatedAt: new Date()
         }
 
-        console.log('💾 Saving to Firebase:', {
+        logger.log('💾 Saving to Firebase:', {
           layoutMode: layoutData.layoutMode,
           isEditMode: layoutData.isEditMode,
           modulesCount: layoutData.modules.length,
@@ -285,7 +286,7 @@ export function useDashboard() {
 
         setDoc(dashboardRef, layoutData, { merge: true })
           .then(() => {
-            console.log('✅ Layout saved to Firebase successfully')
+            logger.log('✅ Layout saved to Firebase successfully')
             // Update the ref with the saved data
             lastFirebaseDataRef.current = currentDataString
             // Also save to localStorage as backup
@@ -295,14 +296,14 @@ export function useDashboard() {
             }, 100)
           })
           .catch((error) => {
-            console.warn('⚠️ Firebase save failed:', error.message)
+            logger.warn('⚠️ Firebase save failed:', error.message)
             // Fallback to localStorage
             localStorage.setItem(`${DASHBOARD_STORAGE_KEY}-${user.id}`, JSON.stringify(layout))
             isSavingRef.current = false
           })
       })
     }).catch((error) => {
-      console.warn('⚠️ Failed to load Firebase modules:', error)
+      logger.warn('⚠️ Failed to load Firebase modules:', error)
       // Fallback to localStorage
       localStorage.setItem(`${DASHBOARD_STORAGE_KEY}-${user.id}`, JSON.stringify(layout))
       isSavingRef.current = false
@@ -345,14 +346,14 @@ export function useDashboard() {
   }
 
   const updateModulePosition = (moduleId: string, position: { x: number; y: number }) => {
-    console.log('📍 Updating module position:', moduleId, position)
+    logger.log('📍 Updating module position:', moduleId, position)
     setLayout(prev => {
       const updatedModules = prev.modules.map(module =>
         module.id === moduleId
           ? { ...module, position }
           : module
       )
-      console.log('📍 Updated modules:', updatedModules.find(m => m.id === moduleId)?.position)
+      logger.log('📍 Updated modules:', updatedModules.find(m => m.id === moduleId)?.position)
       return {
         ...prev,
         modules: updatedModules
@@ -361,7 +362,7 @@ export function useDashboard() {
   }
 
   const updateModuleSize = (moduleId: string, size: { width: number; height: number }) => {
-    console.log('📏 Updating module size:', moduleId, size)
+    logger.log('📏 Updating module size:', moduleId, size)
     setLayout(prev => ({
       ...prev,
       modules: prev.modules.map(module =>
@@ -373,7 +374,7 @@ export function useDashboard() {
   }
 
   const setLayoutMode = (mode: 'grid' | 'free') => {
-    console.log('🔄 Setting layout mode to:', mode)
+    logger.log('🔄 Setting layout mode to:', mode)
     setLayout(prev => ({
       ...prev,
       layoutMode: mode
@@ -411,9 +412,9 @@ export function useDashboard() {
 
         const dashboardRef = doc(db, 'dashboards', `${user.id}_${wedding.id}`)
         await setDoc(dashboardRef, newLayout)
-        console.log('✅ Dashboard layout reset in Firebase (layoutMode preserved:', currentLayoutMode, ')')
+        logger.log('✅ Dashboard layout reset in Firebase (layoutMode preserved:', currentLayoutMode, ')')
       } catch (error) {
-        console.warn('⚠️ Failed to reset Firebase layout:', error)
+        logger.warn('⚠️ Failed to reset Firebase layout:', error)
       }
 
       // Also update localStorage with preserved layoutMode

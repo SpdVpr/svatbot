@@ -10,7 +10,7 @@ import TaskForm from '@/components/tasks/TaskForm'
 import TaskDebug from '@/components/debug/TaskDebug'
 import ModuleHeader from '@/components/common/ModuleHeader'
 import Link from 'next/link'
-
+import logger from '@/lib/logger'
 import { TaskFormData, Task } from '@/types/task'
 import {
   Plus,
@@ -50,11 +50,11 @@ export default function TasksPage() {
   const isDemoUser = user?.email === 'demo@svatbot.cz' || wedding?.id === 'demo-wedding'
 
   // Debug logging for tasks state
-  console.log('🔍 TasksPage render - user:', user?.id, user?.email)
-  console.log('🔍 TasksPage render - wedding:', wedding?.id)
-  console.log('🔍 TasksPage render - isDemoUser:', isDemoUser)
-  console.log('🔍 TasksPage render - tasks count:', tasks.length)
-  console.log('🔍 TasksPage render - tasks:', tasks.map(t => ({ id: t.id, title: t.title })))
+  logger.log('🔍 TasksPage render - user:', user?.id, user?.email)
+  logger.log('🔍 TasksPage render - wedding:', wedding?.id)
+  logger.log('🔍 TasksPage render - isDemoUser:', isDemoUser)
+  logger.log('🔍 TasksPage render - tasks count:', tasks.length)
+  logger.log('🔍 TasksPage render - tasks:', tasks.map(t => ({ id: t.id, title: t.title })))
 
   // Handle initialize tasks from templates
   const handleInitializeTasks = async () => {
@@ -62,23 +62,23 @@ export default function TasksPage() {
       await initializeTasksFromTemplates()
       setShowInitializeModal(false)
     } catch (error) {
-      console.error('Error initializing tasks:', error)
+      logger.error('Error initializing tasks:', error)
     }
   }
 
   // Handle create task
   const handleCreateTask = async (data: TaskFormData) => {
     try {
-      console.log('🚀 Starting task creation:', data.title)
-      console.log('🚀 Current tasks before creation:', tasks.length)
+      logger.log('🚀 Starting task creation:', data.title)
+      logger.log('🚀 Current tasks before creation:', tasks.length)
       setTaskFormLoading(true)
       const newTask = await createTask(data)
-      console.log('✅ Task created successfully:', newTask.title)
-      console.log('✅ Tasks count after creation should be:', tasks.length + 1)
+      logger.log('✅ Task created successfully:', newTask.title)
+      logger.log('✅ Tasks count after creation should be:', tasks.length + 1)
       setShowTaskForm(false)
       setEditingTask(null)
     } catch (error) {
-      console.error('Error creating task:', error)
+      logger.error('Error creating task:', error)
       throw error // Re-throw to show error in form
     } finally {
       setTaskFormLoading(false)
@@ -90,7 +90,7 @@ export default function TasksPage() {
     if (!editingTask) return
 
     try {
-      console.log('🚀 Starting task update:', data.title)
+      logger.log('🚀 Starting task update:', data.title)
       setTaskFormLoading(true)
       await updateTask(editingTask.id, {
         title: data.title,
@@ -101,11 +101,11 @@ export default function TasksPage() {
         assignedTo: data.assignedTo,
         notes: data.notes
       })
-      console.log('✅ Task updated successfully')
+      logger.log('✅ Task updated successfully')
       setShowTaskForm(false)
       setEditingTask(null)
     } catch (error) {
-      console.error('Error updating task:', error)
+      logger.error('Error updating task:', error)
       throw error
     } finally {
       setTaskFormLoading(false)

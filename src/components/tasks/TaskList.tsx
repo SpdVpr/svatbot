@@ -5,6 +5,7 @@ import { Task, TaskFilters, TaskViewOptions } from '@/types/task'
 import { useTask } from '@/hooks/useTask'
 import { useCalendar } from '@/hooks/useCalendar'
 import { useRouter } from 'next/navigation'
+import logger from '@/lib/logger'
 import {
   CheckCircle2,
   Circle,
@@ -68,9 +69,9 @@ export default function TaskList({
   const clearError = isDemoUser && propClearError ? propClearError : hookData.clearError
 
   // Debug logging
-  console.log('📋 TaskList render - tasks:', tasks.length, tasks)
-  console.log('📋 TaskList render - isDemoUser:', isDemoUser)
-  console.log('📋 TaskList render - using props:', isDemoUser && !!propTasks)
+  logger.log('📋 TaskList render - tasks:', tasks.length, tasks)
+  logger.log('📋 TaskList render - isDemoUser:', isDemoUser)
+  logger.log('📋 TaskList render - using props:', isDemoUser && !!propTasks)
 
   const [filters, setFilters] = useState<TaskFilters>({})
   const [viewOptions, setViewOptions] = useState<TaskViewOptions>({
@@ -92,7 +93,7 @@ export default function TaskList({
       setDeleteConfirmId(null)
       setOpenMenuId(null)
     } catch (error) {
-      console.error('Error deleting task:', error)
+      logger.error('Error deleting task:', error)
     }
   }
 
@@ -134,7 +135,7 @@ export default function TaskList({
       // Don't navigate - let user add more tasks
       alert('✅ Úkol byl přidán do kalendáře!')
     } catch (error) {
-      console.error('Error adding task to calendar:', error)
+      logger.error('Error adding task to calendar:', error)
       alert('❌ Chyba při přidávání do kalendáře')
     }
   }
@@ -170,7 +171,7 @@ export default function TaskList({
   })
 
   // Debug filtering
-  console.log('🔍 TaskList filtering:', {
+  logger.log('🔍 TaskList filtering:', {
     totalTasks: tasks.length,
     filteredTasks: filteredTasks.length,
     searchTerm,
@@ -183,7 +184,7 @@ export default function TaskList({
   const groupedTasks = groupTasksBy(filteredTasks, viewOptions.groupBy)
 
   // Debug grouping
-  console.log('🔍 TaskList grouping:', {
+  logger.log('🔍 TaskList grouping:', {
     filteredTasksCount: filteredTasks.length,
     groupedTasks: Object.keys(groupedTasks).map(key => ({
       group: key,

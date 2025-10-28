@@ -18,6 +18,7 @@ import {
   increment
 } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
+import logger from '@/lib/logger'
 
 const AFFILIATE_COOKIE_NAME = 'affiliate_ref'
 const COOKIE_DURATION_DAYS = 30
@@ -182,7 +183,7 @@ export async function trackAffiliateClick(
       if (lastTrackedData &&
           lastTrackedData.code === affiliateCode &&
           Date.now() - lastTrackedData.timestamp < 60000) { // 1 minute
-        console.log('⏭️ Click already tracked recently, skipping')
+        logger.log('⏭️ Click already tracked recently, skipping')
         return
       }
     }
@@ -197,7 +198,7 @@ export async function trackAffiliateClick(
     const snapshot = await getDocs(q)
 
     if (snapshot.empty) {
-      console.warn('⚠️ Affiliate code not found or inactive:', affiliateCode)
+      logger.warn('⚠️ Affiliate code not found or inactive:', affiliateCode)
       return
     }
 
@@ -212,7 +213,7 @@ export async function trackAffiliateClick(
     const currentUrl = typeof window !== 'undefined' ? window.location.href : ''
     const utmParams = getUTMParams(currentUrl)
 
-    console.log('📊 Analytics data:', { source, device, browser, utmParams, landingPage })
+    logger.log('📊 Analytics data:', { source, device, browser, utmParams, landingPage })
 
     // Get today's date for daily stats
     const today = new Date()
@@ -222,7 +223,7 @@ export async function trackAffiliateClick(
     // Update partner stats using increment (atomic operation) - REALTIME
     const currentClicks = affiliateDoc.data().stats?.totalClicks || 0
 
-    console.log('📊 Updating partner stats:', {
+    logger.log('📊 Updating partner stats:', {
       affiliateId,
       currentClicks,
       incrementing: true,
@@ -309,9 +310,9 @@ export async function trackAffiliateClick(
       }))
     }
 
-    console.log('✅ Affiliate click tracked successfully:', { affiliateCode, affiliateId, clicks: currentClicks + 1 })
+    logger.log('✅ Affiliate click tracked successfully:', { affiliateCode, affiliateId, clicks: currentClicks + 1 })
   } catch (err) {
-    console.error('❌ Error tracking affiliate click:', err)
+    logger.error('❌ Error tracking affiliate click:', err)
   }
 }
 
@@ -382,9 +383,9 @@ export async function trackAffiliateRegistration(
       affiliateRegisteredAt: Timestamp.now()
     })
 
-    console.log('✅ Affiliate registration tracked:', affiliateCode)
+    logger.log('✅ Affiliate registration tracked:', affiliateCode)
   } catch (err) {
-    console.error('Error tracking affiliate registration:', err)
+    logger.error('Error tracking affiliate registration:', err)
   }
 }
 
@@ -411,7 +412,7 @@ export async function linkUserToAffiliate(
 
     // Don't override existing affiliate reference (first referrer wins)
     if (userData.affiliateCode) {
-      console.log('ℹ️ User already has affiliate reference:', userData.affiliateCode)
+      logger.log('ℹ️ User already has affiliate reference:', userData.affiliateCode)
       return
     }
 
@@ -446,9 +447,9 @@ export async function linkUserToAffiliate(
       converted: false
     })
 
-    console.log('✅ Existing user linked to affiliate:', affiliateCode)
+    logger.log('✅ Existing user linked to affiliate:', affiliateCode)
   } catch (err) {
-    console.error('Error linking user to affiliate:', err)
+    logger.error('Error linking user to affiliate:', err)
   }
 }
 
@@ -476,7 +477,7 @@ export async function trackAffiliateConversion(
     const refSnapshot = await getDocs(refQuery)
     
     if (refSnapshot.empty) {
-      console.log('No affiliate reference found for user:', userId)
+      logger.log('No affiliate reference found for user:', userId)
       return
     }
 
@@ -495,7 +496,7 @@ export async function trackAffiliateConversion(
     )
 
     if (partnerDoc.empty) {
-      console.warn('Affiliate partner not found:', affiliateCode)
+      logger.warn('Affiliate partner not found:', affiliateCode)
       return
     }
 
@@ -558,7 +559,7 @@ export async function trackAffiliateConversion(
       updatedAt: Timestamp.now()
     })
 
-    console.log('✅ Affiliate conversion tracked:', {
+    logger.log('✅ Affiliate conversion tracked:', {
       affiliateCode,
       amount,
       commissionAmount
@@ -567,7 +568,7 @@ export async function trackAffiliateConversion(
     // Clear affiliate cookie after conversion
     clearAffiliateCookie()
   } catch (err) {
-    console.error('Error tracking affiliate conversion:', err)
+    logger.error('Error tracking affiliate conversion:', err)
   }
 }
 
@@ -579,7 +580,7 @@ export function initAffiliateTracking(): void {
 
   const affiliateCode = getAffiliateCode()
 
-  console.log('🔍 Affiliate tracking initialized:', {
+  logger.log('🔍 Affiliate tracking initialized:', {
     affiliateCode,
     url: window.location.href,
     hasRefParam: new URLSearchParams(window.location.search).has('ref')
@@ -587,10 +588,10 @@ export function initAffiliateTracking(): void {
 
   if (affiliateCode) {
     const landingPage = window.location.pathname + window.location.search
-    console.log('✅ Tracking affiliate click:', { affiliateCode, landingPage })
+    logger.log('✅ Tracking affiliate click:', { affiliateCode, landingPage })
     trackAffiliateClick(affiliateCode, landingPage)
   } else {
-    console.log('ℹ️ No affiliate code found')
+    logger.log('ℹ️ No affiliate code found')
   }
 }
 

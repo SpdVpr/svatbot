@@ -4,6 +4,7 @@ import { MarketplaceVendor } from '@/types/vendor'
 import { marketplaceVendors } from '@/data/marketplaceVendors'
 import { db } from '@/lib/firebase'
 import { collection, query, where, onSnapshot, Timestamp } from 'firebase/firestore'
+import logger from '@/lib/logger'
 
 // Global vendor store for real-time updates
 class VendorStore {
@@ -79,18 +80,18 @@ class VendorStore {
     try {
       localStorage.setItem('marketplace_vendors', JSON.stringify(this.vendors))
     } catch (error) {
-      console.warn('Failed to save vendors to localStorage:', error)
+      logger.warn('Failed to save vendors to localStorage:', error)
     }
   }
 
   // Initialize Firestore listener for real-time updates
   initializeFirestore(): void {
     if (this.isInitialized) {
-      console.log('📦 VendorStore already initialized')
+      logger.log('📦 VendorStore already initialized')
       return
     }
 
-    console.log('🔥 Initializing VendorStore with Firestore...')
+    logger.log('🔥 Initializing VendorStore with Firestore...')
     this.isInitialized = true
 
     try {
@@ -101,7 +102,7 @@ class VendorStore {
       // Set up real-time listener
       this.unsubscribe = onSnapshot(q,
         (snapshot) => {
-          console.log('📦 Firestore vendors snapshot:', snapshot.size, 'approved vendors')
+          logger.log('📦 Firestore vendors snapshot:', snapshot.size, 'approved vendors')
 
           const firestoreVendors: MarketplaceVendor[] = []
           snapshot.forEach((doc) => {
@@ -158,18 +159,18 @@ class VendorStore {
           )
 
           this.vendors = [...firestoreVendors, ...nonConflictingMockVendors]
-          console.log('✅ VendorStore updated:', this.vendors.length, 'total vendors')
+          logger.log('✅ VendorStore updated:', this.vendors.length, 'total vendors')
           this.notifyListeners()
         },
         (error) => {
-          console.error('❌ Firestore vendors listener error:', error)
+          logger.error('❌ Firestore vendors listener error:', error)
           // Fall back to mock data on error
           this.vendors = [...marketplaceVendors]
           this.notifyListeners()
         }
       )
     } catch (error) {
-      console.error('❌ Failed to initialize Firestore listener:', error)
+      logger.error('❌ Failed to initialize Firestore listener:', error)
       // Fall back to mock data
       this.vendors = [...marketplaceVendors]
       this.notifyListeners()
@@ -178,7 +179,7 @@ class VendorStore {
 
   // Load from localStorage (deprecated - now using Firestore)
   loadFromLocalStorage(): void {
-    console.warn('⚠️ loadFromLocalStorage is deprecated, using Firestore instead')
+    logger.warn('⚠️ loadFromLocalStorage is deprecated, using Firestore instead')
     this.initializeFirestore()
   }
 

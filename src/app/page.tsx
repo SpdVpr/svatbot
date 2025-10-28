@@ -8,6 +8,7 @@ import Dashboard from '@/components/dashboard/Dashboard'
 import { useEffect, useState, Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSearchParams } from 'next/navigation'
+import logger from '@/lib/logger'
 
 function HomePageContent() {
   const { user, isInitialized, login } = useAuth()
@@ -28,7 +29,7 @@ function HomePageContent() {
         email: 'demo@svatbot.cz',
         password: 'demo123'
       }).catch((error) => {
-        console.error('Auto demo login failed:', error)
+        logger.error('Auto demo login failed:', error)
         setIsDemoLoading(false)
       })
     }
@@ -75,10 +76,10 @@ function HomePageContent() {
         ) : !wedding ? (
           <OnboardingFlow
             onComplete={() => {
-              console.log('Wedding created successfully')
+              logger.log('Wedding created successfully')
             }}
             onSkip={() => {
-              console.log('Onboarding skipped - will be handled in OnboardingFlow')
+              logger.log('Onboarding skipped - will be handled in OnboardingFlow')
             }}
           />
         ) : (

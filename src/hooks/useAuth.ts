@@ -15,6 +15,7 @@ import { doc, setDoc, getDoc } from 'firebase/firestore'
 import { auth, db } from '@/config/firebase'
 import { useAuthStore } from '@/stores/authStore'
 import { User } from '@/types'
+import logger from '@/lib/logger'
 
 export interface AuthError {
   code: string
@@ -50,7 +51,7 @@ export function useAuth() {
     if (!forceRefresh) {
       const cached = userDataCache.get(firebaseUser.uid)
       if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-        console.log('✅ Using cached user data for:', firebaseUser.uid)
+        logger.log('✅ Using cached user data for:', firebaseUser.uid)
         return cached.user
       }
     }
@@ -63,12 +64,12 @@ export function useAuth() {
       const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid))
       if (userDoc.exists()) {
         userData = userDoc.data()
-        console.log('📥 Loaded user data from Firestore:', { gender: userData?.gender })
+        logger.log('📥 Loaded user data from Firestore:', { gender: userData?.gender })
       } else {
-        console.log('⚠️ No Firestore document found for user:', firebaseUser.uid)
+        logger.log('⚠️ No Firestore document found for user:', firebaseUser.uid)
       }
     } catch (error) {
-      console.warn('Firestore not available for user data, using Firebase Auth data only:', error)
+      logger.warn('Firestore not available for user data, using Firebase Auth data only:', error)
     }
 
     const user: User = {
@@ -106,7 +107,7 @@ export function useAuth() {
         await setDoc(userRef, userData)
       }
     } catch (error) {
-      console.warn('Firestore not available, skipping user data save:', error)
+      logger.warn('Firestore not available, skipping user data save:', error)
       // Continue without Firestore - user is still authenticated
     }
   }
@@ -147,11 +148,11 @@ export function useAuth() {
         const { trackAffiliateRegistration } = await import('@/lib/affiliateTracking')
         await trackAffiliateRegistration(firebaseUser.uid, firebaseUser.email || '')
       } catch (affiliateError) {
-        console.error('Error tracking affiliate registration:', affiliateError)
+        logger.error('Error tracking affiliate registration:', affiliateError)
         // Don't throw - registration succeeded
       }
     } catch (error: any) {
-      console.error('Registration error:', error)
+      logger.error('Registration error:', error)
       setError({
         code: error.code,
         message: getErrorMessage(error.code)
@@ -179,7 +180,7 @@ export function useAuth() {
       const user = await convertFirebaseUser(firebaseUser)
       setUser(user)
     } catch (error: any) {
-      console.error('Login error:', error)
+      logger.error('Login error:', error)
       setError({
         code: error.code,
         message: getErrorMessage(error.code)
@@ -206,7 +207,7 @@ export function useAuth() {
       const user = await convertFirebaseUser(firebaseUser)
       setUser(user)
     } catch (error: any) {
-      console.error('Google login error:', error)
+      logger.error('Google login error:', error)
       setError({
         code: error.code,
         message: getErrorMessage(error.code)
@@ -228,7 +229,7 @@ export function useAuth() {
       await signOut(auth)
       setUser(null)
     } catch (error: any) {
-      console.error('Logout error:', error)
+      logger.error('Logout error:', error)
       setError({
         code: error.code,
         message: 'Chyba při odhlašování'
@@ -251,7 +252,7 @@ export function useAuth() {
           const parsed = JSON.parse(storedAuth)
           previousUserId = parsed.state?.user?.id || null
         } catch (error) {
-          console.warn('Error parsing stored auth:', error)
+          logger.warn('Error parsing stored auth:', error)
         }
       }
     }
@@ -261,7 +262,7 @@ export function useAuth() {
 
       // Debounce rapid auth state changes (within 500ms)
       if (now - lastAuthStateChange < 500) {
-        console.log('🔄 Debouncing rapid auth state change')
+        logger.log('🔄 Debouncing rapid auth state change')
         if (authStateTimeout) {
           clearTimeout(authStateTimeout)
         }
@@ -284,7 +285,7 @@ export function useAuth() {
 
             // If switching to a different user, clear previous user's data
             if (previousUserId && previousUserId !== newUserId) {
-              console.log('🔄 Switching users, clearing data for:', previousUserId, '→', newUserId)
+              logger.log('🔄 Switching users, clearing data for:', previousUserId, '→', newUserId)
               clearUserData()
             }
 
@@ -296,7 +297,7 @@ export function useAuth() {
                 previousUserId = newUserId
               }
             } else {
-              console.log('✅ User already loaded, skipping Firestore fetch')
+              logger.log('✅ User already loaded, skipping Firestore fetch')
             }
           } else {
             if (isMounted) {
@@ -305,12 +306,12 @@ export function useAuth() {
             }
           }
         } catch (error) {
-          console.error('Auth state change error:', error)
+          logger.error('Auth state change error:', error)
 
           // Don't log out demo users even on error
           const currentUser = JSON.parse(localStorage.getItem('auth_user') || 'null')
           if (currentUser?.id === 'demo-user-id' || currentUser?.email === 'demo@svatbot.cz') {
-            console.log('🎭 Preserving demo user session despite auth error')
+            logger.log('🎭 Preserving demo user session despite auth error')
             return
           }
 
@@ -369,7 +370,7 @@ export function useAuth() {
     const currentUser = auth.currentUser
     if (!currentUser) return
 
-    console.log('🔄 Refreshing user data from Firestore...')
+    logger.log('🔄 Refreshing user data from Firestore...')
 
     // Clear cache for this user
     userDataCache.delete(currentUser.uid)
@@ -378,7 +379,7 @@ export function useAuth() {
     const updatedUser = await convertFirebaseUser(currentUser, true)
     setUser(updatedUser)
 
-    console.log('✅ User data refreshed:', { gender: updatedUser.gender })
+    logger.log('✅ User data refreshed:', { gender: updatedUser.gender })
   }
 
   return {

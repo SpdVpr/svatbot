@@ -24,6 +24,7 @@ import {
 } from 'firebase/storage'
 import { db, storage } from '@/lib/firebase'
 import { compressImage, createThumbnail, isValidImageFile, formatFileSize } from '@/utils/imageCompression'
+import logger from '@/lib/logger'
 
 // Moodboard Folder (Pinterest-style boards)
 export interface MoodboardFolder {
@@ -126,7 +127,7 @@ export function useMoodboard() {
     // Use onSnapshot for real-time updates
     const unsubscribe = onSnapshot(q,
       (snapshot) => {
-        console.log('🔄 Moodboard: Loading images from Firebase...', {
+        logger.log('🔄 Moodboard: Loading images from Firebase...', {
           totalDocs: snapshot.docs.length,
           weddingId: wedding.id
         })
@@ -150,7 +151,7 @@ export function useMoodboard() {
 
             // Debug log for category
             if (data.source === 'upload' && data.category !== 'other') {
-              console.log('📋 Loading image with category:', {
+              logger.log('📋 Loading image with category:', {
                 id: doc.id,
                 title: data.title,
                 category: data.category,
@@ -180,7 +181,7 @@ export function useMoodboard() {
             }
           }) as MoodboardImage[]
 
-        console.log('✅ Moodboard: Loaded images:', {
+        logger.log('✅ Moodboard: Loaded images:', {
           total: loadedImages.length,
           uploaded: loadedImages.filter(img => img.source === 'upload').length,
           aiGenerated: loadedImages.filter(img => img.source === 'ai-generated').length,
@@ -194,7 +195,7 @@ export function useMoodboard() {
         setIsLoading(false)
       },
       (err) => {
-        console.error('Error loading moodboard images:', err)
+        logger.error('Error loading moodboard images:', err)
         setError('Nepodařilo se načíst obrázky')
         setIsLoading(false)
       }
@@ -232,19 +233,19 @@ export function useMoodboard() {
           )
 
           if (isPinterestImage) {
-            console.log(`🗑️ Deleting Pinterest image: ${docSnapshot.id}`)
+            logger.log(`🗑️ Deleting Pinterest image: ${docSnapshot.id}`)
             await deleteDoc(doc(db, 'moodboards', docSnapshot.id))
             deletedCount++
           }
         }
 
         if (deletedCount > 0) {
-          console.log(`✅ Cleaned up ${deletedCount} Pinterest images`)
+          logger.log(`✅ Cleaned up ${deletedCount} Pinterest images`)
         }
 
         setCleanupDone(true)
       } catch (error) {
-        console.error('❌ Error cleaning up Pinterest images:', error)
+        logger.error('❌ Error cleaning up Pinterest images:', error)
         setCleanupDone(true) // Don't retry on error
       }
     }
@@ -266,7 +267,7 @@ export function useMoodboard() {
 
     const unsubscribe = onSnapshot(q,
       (snapshot) => {
-        console.log('📁 Loading moodboard folders:', snapshot.docs.length)
+        logger.log('📁 Loading moodboard folders:', snapshot.docs.length)
 
         const loadedFolders: MoodboardFolder[] = snapshot.docs.map(doc => {
           const data = doc.data()
@@ -291,7 +292,7 @@ export function useMoodboard() {
         setFolders(loadedFolders)
       },
       (err) => {
-        console.error('Error loading moodboard folders:', err)
+        logger.error('Error loading moodboard folders:', err)
       }
     )
 
@@ -312,7 +313,7 @@ export function useMoodboard() {
 
         // Only update if count is different
         if (folder.imageCount !== imageCount) {
-          console.log(`📊 Updating folder ${folder.name}: ${folder.imageCount} -> ${imageCount}`)
+          logger.log(`📊 Updating folder ${folder.name}: ${folder.imageCount} -> ${imageCount}`)
           await updateFolderStats(folder.id)
         }
       }
@@ -347,7 +348,7 @@ export function useMoodboard() {
     }
 
     const docRef = await addDoc(collection(db, 'moodboardFolders'), folderData)
-    console.log('✅ AI Folder created:', docRef.id)
+    logger.log('✅ AI Folder created:', docRef.id)
 
     const newFolder: MoodboardFolder = {
       id: docRef.id,
@@ -393,7 +394,7 @@ export function useMoodboard() {
 
       const docRef = await addDoc(collection(db, 'moodboardFolders'), newFolder)
 
-      console.log('✅ Folder created:', docRef.id)
+      logger.log('✅ Folder created:', docRef.id)
 
       return {
         id: docRef.id,
@@ -408,7 +409,7 @@ export function useMoodboard() {
         icon: data.icon
       }
     } catch (err) {
-      console.error('Error creating folder:', err)
+      logger.error('Error creating folder:', err)
       throw err
     }
   }
@@ -421,9 +422,9 @@ export function useMoodboard() {
         ...updates,
         updatedAt: serverTimestamp()
       })
-      console.log('✅ Folder updated:', folderId)
+      logger.log('✅ Folder updated:', folderId)
     } catch (err) {
-      console.error('Error updating folder:', err)
+      logger.error('Error updating folder:', err)
       throw err
     }
   }
@@ -438,9 +439,9 @@ export function useMoodboard() {
       }
 
       await deleteDoc(doc(db, 'moodboardFolders', folderId))
-      console.log('✅ Folder deleted:', folderId)
+      logger.log('✅ Folder deleted:', folderId)
     } catch (err) {
-      console.error('Error deleting folder:', err)
+      logger.error('Error deleting folder:', err)
       throw err
     }
   }
@@ -461,9 +462,9 @@ export function useMoodboard() {
         updatedAt: serverTimestamp()
       })
 
-      console.log(`✅ Updated folder ${folderId} stats: ${imageCount} images`)
+      logger.log(`✅ Updated folder ${folderId} stats: ${imageCount} images`)
     } catch (err) {
-      console.error('Error updating folder stats:', err)
+      logger.error('Error updating folder stats:', err)
     }
   }
 
@@ -476,9 +477,9 @@ export function useMoodboard() {
         await updateFolderStats(folder.id)
       }
 
-      console.log('✅ Updated all folder stats')
+      logger.log('✅ Updated all folder stats')
     } catch (err) {
-      console.error('Error updating all folder stats:', err)
+      logger.error('Error updating all folder stats:', err)
     }
   }
 
@@ -492,7 +493,7 @@ export function useMoodboard() {
   }) => {
     if (!user || !wedding?.id) return
 
-    console.log('🔍 uploadImage called with metadata:', {
+    logger.log('🔍 uploadImage called with metadata:', {
       fileName: file.name,
       metadata: metadata,
       category: metadata?.category,
@@ -507,7 +508,7 @@ export function useMoodboard() {
     try {
       setIsLoading(true)
 
-      console.log(`📸 Komprese obrázku: ${file.name} (${formatFileSize(file.size)})`)
+      logger.log(`📸 Komprese obrázku: ${file.name} (${formatFileSize(file.size)})`)
 
       // Compress main image
       const compressedResult = await compressImage(file, {
@@ -520,7 +521,7 @@ export function useMoodboard() {
       // Create thumbnail
       const thumbnailFile = await createThumbnail(file, 300)
 
-      console.log(`✅ Komprese dokončena: ${formatFileSize(compressedResult.originalSize)} → ${formatFileSize(compressedResult.compressedSize)} (${compressedResult.compressionRatio}% úspora)`)
+      logger.log(`✅ Komprese dokončena: ${formatFileSize(compressedResult.originalSize)} → ${formatFileSize(compressedResult.compressedSize)} (${compressedResult.compressionRatio}% úspora)`)
 
       // Create unique filename
       const timestamp = Date.now()
@@ -559,7 +560,7 @@ export function useMoodboard() {
         storageRef: storageRef.fullPath
       }
 
-      console.log('💾 Saving to Firestore with folder:', {
+      logger.log('💾 Saving to Firestore with folder:', {
         folderId: newImage.folderId,
         category: newImage.category,
         title: newImage.title
@@ -570,7 +571,7 @@ export function useMoodboard() {
         createdAt: serverTimestamp()
       })
 
-      console.log('✅ Saved to Firestore with ID:', docRef.id)
+      logger.log('✅ Saved to Firestore with ID:', docRef.id)
 
       // Don't manually add to state - let Firestore listener handle it to avoid duplicates
       // The onSnapshot listener will automatically add the new image
@@ -580,7 +581,7 @@ export function useMoodboard() {
 
       return { id: docRef.id, ...newImage }
     } catch (err) {
-      console.error('Error uploading image:', err)
+      logger.error('Error uploading image:', err)
       setError('Nepodařilo se nahrát obrázek')
       throw err
     } finally {
@@ -607,7 +608,7 @@ export function useMoodboard() {
           const storageRef = ref(storage, image.storageRef)
           await deleteObject(storageRef)
         } catch (storageErr) {
-          console.warn('Could not delete file from storage:', storageErr)
+          logger.warn('Could not delete file from storage:', storageErr)
         }
       }
 
@@ -619,7 +620,7 @@ export function useMoodboard() {
         await updateFolderStats(folderId)
       }
     } catch (err) {
-      console.error('Error removing image:', err)
+      logger.error('Error removing image:', err)
       setError('Nepodařilo se smazat obrázek')
       throw err
     } finally {
@@ -645,7 +646,7 @@ export function useMoodboard() {
           : img
       ))
     } catch (err) {
-      console.error('Error toggling favorite:', err)
+      logger.error('Error toggling favorite:', err)
       setError('Nepodařilo se aktualizovat oblíbené')
       throw err
     }
@@ -686,7 +687,7 @@ export function useMoodboard() {
 
       await updateDoc(imageRef, updateData)
     } catch (err) {
-      console.error('❌ Error updating image position:', err)
+      logger.error('❌ Error updating image position:', err)
     }
   }
 
@@ -705,7 +706,7 @@ export function useMoodboard() {
           : img
       ))
     } catch (err) {
-      console.error('❌ Error updating image category:', err)
+      logger.error('❌ Error updating image category:', err)
     }
   }
 
@@ -764,7 +765,7 @@ export function useMoodboard() {
         guestCount: wedding.estimatedGuestCount
       }
 
-      console.log('🔍 Step 1: Analyzing images...')
+      logger.log('🔍 Step 1: Analyzing images...')
 
       // Step 1: Analyze images with GPT-4o-mini Vision
       const analyzeResponse = await fetch('/api/ai/moodboard/analyze', {
@@ -783,9 +784,9 @@ export function useMoodboard() {
       }
 
       const { analysis } = await analyzeResponse.json()
-      console.log('✅ Analysis complete:', analysis)
+      logger.log('✅ Analysis complete:', analysis)
 
-      console.log('🎨 Step 2: Generating moodboard...')
+      logger.log('🎨 Step 2: Generating moodboard...')
 
       // Step 2: Generate moodboard with Ideogram
       const generateResponse = await fetch('/api/ai/moodboard/generate', {
@@ -803,9 +804,9 @@ export function useMoodboard() {
       }
 
       const { imageUrl: generatedImageUrl } = await generateResponse.json()
-      console.log('✅ Moodboard generated:', generatedImageUrl)
+      logger.log('✅ Moodboard generated:', generatedImageUrl)
 
-      console.log('✍️ Step 3: Generating description...')
+      logger.log('✍️ Step 3: Generating description...')
 
       // Step 3: Generate description with GPT-4o-mini
       const describeResponse = await fetch('/api/ai/moodboard/describe', {
@@ -824,15 +825,15 @@ export function useMoodboard() {
       }
 
       const { description } = await describeResponse.json()
-      console.log('✅ Description generated')
+      logger.log('✅ Description generated')
 
       // Step 4: Get or create AI folder
-      console.log('📁 Step 4: Getting AI folder...')
+      logger.log('📁 Step 4: Getting AI folder...')
       const aiFolder = await getOrCreateAIFolder()
-      console.log('✅ AI Folder ready:', aiFolder.id)
+      logger.log('✅ AI Folder ready:', aiFolder.id)
 
       // Step 5: Save to Firebase Storage and Firestore
-      console.log('💾 Step 5: Saving to Firebase...')
+      logger.log('💾 Step 5: Saving to Firebase...')
 
       // Download generated image via proxy to bypass CORS
       const proxyResponse = await fetch('/api/ai/moodboard/save', {
@@ -846,7 +847,7 @@ export function useMoodboard() {
       }
 
       const imageBlob = await proxyResponse.blob()
-      console.log('✅ Image downloaded via proxy')
+      logger.log('✅ Image downloaded via proxy')
 
       // Create file from blob
       const timestamp = Date.now()
@@ -897,7 +898,7 @@ export function useMoodboard() {
         'aiMetadata.generatedAt': serverTimestamp()
       })
 
-      console.log('✅ AI Moodboard saved successfully!')
+      logger.log('✅ AI Moodboard saved successfully!')
 
       // Update AI folder stats
       await updateFolderStats(aiFolder.id)
@@ -912,7 +913,7 @@ export function useMoodboard() {
       }
 
     } catch (err) {
-      console.error('❌ Error generating AI moodboard:', err)
+      logger.error('❌ Error generating AI moodboard:', err)
       setError(err instanceof Error ? err.message : 'Nepodařilo se vygenerovat AI moodboard')
       setIsLoading(false)
       throw err
@@ -941,9 +942,9 @@ export function useMoodboard() {
       }
       await updateFolderStats(newFolderId)
 
-      console.log('✅ Image moved to new folder')
+      logger.log('✅ Image moved to new folder')
     } catch (err) {
-      console.error('Error moving image:', err)
+      logger.error('Error moving image:', err)
       throw err
     }
   }

@@ -29,6 +29,7 @@ import {
   BulkTaskOperation
 } from '@/types/task'
 import { taskTemplates } from '@/data/taskTemplates'
+import logger from '@/lib/logger'
 
 interface UseTaskReturn {
   tasks: Task[]
@@ -62,7 +63,7 @@ export function useTask(): UseTaskReturn {
     if (cached) {
       try {
         const parsed = JSON.parse(cached)
-        console.log('⚡ Loaded tasks from localStorage immediately:', parsed.length)
+        logger.log('⚡ Loaded tasks from localStorage immediately:', parsed.length)
         return parsed.map((t: any) => ({
           ...t,
           createdAt: t.createdAt ? new Date(t.createdAt) : new Date(),
@@ -71,7 +72,7 @@ export function useTask(): UseTaskReturn {
           completedDate: t.completedDate ? new Date(t.completedDate) : undefined
         }))
       } catch (e) {
-        console.error('Error parsing cached tasks:', e)
+        logger.error('Error parsing cached tasks:', e)
       }
     }
     return []
@@ -163,25 +164,25 @@ export function useTask(): UseTaskReturn {
 
       try {
         // Try to save to Firestore for real users
-        console.log('🔄 Attempting to save task to Firestore...', { weddingId: wedding.id, title: taskData.title })
+        logger.log('🔄 Attempting to save task to Firestore...', { weddingId: wedding.id, title: taskData.title })
         const docRef = await addDoc(collection(db, 'tasks'), convertToFirestoreData(taskData))
         const newTask: Task = { id: docRef.id, ...taskData }
 
-        console.log('✅ Task created in Firestore:', newTask)
+        logger.log('✅ Task created in Firestore:', newTask)
 
         // Don't update state here - let Firestore listener handle it
         // This ensures consistency with the database
 
         return newTask
       } catch (firestoreError: any) {
-        console.error('❌ Firestore error details:', {
+        logger.error('❌ Firestore error details:', {
           error: firestoreError,
           code: firestoreError?.code,
           message: firestoreError?.message,
           weddingId: wedding.id,
           userId: user?.id
         })
-        console.warn('⚠️ Firestore not available, using localStorage fallback')
+        logger.warn('⚠️ Firestore not available, using localStorage fallback')
 
         // Create task with local ID
         const localId = `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -192,19 +193,19 @@ export function useTask(): UseTaskReturn {
         const existingTasks = JSON.parse(savedTasks)
         existingTasks.push(newTask)
         localStorage.setItem(`tasks_${wedding.id}`, JSON.stringify(existingTasks))
-        console.log('💾 Task saved to localStorage (fallback)')
+        logger.log('💾 Task saved to localStorage (fallback)')
 
         // Update local state immediately for localStorage fallback
         setTasks(prev => {
           const updated = [...prev, newTask]
-          console.log('📝 Updated local tasks state (localStorage):', updated.length, updated)
+          logger.log('📝 Updated local tasks state (localStorage):', updated.length, updated)
           return updated
         })
 
         return newTask
       }
     } catch (error: any) {
-      console.error('Error creating task:', error)
+      logger.error('Error creating task:', error)
       setError('Chyba při vytváření úkolu')
       throw error
     } finally {
@@ -261,11 +262,11 @@ export function useTask(): UseTaskReturn {
           firestoreUpdates.updatedAt = Timestamp.fromDate(new Date())
 
           await updateDoc(taskRef, firestoreUpdates)
-          console.log('✅ Task updated in Firestore:', taskId, firestoreUpdates)
+          logger.log('✅ Task updated in Firestore:', taskId, firestoreUpdates)
           // Don't update state here - let Firestore listener handle it
           return
         } catch (firestoreError) {
-          console.warn('⚠️ Firestore not available, updating localStorage fallback', firestoreError)
+          logger.warn('⚠️ Firestore not available, updating localStorage fallback', firestoreError)
           if (wedding) {
             const savedTasks = localStorage.getItem(`tasks_${wedding.id}`) || '[]'
             const existingTasks = JSON.parse(savedTasks)
@@ -273,7 +274,7 @@ export function useTask(): UseTaskReturn {
             if (taskIndex !== -1) {
               existingTasks[taskIndex] = { ...existingTasks[taskIndex], ...updatedData }
               localStorage.setItem(`tasks_${wedding.id}`, JSON.stringify(existingTasks))
-              console.log('💾 Task updated in localStorage (fallback)')
+              logger.log('💾 Task updated in localStorage (fallback)')
             }
           }
           // Update local state only for localStorage fallback
@@ -282,7 +283,7 @@ export function useTask(): UseTaskReturn {
           ))
         }
     } catch (error: any) {
-      console.error('Error updating task:', error)
+      logger.error('Error updating task:', error)
       setError('Chyba při aktualizaci úkolu')
       throw error
     }
@@ -298,21 +299,21 @@ export function useTask(): UseTaskReturn {
       try {
         // Try to delete from Firestore
         await deleteDoc(doc(db, 'tasks', taskId))
-        console.log('✅ Task deleted from Firestore:', taskId)
+        logger.log('✅ Task deleted from Firestore:', taskId)
         // Don't update state here - let Firestore listener handle it
         return
       } catch (firestoreError) {
-        console.warn('⚠️ Firestore not available, deleting from localStorage fallback')
+        logger.warn('⚠️ Firestore not available, deleting from localStorage fallback')
         const savedTasks = localStorage.getItem(`tasks_${wedding.id}`) || '[]'
         const existingTasks = JSON.parse(savedTasks)
         const filteredTasks = existingTasks.filter((t: Task) => t.id !== taskId)
         localStorage.setItem(`tasks_${wedding.id}`, JSON.stringify(filteredTasks))
-        console.log('💾 Task deleted from localStorage (fallback)')
+        logger.log('💾 Task deleted from localStorage (fallback)')
         // Update local state only for localStorage fallback
         setTasks(prev => prev.filter(task => task.id !== taskId))
       }
     } catch (error: any) {
-      console.error('Error deleting task:', error)
+      logger.error('Error deleting task:', error)
       setError('Chyba při mazání úkolu')
       throw error
     }
@@ -384,7 +385,7 @@ export function useTask(): UseTaskReturn {
         }
       }
     } catch (error: any) {
-      console.error('Error in bulk operation:', error)
+      logger.error('Error in bulk operation:', error)
       setError('Chyba při hromadné operaci')
       throw error
     } finally {
@@ -438,7 +439,7 @@ export function useTask(): UseTaskReturn {
         })
       }
     } catch (error: any) {
-      console.error('Error initializing tasks:', error)
+      logger.error('Error initializing tasks:', error)
       setError('Chyba při vytváření úkolů ze šablon')
     } finally {
       setLoading(false)
@@ -496,7 +497,7 @@ export function useTask(): UseTaskReturn {
             // Clear localStorage when Firestore loads successfully
             localStorage.removeItem(`tasks_${wedding.id}`)
           }, (error) => {
-            console.warn('Firestore snapshot error, using localStorage fallback:', error)
+            logger.warn('Firestore snapshot error, using localStorage fallback:', error)
             // Load from localStorage fallback
             const savedTasks = localStorage.getItem(`tasks_${wedding.id}`)
             if (savedTasks) {
@@ -507,17 +508,17 @@ export function useTask(): UseTaskReturn {
                 createdAt: new Date(task.createdAt),
                 updatedAt: new Date(task.updatedAt)
               }))
-              console.log('📦 Loaded tasks from localStorage (error fallback):', parsedTasks.length, parsedTasks)
+              logger.log('📦 Loaded tasks from localStorage (error fallback):', parsedTasks.length, parsedTasks)
               setTasks(parsedTasks)
             } else {
-              console.log('📦 No tasks in localStorage for wedding:', wedding.id)
+              logger.log('📦 No tasks in localStorage for wedding:', wedding.id)
               setTasks([])
             }
           })
 
           return unsubscribe
         } catch (firestoreError) {
-          console.warn('⚠️ Firestore not available, loading from localStorage')
+          logger.warn('⚠️ Firestore not available, loading from localStorage')
           const savedTasks = localStorage.getItem(`tasks_${wedding.id}`)
           if (savedTasks) {
             const parsedTasks = JSON.parse(savedTasks).map((task: any) => ({
@@ -527,15 +528,15 @@ export function useTask(): UseTaskReturn {
               createdAt: new Date(task.createdAt),
               updatedAt: new Date(task.updatedAt)
             }))
-            console.log('📦 Loaded tasks from localStorage (catch):', parsedTasks.length, parsedTasks)
+            logger.log('📦 Loaded tasks from localStorage (catch):', parsedTasks.length, parsedTasks)
             setTasks(parsedTasks)
           } else {
-            console.log('📦 No tasks in localStorage (catch) for wedding:', wedding.id)
+            logger.log('📦 No tasks in localStorage (catch) for wedding:', wedding.id)
             setTasks([])
           }
         }
       } catch (error: any) {
-        console.error('Error loading tasks:', error)
+        logger.error('Error loading tasks:', error)
         setError('Chyba při načítání úkolů')
       } finally {
         setLoading(false)

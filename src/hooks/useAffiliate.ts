@@ -1,23 +1,24 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { 
-  collection, 
-  doc, 
-  getDoc, 
-  getDocs, 
-  addDoc, 
-  updateDoc, 
-  query, 
-  where, 
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  addDoc,
+  updateDoc,
+  query,
+  where,
   orderBy,
   Timestamp,
   limit
 } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { useAuth } from './useAuth'
-import type { 
-  AffiliatePartner, 
+import logger from '@/lib/logger'
+import type {
+  AffiliatePartner,
   AffiliateApplication,
   Commission,
   Payout,
@@ -71,7 +72,7 @@ export function useAffiliate() {
           setPartner(null)
         }
       } catch (err: any) {
-        console.error('Error loading affiliate partner:', err)
+        logger.error('Error loading affiliate partner:', err)
         setError(err.message)
       } finally {
         setLoading(false)
@@ -172,7 +173,7 @@ export function useAffiliate() {
 
       return partnerRef.id
     } catch (err: any) {
-      console.error('Error submitting application:', err)
+      logger.error('Error submitting application:', err)
       throw err
     }
   }
@@ -198,7 +199,7 @@ export function useAffiliate() {
         ...convertTimestamps(doc.data())
       } as Commission))
     } catch (err: any) {
-      console.error('Error loading commissions:', err)
+      logger.error('Error loading commissions:', err)
       throw new Error('Nepodařilo se načíst provize')
     }
   }
@@ -220,7 +221,7 @@ export function useAffiliate() {
         ...convertTimestamps(doc.data())
       } as Payout))
     } catch (err: any) {
-      console.error('Error loading payouts:', err)
+      logger.error('Error loading payouts:', err)
       throw new Error('Nepodařilo se načíst výplaty')
     }
   }
@@ -256,7 +257,7 @@ export function useAffiliate() {
 
       return docRef.id
     } catch (err: any) {
-      console.error('Error requesting payout:', err)
+      logger.error('Error requesting payout:', err)
       throw new Error('Nepodařilo se požádat o výplatu')
     }
   }
@@ -279,7 +280,7 @@ export function useAffiliate() {
         updatedAt: new Date()
       })
     } catch (err: any) {
-      console.error('Error updating payout details:', err)
+      logger.error('Error updating payout details:', err)
       throw new Error('Nepodařilo se aktualizovat platební údaje')
     }
   }
@@ -305,7 +306,7 @@ export function useAffiliate() {
         ...convertTimestamps(doc.data())
       } as AffiliateStats
     } catch (err: any) {
-      console.error('Error loading stats:', err)
+      logger.error('Error loading stats:', err)
       return null
     }
   }
@@ -323,7 +324,7 @@ export function useAffiliate() {
       const snapshot = await getDocs(q)
       
       if (snapshot.empty) {
-        console.warn('Affiliate code not found:', affiliateCode)
+        logger.warn('Affiliate code not found:', affiliateCode)
         return
       }
 
@@ -350,7 +351,7 @@ export function useAffiliate() {
       // Store in cookie for 30 days
       document.cookie = `affiliate_ref=${affiliateCode}; max-age=${30 * 24 * 60 * 60}; path=/`
     } catch (err: any) {
-      console.error('Error tracking click:', err)
+      logger.error('Error tracking click:', err)
     }
   }
 
