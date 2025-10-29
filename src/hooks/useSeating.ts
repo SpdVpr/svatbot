@@ -19,6 +19,7 @@ import { db } from '@/config/firebase'
 import { useAuth } from './useAuth'
 import { useWedding } from './useWedding'
 import { useGuest } from './useGuest'
+import { useDemoLock } from './useDemoLock'
 import {
   SeatingPlan,
   Table,
@@ -92,6 +93,7 @@ export function useSeating(): UseSeatingReturn {
   const { user } = useAuth()
   const { wedding } = useWedding()
   const { guests } = useGuest()
+  const { withDemoCheck } = useDemoLock()
   const [seatingPlans, setSeatingPlans] = useState<SeatingPlan[]>([])
   const [currentPlan, _setCurrentPlanState] = useState<SeatingPlan | null>(null)
   const [tables, setTables] = useState<Table[]>([])
@@ -345,13 +347,14 @@ export function useSeating(): UseSeatingReturn {
 
   // Create seating plan
   const createSeatingPlan = async (data: SeatingPlanFormData): Promise<SeatingPlan> => {
-    if (!wedding || !user) {
-      throw new Error('Žádná svatba nebo uživatel není vybrán')
-    }
+    return withDemoCheck(async () => {
+      if (!wedding || !user) {
+        throw new Error('Žádná svatba nebo uživatel není vybrán')
+      }
 
-    try {
-      setError(null)
-      setLoading(true)
+      try {
+        setError(null)
+        setLoading(true)
 
       // Create plan with local ID first (for immediate response)
       const localId = `seating_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -406,17 +409,19 @@ export function useSeating(): UseSeatingReturn {
     } finally {
       setLoading(false)
     }
+    }) as Promise<SeatingPlan>
   }
 
   // Create table
   const createTable = async (data: TableFormData, planId?: string): Promise<Table> => {
-    const activePlan = planId ? seatingPlans.find(p => p.id === planId) : currentPlan
+    return withDemoCheck(async () => {
+      const activePlan = planId ? seatingPlans.find(p => p.id === planId) : currentPlan
 
-    if (!wedding || !user || !activePlan) {
-      throw new Error('Žádná svatba, uživatel nebo plán není vybrán')
-    }
+      if (!wedding || !user || !activePlan) {
+        throw new Error('Žádná svatba, uživatel nebo plán není vybrán')
+      }
 
-    try {
+      try {
       setError(null)
 
       // Create table with local ID
@@ -459,6 +464,7 @@ export function useSeating(): UseSeatingReturn {
       setError('Chyba při vytváření stolu')
       throw error
     }
+    }) as Promise<Table>
   }
 
   // Create seats for table

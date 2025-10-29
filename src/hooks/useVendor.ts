@@ -15,6 +15,7 @@ import {
 import { db } from '@/config/firebase'
 import { useAuth } from './useAuth'
 import { useWedding } from './useWedding'
+import { useDemoLock } from './useDemoLock'
 import {
   Vendor,
   VendorFormData,
@@ -45,6 +46,7 @@ interface UseVendorReturn {
 export function useVendor(): UseVendorReturn {
   const { user } = useAuth()
   const { wedding } = useWedding()
+  const { withDemoCheck } = useDemoLock()
 
   // Initialize with localStorage data if available
   const [vendors, setVendors] = useState<Vendor[]>(() => {
@@ -226,11 +228,12 @@ export function useVendor(): UseVendorReturn {
 
   // Create new vendor
   const createVendor = async (data: VendorFormData): Promise<Vendor> => {
-    if (!wedding || !user) {
-      throw new Error('Žádná svatba nebo uživatel není vybrán')
-    }
+    return withDemoCheck(async () => {
+      if (!wedding || !user) {
+        throw new Error('Žádná svatba nebo uživatel není vybrán')
+      }
 
-    try {
+      try {
       setError(null)
       setLoading(true)
 
@@ -365,11 +368,13 @@ export function useVendor(): UseVendorReturn {
     } finally {
       setLoading(false)
     }
+    }) as Promise<Vendor>
   }
 
   // Update vendor
   const updateVendor = async (vendorId: string, updates: Partial<Vendor>): Promise<void> => {
-    try {
+    return withDemoCheck(async () => {
+      try {
       setError(null)
 
       // Calculate price range if services are being updated (use discountedPrice if available)
@@ -425,11 +430,13 @@ export function useVendor(): UseVendorReturn {
       setError('Chyba při aktualizaci dodavatele')
       throw error
     }
+    }) as Promise<void>
   }
 
   // Delete vendor
   const deleteVendor = async (vendorId: string): Promise<void> => {
-    try {
+    return withDemoCheck(async () => {
+      try {
       setError(null)
 
       try {
@@ -452,6 +459,7 @@ export function useVendor(): UseVendorReturn {
       setError('Chyba při mazání dodavatele')
       throw error
     }
+    }) as Promise<void>
   }
 
   // Filter vendors

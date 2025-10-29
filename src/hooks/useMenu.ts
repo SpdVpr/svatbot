@@ -16,6 +16,7 @@ import {
 import { db } from '@/config/firebase'
 import { useAuth } from './useAuth'
 import { useWedding } from './useWedding'
+import { useDemoLock } from './useDemoLock'
 import {
   MenuItem,
   DrinkItem,
@@ -57,6 +58,7 @@ export function useMenu(): UseMenuReturn {
   const [error, setError] = useState<string | null>(null)
   const { user } = useAuth()
   const { wedding } = useWedding()
+  const { withDemoCheck } = useDemoLock()
 
   // Helper function to remove undefined values from object
   const removeUndefined = (obj: any): any => {
@@ -96,9 +98,10 @@ export function useMenu(): UseMenuReturn {
 
   // Create menu item
   const createMenuItem = async (data: MenuFormData): Promise<MenuItem> => {
-    if (!wedding?.id) throw new Error('Není vybrána svatba')
+    return withDemoCheck(async () => {
+      if (!wedding?.id) throw new Error('Není vybrána svatba')
 
-    try {
+      try {
       // Calculate total cost: use totalPrice if available, otherwise calculate from pricePerServing
       const totalCost = data.totalPrice || ((data.pricePerServing || 0) * data.estimatedQuantity)
       const now = new Date()
@@ -146,11 +149,13 @@ export function useMenu(): UseMenuReturn {
       console.error('Error creating menu item:', err)
       throw new Error('Chyba při vytváření položky menu')
     }
+    }) as Promise<MenuItem>
   }
 
   // Update menu item
   const updateMenuItem = async (itemId: string, updates: Partial<MenuItem>): Promise<void> => {
-    try {
+    return withDemoCheck(async () => {
+      try {
       // Recalculate total cost if relevant fields changed
       if (updates.pricePerServing !== undefined || updates.estimatedQuantity !== undefined || updates.totalPrice !== undefined) {
         const item = menuItems.find(i => i.id === itemId)
@@ -173,24 +178,28 @@ export function useMenu(): UseMenuReturn {
       console.error('Error updating menu item:', err)
       throw new Error('Chyba při aktualizaci položky menu')
     }
+    }) as Promise<void>
   }
 
   // Delete menu item
   const deleteMenuItem = async (itemId: string): Promise<void> => {
-    try {
+    return withDemoCheck(async () => {
+      try {
       // Use Firestore for all users
       await deleteDoc(doc(db, 'menuItems', itemId))
     } catch (err: any) {
       console.error('Error deleting menu item:', err)
       throw new Error('Chyba při mazání položky menu')
     }
+    }) as Promise<void>
   }
 
   // Create drink item
   const createDrinkItem = async (data: DrinkFormData): Promise<DrinkItem> => {
-    if (!wedding?.id) throw new Error('Není vybrána svatba')
+    return withDemoCheck(async () => {
+      if (!wedding?.id) throw new Error('Není vybrána svatba')
 
-    try {
+      try {
       const totalCost = (data.pricePerUnit || 0) * data.estimatedQuantity
       const now = new Date()
 
@@ -233,11 +242,13 @@ export function useMenu(): UseMenuReturn {
       console.error('Error creating drink item:', err)
       throw new Error('Chyba při vytváření nápoje')
     }
+    }) as Promise<DrinkItem>
   }
 
   // Update drink item
   const updateDrinkItem = async (itemId: string, updates: Partial<DrinkItem>): Promise<void> => {
-    try {
+    return withDemoCheck(async () => {
+      try {
       // Recalculate total cost if relevant fields changed
       if (updates.pricePerUnit !== undefined || updates.estimatedQuantity !== undefined) {
         const item = drinkItems.find(i => i.id === itemId)
@@ -258,17 +269,20 @@ export function useMenu(): UseMenuReturn {
       console.error('Error updating drink item:', err)
       throw new Error('Chyba při aktualizaci nápoje')
     }
+    }) as Promise<void>
   }
 
   // Delete drink item
   const deleteDrinkItem = async (itemId: string): Promise<void> => {
-    try {
+    return withDemoCheck(async () => {
+      try {
       // Use Firestore for all users
       await deleteDoc(doc(db, 'drinkItems', itemId))
     } catch (err: any) {
       console.error('Error deleting drink item:', err)
       throw new Error('Chyba při mazání nápoje')
     }
+    }) as Promise<void>
   }
 
   // Filter menu items

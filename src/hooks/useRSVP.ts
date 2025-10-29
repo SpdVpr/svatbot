@@ -17,6 +17,7 @@ import { db } from '@/config/firebase'
 import { useAuth } from './useAuth'
 import { useWedding } from './useWedding'
 import { useGuest } from './useGuest'
+import { useDemoLock } from './useDemoLock'
 import {
   RSVPInvitation,
   RSVPResponse,
@@ -66,6 +67,7 @@ export function useRSVP(): UseRSVPReturn {
   const { user } = useAuth()
   const { wedding } = useWedding()
   const { guests } = useGuest()
+  const { withDemoCheck } = useDemoLock()
   const [invitations, setInvitations] = useState<RSVPInvitation[]>([])
   const [responses, setResponses] = useState<RSVPResponse[]>([])
   const [templates, setTemplates] = useState<RSVPTemplate[]>([])
@@ -312,53 +314,77 @@ export function useRSVP(): UseRSVPReturn {
 
   // Placeholder implementations
   const createInvitation = async (guestId: string, templateId?: string): Promise<RSVPInvitation> => {
-    // TODO: Implement
-    throw new Error('Not implemented')
+    const result = await withDemoCheck(async () => {
+      // TODO: Implement
+      throw new Error('Not implemented')
+    })
+    if (!result) throw new Error('DEMO_LOCKED')
+    return result
   }
 
   const sendInvitation = async (invitationId: string): Promise<void> => {
-    // TODO: Implement email sending
-    console.log('Sending invitation:', invitationId)
+    return withDemoCheck(async () => {
+      // TODO: Implement email sending
+      console.log('Sending invitation:', invitationId)
+    }) as Promise<void>
   }
 
   const sendBulkInvitations = async (guestIds: string[], templateId?: string): Promise<void> => {
-    // TODO: Implement bulk sending
-    console.log('Sending bulk invitations to:', guestIds)
+    return withDemoCheck(async () => {
+      // TODO: Implement bulk sending
+      console.log('Sending bulk invitations to:', guestIds)
+    }) as Promise<void>
   }
 
   const sendReminder = async (invitationId: string): Promise<void> => {
-    // TODO: Implement reminder sending
-    console.log('Sending reminder for:', invitationId)
+    return withDemoCheck(async () => {
+      // TODO: Implement reminder sending
+      console.log('Sending reminder for:', invitationId)
+    }) as Promise<void>
   }
 
   const submitRSVP = async (invitationCode: string, formData: PublicRSVPForm): Promise<void> => {
-    // TODO: Implement public RSVP submission
-    console.log('Submitting RSVP:', invitationCode, formData)
+    return withDemoCheck(async () => {
+      // TODO: Implement public RSVP submission
+      console.log('Submitting RSVP:', invitationCode, formData)
+    }) as Promise<void>
   }
 
   const updateResponse = async (responseId: string, updates: Partial<RSVPResponse>): Promise<void> => {
-    // TODO: Implement response updates
-    console.log('Updating response:', responseId, updates)
+    return withDemoCheck(async () => {
+      // TODO: Implement response updates
+      console.log('Updating response:', responseId, updates)
+    }) as Promise<void>
   }
 
   const createTemplate = async (template: Omit<RSVPTemplate, 'id' | 'createdAt' | 'updatedAt'>): Promise<RSVPTemplate> => {
-    // TODO: Implement template creation
-    throw new Error('Not implemented')
+    const result = await withDemoCheck(async () => {
+      // TODO: Implement template creation
+      throw new Error('Not implemented')
+    })
+    if (!result) throw new Error('DEMO_LOCKED')
+    return result
   }
 
   const updateTemplate = async (templateId: string, updates: Partial<RSVPTemplate>): Promise<void> => {
-    // TODO: Implement template updates
-    console.log('Updating template:', templateId, updates)
+    return withDemoCheck(async () => {
+      // TODO: Implement template updates
+      console.log('Updating template:', templateId, updates)
+    }) as Promise<void>
   }
 
   const deleteTemplate = async (templateId: string): Promise<void> => {
-    // TODO: Implement template deletion
-    console.log('Deleting template:', templateId)
+    return withDemoCheck(async () => {
+      // TODO: Implement template deletion
+      console.log('Deleting template:', templateId)
+    }) as Promise<void>
   }
 
   const updateSettings = async (updates: Partial<RSVPSettings>): Promise<void> => {
-    // TODO: Implement settings updates
-    console.log('Updating RSVP settings:', updates)
+    return withDemoCheck(async () => {
+      // TODO: Implement settings updates
+      console.log('Updating RSVP settings:', updates)
+    }) as Promise<void>
   }
 
   const getInvitationByCode = (code: string): RSVPInvitation | null => {
