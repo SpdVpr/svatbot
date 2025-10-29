@@ -77,8 +77,8 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
 
   const layoutMode = layout.layoutMode || 'grid'
 
-  // Check if user can edit layout (only unlocked DEMO account)
-  const canEditLayout = isDemoUser && !isDemoLocked
+  // Check if user can edit layout (normal users can, locked DEMO cannot)
+  const canEditLayout = !isDemoUser || !isDemoLocked
 
   const containerRef = useRef<HTMLDivElement>(null)
   const [canvasWidth, setCanvasWidth] = useState<CanvasWidth>('normal')
@@ -391,7 +391,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
                 className={`btn-outline flex items-center space-x-2 ${
                   layout.isEditMode ? 'bg-primary-50 border-primary-400 shadow-2xl text-primary-700' : ''
                 } ${!canEditLayout ? 'opacity-50 cursor-not-allowed' : ''}`}
-                title={!canEditLayout ? 'Úprava layoutu je dostupná pouze pro DEMO účet' : ''}
+                title={!canEditLayout ? 'DEMO účet je zamčený - úprava layoutu není možná' : ''}
               >
                 <Edit3 className="w-4 h-4" />
                 <span className="hidden sm:inline">

@@ -54,8 +54,8 @@ export default function SimpleDragDrop({ onWeddingSettingsClick }: SimpleDragDro
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
   const [isDragging, setIsDragging] = useState(false)
 
-  // Check if user can edit layout (only unlocked DEMO account)
-  const canEditLayout = isDemoUser && !isDemoLocked
+  // Check if user can edit layout (normal users can, locked DEMO cannot)
+  const canEditLayout = !isDemoUser || !isDemoLocked
   const draggedElementRef = useRef<HTMLDivElement | null>(null)
   const dragTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -260,7 +260,7 @@ export default function SimpleDragDrop({ onWeddingSettingsClick }: SimpleDragDro
             className={`btn-outline flex items-center space-x-2 ${
               layout.isEditMode ? 'bg-primary-50 border-primary-300 text-primary-700' : ''
             } ${!canEditLayout ? 'opacity-50 cursor-not-allowed' : ''}`}
-            title={!canEditLayout ? 'Úprava layoutu je dostupná pouze pro DEMO účet' : ''}
+            title={!canEditLayout ? 'DEMO účet je zamčený - úprava layoutu není možná' : ''}
           >
             <Edit3 className="w-4 h-4" />
             <span className="hidden sm:inline">

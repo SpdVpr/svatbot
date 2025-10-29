@@ -313,9 +313,9 @@ export function useDashboard() {
   }, [layout, user?.id, wedding?.id, loading])
 
   const updateModuleOrder = (modules: DashboardModule[]) => {
-    // Block for normal users, allow only for DEMO account (when unlocked)
-    if (!isDemoUser || isDemoLocked) {
-      console.log('🔒 Layout editing blocked - only unlocked DEMO account can edit layout')
+    // Block only for locked DEMO account
+    if (isDemoUser && isDemoLocked) {
+      console.log('🔒 DEMO account is locked - layout editing prevented')
       return
     }
 
@@ -329,9 +329,9 @@ export function useDashboard() {
   }
 
   const toggleEditMode = () => {
-    // Block for normal users, allow only for DEMO account (when unlocked)
-    if (!isDemoUser || isDemoLocked) {
-      console.log('🔒 Layout editing blocked - only unlocked DEMO account can edit layout')
+    // Block only for locked DEMO account
+    if (isDemoUser && isDemoLocked) {
+      console.log('🔒 DEMO account is locked - layout editing prevented')
       return
     }
 
@@ -342,9 +342,9 @@ export function useDashboard() {
   }
 
   const toggleLock = () => {
-    // Block for normal users, allow only for DEMO account (when unlocked)
-    if (!isDemoUser || isDemoLocked) {
-      console.log('🔒 Layout editing blocked - only unlocked DEMO account can edit layout')
+    // Block only for locked DEMO account
+    if (isDemoUser && isDemoLocked) {
+      console.log('🔒 DEMO account is locked - layout editing prevented')
       return
     }
 
@@ -355,9 +355,9 @@ export function useDashboard() {
   }
 
   const toggleModuleVisibility = (moduleId: string) => {
-    // Block for normal users, allow only for DEMO account (when unlocked)
-    if (!isDemoUser || isDemoLocked) {
-      console.log('🔒 Layout editing blocked - only unlocked DEMO account can edit layout')
+    // Block only for locked DEMO account
+    if (isDemoUser && isDemoLocked) {
+      console.log('🔒 DEMO account is locked - layout editing prevented')
       return
     }
 
@@ -372,9 +372,9 @@ export function useDashboard() {
   }
 
   const updateModulePosition = (moduleId: string, position: { x: number; y: number }) => {
-    // Block for normal users, allow only for DEMO account (when unlocked)
-    if (!isDemoUser || isDemoLocked) {
-      console.log('🔒 Layout editing blocked - only unlocked DEMO account can edit layout')
+    // Block only for locked DEMO account
+    if (isDemoUser && isDemoLocked) {
+      console.log('🔒 DEMO account is locked - layout editing prevented')
       return
     }
 
@@ -394,9 +394,9 @@ export function useDashboard() {
   }
 
   const updateModuleSize = (moduleId: string, size: { width: number; height: number }) => {
-    // Block for normal users, allow only for DEMO account (when unlocked)
-    if (!isDemoUser || isDemoLocked) {
-      console.log('🔒 Layout editing blocked - only unlocked DEMO account can edit layout')
+    // Block only for locked DEMO account
+    if (isDemoUser && isDemoLocked) {
+      console.log('🔒 DEMO account is locked - layout editing prevented')
       return
     }
 
@@ -412,9 +412,9 @@ export function useDashboard() {
   }
 
   const setLayoutMode = (mode: 'grid' | 'free') => {
-    // Block for normal users, allow only for DEMO account (when unlocked)
-    if (!isDemoUser || isDemoLocked) {
-      console.log('🔒 Layout editing blocked - only unlocked DEMO account can edit layout')
+    // Block only for locked DEMO account
+    if (isDemoUser && isDemoLocked) {
+      console.log('🔒 DEMO account is locked - layout editing prevented')
       return
     }
 
@@ -426,9 +426,9 @@ export function useDashboard() {
   }
 
   const toggleModuleLock = (moduleId: string) => {
-    // Block for normal users, allow only for DEMO account (when unlocked)
-    if (!isDemoUser || isDemoLocked) {
-      console.log('🔒 Layout editing blocked - only unlocked DEMO account can edit layout')
+    // Block only for locked DEMO account
+    if (isDemoUser && isDemoLocked) {
+      console.log('🔒 DEMO account is locked - layout editing prevented')
       return
     }
 
@@ -443,9 +443,9 @@ export function useDashboard() {
   }
 
   const resetLayout = async () => {
-    // Block for normal users, allow only for DEMO account (when unlocked)
-    if (!isDemoUser || isDemoLocked) {
-      console.log('🔒 Layout editing blocked - only unlocked DEMO account can edit layout')
+    // Block only for locked DEMO account
+    if (isDemoUser && isDemoLocked) {
+      console.log('🔒 DEMO account is locked - layout editing prevented')
       return
     }
 
