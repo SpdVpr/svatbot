@@ -63,8 +63,14 @@ class SpotifyClient {
 
   async search(query: string, limit: number = 10): Promise<SpotifyTrack[]> {
     try {
+      // Validate query
+      if (!query || !query.trim()) {
+        console.warn('Empty search query')
+        return []
+      }
+
       const token = await this.getAccessToken()
-      
+
       const response = await fetch(
         `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=${limit}`,
         {
@@ -75,6 +81,8 @@ class SpotifyClient {
       )
 
       if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        console.error('Spotify API error:', response.status, errorData)
         throw new Error(`Spotify API error: ${response.status}`)
       }
 

@@ -167,6 +167,8 @@ export function useMusic() {
   const [musicId, setMusicId] = useState<string | null>(null)
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const lastLocalChangeRef = useRef<number>(0) // Timestamp of last local change
+  const lastSavedTimestampRef = useRef<number>(0) // Timestamp of last successful save
+  const isProcessingFirebaseUpdateRef = useRef<boolean>(false) // Flag to prevent auto-save during Firebase update
 
   // Migrate old categories to new format
   const migrateCategories = (oldCategories: MusicCategory[]): MusicCategory[] => {
@@ -312,18 +314,46 @@ export function useMusic() {
     const unsubscribe = onSnapshot(musicQuery, (snapshot) => {
       // Skip updates while saving to prevent overwriting local changes
       if (saving) {
+        console.log('⏭️ Skipping Firebase update - currently saving')
         return
       }
 
       // Skip updates for 5 seconds after local change to prevent race conditions
       const timeSinceLastChange = Date.now() - lastLocalChangeRef.current
       if (timeSinceLastChange < 5000 && lastLocalChangeRef.current > 0) {
+        console.log(`⏭️ Skipping Firebase update - ${timeSinceLastChange}ms since last change (waiting 5000ms)`)
         return
       }
 
       if (!snapshot.empty) {
         const musicDoc = snapshot.docs[0]
         const data = musicDoc.data()
+
+        // Check if this update is older than our last save - if so, ignore it
+        let firebaseTimestamp = 0
+        if (data.updatedAt) {
+          // Handle both Firestore Timestamp and Date objects
+          if (typeof data.updatedAt.toMillis === 'function') {
+            firebaseTimestamp = data.updatedAt.toMillis()
+          } else if (typeof data.updatedAt.getTime === 'function') {
+            firebaseTimestamp = data.updatedAt.getTime()
+          } else if (data.updatedAt.seconds) {
+            firebaseTimestamp = data.updatedAt.seconds * 1000
+          }
+        }
+
+        console.log(`📥 Firebase snapshot - Firebase timestamp: ${firebaseTimestamp}, Last saved: ${lastSavedTimestampRef.current}`)
+
+        if (firebaseTimestamp > 0 && lastSavedTimestampRef.current > 0 && firebaseTimestamp < lastSavedTimestampRef.current) {
+          console.log(`⏭️ Skipping Firebase update - older than last save`)
+          return
+        }
+
+        console.log(`✅ Processing Firebase snapshot update`)
+
+        // Set flag to prevent auto-save from triggering
+        isProcessingFirebaseUpdateRef.current = true
+
         setMusicId(musicDoc.id)
 
         // Backward compatibility: convert old vendor format to vendors array
@@ -346,6 +376,11 @@ export function useMusic() {
         loadedCategories = ensureSparklerDanceCategory(loadedCategories)
         loadedCategories = ensureBouquetTossCategory(loadedCategories)
         setCategories(loadedCategories)
+
+        // Reset flag after state updates
+        setTimeout(() => {
+          isProcessingFirebaseUpdateRef.current = false
+        }, 100)
       } else {
         setMusicId(null)
         setVendors([])
@@ -414,12 +449,19 @@ export function useMusic() {
       return
     }
 
+    // Skip auto-save if we're processing a Firebase update
+    if (isProcessingFirebaseUpdateRef.current) {
+      console.log('⏭️ Skipping auto-save - processing Firebase update')
+      return
+    }
+
     // Clear previous timeout
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current)
     }
 
     saveTimeoutRef.current = setTimeout(async () => {
+      console.log('💾 Auto-save triggered')
       setSaving(true)
       try {
         // Clean data to remove undefined values
@@ -437,6 +479,7 @@ export function useMusic() {
           return obj
         }
 
+        const saveTimestamp = Date.now()
         const cleanedData = {
           weddingId: wedding.id,
           userId: user.id,
@@ -456,10 +499,16 @@ export function useMusic() {
           setMusicId(musicRef.id)
         }
 
+        // Store the timestamp of this successful save
+        lastSavedTimestampRef.current = saveTimestamp
+        console.log(`✅ Auto-save completed successfully (timestamp: ${saveTimestamp})`)
+
         // Reset local change timestamp after successful save
+        // Wait 6 seconds to ensure Firebase snapshot doesn't overwrite our changes
         setTimeout(() => {
+          console.log('🔄 Resetting lastLocalChangeRef to 0')
           lastLocalChangeRef.current = 0
-        }, 1000)
+        }, 6000)
       } catch (error) {
         console.error('❌ Error saving music data:', error)
       } finally {
@@ -494,7 +543,9 @@ export function useMusic() {
   }
 
   const addSong = (categoryId: string, song: Song) => {
-    lastLocalChangeRef.current = Date.now()
+    const timestamp = Date.now()
+    lastLocalChangeRef.current = timestamp
+    console.log(`🎵 addSong called - setting lastLocalChangeRef to ${timestamp}`)
     setCategories(prev => prev.map(cat => {
       if (cat.id === categoryId) {
         return {
