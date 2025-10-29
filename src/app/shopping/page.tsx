@@ -126,10 +126,10 @@ export default function ShoppingPage() {
               <div className="flex-1">
                 <p className="text-sm text-gray-600 mb-1">Celková hodnota</p>
                 <p className="text-3xl font-bold text-blue-600 mb-1">
-                  {currencyUtils.formatShort(stats.totalValue)}
+                  {currencyUtils.format(stats.totalValue)}
                 </p>
                 <p className="text-xs text-gray-500">
-                  Zaplaceno: {currencyUtils.formatShort(stats.purchasedValue)}
+                  Zaplaceno: {currencyUtils.format(stats.purchasedValue)}
                 </p>
               </div>
               <div className="p-3 rounded-xl bg-blue-100">
