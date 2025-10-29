@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { Guest, GuestFormData } from '@/types/guest'
 import { useAuth } from '@/hooks/useAuth'
 import { useWedding } from '@/hooks/useWedding'
+import { useDemoLock } from '@/hooks/useDemoLock'
 
 // Demo guests data
 const getDemoGuests = (): Guest[] => [
@@ -151,6 +152,7 @@ const cleanForFirestore = (obj: any): any => {
 export function useRobustGuests() {
   const { user } = useAuth()
   const { wedding } = useWedding()
+  const { withDemoCheck } = useDemoLock()
 
   // Initialize with localStorage data if available
   const [guests, setGuests] = useState<Guest[]>(() => {
@@ -315,13 +317,14 @@ export function useRobustGuests() {
 
   // Update guest function
   const updateGuest = useCallback(async (guestId: string, updates: Partial<Guest>): Promise<void> => {
-    console.log('✏️ useRobustGuests: Updating guest:', guestId, 'with updates:', updates)
+    return withDemoCheck(async () => {
+      console.log('✏️ useRobustGuests: Updating guest:', guestId, 'with updates:', updates)
 
-    isSavingRef.current = true
+      isSavingRef.current = true
 
-    // Get current guests from ref to avoid stale closure
-    const currentGuests = guestsRef.current
-    const currentGuest = currentGuests.find(g => g.id === guestId)
+      // Get current guests from ref to avoid stale closure
+      const currentGuests = guestsRef.current
+      const currentGuest = currentGuests.find(g => g.id === guestId)
 
     if (!currentGuest) {
       console.error('❌ useRobustGuests: Guest not found:', guestId)
@@ -379,14 +382,16 @@ export function useRobustGuests() {
       console.warn('⚠️ Failed to load Firestore modules:', error)
       isSavingRef.current = false
     })
-  }, [wedding?.id])
+    }) as Promise<void>
+  }, [wedding?.id, withDemoCheck])
 
   // Create guest function
   const createGuest = useCallback(async (data: GuestFormData): Promise<Guest> => {
-    isSavingRef.current = true
+    return withDemoCheck(async () => {
+      isSavingRef.current = true
 
-    // Generate unique ID
-    const guestId = `guest-${user?.id || 'unknown'}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      // Generate unique ID
+      const guestId = `guest-${user?.id || 'unknown'}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 
     const newGuest: Guest = {
       id: guestId,
@@ -455,7 +460,8 @@ export function useRobustGuests() {
     }
 
     return newGuest
-  }, [wedding?.id, user?.id])
+    }) as Promise<Guest>
+  }, [wedding?.id, user?.id, withDemoCheck])
 
   // Calculate stats
   const totalAttendees = guests.reduce((total, guest) => {
@@ -549,10 +555,11 @@ export function useRobustGuests() {
 
   // Delete guest
   const deleteGuest = useCallback(async (guestId: string): Promise<void> => {
-    console.log('🗑️ useRobustGuests: Deleting guest:', guestId)
-    isSavingRef.current = true
+    return withDemoCheck(async () => {
+      console.log('🗑️ useRobustGuests: Deleting guest:', guestId)
+      isSavingRef.current = true
 
-    const currentGuest = guestsRef.current.find(g => g.id === guestId)
+      const currentGuest = guestsRef.current.find(g => g.id === guestId)
     if (!currentGuest) {
       console.error('❌ useRobustGuests: Guest not found for deletion:', guestId)
       return
@@ -581,7 +588,8 @@ export function useRobustGuests() {
     } else {
       isSavingRef.current = false
     }
-  }, [user, wedding])
+    }) as Promise<void>
+  }, [user, wedding, withDemoCheck])
 
   return {
     guests,
@@ -600,13 +608,14 @@ export function useRobustGuests() {
     sendInvitations: async () => {},
     sendReminders: async () => {},
     reorderGuests: async (reorderedGuests: Guest[]) => {
-      console.log('🔄 Reordering guests:', reorderedGuests.length)
+      return withDemoCheck(async () => {
+        console.log('🔄 Reordering guests:', reorderedGuests.length)
 
-      // Update sortOrder for each guest
-      const guestsWithOrder = reorderedGuests.map((guest, index) => ({
-        ...guest,
-        sortOrder: index
-      }))
+        // Update sortOrder for each guest
+        const guestsWithOrder = reorderedGuests.map((guest, index) => ({
+          ...guest,
+          sortOrder: index
+        }))
 
       // Update local state immediately for instant UI feedback
       setGuests(guestsWithOrder)
@@ -643,6 +652,7 @@ export function useRobustGuests() {
           throw error
         }
       }
+      }) as Promise<void>
     },
     clearError: () => setError(null)
   }

@@ -855,6 +855,15 @@ service cloud.firestore {
       allow delete: if isSuperAdmin();
     }
 
+    // Demo Settings - Admin only can write, anyone authenticated can read
+    match /demoSettings/{settingId} {
+      // Anyone authenticated can read demo settings (to check if they're demo user)
+      allow read: if isAuthenticated();
+
+      // Only admins can create/update/delete demo settings
+      allow create, update, delete: if isAdmin();
+    }
+
     // ========================================
     // AFFILIATE SYSTEM
     // ========================================
