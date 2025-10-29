@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { use, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   ArrowLeft,
@@ -23,21 +23,25 @@ import { useAccommodationWithGuests } from '@/hooks/useAccommodationWithGuests'
 import { useAccommodation } from '@/hooks/useAccommodation'
 import type { Room } from '@/types'
 import RoomImageGallery, { useRoomImageGallery } from '@/components/accommodation/RoomImageGallery'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 interface AccommodationDetailPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default function AccommodationDetailPage({ params }: AccommodationDetailPageProps) {
+  // Use React's use() hook to unwrap params Promise in Client Component
+  const { id } = use(params)
+
   const router = useRouter()
-  const { getAccommodationWithOccupancy, loading } = useAccommodationWithGuests()
+  const { getAccommodationWithOccupancy, loading, accommodations } = useAccommodationWithGuests()
   const { deleteRoom } = useAccommodation()
   // Removed tabs - show rooms directly
   const { isOpen, images, roomName, initialIndex, openGallery, closeGallery } = useRoomImageGallery()
 
-  const accommodation = getAccommodationWithOccupancy(params.id)
+  const accommodation = getAccommodationWithOccupancy(id)
 
   const handleDeleteRoom = async (roomId: string, roomName: string) => {
     if (!accommodation) return
@@ -54,17 +58,21 @@ export default function AccommodationDetailPage({ params }: AccommodationDetailP
     }
   }
 
-  // Show loading while data is being fetched
-  if (loading) {
+  // Show loading while data is being fetched OR while accommodations list is empty
+  // This prevents flickering when navigating to the page
+  if (loading || accommodations.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="loading-spinner w-8 h-8" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-white">
+        <div className="text-center">
+          <LoadingSpinner size="lg" />
+          <p className="mt-4 text-gray-600">Načítám ubytování...</p>
+        </div>
       </div>
     )
   }
 
-  // If not loading and accommodation not found, show error
-  if (!loading && !accommodation) {
+  // If data is loaded and accommodation not found, show error
+  if (!accommodation) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">

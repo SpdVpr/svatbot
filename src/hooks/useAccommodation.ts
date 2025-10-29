@@ -146,6 +146,12 @@ export function useAccommodation(): UseAccommodationReturn {
           updatedAt: doc.data().updatedAt?.toDate() || new Date(),
         })) as Accommodation[]
 
+        console.log('🔥 useAccommodation - Firestore snapshot received:', {
+          count: accommodationData.length,
+          ids: accommodationData.map(a => a.id),
+          weddingId: wedding.id
+        })
+
         // Sort by createdAt descending in JavaScript
         const sortedData = accommodationData.sort((a, b) =>
           b.createdAt.getTime() - a.createdAt.getTime()

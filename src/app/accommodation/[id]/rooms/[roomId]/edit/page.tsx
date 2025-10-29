@@ -1,25 +1,29 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { use, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Bed, Save, Users, DollarSign, Plus, X, Copy } from 'lucide-react'
 import { useAccommodation, type RoomFormData } from '@/hooks/useAccommodation'
 import type { RoomType, BedType } from '@/types'
 import SimpleRoomImageUpload from '@/components/accommodation/SimpleRoomImageUpload'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 interface EditRoomPageProps {
-  params: {
+  params: Promise<{
     id: string
     roomId: string
-  }
+  }>
 }
 
 export default function EditRoomPage({ params }: EditRoomPageProps) {
+  // Use React's use() hook to unwrap params Promise in Client Component
+  const { id, roomId } = use(params)
+
   const router = useRouter()
-  const { getAccommodationById, updateRoom, addRoom, loading } = useAccommodation()
-  
-  const accommodation = getAccommodationById(params.id)
-  const room = accommodation?.rooms.find(r => r.id === params.roomId)
+  const { getAccommodationById, updateRoom, addRoom, loading, accommodations } = useAccommodation()
+
+  const accommodation = getAccommodationById(id)
+  const room = accommodation?.rooms.find(r => r.id === roomId)
 
   const [formData, setFormData] = useState<RoomFormData>({
     name: '',
@@ -206,6 +210,18 @@ export default function EditRoomPage({ params }: EditRoomPageProps) {
     } finally {
       setSaving(false)
     }
+  }
+
+  // Show loading while data is being fetched OR while accommodations list is empty
+  if (loading || accommodations.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-white">
+        <div className="text-center">
+          <LoadingSpinner size="lg" />
+          <p className="mt-4 text-gray-600">Načítám pokoj...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!accommodation || !room) {

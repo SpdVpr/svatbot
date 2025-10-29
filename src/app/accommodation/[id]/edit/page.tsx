@@ -1,23 +1,27 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { use, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Building2, Save, MapPin, Phone, Mail, Globe, Plus, X } from 'lucide-react'
 import { useAccommodation, type AccommodationFormData } from '@/hooks/useAccommodation'
 import AccommodationImageUpload from '@/components/accommodation/AccommodationImageUpload'
 import { ensureUrlProtocol } from '@/utils/url'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 interface EditAccommodationPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default function EditAccommodationPage({ params }: EditAccommodationPageProps) {
+  // Use React's use() hook to unwrap params Promise in Client Component
+  const { id } = use(params)
+
   const router = useRouter()
-  const { getAccommodationById, updateAccommodation, loading } = useAccommodation()
-  
-  const accommodation = getAccommodationById(params.id)
+  const { getAccommodationById, updateAccommodation, loading, accommodations } = useAccommodation()
+
+  const accommodation = getAccommodationById(id)
 
   const [formData, setFormData] = useState<AccommodationFormData>({
     name: '',
@@ -137,6 +141,18 @@ export default function EditAccommodationPage({ params }: EditAccommodationPageP
     } finally {
       setSaving(false)
     }
+  }
+
+  // Show loading while data is being fetched OR while accommodations list is empty
+  if (loading || accommodations.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-white">
+        <div className="text-center">
+          <LoadingSpinner size="lg" />
+          <p className="mt-4 text-gray-600">Načítám ubytování...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!accommodation) {

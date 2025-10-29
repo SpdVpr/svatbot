@@ -1,22 +1,26 @@
 'use client'
 
-import { useState } from 'react'
+import { use, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Bed, Save, Users, DollarSign, Plus, X, Copy } from 'lucide-react'
 import { useAccommodation, type RoomFormData } from '@/hooks/useAccommodation'
 import type { RoomType, BedType } from '@/types'
 import SimpleRoomImageUpload from '@/components/accommodation/SimpleRoomImageUpload'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 interface NewRoomPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default function NewRoomPage({ params }: NewRoomPageProps) {
+  // Use React's use() hook to unwrap params Promise in Client Component
+  const { id } = use(params)
+
   const router = useRouter()
-  const { getAccommodationById, addRoom, loading } = useAccommodation()
-  const accommodation = getAccommodationById(params.id)
+  const { getAccommodationById, addRoom, loading, accommodations } = useAccommodation()
+  const accommodation = getAccommodationById(id)
   
   const [formData, setFormData] = useState<RoomFormData>({
     name: '',
@@ -138,6 +142,18 @@ export default function NewRoomPage({ params }: NewRoomPageProps) {
       console.error('Error creating room(s):', error)
       alert('Chyba při vytváření pokoje/pokojů')
     }
+  }
+
+  // Show loading while data is being fetched OR while accommodations list is empty
+  if (loading || accommodations.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-white">
+        <div className="text-center">
+          <LoadingSpinner size="lg" />
+          <p className="mt-4 text-gray-600">Načítám ubytování...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!accommodation) {
