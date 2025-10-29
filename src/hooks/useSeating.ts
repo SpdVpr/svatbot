@@ -805,156 +805,164 @@ export function useSeating(): UseSeatingReturn {
 
   // Chair row management functions
   const createChairRow = async (data: ChairRowFormData, planId?: string): Promise<ChairRow> => {
-    const activePlan = planId ? seatingPlans.find(p => p.id === planId) : currentPlan
+    return withDemoCheck(async () => {
+      const activePlan = planId ? seatingPlans.find(p => p.id === planId) : currentPlan
 
-    if (!wedding || !user || !activePlan) {
-      throw new Error('Žádná svatba, uživatel nebo plán není vybrán')
-    }
-
-    try {
-      setError(null)
-
-      // Create chair row with local ID
-      const localId = `chairrow_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-
-      const newChairRow: ChairRow = {
-        id: localId,
-        weddingId: wedding.id,
-        name: data.name,
-        chairCount: data.chairCount,
-        orientation: data.orientation,
-        rows: data.rows,
-        columns: data.columns,
-        hasAisle: data.hasAisle,
-        aisleWidth: data.aisleWidth,
-        position: data.position,
-        rotation: data.rotation,
-        color: data.color,
-        spacing: data.spacing || 40,
-        isHighlighted: false,
-        notes: data.notes,
-        createdAt: new Date(),
-        updatedAt: new Date()
+      if (!wedding || !user || !activePlan) {
+        throw new Error('Žádná svatba, uživatel nebo plán není vybrán')
       }
 
-      // Create seats for the chair row
-      const newChairSeats: ChairSeat[] = []
-      for (let i = 1; i <= data.chairCount; i++) {
-        newChairSeats.push({
-          id: `chairseat_${localId}_${i}`,
-          chairRowId: localId,
-          position: i,
-          isReserved: false,
+      try {
+        setError(null)
+
+        // Create chair row with local ID
+        const localId = `chairrow_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+
+        const newChairRow: ChairRow = {
+          id: localId,
+          weddingId: wedding.id,
+          name: data.name,
+          chairCount: data.chairCount,
+          orientation: data.orientation,
+          rows: data.rows,
+          columns: data.columns,
+          hasAisle: data.hasAisle,
+          aisleWidth: data.aisleWidth,
+          position: data.position,
+          rotation: data.rotation,
+          color: data.color,
+          spacing: data.spacing || 40,
+          isHighlighted: false,
+          notes: data.notes,
           createdAt: new Date(),
           updatedAt: new Date()
-        })
-      }
-
-      // Update the seating plan
-      const updatedChairRows = [...(activePlan.chairRows || []), newChairRow]
-      const updatedChairSeats = [...(activePlan.chairSeats || []), ...newChairSeats]
-
-      await updateSeatingPlan(activePlan.id, {
-        chairRows: updatedChairRows,
-        chairSeats: updatedChairSeats,
-        totalSeats: (activePlan.totalSeats || 0) + data.chairCount
-      })
-
-      return newChairRow
-    } catch (error: any) {
-      console.error('❌ Error creating chair row:', error)
-      setError('Chyba při vytváření řady židlí: ' + error.message)
-      throw error
-    }
-  }
-
-  const updateChairRow = async (chairRowId: string, updates: Partial<ChairRow>) => {
-    if (!wedding || !currentPlan) return
-
-    try {
-      // Update chair row in the seating plan
-      const updatedChairRows = (currentPlan.chairRows || []).map(row =>
-        row.id === chairRowId
-          ? { ...row, ...updates, updatedAt: new Date() }
-          : row
-      )
-
-      // If chair count changed, update seats
-      let updatedChairSeats = currentPlan.chairSeats || []
-      if (updates.chairCount !== undefined) {
-        const chairRow = currentPlan.chairRows?.find(r => r.id === chairRowId)
-        if (chairRow && chairRow.chairCount !== updates.chairCount) {
-          // Remove old seats
-          updatedChairSeats = updatedChairSeats.filter(s => s.chairRowId !== chairRowId)
-
-          // Create new seats
-          const newSeats: ChairSeat[] = []
-          for (let i = 1; i <= updates.chairCount; i++) {
-            newSeats.push({
-              id: `chairseat_${chairRowId}_${i}`,
-              chairRowId: chairRowId,
-              position: i,
-              isReserved: false,
-              createdAt: new Date(),
-              updatedAt: new Date()
-            })
-          }
-          updatedChairSeats = [...updatedChairSeats, ...newSeats]
         }
+
+        // Create seats for the chair row
+        const newChairSeats: ChairSeat[] = []
+        for (let i = 1; i <= data.chairCount; i++) {
+          newChairSeats.push({
+            id: `chairseat_${localId}_${i}`,
+            chairRowId: localId,
+            position: i,
+            isReserved: false,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          })
+        }
+
+        // Update the seating plan
+        const updatedChairRows = [...(activePlan.chairRows || []), newChairRow]
+        const updatedChairSeats = [...(activePlan.chairSeats || []), ...newChairSeats]
+
+        await updateSeatingPlan(activePlan.id, {
+          chairRows: updatedChairRows,
+          chairSeats: updatedChairSeats,
+          totalSeats: (activePlan.totalSeats || 0) + data.chairCount
+        })
+
+        return newChairRow
+      } catch (error: any) {
+        console.error('❌ Error creating chair row:', error)
+        setError('Chyba při vytváření řady židlí: ' + error.message)
+        throw error
       }
-
-      await updateSeatingPlan(currentPlan.id, {
-        chairRows: updatedChairRows,
-        chairSeats: updatedChairSeats
-      })
-    } catch (error) {
-      console.error('Error updating chair row:', error)
-      throw error
-    }
+    }) as Promise<ChairRow>
   }
 
-  const deleteChairRow = async (chairRowId: string) => {
-    if (!wedding || !currentPlan) return
+  const updateChairRow = async (chairRowId: string, updates: Partial<ChairRow>): Promise<void> => {
+    return withDemoCheck(async () => {
+      if (!wedding || !currentPlan) return
 
-    try {
-      // Remove chair row from current plan
-      const updatedChairRows = (currentPlan.chairRows || []).filter(row => row.id !== chairRowId)
+      try {
+        // Update chair row in the seating plan
+        const updatedChairRows = (currentPlan.chairRows || []).map(row =>
+          row.id === chairRowId
+            ? { ...row, ...updates, updatedAt: new Date() }
+            : row
+        )
 
-      // Remove seats associated with this chair row
-      const updatedChairSeats = (currentPlan.chairSeats || []).filter(seat => seat.chairRowId !== chairRowId)
+        // If chair count changed, update seats
+        let updatedChairSeats = currentPlan.chairSeats || []
+        if (updates.chairCount !== undefined) {
+          const chairRow = currentPlan.chairRows?.find(r => r.id === chairRowId)
+          if (chairRow && chairRow.chairCount !== updates.chairCount) {
+            // Remove old seats
+            updatedChairSeats = updatedChairSeats.filter(s => s.chairRowId !== chairRowId)
 
-      // Calculate total seats
-      const tableTotalSeats = currentPlan.tables.reduce((sum, t) => sum + t.capacity, 0)
-      const chairRowTotalSeats = updatedChairRows.reduce((sum, r) => sum + r.chairCount, 0)
+            // Create new seats
+            const newSeats: ChairSeat[] = []
+            for (let i = 1; i <= updates.chairCount; i++) {
+              newSeats.push({
+                id: `chairseat_${chairRowId}_${i}`,
+                chairRowId: chairRowId,
+                position: i,
+                isReserved: false,
+                createdAt: new Date(),
+                updatedAt: new Date()
+              })
+            }
+            updatedChairSeats = [...updatedChairSeats, ...newSeats]
+          }
+        }
 
-      await updateSeatingPlan(currentPlan.id, {
-        chairRows: updatedChairRows,
-        chairSeats: updatedChairSeats,
-        totalSeats: tableTotalSeats + chairRowTotalSeats
-      })
-    } catch (error) {
-      console.error('Error deleting chair row:', error)
-      throw error
-    }
+        await updateSeatingPlan(currentPlan.id, {
+          chairRows: updatedChairRows,
+          chairSeats: updatedChairSeats
+        })
+      } catch (error) {
+        console.error('Error updating chair row:', error)
+        throw error
+      }
+    }) as Promise<void>
   }
 
-  const moveChairRow = async (chairRowId: string, position: { x: number; y: number }) => {
-    if (!wedding || !currentPlan) return
+  const deleteChairRow = async (chairRowId: string): Promise<void> => {
+    return withDemoCheck(async () => {
+      if (!wedding || !currentPlan) return
 
-    try {
-      // Update chair row position in the seating plan
-      const updatedChairRows = (currentPlan.chairRows || []).map(row =>
-        row.id === chairRowId
-          ? { ...row, position, updatedAt: new Date() }
-          : row
-      )
+      try {
+        // Remove chair row from current plan
+        const updatedChairRows = (currentPlan.chairRows || []).filter(row => row.id !== chairRowId)
 
-      await updateSeatingPlan(currentPlan.id, {
-        chairRows: updatedChairRows
-      })
-    } catch (error) {
-      console.error('Error moving chair row:', error)
-    }
+        // Remove seats associated with this chair row
+        const updatedChairSeats = (currentPlan.chairSeats || []).filter(seat => seat.chairRowId !== chairRowId)
+
+        // Calculate total seats
+        const tableTotalSeats = currentPlan.tables.reduce((sum, t) => sum + t.capacity, 0)
+        const chairRowTotalSeats = updatedChairRows.reduce((sum, r) => sum + r.chairCount, 0)
+
+        await updateSeatingPlan(currentPlan.id, {
+          chairRows: updatedChairRows,
+          chairSeats: updatedChairSeats,
+          totalSeats: tableTotalSeats + chairRowTotalSeats
+        })
+      } catch (error) {
+        console.error('Error deleting chair row:', error)
+        throw error
+      }
+    }) as Promise<void>
+  }
+
+  const moveChairRow = async (chairRowId: string, position: { x: number; y: number }): Promise<void> => {
+    return withDemoCheck(async () => {
+      if (!wedding || !currentPlan) return
+
+      try {
+        // Update chair row position in the seating plan
+        const updatedChairRows = (currentPlan.chairRows || []).map(row =>
+          row.id === chairRowId
+            ? { ...row, position, updatedAt: new Date() }
+            : row
+        )
+
+        await updateSeatingPlan(currentPlan.id, {
+          chairRows: updatedChairRows
+        })
+      } catch (error) {
+        console.error('Error moving chair row:', error)
+      }
+    }) as Promise<void>
   }
 
   const assignGuestToChairSeat = async (personId: string, chairSeatId: string) => {

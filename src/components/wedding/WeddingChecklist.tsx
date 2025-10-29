@@ -5,6 +5,7 @@ import { WEDDING_CHECKLIST, ChecklistItem, ChecklistPhase } from '@/data/wedding
 import { useTask } from '@/hooks/useTask'
 import { useWedding } from '@/hooks/useWedding'
 import { useAuth } from '@/hooks/useAuth'
+import { useDemoLock } from '@/hooks/useDemoLock'
 import { TaskFormData } from '@/types/task'
 import { doc, setDoc, getDoc } from 'firebase/firestore'
 import { db } from '@/config/firebase'
@@ -27,6 +28,7 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
   const { createTask, tasks, updateTask, deleteTask } = useTask()
   const { wedding } = useWedding()
   const { user } = useAuth()
+  const { withDemoCheck } = useDemoLock()
   const [expandedPhases, setExpandedPhases] = useState<string[]>([]) // Žádná kategorie není automaticky otevřená
   const [addingToTasks, setAddingToTasks] = useState<string | null>(null)
   const [markingComplete, setMarkingComplete] = useState<string | null>(null)
@@ -233,112 +235,120 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
 
   // Hide item
   const handleHideItem = async (item: ChecklistItem) => {
-    try {
-      const newHiddenItems = new Set(hiddenItems).add(item.id)
-      setHiddenItems(newHiddenItems)
-      await saveChecklistData(completedItems, newHiddenItems)
-    } catch (error) {
-      console.error('Error hiding item:', error)
-    }
+    return withDemoCheck(async () => {
+      try {
+        const newHiddenItems = new Set(hiddenItems).add(item.id)
+        setHiddenItems(newHiddenItems)
+        await saveChecklistData(completedItems, newHiddenItems)
+      } catch (error) {
+        console.error('Error hiding item:', error)
+      }
+    })
   }
 
   // Unhide item
   const handleUnhideItem = async (item: ChecklistItem) => {
-    try {
-      const newHiddenItems = new Set(hiddenItems)
-      newHiddenItems.delete(item.id)
-      setHiddenItems(newHiddenItems)
-      await saveChecklistData(completedItems, newHiddenItems)
-    } catch (error) {
-      console.error('Error unhiding item:', error)
-    }
+    return withDemoCheck(async () => {
+      try {
+        const newHiddenItems = new Set(hiddenItems)
+        newHiddenItems.delete(item.id)
+        setHiddenItems(newHiddenItems)
+        await saveChecklistData(completedItems, newHiddenItems)
+      } catch (error) {
+        console.error('Error unhiding item:', error)
+      }
+    })
   }
 
   // Mark item as complete
   const handleMarkComplete = async (item: ChecklistItem) => {
-    try {
-      setMarkingComplete(item.id)
+    return withDemoCheck(async () => {
+      try {
+        setMarkingComplete(item.id)
 
-      // Check if this item has a corresponding task
-      const correspondingTask = tasks.find(task =>
-        task.checklistItemId === item.id ||
-        task.title.toLowerCase() === item.title.toLowerCase()
-      )
+        // Check if this item has a corresponding task
+        const correspondingTask = tasks.find(task =>
+          task.checklistItemId === item.id ||
+          task.title.toLowerCase() === item.title.toLowerCase()
+        )
 
-      if (correspondingTask && correspondingTask.status !== 'completed') {
-        // If task exists and is not completed, mark it as completed
-        await updateTask(correspondingTask.id, {
-          status: 'completed',
-          completedAt: new Date()
-        })
-      } else {
-        // If no task exists, update local checklist state
-        const newCompletedItems = new Set(completedItems).add(item.id)
-        setCompletedItems(newCompletedItems)
-        await saveChecklistData(newCompletedItems, hiddenItems)
+        if (correspondingTask && correspondingTask.status !== 'completed') {
+          // If task exists and is not completed, mark it as completed
+          await updateTask(correspondingTask.id, {
+            status: 'completed',
+            completedAt: new Date()
+          })
+        } else {
+          // If no task exists, update local checklist state
+          const newCompletedItems = new Set(completedItems).add(item.id)
+          setCompletedItems(newCompletedItems)
+          await saveChecklistData(newCompletedItems, hiddenItems)
+        }
+
+        // Show success message
+        setShowSuccess(item.id)
+        setTimeout(() => setShowSuccess(null), 2000)
+      } catch (error) {
+        console.error('Error marking complete:', error)
+        alert('Chyba při označování jako hotovo')
+        // Revert local state on error if we updated it
+        const correspondingTask = tasks.find(task =>
+          task.checklistItemId === item.id ||
+          task.title.toLowerCase() === item.title.toLowerCase()
+        )
+        if (!correspondingTask) {
+          setCompletedItems(prev => {
+            const newSet = new Set(prev)
+            newSet.delete(item.id)
+            return newSet
+          })
+        }
+      } finally {
+        setMarkingComplete(null)
       }
-
-      // Show success message
-      setShowSuccess(item.id)
-      setTimeout(() => setShowSuccess(null), 2000)
-    } catch (error) {
-      console.error('Error marking complete:', error)
-      alert('Chyba při označování jako hotovo')
-      // Revert local state on error if we updated it
-      const correspondingTask = tasks.find(task =>
-        task.checklistItemId === item.id ||
-        task.title.toLowerCase() === item.title.toLowerCase()
-      )
-      if (!correspondingTask) {
-        setCompletedItems(prev => {
-          const newSet = new Set(prev)
-          newSet.delete(item.id)
-          return newSet
-        })
-      }
-    } finally {
-      setMarkingComplete(null)
-    }
+    })
   }
 
   // Unmark item as complete
   const handleUnmarkComplete = async (item: ChecklistItem) => {
-    try {
-      setMarkingComplete(item.id)
+    return withDemoCheck(async () => {
+      try {
+        setMarkingComplete(item.id)
 
-      // Check if this item has a corresponding task
-      const correspondingTask = tasks.find(task =>
-        task.checklistItemId === item.id ||
-        task.title.toLowerCase() === item.title.toLowerCase()
-      )
+        // Check if this item has a corresponding task
+        const correspondingTask = tasks.find(task =>
+          task.checklistItemId === item.id ||
+          task.title.toLowerCase() === item.title.toLowerCase()
+        )
 
-      if (correspondingTask && correspondingTask.status === 'completed') {
-        // If task exists and is completed, mark it as pending
-        await updateTask(correspondingTask.id, {
-          status: 'pending',
-          completedAt: undefined
-        })
-      } else {
-        // If no task exists, update local checklist state
-        const newCompletedItems = new Set(completedItems)
-        newCompletedItems.delete(item.id)
-        setCompletedItems(newCompletedItems)
-        await saveChecklistData(newCompletedItems, hiddenItems)
+        if (correspondingTask && correspondingTask.status === 'completed') {
+          // If task exists and is completed, mark it as pending
+          await updateTask(correspondingTask.id, {
+            status: 'pending',
+            completedAt: undefined
+          })
+        } else {
+          // If no task exists, update local checklist state
+          const newCompletedItems = new Set(completedItems)
+          newCompletedItems.delete(item.id)
+          setCompletedItems(newCompletedItems)
+          await saveChecklistData(newCompletedItems, hiddenItems)
+        }
+      } catch (error) {
+        console.error('Error unmarking complete:', error)
+        alert('Chyba při rušení dokončení')
+        // Revert local state on error if we updated it
+        const correspondingTask = tasks.find(task =>
+          task.checklistItemId === item.id ||
+          task.title.toLowerCase() === item.title.toLowerCase()
+        )
+        if (!correspondingTask) {
+          setCompletedItems(prev => new Set(prev).add(item.id))
+        }
+      } finally {
+        setMarkingComplete(null)
       }
-    } catch (error) {
-      console.error('Error unmarking complete:', error)
-      alert('Chyba při rušení dokončení')
-      // Revert local state on error if we updated it
-      const correspondingTask = tasks.find(task =>
-        task.checklistItemId === item.id ||
-        task.title.toLowerCase() === item.title.toLowerCase()
-      )
-      if (!correspondingTask) {
-        setCompletedItems(prev => new Set(prev).add(item.id))
-      }
-    } finally {
-      setMarkingComplete(null)
-    }
+    })
   }
 
   // Get priority color

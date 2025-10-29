@@ -7,6 +7,8 @@ import { DashboardModule } from '@/types/dashboard'
 import { Edit3, Lock, Unlock, Eye, EyeOff, RotateCcw, GripVertical, Grid3x3, Maximize2, Maximize, BookOpen, Sparkles } from 'lucide-react'
 import OnboardingWizard from '../onboarding/OnboardingWizard'
 import { getViewTransitionName } from '@/hooks/useViewTransition'
+import { useAuth } from '@/hooks/useAuth'
+import { useIsDemoUser } from '@/hooks/useDemoSettings'
 
 // Module components
 import WeddingCountdownModule from './modules/WeddingCountdownModule'
@@ -55,6 +57,9 @@ const CANVAS_WIDTHS = {
 }
 
 export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropProps) {
+  const { user } = useAuth()
+  const { isDemoUser, isLocked: isDemoLocked } = useIsDemoUser(user?.id)
+
   const {
     layout,
     loading,
@@ -71,6 +76,9 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
   const { getProgress, getNextStep } = useOnboarding()
 
   const layoutMode = layout.layoutMode || 'grid'
+
+  // Check if user can edit layout (only unlocked DEMO account)
+  const canEditLayout = isDemoUser && !isDemoLocked
 
   const containerRef = useRef<HTMLDivElement>(null)
   const [canvasWidth, setCanvasWidth] = useState<CanvasWidth>('normal')
@@ -379,9 +387,11 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
 
               <button
                 onClick={toggleEditMode}
+                disabled={!canEditLayout}
                 className={`btn-outline flex items-center space-x-2 ${
                   layout.isEditMode ? 'bg-primary-50 border-primary-400 shadow-2xl text-primary-700' : ''
-                }`}
+                } ${!canEditLayout ? 'opacity-50 cursor-not-allowed' : ''}`}
+                title={!canEditLayout ? 'Úprava layoutu je dostupná pouze pro DEMO účet' : ''}
               >
                 <Edit3 className="w-4 h-4" />
                 <span className="hidden sm:inline">

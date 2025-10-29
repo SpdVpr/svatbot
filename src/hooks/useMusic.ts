@@ -5,6 +5,7 @@ import { doc, getDoc, setDoc, updateDoc, collection, query, where, onSnapshot } 
 import { db } from '@/config/firebase'
 import { useAuth } from './useAuth'
 import { useWedding } from './useWedding'
+import { useDemoLock } from './useDemoLock'
 
 export interface Song {
   id: string
@@ -160,6 +161,7 @@ const DEFAULT_CATEGORIES: MusicCategory[] = [
 export function useMusic() {
   const { user } = useAuth()
   const { wedding } = useWedding()
+  const { withDemoCheck } = useDemoLock()
   const [vendors, setVendors] = useState<MusicVendor[]>([])
   const [categories, setCategories] = useState<MusicCategory[]>(DEFAULT_CATEGORIES)
   const [loading, setLoading] = useState(true)
@@ -543,31 +545,35 @@ export function useMusic() {
   }
 
   const addSong = (categoryId: string, song: Song) => {
-    const timestamp = Date.now()
-    lastLocalChangeRef.current = timestamp
-    console.log(`🎵 addSong called - setting lastLocalChangeRef to ${timestamp}`)
-    setCategories(prev => prev.map(cat => {
-      if (cat.id === categoryId) {
-        return {
-          ...cat,
-          songs: [...cat.songs, song]
+    withDemoCheck(async () => {
+      const timestamp = Date.now()
+      lastLocalChangeRef.current = timestamp
+      console.log(`🎵 addSong called - setting lastLocalChangeRef to ${timestamp}`)
+      setCategories(prev => prev.map(cat => {
+        if (cat.id === categoryId) {
+          return {
+            ...cat,
+            songs: [...cat.songs, song]
+          }
         }
-      }
-      return cat
-    }))
+        return cat
+      }))
+    })
   }
 
   const removeSong = (categoryId: string, songId: string) => {
-    lastLocalChangeRef.current = Date.now()
-    setCategories(prev => prev.map(cat => {
-      if (cat.id === categoryId) {
-        return {
-          ...cat,
-          songs: cat.songs.filter(s => s.id !== songId)
+    withDemoCheck(async () => {
+      lastLocalChangeRef.current = Date.now()
+      setCategories(prev => prev.map(cat => {
+        if (cat.id === categoryId) {
+          return {
+            ...cat,
+            songs: cat.songs.filter(s => s.id !== songId)
+          }
         }
-      }
-      return cat
-    }))
+        return cat
+      }))
+    })
   }
 
   const updateSong = (categoryId: string, songId: string, updates: Partial<Song>) => {

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { DashboardModule, DashboardLayout, DEFAULT_DASHBOARD_MODULES } from '@/types/dashboard'
 import { useAuth } from './useAuth'
 import { useWedding } from './useWedding'
+import { useIsDemoUser } from './useDemoSettings'
 import logger from '@/lib/logger'
 
 const DASHBOARD_STORAGE_KEY = 'svatbot-dashboard-layout'
@@ -11,6 +12,7 @@ const DASHBOARD_STORAGE_KEY = 'svatbot-dashboard-layout'
 export function useDashboard() {
   const { user } = useAuth()
   const { wedding } = useWedding()
+  const { isDemoUser, isLocked: isDemoLocked } = useIsDemoUser(user?.id)
 
   // Initialize layout with layoutMode from localStorage if available
   const [layout, setLayout] = useState<DashboardLayout>(() => {
@@ -311,6 +313,12 @@ export function useDashboard() {
   }, [layout, user?.id, wedding?.id, loading])
 
   const updateModuleOrder = (modules: DashboardModule[]) => {
+    // Block for normal users, allow only for DEMO account (when unlocked)
+    if (!isDemoUser || isDemoLocked) {
+      console.log('🔒 Layout editing blocked - only unlocked DEMO account can edit layout')
+      return
+    }
+
     setLayout(prev => ({
       ...prev,
       modules: modules.map((module, index) => ({
@@ -321,6 +329,12 @@ export function useDashboard() {
   }
 
   const toggleEditMode = () => {
+    // Block for normal users, allow only for DEMO account (when unlocked)
+    if (!isDemoUser || isDemoLocked) {
+      console.log('🔒 Layout editing blocked - only unlocked DEMO account can edit layout')
+      return
+    }
+
     setLayout(prev => ({
       ...prev,
       isEditMode: !prev.isEditMode
@@ -328,6 +342,12 @@ export function useDashboard() {
   }
 
   const toggleLock = () => {
+    // Block for normal users, allow only for DEMO account (when unlocked)
+    if (!isDemoUser || isDemoLocked) {
+      console.log('🔒 Layout editing blocked - only unlocked DEMO account can edit layout')
+      return
+    }
+
     setLayout(prev => ({
       ...prev,
       isLocked: !prev.isLocked
@@ -335,6 +355,12 @@ export function useDashboard() {
   }
 
   const toggleModuleVisibility = (moduleId: string) => {
+    // Block for normal users, allow only for DEMO account (when unlocked)
+    if (!isDemoUser || isDemoLocked) {
+      console.log('🔒 Layout editing blocked - only unlocked DEMO account can edit layout')
+      return
+    }
+
     setLayout(prev => ({
       ...prev,
       modules: prev.modules.map(module =>
@@ -346,6 +372,12 @@ export function useDashboard() {
   }
 
   const updateModulePosition = (moduleId: string, position: { x: number; y: number }) => {
+    // Block for normal users, allow only for DEMO account (when unlocked)
+    if (!isDemoUser || isDemoLocked) {
+      console.log('🔒 Layout editing blocked - only unlocked DEMO account can edit layout')
+      return
+    }
+
     logger.log('📍 Updating module position:', moduleId, position)
     setLayout(prev => {
       const updatedModules = prev.modules.map(module =>
@@ -362,6 +394,12 @@ export function useDashboard() {
   }
 
   const updateModuleSize = (moduleId: string, size: { width: number; height: number }) => {
+    // Block for normal users, allow only for DEMO account (when unlocked)
+    if (!isDemoUser || isDemoLocked) {
+      console.log('🔒 Layout editing blocked - only unlocked DEMO account can edit layout')
+      return
+    }
+
     logger.log('📏 Updating module size:', moduleId, size)
     setLayout(prev => ({
       ...prev,
@@ -374,6 +412,12 @@ export function useDashboard() {
   }
 
   const setLayoutMode = (mode: 'grid' | 'free') => {
+    // Block for normal users, allow only for DEMO account (when unlocked)
+    if (!isDemoUser || isDemoLocked) {
+      console.log('🔒 Layout editing blocked - only unlocked DEMO account can edit layout')
+      return
+    }
+
     logger.log('🔄 Setting layout mode to:', mode)
     setLayout(prev => ({
       ...prev,
@@ -382,6 +426,12 @@ export function useDashboard() {
   }
 
   const toggleModuleLock = (moduleId: string) => {
+    // Block for normal users, allow only for DEMO account (when unlocked)
+    if (!isDemoUser || isDemoLocked) {
+      console.log('🔒 Layout editing blocked - only unlocked DEMO account can edit layout')
+      return
+    }
+
     setLayout(prev => ({
       ...prev,
       modules: prev.modules.map(module =>
@@ -393,6 +443,12 @@ export function useDashboard() {
   }
 
   const resetLayout = async () => {
+    // Block for normal users, allow only for DEMO account (when unlocked)
+    if (!isDemoUser || isDemoLocked) {
+      console.log('🔒 Layout editing blocked - only unlocked DEMO account can edit layout')
+      return
+    }
+
     // Preserve the current layoutMode when resetting
     const currentLayoutMode = layout.layoutMode || 'grid'
 

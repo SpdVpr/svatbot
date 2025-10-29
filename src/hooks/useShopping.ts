@@ -1,15 +1,17 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { collection, query, where, onSnapshot, addDoc, updateDoc, deleteDoc, doc, Timestamp } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { useAuth } from './useAuth'
 import { useWedding } from './useWedding'
+import { useDemoLock } from './useDemoLock'
 import { ShoppingItem, ShoppingStats, ShoppingFormData, ShoppingCategory } from '@/types/shopping'
 
 export function useShopping() {
   const { user } = useAuth()
   const { wedding } = useWedding()
+  const { withDemoCheck } = useDemoLock()
   const [items, setItems] = useState<ShoppingItem[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -111,35 +113,37 @@ export function useShopping() {
   }, [items])
 
   // Add new shopping item
-  const addItem = async (data: ShoppingFormData): Promise<string> => {
-    if (!user || !wedding?.id) {
-      throw new Error('User or wedding not found')
-    }
+  const addItem = useCallback(async (data: ShoppingFormData): Promise<string> => {
+    return withDemoCheck(async () => {
+      if (!user || !wedding?.id) {
+        throw new Error('User or wedding not found')
+      }
 
-    const newItem = {
-      weddingId: wedding.id,
-      userId: user.id,
-      name: data.name,
-      url: data.url || null,
-      imageUrl: data.imageUrl || null,
-      price: data.price || null,
-      quantity: data.quantity || null,
-      currency: data.currency || 'CZK',
-      description: data.description || null,
-      category: data.category || null,
-      priority: data.priority || null,
-      status: data.status,
-      isPurchased: data.status === 'purchased',
-      purchaseDate: data.status === 'purchased' ? Timestamp.now() : null,
-      notes: data.notes || null,
-      tags: data.tags || [],
-      createdAt: Timestamp.now(),
-      updatedAt: Timestamp.now()
-    }
+      const newItem = {
+        weddingId: wedding.id,
+        userId: user.id,
+        name: data.name,
+        url: data.url || null,
+        imageUrl: data.imageUrl || null,
+        price: data.price || null,
+        quantity: data.quantity || null,
+        currency: data.currency || 'CZK',
+        description: data.description || null,
+        category: data.category || null,
+        priority: data.priority || null,
+        status: data.status,
+        isPurchased: data.status === 'purchased',
+        purchaseDate: data.status === 'purchased' ? Timestamp.now() : null,
+        notes: data.notes || null,
+        tags: data.tags || [],
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now()
+      }
 
-    const docRef = await addDoc(collection(db, 'shopping'), newItem)
-    return docRef.id
-  }
+      const docRef = await addDoc(collection(db, 'shopping'), newItem)
+      return docRef.id
+    }) as Promise<string>
+  }, [user, wedding?.id, withDemoCheck])
 
   // Helper function to remove undefined values
   const removeUndefined = (obj: any): any => {

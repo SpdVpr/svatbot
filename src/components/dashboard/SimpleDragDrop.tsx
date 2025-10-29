@@ -5,6 +5,8 @@ import { Edit3, Lock, Unlock, RotateCcw, GripVertical, Eye, EyeOff } from 'lucid
 import { useDashboard } from '@/hooks/useDashboard'
 import { DashboardModule } from '@/types/dashboard'
 import { getViewTransitionName } from '@/hooks/useViewTransition'
+import { useAuth } from '@/hooks/useAuth'
+import { useIsDemoUser } from '@/hooks/useDemoSettings'
 
 // Import module components
 import WeddingCountdownModule from './modules/WeddingCountdownModule'
@@ -33,6 +35,9 @@ interface SimpleDragDropProps {
 }
 
 export default function SimpleDragDrop({ onWeddingSettingsClick }: SimpleDragDropProps) {
+  const { user } = useAuth()
+  const { isDemoUser, isLocked: isDemoLocked } = useIsDemoUser(user?.id)
+
   const {
     layout,
     loading,
@@ -48,6 +53,9 @@ export default function SimpleDragDrop({ onWeddingSettingsClick }: SimpleDragDro
   const [draggedModule, setDraggedModule] = useState<string | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
   const [isDragging, setIsDragging] = useState(false)
+
+  // Check if user can edit layout (only unlocked DEMO account)
+  const canEditLayout = isDemoUser && !isDemoLocked
   const draggedElementRef = useRef<HTMLDivElement | null>(null)
   const dragTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -248,9 +256,11 @@ export default function SimpleDragDrop({ onWeddingSettingsClick }: SimpleDragDro
         <div className="flex items-center space-x-2">
           <button
             onClick={toggleEditMode}
+            disabled={!canEditLayout}
             className={`btn-outline flex items-center space-x-2 ${
               layout.isEditMode ? 'bg-primary-50 border-primary-300 text-primary-700' : ''
-            }`}
+            } ${!canEditLayout ? 'opacity-50 cursor-not-allowed' : ''}`}
+            title={!canEditLayout ? 'Úprava layoutu je dostupná pouze pro DEMO účet' : ''}
           >
             <Edit3 className="w-4 h-4" />
             <span className="hidden sm:inline">
