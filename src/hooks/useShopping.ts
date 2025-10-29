@@ -51,13 +51,25 @@ export function useShopping() {
     const purchasedItems = items.filter(item => item.isPurchased).length
     const pendingItems = items.filter(item => !item.isPurchased).length
 
-    const totalValue = items.reduce((sum, item) => sum + (item.price || 0), 0)
+    const totalValue = items.reduce((sum, item) => {
+      const itemPrice = item.price || 0
+      const itemQuantity = item.quantity || 1
+      return sum + (itemPrice * itemQuantity)
+    }, 0)
     const purchasedValue = items
       .filter(item => item.isPurchased)
-      .reduce((sum, item) => sum + (item.price || 0), 0)
+      .reduce((sum, item) => {
+        const itemPrice = item.price || 0
+        const itemQuantity = item.quantity || 1
+        return sum + (itemPrice * itemQuantity)
+      }, 0)
     const pendingValue = items
       .filter(item => !item.isPurchased)
-      .reduce((sum, item) => sum + (item.price || 0), 0)
+      .reduce((sum, item) => {
+        const itemPrice = item.price || 0
+        const itemQuantity = item.quantity || 1
+        return sum + (itemPrice * itemQuantity)
+      }, 0)
 
     const byCategory: Record<ShoppingCategory, number> = {
       decoration: 0,
@@ -111,6 +123,7 @@ export function useShopping() {
       url: data.url || null,
       imageUrl: data.imageUrl || null,
       price: data.price || null,
+      quantity: data.quantity || null,
       currency: data.currency || 'CZK',
       description: data.description || null,
       category: data.category || null,

@@ -8,6 +8,7 @@ export interface ShoppingItem {
   url?: string
   imageUrl?: string
   price?: number
+  quantity?: number
   currency: string
   
   // Metadata
@@ -68,6 +69,7 @@ export interface ShoppingFormData {
   url?: string
   imageUrl?: string
   price?: number
+  quantity?: number
   currency: string
   description?: string
   category?: ShoppingCategory

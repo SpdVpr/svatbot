@@ -21,6 +21,7 @@ export default function ShoppingItemForm({ item, onClose }: ShoppingItemFormProp
     url: item?.url || '',
     imageUrl: item?.imageUrl || '',
     price: item?.price || undefined,
+    quantity: item?.quantity || undefined,
     currency: item?.currency || 'CZK',
     description: item?.description || '',
     category: item?.category || undefined,
@@ -210,12 +211,12 @@ export default function ShoppingItemForm({ item, onClose }: ShoppingItemFormProp
             </div>
           </div>
 
-          {/* Price and Currency */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* Price, Quantity and Currency */}
+          <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <Coins className="w-4 h-4 inline mr-1" />
-                Cena
+                Cena za kus
               </label>
               <input
                 type="number"
@@ -224,6 +225,20 @@ export default function ShoppingItemForm({ item, onClose }: ShoppingItemFormProp
                 placeholder="0"
                 min="0"
                 step="0.01"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Počet kusů
+              </label>
+              <input
+                type="number"
+                value={formData.quantity || ''}
+                onChange={(e) => handleChange('quantity', e.target.value ? parseInt(e.target.value) : undefined)}
+                placeholder="1"
+                min="1"
+                step="1"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               />
             </div>
@@ -242,6 +257,18 @@ export default function ShoppingItemForm({ item, onClose }: ShoppingItemFormProp
               </select>
             </div>
           </div>
+
+          {/* Total Price Display */}
+          {formData.price && formData.quantity && formData.quantity > 1 && (
+            <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-700">Celková cena:</span>
+                <span className="text-lg font-bold text-purple-600">
+                  {(formData.price * formData.quantity).toFixed(2)} {formData.currency}
+                </span>
+              </div>
+            </div>
+          )}
 
           {/* Description */}
           <div>

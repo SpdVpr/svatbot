@@ -80,9 +80,9 @@ export default function ShoppingListModule() {
             <div className="text-center hover-lift">
               <div className="text-sm font-bold text-gray-900">
                 <NumberCounter
-                  end={Math.round(stats.purchasedValue / 1000)}
+                  end={stats.purchasedValue}
                   duration={1800}
-                  suffix="k Kč"
+                  suffix=" Kč"
                 />
               </div>
               <div className="text-xs text-gray-500">Zaplaceno</div>
@@ -90,9 +90,9 @@ export default function ShoppingListModule() {
             <div className="text-center hover-lift">
               <div className="text-sm font-bold text-gray-900">
                 <NumberCounter
-                  end={Math.round(stats.pendingValue / 1000)}
+                  end={stats.pendingValue}
                   duration={1800}
-                  suffix="k Kč"
+                  suffix=" Kč"
                 />
               </div>
               <div className="text-xs text-gray-500">Zbývá</div>

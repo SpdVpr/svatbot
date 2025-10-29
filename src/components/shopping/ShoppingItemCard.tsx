@@ -91,9 +91,22 @@ export default function ShoppingItemCard({ item, viewMode }: ShoppingItemCardPro
                     </span>
                   )}
                   {item.price && (
-                    <span className="text-sm font-semibold text-purple-600">
-                      {currencyUtils.format(item.price, item.currency)}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      {item.quantity && item.quantity > 1 ? (
+                        <>
+                          <span className="text-xs text-gray-500">
+                            {item.quantity}× {currencyUtils.format(item.price, item.currency)}
+                          </span>
+                          <span className="text-sm font-semibold text-purple-600">
+                            = {currencyUtils.format(item.price * item.quantity, item.currency)}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-sm font-semibold text-purple-600">
+                          {currencyUtils.format(item.price, item.currency)}
+                        </span>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
@@ -219,17 +232,44 @@ export default function ShoppingItemCard({ item, viewMode }: ShoppingItemCardPro
             <p className="text-sm text-gray-600 line-clamp-2">{item.description}</p>
           )}
 
-          <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-            {category && (
-              <span className="text-xs text-gray-500 flex items-center gap-1">
-                <span>{category.icon}</span>
-                <span>{category.label}</span>
-              </span>
-            )}
+          <div className="pt-2 border-t border-gray-100 space-y-2">
+            <div className="flex items-center justify-between">
+              {category && (
+                <span className="text-xs text-gray-500 flex items-center gap-1">
+                  <span>{category.icon}</span>
+                  <span>{category.label}</span>
+                </span>
+              )}
+            </div>
+
             {item.price && (
-              <span className="text-sm font-semibold text-purple-600">
-                {currencyUtils.format(item.price, item.currency)}
-              </span>
+              <div className="space-y-1">
+                {item.quantity && item.quantity > 1 ? (
+                  <>
+                    <div className="flex items-center justify-between text-xs text-gray-500">
+                      <span>Cena za kus:</span>
+                      <span>{currencyUtils.format(item.price, item.currency)}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-gray-500">
+                      <span>Počet kusů:</span>
+                      <span>{item.quantity}×</span>
+                    </div>
+                    <div className="flex items-center justify-between pt-1 border-t border-gray-100">
+                      <span className="text-sm font-medium text-gray-700">Celkem:</span>
+                      <span className="text-sm font-bold text-purple-600">
+                        {currencyUtils.format(item.price * item.quantity, item.currency)}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700">Cena:</span>
+                    <span className="text-sm font-bold text-purple-600">
+                      {currencyUtils.format(item.price, item.currency)}
+                    </span>
+                  </div>
+                )}
+              </div>
             )}
           </div>
 
