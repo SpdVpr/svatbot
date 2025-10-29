@@ -16,6 +16,7 @@ import {
 import { db } from '@/config/firebase'
 import { useAuth } from './useAuth'
 import { useWedding } from './useWedding'
+import { useDemoLock } from './useDemoLock'
 import {
   BudgetItem,
   BudgetFormData,
@@ -54,6 +55,7 @@ interface UseBudgetReturn {
 export function useBudget(): UseBudgetReturn {
   const { user } = useAuth()
   const { wedding } = useWedding()
+  const { withDemoCheck } = useDemoLock()
 
   // Initialize with localStorage data if available
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>(() => {
@@ -210,13 +212,14 @@ export function useBudget(): UseBudgetReturn {
 
   // Create new budget item
   const createBudgetItem = async (data: BudgetFormData): Promise<BudgetItem> => {
-    if (!wedding || !user) {
-      throw new Error('Žádná svatba nebo uživatel není vybrán')
-    }
+    return withDemoCheck(async () => {
+      if (!wedding || !user) {
+        throw new Error('Žádná svatba nebo uživatel není vybrán')
+      }
 
-    try {
-      setError(null)
-      setLoading(true)
+      try {
+        setError(null)
+        setLoading(true)
 
       const itemData: Omit<BudgetItem, 'id'> = {
         weddingId: wedding.id,
@@ -283,12 +286,14 @@ export function useBudget(): UseBudgetReturn {
     } finally {
       setLoading(false)
     }
+    }) as Promise<BudgetItem>
   }
 
   // Update budget item
   const updateBudgetItem = async (itemId: string, updates: Partial<BudgetItem>): Promise<void> => {
-    try {
-      setError(null)
+    return withDemoCheck(async () => {
+      try {
+        setError(null)
 
       const updatedData = {
         ...updates,
@@ -335,12 +340,14 @@ export function useBudget(): UseBudgetReturn {
       setError('Chyba při aktualizaci rozpočtové položky')
       throw error
     }
+    }) as Promise<void>
   }
 
   // Delete budget item
   const deleteBudgetItem = async (itemId: string): Promise<void> => {
-    try {
-      setError(null)
+    return withDemoCheck(async () => {
+      try {
+        setError(null)
 
       try {
         // Try to delete from Firestore
@@ -362,6 +369,7 @@ export function useBudget(): UseBudgetReturn {
       setError('Chyba při mazání rozpočtové položky')
       throw error
     }
+    }) as Promise<void>
   }
 
   // Create vendor (placeholder)
@@ -384,17 +392,19 @@ export function useBudget(): UseBudgetReturn {
 
   // Record payment
   const recordPayment = async (budgetItemId: string, amount: number, method: string): Promise<void> => {
-    const item = budgetItems.find(item => item.id === budgetItemId)
-    if (!item) return
+    return withDemoCheck(async () => {
+      const item = budgetItems.find(item => item.id === budgetItemId)
+      if (!item) return
 
-    const newPaidAmount = item.paidAmount + amount
-    const newStatus = newPaidAmount >= item.actualAmount ? 'paid' : 'partial'
+      const newPaidAmount = item.paidAmount + amount
+      const newStatus = newPaidAmount >= item.actualAmount ? 'paid' : 'partial'
 
-    await updateBudgetItem(budgetItemId, {
-      paidAmount: newPaidAmount,
-      paymentStatus: newStatus,
-      paidDate: newStatus === 'paid' ? new Date() : item.paidDate
-    })
+      await updateBudgetItem(budgetItemId, {
+        paidAmount: newPaidAmount,
+        paymentStatus: newStatus,
+        paidDate: newStatus === 'paid' ? new Date() : item.paidDate
+      })
+    }) as Promise<void>
   }
 
 
