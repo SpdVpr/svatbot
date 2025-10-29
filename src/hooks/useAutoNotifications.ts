@@ -4,6 +4,7 @@ import { useEffect, useCallback, useRef } from 'react'
 import { useAuth } from './useAuth'
 import { useWedding } from './useWedding'
 import { useTask } from './useTask'
+import { useWeddingDate } from './useDemoSettings'
 import { useWeddingNotifications, WeddingNotificationType } from './useWeddingNotifications'
 import { useSvatbotNotifications } from './useSvatbotNotifications'
 import { useLiveToastNotifications } from './useWeddingNotifications'
@@ -31,6 +32,9 @@ export function useAutoNotifications() {
     sendProactiveSuggestion,
     sendDailyCheckIn
   } = useSvatbotNotifications()
+
+  // Use DEMO-aware wedding date
+  const { weddingDate, isDemoUser } = useWeddingDate(user?.id, wedding?.weddingDate || null)
 
   const lastCheckRef = useRef<Date | null>(null)
   const hasShownWelcomeRef = useRef(false)
@@ -110,11 +114,11 @@ export function useAutoNotifications() {
 
   // Milestone countdown notifications
   const checkMilestones = useCallback(async () => {
-    if (!wedding?.weddingDate) return
+    if (!weddingDate) return
 
     const now = new Date()
-    const weddingDate = new Date(wedding.weddingDate)
-    const daysUntil = Math.ceil((weddingDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+    const wedding = new Date(weddingDate)
+    const daysUntil = Math.ceil((wedding.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
 
     // Important milestones
     const milestones = [365, 180, 100, 60, 30, 14, 7, 3, 1]
@@ -134,7 +138,7 @@ export function useAutoNotifications() {
         )
       }
     }
-  }, [wedding?.weddingDate, celebrateMilestone, showToast])
+  }, [weddingDate, celebrateMilestone, showToast])
 
   // Task completion celebrations
   const checkTaskCompletions = useCallback(async () => {

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useEmail } from '@/hooks/useEmail'
 import { useAuth } from '@/hooks/useAuth'
 import { useWedding } from '@/hooks/useWedding'
+import { useWeddingDate } from '@/hooks/useDemoSettings'
 import {
   Mail,
   Bell,
@@ -49,6 +50,9 @@ export default function EmailNotifications() {
   
   const { user } = useAuth()
   const { wedding } = useWedding()
+
+  // Use DEMO-aware wedding date
+  const { weddingDate, isDemoUser } = useWeddingDate(user?.id, wedding?.weddingDate || null)
 
   // Handle settings change
   const handleSettingChange = (key: keyof NotificationSettings) => {
@@ -97,9 +101,9 @@ export default function EmailNotifications() {
     await sendWeeklyProgressReport(progressData)
   }
 
-  // Calculate days until wedding
-  const daysUntilWedding = wedding?.weddingDate 
-    ? Math.ceil((new Date(wedding.weddingDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+  // Calculate days until wedding (using DEMO-aware date)
+  const daysUntilWedding = weddingDate
+    ? Math.ceil((new Date(weddingDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
     : null
 
   return (
