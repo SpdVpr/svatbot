@@ -18,11 +18,12 @@ import {
 import { db } from '@/config/firebase'
 import { useAuth } from './useAuth'
 import { useWedding } from './useWedding'
-import type { 
-  Accommodation, 
-  Room, 
-  RoomReservation, 
-  ReservationStatus 
+import { useDemoLock } from './useDemoLock'
+import type {
+  Accommodation,
+  Room,
+  RoomReservation,
+  ReservationStatus
 } from '@/types'
 
 interface AccommodationStats {
@@ -99,6 +100,7 @@ interface UseAccommodationReturn {
 export function useAccommodation(): UseAccommodationReturn {
   const { user } = useAuth()
   const { wedding } = useWedding()
+  const { withDemoCheck } = useDemoLock()
   const [accommodations, setAccommodations] = useState<Accommodation[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -173,10 +175,11 @@ export function useAccommodation(): UseAccommodationReturn {
 
   // Create accommodation
   const createAccommodation = useCallback(async (data: AccommodationFormData): Promise<Accommodation> => {
-    if (!user || !wedding?.id) throw new Error('User or wedding not found')
+    return withDemoCheck(async () => {
+      if (!user || !wedding?.id) throw new Error('User or wedding not found')
 
-    try {
-      setLoading(true)
+      try {
+        setLoading(true)
       const accommodationsRef = collection(db, 'accommodations')
 
       const accommodationData = {
@@ -206,14 +209,16 @@ export function useAccommodation(): UseAccommodationReturn {
     } finally {
       setLoading(false)
     }
-  }, [user, wedding])
+    }) as Promise<Accommodation>
+  }, [user, wedding, withDemoCheck])
 
   // Update accommodation
   const updateAccommodation = useCallback(async (id: string, updates: Partial<AccommodationFormData>) => {
-    if (!user || !wedding?.id) throw new Error('User or wedding not found')
+    return withDemoCheck(async () => {
+      if (!user || !wedding?.id) throw new Error('User or wedding not found')
 
-    try {
-      setLoading(true)
+      try {
+        setLoading(true)
       const accommodationRef = doc(db, 'accommodations', id)
       
       await updateDoc(accommodationRef, {
@@ -227,14 +232,16 @@ export function useAccommodation(): UseAccommodationReturn {
     } finally {
       setLoading(false)
     }
-  }, [user, wedding])
+    }) as Promise<void>
+  }, [user, wedding, withDemoCheck])
 
   // Delete accommodation
   const deleteAccommodation = useCallback(async (id: string) => {
-    if (!user || !wedding?.id) throw new Error('User or wedding not found')
+    return withDemoCheck(async () => {
+      if (!user || !wedding?.id) throw new Error('User or wedding not found')
 
-    try {
-      setLoading(true)
+      try {
+        setLoading(true)
       const accommodationRef = doc(db, 'accommodations', id)
       await deleteDoc(accommodationRef)
     } catch (err: any) {
@@ -244,14 +251,16 @@ export function useAccommodation(): UseAccommodationReturn {
     } finally {
       setLoading(false)
     }
-  }, [user, wedding])
+    }) as Promise<void>
+  }, [user, wedding, withDemoCheck])
 
   // Add room to accommodation
   const addRoom = useCallback(async (accommodationId: string, roomData: RoomFormData): Promise<Room> => {
-    if (!user || !wedding?.id) throw new Error('User or wedding not found')
+    return withDemoCheck(async () => {
+      if (!user || !wedding?.id) throw new Error('User or wedding not found')
 
-    try {
-      setLoading(true)
+      try {
+        setLoading(true)
 
       // Get fresh data from Firestore to avoid stale closure data
       const accommodationRef = doc(db, 'accommodations', accommodationId)
@@ -291,7 +300,8 @@ export function useAccommodation(): UseAccommodationReturn {
     } finally {
       setLoading(false)
     }
-  }, [user, wedding, accommodations])
+    }) as Promise<Room>
+  }, [user, wedding, accommodations, withDemoCheck])
 
   // Helper functions
   const getAccommodationById = useCallback((id: string) => {
@@ -316,10 +326,11 @@ export function useAccommodation(): UseAccommodationReturn {
 
   // Update room in accommodation
   const updateRoom = useCallback(async (accommodationId: string, roomId: string, updates: Partial<RoomFormData>) => {
-    if (!user || !wedding?.id) throw new Error('User or wedding not found')
+    return withDemoCheck(async () => {
+      if (!user || !wedding?.id) throw new Error('User or wedding not found')
 
-    try {
-      setLoading(true)
+      try {
+        setLoading(true)
       const accommodation = accommodations.find(acc => acc.id === accommodationId)
       if (!accommodation) throw new Error('Accommodation not found')
 
@@ -349,13 +360,15 @@ export function useAccommodation(): UseAccommodationReturn {
     } finally {
       setLoading(false)
     }
-  }, [user, wedding, accommodations])
+    }) as Promise<void>
+  }, [user, wedding, accommodations, withDemoCheck])
 
   const deleteRoom = useCallback(async (accommodationId: string, roomId: string) => {
-    if (!user || !wedding?.id) throw new Error('User or wedding not found')
+    return withDemoCheck(async () => {
+      if (!user || !wedding?.id) throw new Error('User or wedding not found')
 
-    try {
-      setLoading(true)
+      try {
+        setLoading(true)
 
       // Get fresh data from Firestore to avoid stale closure data
       const accommodationRef = doc(db, 'accommodations', accommodationId)
@@ -385,7 +398,8 @@ export function useAccommodation(): UseAccommodationReturn {
     } finally {
       setLoading(false)
     }
-  }, [user, wedding])
+    }) as Promise<void>
+  }, [user, wedding, withDemoCheck])
 
   const createReservation = useCallback(async (roomId: string, reservationData: Omit<RoomReservation, 'id' | 'roomId' | 'createdAt' | 'updatedAt'>) => {
     // TODO: Implement reservation creation

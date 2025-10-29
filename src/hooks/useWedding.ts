@@ -16,12 +16,14 @@ import {
 import { db } from '@/config/firebase'
 import { useWeddingStore } from '@/stores/weddingStore'
 import { useAuthStore } from '@/stores/authStore'
+import { useDemoLock } from './useDemoLock'
 import { Wedding, OnboardingData, WeddingProgress } from '@/types'
 import logger from '@/lib/logger'
 
 export function useWedding() {
   const { user } = useAuthStore()
   const { currentWedding, setCurrentWedding, setLoading } = useWeddingStore()
+  const { withDemoCheck } = useDemoLock()
   const [error, setError] = useState<string | null>(null)
   const loadingRef = useRef(false)
 
@@ -134,12 +136,13 @@ export function useWedding() {
 
   // Update wedding
   const updateWedding = async (updates: Partial<Wedding>): Promise<void> => {
-    if (!currentWedding || !user) {
-      throw new Error('Žádná svatba nebo uživatel není vybrán')
-    }
+    return withDemoCheck(async () => {
+      if (!currentWedding || !user) {
+        throw new Error('Žádná svatba nebo uživatel není vybrán')
+      }
 
-    try {
-      setError(null)
+      try {
+        setError(null)
 
       const updatedData = {
         ...updates,
@@ -170,6 +173,7 @@ export function useWedding() {
       setError('Chyba při aktualizaci svatby')
       throw error
     }
+    }) as Promise<void>
   }
 
   // Update wedding progress
