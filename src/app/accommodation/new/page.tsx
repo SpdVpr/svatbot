@@ -117,7 +117,11 @@ export default function NewAccommodationPage() {
       }
 
       const accommodation = await createAccommodation(accommodationDataWithImages)
-      router.push(`/accommodation/${accommodation.id}`)
+
+      // Wait a bit for Firestore listener to update, then redirect to detail
+      setTimeout(() => {
+        router.push(`/accommodation/${accommodation.id}`)
+      }, 500)
     } catch (error) {
       console.error('Error creating accommodation:', error)
       alert('Chyba při vytváření ubytování')

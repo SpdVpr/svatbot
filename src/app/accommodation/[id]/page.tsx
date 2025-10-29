@@ -54,6 +54,7 @@ export default function AccommodationDetailPage({ params }: AccommodationDetailP
     }
   }
 
+  // Show loading while data is being fetched
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -62,7 +63,8 @@ export default function AccommodationDetailPage({ params }: AccommodationDetailP
     )
   }
 
-  if (!accommodation) {
+  // If not loading and accommodation not found, show error
+  if (!loading && !accommodation) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -76,6 +78,15 @@ export default function AccommodationDetailPage({ params }: AccommodationDetailP
             Zpět na přehled
           </button>
         </div>
+      </div>
+    )
+  }
+
+  // If accommodation is still undefined but loading is false, wait a bit more
+  if (!accommodation) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="loading-spinner w-8 h-8" />
       </div>
     )
   }
