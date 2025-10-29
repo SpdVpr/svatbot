@@ -58,20 +58,23 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
     return (
       <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border-2 border-primary-500 p-1.5 overflow-hidden">
+          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border-2 border-primary-500 overflow-hidden" style={{ padding: '2px' }}>
             <video
               autoPlay
               loop
               muted
               playsInline
-              className="w-full h-full object-contain"
+              className="w-full h-full"
               style={{
-                imageRendering: 'crisp-edges',
-                filter: 'contrast(1.05) brightness(1.02)',
-                transform: 'translateZ(0)'
+                objectFit: 'cover',
+                imageRendering: 'auto',
+                WebkitFontSmoothing: 'antialiased',
+                transform: 'translateZ(0)',
+                backfaceVisibility: 'hidden',
+                willChange: 'transform'
               }}
             >
-              <source src="/animated.webm" type="video/webm" />
+              <source src="/animated2.webm" type="video/webm" />
             </video>
           </div>
           <div>
@@ -140,20 +143,23 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
       {/* Svatbot Header */}
       <div className="bg-gradient-to-r from-primary-500 to-pink-500 rounded-xl p-6 text-white shadow-lg">
         <div className="flex items-start gap-4">
-          <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-md flex-shrink-0 p-2 overflow-hidden">
+          <div className="bg-white rounded-full flex items-center justify-center shadow-md flex-shrink-0 overflow-hidden" style={{ width: '80px', height: '130px', padding: '4px' }}>
             <video
               autoPlay
               loop
               muted
               playsInline
-              className="w-full h-full object-contain"
+              className="w-full h-full"
               style={{
-                imageRendering: 'crisp-edges',
-                filter: 'contrast(1.05) brightness(1.02)',
-                transform: 'translateZ(0)'
+                objectFit: 'cover',
+                imageRendering: 'auto',
+                WebkitFontSmoothing: 'antialiased',
+                transform: 'translateZ(0)',
+                backfaceVisibility: 'hidden',
+                willChange: 'transform'
               }}
             >
-              <source src="/animated.webm" type="video/webm" />
+              <source src="/animated2.webm" type="video/webm" />
             </video>
           </div>
           <div className="flex-1 min-w-0">
