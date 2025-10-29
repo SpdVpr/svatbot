@@ -7,6 +7,8 @@ import { useTask } from '@/hooks/useTask'
 import { useGuest } from '@/hooks/useGuest'
 import { useBudget } from '@/hooks/useBudget'
 import { useVendor } from '@/hooks/useVendor'
+import { useAuth } from '@/hooks/useAuth'
+import { useWeddingDate } from '@/hooks/useDemoSettings'
 import { useRecommendationRotation } from '@/hooks/useRecommendationRotation'
 import { WEDDING_CHECKLIST } from '@/data/weddingChecklistTemplates'
 import { dateUtils } from '@/utils'
@@ -33,16 +35,20 @@ interface Recommendation {
 let globalIntervalId: NodeJS.Timeout | null = null
 
 export default function WeddingCountdownModule({ onWeddingSettingsClick }: WeddingCountdownModuleProps) {
+  const { user } = useAuth()
   const { wedding } = useWedding()
   const { tasks, stats } = useTask()
   const { guests, stats: guestStats } = useGuest()
   const { budgetItems, stats: budgetStats } = useBudget()
   const { vendors, stats: vendorStats } = useVendor()
 
+  // Use DEMO-aware wedding date
+  const { weddingDate, isDemoUser } = useWeddingDate(user?.id, wedding?.weddingDate || null)
+
   // Random seed that changes on each mount to ensure different order every time
   const [randomSeed] = useState(() => Math.random())
 
-  const daysUntilWedding = wedding?.weddingDate ? dateUtils.daysUntilWedding(wedding.weddingDate) : null
+  const daysUntilWedding = weddingDate ? dateUtils.daysUntilWedding(weddingDate) : null
 
   // Generate intelligent recommendations
   const recommendations = useMemo(() => {
@@ -750,9 +756,9 @@ export default function WeddingCountdownModule({ onWeddingSettingsClick }: Weddi
                     : 'Svatba proběhla'
                 }
               </p>
-              {daysUntilWedding > 0 && wedding?.weddingDate && (
+              {daysUntilWedding > 0 && weddingDate && (
                 <p className="text-xs text-text-muted mt-1">
-                  Od {dateUtils.format(new Date(), 'dd.MM.yyyy')} do {dateUtils.format(wedding.weddingDate, 'dd.MM.yyyy')}
+                  Od {dateUtils.format(new Date(), 'dd.MM.yyyy')} do {dateUtils.format(weddingDate, 'dd.MM.yyyy')}
                 </p>
               )}
             </div>

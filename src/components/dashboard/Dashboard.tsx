@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useWeddingStore } from '@/stores/weddingStore'
 import { useAuth } from '@/hooks/useAuth'
 import { useSubscription } from '@/hooks/useSubscription'
+import { useWeddingDate } from '@/hooks/useDemoSettings'
 import { dateUtils } from '@/utils'
 import DragDropWrapper from './DragDropWrapper'
 import { CanvasProvider, useCanvas } from '@/contexts/CanvasContext'
@@ -51,6 +52,9 @@ function DashboardContent() {
   const [showMobileMenu, setShowMobileMenu] = useState(false)
   const [showTrialExpiredModal, setShowTrialExpiredModal] = useState(false)
   const searchParams = useSearchParams()
+
+  // Use DEMO-aware wedding date
+  const { weddingDate, isDemoUser } = useWeddingDate(user?.id, currentWedding?.weddingDate || null)
 
   // Check if trial has expired
   const isTrialExpired = subscription &&
@@ -279,8 +283,8 @@ function DashboardContent() {
                 {wedding.brideName} & {wedding.groomName}
               </h2>
               <p className="text-xs text-text-muted">
-                {wedding.weddingDate
-                  ? `${dateUtils.format(wedding.weddingDate, 'dd.MM.yyyy')}`
+                {weddingDate
+                  ? `${dateUtils.format(weddingDate, 'dd.MM.yyyy')}`
                   : 'Klikněte pro nastavení data'
                 }
               </p>
@@ -324,8 +328,8 @@ function DashboardContent() {
                   </h1>
                   <div className="flex items-center gap-4">
                     <p className="body-small text-text-muted">
-                      {wedding.weddingDate
-                        ? `${dateUtils.format(wedding.weddingDate, 'dd. MMMM yyyy')} • Dnes: ${dateUtils.format(new Date(), 'dd. MMMM yyyy')}`
+                      {weddingDate
+                        ? `${dateUtils.format(weddingDate, 'dd. MMMM yyyy')} • Dnes: ${dateUtils.format(new Date(), 'dd. MMMM yyyy')}`
                         : 'Datum zatím nestanoveno - klikněte pro nastavení'
                       }
                     </p>
