@@ -10,6 +10,7 @@ import PaymentsTab from '@/components/admin/PaymentsTab'
 import EmailStatsPanel from '@/components/admin/EmailStatsPanel'
 import EmailTestPanel from '@/components/admin/EmailTestPanel'
 import ReviewModeration from '@/components/admin/ReviewModeration'
+import DemoAccountPanel from '@/components/admin/DemoAccountPanel'
 import {
   Users,
   Clock,
@@ -102,6 +103,9 @@ export default function AdminDashboard() {
 function OverviewTab({ stats }: { stats: any }) {
   return (
     <div className="space-y-6">
+      {/* DEMO Account Management Panel */}
+      <DemoAccountPanel />
+
       {/* Main Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
