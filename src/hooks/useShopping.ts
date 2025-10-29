@@ -128,10 +128,21 @@ export function useShopping() {
     return docRef.id
   }
 
+  // Helper function to remove undefined values
+  const removeUndefined = (obj: any): any => {
+    const cleaned: any = {}
+    Object.keys(obj).forEach(key => {
+      if (obj[key] !== undefined) {
+        cleaned[key] = obj[key]
+      }
+    })
+    return cleaned
+  }
+
   // Update shopping item
   const updateItem = async (id: string, data: Partial<ShoppingFormData>): Promise<void> => {
     const itemRef = doc(db, 'shopping', id)
-    
+
     const updateData: any = {
       ...data,
       updatedAt: Timestamp.now()
@@ -143,7 +154,10 @@ export function useShopping() {
       updateData.purchaseDate = data.status === 'purchased' ? Timestamp.now() : null
     }
 
-    await updateDoc(itemRef, updateData)
+    // Remove undefined values before saving to Firestore
+    const cleanedData = removeUndefined(updateData)
+
+    await updateDoc(itemRef, cleanedData)
   }
 
   // Delete shopping item
