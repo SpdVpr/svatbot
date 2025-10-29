@@ -18,6 +18,7 @@ import {
 import { db } from '@/config/firebase'
 import { useAuth } from './useAuth'
 import { useWedding } from './useWedding'
+import { useDemoLock } from './useDemoLock'
 import {
   Task,
   TaskFormData,
@@ -51,6 +52,7 @@ interface UseTaskReturn {
 export function useTask(): UseTaskReturn {
   const { user } = useAuth()
   const { wedding } = useWedding()
+  const { withDemoCheck } = useDemoLock()
 
   // Initialize with localStorage data if available
   const [tasks, setTasks] = useState<Task[]>(() => {
@@ -137,13 +139,14 @@ export function useTask(): UseTaskReturn {
 
   // Create new task
   const createTask = async (data: TaskFormData): Promise<Task> => {
-    if (!wedding) {
-      throw new Error('Žádná svatba není vybrána')
-    }
+    return withDemoCheck(async () => {
+      if (!wedding) {
+        throw new Error('Žádná svatba není vybrána')
+      }
 
-    try {
-      setError(null)
-      setLoading(true)
+      try {
+        setError(null)
+        setLoading(true)
 
       const taskData: Omit<Task, 'id'> = {
         weddingId: wedding.id,
@@ -211,14 +214,16 @@ export function useTask(): UseTaskReturn {
     } finally {
       setLoading(false)
     }
+    }) as Promise<Task>
   }
 
   // Update task
   const updateTask = async (taskId: string, updates: Partial<Task>): Promise<void> => {
-    if (!wedding) return
+    return withDemoCheck(async () => {
+      if (!wedding) return
 
-    try {
-      setError(null)
+      try {
+        setError(null)
 
       const updatedData = {
         ...updates,
@@ -287,14 +292,16 @@ export function useTask(): UseTaskReturn {
       setError('Chyba při aktualizaci úkolu')
       throw error
     }
+    }) as Promise<void>
   }
 
   // Delete task
   const deleteTask = async (taskId: string): Promise<void> => {
-    if (!wedding) return
+    return withDemoCheck(async () => {
+      if (!wedding) return
 
-    try {
-      setError(null)
+      try {
+        setError(null)
 
       try {
         // Try to delete from Firestore
@@ -317,20 +324,23 @@ export function useTask(): UseTaskReturn {
       setError('Chyba při mazání úkolu')
       throw error
     }
+    }) as Promise<void>
   }
 
   // Toggle task status (pending <-> completed)
   const toggleTaskStatus = async (taskId: string): Promise<void> => {
-    const task = tasks.find(t => t.id === taskId)
-    if (!task) return
+    return withDemoCheck(async () => {
+      const task = tasks.find(t => t.id === taskId)
+      if (!task) return
 
-    const newStatus = task.status === 'completed' ? 'pending' : 'completed'
-    const updates: Partial<Task> = {
-      status: newStatus,
-      completedAt: newStatus === 'completed' ? new Date() : undefined
-    }
+      const newStatus = task.status === 'completed' ? 'pending' : 'completed'
+      const updates: Partial<Task> = {
+        status: newStatus,
+        completedAt: newStatus === 'completed' ? new Date() : undefined
+      }
 
-    await updateTask(taskId, updates)
+      await updateTask(taskId, updates)
+    }) as Promise<void>
   }
 
   // Create task from template
@@ -363,34 +373,36 @@ export function useTask(): UseTaskReturn {
 
   // Bulk operations
   const bulkOperation = async (operation: BulkTaskOperation): Promise<void> => {
-    try {
-      setError(null)
-      setLoading(true)
+    return withDemoCheck(async () => {
+      try {
+        setError(null)
+        setLoading(true)
 
-      for (const taskId of operation.taskIds) {
-        switch (operation.operation) {
-          case 'complete':
-            await toggleTaskStatus(taskId)
-            break
-          case 'delete':
-            await deleteTask(taskId)
-            break
-          case 'update-status':
-          case 'update-category':
-          case 'update-priority':
-            if (operation.data) {
-              await updateTask(taskId, operation.data)
-            }
-            break
+        for (const taskId of operation.taskIds) {
+          switch (operation.operation) {
+            case 'complete':
+              await toggleTaskStatus(taskId)
+              break
+            case 'delete':
+              await deleteTask(taskId)
+              break
+            case 'update-status':
+            case 'update-category':
+            case 'update-priority':
+              if (operation.data) {
+                await updateTask(taskId, operation.data)
+              }
+              break
+          }
         }
+      } catch (error: any) {
+        logger.error('Error in bulk operation:', error)
+        setError('Chyba při hromadné operaci')
+        throw error
+      } finally {
+        setLoading(false)
       }
-    } catch (error: any) {
-      logger.error('Error in bulk operation:', error)
-      setError('Chyba při hromadné operaci')
-      throw error
-    } finally {
-      setLoading(false)
-    }
+    }) as Promise<void>
   }
 
   // Filter tasks
@@ -415,35 +427,37 @@ export function useTask(): UseTaskReturn {
 
   // Initialize tasks from templates
   const initializeTasksFromTemplates = async (): Promise<void> => {
-    if (!wedding) return
+    return withDemoCheck(async () => {
+      if (!wedding) return
 
-    try {
-      setLoading(true)
+      try {
+        setLoading(true)
 
-      // Get wedding date to calculate due dates
-      const weddingDate = wedding.weddingDate
-      if (!weddingDate) return
+        // Get wedding date to calculate due dates
+        const weddingDate = wedding.weddingDate
+        if (!weddingDate) return
 
-      // Create tasks from required templates
-      const requiredTemplates = taskTemplates.filter(t => t.isRequired)
+        // Create tasks from required templates
+        const requiredTemplates = taskTemplates.filter(t => t.isRequired)
 
-      for (const template of requiredTemplates) {
-        // Calculate due date
-        const dueDate = new Date(weddingDate)
-        dueDate.setDate(dueDate.getDate() - (template.recommendedWeeksBefore * 7))
+        for (const template of requiredTemplates) {
+          // Calculate due date
+          const dueDate = new Date(weddingDate)
+          dueDate.setDate(dueDate.getDate() - (template.recommendedWeeksBefore * 7))
 
-        await createFromTemplate({
-          templateId: template.id,
-          weddingId: wedding.id,
-          customDueDate: dueDate
-        })
+          await createFromTemplate({
+            templateId: template.id,
+            weddingId: wedding.id,
+            customDueDate: dueDate
+          })
+        }
+      } catch (error: any) {
+        logger.error('Error initializing tasks:', error)
+        setError('Chyba při vytváření úkolů ze šablon')
+      } finally {
+        setLoading(false)
       }
-    } catch (error: any) {
-      logger.error('Error initializing tasks:', error)
-      setError('Chyba při vytváření úkolů ze šablon')
-    } finally {
-      setLoading(false)
-    }
+    }) as Promise<void>
   }
 
   // Calculate task statistics
