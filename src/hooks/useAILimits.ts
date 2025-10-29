@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from './useAuth'
 import { useWedding } from './useWedding'
 import { useSubscription } from './useSubscription'
+import { useIsDemoUser } from './useDemoSettings'
 import { db } from '@/config/firebase'
 import { doc, getDoc, setDoc, updateDoc, increment, Timestamp } from 'firebase/firestore'
 
@@ -32,7 +33,8 @@ export function useAILimits() {
   const { user } = useAuth()
   const { wedding } = useWedding()
   const { subscription, hasPremiumAccess } = useSubscription()
-  
+  const { isDemoUser, isLocked } = useIsDemoUser(user?.id)
+
   const [limitsInfo, setLimitsInfo] = useState<AILimitsInfo>({
     chatQueriesUsed: 0,
     chatQueriesLimit: 3,
@@ -107,26 +109,45 @@ export function useAILimits() {
         })
       }
 
+      // Check if this is a locked DEMO account
+      if (isDemoUser && isLocked) {
+        // DEMO account has 0 queries available
+        setLimitsInfo({
+          chatQueriesUsed: 0,
+          chatQueriesLimit: 0,
+          chatQueriesRemaining: 0,
+          canUseChat: false,
+          moodboardsUsed: 0,
+          moodboardsLimit: 0,
+          moodboardsRemaining: 0,
+          canUseMoodboard: false,
+          isLoading: false,
+          error: null,
+          lastResetDate: today
+        })
+        return
+      }
+
       // Get limits from subscription
       const plan = subscription?.plan || 'free_trial'
-      const planDetails = await import('@/types/subscription').then(m => 
+      const planDetails = await import('@/types/subscription').then(m =>
         m.SUBSCRIPTION_PLANS.find(p => p.id === plan)
       )
 
-      const chatLimit = hasPremiumAccess 
-        ? 'unlimited' 
+      const chatLimit = hasPremiumAccess
+        ? 'unlimited'
         : (planDetails?.limits.aiChatQueriesPerDay || 3)
-      
-      const moodboardLimit = hasPremiumAccess 
-        ? 'unlimited' 
+
+      const moodboardLimit = hasPremiumAccess
+        ? 'unlimited'
         : (planDetails?.limits.aiMoodboardsPerDay || 1)
 
-      const chatRemaining = chatLimit === 'unlimited' 
-        ? 'unlimited' 
+      const chatRemaining = chatLimit === 'unlimited'
+        ? 'unlimited'
         : Math.max(0, chatLimit - chatUsed)
-      
-      const moodboardRemaining = moodboardLimit === 'unlimited' 
-        ? 'unlimited' 
+
+      const moodboardRemaining = moodboardLimit === 'unlimited'
+        ? 'unlimited'
         : Math.max(0, moodboardLimit - moodboardUsed)
 
       setLimitsInfo({
@@ -151,7 +172,7 @@ export function useAILimits() {
         error: 'Chyba při načítání limitů AI funkcí'
       }))
     }
-  }, [user?.id, wedding?.id, subscription?.plan, hasPremiumAccess])
+  }, [user?.id, wedding?.id, subscription?.plan, hasPremiumAccess, isDemoUser, isLocked])
 
   // Load on mount and when dependencies change
   useEffect(() => {
@@ -214,6 +235,11 @@ export function useAILimits() {
 
   // Get limit message for UI
   const getLimitMessage = (featureType: AIFeatureType): string => {
+    // DEMO account message
+    if (isDemoUser && isLocked) {
+      return 'DEMO účet nemá přístup k AI funkcím. Registrujte se pro 3 dotazy denně zdarma.'
+    }
+
     if (hasPremiumAccess) {
       return 'Neomezené použití s Premium členstvím'
     }
