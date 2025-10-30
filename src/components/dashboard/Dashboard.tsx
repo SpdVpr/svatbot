@@ -293,7 +293,10 @@ function DashboardContent() {
             {/* Subscription info */}
             {subscription?.status === 'trialing' && trialDaysRemaining !== null && (
               <div className="mt-2 px-2">
-                <div className="flex items-center gap-1.5 text-xs">
+                <button
+                  onClick={() => openAccountModal('subscription')}
+                  className="flex items-center gap-1.5 text-xs hover:opacity-80 transition-opacity"
+                >
                   <Clock className="w-3.5 h-3.5 text-amber-600" />
                   <span className={`font-medium ${trialDaysRemaining <= 3 ? 'text-red-600' : 'text-amber-600'}`}>
                     {trialDaysRemaining === 0
@@ -301,7 +304,7 @@ function DashboardContent() {
                       : `Trial vyprší za ${trialDaysRemaining} ${trialDaysRemaining === 1 ? 'den' : trialDaysRemaining <= 4 ? 'dny' : 'dní'}`
                     }
                   </span>
-                </div>
+                </button>
               </div>
             )}
           </div>
@@ -326,28 +329,29 @@ function DashboardContent() {
                     Svatba {wedding.brideName} & {wedding.groomName}
                     <Edit className="w-4 h-4 inline ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </h1>
-                  <div className="flex items-center gap-4">
-                    <p className="body-small text-text-muted">
-                      {weddingDate
-                        ? `${dateUtils.format(weddingDate, 'dd. MMMM yyyy')} • Dnes: ${dateUtils.format(new Date(), 'dd. MMMM yyyy')}`
-                        : 'Datum zatím nestanoveno - klikněte pro nastavení'
-                      }
-                    </p>
-
-                    {/* Subscription info */}
-                    {subscription?.status === 'trialing' && trialDaysRemaining !== null && (
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="w-4 h-4 text-amber-600" />
-                        <span className={`text-sm font-medium ${trialDaysRemaining <= 3 ? 'text-red-600' : 'text-amber-600'}`}>
-                          {trialDaysRemaining === 0
-                            ? 'Trial vyprší dnes!'
-                            : `Trial vyprší za ${trialDaysRemaining} ${trialDaysRemaining === 1 ? 'den' : trialDaysRemaining <= 4 ? 'dny' : 'dní'}`
-                          }
-                        </span>
-                      </div>
-                    )}
-                  </div>
+                  <p className="body-small text-text-muted">
+                    {weddingDate
+                      ? `${dateUtils.format(weddingDate, 'dd. MMMM yyyy')} • Dnes: ${dateUtils.format(new Date(), 'dd. MMMM yyyy')}`
+                      : 'Datum zatím nestanoveno - klikněte pro nastavení'
+                    }
+                  </p>
                 </button>
+
+                {/* Subscription info - outside button to avoid nesting */}
+                {subscription?.status === 'trialing' && trialDaysRemaining !== null && (
+                  <button
+                    onClick={() => openAccountModal('subscription')}
+                    className="flex items-center gap-1.5 hover:opacity-80 transition-opacity mt-1"
+                  >
+                    <Clock className="w-4 h-4 text-amber-600" />
+                    <span className={`text-sm font-medium ${trialDaysRemaining <= 3 ? 'text-red-600' : 'text-amber-600'}`}>
+                      {trialDaysRemaining === 0
+                        ? 'Trial vyprší dnes!'
+                        : `Trial vyprší za ${trialDaysRemaining} ${trialDaysRemaining === 1 ? 'den' : trialDaysRemaining <= 4 ? 'dny' : 'dní'}`
+                      }
+                    </span>
+                  </button>
+                )}
               </div>
             </div>
 

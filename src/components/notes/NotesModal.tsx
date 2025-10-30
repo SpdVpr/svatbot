@@ -1,8 +1,9 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { X, Save, StickyNote, Palette } from 'lucide-react'
+import { X, Save, StickyNote, Palette, Lock } from 'lucide-react'
 import { useNotes } from '@/hooks/useNotes'
+import { useDemoLock } from '@/hooks/useDemoLock'
 import { getViewTransitionName } from '@/hooks/useViewTransition'
 
 interface NotesModalProps {
@@ -21,6 +22,7 @@ const COLORS = [
 
 export default function NotesModal({ isOpen, onClose }: NotesModalProps) {
   const { notes, loading, createNote, updateNote } = useNotes()
+  const { isLocked } = useDemoLock()
   const [content, setContent] = useState('')
   const [selectedColor, setSelectedColor] = useState<'yellow' | 'blue' | 'green' | 'pink' | 'purple' | 'orange'>('yellow')
   const [isSaving, setIsSaving] = useState(false)
@@ -39,7 +41,7 @@ export default function NotesModal({ isOpen, onClose }: NotesModalProps) {
   }, [isOpen, notes, loading])
 
   const handleSave = async () => {
-    if (isSaving) return
+    if (isSaving || isLocked) return
 
     setIsSaving(true)
     try {
@@ -67,6 +69,8 @@ export default function NotesModal({ isOpen, onClose }: NotesModalProps) {
   }
 
   const handleColorChange = (color: typeof selectedColor) => {
+    if (isLocked) return
+
     setSelectedColor(color)
     // Auto-save color change if note exists
     if (notes.length > 0) {
@@ -119,8 +123,9 @@ export default function NotesModal({ isOpen, onClose }: NotesModalProps) {
                 <button
                   key={color.name}
                   onClick={() => handleColorChange(color.name)}
-                  className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 ${selectedColor === color.name ? 'border-gray-400' : 'border-gray-200'} ${color.bg}`}
-                  title={color.name}
+                  disabled={Boolean(isLocked)}
+                  className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 ${selectedColor === color.name ? 'border-gray-400' : 'border-gray-200'} ${color.bg} disabled:opacity-50 disabled:cursor-not-allowed`}
+                  title={isLocked ? 'Zamčeno' : color.name}
                 />
               ))}
             </div>
@@ -134,19 +139,33 @@ export default function NotesModal({ isOpen, onClose }: NotesModalProps) {
         </div>
 
         {/* Content */}
-        <div className={`flex-1 p-3 sm:p-4 ${colorConfig.bg}`}>
+        <div className={`flex-1 p-3 sm:p-4 ${colorConfig.bg} relative`}>
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-sm sm:text-base text-gray-500">Načítání...</div>
             </div>
           ) : (
-            <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Začněte psát své poznámky..."
-              className={`w-full h-full resize-none border-none outline-none bg-transparent ${colorConfig.text} placeholder-gray-500 text-xs sm:text-sm leading-relaxed`}
-              style={{ fontFamily: 'inherit' }}
-            />
+            <>
+              <textarea
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder={isLocked ? "Demo účet je zamčený - poznámky nelze upravovat" : "Začněte psát své poznámky..."}
+                disabled={Boolean(isLocked)}
+                className={`w-full h-full resize-none border-none outline-none bg-transparent ${colorConfig.text} placeholder-gray-500 text-xs sm:text-sm leading-relaxed disabled:cursor-not-allowed disabled:opacity-60`}
+                style={{ fontFamily: 'inherit' }}
+              />
+              {isLocked && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-5 pointer-events-none">
+                  <div className="bg-white rounded-lg shadow-lg p-4 flex items-center gap-3 pointer-events-auto">
+                    <Lock className="w-5 h-5 text-yellow-600" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">Demo účet je zamčený</p>
+                      <p className="text-xs text-gray-600">Poznámky nelze upravovat</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
 
@@ -157,11 +176,20 @@ export default function NotesModal({ isOpen, onClose }: NotesModalProps) {
           </div>
           <button
             onClick={handleSave}
-            disabled={isSaving}
-            className="px-3 py-1.5 sm:px-4 sm:py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 flex items-center space-x-2 text-xs sm:text-sm"
+            disabled={Boolean(isSaving || isLocked)}
+            className="px-3 py-1.5 sm:px-4 sm:py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 text-xs sm:text-sm"
           >
-            <Save className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span>{isSaving ? 'Ukládání...' : 'Uložit'}</span>
+            {isLocked ? (
+              <>
+                <Lock className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span>Zamčeno</span>
+              </>
+            ) : (
+              <>
+                <Save className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span>{isSaving ? 'Ukládání...' : 'Uložit'}</span>
+              </>
+            )}
           </button>
         </div>
       </div>
