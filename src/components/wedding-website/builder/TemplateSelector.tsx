@@ -9,6 +9,7 @@ import Link from 'next/link'
 interface TemplateSelectorProps {
   selectedTemplate: TemplateType | null
   onSelect: (template: TemplateType) => void
+  disabled?: boolean
 }
 
 // Konfigurace šablon
@@ -150,7 +151,7 @@ const TEMPLATES: TemplateConfig[] = [
   },
 ]
 
-export default function TemplateSelector({ selectedTemplate, onSelect }: TemplateSelectorProps) {
+export default function TemplateSelector({ selectedTemplate, onSelect, disabled = false }: TemplateSelectorProps) {
   const [hoveredTemplate, setHoveredTemplate] = useState<TemplateType | null>(null)
   const { subscription, hasPremiumAccess } = useSubscription()
 
@@ -162,6 +163,7 @@ export default function TemplateSelector({ selectedTemplate, onSelect }: Templat
   const FREE_TEMPLATES = ['classic-elegance', 'modern-minimalist']
 
   const isTemplateLocked = (templateId: string) => {
+    if (disabled) return true // Lock all templates if disabled
     if (canAccessAllTemplates) return false
     return !FREE_TEMPLATES.includes(templateId)
   }

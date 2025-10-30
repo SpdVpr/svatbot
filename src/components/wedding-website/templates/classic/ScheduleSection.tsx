@@ -66,37 +66,37 @@ export default function ScheduleSection({ content }: ScheduleSectionProps) {
 
         {/* Timeline */}
         <div className="relative">
-          {/* Vertical line */}
-          <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-amber-400 to-rose-400"></div>
+          {/* Vertical line - hide on mobile */}
+          <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-amber-400 to-rose-400 hidden sm:block"></div>
 
           {/* Schedule items */}
           <div className="space-y-8">
             {scheduleItems.map((item, index) => (
               <div key={index} className="relative flex items-start">
-                {/* Time circle */}
-                <div className="flex-shrink-0 w-16 h-16 bg-white border-4 border-amber-400 rounded-full flex items-center justify-center shadow-lg z-10">
+                {/* Time circle - hide on mobile */}
+                <div className="hidden sm:flex flex-shrink-0 w-16 h-16 bg-white border-4 border-amber-400 rounded-full items-center justify-center shadow-lg z-10">
                   <Clock className="w-6 h-6 text-amber-600" />
                 </div>
 
                 {/* Content */}
-                <div className="ml-8 bg-white rounded-xl p-6 shadow-lg border border-gray-100 flex-1">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-2xl">{item.icon}</span>
-                        <h3 className="text-xl font-bold text-gray-900 font-serif">
+                <div className="sm:ml-8 bg-white rounded-xl p-4 sm:p-6 shadow-lg border border-gray-100 flex-1 w-full overflow-hidden">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-3 mb-2 flex-wrap">
+                        <span className="text-2xl flex-shrink-0">{item.icon}</span>
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 font-serif break-words">
                           {item.title}
                         </h3>
                       </div>
-                      
-                      <p className="text-gray-600 mb-2">
+
+                      <p className="text-gray-600 mb-2 text-sm sm:text-base break-words">
                         {item.description}
                       </p>
                     </div>
 
-                    <div className="text-right ml-4">
-                      <div className="bg-gradient-to-r from-amber-100 to-rose-100 px-4 py-2 rounded-full">
-                        <span className="font-bold text-gray-900">
+                    <div className="flex-shrink-0">
+                      <div className="bg-gradient-to-r from-amber-100 to-rose-100 px-3 sm:px-4 py-2 rounded-full inline-block">
+                        <span className="font-bold text-gray-900 text-sm sm:text-base whitespace-nowrap">
                           {item.time}
                         </span>
                       </div>

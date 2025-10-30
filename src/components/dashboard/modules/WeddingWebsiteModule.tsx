@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Globe, Plus, Edit, Eye, BarChart3, ExternalLink, Loader2, Settings, ArrowRight } from 'lucide-react'
+import { Globe, Plus, Edit, Eye, BarChart3, ExternalLink, Loader2, Settings, ArrowRight, QrCode } from 'lucide-react'
 import Link from 'next/link'
 import { useWeddingWebsite } from '@/hooks/useWeddingWebsite'
+import WeddingWebsiteQRCode from '@/components/wedding-website/WeddingWebsiteQRCode'
 
 interface WeddingWebsiteModuleProps {
   onResize?: (width: number, height: number) => void
@@ -12,6 +13,7 @@ interface WeddingWebsiteModuleProps {
 export default function WeddingWebsiteModule({ onResize }: WeddingWebsiteModuleProps) {
   const { website, loading, error } = useWeddingWebsite()
   const [mounted, setMounted] = useState(false)
+  const [showQR, setShowQR] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -177,6 +179,34 @@ export default function WeddingWebsiteModule({ onResize }: WeddingWebsiteModuleP
           </a>
         )}
       </div>
+
+      {/* QR Code Section */}
+      {website.isPublished && (
+        <div className="mb-4 pb-4 border-b border-gray-200">
+          <button
+            onClick={() => setShowQR(!showQR)}
+            className="w-full flex items-center justify-between text-sm text-gray-700 hover:text-gray-900 transition-colors mb-3"
+          >
+            <span className="flex items-center gap-2">
+              <QrCode className="w-4 h-4" />
+              <span className="font-medium">QR kód webu</span>
+            </span>
+            <span className="text-xs text-gray-500">
+              {showQR ? 'Skrýt' : 'Zobrazit'}
+            </span>
+          </button>
+
+          {showQR && (
+            <div className="flex justify-center py-2">
+              <WeddingWebsiteQRCode
+                url={websiteUrl}
+                size={150}
+                showDownload={true}
+              />
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Quick link to full management */}
       <div className="mt-4 pt-4 border-t border-gray-200">

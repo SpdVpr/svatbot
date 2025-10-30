@@ -6,6 +6,42 @@ import type { WeddingWebsite } from '@/types/wedding-website'
 import ClassicEleganceTemplate from '@/components/wedding-website/templates/ClassicEleganceTemplate'
 import ModernMinimalistTemplate from '@/components/wedding-website/templates/ModernMinimalistTemplate'
 import RomanticBohoTemplate from '@/components/wedding-website/templates/RomanticBohoTemplate'
+import WeddingWebsiteAnalytics from '@/components/wedding-website/WeddingWebsiteAnalytics'
+
+// Helper function to recursively convert Firestore Timestamps to ISO strings
+function serializeTimestamps(obj: any): any {
+  if (obj === null || obj === undefined) {
+    return obj
+  }
+
+  // Check if it's a Firestore Timestamp
+  if (obj?.toDate && typeof obj.toDate === 'function') {
+    try {
+      return obj.toDate().toISOString()
+    } catch {
+      return obj
+    }
+  }
+
+  // Handle arrays
+  if (Array.isArray(obj)) {
+    return obj.map(item => serializeTimestamps(item))
+  }
+
+  // Handle objects
+  if (typeof obj === 'object') {
+    const serialized: any = {}
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        serialized[key] = serializeTimestamps(obj[key])
+      }
+    }
+    return serialized
+  }
+
+  // Return primitive values as-is
+  return obj
+}
 
 // Disable static generation and caching for this page
 export const dynamic = 'force-dynamic'
@@ -49,17 +85,22 @@ async function getWeddingWebsite(customUrl: string): Promise<WeddingWebsite | nu
     const websiteSnap = await getDoc(websiteRef)
 
     if (websiteSnap.exists()) {
-      const websiteData = websiteSnap.data() as WeddingWebsite
+      const websiteData = websiteSnap.data() as any
 
       // Check if website is published
       if (!websiteData.isPublished) {
         return null
       }
 
-      return {
-        ...websiteData,
-        id: websiteSnap.id
+      // Recursively convert all Firestore Timestamps to ISO strings for client components
+      const serializedData = serializeTimestamps(websiteData)
+
+      const serializedWebsite: WeddingWebsite = {
+        ...serializedData,
+        id: websiteSnap.id,
       }
+
+      return serializedWebsite
     }
 
     return null
@@ -134,6 +175,14 @@ export default async function WeddingWebsitePage({ params }: PageProps) {
     }
   }
 
-  return renderTemplate()
+  return (
+    <>
+      {/* Track analytics */}
+      <WeddingWebsiteAnalytics websiteId={website.id} />
+
+      {/* Render template */}
+      {renderTemplate()}
+    </>
+  )
 }
 

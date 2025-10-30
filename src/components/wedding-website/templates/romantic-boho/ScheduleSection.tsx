@@ -66,18 +66,18 @@ export default function ScheduleSection({ content }: ScheduleSectionProps) {
                   </div>
 
                   {/* Content card - mobile */}
-                  <div className="md:hidden flex-1 ml-6">
-                    <div className="bg-white rounded-2xl p-6 shadow-xl border-2 border-rose-100 hover:border-rose-300 transition-all duration-300">
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="bg-gradient-to-br from-rose-100 to-pink-100 rounded-full p-2">
+                  <div className="md:hidden flex-1 ml-6 min-w-0">
+                    <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-xl border-2 border-rose-100 hover:border-rose-300 transition-all duration-300">
+                      <div className="flex items-center gap-3 mb-3 flex-wrap">
+                        <div className="bg-gradient-to-br from-rose-100 to-pink-100 rounded-full p-2 flex-shrink-0">
                           <Icon className="w-5 h-5 text-rose-600" />
                         </div>
-                        <h3 className="text-xl font-bold text-gray-800" style={{ fontFamily: 'Playfair Display, serif' }}>
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-800 break-words" style={{ fontFamily: 'Playfair Display, serif' }}>
                           {item.title}
                         </h3>
                       </div>
                       {item.description && (
-                        <p className="text-gray-600 leading-relaxed">{item.description}</p>
+                        <p className="text-gray-600 leading-relaxed text-sm sm:text-base break-words">{item.description}</p>
                       )}
                     </div>
                   </div>

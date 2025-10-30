@@ -22,6 +22,7 @@ interface ContentEditorProps {
   onContentChange: (content: WebsiteContent) => void
   onSave?: () => Promise<void>
   onExpandedChange?: (expanded: boolean) => void
+  disabled?: boolean
 }
 
 interface Section {
@@ -33,7 +34,7 @@ interface Section {
   enabled: boolean
 }
 
-export default function ContentEditor({ content, onContentChange, onSave, onExpandedChange }: ContentEditorProps) {
+export default function ContentEditor({ content, onContentChange, onSave, onExpandedChange, disabled = false }: ContentEditorProps) {
   const [expandedSection, setExpandedSection] = useState<SectionType | null>(null)
   const [isSaving, setIsSaving] = useState(false)
 
@@ -170,6 +171,8 @@ export default function ContentEditor({ content, onContentChange, onSave, onExpa
   }
 
   const toggleSectionEnabled = (sectionId: SectionType, enabled: boolean) => {
+    if (disabled) return
+
     const updatedContent = { ...content }
 
     switch (sectionId) {
@@ -212,12 +215,14 @@ export default function ContentEditor({ content, onContentChange, onSave, onExpa
   }
 
   const updateSectionContent = (sectionId: SectionType, sectionContent: any) => {
+    if (disabled) return
     const updatedContent = { ...content }
     updatedContent[sectionId] = sectionContent
     onContentChange(updatedContent)
   }
 
   const handleSectionOrderChange = (newOrder: SectionType[]) => {
+    if (disabled) return
     onContentChange({
       ...content,
       sectionOrder: newOrder
@@ -225,6 +230,8 @@ export default function ContentEditor({ content, onContentChange, onSave, onExpa
   }
 
   const handleSaveSection = async () => {
+    if (disabled) return
+
     if (onSave) {
       setIsSaving(true)
       try {
@@ -485,13 +492,14 @@ export default function ContentEditor({ content, onContentChange, onSave, onExpa
                 const section = sections.find(s => s.id === expandedSection)
                 if (!section || section.required) return null
                 return (
-                  <label className="flex items-center gap-3 bg-white/20 px-4 py-2 rounded-lg cursor-pointer hover:bg-white/30 transition-colors">
+                  <label className={`flex items-center gap-3 bg-white/20 px-4 py-2 rounded-lg transition-colors ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-white/30'}`}>
                     <span className="text-sm font-medium text-white">Zobrazit na webu</span>
                     <input
                       type="checkbox"
                       checked={section.enabled}
                       onChange={(e) => toggleSectionEnabled(section.id, e.target.checked)}
-                      className="w-5 h-5 rounded border-white text-pink-600 focus:ring-pink-500 focus:ring-offset-0"
+                      disabled={disabled}
+                      className="w-5 h-5 rounded border-white text-pink-600 focus:ring-pink-500 focus:ring-offset-0 disabled:cursor-not-allowed"
                     />
                   </label>
                 )
@@ -515,7 +523,7 @@ export default function ContentEditor({ content, onContentChange, onSave, onExpa
                   <div className="border-t border-gray-200 p-6 bg-gray-50 flex justify-end">
                     <button
                       onClick={handleSaveSection}
-                      disabled={isSaving}
+                      disabled={isSaving || disabled}
                       className="inline-flex items-center gap-2 bg-pink-500 text-white px-6 py-3 rounded-lg hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Save className="w-5 h-5" />

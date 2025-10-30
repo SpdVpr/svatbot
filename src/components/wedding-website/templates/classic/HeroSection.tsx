@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { Calendar, Heart } from 'lucide-react'
 import type { HeroContent } from '@/types/wedding-website'
 import { Timestamp } from 'firebase/firestore'
@@ -56,6 +57,25 @@ interface HeroSectionProps {
 export default function HeroSection({ content }: HeroSectionProps) {
   const { bride, groom, weddingDate, tagline, mainImage } = content
 
+  // Generate random positions only on client side to avoid hydration mismatch
+  const [heartPositions, setHeartPositions] = useState<Array<{
+    left: number
+    top: number
+    delay: number
+    duration: number
+  }>>([])
+
+  useEffect(() => {
+    // Generate positions only once on mount
+    setHeartPositions(
+      [...Array(6)].map((_, i) => ({
+        left: Math.random() * 100,
+        top: Math.random() * 100,
+        delay: i * 0.5,
+        duration: 3 + Math.random() * 2
+      }))
+    )
+  }, [])
 
 
   return (
@@ -184,17 +204,17 @@ export default function HeroSection({ content }: HeroSectionProps) {
 
       {/* Floating hearts animation */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[...Array(6)].map((_, i) => (
+        {heartPositions.map((pos, i) => (
           <Heart
             key={i}
             className={`absolute w-4 h-4 opacity-20 animate-pulse ${
               mainImage ? 'text-white' : 'text-rose-300'
             }`}
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${i * 0.5}s`,
-              animationDuration: `${3 + Math.random() * 2}s`
+              left: `${pos.left}%`,
+              top: `${pos.top}%`,
+              animationDelay: `${pos.delay}s`,
+              animationDuration: `${pos.duration}s`
             }}
           />
         ))}

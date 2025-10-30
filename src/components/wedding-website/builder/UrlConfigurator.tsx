@@ -9,9 +9,10 @@ import { useWeddingStore } from '@/stores/weddingStore'
 interface UrlConfiguratorProps {
   customUrl: string
   onUrlChange: (url: string) => void
+  disabled?: boolean
 }
 
-export default function UrlConfigurator({ customUrl, onUrlChange }: UrlConfiguratorProps) {
+export default function UrlConfigurator({ customUrl, onUrlChange, disabled = false }: UrlConfiguratorProps) {
   const { currentWedding: wedding } = useWeddingStore()
   const { checkUrlAvailability } = useWeddingWebsite()
   
@@ -70,6 +71,7 @@ export default function UrlConfigurator({ customUrl, onUrlChange }: UrlConfigura
   }, [inputValue, checkUrlAvailability])
 
   const handleInputChange = (value: string) => {
+    if (disabled) return
     const normalized = normalizeCustomUrl(value)
     setInputValue(normalized)
     if (isAvailable) {
@@ -78,6 +80,7 @@ export default function UrlConfigurator({ customUrl, onUrlChange }: UrlConfigura
   }
 
   const handleSuggestionClick = (suggestion: string) => {
+    if (disabled) return
     setInputValue(suggestion)
     onUrlChange(suggestion)
   }
@@ -115,7 +118,8 @@ export default function UrlConfigurator({ customUrl, onUrlChange }: UrlConfigura
             value={inputValue}
             onChange={(e) => handleInputChange(e.target.value)}
             placeholder="jana-petr"
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+            disabled={disabled}
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
           />
           <span className="text-gray-500">.svatbot.cz</span>
 
@@ -224,11 +228,12 @@ export default function UrlConfigurator({ customUrl, onUrlChange }: UrlConfigura
               <button
                 key={index}
                 onClick={() => handleSuggestionClick(suggestion)}
+                disabled={disabled}
                 className={`p-3 rounded-lg border-2 text-left transition-all ${
                   inputValue === suggestion
                     ? 'border-pink-500 bg-pink-50'
                     : 'border-gray-200 bg-white hover:border-pink-300'
-                }`}
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-sm text-gray-900">

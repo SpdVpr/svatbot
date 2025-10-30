@@ -33,11 +33,12 @@ export default function RSVPManagementPage() {
     }
 
     // Load RSVPs from Firestore
+    // Note: We don't use orderBy here to avoid requiring a composite index
+    // Instead, we sort the data on the client side
     const rsvpsQuery = query(
       collection(db, 'weddingWebsiteRSVPs'),
       where('websiteId', '==', website.id),
-      where('weddingId', '==', wedding.id),
-      orderBy('submittedAt', 'desc')
+      where('weddingId', '==', wedding.id)
     )
 
     const unsubscribe = onSnapshot(
@@ -48,11 +49,19 @@ export default function RSVPManagementPage() {
           return {
             id: doc.id,
             ...data,
-            submittedAt: data.submittedAt instanceof Timestamp 
-              ? data.submittedAt.toDate() 
+            submittedAt: data.submittedAt instanceof Timestamp
+              ? data.submittedAt.toDate()
               : new Date(data.submittedAt)
           } as RSVP
         })
+
+        // Sort by submittedAt descending (newest first) on the client side
+        rsvpData.sort((a, b) => {
+          const dateA = a.submittedAt instanceof Date ? a.submittedAt.getTime() : 0
+          const dateB = b.submittedAt instanceof Date ? b.submittedAt.getTime() : 0
+          return dateB - dateA
+        })
+
         setRsvps(rsvpData)
         setLoading(false)
       },

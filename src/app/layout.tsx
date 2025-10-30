@@ -7,6 +7,7 @@ import CookieBanner from '@/components/common/CookieBanner'
 import AffiliateTracker from '@/components/affiliate/AffiliateTracker'
 import GlobalFeedbackButton from '@/components/common/GlobalFeedbackButton'
 import UserTrackingWrapper from '@/components/common/UserTrackingWrapper'
+import DemoLockBanner from '@/components/common/DemoLockBanner'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -290,6 +291,11 @@ export default function RootLayout({
         'selection:bg-primary-200 selection:text-primary-800'
       )}>
         <UserTrackingWrapper>
+          {/* Demo Lock Banner - Shows when demo account is locked */}
+          <Suspense fallback={null}>
+            <DemoLockBanner />
+          </Suspense>
+
           <div id="root" className="relative">
             {children}
           </div>

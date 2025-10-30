@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/stores/authStore'
 import { useWeddingStore } from '@/stores/weddingStore'
 import { useWeddingWebsite } from '@/hooks/useWeddingWebsite'
+import { useDemoLock } from '@/hooks/useDemoLock'
 import { ArrowLeft, ArrowRight, Save, Eye, Rocket, Home, ExternalLink } from 'lucide-react'
 import TemplateSelector from '@/components/wedding-website/builder/TemplateSelector'
 import UrlConfigurator from '@/components/wedding-website/builder/UrlConfigurator'
@@ -22,6 +23,7 @@ export default function WeddingWebsiteBuilderPage() {
   const { user } = useAuthStore()
   const { currentWedding: wedding } = useWeddingStore()
   const { website, createWebsite, updateWebsite, publishWebsite, loading } = useWeddingWebsite()
+  const { withDemoCheck, canMakeChanges, isLocked } = useDemoLock()
 
   const [currentStep, setCurrentStep] = useState<Step>('url')
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateType | null>(
@@ -107,14 +109,20 @@ export default function WeddingWebsiteBuilderPage() {
       setIsSaving(true)
       try {
         // Vytvoříme základní web s URL a výchozí šablonou
-        await createWebsite({
-          customUrl,
-          template: 'classic-elegance', // Výchozí šablona
-          content,
+        await withDemoCheck(async () => {
+          await createWebsite({
+            customUrl,
+            template: 'classic-elegance', // Výchozí šablona
+            content,
+          })
         })
         // Po vytvoření přejdeme na výběr šablony
         setCurrentStep('template')
       } catch (error) {
+        if (error instanceof Error && error.message === 'DEMO_LOCKED') {
+          // Demo locked - don't show error
+          return
+        }
         console.error('Error creating website:', error)
       } finally {
         setIsSaving(false)
@@ -126,12 +134,18 @@ export default function WeddingWebsiteBuilderPage() {
     if (website && selectedTemplate && customUrl) {
       setIsSaving(true)
       try {
-        await updateWebsite({
-          template: selectedTemplate,
-          customUrl,
-          content,
+        await withDemoCheck(async () => {
+          await updateWebsite({
+            template: selectedTemplate,
+            customUrl,
+            content,
+          })
         })
       } catch (error) {
+        if (error instanceof Error && error.message === 'DEMO_LOCKED') {
+          // Demo locked - don't show error
+          return
+        }
         console.error('Error saving before next step:', error)
       } finally {
         setIsSaving(false)
@@ -162,22 +176,28 @@ export default function WeddingWebsiteBuilderPage() {
 
     setIsSaving(true)
     try {
-      if (!website) {
-        // Vytvoření nového webu
-        await createWebsite({
-          customUrl,
-          template: selectedTemplate,
-          content,
-        })
-      } else {
-        // Aktualizace existujícího webu
-        await updateWebsite({
-          template: selectedTemplate,
-          customUrl,
-          content,
-        })
-      }
+      await withDemoCheck(async () => {
+        if (!website) {
+          // Vytvoření nového webu
+          await createWebsite({
+            customUrl,
+            template: selectedTemplate,
+            content,
+          })
+        } else {
+          // Aktualizace existujícího webu
+          await updateWebsite({
+            template: selectedTemplate,
+            customUrl,
+            content,
+          })
+        }
+      })
     } catch (error) {
+      if (error instanceof Error && error.message === 'DEMO_LOCKED') {
+        // Demo locked - alert already shown
+        return
+      }
       console.error('Error saving website:', error)
     } finally {
       setIsSaving(false)
@@ -193,13 +213,20 @@ export default function WeddingWebsiteBuilderPage() {
       setIsSaving(true)
       try {
         console.log('💾 Saving template change:', template)
-        await updateWebsite({
-          template,
-          customUrl,
-          content,
+        await withDemoCheck(async () => {
+          await updateWebsite({
+            template,
+            customUrl,
+            content,
+          })
         })
         console.log('✅ Template saved successfully')
       } catch (error) {
+        if (error instanceof Error && error.message === 'DEMO_LOCKED') {
+          // Demo locked - alert already shown, revert template selection
+          setSelectedTemplate(website.template)
+          return
+        }
         console.error('❌ Error updating template:', error)
         alert('Chyba při ukládání šablony. Zkuste to prosím znovu.')
       } finally {
@@ -220,11 +247,17 @@ export default function WeddingWebsiteBuilderPage() {
     setIsPublishing(true)
     try {
       console.log('📞 Calling publishWebsite hook...')
-      await publishWebsite()
+      await withDemoCheck(async () => {
+        await publishWebsite()
+      })
       console.log('✅ Website published successfully!')
       // Přejdi na preview krok po publikování
       setCurrentStep('preview')
     } catch (error) {
+      if (error instanceof Error && error.message === 'DEMO_LOCKED') {
+        // Demo locked - alert already shown
+        return
+      }
       console.error('❌ Error publishing website:', error)
     } finally {
       setIsPublishing(false)
@@ -270,7 +303,7 @@ export default function WeddingWebsiteBuilderPage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={handleSave}
-                disabled={isSaving || !selectedTemplate || !customUrl}
+                disabled={Boolean(isSaving || !selectedTemplate || !customUrl.trim() || isLocked)}
                 className="inline-flex items-center gap-2 bg-white text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save className="w-4 h-4" />
@@ -280,7 +313,7 @@ export default function WeddingWebsiteBuilderPage() {
               {website && !website.isPublished && (
                 <button
                   onClick={handlePublish}
-                  disabled={isPublishing}
+                  disabled={Boolean(isPublishing || isLocked)}
                   className="inline-flex items-center gap-2 bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Rocket className="w-4 h-4" />
@@ -300,7 +333,7 @@ export default function WeddingWebsiteBuilderPage() {
                 <div key={step.id} className="flex items-center">
                   <button
                     onClick={() => isClickable && setCurrentStep(step.id)}
-                    disabled={!isClickable}
+                    disabled={Boolean(!isClickable)}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                       currentStep === step.id
                         ? 'bg-pink-100 text-pink-700'
@@ -340,6 +373,7 @@ export default function WeddingWebsiteBuilderPage() {
           <UrlConfigurator
             customUrl={customUrl}
             onUrlChange={setCustomUrl}
+            disabled={Boolean(isLocked)}
           />
         )}
 
@@ -366,6 +400,7 @@ export default function WeddingWebsiteBuilderPage() {
             <TemplateSelector
               selectedTemplate={selectedTemplate}
               onSelect={handleTemplateChange}
+              disabled={Boolean(isLocked)}
             />
           </div>
         )}
@@ -376,6 +411,7 @@ export default function WeddingWebsiteBuilderPage() {
             onContentChange={setContent}
             onSave={handleSave}
             onExpandedChange={setIsSectionExpanded}
+            disabled={Boolean(isLocked)}
           />
         )}
 
@@ -513,7 +549,7 @@ export default function WeddingWebsiteBuilderPage() {
           <div className="flex items-center justify-between mt-8">
             <button
               onClick={handlePrevious}
-              disabled={currentStepIndex === 0}
+              disabled={Boolean(currentStepIndex === 0)}
               className="inline-flex items-center gap-2 bg-white text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -525,7 +561,7 @@ export default function WeddingWebsiteBuilderPage() {
                 {!website?.isPublished && (
                   <button
                     onClick={handlePublish}
-                    disabled={isPublishing || !canGoNext()}
+                    disabled={Boolean(isPublishing || !canGoNext() || isLocked)}
                     className="inline-flex items-center gap-2 bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Rocket className="w-5 h-5" />
@@ -543,7 +579,7 @@ export default function WeddingWebsiteBuilderPage() {
             ) : (
               <button
                 onClick={handleNext}
-                disabled={!canGoNext() || isSaving}
+                disabled={Boolean(!canGoNext() || isSaving || isLocked)}
                 className="inline-flex items-center gap-2 bg-pink-500 text-white px-6 py-3 rounded-lg hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {currentStep === 'url' && !website ? (
