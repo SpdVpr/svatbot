@@ -347,9 +347,10 @@ export function useOnboarding() {
 
   // Get progress percentage
   const getProgress = useCallback((): number => {
-    if (steps.length === 0) return 0
-    return Math.round((onboardingState.completedSteps.length / steps.length) * 100)
-  }, [steps.length, onboardingState.completedSteps.length])
+    const totalSteps = ONBOARDING_STEPS.length
+    if (totalSteps === 0) return 0
+    return Math.round((onboardingState.completedSteps.length / totalSteps) * 100)
+  }, [onboardingState.completedSteps.length])
 
   return {
     onboardingState,
