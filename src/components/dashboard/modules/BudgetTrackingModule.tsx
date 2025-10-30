@@ -20,9 +20,9 @@ export default function BudgetTrackingModule() {
 
       <div className="space-y-4">
         {/* Budget Overview */}
-        <div className="bg-green-50 p-4 rounded-lg glass-morphism">
+        <div className="bg-primary-50 p-4 rounded-lg glass-morphism">
           <div className="text-center mb-3">
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-primary-600">
               <NumberCounter
                 end={Math.round(stats.totalBudget / 1000)}
                 duration={2000}
@@ -30,20 +30,20 @@ export default function BudgetTrackingModule() {
                 className="inline-block"
               />
             </div>
-            <div className="text-sm text-green-700">Celkový rozpočet</div>
+            <div className="text-sm text-primary-700">Celkový rozpočet</div>
           </div>
 
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm text-green-700">Využito</span>
-            <span className="text-sm font-semibold text-green-900">
+            <span className="text-sm text-primary-700">Využito</span>
+            <span className="text-sm font-semibold text-primary-900">
               <NumberCounter end={stats.budgetUsed} duration={1500} suffix="%" />
             </span>
           </div>
-          <div className="w-full bg-green-200 rounded-full h-2">
+          <div className="w-full bg-primary-200 rounded-full h-2">
             <div
               className={`h-2 rounded-full transition-all duration-300 ${
                 stats.budgetUsed > 90 ? 'bg-red-500' :
-                stats.budgetUsed > 75 ? 'bg-yellow-500' : 'bg-green-500'
+                stats.budgetUsed > 75 ? 'bg-yellow-500' : 'bg-primary-500'
               }`}
               style={{ width: `${Math.min(stats.budgetUsed, 100)}%` }}
             />

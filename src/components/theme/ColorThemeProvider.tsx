@@ -88,6 +88,8 @@ export default function ColorThemeProvider({ children }: { children: React.React
     // Apply all CSS variables for primary colors
     root.style.setProperty('--color-primary', colors.primary)
     root.style.setProperty('--color-primary-light', colors.primaryLight)
+    root.style.setProperty('--color-primary-50', colors.primaryLight) // Add explicit 50 shade
+    root.style.setProperty('--color-primary-100', colors.primaryLight) // Add explicit 100 shade
     root.style.setProperty('--color-primary-dark', colors.primaryDark)
     root.style.setProperty('--color-primary-200', colors.primary200)
     root.style.setProperty('--color-primary-300', colors.primary300)
@@ -100,6 +102,8 @@ export default function ColorThemeProvider({ children }: { children: React.React
     // Apply all CSS variables for secondary colors
     root.style.setProperty('--color-secondary', colors.secondary)
     root.style.setProperty('--color-secondary-light', colors.secondaryLight)
+    root.style.setProperty('--color-secondary-50', colors.secondaryLight) // Add explicit 50 shade
+    root.style.setProperty('--color-secondary-100', colors.secondaryLight) // Add explicit 100 shade
     root.style.setProperty('--color-secondary-200', colors.secondary200)
     root.style.setProperty('--color-secondary-300', colors.secondary300)
     root.style.setProperty('--color-secondary-400', colors.secondary400)
@@ -111,6 +115,8 @@ export default function ColorThemeProvider({ children }: { children: React.React
     // Apply all CSS variables for accent colors
     root.style.setProperty('--color-accent', colors.accent)
     root.style.setProperty('--color-accent-light', colors.accentLight)
+    root.style.setProperty('--color-accent-50', colors.accentLight) // Add explicit 50 shade
+    root.style.setProperty('--color-accent-100', colors.accentLight) // Add explicit 100 shade
     root.style.setProperty('--color-accent-200', colors.accent200)
     root.style.setProperty('--color-accent-300', colors.accent300)
     root.style.setProperty('--color-accent-400', colors.accent400)

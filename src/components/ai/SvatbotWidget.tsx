@@ -47,10 +47,10 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
 
   const getPriorityColor = (priority: CoachSuggestion['priority']) => {
     switch (priority) {
-      case 'high': return 'border-l-red-500 bg-red-50'
-      case 'medium': return 'border-l-yellow-500 bg-yellow-50'
-      case 'low': return 'border-l-blue-500 bg-blue-50'
-      default: return 'border-l-gray-500 bg-gray-50'
+      case 'high': return 'border-l-red-500 bg-primary-50'
+      case 'medium': return 'border-l-yellow-500 bg-primary-50'
+      case 'low': return 'border-l-primary-500 bg-primary-50'
+      default: return 'border-l-gray-500 bg-primary-50'
     }
   }
 
@@ -141,7 +141,7 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
   return (
     <div className="space-y-6">
       {/* Svatbot Header */}
-      <div className="bg-gradient-to-r from-primary-500 to-pink-500 rounded-xl p-6 text-white shadow-lg">
+      <div className="bg-gradient-to-r from-primary-500 to-primary-400 rounded-xl p-6 text-white shadow-lg">
         <div className="flex items-start gap-4">
           <div className="bg-white rounded-full flex items-center justify-center shadow-md flex-shrink-0 overflow-hidden" style={{ width: '80px', height: '130px', padding: '4px' }}>
             <video
@@ -278,7 +278,7 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
         <div className="mt-4 pt-4 border-t border-gray-200">
           <Link
             href="/ai"
-            className="w-full bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 text-white px-6 py-3 rounded-lg transition-all flex items-center justify-center gap-2 font-medium shadow-md hover:shadow-lg"
+            className="w-full bg-gradient-to-r from-primary-500 to-primary-400 hover:from-primary-600 hover:to-primary-500 text-white px-6 py-3 rounded-lg transition-all flex items-center justify-center gap-2 font-medium shadow-md hover:shadow-lg"
           >
             <MessageCircle className="w-5 h-5" />
             <span>Popovídat si se Svatbotem</span>

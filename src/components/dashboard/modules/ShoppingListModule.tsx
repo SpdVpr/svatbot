@@ -20,19 +20,19 @@ export default function ShoppingListModule() {
 
       <div className="space-y-4">
         {/* Shopping Overview */}
-        <div className="bg-purple-50 p-4 rounded-lg glass-morphism">
+        <div className="bg-primary-50 p-4 rounded-lg glass-morphism">
           <div className="text-center mb-3">
-            <div className="text-2xl font-bold text-purple-600">
+            <div className="text-2xl font-bold text-primary-600">
               <NumberCounter end={stats.totalItems} duration={1800} />
             </div>
-            <div className="text-sm text-purple-700">Produktů celkem</div>
+            <div className="text-sm text-primary-700">Produktů celkem</div>
           </div>
 
           {stats.totalValue > 0 && (
             <>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-purple-700">Zakoupeno</span>
-                <span className="text-sm font-semibold text-purple-900">
+                <span className="text-sm text-primary-700">Zakoupeno</span>
+                <span className="text-sm font-semibold text-primary-900">
                   <NumberCounter
                     end={stats.totalItems > 0 ? Math.round((stats.purchasedItems / stats.totalItems) * 100) : 0}
                     duration={1500}
@@ -40,9 +40,9 @@ export default function ShoppingListModule() {
                   />
                 </span>
               </div>
-              <div className="w-full bg-purple-200 rounded-full h-2">
+              <div className="w-full bg-primary-200 rounded-full h-2">
                 <div
-                  className="h-2 rounded-full bg-purple-500 transition-all duration-300"
+                  className="h-2 rounded-full bg-primary-500 transition-all duration-300"
                   style={{
                     width: `${stats.totalItems > 0 ? (stats.purchasedItems / stats.totalItems) * 100 : 0}%`
                   }}

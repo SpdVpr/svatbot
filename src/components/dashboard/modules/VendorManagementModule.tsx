@@ -26,11 +26,11 @@ export default function VendorManagementModule() {
 
       <div className="space-y-4">
         {/* Vendor Count */}
-        <div className="bg-orange-50 p-4 rounded-lg text-center glass-morphism">
-          <div className="text-2xl font-bold text-orange-600 mb-1">
+        <div className="bg-primary-50 p-4 rounded-lg text-center glass-morphism">
+          <div className="text-2xl font-bold text-primary-600 mb-1">
             <NumberCounter end={vendorStats.total} duration={1800} />
           </div>
-          <div className="text-sm text-orange-700">Celkem dodavatelů</div>
+          <div className="text-sm text-primary-700">Celkem dodavatelů</div>
         </div>
 
         {/* Vendor Stats */}

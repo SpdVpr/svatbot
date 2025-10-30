@@ -35,11 +35,11 @@ export default function SeatingPlanModule() {
 
       <div className="space-y-3 sm:space-y-4">
         {/* Seating Overview */}
-        <div className="bg-indigo-50 p-3 sm:p-4 rounded-lg text-center glass-morphism">
-          <div className="text-xl sm:text-2xl font-bold text-indigo-600 mb-1">
+        <div className="bg-primary-50 p-3 sm:p-4 rounded-lg text-center glass-morphism">
+          <div className="text-xl sm:text-2xl font-bold text-primary-600 mb-1">
             <NumberCounter end={seatingStats.totalTables} duration={1800} />
           </div>
-          <div className="text-xs sm:text-sm text-indigo-700">Stolů naplánováno</div>
+          <div className="text-xs sm:text-sm text-primary-700">Stolů naplánováno</div>
         </div>
 
         {/* Assignment Stats */}

@@ -19,14 +19,14 @@ export default function TimelinePlanningModule() {
 
       <div className="space-y-3 sm:space-y-4">
         {/* Calendar Overview */}
-        <div className="bg-purple-50 p-3 sm:p-4 rounded-lg glass-morphism">
+        <div className="bg-primary-50 p-3 sm:p-4 rounded-lg glass-morphism">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs sm:text-sm font-medium text-purple-900">Celkem událostí</span>
-            <span className="text-base sm:text-lg font-bold text-purple-600">
+            <span className="text-xs sm:text-sm font-medium text-primary-900">Celkem událostí</span>
+            <span className="text-base sm:text-lg font-bold text-primary-600">
               <NumberCounter end={stats.totalEvents} duration={1800} />
             </span>
           </div>
-          <div className="text-xs text-purple-700 mt-1">
+          <div className="text-xs text-primary-700 mt-1">
             <NumberCounter end={stats.todayEvents} duration={1200} className="inline-block" /> dnes • <NumberCounter end={stats.thisWeekEvents} duration={1200} className="inline-block" /> tento týden
           </div>
         </div>

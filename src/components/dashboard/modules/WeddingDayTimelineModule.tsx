@@ -39,15 +39,15 @@ export default function WeddingDayTimelineModule() {
         {/* Timeline Overview */}
         {timeline.length > 0 ? (
           <>
-            <div className="bg-purple-50 p-3 sm:p-4 rounded-lg glass-morphism">
+            <div className="bg-primary-50 p-3 sm:p-4 rounded-lg glass-morphism">
               <div className="text-center mb-3">
-                <div className="text-xl sm:text-2xl font-bold text-purple-600">
+                <div className="text-xl sm:text-2xl font-bold text-primary-600">
                   <NumberCounter end={stats.total} duration={1800} />
                 </div>
-                <div className="text-xs sm:text-sm text-purple-700">Naplánovaných aktivit</div>
+                <div className="text-xs sm:text-sm text-primary-700">Naplánovaných aktivit</div>
               </div>
 
-              <div className="text-xs text-purple-700 text-center">
+              <div className="text-xs text-primary-700 text-center">
                 Kompletní harmonogram svatebního dne
               </div>
             </div>

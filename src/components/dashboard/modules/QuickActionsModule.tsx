@@ -24,7 +24,7 @@ export default function QuickActionsModule() {
       title: 'Přidat hosta',
       description: 'Nový host na seznam',
       href: '/guests',
-      color: 'text-white bg-primary-600 hover:bg-primary-500'
+      color: 'text-white bg-purple-600 hover:bg-purple-500'
     },
     {
       icon: DollarSign,

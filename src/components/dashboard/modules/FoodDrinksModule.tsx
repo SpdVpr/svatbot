@@ -19,11 +19,11 @@ export default function FoodDrinksModule() {
 
       <div className="space-y-4">
         {/* Cost Overview */}
-        <div className="bg-pink-50 p-4 rounded-lg text-center">
-          <div className="text-2xl font-bold text-pink-600 mb-1">
+        <div className="bg-primary-50 p-4 rounded-lg text-center">
+          <div className="text-2xl font-bold text-primary-600 mb-1">
             {currencyUtils.formatShort(stats.totalEstimatedCost)}
           </div>
-          <div className="text-sm text-pink-700">Odhadované náklady</div>
+          <div className="text-sm text-primary-700">Odhadované náklady</div>
         </div>
 
         {/* Items Count */}

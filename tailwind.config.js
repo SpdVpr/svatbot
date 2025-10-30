@@ -10,8 +10,8 @@ module.exports = {
       colors: {
         // SvatBot brand colors - now using CSS variables for dynamic theming
         primary: {
-          50: 'var(--color-primary-light, #fdf2f8)',
-          100: 'var(--color-primary-light, #fce7f3)',
+          50: 'var(--color-primary-50, #fdf2f8)',
+          100: 'var(--color-primary-100, #fce7f3)',
           200: 'var(--color-primary-200, #fbcfe8)',
           300: 'var(--color-primary-300, #f9a8d4)',
           400: 'var(--color-primary-400, #f472b6)',
@@ -22,8 +22,8 @@ module.exports = {
           900: 'var(--color-primary-900, #831843)',
         },
         secondary: {
-          50: 'var(--color-secondary-light, #faf5ff)',
-          100: 'var(--color-secondary-light, #f3e8ff)',
+          50: 'var(--color-secondary-50, #faf5ff)',
+          100: 'var(--color-secondary-100, #f3e8ff)',
           200: 'var(--color-secondary-200, #e9d5ff)',
           300: 'var(--color-secondary-300, #d8b4fe)',
           400: 'var(--color-secondary-400, #c084fc)',
@@ -34,8 +34,8 @@ module.exports = {
           900: 'var(--color-secondary-900, #581c87)',
         },
         accent: {
-          50: 'var(--color-accent-light, #fffbeb)',
-          100: 'var(--color-accent-light, #fef3c7)',
+          50: 'var(--color-accent-50, #fffbeb)',
+          100: 'var(--color-accent-100, #fef3c7)',
           200: 'var(--color-accent-200, #fde68a)',
           300: 'var(--color-accent-300, #fcd34d)',
           400: 'var(--color-accent-400, #fbbf24)',
