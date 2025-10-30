@@ -1135,6 +1135,26 @@ service cloud.firestore {
       );
     }
 
+    // Color Themes collection - User's color theme preferences
+    match /colorThemes/{themeId} {
+      // User can read their own color theme
+      allow read: if isAuthenticated() &&
+                     resource.data.userId == request.auth.uid;
+
+      // User can create their own color theme
+      allow create: if isAuthenticated() &&
+                       request.resource.data.keys().hasAll(['theme', 'userId', 'weddingId']) &&
+                       request.auth.uid == request.resource.data.userId;
+
+      // User can update their own color theme
+      allow update: if isAuthenticated() &&
+                       resource.data.userId == request.auth.uid;
+
+      // User can delete their own color theme
+      allow delete: if isAuthenticated() &&
+                       resource.data.userId == request.auth.uid;
+    }
+
     // Deny all other access
     match /{document=**} {
       allow read, write: if false;

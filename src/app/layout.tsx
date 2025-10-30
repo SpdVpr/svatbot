@@ -8,6 +8,7 @@ import AffiliateTracker from '@/components/affiliate/AffiliateTracker'
 import GlobalFeedbackButton from '@/components/common/GlobalFeedbackButton'
 import UserTrackingWrapper from '@/components/common/UserTrackingWrapper'
 import DemoLockBanner from '@/components/common/DemoLockBanner'
+import ColorThemeProvider from '@/components/theme/ColorThemeProvider'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -290,29 +291,31 @@ export default function RootLayout({
         'min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 font-sans antialiased',
         'selection:bg-primary-200 selection:text-primary-800'
       )}>
-        <UserTrackingWrapper>
-          {/* Demo Lock Banner - Shows when demo account is locked */}
-          <Suspense fallback={null}>
-            <DemoLockBanner />
-          </Suspense>
+        <ColorThemeProvider>
+          <UserTrackingWrapper>
+            {/* Demo Lock Banner - Shows when demo account is locked */}
+            <Suspense fallback={null}>
+              <DemoLockBanner />
+            </Suspense>
 
-          <div id="root" className="relative">
-            {children}
-          </div>
+            <div id="root" className="relative">
+              {children}
+            </div>
 
-          {/* Affiliate Tracking */}
-          <Suspense fallback={null}>
-            <AffiliateTracker />
-          </Suspense>
+            {/* Affiliate Tracking */}
+            <Suspense fallback={null}>
+              <AffiliateTracker />
+            </Suspense>
 
-          {/* Cookie Banner */}
-          <CookieBanner />
+            {/* Cookie Banner */}
+            <CookieBanner />
 
-          {/* Global Feedback Button */}
-          <Suspense fallback={null}>
-            <GlobalFeedbackButton />
-          </Suspense>
-        </UserTrackingWrapper>
+            {/* Global Feedback Button */}
+            <Suspense fallback={null}>
+              <GlobalFeedbackButton />
+            </Suspense>
+          </UserTrackingWrapper>
+        </ColorThemeProvider>
 
         {/* Portal for modals */}
         <div id="modal-root" />

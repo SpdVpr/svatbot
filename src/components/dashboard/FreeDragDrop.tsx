@@ -4,11 +4,13 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { useDashboard } from '@/hooks/useDashboard'
 import { useOnboarding } from '@/hooks/useOnboarding'
 import { DashboardModule } from '@/types/dashboard'
-import { Edit3, Lock, Unlock, Eye, EyeOff, RotateCcw, GripVertical, Grid3x3, Maximize2, Maximize, BookOpen, Sparkles } from 'lucide-react'
+import { Edit3, Lock, Unlock, Eye, EyeOff, RotateCcw, GripVertical, Grid3x3, Maximize2, Maximize, BookOpen, Sparkles, Palette } from 'lucide-react'
 import OnboardingWizard from '../onboarding/OnboardingWizard'
 import { getViewTransitionName } from '@/hooks/useViewTransition'
 import { useAuth } from '@/hooks/useAuth'
 import { useIsDemoUser } from '@/hooks/useDemoSettings'
+import { useColorTheme } from '@/hooks/useColorTheme'
+import { COLOR_PALETTES, ColorTheme } from '@/types/colorTheme'
 
 // Module components
 import WeddingCountdownModule from './modules/WeddingCountdownModule'
@@ -74,6 +76,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
   } = useDashboard()
 
   const { getProgress, getNextStep } = useOnboarding()
+  const { colorTheme, changeTheme, canChangeTheme } = useColorTheme()
 
   const layoutMode = layout.layoutMode || 'grid'
 
@@ -85,6 +88,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
   const [canvasSize, setCanvasSize] = useState({ width: CANVAS_WIDTHS['normal'].width, height: 4000 })
   const [snapGuides, setSnapGuides] = useState<{ x: number[], y: number[] }>({ x: [], y: [] })
   const [showCanvasMenu, setShowCanvasMenu] = useState(false)
+  const [showColorMenu, setShowColorMenu] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [showOnboardingWizard, setShowOnboardingWizard] = useState(false)
 
@@ -110,11 +114,14 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
       if (showCanvasMenu && !target.closest('[data-canvas-menu]')) {
         setShowCanvasMenu(false)
       }
+      if (showColorMenu && !target.closest('[data-color-menu]')) {
+        setShowColorMenu(false)
+      }
     }
 
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [showCanvasMenu])
+  }, [showCanvasMenu, showColorMenu])
 
   // Render module content
   const renderModule = (module: DashboardModule) => {
@@ -250,7 +257,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
       <div className="space-y-6">
         {/* Dashboard Controls */}
         <div
-          className="bg-gray-50/95 backdrop-blur-xl p-5 rounded-3xl border border-gray-100/60 mx-auto shadow-lg"
+          className="bg-gray-50/95 backdrop-blur-xl p-5 rounded-3xl border border-gray-100/60 mx-auto shadow-lg relative z-[100]"
           style={{
             maxWidth: '1240px',
             boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
@@ -349,7 +356,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
 
                 {showCanvasMenu && (
                   <div
-                    className="absolute right-0 top-full mt-2 w-72 bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg border border-white/60 z-50"
+                    className="absolute right-0 top-full mt-2 w-72 bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg border border-white/60 z-[110]"
                     style={{
                       boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
                     }}
@@ -379,6 +386,75 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
                             <span className="text-xs text-gray-500">{CANVAS_WIDTHS[width].description}</span>
                           </button>
                         ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Color Theme Selector */}
+              <div className="relative" data-color-menu>
+                <button
+                  onClick={() => setShowColorMenu(!showColorMenu)}
+                  disabled={!canChangeTheme}
+                  className="btn-outline flex items-center space-x-2"
+                  title="Změnit barevnou paletu"
+                >
+                  <Palette className="w-4 h-4" />
+                  <span className="hidden lg:inline text-sm">
+                    Barvy
+                  </span>
+                </button>
+
+                {showColorMenu && (
+                  <div
+                    className="absolute right-0 top-full mt-2 w-80 bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg border border-white/60 z-[110]"
+                    style={{
+                      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+                    }}
+                  >
+                    <div className="p-4">
+                      <p className="text-sm font-semibold text-gray-700 mb-3">Barevná paleta</p>
+                      <div className="space-y-2">
+                        {(Object.keys(COLOR_PALETTES) as ColorTheme[]).map((theme) => {
+                          const palette = COLOR_PALETTES[theme]
+                          return (
+                            <button
+                              key={theme}
+                              onClick={() => {
+                                changeTheme(theme)
+                                setShowColorMenu(false)
+                              }}
+                              className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-300 ${
+                                colorTheme === theme
+                                  ? 'bg-primary-50 text-primary-700 font-medium shadow-sm scale-105'
+                                  : 'hover:bg-gray-50 text-gray-700 hover:scale-102'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-sm font-medium">{palette.name}</span>
+                                {colorTheme === theme && (
+                                  <span className="text-primary-600 text-lg">✓</span>
+                                )}
+                              </div>
+                              <p className="text-xs text-gray-500 mb-2">{palette.description}</p>
+                              <div className="flex space-x-1">
+                                <div
+                                  className="w-6 h-6 rounded-full border-2 border-white shadow-sm"
+                                  style={{ backgroundColor: palette.colors.primary }}
+                                />
+                                <div
+                                  className="w-6 h-6 rounded-full border-2 border-white shadow-sm"
+                                  style={{ backgroundColor: palette.colors.secondary }}
+                                />
+                                <div
+                                  className="w-6 h-6 rounded-full border-2 border-white shadow-sm"
+                                  style={{ backgroundColor: palette.colors.accent }}
+                                />
+                              </div>
+                            </button>
+                          )
+                        })}
                       </div>
                     </div>
                   </div>

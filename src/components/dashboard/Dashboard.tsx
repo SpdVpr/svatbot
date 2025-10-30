@@ -210,7 +210,7 @@ function DashboardContent() {
 
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'rgb(253, 242, 248)' }}>
+    <div className="min-h-screen flex flex-col">
       {/* Trial Expired Modal - Blocks access */}
       {showTrialExpiredModal && (
         <TrialExpiredModal

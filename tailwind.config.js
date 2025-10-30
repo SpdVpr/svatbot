@@ -8,42 +8,42 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // SvatBot brand colors
+        // SvatBot brand colors - now using CSS variables for dynamic theming
         primary: {
-          50: '#fdf2f8',
-          100: '#fce7f3',
-          200: '#fbcfe8',
-          300: '#f9a8d4',
-          400: '#f472b6',
-          500: '#F8BBD9', // Main brand color - Soft Rose
-          600: '#db2777',
-          700: '#be185d',
-          800: '#9d174d',
-          900: '#831843',
+          50: 'var(--color-primary-light, #fdf2f8)',
+          100: 'var(--color-primary-light, #fce7f3)',
+          200: 'var(--color-primary-200, #fbcfe8)',
+          300: 'var(--color-primary-300, #f9a8d4)',
+          400: 'var(--color-primary-400, #f472b6)',
+          500: 'var(--color-primary, #F8BBD9)', // Main brand color - Dynamic
+          600: 'var(--color-primary-600, #db2777)',
+          700: 'var(--color-primary-700, #be185d)',
+          800: 'var(--color-primary-800, #9d174d)',
+          900: 'var(--color-primary-900, #831843)',
         },
         secondary: {
-          50: '#faf5ff',
-          100: '#f3e8ff',
-          200: '#e9d5ff',
-          300: '#d8b4fe',
-          400: '#c084fc',
-          500: '#E1D5E7', // Lavender
-          600: '#9333ea',
-          700: '#7c3aed',
-          800: '#6b21a8',
-          900: '#581c87',
+          50: 'var(--color-secondary-light, #faf5ff)',
+          100: 'var(--color-secondary-light, #f3e8ff)',
+          200: 'var(--color-secondary-200, #e9d5ff)',
+          300: 'var(--color-secondary-300, #d8b4fe)',
+          400: 'var(--color-secondary-400, #c084fc)',
+          500: 'var(--color-secondary, #E1D5E7)', // Dynamic
+          600: 'var(--color-secondary-600, #9333ea)',
+          700: 'var(--color-secondary-700, #7c3aed)',
+          800: 'var(--color-secondary-800, #6b21a8)',
+          900: 'var(--color-secondary-900, #581c87)',
         },
         accent: {
-          50: '#fffbeb',
-          100: '#fef3c7',
-          200: '#fde68a',
-          300: '#fcd34d',
-          400: '#fbbf24',
-          500: '#F7DC6F', // Gold
-          600: '#d97706',
-          700: '#b45309',
-          800: '#92400e',
-          900: '#78350f',
+          50: 'var(--color-accent-light, #fffbeb)',
+          100: 'var(--color-accent-light, #fef3c7)',
+          200: 'var(--color-accent-200, #fde68a)',
+          300: 'var(--color-accent-300, #fcd34d)',
+          400: 'var(--color-accent-400, #fbbf24)',
+          500: 'var(--color-accent, #F7DC6F)', // Dynamic
+          600: 'var(--color-accent-600, #d97706)',
+          700: 'var(--color-accent-700, #b45309)',
+          800: 'var(--color-accent-800, #92400e)',
+          900: 'var(--color-accent-900, #78350f)',
         },
         neutral: {
           50: '#FDFEFE', // Cream White

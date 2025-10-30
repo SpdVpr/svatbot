@@ -1,12 +1,14 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Edit3, Lock, Unlock, RotateCcw, GripVertical, Eye, EyeOff } from 'lucide-react'
+import { Edit3, Lock, Unlock, RotateCcw, GripVertical, Eye, EyeOff, Palette } from 'lucide-react'
 import { useDashboard } from '@/hooks/useDashboard'
 import { DashboardModule } from '@/types/dashboard'
 import { getViewTransitionName } from '@/hooks/useViewTransition'
 import { useAuth } from '@/hooks/useAuth'
 import { useIsDemoUser } from '@/hooks/useDemoSettings'
+import { useColorTheme } from '@/hooks/useColorTheme'
+import { COLOR_PALETTES, ColorTheme } from '@/types/colorTheme'
 
 // Import module components
 import WeddingCountdownModule from './modules/WeddingCountdownModule'
@@ -50,14 +52,30 @@ export default function SimpleDragDrop({ onWeddingSettingsClick }: SimpleDragDro
     getVisibleModules
   } = useDashboard()
 
+  const { colorTheme, changeTheme, canChangeTheme } = useColorTheme()
+
   const [draggedModule, setDraggedModule] = useState<string | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
   const [isDragging, setIsDragging] = useState(false)
+  const [showColorMenu, setShowColorMenu] = useState(false)
 
   // Check if user can edit layout (normal users can, locked DEMO cannot)
   const canEditLayout = !isDemoUser || !isDemoLocked
   const draggedElementRef = useRef<HTMLDivElement | null>(null)
   const dragTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Close color menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element
+      if (showColorMenu && !target.closest('[data-color-menu]')) {
+        setShowColorMenu(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showColorMenu])
 
   const handleDragStart = (e: React.DragEvent, moduleId: string, index: number) => {
     if (!layout.isEditMode) return
@@ -242,7 +260,7 @@ export default function SimpleDragDrop({ onWeddingSettingsClick }: SimpleDragDro
   return (
     <div className="space-y-6">
       {/* Dashboard Controls */}
-      <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-gray-200">
+      <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-gray-200 relative z-[100]">
         <div className="flex items-center space-x-4">
           <h2 className="text-lg font-semibold text-gray-900">Dashboard</h2>
           {layout.isEditMode && (
@@ -254,6 +272,75 @@ export default function SimpleDragDrop({ onWeddingSettingsClick }: SimpleDragDro
         </div>
 
         <div className="flex items-center space-x-2">
+          {/* Color Theme Selector */}
+          <div className="relative" data-color-menu>
+            <button
+              onClick={() => setShowColorMenu(!showColorMenu)}
+              disabled={!canChangeTheme}
+              className="btn-outline flex items-center space-x-2"
+              title="Změnit barevnou paletu"
+            >
+              <Palette className="w-4 h-4" />
+              <span className="hidden lg:inline text-sm">
+                Barvy
+              </span>
+            </button>
+
+            {showColorMenu && (
+              <div
+                className="absolute right-0 top-full mt-2 w-80 bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg border border-white/60 z-[110]"
+                style={{
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+                }}
+              >
+                <div className="p-4">
+                  <p className="text-sm font-semibold text-gray-700 mb-3">Barevná paleta</p>
+                  <div className="space-y-2">
+                    {(Object.keys(COLOR_PALETTES) as ColorTheme[]).map((theme) => {
+                      const palette = COLOR_PALETTES[theme]
+                      return (
+                        <button
+                          key={theme}
+                          onClick={() => {
+                            changeTheme(theme)
+                            setShowColorMenu(false)
+                          }}
+                          className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-300 ${
+                            colorTheme === theme
+                              ? 'bg-primary-50 text-primary-700 font-medium shadow-sm scale-105'
+                              : 'hover:bg-gray-50 text-gray-700 hover:scale-102'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm font-medium">{palette.name}</span>
+                            {colorTheme === theme && (
+                              <span className="text-primary-600 text-lg">✓</span>
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-500 mb-2">{palette.description}</p>
+                          <div className="flex space-x-1">
+                            <div
+                              className="w-6 h-6 rounded-full border-2 border-white shadow-sm"
+                              style={{ backgroundColor: palette.colors.primary }}
+                            />
+                            <div
+                              className="w-6 h-6 rounded-full border-2 border-white shadow-sm"
+                              style={{ backgroundColor: palette.colors.secondary }}
+                            />
+                            <div
+                              className="w-6 h-6 rounded-full border-2 border-white shadow-sm"
+                              style={{ backgroundColor: palette.colors.accent }}
+                            />
+                          </div>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
           <button
             onClick={toggleEditMode}
             disabled={!canEditLayout}

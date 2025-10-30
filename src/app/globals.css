@@ -22,6 +22,41 @@
     /* SvatBot.cz custom properties */
     --wedding-gradient: linear-gradient(135deg, #fdf2f8 0%, #faf5ff 50%, #fffbeb 100%);
     --shadow-wedding: 0 4px 25px -5px rgba(248, 187, 217, 0.3), 0 10px 30px -5px rgba(225, 213, 231, 0.2);
+
+    /* Dynamic color theme variables - defaults (Rose theme) */
+    /* Primary colors */
+    --color-primary: #F8BBD9;
+    --color-primary-light: #fce7f3;
+    --color-primary-dark: #f472b6;
+    --color-primary-200: #fbcfe8;
+    --color-primary-300: #f9a8d4;
+    --color-primary-400: #f472b6;
+    --color-primary-600: #db2777;
+    --color-primary-700: #be185d;
+    --color-primary-800: #9d174d;
+    --color-primary-900: #831843;
+
+    /* Secondary colors */
+    --color-secondary: #E1D5E7;
+    --color-secondary-light: #f3e8ff;
+    --color-secondary-200: #e9d5ff;
+    --color-secondary-300: #d8b4fe;
+    --color-secondary-400: #c084fc;
+    --color-secondary-600: #9333ea;
+    --color-secondary-700: #7c3aed;
+    --color-secondary-800: #6b21a8;
+    --color-secondary-900: #581c87;
+
+    /* Accent colors */
+    --color-accent: #F7DC6F;
+    --color-accent-light: #fef3c7;
+    --color-accent-200: #fde68a;
+    --color-accent-300: #fcd34d;
+    --color-accent-400: #fbbf24;
+    --color-accent-600: #d97706;
+    --color-accent-700: #b45309;
+    --color-accent-800: #92400e;
+    --color-accent-900: #78350f;
   }
 
   /* Redesignr.ai styles */
