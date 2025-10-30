@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { useWeddingNotifications, useLiveToastNotifications } from '@/hooks/useWeddingNotifications'
 import {
   Bell,
@@ -43,13 +44,32 @@ const typeColors = {
 
 export default function LiveNotifications() {
   const [isOpen, setIsOpen] = useState(false)
-  const { 
-    notifications, 
-    unreadCount, 
-    loading, 
-    markAsRead, 
-    markAllAsRead 
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, right: 0 })
+  const [mounted, setMounted] = useState(false)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  const {
+    notifications,
+    unreadCount,
+    loading,
+    markAsRead,
+    markAllAsRead
   } = useWeddingNotifications()
+
+  // Check if component is mounted (for portal)
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Calculate dropdown position when opened
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect()
+      setDropdownPosition({
+        top: rect.bottom + 8, // 8px below the button
+        right: window.innerWidth - rect.right
+      })
+    }
+  }, [isOpen])
 
   const formatTimeAgo = (timestamp: any) => {
     if (!timestamp) return 'Právě teď'
@@ -77,132 +97,145 @@ export default function LiveNotifications() {
     }
   }
 
-  return (
+  // Render dropdown content
+  const dropdownContent = isOpen && mounted ? (
     <>
-      {/* Notification Bell */}
-      <div className="relative">
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          <Bell className="w-6 h-6" />
-          {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
-              {unreadCount > 99 ? '99+' : unreadCount}
-            </span>
-          )}
-        </button>
+      {/* Click outside to close - backdrop */}
+      <div
+        className="fixed inset-0 z-[9998]"
+        onClick={() => setIsOpen(false)}
+      />
 
-        {/* Notification Dropdown - Mobile optimized */}
-        {isOpen && (
-          <div className="fixed sm:absolute left-2 right-2 sm:right-0 sm:left-auto top-[60px] sm:top-full mt-0 sm:mt-2 w-auto sm:w-96 max-w-md bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-[80vh] sm:max-h-96 overflow-hidden">
-            {/* Header */}
-            <div className="p-3 sm:p-4 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900">Notifikace</h3>
-              <div className="flex items-center space-x-1 sm:space-x-2">
-                {unreadCount > 0 && (
-                  <button
-                    onClick={markAllAsRead}
-                    className="text-xs sm:text-sm text-blue-600 hover:text-blue-700 whitespace-nowrap"
-                  >
-                    Označit vše
-                  </button>
-                )}
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="p-1 hover:bg-gray-100 rounded"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Notifications List - Mobile optimized */}
-            <div className="max-h-[60vh] sm:max-h-80 overflow-y-auto">
-              {loading ? (
-                <div className="p-3 sm:p-4 text-center text-gray-500 text-sm">
-                  Načítání notifikací...
-                </div>
-              ) : notifications.length === 0 ? (
-                <div className="p-6 sm:p-8 text-center text-gray-500">
-                  <Bell className="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-2 sm:mb-3" />
-                  <p className="text-xs sm:text-sm">Žádné notifikace</p>
-                </div>
-              ) : (
-                <div className="divide-y divide-gray-100">
-                  {notifications.map((notification) => {
-                    const CategoryIcon = categoryIcons[notification.category] || Bell
-                    
-                    return (
-                      <div
-                        key={notification.id}
-                        className={`p-3 sm:p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
-                          !notification.read ? 'bg-blue-50' : ''
-                        }`}
-                        onClick={() => handleNotificationClick(notification)}
-                      >
-                        <div className="flex items-start space-x-2 sm:space-x-3">
-                          {/* Icon */}
-                          <div className={`flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center ${
-                            priorityColors[notification.priority]
-                          }`}>
-                            <CategoryIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-                          </div>
-
-                          {/* Content */}
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs sm:text-sm font-medium text-gray-900">
-                              {notification.title}
-                            </p>
-                            <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-2">
-                              {notification.message}
-                            </p>
-                            <p className="text-[10px] sm:text-xs text-gray-500 mt-1 sm:mt-2">
-                              {formatTimeAgo(notification.createdAt)}
-                            </p>
-
-                            {/* Priority Badge */}
-                            {notification.priority === 'urgent' && (
-                              <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium bg-red-100 text-red-700 mt-1 sm:mt-2">
-                                Urgentní
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Unread Indicator */}
-                          {!notification.read && (
-                            <div className="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full"></div>
-                          )}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Footer */}
-            {notifications.length > 0 && (
-              <div className="p-2 sm:p-3 border-t border-gray-200 bg-gray-50">
-                <Link
-                  href="/notifications"
-                  className="text-xs sm:text-sm text-blue-600 hover:text-blue-700 font-medium"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Zobrazit všechny notifikace →
-                </Link>
-              </div>
+      {/* Notification Dropdown - Mobile optimized */}
+      <div
+        className="fixed left-2 right-2 sm:left-auto sm:right-auto w-auto sm:w-96 max-w-md bg-white rounded-lg shadow-xl border border-gray-200 z-[9999] max-h-[80vh] sm:max-h-96 overflow-hidden"
+        style={{
+          top: `${dropdownPosition.top}px`,
+          right: typeof window !== 'undefined' && window.innerWidth >= 640 ? `${dropdownPosition.right}px` : undefined,
+          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.15), 0 10px 20px rgba(0, 0, 0, 0.1)'
+        }}
+      >
+        {/* Header */}
+        <div className="p-3 sm:p-4 border-b border-gray-200 flex items-center justify-between">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900">Notifikace</h3>
+          <div className="flex items-center space-x-1 sm:space-x-2">
+            {unreadCount > 0 && (
+              <button
+                onClick={markAllAsRead}
+                className="text-xs sm:text-sm text-blue-600 hover:text-blue-700 whitespace-nowrap"
+              >
+                Označit vše
+              </button>
             )}
+            <button
+              onClick={() => setIsOpen(false)}
+              className="p-1 hover:bg-gray-100 rounded"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Notifications List - Mobile optimized */}
+        <div className="max-h-[60vh] sm:max-h-80 overflow-y-auto">
+          {loading ? (
+            <div className="p-3 sm:p-4 text-center text-gray-500 text-sm">
+              Načítání notifikací...
+            </div>
+          ) : notifications.length === 0 ? (
+            <div className="p-6 sm:p-8 text-center text-gray-500">
+              <Bell className="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-2 sm:mb-3" />
+              <p className="text-xs sm:text-sm">Žádné notifikace</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {notifications.map((notification) => {
+                const CategoryIcon = categoryIcons[notification.category] || Bell
+
+                return (
+                  <div
+                    key={notification.id}
+                    className={`p-3 sm:p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
+                      !notification.read ? 'bg-blue-50' : ''
+                    }`}
+                    onClick={() => handleNotificationClick(notification)}
+                  >
+                    <div className="flex items-start space-x-2 sm:space-x-3">
+                      {/* Icon */}
+                      <div className={`flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center ${
+                        priorityColors[notification.priority]
+                      }`}>
+                        <CategoryIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs sm:text-sm font-medium text-gray-900">
+                          {notification.title}
+                        </p>
+                        <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-2">
+                          {notification.message}
+                        </p>
+                        <p className="text-[10px] sm:text-xs text-gray-500 mt-1 sm:mt-2">
+                          {formatTimeAgo(notification.createdAt)}
+                        </p>
+
+                        {/* Priority Badge */}
+                        {notification.priority === 'urgent' && (
+                          <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium bg-red-100 text-red-700 mt-1 sm:mt-2">
+                            Urgentní
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Unread Indicator */}
+                      {!notification.read && (
+                        <div className="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full"></div>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        {notifications.length > 0 && (
+          <div className="p-2 sm:p-3 border-t border-gray-200 bg-gray-50">
+            <Link
+              href="/notifications"
+              className="text-xs sm:text-sm text-blue-600 hover:text-blue-700 font-medium"
+              onClick={() => setIsOpen(false)}
+            >
+              Zobrazit všechny notifikace →
+            </Link>
           </div>
         )}
       </div>
+    </>
+  ) : null
 
-      {/* Click outside to close */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={() => setIsOpen(false)}
-        />
+  return (
+    <>
+      {/* Notification Bell */}
+      <button
+        ref={buttonRef}
+        onClick={() => setIsOpen(!isOpen)}
+        className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+      >
+        <Bell className="w-6 h-6" />
+        {unreadCount > 0 && (
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
+            {unreadCount > 99 ? '99+' : unreadCount}
+          </span>
+        )}
+      </button>
+
+      {/* Render dropdown via portal to body */}
+      {mounted && typeof document !== 'undefined' && createPortal(
+        dropdownContent,
+        document.body
       )}
     </>
   )

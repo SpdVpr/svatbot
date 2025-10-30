@@ -408,7 +408,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
 
                 {showColorMenu && (
                   <div
-                    className="absolute right-0 top-full mt-2 w-80 bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg border border-white/60 z-[110]"
+                    className="absolute right-0 top-full mt-2 w-64 bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg border border-white/60 z-[110]"
                     style={{
                       boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
                     }}
@@ -425,32 +425,21 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
                                 changeTheme(theme)
                                 setShowColorMenu(false)
                               }}
-                              className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-300 ${
+                              className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-300 border-2 ${
                                 colorTheme === theme
-                                  ? 'bg-primary-50 text-primary-700 font-medium shadow-sm scale-105'
-                                  : 'hover:bg-gray-50 text-gray-700 hover:scale-102'
+                                  ? 'border-gray-400 shadow-md scale-105'
+                                  : 'border-transparent hover:border-gray-200 hover:scale-102'
                               }`}
+                              style={{
+                                backgroundColor: palette.colors.primaryLight,
+                                color: palette.colors.primary700
+                              }}
                             >
-                              <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center justify-between">
                                 <span className="text-sm font-medium">{palette.name}</span>
                                 {colorTheme === theme && (
-                                  <span className="text-primary-600 text-lg">✓</span>
+                                  <span className="text-lg">✓</span>
                                 )}
-                              </div>
-                              <p className="text-xs text-gray-500 mb-2">{palette.description}</p>
-                              <div className="flex space-x-1">
-                                <div
-                                  className="w-6 h-6 rounded-full border-2 border-white shadow-sm"
-                                  style={{ backgroundColor: palette.colors.primary }}
-                                />
-                                <div
-                                  className="w-6 h-6 rounded-full border-2 border-white shadow-sm"
-                                  style={{ backgroundColor: palette.colors.secondary }}
-                                />
-                                <div
-                                  className="w-6 h-6 rounded-full border-2 border-white shadow-sm"
-                                  style={{ backgroundColor: palette.colors.accent }}
-                                />
                               </div>
                             </button>
                           )
