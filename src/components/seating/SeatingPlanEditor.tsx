@@ -3402,7 +3402,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
       {/* Table form modal */}
       {showTableForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[150]">
           <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               {editingTable ? 'Upravit stůl' : 'Přidat nový stůl'}
@@ -3657,7 +3657,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
       {/* Chair row form modal */}
       {showChairRowForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[150]">
           <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               {editingChairRow ? 'Upravit řadu židlí' : 'Přidat řadu židlí'}
@@ -3840,7 +3840,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
       {/* Custom area form modal */}
       {showCustomAreaForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[150]">
           <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               {editingCustomArea ? 'Upravit plochu' : 'Přidat plochu'}
@@ -3948,7 +3948,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
       {/* Dance floor form modal */}
       {showDanceFloorForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[150]">
           <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Přidat taneční parket
@@ -4019,7 +4019,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
       {/* Dance floor edit modal */}
       {editingDanceFloor && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[150]">
           <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Upravit taneční parket
@@ -4090,7 +4090,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
       {/* Guest assignment modal */}
       {showGuestAssignment && selectedSeat && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[150]">
           <div className="bg-white rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[80vh] flex flex-col">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Přiřadit hosta k místu
@@ -4228,7 +4228,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
       {/* Venue settings modal */}
       {showVenueSettings && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[150]">
           <div className="bg-white rounded-xl p-6 max-w-lg w-full mx-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Nastavení plochy

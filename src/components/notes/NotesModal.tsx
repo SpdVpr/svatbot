@@ -95,7 +95,7 @@ export default function NotesModal({ isOpen, onClose }: NotesModalProps) {
   const colorConfig = COLORS.find(c => c.name === selectedColor) || COLORS[0]
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4 animate-fade-in">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[150] p-2 sm:p-4 animate-fade-in">
       {/* Backdrop with View Transition - Solid to prevent content showing through */}
       <div
         className="absolute inset-0 bg-black/50"

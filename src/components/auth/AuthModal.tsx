@@ -198,7 +198,7 @@ export default function AuthModal({ mode, onClose, onSwitchMode, showDemoOption 
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black bg-opacity-50">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
