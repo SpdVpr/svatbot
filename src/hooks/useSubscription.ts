@@ -36,6 +36,15 @@ export function useSubscription() {
   const [error, setError] = useState<string | null>(null)
   const hasLoadedRef = useRef(false) // Track if data has been loaded
 
+  // Load all subscription data
+  const loadSubscriptionData = async () => {
+    if (!user || !wedding) return
+
+    await loadSubscription()
+    await loadPayments()
+    await loadUsageStats()
+  }
+
   // Load subscription data - only once when user/wedding changes
   useEffect(() => {
     if (!user || !wedding) {
@@ -48,9 +57,7 @@ export function useSubscription() {
       setLoading(true)
     }
 
-    loadSubscription()
-    loadPayments()
-    loadUsageStats()
+    loadSubscriptionData()
   }, [user?.id, wedding?.id]) // Only depend on IDs to prevent unnecessary reloads
 
   // Load subscription
@@ -259,11 +266,11 @@ export function useSubscription() {
     try {
       setLoading(true)
 
-      // Import Stripe module dynamically
-      const { createCheckoutSession } = await import('@/lib/stripe')
+      // Import GoPay module dynamically
+      const { createGoPayPayment } = await import('@/lib/gopay')
 
-      // Create checkout session
-      const checkoutUrl = await createCheckoutSession({
+      // Create GoPay payment
+      const paymentUrl = await createGoPayPayment({
         userId: user.id,
         userEmail: user.email,
         plan,
@@ -271,8 +278,8 @@ export function useSubscription() {
         cancelUrl: `${window.location.origin}/?payment=canceled`
       })
 
-      // Redirect to checkout (or success page in mock mode)
-      window.location.href = checkoutUrl
+      // Redirect to GoPay payment gateway
+      window.location.href = paymentUrl
 
     } catch (err) {
       console.error('Error upgrading subscription:', err)
@@ -282,6 +289,54 @@ export function useSubscription() {
     }
   }
 
+  // Verify payment after return from GoPay
+  useEffect(() => {
+    const verifyPayment = async () => {
+      // Check if we're returning from GoPay
+      const urlParams = new URLSearchParams(window.location.search)
+      const paymentStatus = urlParams.get('payment')
+      const paymentId = urlParams.get('id')
+
+      if (paymentStatus === 'success' && paymentId) {
+        console.log('🔍 Verifying payment:', paymentId)
+
+        try {
+          setLoading(true)
+
+          // Call verify endpoint
+          const response = await fetch('/api/gopay/verify-payment', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ paymentId })
+          })
+
+          if (response.ok) {
+            const data = await response.json()
+            console.log('✅ Payment verified:', data)
+
+            // Reload subscription data
+            if (user && wedding) {
+              await loadSubscriptionData()
+            }
+
+            // Clean URL
+            window.history.replaceState({}, '', window.location.pathname)
+          } else {
+            console.error('Failed to verify payment')
+          }
+        } catch (error) {
+          console.error('Error verifying payment:', error)
+        } finally {
+          setLoading(false)
+        }
+      }
+    }
+
+    verifyPayment()
+  }, []) // Run once on mount
+
   // Cancel subscription
   const cancelSubscription = async () => {
     if (!user || !subscription) return
@@ -289,11 +344,20 @@ export function useSubscription() {
     try {
       setLoading(true)
 
-      // Import Stripe module dynamically
-      const { cancelSubscription: cancelStripeSubscription } = await import('@/lib/stripe')
+      // Call GoPay API to cancel subscription
+      const response = await fetch('/api/gopay/cancel-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId: user.id
+        })
+      })
 
-      // Cancel via Stripe (or mock)
-      await cancelStripeSubscription(user.id, subscription.stripeSubscriptionId || subscription.id)
+      if (!response.ok) {
+        throw new Error('Failed to cancel subscription')
+      }
 
       setSubscription({
         ...subscription,
@@ -318,11 +382,20 @@ export function useSubscription() {
     try {
       setLoading(true)
 
-      // Import Stripe module dynamically
-      const { reactivateSubscription: reactivateStripeSubscription } = await import('@/lib/stripe')
+      // Call GoPay API to reactivate subscription
+      const response = await fetch('/api/gopay/reactivate-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId: user.id
+        })
+      })
 
-      // Reactivate via Stripe (or mock)
-      await reactivateStripeSubscription(user.id, subscription.stripeSubscriptionId || subscription.id)
+      if (!response.ok) {
+        throw new Error('Failed to reactivate subscription')
+      }
 
       setSubscription({
         ...subscription,

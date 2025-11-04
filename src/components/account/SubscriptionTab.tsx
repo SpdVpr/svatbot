@@ -288,7 +288,7 @@ function SubscriptionTab({ subscriptionData }: SubscriptionTabProps) {
               )}
             </button>
             <p className="text-center text-sm text-gray-500 mt-3">
-              Bezpečná platba přes Stripe. Můžete zrušit kdykoliv.
+              Bezpečná platba přes GoPay. Můžete zrušit kdykoliv.
             </p>
           </div>
         </div>

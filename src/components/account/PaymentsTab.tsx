@@ -84,7 +84,7 @@ function PaymentsTab({ subscriptionData }: PaymentsTabProps) {
         </h3>
 
         <p className="text-sm text-gray-600 mb-4">
-          Všechny platby jsou zpracovávány bezpečně přes Stripe. Platební metodu a fakturační údaje zadáváte přímo v Stripe při platbě.
+          Všechny platby jsou zpracovávány bezpečně přes GoPay. Platební metodu a fakturační údaje zadáváte přímo v GoPay platební bráně.
         </p>
 
         {!payments || payments.length === 0 ? (
