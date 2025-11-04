@@ -44,6 +44,12 @@ export const GOPAY_CONFIG = {
       currency: 'CZK',
       interval: 'year',
       name: 'Premium Roční'
+    },
+    test_daily: {
+      amount: 1000, // 10 CZK in cents
+      currency: 'CZK',
+      interval: 'day',
+      name: 'Test Denní'
     }
   }
 }
@@ -51,7 +57,7 @@ export const GOPAY_CONFIG = {
 export interface CheckoutSessionParams {
   userId: string
   userEmail: string
-  plan: 'premium_monthly' | 'premium_yearly'
+  plan: 'premium_monthly' | 'premium_yearly' | 'test_daily'
   successUrl: string
   cancelUrl: string
 }
