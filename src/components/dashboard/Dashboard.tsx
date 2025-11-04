@@ -307,6 +307,21 @@ function DashboardContent() {
                 </button>
               </div>
             )}
+
+            {/* Premium subscription info */}
+            {subscription?.status === 'active' && hasPremiumAccess && (
+              <div className="mt-2 px-2">
+                <button
+                  onClick={() => openAccountModal('subscription')}
+                  className="flex items-center gap-1.5 text-xs hover:opacity-80 transition-opacity"
+                >
+                  <Crown className="w-3.5 h-3.5 text-primary-600" fill="currentColor" />
+                  <span className="font-medium text-primary-600">
+                    {subscription.plan === 'premium_monthly' ? 'Premium Měsíční' : 'Premium Roční'}
+                  </span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -349,6 +364,19 @@ function DashboardContent() {
                         ? 'Trial vyprší dnes!'
                         : `Trial vyprší za ${trialDaysRemaining} ${trialDaysRemaining === 1 ? 'den' : trialDaysRemaining <= 4 ? 'dny' : 'dní'}`
                       }
+                    </span>
+                  </button>
+                )}
+
+                {/* Premium subscription info */}
+                {subscription?.status === 'active' && hasPremiumAccess && (
+                  <button
+                    onClick={() => openAccountModal('subscription')}
+                    className="flex items-center gap-1.5 hover:opacity-80 transition-opacity mt-1"
+                  >
+                    <Crown className="w-4 h-4 text-primary-600" fill="currentColor" />
+                    <span className="text-sm font-medium text-primary-600">
+                      {subscription.plan === 'premium_monthly' ? 'Premium Měsíční' : 'Premium Roční'}
                     </span>
                   </button>
                 )}

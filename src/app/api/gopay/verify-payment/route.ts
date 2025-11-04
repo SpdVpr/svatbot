@@ -94,9 +94,13 @@ export async function POST(request: NextRequest) {
         await subscriptionRef.update({
           plan,
           status: 'active',
+          isTrialActive: false,
           currentPeriodStart: startDate,
           currentPeriodEnd: endDate,
           cancelAtPeriodEnd: false,
+          amount: payment.amount / 100,
+          currency: payment.currency,
+          goPayPaymentId: payment.id.toString(),
           updatedAt: Timestamp.now()
         })
       } else {
@@ -105,9 +109,13 @@ export async function POST(request: NextRequest) {
           userId,
           plan,
           status: 'active',
+          isTrialActive: false,
           currentPeriodStart: startDate,
           currentPeriodEnd: endDate,
           cancelAtPeriodEnd: false,
+          amount: payment.amount / 100,
+          currency: payment.currency,
+          goPayPaymentId: payment.id.toString(),
           createdAt: Timestamp.now(),
           updatedAt: Timestamp.now()
         })
