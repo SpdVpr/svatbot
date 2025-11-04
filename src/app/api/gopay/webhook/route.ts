@@ -138,7 +138,7 @@ export async function GET(request: NextRequest) {
       const subscriptionRef = adminDb.collection('subscriptions').doc(userId)
       const subscriptionDoc = await subscriptionRef.get()
 
-      if (subscriptionDoc.exists()) {
+      if (subscriptionDoc.exists) {
         // Update existing subscription
         await subscriptionRef.update({
           plan,

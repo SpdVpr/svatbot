@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAdminDb } from '@/lib/firebase-admin'
+import { getAdminDb } from '@/config/firebase-admin'
 import { Timestamp } from 'firebase-admin/firestore'
 
 /**
