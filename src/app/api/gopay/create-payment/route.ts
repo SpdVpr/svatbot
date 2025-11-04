@@ -13,11 +13,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Validate plan type
+    if (plan !== 'premium_monthly' && plan !== 'premium_yearly' && plan !== 'test_daily') {
+      return NextResponse.json(
+        { error: 'Invalid plan type' },
+        { status: 400 }
+      )
+    }
+
     // Create GoPay payment
     const payment = await createGoPayPaymentServer({
       userId,
       userEmail,
-      plan,
+      plan: plan as 'premium_monthly' | 'premium_yearly' | 'test_daily',
       successUrl,
       cancelUrl
     })
