@@ -317,7 +317,9 @@ function DashboardContent() {
                 >
                   <Crown className="w-3.5 h-3.5 text-primary-600" fill="currentColor" />
                   <span className="font-medium text-primary-600">
-                    {subscription.plan === 'premium_monthly' ? 'Premium Měsíční' : 'Premium Roční'}
+                    {subscription.plan === 'premium_monthly' && 'Premium Měsíční'}
+                    {subscription.plan === 'premium_yearly' && 'Premium Roční'}
+                    {subscription.plan === 'test_daily' && '🧪 Test Denní'}
                   </span>
                 </button>
               </div>
@@ -376,7 +378,9 @@ function DashboardContent() {
                   >
                     <Crown className="w-4 h-4 text-primary-600" fill="currentColor" />
                     <span className="text-sm font-medium text-primary-600">
-                      {subscription.plan === 'premium_monthly' ? 'Premium Měsíční' : 'Premium Roční'}
+                      {subscription.plan === 'premium_monthly' && 'Premium Měsíční'}
+                      {subscription.plan === 'premium_yearly' && 'Premium Roční'}
+                      {subscription.plan === 'test_daily' && '🧪 Test Denní'}
                     </span>
                   </button>
                 )}

@@ -81,8 +81,18 @@ export async function POST(request: NextRequest) {
       // Calculate subscription dates
       const now = new Date()
       const startDate = Timestamp.fromDate(now)
+
+      let daysToAdd: number
+      if (plan === 'premium_yearly') {
+        daysToAdd = 365
+      } else if (plan === 'test_daily') {
+        daysToAdd = 1
+      } else {
+        daysToAdd = 30
+      }
+
       const endDate = Timestamp.fromDate(
-        new Date(now.getTime() + (plan === 'premium_yearly' ? 365 : 30) * 24 * 60 * 60 * 1000)
+        new Date(now.getTime() + daysToAdd * 24 * 60 * 60 * 1000)
       )
 
       // Update or create subscription

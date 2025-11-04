@@ -131,6 +131,8 @@ export async function GET(request: NextRequest) {
 
       if (plan === 'premium_monthly') {
         periodEnd.setMonth(periodEnd.getMonth() + 1)
+      } else if (plan === 'test_daily') {
+        periodEnd.setDate(periodEnd.getDate() + 1) // Add 1 day for testing
       } else {
         periodEnd.setFullYear(periodEnd.getFullYear() + 1)
       }

@@ -1,6 +1,6 @@
 // Subscription and Monetization Types
 
-export type SubscriptionPlan = 'free_trial' | 'premium_monthly' | 'premium_yearly'
+export type SubscriptionPlan = 'free_trial' | 'premium_monthly' | 'premium_yearly' | 'test_daily'
 
 export type SubscriptionStatus = 
   | 'trialing'      // Free trial period
@@ -187,6 +187,39 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDetails[] = [
       photoGallery: true,
       emailNotifications: true,
       customDomain: true,
+      prioritySupport: true,
+      aiAssistant: true,
+      advancedAnalytics: true,
+      aiChatQueriesPerDay: 'unlimited',
+      aiMoodboardsPerDay: 'unlimited',
+      websiteTemplates: 'all'
+    }
+  },
+  {
+    id: 'test_daily',
+    name: 'Test denní',
+    description: '⚠️ Pouze pro testování - opakování každý den',
+    price: 10,
+    currency: 'CZK',
+    interval: 'month',
+    intervalCount: 1,
+    features: [
+      '⚠️ TESTOVACÍ PŘEDPLATNÉ',
+      'Opakování každý den',
+      'Pro testování recurring plateb',
+      'Všechny Premium funkce'
+    ],
+    limits: {
+      maxGuests: 'unlimited',
+      maxTasks: 'unlimited',
+      maxBudgetItems: 'unlimited',
+      maxVendors: 'unlimited',
+      maxPhotos: 'unlimited',
+      weddingWebsite: true,
+      onlineRSVP: true,
+      photoGallery: true,
+      emailNotifications: true,
+      customDomain: false,
       prioritySupport: true,
       aiAssistant: true,
       advancedAnalytics: true,
