@@ -20,8 +20,26 @@ export type { CheckoutSessionParams, GoPayPayment } from './gopay'
  */
 async function getAccessToken(scope: 'payment-create' | 'payment-all' = 'payment-all'): Promise<string> {
   const { GOPAY_CONFIG } = await import('./gopay')
+
+  // Validate credentials
+  if (!GOPAY_CONFIG.clientId || !GOPAY_CONFIG.clientSecret) {
+    console.error('❌ Missing GoPay credentials:', {
+      hasClientId: !!GOPAY_CONFIG.clientId,
+      hasClientSecret: !!GOPAY_CONFIG.clientSecret,
+      environment: GOPAY_CONFIG.environment
+    })
+    throw new Error('Chybí GoPay credentials. Zkontrolujte environment variables.')
+  }
+
+  console.log('🔑 Getting GoPay access token...', {
+    clientId: GOPAY_CONFIG.clientId,
+    environment: GOPAY_CONFIG.environment,
+    apiUrl: GOPAY_CONFIG.apiUrl,
+    scope
+  })
+
   const credentials = Buffer.from(`${GOPAY_CONFIG.clientId}:${GOPAY_CONFIG.clientSecret}`).toString('base64')
-  
+
   const response = await fetch(`${GOPAY_CONFIG.apiUrl}/oauth2/token`, {
     method: 'POST',
     headers: {
@@ -34,11 +52,16 @@ async function getAccessToken(scope: 'payment-create' | 'payment-all' = 'payment
 
   if (!response.ok) {
     const error = await response.text()
-    console.error('GoPay OAuth error:', error)
-    throw new Error('Nepodařilo se získat přístupový token')
+    console.error('❌ GoPay OAuth error:', {
+      status: response.status,
+      statusText: response.statusText,
+      error
+    })
+    throw new Error(`Nepodařilo se získat přístupový token: ${response.status} ${response.statusText}`)
   }
 
   const data = await response.json()
+  console.log('✅ GoPay access token obtained')
   return data.access_token
 }
 
