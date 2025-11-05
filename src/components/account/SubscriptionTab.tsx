@@ -207,6 +207,14 @@ function SubscriptionTab({ subscriptionData }: SubscriptionTabProps) {
                   <span className="text-4xl font-bold text-gray-900">299</span>
                   <span className="text-gray-600">Kč / měsíc</span>
                 </div>
+                <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-xs text-blue-900 font-semibold mb-1">
+                    🔄 Opakovaná platba každý měsíc
+                  </p>
+                  <p className="text-xs text-blue-800">
+                    Platba 299 Kč se automaticky strhává každý měsíc. Můžete zrušit kdykoliv jedním kliknutím v nastavení účtu na záložce "Předplatné" tlačítkem "Zrušit předplatné".
+                  </p>
+                </div>
               </div>
 
               <ul className="space-y-3">
@@ -260,6 +268,14 @@ function SubscriptionTab({ subscriptionData }: SubscriptionTabProps) {
                 <p className="text-xs text-gray-500 mt-1">
                   To je jen 250 Kč/měsíc
                 </p>
+                <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-xs text-green-900 font-semibold mb-1">
+                    ✓ Jednorázová platba
+                  </p>
+                  <p className="text-xs text-green-800">
+                    Zaplatíte pouze jednou 2 999 Kč za celý rok. Žádné automatické obnovení ani opakované platby.
+                  </p>
+                </div>
               </div>
 
               <ul className="space-y-3">

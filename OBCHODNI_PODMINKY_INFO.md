@@ -70,11 +70,24 @@ Popis služby SvatBot.cz:
 - Okamžitý přístup k placené verzi
 
 #### 🔄 Předplatné
-- **Měsíční členství (299 Kč/měsíc):** Automatické strhávání každý měsíc, lze kdykoli zrušit
-- **Roční členství (2 999 Kč - jednorázová platba):** Platba za celý rok, bez automatického obnovení
-- Měsíční lze zrušit kdykoli v nastavení účtu
-- Zrušení měsíčního je účinné k datu konce předplaceného období
-- Roční se po uplynutí roku automaticky neobnovuje
+
+**Měsíční členství (299 Kč/měsíc):**
+- 🔄 **OPAKOVANÁ PLATBA** - Platba 299 Kč se automaticky strhává každý měsíc z platební karty přes GoPay
+- Lze kdykoli zrušit v nastavení účtu na záložce "Předplatné" tlačítkem "Zrušit předplatné"
+- Zrušení je účinné k datu konce aktuálního předplaceného období
+- Již zaplacené částky za aktuální období nejsou vratné (s výjimkou odstoupení od smlouvy)
+
+**Jak zrušit měsíční členství:**
+1. Přihlaste se do účtu na SvatBot.cz
+2. Klikněte na ikonu profilu v pravém horním rohu
+3. Vyberte záložku "Předplatné"
+4. Klikněte na tlačítko "Zrušit předplatné"
+5. Potvrďte zrušení
+
+**Roční členství (2 999 Kč - jednorázová platba):**
+- ✓ **JEDNORÁZOVÁ PLATBA** - Zaplatíte pouze jednou 2 999 Kč za celý rok
+- Žádné automatické obnovení ani opakované platby
+- Po uplynutí roku je nutné provést novou platbu pro pokračování
 
 ### 6. Práva a povinnosti ✅
 

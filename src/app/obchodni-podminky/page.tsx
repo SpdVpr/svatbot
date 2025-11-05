@@ -209,27 +209,58 @@ export default function ObchodniPodminkyPage() {
                 Placené verze služby jsou poskytovány ve dvou variantách:
               </p>
               <div className="bg-gradient-to-br from-rose-50 to-pink-50 border-2 border-rose-200 p-6 rounded-lg mb-4">
-                <ul className="space-y-3 text-gray-700">
+                <ul className="space-y-4 text-gray-700">
                   <li>
                     <strong className="text-gray-900">Měsíční členství (299 Kč/měsíc):</strong>
                     <br />
                     <span className="text-sm">Platba se automaticky strhává každý měsíc. Členství lze kdykoli zrušit v nastavení účtu.</span>
+                    <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded">
+                      <p className="text-xs font-semibold text-blue-900 mb-1">🔄 OPAKOVANÁ PLATBA</p>
+                      <p className="text-xs text-blue-800">
+                        Jedná se o opakovanou platbu ve výši 299 Kč, která se automaticky strhává každý měsíc z vaší platební karty prostřednictvím platební brány GoPay.
+                      </p>
+                    </div>
                   </li>
                   <li>
                     <strong className="text-gray-900">Roční členství (2 999 Kč - jednorázová platba):</strong>
                     <br />
                     <span className="text-sm">Jednorázová platba za celý rok. Členství se automaticky neobnovuje a po uplynutí roku je nutné provést novou platbu.</span>
+                    <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded">
+                      <p className="text-xs font-semibold text-green-900 mb-1">✓ JEDNORÁZOVÁ PLATBA</p>
+                      <p className="text-xs text-green-800">
+                        Zaplatíte pouze jednou 2 999 Kč za celý rok. Žádné automatické obnovení ani opakované platby.
+                      </p>
+                    </div>
                   </li>
                 </ul>
               </div>
-              <p className="text-gray-700 mt-3">
-                <strong>Měsíční členství:</strong> Zákazník může předplatné kdykoli zrušit v nastavení svého účtu.
-                Zrušení je účinné k datu konce aktuálního předplaceného období. Již zaplacené částky za aktuální
-                období nejsou vratné (s výjimkou odstoupení od smlouvy dle bodu 7).
-              </p>
+
+              <div className="bg-amber-50 border-2 border-amber-300 p-5 rounded-lg mb-4">
+                <h4 className="text-lg font-bold text-amber-900 mb-3 flex items-center">
+                  <span className="mr-2">⚠️</span>
+                  Jak zrušit měsíční členství
+                </h4>
+                <p className="text-sm text-amber-900 mb-3">
+                  <strong>Měsíční členství můžete zrušit kdykoliv jednoduše a rychle:</strong>
+                </p>
+                <ol className="list-decimal pl-5 space-y-2 text-sm text-amber-900">
+                  <li>Přihlaste se do svého účtu na SvatBot.cz</li>
+                  <li>Klikněte na ikonu profilu v pravém horním rohu</li>
+                  <li>Vyberte záložku <strong>"Předplatné"</strong></li>
+                  <li>Klikněte na tlačítko <strong>"Zrušit předplatné"</strong></li>
+                  <li>Potvrďte zrušení</li>
+                </ol>
+                <p className="text-sm text-amber-900 mt-3">
+                  <strong>Důležité:</strong> Zrušení je účinné k datu konce aktuálního předplaceného období.
+                  Do té doby máte plný přístup ke všem funkcím. Již zaplacené částky za aktuální období
+                  nejsou vratné (s výjimkou odstoupení od smlouvy dle bodu 7).
+                </p>
+              </div>
+
               <p className="text-gray-700 mt-3">
                 <strong>Roční členství (2 999 Kč):</strong> Jedná se o jednorázovou platbu bez automatického obnovení.
                 Po uplynutí ročního období je nutné provést novou platbu pro pokračování v používání prémiových funkcí.
+                Roční členství se automaticky nezrušuje ani neobnovuje.
               </p>
             </section>
 
