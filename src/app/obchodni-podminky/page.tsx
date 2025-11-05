@@ -46,7 +46,7 @@ export default function ObchodniPodminkyPage() {
                 o ochraně spotřebitele, ve znění pozdějších předpisů.
               </p>
               <p className="text-sm text-gray-500 mt-4">
-                <strong>Poslední aktualizace:</strong> 16. října 2025
+                <strong>Poslední aktualizace:</strong> 5. listopadu 2025
               </p>
             </section>
 
@@ -120,12 +120,11 @@ export default function ObchodniPodminkyPage() {
                 <li>Další nástroje pro plánování svatby</li>
               </ul>
               <p className="text-gray-700 mt-4">
-                Služba je poskytována ve třech variantách:
+                Služba je poskytována ve dvou variantách:
               </p>
               <ul className="list-disc pl-6 space-y-2 text-gray-700">
-                <li><strong>Free (Zdarma)</strong> - základní funkce s omezeními</li>
-                <li><strong>Premium</strong> - rozšířené funkce bez omezení</li>
-                <li><strong>Ultimate</strong> - všechny funkce včetně prioritní podpory</li>
+                <li><strong>Free (Zdarma)</strong> - první měsíc po registraci zdarma s přístupem ke všem funkcím</li>
+                <li><strong>Premium (Placené)</strong> - pokračování v používání všech funkcí po uplynutí zkušebního měsíce</li>
               </ul>
             </section>
 
@@ -177,21 +176,21 @@ export default function ObchodniPodminkyPage() {
               <div className="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg mb-4">
                 <p className="text-gray-900 font-semibold mb-3">Způsob platby:</p>
                 <ul className="list-disc pl-6 space-y-2 text-gray-700">
-                  <li><strong>Online platba platební kartou</strong> (Visa, Mastercard, American Express)</li>
-                  <li><strong>Platební brána:</strong> Stripe (<a href="https://stripe.com" className="text-rose-600 hover:text-rose-700">stripe.com</a>)</li>
-                  <li><strong>Měna:</strong> CZK (Kč) nebo EUR (€)</li>
-                  <li><strong>Zabezpečení:</strong> PCI DSS Level 1 certifikace</li>
+                  <li><strong>Online platba platební kartou</strong> (Visa, Mastercard, American Express, Maestro)</li>
+                  <li><strong>Platební brána:</strong> GoPay (<a href="https://www.gopay.com" className="text-rose-600 hover:text-rose-700" target="_blank" rel="noopener noreferrer">www.gopay.com</a>)</li>
+                  <li><strong>Měna:</strong> CZK (Kč)</li>
+                  <li><strong>Zabezpečení:</strong> PCI DSS certifikace</li>
                 </ul>
               </div>
               <p className="text-gray-700 mb-3">
-                Platba je zpracována bezpečně prostřednictvím platební brány Stripe. Provozovatel 
-                nemá přístup k údajům o platební kartě zákazníka. Všechny platební údaje jsou 
+                Platba je zpracována bezpečně prostřednictvím platební brány GoPay. Provozovatel
+                nemá přístup k údajům o platební kartě zákazníka. Všechny platební údaje jsou
                 šifrovány a zpracovávány v souladu s nejvyššími bezpečnostními standardy.
               </p>
               <p className="text-gray-700 mb-3">
-                Více informací o zpracování plateb: 
-                <a href="https://stripe.com/privacy" className="text-rose-600 hover:text-rose-700 ml-1">
-                  Stripe Privacy Policy
+                Více informací o zpracování plateb:
+                <a href="https://www.gopay.com/cs/ochrana-osobnich-udaju" className="text-rose-600 hover:text-rose-700 ml-1" target="_blank" rel="noopener noreferrer">
+                  GoPay - Ochrana osobních údajů
                 </a>
               </p>
 
@@ -205,19 +204,32 @@ export default function ObchodniPodminkyPage() {
                 <li>Přístup k placené verzi služby</li>
               </ul>
 
-              <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-2">5.4 Předplatné</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-2">5.4 Předplatné a platební plány</h3>
               <p className="text-gray-700 mb-3">
-                Placené verze služby jsou poskytovány formou předplatného:
+                Placené verze služby jsou poskytovány ve dvou variantách:
               </p>
-              <ul className="list-disc pl-6 space-y-2 text-gray-700">
-                <li><strong>Měsíční předplatné:</strong> Automaticky se obnovuje každý měsíc</li>
-                <li><strong>Roční předplatné:</strong> Automaticky se obnovuje každý rok</li>
-                <li><strong>Jednorázová platba:</strong> Bez automatického obnovení (pokud je nabízena)</li>
-              </ul>
+              <div className="bg-gradient-to-br from-rose-50 to-pink-50 border-2 border-rose-200 p-6 rounded-lg mb-4">
+                <ul className="space-y-3 text-gray-700">
+                  <li>
+                    <strong className="text-gray-900">Měsíční členství (299 Kč/měsíc):</strong>
+                    <br />
+                    <span className="text-sm">Platba se automaticky strhává každý měsíc. Členství lze kdykoli zrušit v nastavení účtu.</span>
+                  </li>
+                  <li>
+                    <strong className="text-gray-900">Roční členství (2 999 Kč - jednorázová platba):</strong>
+                    <br />
+                    <span className="text-sm">Jednorázová platba za celý rok. Členství se automaticky neobnovuje a po uplynutí roku je nutné provést novou platbu.</span>
+                  </li>
+                </ul>
+              </div>
               <p className="text-gray-700 mt-3">
-                Zákazník může předplatné kdykoli zrušit v nastavení svého účtu. Zrušení je účinné 
-                k datu konce aktuálního předplaceného období. Již zaplacené částky za aktuální 
+                <strong>Měsíční členství:</strong> Zákazník může předplatné kdykoli zrušit v nastavení svého účtu.
+                Zrušení je účinné k datu konce aktuálního předplaceného období. Již zaplacené částky za aktuální
                 období nejsou vratné (s výjimkou odstoupení od smlouvy dle bodu 7).
+              </p>
+              <p className="text-gray-700 mt-3">
+                <strong>Roční členství (2 999 Kč):</strong> Jedná se o jednorázovou platbu bez automatického obnovení.
+                Po uplynutí ročního období je nutné provést novou platbu pro pokračování v používání prémiových funkcí.
               </p>
             </section>
 
@@ -482,7 +494,10 @@ export default function ObchodniPodminkyPage() {
 
               <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-2">13.4 Účinnost</h3>
               <p className="text-gray-700 mb-3">
-                Tyto obchodní podmínky nabývají účinnosti dnem <strong>16. října 2025</strong>.
+                Tyto obchodní podmínky nabývají účinnosti dnem <strong>5. listopadu 2025</strong>.
+              </p>
+              <p className="text-gray-700 mb-3 text-sm">
+                Předchozí verze: 16. října 2025
               </p>
             </section>
 

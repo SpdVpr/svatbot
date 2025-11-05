@@ -1104,7 +1104,7 @@ export default function WelcomeScreen() {
               </summary>
               <div className="mt-4 text-gray-600 leading-relaxed" itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
                 <p itemProp="text">
-                  Ano! SvatBot.cz nabízí bezplatný plán s přístupem k základním funkcím. Pro pokročilé funkce jako AI asistent, neomezený počet hostů a premium šablony svatebního webu nabízíme prémiové plány od 2 999 Kč. Můžete začít zdarma a upgradovat kdykoliv během plánování.
+                  Ano! První měsíc po registraci je zcela zdarma s přístupem ke všem funkcím. Pokud se vám aplikace bude líbit, můžete si zvolit měsíční členství za 299 Kč/měsíc nebo roční členství za 2 999 Kč jako jednorázovou platbu. Platby jsou zpracovány bezpečně přes GoPay platební bránu.
                 </p>
               </div>
             </details>
@@ -1125,12 +1125,12 @@ export default function WelcomeScreen() {
             {/* FAQ 4 */}
             <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
               <summary className="font-semibold text-lg text-gray-900 cursor-pointer flex items-center justify-between" itemProp="name">
-                Mohu sdílet přístup s partnerem nebo rodinou?
+                Jak jednoduché je zaplatit nebo zrušit členství?
                 <ChevronDown className="w-5 h-5 text-gray-500" aria-hidden="true" />
               </summary>
               <div className="mt-4 text-gray-600 leading-relaxed" itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
                 <p itemProp="text">
-                  Ano! SvatBot.cz podporuje sdílení přístupu. Můžete pozvat svého partnera, rodiče nebo svatební koordinátorku ke spolupráci na plánování. Všechny změny se synchronizují v reálném čase a každý má přístup k aktuálním informacím.
+                  Velmi jednoduché! Platbu i zrušení zvládnete na jedno kliknutí přímo v nastavení účtu. Žádné komplikované formuláře ani telefonáty. Platby jsou zpracovány bezpečně přes GoPay platební bránu s podporou všech běžných platebních karet. Zrušení členství je okamžité a bez jakýchkoliv poplatků.
                 </p>
               </div>
             </details>

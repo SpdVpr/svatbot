@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Check, Sparkles, Zap, Crown, Globe, TrendingUp, Bot, Wand2, MessageSquare } from 'lucide-react'
+import Image from 'next/image'
 
 interface PricingSectionProps {
   onGetStarted: () => void
@@ -223,7 +224,7 @@ export default function PricingSection({ onGetStarted }: PricingSectionProps) {
                   <TrendingUp className="w-4 h-4 text-emerald-400" />
                 </div>
               </div>
-              <p className="text-gray-400 text-sm mt-2">Fakturováno jednou ročně</p>
+              <p className="text-gray-400 text-sm mt-2">Jednorázová platba • Bez automatického obnovení</p>
             </div>
 
             <button
@@ -240,7 +241,7 @@ export default function PricingSection({ onGetStarted }: PricingSectionProps) {
                   Stejné funkce jako měsíční
                 </p>
                 <p className="text-gray-300 text-xs">
-                  Vše co měsíční předplatné + úspora 589 Kč ročně
+                  Vše co měsíční členství + úspora 589 Kč ročně • Jednorázová platba
                 </p>
               </div>
 
@@ -276,6 +277,25 @@ export default function PricingSection({ onGetStarted }: PricingSectionProps) {
               <span className="text-sm">30denní záruka vrácení peněz</span>
             </div>
           </div>
+        </div>
+
+        {/* GoPay Payment Gateway */}
+        <div className="mt-12 md:mt-16 text-center animate-fade-in" style={{ animationDelay: '0.8s' }}>
+          <p className="text-gray-400 text-sm mb-4">Bezpečné platby zajištěny přes</p>
+          <div className="flex items-center justify-center">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-8 py-4 border border-white/20 hover:border-white/30 transition-all">
+              <Image
+                src="/GoPay loga/white.svg"
+                alt="GoPay - Bezpečná platební brána"
+                width={120}
+                height={40}
+                className="opacity-90 hover:opacity-100 transition-opacity"
+              />
+            </div>
+          </div>
+          <p className="text-gray-500 text-xs mt-3">
+            Podporujeme Visa, Mastercard, American Express a Maestro
+          </p>
         </div>
       </div>
     </section>

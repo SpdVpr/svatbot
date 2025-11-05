@@ -6,9 +6,10 @@ Vytvořena kompletní stránka **Obchodní podmínky** pro SvatBot.cz v souladu 
 
 ## 🔗 Stránka
 
-**URL:** `/obchodni-podminky`  
-**Soubor:** `src/app/obchodni-podminky/page.tsx`  
+**URL:** `/obchodni-podminky`
+**Soubor:** `src/app/obchodni-podminky/page.tsx`
 **Vytvořeno:** 16. října 2025
+**Aktualizováno:** 5. listopadu 2025
 
 ## 📄 Obsah stránky
 
@@ -40,9 +41,8 @@ Popis služby SvatBot.cz:
 - Svatební web
 
 **Varianty služby:**
-- Free (zdarma) - základní funkce
-- Premium - rozšířené funkce
-- Ultimate - všechny funkce + prioritní podpora
+- Free (zdarma) - první měsíc po registraci zdarma s přístupem ke všem funkcím
+- Premium (placené) - pokračování v používání všech funkcí po uplynutí zkušebního měsíce
 
 ### 4. Registrace a uzavření smlouvy ✅
 - Podmínky registrace (18+ let)
@@ -51,13 +51,13 @@ Popis služby SvatBot.cz:
 
 ### 5. Ceny a platební podmínky ✅
 
-#### 💳 Platební brána: **STRIPE**
+#### 💳 Platební brána: **GOPAY**
 - **Způsob platby:** Online platební kartou
-- **Podporované karty:** Visa, Mastercard, American Express
-- **Měna:** CZK (Kč) nebo EUR (€)
-- **Zabezpečení:** PCI DSS Level 1 certifikace
-- **Odkaz:** https://stripe.com
-- **Privacy:** https://stripe.com/privacy
+- **Podporované karty:** Visa, Mastercard, American Express, Maestro
+- **Měna:** CZK (Kč)
+- **Zabezpečení:** PCI DSS certifikace
+- **Odkaz:** https://www.gopay.com
+- **Privacy:** https://www.gopay.com/cs/ochrana-osobnich-udaju
 
 #### 💰 Ceny
 - Všechny ceny včetně daní
@@ -70,11 +70,11 @@ Popis služby SvatBot.cz:
 - Okamžitý přístup k placené verzi
 
 #### 🔄 Předplatné
-- **Měsíční:** Automatické obnovení každý měsíc
-- **Roční:** Automatické obnovení každý rok
-- **Jednorázová:** Bez automatického obnovení
-- Zrušení kdykoli v nastavení účtu
-- Účinné k datu konce předplaceného období
+- **Měsíční členství (299 Kč/měsíc):** Automatické strhávání každý měsíc, lze kdykoli zrušit
+- **Roční členství (2 999 Kč - jednorázová platba):** Platba za celý rok, bez automatického obnovení
+- Měsíční lze zrušit kdykoli v nastavení účtu
+- Zrušení měsíčního je účinné k datu konce předplaceného období
+- Roční se po uplynutí roku automaticky neobnovuje
 
 ### 6. Práva a povinnosti ✅
 
@@ -189,19 +189,19 @@ Podle § 1837 občanského zákoníku nemůže spotřebitel odstoupit od smlouvy
   - Dozor nad dodržováním zákona o ochraně spotřebitele
   - Mimosoudní řešení sporů
 
-## 💳 Stripe integrace
+## 💳 GoPay integrace
 
 ### Informace v obchodních podmínkách:
-✅ Stripe jako platební brána  
-✅ Podporované karty (Visa, Mastercard, Amex)  
-✅ PCI DSS Level 1 certifikace  
-✅ Odkaz na Stripe Privacy Policy  
-✅ Zabezpečení platebních údajů  
-✅ Provozovatel nemá přístup k údajům o kartě  
+✅ GoPay jako platební brána
+✅ Podporované karty (Visa, Mastercard, Amex, Maestro)
+✅ PCI DSS certifikace
+✅ Odkaz na GoPay Privacy Policy
+✅ Zabezpečení platebních údajů
+✅ Provozovatel nemá přístup k údajům o kartě
 
 ### Odkazy:
-- https://stripe.com
-- https://stripe.com/privacy
+- https://www.gopay.com
+- https://www.gopay.com/cs/ochrana-osobnich-udaju
 
 ## 🔗 Navigace
 
@@ -239,7 +239,9 @@ Podle § 1837 občanského zákoníku nemůže spotřebitel odstoupit od smlouvy
 - [x] Adresa: Zápská 1149, 250 71 Nehvizdy
 - [x] Email: info@svatbot.cz
 - [x] Není plátcem DPH
-- [x] Stripe jako platební brána
+- [x] GoPay jako platební brána
+- [x] Měsíční členství 299 Kč s automatickým strhávání
+- [x] Roční členství jako jednorázová platba bez obnovení
 - [x] 14denní odstoupení od smlouvy
 - [x] ČOI jako subjekt mimosoudního řešení
 - [x] Platforma ODR
