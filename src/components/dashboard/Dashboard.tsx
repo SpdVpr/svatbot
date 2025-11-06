@@ -51,6 +51,7 @@ function DashboardContent() {
   const [accountInitialTab, setAccountInitialTab] = useState<'profile' | 'subscription' | 'payments' | 'statistics' | 'settings' | 'feedback'>('profile')
   const [showMobileMenu, setShowMobileMenu] = useState(false)
   const [showTrialExpiredModal, setShowTrialExpiredModal] = useState(false)
+  const [showOnboardingWizardFromDashboard, setShowOnboardingWizardFromDashboard] = useState(false)
   const searchParams = useSearchParams()
 
   // Use DEMO-aware wedding date
@@ -106,7 +107,8 @@ function DashboardContent() {
 
   // Helper functions for opening/closing modals with View Transitions
   const openWeddingSettings = () => {
-    startTransition(() => setShowWeddingSettings(true))
+    // Set state immediately to hide content instantly (no transition delay)
+    setShowWeddingSettings(true)
   }
 
   const closeWeddingSettings = () => {
@@ -114,7 +116,7 @@ function DashboardContent() {
   }
 
   const openNotesModal = () => {
-    // Set state immediately to hide content, then start transition for modal
+    // Set state immediately to hide content instantly (no transition delay)
     setShowNotesModal(true)
   }
 
@@ -123,7 +125,7 @@ function DashboardContent() {
   }
 
   const openAccountModal = (tab?: typeof accountInitialTab) => {
-    // Set state immediately to hide content, then start transition for modal
+    // Set state immediately to hide content instantly (no transition delay)
     if (tab) setAccountInitialTab(tab)
     setShowAccountModal(true)
   }
@@ -227,8 +229,8 @@ function DashboardContent() {
         <ScrollProgress />
 
       {/* Glassmorphism Header - hidden when modal is open */}
-      <header className={`bg-gray-50/95 backdrop-blur-xl border-b border-gray-100/50 shadow-sm sticky top-0 z-50 transition-opacity duration-200 ${
-        showNotesModal || showAccountModal ? 'opacity-0 pointer-events-none' : 'opacity-100'
+      <header className={`bg-gray-50/95 backdrop-blur-xl border-b border-gray-100/50 shadow-sm sticky top-0 z-[200] ${
+        showNotesModal || showAccountModal || showWeddingSettings || showOnboardingWizardFromDashboard ? 'hidden' : ''
       }`}>
         {/* Mobile Header */}
         <div className="sm:hidden">
@@ -455,10 +457,13 @@ function DashboardContent() {
       </header>
 
       {/* Main Content - Reduced padding on mobile, hidden when modal is open */}
-      <main className={`flex-1 py-2 sm:py-6 px-2 sm:px-6 lg:px-8 transition-opacity duration-200 ${
-        showNotesModal || showAccountModal ? 'opacity-0 pointer-events-none' : 'opacity-100'
+      <main className={`flex-1 py-2 sm:py-6 px-2 sm:px-6 lg:px-8 ${
+        showNotesModal || showAccountModal || showWeddingSettings || showOnboardingWizardFromDashboard ? 'hidden' : ''
       }`}>
-        <DragDropWrapper onWeddingSettingsClick={openWeddingSettings} />
+        <DragDropWrapper
+          onWeddingSettingsClick={openWeddingSettings}
+          onOnboardingWizardChange={setShowOnboardingWizardFromDashboard}
+        />
       </main>
 
       {/* Wedding Settings Modal */}

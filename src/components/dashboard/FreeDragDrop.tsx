@@ -35,6 +35,7 @@ import OnboardingWidget from '../onboarding/OnboardingWidget'
 
 interface FreeDragDropProps {
   onWeddingSettingsClick?: () => void
+  onOnboardingWizardChange?: (isOpen: boolean) => void
 }
 
 // Module size configurations (width x height in pixels)
@@ -58,7 +59,7 @@ const CANVAS_WIDTHS = {
   'ultra-wide': { width: 2040, label: 'Ultra široký (5 modulů)', description: '2040px - 5 modulů vedle sebe' }
 }
 
-export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropProps) {
+export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizardChange }: FreeDragDropProps) {
   const { user } = useAuth()
   const { isDemoUser, isLocked: isDemoLocked } = useIsDemoUser(user?.id)
 
@@ -257,7 +258,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
       <div className="space-y-6">
         {/* Dashboard Controls */}
         <div
-          className="bg-gray-50/95 backdrop-blur-xl p-5 rounded-3xl border border-gray-100/60 mx-auto shadow-lg relative z-[100]"
+          className="bg-gray-50/95 backdrop-blur-xl p-5 rounded-3xl border border-gray-100/60 mx-auto shadow-lg relative z-[40]"
           style={{
             maxWidth: '1240px',
             boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
@@ -330,7 +331,10 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
                   </div>
                 </div>
                 <button
-                  onClick={() => setShowOnboardingWizard(true)}
+                  onClick={() => {
+                    setShowOnboardingWizard(true)
+                    onOnboardingWizardChange?.(true)
+                  }}
                   className="btn-primary flex items-center space-x-1 text-sm px-4 py-2"
                 >
                   <BookOpen className="w-4 h-4" />
@@ -356,7 +360,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
 
                 {showCanvasMenu && (
                   <div
-                    className="absolute right-0 top-full mt-2 w-72 bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg border border-white/60 z-[110]"
+                    className="absolute right-0 top-full mt-2 w-72 bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg border border-white/60 z-[50]"
                     style={{
                       boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
                     }}
@@ -408,7 +412,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
 
                 {showColorMenu && (
                   <div
-                    className="absolute right-0 top-full mt-2 w-64 bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg border border-white/60 z-[110]"
+                    className="absolute right-0 top-full mt-2 w-64 bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg border border-white/60 z-[50]"
                     style={{
                       boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
                     }}
@@ -622,7 +626,10 @@ export default function FreeDragDrop({ onWeddingSettingsClick }: FreeDragDropPro
       {/* Onboarding Wizard */}
       {showOnboardingWizard && (
         <OnboardingWizard
-          onClose={() => setShowOnboardingWizard(false)}
+          onClose={() => {
+            setShowOnboardingWizard(false)
+            onOnboardingWizardChange?.(false)
+          }}
           autoShow={false}
         />
       )}

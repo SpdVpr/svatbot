@@ -58,7 +58,7 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
     return (
       <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border-2 border-primary-500 overflow-hidden" style={{ padding: '2px' }}>
+          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border-2 border-primary-500 overflow-hidden" style={{ padding: '0' }}>
             <video
               autoPlay
               loop
@@ -143,7 +143,7 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
       {/* Svatbot Header */}
       <div className="bg-gradient-to-r from-primary-500 to-primary-400 rounded-xl p-6 text-white shadow-lg">
         <div className="flex items-start gap-4">
-          <div className="bg-white rounded-full flex items-center justify-center shadow-md flex-shrink-0 overflow-hidden" style={{ width: '80px', height: '130px', padding: '4px' }}>
+          <div className="bg-white rounded-full flex items-center justify-center shadow-md flex-shrink-0 overflow-hidden" style={{ width: '80px', height: '130px', padding: '0' }}>
             <video
               autoPlay
               loop
@@ -168,27 +168,7 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
           </div>
         </div>
 
-        {/* Emotional Insight Summary */}
-        {emotionalInsight && (
-          <div className="mt-4 pt-4 border-t border-white/20">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Heart className="w-5 h-5" />
-                <span className="font-medium">Vaše nálada:</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-sm">
-                  {emotionalInsight.overallMood === 'positive' ? '😊 Pozitivní' :
-                   emotionalInsight.overallMood === 'neutral' ? '😐 Neutrální' :
-                   '😰 Stres'}
-                </span>
-                <span className="text-sm bg-white/20 px-3 py-1 rounded-full">
-                  Stres: {emotionalInsight.stressLevel}/10
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
+
       </div>
 
       {/* Mood Tracker */}

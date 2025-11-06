@@ -114,7 +114,7 @@ function AIPageContent() {
             <div className="flex items-center space-x-2">
               <div className="flex items-center space-x-1 px-2 py-1 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-full">
                 <Sparkles className="w-3 h-3 text-blue-600" />
-                <span className="text-xs font-medium text-blue-700 hidden sm:inline">GPT-4 + Perplexity</span>
+                <span className="text-xs font-medium text-blue-700 hidden sm:inline">GPT-4o</span>
               </div>
             </div>
           </div>

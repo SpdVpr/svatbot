@@ -2,20 +2,20 @@
 
 import { useState } from 'react'
 import { useAICoach, MoodEntry } from '@/hooks/useAICoach'
-import { Smile, Meh, Frown, AlertTriangle, TrendingUp, Heart, Sparkles } from 'lucide-react'
+import { TrendingUp, Heart } from 'lucide-react'
 
 const moodOptions: Array<{
   value: MoodEntry['mood']
   label: string
-  icon: any
+  emoji: string
   color: string
   bgColor: string
 }> = [
-  { value: 'great', label: 'Skvělá', icon: Sparkles, color: 'text-green-600', bgColor: 'bg-green-100 hover:bg-green-200' },
-  { value: 'good', label: 'Dobrá', icon: Smile, color: 'text-blue-600', bgColor: 'bg-blue-100 hover:bg-blue-200' },
-  { value: 'okay', label: 'Ujde to', icon: Meh, color: 'text-yellow-600', bgColor: 'bg-yellow-100 hover:bg-yellow-200' },
-  { value: 'stressed', label: 'Stres', icon: Frown, color: 'text-orange-600', bgColor: 'bg-orange-100 hover:bg-orange-200' },
-  { value: 'overwhelmed', label: 'Přetížení', icon: AlertTriangle, color: 'text-red-600', bgColor: 'bg-red-100 hover:bg-red-200' }
+  { value: 'great', label: 'Skvělá', emoji: '😄', color: 'text-green-600', bgColor: 'bg-green-100 hover:bg-green-200' },
+  { value: 'good', label: 'Dobrá', emoji: '😊', color: 'text-blue-600', bgColor: 'bg-blue-100 hover:bg-blue-200' },
+  { value: 'okay', label: 'Ujde to', emoji: '😐', color: 'text-yellow-600', bgColor: 'bg-yellow-100 hover:bg-yellow-200' },
+  { value: 'stressed', label: 'Stres', emoji: '😟', color: 'text-orange-600', bgColor: 'bg-orange-100 hover:bg-orange-200' },
+  { value: 'overwhelmed', label: 'Přetížení', emoji: '😰', color: 'text-red-600', bgColor: 'bg-red-100 hover:bg-red-200' }
 ]
 
 interface MoodTrackerProps {
@@ -25,19 +25,15 @@ interface MoodTrackerProps {
 
 export default function MoodTracker({ compact = false, onMoodSaved }: MoodTrackerProps) {
   const [selectedMood, setSelectedMood] = useState<MoodEntry['mood'] | null>(null)
-  const [stressLevel, setStressLevel] = useState(5)
-  const [energyLevel, setEnergyLevel] = useState(5)
-  const [note, setNote] = useState('')
-  const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
-  const { saveMoodEntry, emotionalInsight } = useAICoach()
+  const { saveMoodEntry, emotionalInsight, refreshEmotionalInsight } = useAICoach()
 
-  const handleMoodSelect = (mood: MoodEntry['mood']) => {
+  const handleMoodSelect = async (mood: MoodEntry['mood']) => {
     setSelectedMood(mood)
-    setShowForm(true)
     setSaved(false)
+    setSaving(true)
 
     // Auto-set stress level based on mood
     const stressDefaults = {
@@ -47,15 +43,14 @@ export default function MoodTracker({ compact = false, onMoodSaved }: MoodTracke
       stressed: 7,
       overwhelmed: 9
     }
-    setStressLevel(stressDefaults[mood])
-  }
+    const autoStressLevel = stressDefaults[mood]
+    const autoEnergyLevel = mood === 'great' ? 8 : mood === 'good' ? 7 : mood === 'okay' ? 5 : mood === 'stressed' ? 4 : 3
 
-  const handleSave = async () => {
-    if (!selectedMood) return
-
-    setSaving(true)
     try {
-      await saveMoodEntry(selectedMood, stressLevel, energyLevel, note)
+      await saveMoodEntry(mood, autoStressLevel, autoEnergyLevel, '')
+
+      // Refresh emotional insight immediately after saving
+      await refreshEmotionalInsight()
 
       // Show success state
       setSaved(true)
@@ -63,10 +58,6 @@ export default function MoodTracker({ compact = false, onMoodSaved }: MoodTracke
       // Reset form after delay
       setTimeout(() => {
         setSelectedMood(null)
-        setStressLevel(5)
-        setEnergyLevel(5)
-        setNote('')
-        setShowForm(false)
         setSaved(false)
       }, 1500)
 
@@ -78,11 +69,7 @@ export default function MoodTracker({ compact = false, onMoodSaved }: MoodTracke
     }
   }
 
-  const handleCancel = () => {
-    setSelectedMood(null)
-    setShowForm(false)
-    setNote('')
-  }
+
 
   if (compact) {
     return (
@@ -105,117 +92,29 @@ export default function MoodTracker({ compact = false, onMoodSaved }: MoodTracke
           )}
         </div>
 
-        {!showForm ? (
-          <div className="grid grid-cols-5 gap-2">
-            {moodOptions.map((option) => {
-              const Icon = option.icon
-              return (
-                <button
-                  key={option.value}
-                  onClick={() => handleMoodSelect(option.value)}
-                  className={`${option.bgColor} ${option.color} p-3 rounded-lg transition-all hover:scale-105 flex items-center justify-center`}
-                  title={option.label}
-                >
-                  <Icon className="w-6 h-6" />
-                </button>
-              )
-            })}
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-sm">
-              {moodOptions.find(o => o.value === selectedMood) && (
-                <>
-                  {(() => {
-                    const Icon = moodOptions.find(o => o.value === selectedMood)!.icon
-                    return <Icon className="w-4 h-4" />
-                  })()}
-                  <span className="font-medium">
-                    {moodOptions.find(o => o.value === selectedMood)?.label}
-                  </span>
-                </>
-              )}
-            </div>
-
-            {/* Stress Level */}
-            <div>
-              <label className="text-xs text-gray-600 mb-1 block">
-                Úroveň stresu: {stressLevel}/10
-              </label>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={stressLevel}
-                onChange={(e) => setStressLevel(Number(e.target.value))}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary-500"
-              />
-            </div>
-
-            {/* Energy Level */}
-            <div>
-              <label className="text-xs text-gray-600 mb-1 block">
-                Úroveň energie: {energyLevel}/10
-              </label>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={energyLevel}
-                onChange={(e) => setEnergyLevel(Number(e.target.value))}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary-500"
-              />
-            </div>
-
-            {/* Optional Note */}
-            <textarea
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="Poznámka (volitelné)..."
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
-              rows={2}
-            />
-
-            {/* Actions */}
-            <div className="flex gap-2">
+        <div className="grid grid-cols-5 gap-2">
+          {moodOptions.map((option) => {
+            return (
               <button
-                onClick={handleSave}
-                disabled={saving || saved}
-                className={`flex-1 px-4 py-2 rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2 ${
-                  saved
-                    ? 'bg-green-500 text-white'
-                    : 'bg-gradient-to-r from-primary-500 to-pink-500 text-white hover:from-primary-600 hover:to-pink-600 shadow-md hover:shadow-lg disabled:opacity-50'
+                key={option.value}
+                onClick={() => handleMoodSelect(option.value)}
+                disabled={saving}
+                className={`${option.bgColor} ${option.color} p-3 rounded-lg transition-all hover:scale-105 flex items-center justify-center text-2xl disabled:opacity-50 ${
+                  selectedMood === option.value && saved ? 'ring-2 ring-green-500' : ''
                 }`}
+                title={option.label}
               >
-                {saved ? (
-                  <>
-                    <span>✓</span>
-                    <span>Odesláno!</span>
-                  </>
-                ) : saving ? (
-                  <>
-                    <span className="animate-spin">⏳</span>
-                    <span>Odesílám...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>📤</span>
-                    <span>Odeslat</span>
-                  </>
-                )}
+                {option.emoji}
               </button>
-              <button
-                onClick={handleCancel}
-                disabled={saving || saved}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium disabled:opacity-50"
-              >
-                Zrušit
-              </button>
-            </div>
+            )
+          })}
+        </div>
 
-            {/* Info text */}
-            <p className="text-xs text-gray-500 text-center">
-              💡 Svatbot analyzuje tvou náladu a přizpůsobí ti podporu
+        {/* Success message */}
+        {saved && (
+          <div className="mt-3 text-center">
+            <p className="text-sm text-green-600 font-medium">
+              ✓ Nálada uložena!
             </p>
           </div>
         )}
@@ -280,111 +179,35 @@ export default function MoodTracker({ compact = false, onMoodSaved }: MoodTracke
       )}
 
       {/* Mood Selection */}
-      {!showForm ? (
-        <div>
-          <p className="text-sm text-gray-600 mb-4">Jak se dnes cítíte?</p>
-          <div className="grid grid-cols-5 gap-3">
-            {moodOptions.map((option) => {
-              const Icon = option.icon
-              return (
-                <button
-                  key={option.value}
-                  onClick={() => handleMoodSelect(option.value)}
-                  className={`${option.bgColor} ${option.color} p-4 rounded-xl transition-all hover:scale-105 hover:shadow-md flex flex-col items-center gap-2`}
-                >
-                  <Icon className="w-8 h-8" />
-                  <span className="text-sm font-medium">{option.label}</span>
-                </button>
-              )
-            })}
-          </div>
+      <div>
+        <p className="text-sm text-gray-600 mb-4">Jak se dnes cítíte?</p>
+        <div className="grid grid-cols-5 gap-3">
+          {moodOptions.map((option) => {
+            return (
+              <button
+                key={option.value}
+                onClick={() => handleMoodSelect(option.value)}
+                disabled={saving}
+                className={`${option.bgColor} ${option.color} p-4 rounded-xl transition-all hover:scale-105 hover:shadow-md flex flex-col items-center gap-2 disabled:opacity-50 ${
+                  selectedMood === option.value && saved ? 'ring-2 ring-green-500' : ''
+                }`}
+              >
+                <span className="text-3xl">{option.emoji}</span>
+                <span className="text-sm font-medium">{option.label}</span>
+              </button>
+            )
+          })}
         </div>
-      ) : (
-        <div className="space-y-4">
-          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-            {moodOptions.find(o => o.value === selectedMood) && (
-              <>
-                {(() => {
-                  const Icon = moodOptions.find(o => o.value === selectedMood)!.icon
-                  return <Icon className="w-6 h-6" />
-                })()}
-                <span className="font-semibold text-lg">
-                  {moodOptions.find(o => o.value === selectedMood)?.label}
-                </span>
-              </>
-            )}
-          </div>
 
-          {/* Stress Level */}
-          <div>
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
-              Úroveň stresu: <span className="text-primary-600 font-bold">{stressLevel}/10</span>
-            </label>
-            <input
-              type="range"
-              min="1"
-              max="10"
-              value={stressLevel}
-              onChange={(e) => setStressLevel(Number(e.target.value))}
-              className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary-500"
-            />
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
-              <span>Žádný stres</span>
-              <span>Extrémní stres</span>
-            </div>
+        {/* Success message */}
+        {saved && (
+          <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg text-center">
+            <p className="text-sm text-green-700 font-medium">
+              ✓ Nálada úspěšně uložena! Svatbot ti přizpůsobí podporu.
+            </p>
           </div>
-
-          {/* Energy Level */}
-          <div>
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
-              Úroveň energie: <span className="text-primary-600 font-bold">{energyLevel}/10</span>
-            </label>
-            <input
-              type="range"
-              min="1"
-              max="10"
-              value={energyLevel}
-              onChange={(e) => setEnergyLevel(Number(e.target.value))}
-              className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary-500"
-            />
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
-              <span>Vyčerpaný</span>
-              <span>Plný energie</span>
-            </div>
-          </div>
-
-          {/* Optional Note */}
-          <div>
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
-              Poznámka (volitelné)
-            </label>
-            <textarea
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="Co vás dnes trápí nebo těší?"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
-              rows={3}
-            />
-          </div>
-
-          {/* Actions */}
-          <div className="flex gap-3 pt-2">
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="flex-1 bg-gradient-to-r from-primary-500 to-pink-500 text-white px-6 py-3 rounded-lg hover:from-primary-600 hover:to-pink-600 transition-all disabled:opacity-50 font-medium shadow-md hover:shadow-lg"
-            >
-              {saving ? 'Ukládám...' : 'Uložit náladu'}
-            </button>
-            <button
-              onClick={handleCancel}
-              className="px-6 py-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
-            >
-              Zrušit
-            </button>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }

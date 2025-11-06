@@ -5,9 +5,10 @@ import FreeDragDrop from './FreeDragDrop'
 
 interface DragDropWrapperProps {
   onWeddingSettingsClick: () => void
+  onOnboardingWizardChange?: (isOpen: boolean) => void
 }
 
-export default function DragDropWrapper({ onWeddingSettingsClick }: DragDropWrapperProps) {
+export default function DragDropWrapper({ onWeddingSettingsClick, onOnboardingWizardChange }: DragDropWrapperProps) {
   const { hasLoadedFromFirebase } = useDashboard()
 
   // Use FreeDragDrop for both grid and free modes
@@ -19,7 +20,10 @@ export default function DragDropWrapper({ onWeddingSettingsClick }: DragDropWrap
         transition: 'opacity 0.15s ease-in-out'
       }}
     >
-      <FreeDragDrop onWeddingSettingsClick={onWeddingSettingsClick} />
+      <FreeDragDrop
+        onWeddingSettingsClick={onWeddingSettingsClick}
+        onOnboardingWizardChange={onOnboardingWizardChange}
+      />
     </div>
   )
 }

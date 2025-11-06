@@ -245,6 +245,12 @@ export function useAICoach() {
     }
   }, [getRecentMoods])
 
+  // Refresh emotional insight (updates state)
+  const refreshEmotionalInsight = useCallback(async () => {
+    const insight = await analyzeEmotionalState()
+    setEmotionalInsight(insight)
+  }, [analyzeEmotionalState])
+
   // Generate motivational and supportive messages (friend & companion style)
   const generateSuggestions = useCallback(async (): Promise<CoachSuggestion[]> => {
     if (!wedding || !user) return []
@@ -629,6 +635,7 @@ export function useAICoach() {
     saveMoodEntry,
     getRecentMoods,
     analyzeEmotionalState,
+    refreshEmotionalInsight,
 
     // Suggestions
     generateSuggestions,
