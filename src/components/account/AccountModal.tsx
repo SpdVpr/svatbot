@@ -21,11 +21,13 @@ import {
   CheckCircle,
   Clock,
   ChevronDown,
-  MessageCircle
+  MessageCircle,
+  FileText
 } from 'lucide-react'
 import ProfileTab from './ProfileTab'
 import SubscriptionTab from './SubscriptionTab'
 import PaymentsTab from './PaymentsTab'
+import InvoicesTab from './InvoicesTab'
 import StatisticsTab from './StatisticsTab'
 import SettingsTab from './SettingsTab'
 import FeedbackTab from './FeedbackTab'
@@ -36,7 +38,7 @@ interface AccountModalProps {
   initialTab?: TabType
 }
 
-type TabType = 'profile' | 'subscription' | 'payments' | 'statistics' | 'settings' | 'feedback'
+type TabType = 'profile' | 'subscription' | 'payments' | 'invoices' | 'statistics' | 'settings' | 'feedback'
 
 export default function AccountModal({ onClose, initialTab = 'profile' }: AccountModalProps) {
   const { user, logout } = useAuth()
@@ -50,6 +52,7 @@ export default function AccountModal({ onClose, initialTab = 'profile' }: Accoun
     { id: 'profile' as TabType, label: 'Profil', icon: User },
     { id: 'subscription' as TabType, label: 'Předplatné', icon: Crown },
     { id: 'payments' as TabType, label: 'Platby', icon: CreditCard },
+    { id: 'invoices' as TabType, label: 'Faktury', icon: FileText },
     { id: 'statistics' as TabType, label: 'Statistiky', icon: BarChart3 },
     { id: 'feedback' as TabType, label: 'Feedback', icon: MessageCircle },
     { id: 'settings' as TabType, label: 'Nastavení', icon: Settings }
@@ -229,6 +232,7 @@ export default function AccountModal({ onClose, initialTab = 'profile' }: Accoun
           {activeTab === 'profile' && <ProfileTab />}
           {activeTab === 'subscription' && <SubscriptionTab subscriptionData={subscriptionData} />}
           {activeTab === 'payments' && <PaymentsTab subscriptionData={subscriptionData} />}
+          {activeTab === 'invoices' && <InvoicesTab />}
           {activeTab === 'statistics' && <StatisticsTab subscriptionData={subscriptionData} />}
           {activeTab === 'feedback' && <FeedbackTab />}
           {activeTab === 'settings' && <SettingsTab />}

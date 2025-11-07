@@ -7,6 +7,7 @@ import UserAnalyticsTable from '@/components/admin/UserAnalyticsTable'
 import AdminMessaging from '@/components/admin/AdminMessaging'
 import FeedbackManagement from '@/components/admin/FeedbackManagement'
 import PaymentsTab from '@/components/admin/PaymentsTab'
+import InvoicesTab from '@/components/admin/InvoicesTab'
 import EmailStatsPanel from '@/components/admin/EmailStatsPanel'
 import EmailTestPanel from '@/components/admin/EmailTestPanel'
 import ReviewModeration from '@/components/admin/ReviewModeration'
@@ -21,10 +22,11 @@ import {
   MessageSquare,
   MessageCircle,
   ShoppingBag,
-  Star
+  Star,
+  FileText
 } from 'lucide-react'
 
-type TabType = 'overview' | 'users' | 'messages' | 'feedback' | 'payments' | 'vendors' | 'reviews'
+type TabType = 'overview' | 'users' | 'messages' | 'feedback' | 'payments' | 'invoices' | 'vendors' | 'reviews'
 
 export default function AdminDashboard() {
   const { stats, loading } = useAdminStats()
@@ -49,6 +51,7 @@ export default function AdminDashboard() {
     { id: 'overview' as TabType, label: 'Přehled', icon: LayoutDashboard },
     { id: 'users' as TabType, label: 'Uživatelé', icon: Users },
     { id: 'payments' as TabType, label: 'Platby', icon: DollarSign },
+    { id: 'invoices' as TabType, label: 'Faktury', icon: FileText },
     { id: 'reviews' as TabType, label: 'Recenze', icon: Star },
     { id: 'messages' as TabType, label: 'Zprávy', icon: MessageSquare },
     { id: 'feedback' as TabType, label: 'Feedback', icon: MessageCircle },
@@ -92,6 +95,7 @@ export default function AdminDashboard() {
       {activeTab === 'overview' && <OverviewTab stats={stats} />}
       {activeTab === 'users' && <UserAnalyticsTable />}
       {activeTab === 'payments' && <PaymentsTab />}
+      {activeTab === 'invoices' && <InvoicesTab />}
       {activeTab === 'reviews' && <ReviewModeration />}
       {activeTab === 'messages' && <AdminMessaging />}
       {activeTab === 'feedback' && <FeedbackManagement />}

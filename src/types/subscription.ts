@@ -235,27 +235,105 @@ export interface Payment {
   id: string
   userId: string
   subscriptionId: string
-  
+
   // Payment details
   amount: number
   currency: string
   status: PaymentStatus
-  
+
   // Payment method
   paymentMethod: PaymentMethod
   last4?: string // Last 4 digits of card
-  
+
   // Dates
   createdAt: Date
   paidAt?: Date
-  
+
   // Invoice
   invoiceUrl?: string
   invoiceNumber?: string
-  
+  invoicePdfUrl?: string // URL to generated PDF invoice
+
   // Stripe
   stripePaymentIntentId?: string
   stripeInvoiceId?: string
+
+  // GoPay
+  goPayId?: number
+  orderNumber?: string
+  plan?: string
+}
+
+// Invoice data structure
+export interface Invoice {
+  id: string
+  invoiceNumber: string
+  paymentId: string
+  userId: string
+  userEmail: string
+
+  // Company/User details
+  customerName?: string
+  customerAddress?: string
+  customerCity?: string
+  customerZip?: string
+  customerCountry?: string
+  customerICO?: string // IČO - Company ID
+  customerDIC?: string // DIČ - Tax ID
+
+  // Invoice details
+  issueDate: Date
+  dueDate: Date
+  taxableDate: Date // DUZP - Datum zdanitelného plnění
+
+  // Items
+  items: InvoiceItem[]
+
+  // Amounts
+  subtotal: number
+  vatRate: number // 0 for non-VAT payers
+  vatAmount: number
+  total: number
+  currency: string
+
+  // Payment info
+  paymentMethod: string
+  variableSymbol: string
+  status: 'draft' | 'issued' | 'paid' | 'cancelled'
+  paidAt?: Date
+
+  // Supplier info (SvatBot.cz)
+  supplierName: string
+  supplierAddress: string
+  supplierCity: string
+  supplierZip: string
+  supplierCountry: string
+  supplierICO: string
+  supplierDIC?: string
+  supplierEmail: string
+  supplierPhone?: string
+  supplierBankAccount?: string
+  supplierIBAN?: string
+  supplierSWIFT?: string
+
+  // Notes
+  notes?: string
+
+  // PDF
+  invoicePdfUrl?: string
+
+  // Metadata
+  createdAt: Date
+  updatedAt: Date
+  pdfGeneratedAt?: Date
+}
+
+export interface InvoiceItem {
+  description: string
+  quantity: number
+  unitPrice: number
+  vatRate: number
+  total: number
 }
 
 export type PaymentStatus = 

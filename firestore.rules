@@ -813,6 +813,19 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Invoices - User and admin access
+    match /invoices/{invoiceId} {
+      // User can read their own invoices, admins can read all
+      allow read: if isAuthenticated() &&
+                     (resource.data.userId == request.auth.uid || isAdmin());
+
+      // Only system can create/update invoices
+      allow create, update: if false;
+
+      // Only admins can delete
+      allow delete: if isAdmin();
+    }
+
     // Affiliate Program
     match /affiliatePartners/{partnerId} {
       // Partners can read their own data, admins can read all

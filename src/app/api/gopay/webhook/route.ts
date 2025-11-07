@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getPaymentStatus } from '@/lib/gopay-server'
 import { getAdminDb } from '@/config/firebase-admin'
 import { Timestamp } from 'firebase-admin/firestore'
+import { generateInvoiceNumber, generateVariableSymbol } from '@/lib/invoiceGenerator'
 
 /**
  * GoPay Webhook Handler
@@ -124,7 +125,7 @@ export async function GET(request: NextRequest) {
       console.log('✅ Payment updated:', paymentDoc.id, status)
     }
 
-    // If payment succeeded, update subscription
+    // If payment succeeded, update subscription and create invoice
     if (payment.state === 'PAID') {
       const now = new Date()
       const periodEnd = new Date(now)
@@ -179,6 +180,15 @@ export async function GET(request: NextRequest) {
       } else {
         console.log('✅ Subscription ACTIVATED (initial payment) for user:', userId)
       }
+
+      // Create invoice automatically
+      try {
+        await createInvoiceForPayment(adminDb, payment, userId, plan)
+        console.log('✅ Invoice created for payment:', payment.id)
+      } catch (invoiceError) {
+        console.error('❌ Error creating invoice:', invoiceError)
+        // Don't fail the webhook if invoice creation fails
+      }
     }
 
     return NextResponse.json({ success: true })
@@ -189,6 +199,112 @@ export async function GET(request: NextRequest) {
       { error: error.message || 'Webhook processing failed' },
       { status: 500 }
     )
+  }
+}
+
+/**
+ * Create invoice for successful payment
+ */
+async function createInvoiceForPayment(
+  adminDb: any,
+  payment: any,
+  userId: string,
+  plan: string
+) {
+  try {
+    // Get user email
+    const userDoc = await adminDb.collection('users').doc(userId).get()
+    const userEmail = userDoc.exists ? userDoc.data().email : 'unknown@svatbot.cz'
+
+    // Generate invoice number and variable symbol
+    const now = new Date()
+    const invoiceNumber = generateInvoiceNumber(now)
+    const variableSymbol = generateVariableSymbol(invoiceNumber)
+
+    // Determine plan name
+    let planName = 'Premium předplatné'
+    if (plan === 'premium_monthly') {
+      planName = 'Premium předplatné - měsíční'
+    } else if (plan === 'premium_yearly') {
+      planName = 'Premium předplatné - roční'
+    }
+
+    const amount = payment.amount / 100 // Convert from cents
+
+    // Company info for SvatBot.cz
+    const supplierInfo = {
+      supplierName: 'SvatBot.cz',
+      supplierAddress: 'Příkladová 123',
+      supplierCity: 'Praha',
+      supplierZip: '110 00',
+      supplierCountry: 'Česká republika',
+      supplierICO: '12345678',
+      supplierEmail: 'info@svatbot.cz',
+      supplierPhone: '+420 XXX XXX XXX',
+      supplierBankAccount: 'XXXX-XXXXXX/XXXX',
+      supplierIBAN: 'CZ XX XXXX XXXX XXXX XXXX XXXX',
+      supplierSWIFT: 'XXXXXXXX'
+    }
+
+    // Create invoice document
+    const invoice = {
+      invoiceNumber,
+      paymentId: payment.id.toString(),
+      userId,
+      userEmail,
+
+      // Customer details
+      customerName: userEmail,
+
+      // Dates
+      issueDate: Timestamp.fromDate(now),
+      dueDate: Timestamp.fromDate(now), // Already paid
+      taxableDate: Timestamp.fromDate(now),
+
+      // Items
+      items: [
+        {
+          description: planName,
+          quantity: 1,
+          unitPrice: amount,
+          vatRate: 0,
+          total: amount
+        }
+      ],
+
+      // Amounts
+      subtotal: amount,
+      vatRate: 0,
+      vatAmount: 0,
+      total: amount,
+      currency: payment.currency,
+
+      // Payment info
+      paymentMethod: 'Platební karta',
+      variableSymbol,
+      status: 'paid',
+      paidAt: Timestamp.fromDate(now),
+
+      // Supplier info
+      ...supplierInfo,
+
+      // Metadata
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now()
+    }
+
+    // Save invoice to Firestore
+    const invoiceRef = await adminDb.collection('invoices').add(invoice)
+
+    console.log('Invoice created:', invoiceRef.id, invoiceNumber)
+
+    // Note: PDF generation will be done on-demand when user requests download
+    // This keeps the webhook fast and reliable
+
+    return invoiceRef.id
+  } catch (error) {
+    console.error('Error creating invoice:', error)
+    throw error
   }
 }
 
