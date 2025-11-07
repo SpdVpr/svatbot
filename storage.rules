@@ -111,6 +111,16 @@ service firebase.storage {
                        firestore.get(/databases/(default)/documents/weddings/$(weddingId)).data.userId == request.auth.uid;
     }
 
+    // Invoice PDFs
+    match /invoices/{userId}/{fileName} {
+      // Users can read their own invoices, admins can read all
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      // Only system (via Admin SDK) can write invoice PDFs
+      allow write: if false;
+      // Only admins can delete
+      allow delete: if isAdmin();
+    }
+
     // Deny all other access
     match /{allPaths=**} {
       allow read, write: if false;

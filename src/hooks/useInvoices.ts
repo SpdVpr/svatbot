@@ -160,8 +160,8 @@ export function useInvoices(userId?: string) {
 
       const createdInvoice = { ...invoice, id: invoiceRef.id } as Invoice
 
-      // Generate PDF
-      await generateAndUploadPDF(createdInvoice)
+      // Note: PDF will be generated on-demand when user downloads it
+      // This keeps invoice creation fast and reliable
 
       return createdInvoice
     } catch (err) {
@@ -172,7 +172,10 @@ export function useInvoices(userId?: string) {
 
   /**
    * Generate PDF and upload to Firebase Storage
+   * NOTE: This function is no longer used - PDFs are generated on-demand
+   * Keeping it for potential future use (e.g., email attachments)
    */
+  /*
   const generateAndUploadPDF = async (invoice: Invoice): Promise<string> => {
     try {
       // Generate PDF
@@ -210,23 +213,18 @@ export function useInvoices(userId?: string) {
       throw new Error('Nepodařilo se vygenerovat PDF faktury')
     }
   }
+  */
 
   /**
    * Download invoice PDF
    */
   const downloadInvoice = async (invoice: Invoice) => {
     try {
-      if (!invoice.invoicePdfUrl) {
-        // Generate PDF if not exists
-        await generateAndUploadPDF(invoice)
-        await loadInvoices() // Reload to get updated URL
-        return
-      }
+      // Generate PDF on-demand (no storage upload needed)
+      const pdfBlob = await generateInvoicePDF(invoice)
 
-      // Download PDF
-      const response = await fetch(invoice.invoicePdfUrl)
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
+      // Download PDF directly
+      const url = window.URL.createObjectURL(pdfBlob)
       const a = document.createElement('a')
       a.href = url
       a.download = `Faktura-${invoice.invoiceNumber}.pdf`
