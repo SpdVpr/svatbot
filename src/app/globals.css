@@ -8,7 +8,7 @@
 @import '../styles/view-transitions.css';
 
 /* Import Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&family=Cormorant+Upright:wght@300;400;500;600;700&display=swap');
 
 /* Import drag and drop styles */
 @import '../styles/drag-drop.css';
@@ -556,4 +556,15 @@
     width: 2rem;
     height: 2.8rem;
   }
+}
+
+/* Dashboard headings with Cormorant Upright font */
+.wedding-card h1,
+.wedding-card h2,
+.wedding-card h3,
+.wedding-card h4,
+.dashboard-heading {
+  font-family: var(--font-cormorant), 'Cormorant Upright', serif !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em;
 }

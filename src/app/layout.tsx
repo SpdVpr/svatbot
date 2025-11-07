@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter, Playfair_Display, Montserrat } from 'next/font/google'
+import { Inter, Playfair_Display, Montserrat, Cormorant_Upright } from 'next/font/google'
 import { Suspense } from 'react'
 import './globals.css'
 import { cn } from '@/utils'
@@ -9,6 +9,7 @@ import GlobalFeedbackButton from '@/components/common/GlobalFeedbackButton'
 import UserTrackingWrapper from '@/components/common/UserTrackingWrapper'
 import DemoLockBanner from '@/components/common/DemoLockBanner'
 import ColorThemeProvider from '@/components/theme/ColorThemeProvider'
+import WeddingPattern from '@/components/theme/WeddingPattern'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -25,6 +26,13 @@ const playfair = Playfair_Display({
 const montserrat = Montserrat({
   subsets: ['latin'],
   variable: '--font-montserrat',
+  display: 'swap',
+})
+
+const cormorantUpright = Cormorant_Upright({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-cormorant',
   display: 'swap',
 })
 
@@ -269,7 +277,8 @@ export default function RootLayout({
     <html lang="cs" className={cn(
       inter.variable,
       playfair.variable,
-      montserrat.variable
+      montserrat.variable,
+      cormorantUpright.variable
     )}>
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -292,6 +301,9 @@ export default function RootLayout({
         'selection:bg-primary-200 selection:text-primary-800'
       )}>
         <ColorThemeProvider>
+          {/* Wedding Pattern Background */}
+          <WeddingPattern />
+
           <UserTrackingWrapper>
             {/* Demo Lock Banner - Shows when demo account is locked */}
             <Suspense fallback={null}>
