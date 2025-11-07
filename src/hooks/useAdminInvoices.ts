@@ -14,6 +14,7 @@ import { db } from '@/config/firebase'
 import { Invoice } from '@/types/subscription'
 import JSZip from 'jszip'
 import { saveAs } from 'file-saver'
+import { generateInvoicePDF } from '@/lib/invoiceGenerator'
 
 export interface AdminInvoiceStats {
   totalInvoices: number
@@ -134,13 +135,11 @@ export function useAdminInvoices() {
    */
   const downloadInvoice = async (invoice: Invoice) => {
     try {
-      if (!invoice.invoicePdfUrl) {
-        throw new Error('PDF faktury není k dispozici')
-      }
+      // Generate PDF on-demand (same as user download)
+      const pdfBlob = await generateInvoicePDF(invoice)
 
-      const response = await fetch(invoice.invoicePdfUrl)
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
+      // Download PDF directly
+      const url = window.URL.createObjectURL(pdfBlob)
       const a = document.createElement('a')
       a.href = url
       a.download = `Faktura-${invoice.invoiceNumber}.pdf`
@@ -163,14 +162,12 @@ export function useAdminInvoices() {
       const selectedInvoices = invoices.filter(inv => invoiceIds.includes(inv.id))
 
       for (const invoice of selectedInvoices) {
-        if (invoice.invoicePdfUrl) {
-          try {
-            const response = await fetch(invoice.invoicePdfUrl)
-            const blob = await response.blob()
-            zip.file(`Faktura-${invoice.invoiceNumber}.pdf`, blob)
-          } catch (err) {
-            console.error(`Error downloading invoice ${invoice.invoiceNumber}:`, err)
-          }
+        try {
+          // Generate PDF on-demand for each invoice
+          const pdfBlob = await generateInvoicePDF(invoice)
+          zip.file(`Faktura-${invoice.invoiceNumber}.pdf`, pdfBlob)
+        } catch (err) {
+          console.error(`Error generating invoice ${invoice.invoiceNumber}:`, err)
         }
       }
 

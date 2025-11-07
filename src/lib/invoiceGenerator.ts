@@ -145,9 +145,44 @@ export async function generateInvoicePDF(invoice: Invoice): Promise<Blob> {
 
   // Items table
   yPos += 10
-  
+
+  // Helper to remove diacritics for PDF rendering
+  const removeDiacritics = (str: string) => {
+    return str
+      .replace(/[áàâä]/g, 'a')
+      .replace(/[ÁÀÂÄ]/g, 'A')
+      .replace(/[éèêë]/g, 'e')
+      .replace(/[ÉÈÊË]/g, 'E')
+      .replace(/[íìîï]/g, 'i')
+      .replace(/[ÍÌÎÏ]/g, 'I')
+      .replace(/[óòôö]/g, 'o')
+      .replace(/[ÓÒÔÖ]/g, 'O')
+      .replace(/[úùûü]/g, 'u')
+      .replace(/[ÚÙÛÜ]/g, 'U')
+      .replace(/[ýÿ]/g, 'y')
+      .replace(/[ÝŸ]/g, 'Y')
+      .replace(/č/g, 'c')
+      .replace(/Č/g, 'C')
+      .replace(/ď/g, 'd')
+      .replace(/Ď/g, 'D')
+      .replace(/ě/g, 'e')
+      .replace(/Ě/g, 'E')
+      .replace(/ň/g, 'n')
+      .replace(/Ň/g, 'N')
+      .replace(/ř/g, 'r')
+      .replace(/Ř/g, 'R')
+      .replace(/š/g, 's')
+      .replace(/Š/g, 'S')
+      .replace(/ť/g, 't')
+      .replace(/Ť/g, 'T')
+      .replace(/ů/g, 'u')
+      .replace(/Ů/g, 'U')
+      .replace(/ž/g, 'z')
+      .replace(/Ž/g, 'Z')
+  }
+
   const tableData = invoice.items.map(item => [
-    item.description,
+    removeDiacritics(item.description),
     item.quantity.toString(),
     `${formatCurrency(item.unitPrice)} ${invoice.currency}`,
     `${item.vatRate}%`,
@@ -183,29 +218,32 @@ export async function generateInvoicePDF(invoice: Invoice): Promise<Blob> {
   yPos = (doc as any).lastAutoTable.finalY + 10
 
   // Summary box
-  const summaryX = 130
+  const summaryX = 120
+  const summaryWidth = 70
   doc.setFillColor(249, 250, 251)
-  doc.rect(summaryX, yPos, 60, 35, 'F')
+  doc.rect(summaryX, yPos, summaryWidth, 40, 'F')
 
   yPos += 7
   doc.setFontSize(10)
   doc.setTextColor(...grayColor)
   addText('Zaklad:', summaryX + 5, yPos)
   doc.setTextColor(...darkColor)
-  addText(`${formatCurrency(invoice.subtotal)} ${invoice.currency}`, summaryX + 55, yPos, { align: 'right' })
+  addText(`${formatCurrency(invoice.subtotal)} ${invoice.currency}`, summaryX + summaryWidth - 5, yPos, { align: 'right' })
 
   yPos += 6
   doc.setTextColor(...grayColor)
   addText(`DPH (${invoice.vatRate}%):`, summaryX + 5, yPos)
   doc.setTextColor(...darkColor)
-  addText(`${formatCurrency(invoice.vatAmount)} ${invoice.currency}`, summaryX + 55, yPos, { align: 'right' })
+  addText(`${formatCurrency(invoice.vatAmount)} ${invoice.currency}`, summaryX + summaryWidth - 5, yPos, { align: 'right' })
 
   yPos += 10
-  doc.setFontSize(12)
+  doc.setFontSize(11)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(...primaryColor)
   addText('Celkem k uhrade:', summaryX + 5, yPos)
-  addText(`${formatCurrency(invoice.total)} ${invoice.currency}`, summaryX + 55, yPos, { align: 'right' })
+  yPos += 6
+  doc.setFontSize(14)
+  addText(`${formatCurrency(invoice.total)} ${invoice.currency}`, summaryX + summaryWidth - 5, yPos, { align: 'right' })
 
   // Payment info
   yPos += 15

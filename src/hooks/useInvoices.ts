@@ -19,18 +19,18 @@ import { generateInvoicePDF, generateInvoiceNumber, generateVariableSymbol } fro
 
 // Company info for SvatBot.cz
 const SVATBOT_INFO = {
-  supplierName: 'SvatBot.cz',
-  supplierAddress: 'Příkladová 123', // TODO: Replace with real address
-  supplierCity: 'Praha',
-  supplierZip: '110 00',
-  supplierCountry: 'Česká republika',
-  supplierICO: '12345678', // TODO: Replace with real IČO
+  supplierName: 'Michal Vesecky',
+  supplierAddress: 'Zapska 1149',
+  supplierCity: 'Nehvizdy',
+  supplierZip: '250 71',
+  supplierCountry: 'Ceska republika',
+  supplierICO: '88320090',
   supplierDIC: undefined, // Not VAT payer
   supplierEmail: 'info@svatbot.cz',
-  supplierPhone: '+420 XXX XXX XXX', // TODO: Replace with real phone
-  supplierBankAccount: 'XXXX-XXXXXX/XXXX', // TODO: Replace with real account
-  supplierIBAN: 'CZ XX XXXX XXXX XXXX XXXX XXXX',
-  supplierSWIFT: 'XXXXXXXX'
+  supplierPhone: undefined,
+  supplierBankAccount: undefined,
+  supplierIBAN: undefined,
+  supplierSWIFT: undefined
 }
 
 export function useInvoices(userId?: string) {
