@@ -1,17 +1,15 @@
 'use client'
 
 import Link from 'next/link'
-import { Building2, Bed, Users, Calendar, ArrowRight, Plus } from 'lucide-react'
+import { Building2, Bed, Users, ArrowRight, Plus } from 'lucide-react'
 import { useAccommodationWithGuests } from '@/hooks/useAccommodationWithGuests'
 
 export default function AccommodationManagementModule() {
   const { stats, accommodations, loading } = useAccommodationWithGuests()
 
-  // Don't show loading state - let content fade in smoothly
-
   return (
-    <div className="wedding-card">
-      <Link href="/accommodation" className="block mb-4">
+    <div className="wedding-card h-[353px] flex flex-col">
+      <Link href="/accommodation" className="block mb-4 flex-shrink-0">
         <h3 className="text-base sm:text-lg font-semibold flex items-center justify-start sm:justify-center space-x-2 hover:text-primary-600 transition-colors">
           <Building2 className="w-4 h-4 sm:w-5 sm:h-5 text-primary-600 flex-shrink-0" />
           <span className="truncate">Ubytování</span>
@@ -20,8 +18,8 @@ export default function AccommodationManagementModule() {
 
       {accommodations.length === 0 ? (
         // Empty state
-        <div className="text-center py-6">
-          <Building2 className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+        <div className="flex-1 flex flex-col justify-center items-center text-center py-6">
+          <Building2 className="w-12 h-12 text-gray-300 mb-3" />
           <h4 className="text-sm font-medium text-gray-900 mb-2">
             Žádné ubytování
           </h4>
@@ -37,61 +35,64 @@ export default function AccommodationManagementModule() {
           </Link>
         </div>
       ) : (
-        <div className="space-y-4">
-          {/* Progress Overview */}
-          <div className="bg-primary-50 p-4 rounded-lg">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-primary-900">Obsazenost pokojů</span>
-              <span className="text-lg font-bold text-primary-600">{stats.occupancyRate}%</span>
+        <div className="flex-1 flex flex-col justify-between min-h-0">
+          <div className="space-y-3">
+            {/* Progress Overview */}
+            <div className="bg-primary-50 p-3 rounded-lg glass-morphism">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-primary-900">Obsazenost</span>
+                <span className="text-lg font-bold text-primary-600">{stats.occupancyRate}%</span>
+              </div>
+              <div className="w-full bg-primary-200 rounded-full h-2">
+                <div
+                  className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${stats.occupancyRate}%` }}
+                />
+              </div>
+              <div className="text-xs text-primary-700 mt-1">
+                {stats.occupiedRooms} z {stats.totalRooms} pokojů
+              </div>
             </div>
-            <div className="w-full bg-primary-200 rounded-full h-2">
-              <div
-                className="bg-primary-600 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${stats.occupancyRate}%` }}
-              />
-            </div>
-            <div className="text-xs text-primary-700 mt-1">
-              {stats.occupiedRooms} z {stats.totalRooms} pokojů obsazeno
+
+            {/* Quick Stats */}
+            <div className="grid grid-cols-3 gap-2">
+              <div className="text-center hover-lift">
+                <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-lg mx-auto mb-1 float-enhanced">
+                  <Building2 className="w-4 h-4 text-blue-600" />
+                </div>
+                <div className="text-sm font-bold text-gray-900">{stats.totalAccommodations}</div>
+                <div className="text-xs text-gray-500">Ubytování</div>
+              </div>
+              <div className="text-center hover-lift">
+                <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.2s' }}>
+                  <Bed className="w-4 h-4 text-green-600" />
+                </div>
+                <div className="text-sm font-bold text-gray-900">{stats.availableRooms}</div>
+                <div className="text-xs text-gray-500">Dostupné</div>
+              </div>
+              <div className="text-center hover-lift">
+                <div className="flex items-center justify-center w-8 h-8 bg-red-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.4s' }}>
+                  <Users className="w-4 h-4 text-red-600" />
+                </div>
+                <div className="text-sm font-bold text-gray-900">{stats.occupiedRooms}</div>
+                <div className="text-xs text-gray-500">Obsazené</div>
+              </div>
             </div>
           </div>
 
-          {/* Quick Stats */}
-          <div className="grid grid-cols-3 gap-3">
-            <div className="text-center">
-              <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-lg mx-auto mb-1">
-                <Building2 className="w-4 h-4 text-blue-600" />
-              </div>
-              <div className="text-lg font-bold text-gray-900">{stats.totalAccommodations}</div>
-              <div className="text-xs text-gray-500">Ubytování</div>
-            </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg mx-auto mb-1">
-                <Bed className="w-4 h-4 text-green-600" />
-              </div>
-              <div className="text-lg font-bold text-gray-900">{stats.availableRooms}</div>
-              <div className="text-xs text-gray-500">Dostupné</div>
-            </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center w-8 h-8 bg-red-100 rounded-lg mx-auto mb-1">
-                <Users className="w-4 h-4 text-red-600" />
-              </div>
-              <div className="text-lg font-bold text-gray-900">{stats.occupiedRooms}</div>
-              <div className="text-xs text-gray-500">Obsazené</div>
-            </div>
+          <div className="pt-4 border-t border-gray-200 flex-shrink-0">
+            <Link
+              href="/accommodation"
+              className="btn-primary w-full flex items-center justify-center space-x-2"
+            >
+              <Building2 className="w-4 h-4" />
+              <span>Spravovat ubytování</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       )}
-
-      <div className="mt-4 pt-4 border-t border-gray-200">
-        <Link
-          href="/accommodation"
-          className="btn-primary w-full flex items-center justify-center space-x-2"
-        >
-          <Building2 className="w-4 h-4" />
-          <span>Spravovat ubytování</span>
-          <ArrowRight className="w-4 h-4" />
-        </Link>
-      </div>
     </div>
   )
 }
+

@@ -33,49 +33,49 @@ export default function TaskManagementModule() {
   }
 
   return (
-    <div className="wedding-card h-full flex flex-col">
-      <Link href="/tasks" className="block mb-4">
+    <div className="wedding-card h-[353px] flex flex-col">
+      <Link href="/tasks" className="block mb-4 flex-shrink-0">
         <h3 className="text-base sm:text-lg font-semibold flex items-center justify-start sm:justify-center space-x-2 hover:text-primary-600 transition-colors">
           <List className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0" />
           <span className="truncate">Správa úkolů</span>
         </h3>
       </Link>
 
-      <div className="space-y-4 flex-1 flex flex-col">
-        {/* Quick Stats */}
-        <div className="grid grid-cols-3 gap-3">
-          <div className="text-center hover-lift">
-            <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg mx-auto mb-1 float-enhanced">
-              <CheckCircle className="w-4 h-4 text-green-600" />
+      <div className="flex-1 flex flex-col justify-between min-h-0">
+        <div className="space-y-3">
+          {/* Quick Stats */}
+          <div className="grid grid-cols-3 gap-2">
+            <div className="text-center hover-lift">
+              <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg mx-auto mb-1 float-enhanced">
+                <CheckCircle className="w-4 h-4 text-green-600" />
+              </div>
+              <div className="text-sm font-bold text-gray-900">
+                <NumberCounter end={stats.completed} duration={1500} />
+              </div>
+              <div className="text-xs text-gray-500">Dokončeno</div>
             </div>
-            <div className="text-lg font-bold text-gray-900">
-              <NumberCounter end={stats.completed} duration={1500} />
+            <div className="text-center hover-lift">
+              <div className="flex items-center justify-center w-8 h-8 bg-yellow-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.2s' }}>
+                <Clock className="w-4 h-4 text-yellow-600" />
+              </div>
+              <div className="text-sm font-bold text-gray-900">
+                <NumberCounter end={stats.inProgress} duration={1500} />
+              </div>
+              <div className="text-xs text-gray-500">Probíhá</div>
             </div>
-            <div className="text-xs text-gray-500">Dokončeno</div>
+            <div className="text-center hover-lift">
+              <div className="flex items-center justify-center w-8 h-8 bg-red-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.4s' }}>
+                <AlertTriangle className="w-4 h-4 text-red-600" />
+              </div>
+              <div className="text-sm font-bold text-gray-900">
+                <NumberCounter end={stats.overdue} duration={1500} />
+              </div>
+              <div className="text-xs text-gray-500">Po termínu</div>
+            </div>
           </div>
-          <div className="text-center hover-lift">
-            <div className="flex items-center justify-center w-8 h-8 bg-yellow-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.2s' }}>
-              <Clock className="w-4 h-4 text-yellow-600" />
-            </div>
-            <div className="text-lg font-bold text-gray-900">
-              <NumberCounter end={stats.inProgress} duration={1500} />
-            </div>
-            <div className="text-xs text-gray-500">Probíhá</div>
-          </div>
-          <div className="text-center hover-lift">
-            <div className="flex items-center justify-center w-8 h-8 bg-red-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.4s' }}>
-              <AlertTriangle className="w-4 h-4 text-red-600" />
-            </div>
-            <div className="text-lg font-bold text-gray-900">
-              <NumberCounter end={stats.overdue} duration={1500} />
-            </div>
-            <div className="text-xs text-gray-500">Po termínu</div>
-          </div>
-        </div>
 
-        {/* Upcoming Tasks Section */}
-        <div className="flex-1 flex flex-col min-h-0">
-          <div className="space-y-2">
+          {/* Upcoming Tasks Section - Show 2 tasks */}
+          <div className="space-y-1.5">
             {upcomingTasks.length > 0 ? (
               <>
                 {displayedTasks.map((task) => {
@@ -83,55 +83,45 @@ export default function TaskManagementModule() {
                   return (
                     <div
                       key={task.id}
-                      className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:border-primary-300 transition-colors cursor-pointer bg-white"
+                      className="flex items-center space-x-2 p-1.5 border border-gray-200 rounded-lg hover:border-primary-300 transition-colors cursor-pointer bg-white"
                     >
-                      <div className="p-1.5 bg-primary-100 rounded-lg flex-shrink-0">
-                        <TaskIcon className="w-4 h-4 text-primary-600" />
+                      <div className="p-1 bg-primary-100 rounded flex-shrink-0">
+                        <TaskIcon className="w-3 h-3 text-primary-600" />
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <h5 className="font-medium text-sm text-text-primary truncate">
+                        <h5 className="font-medium text-xs text-text-primary truncate">
                           {task.title}
                         </h5>
-                        <p className="text-xs text-text-muted">
+                        <p className="text-[10px] text-text-muted">
                           {task.dueDate ? dateUtils.format(new Date(task.dueDate)) : 'Bez termínu'}
                         </p>
-                      </div>
-
-                      <div className={`px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${
-                        task.priority === 'high'
-                          ? 'bg-red-100 text-red-700'
-                          : task.priority === 'medium'
-                            ? 'bg-yellow-100 text-yellow-700'
-                            : 'bg-green-100 text-green-700'
-                      }`}>
-                        {task.priority === 'high' ? 'Vysoká' :
-                         task.priority === 'medium' ? 'Střední' : 'Nízká'}
                       </div>
                     </div>
                   )
                 })}
               </>
             ) : (
-              <div className="text-center py-6">
-                <CheckCircle className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-                <p className="text-sm text-gray-500">Žádné nadcházející úkoly</p>
+              <div className="text-center py-3">
+                <CheckCircle className="w-6 h-6 text-gray-300 mx-auto mb-1" />
+                <p className="text-xs text-gray-500">Žádné nadcházející úkoly</p>
               </div>
             )}
           </div>
         </div>
-      </div>
 
-      <div className="mt-4 pt-4 border-t border-gray-200">
-        <Link
-          href="/tasks"
-          className="btn-primary w-full flex items-center justify-center space-x-2"
-        >
-          <List className="w-4 h-4" />
-          <span>Spravovat úkoly</span>
-          <ArrowRight className="w-4 h-4" />
-        </Link>
+        <div className="pt-4 border-t border-gray-200 flex-shrink-0">
+          <Link
+            href="/tasks"
+            className="btn-primary w-full flex items-center justify-center space-x-2"
+          >
+            <List className="w-4 h-4" />
+            <span>Spravovat úkoly</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
       </div>
     </div>
   )
 }
+

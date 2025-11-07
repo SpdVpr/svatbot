@@ -410,7 +410,7 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
 
         {/* Phase categories with statistics */}
         <div className="space-y-2">
-          {WEDDING_CHECKLIST.map((phase) => {
+          {WEDDING_CHECKLIST.filter(phase => phase.id !== 'after-wedding').map((phase) => {
             const itemsCompleted = phase.items.filter(item => isItemCompleted(item)).length
             const totalPhaseItems = phase.items.length
             const phasePercentage = Math.round((itemsCompleted / totalPhaseItems) * 100)

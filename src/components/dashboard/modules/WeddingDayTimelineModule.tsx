@@ -24,81 +24,89 @@ const categoryLabels = {
 export default function WeddingDayTimelineModule() {
   const { timeline, stats, loading } = useWeddingDayTimeline()
 
-  // Don't show loading state - let content fade in smoothly
-
   return (
-    <div className="wedding-card">
-      <Link href="/svatebni-den" className="block mb-4">
+    <div className="wedding-card h-[353px] flex flex-col">
+      <Link href="/svatebni-den" className="block mb-4 flex-shrink-0">
         <h3 className="text-base sm:text-lg font-semibold flex items-center justify-start sm:justify-center space-x-2 hover:text-primary-600 transition-colors">
           <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-primary-600 flex-shrink-0" />
-          <span className="truncate">Harmonogram svatebního dne</span>
+          <span className="truncate">Harmonogram dne</span>
         </h3>
       </Link>
 
-      <div className="space-y-3 sm:space-y-4">
-        {/* Timeline Overview */}
+      <div className="flex-1 flex flex-col justify-between min-h-0">
         {timeline.length > 0 ? (
           <>
-            <div className="bg-primary-50 p-3 sm:p-4 rounded-lg glass-morphism">
-              <div className="text-center mb-3">
-                <div className="text-xl sm:text-2xl font-bold text-primary-600">
-                  <NumberCounter end={stats.total} duration={1800} />
+            <div className="space-y-3">
+              {/* Timeline Overview */}
+              <div className="bg-primary-50 p-3 rounded-lg glass-morphism">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-primary-600">
+                    <NumberCounter end={stats.total} duration={1800} />
+                  </div>
+                  <div className="text-sm text-primary-700">Naplánovaných aktivit</div>
                 </div>
-                <div className="text-xs sm:text-sm text-primary-700">Naplánovaných aktivit</div>
               </div>
 
-              <div className="text-xs text-primary-700 text-center">
-                Kompletní harmonogram svatebního dne
+              {/* Next Items */}
+              <div className="bg-white border border-gray-200 rounded-lg p-2">
+                <div className="text-xs font-medium text-gray-700 mb-2">Nadcházející aktivity</div>
+                <div className="space-y-1.5">
+                  {timeline.filter(item => !item.isCompleted).slice(0, 2).map(item => (
+                    <div key={item.id} className="flex items-start space-x-2">
+                      <Clock className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-medium text-gray-900 truncate">
+                          {item.time} - {item.activity}
+                        </div>
+                        <div className="text-[10px] text-gray-500">{item.duration}</div>
+                      </div>
+                    </div>
+                  ))}
+                  {timeline.filter(item => !item.isCompleted).length === 0 && (
+                    <div className="text-xs text-gray-500 text-center py-2">
+                      <CheckCircle className="w-4 h-4 text-primary-600 mx-auto mb-1" />
+                      Vše dokončeno!
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* Next Items */}
-            <div className="bg-white border border-gray-200 rounded-lg p-2 sm:p-3">
-              <div className="text-xs sm:text-sm font-medium text-gray-700 mb-2">Nadcházející aktivity</div>
-              <div className="space-y-2">
-                {timeline.filter(item => !item.isCompleted).slice(0, 3).map(item => (
-                  <div key={item.id} className="flex items-start space-x-2">
-                    <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs font-medium text-gray-900 truncate">
-                        {item.time} - {item.activity}
-                      </div>
-                      <div className="text-xs text-gray-500">{item.duration}</div>
-                    </div>
-                  </div>
-                ))}
-                {timeline.filter(item => !item.isCompleted).length === 0 && (
-                  <div className="text-xs text-gray-500 text-center py-2">
-                    <CheckCircle className="w-4 h-4 text-primary-600 mx-auto mb-1" />
-                    Vše dokončeno!
-                  </div>
-                )}
-              </div>
+            <div className="pt-4 border-t border-gray-200 flex-shrink-0">
+              <Link
+                href="/svatebni-den"
+                className="btn-primary w-full flex items-center justify-center space-x-2"
+              >
+                <Calendar className="w-4 h-4" />
+                <span>Spravovat harmonogram</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           </>
         ) : (
-          <div className="bg-gray-50 p-4 sm:p-6 rounded-lg text-center">
-            <Calendar className="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-2 sm:mb-3" />
-            <p className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">
-              Zatím nemáte naplánovaný harmonogram svatebního dne
-            </p>
-            <p className="text-xs text-gray-500">
-              Vytvořte si detailní časový plán pro váš velký den
-            </p>
-          </div>
-        )}
-      </div>
+          <>
+            <div className="flex-1 flex flex-col justify-center items-center text-center">
+              <Calendar className="w-10 h-10 text-gray-300 mb-2" />
+              <p className="text-sm text-gray-600 mb-1">
+                Zatím nemáte naplánovaný harmonogram
+              </p>
+              <p className="text-xs text-gray-500">
+                Vytvořte si detailní časový plán
+              </p>
+            </div>
 
-      <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
-        <Link
-          href="/svatebni-den"
-          className="btn-primary w-full flex items-center justify-center space-x-2 text-sm sm:text-base"
-        >
-          <Calendar className="w-4 h-4" />
-          <span className="hidden sm:inline">Spravovat harmonogram</span>
-          <span className="sm:hidden">Harmonogram</span>
-          <ArrowRight className="w-4 h-4" />
-        </Link>
+            <div className="pt-4 border-t border-gray-200 flex-shrink-0">
+              <Link
+                href="/svatebni-den"
+                className="btn-primary w-full flex items-center justify-center space-x-2"
+              >
+                <Calendar className="w-4 h-4" />
+                <span>Spravovat harmonogram</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </>
+        )}
       </div>
     </div>
   )

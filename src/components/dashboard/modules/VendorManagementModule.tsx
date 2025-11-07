@@ -16,65 +16,68 @@ export default function VendorManagementModule() {
   }
 
   return (
-    <div className="wedding-card">
-      <Link href="/vendors" className="block mb-4">
+    <div className="wedding-card h-[353px] flex flex-col">
+      <Link href="/vendors" className="block mb-4 flex-shrink-0">
         <h3 className="text-base sm:text-lg font-semibold flex items-center justify-start sm:justify-center space-x-2 hover:text-primary-600 transition-colors">
           <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-primary-600 flex-shrink-0" />
           <span className="truncate">Dodavatelé</span>
         </h3>
       </Link>
 
-      <div className="space-y-4">
-        {/* Vendor Count */}
-        <div className="bg-primary-50 p-4 rounded-lg text-center glass-morphism">
-          <div className="text-2xl font-bold text-primary-600 mb-1">
-            <NumberCounter end={vendorStats.total} duration={1800} />
+      <div className="flex-1 flex flex-col justify-between min-h-0">
+        <div className="space-y-3">
+          {/* Vendor Count */}
+          <div className="bg-primary-50 p-3 rounded-lg text-center glass-morphism">
+            <div className="text-2xl font-bold text-primary-600">
+              <NumberCounter end={vendorStats.total} duration={1800} />
+            </div>
+            <div className="text-sm text-primary-700">Celkem dodavatelů</div>
           </div>
-          <div className="text-sm text-primary-700">Celkem dodavatelů</div>
+
+          {/* Vendor Stats */}
+          <div className="grid grid-cols-3 gap-2">
+            <div className="text-center hover-lift">
+              <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg mx-auto mb-1 float-enhanced">
+                <CheckCircle className="w-4 h-4 text-green-600" />
+              </div>
+              <div className="text-sm font-bold text-gray-900">
+                <NumberCounter end={vendorStats.confirmed} duration={1500} />
+              </div>
+              <div className="text-xs text-gray-500">Potvrzeno</div>
+            </div>
+            <div className="text-center hover-lift">
+              <div className="flex items-center justify-center w-8 h-8 bg-yellow-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.2s' }}>
+                <Clock className="w-4 h-4 text-yellow-600" />
+              </div>
+              <div className="text-sm font-bold text-gray-900">
+                <NumberCounter end={vendorStats.pending} duration={1500} />
+              </div>
+              <div className="text-xs text-gray-500">Čeká</div>
+            </div>
+            <div className="text-center hover-lift">
+              <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.4s' }}>
+                <Users className="w-4 h-4 text-blue-600" />
+              </div>
+              <div className="text-sm font-bold text-gray-900">
+                <NumberCounter end={vendorStats.contacted} duration={1500} />
+              </div>
+              <div className="text-xs text-gray-500">Kontaktováno</div>
+            </div>
+          </div>
         </div>
 
-        {/* Vendor Stats */}
-        <div className="grid grid-cols-3 gap-2">
-          <div className="text-center hover-lift">
-            <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg mx-auto mb-1 float-enhanced">
-              <CheckCircle className="w-4 h-4 text-green-600" />
-            </div>
-            <div className="text-sm font-bold text-gray-900">
-              <NumberCounter end={vendorStats.confirmed} duration={1500} />
-            </div>
-            <div className="text-xs text-gray-500">Potvrzeno</div>
-          </div>
-          <div className="text-center hover-lift">
-            <div className="flex items-center justify-center w-8 h-8 bg-yellow-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.2s' }}>
-              <Clock className="w-4 h-4 text-yellow-600" />
-            </div>
-            <div className="text-sm font-bold text-gray-900">
-              <NumberCounter end={vendorStats.pending} duration={1500} />
-            </div>
-            <div className="text-xs text-gray-500">Čeká</div>
-          </div>
-          <div className="text-center hover-lift">
-            <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.4s' }}>
-              <Users className="w-4 h-4 text-blue-600" />
-            </div>
-            <div className="text-sm font-bold text-gray-900">
-              <NumberCounter end={vendorStats.contacted} duration={1500} />
-            </div>
-            <div className="text-xs text-gray-500">Kontaktováno</div>
-          </div>
+        <div className="pt-4 border-t border-gray-200 flex-shrink-0">
+          <Link 
+            href="/vendors" 
+            className="btn-primary w-full flex items-center justify-center space-x-2"
+          >
+            <Briefcase className="w-4 h-4" />
+            <span>Spravovat dodavatele</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
-      </div>
-
-      <div className="mt-4 pt-4 border-t border-gray-200">
-        <Link 
-          href="/vendors" 
-          className="btn-primary w-full flex items-center justify-center space-x-2"
-        >
-          <Briefcase className="w-4 h-4" />
-          <span>Spravovat dodavatele</span>
-          <ArrowRight className="w-4 h-4" />
-        </Link>
       </div>
     </div>
   )
 }
+

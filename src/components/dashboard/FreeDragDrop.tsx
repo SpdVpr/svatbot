@@ -41,8 +41,8 @@ interface FreeDragDropProps {
 // Module size configurations (width x height in pixels)
 // Calculation: 3 modules × 360px = 1080px + 4 gaps × 40px = 1240px
 const MODULE_SIZES = {
-  small: { width: 360, height: 400 },
-  medium: { width: 360, height: 450 },
+  small: { width: 360, height: 353 },
+  medium: { width: 360, height: 353 },
   large: { width: 760, height: 450 },  // 2 modules wide: 360 + 40 + 360
   full: { width: 1160, height: 500 }   // 3 modules wide: 360 + 40 + 360 + 40 + 360
 }

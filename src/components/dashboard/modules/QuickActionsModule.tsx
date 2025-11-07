@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Zap, Plus, Users, DollarSign, ListChecks } from 'lucide-react'
+import { Zap, Plus, Users, DollarSign, ListChecks, Music, Briefcase } from 'lucide-react'
 
 export default function QuickActionsModule() {
   const quickActions = [
@@ -32,6 +32,20 @@ export default function QuickActionsModule() {
       description: 'Nová položka rozpočtu',
       href: '/budget',
       color: 'text-white bg-primary-800 hover:bg-primary-700'
+    },
+    {
+      icon: Music,
+      title: 'Přidat hudbu',
+      description: 'Nová píseň do playlistu',
+      href: '/music',
+      color: 'text-white bg-purple-600 hover:bg-purple-500'
+    },
+    {
+      icon: Briefcase,
+      title: 'Přidat dodavatele',
+      description: 'Nový dodavatel',
+      href: '/vendors',
+      color: 'text-white bg-indigo-600 hover:bg-indigo-500'
     }
   ]
 

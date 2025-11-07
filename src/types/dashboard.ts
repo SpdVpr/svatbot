@@ -179,14 +179,14 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     isLocked: false,
     order: 11
   },
-  // Row 5 - Harmonogram svatebního dne pod "Jídlo a pití" + 2 další moduly
+  // Row 5 - Harmonogram dne + 2 další moduly
   {
     id: 'wedding-day-timeline',
     type: 'wedding-day-timeline',
-    title: 'Harmonogram svatebního dne',
-    size: 'large',
+    title: 'Harmonogram dne',
+    size: 'small',
     position: { x: 40, y: 2490 },
-    customSize: { width: 760, height: 450 }, // Rozšířeno na šířku jako "Odpočet do svatby" (2 moduly široké)
+    customSize: { width: 360, height: 353 }, // Stejná velikost jako ostatní malé moduly
     gridPosition: { row: 5, column: 0 },
     isVisible: true,
     isLocked: false,
@@ -197,8 +197,9 @@ export const DEFAULT_DASHBOARD_MODULES: DashboardModule[] = [
     type: 'food-drinks',
     title: 'Jídlo a Pití',
     size: 'medium',
-    position: { x: 840, y: 2490 },
-    gridPosition: { row: 5, column: 2 },
+    position: { x: 440, y: 2490 },
+    customSize: { width: 360, height: 353 },
+    gridPosition: { row: 5, column: 1 },
     isVisible: true,
     isLocked: false,
     order: 13

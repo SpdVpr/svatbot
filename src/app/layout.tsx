@@ -38,10 +38,10 @@ const cormorantUpright = Cormorant_Upright({
 
 export const metadata: Metadata = {
   title: {
-    default: 'AI Svatební Asistent Zdarma | SvatBot.cz - První v ČR',
+    default: 'AI Svatební Asistent | SvatBot.cz',
     template: '%s | SvatBot.cz - AI Svatební Plánovač'
   },
-  description: 'Jediný český svatební plánovač s AI asistentem! Naplánujte svatbu za 50+ hodin méně. Rozpočet, timeline, hosté, seating plan, svatební web. Vyzkoušejte zdarma! ⭐ 4.9/5 od 127 uživatelů',
+  description: 'Jediný český svatební plánovač s AI asistentem! Naplánujte svatbu za 50+ hodin méně. Rozpočet, timeline, hosté, seating plan, svatební web. ⭐ 4.9/5 od 127 uživatelů',
   keywords: [
     // TIER 1: Vysoký objem vyhledávání (priorita ⭐⭐⭐⭐⭐)
     'plánování svatby',
@@ -114,7 +114,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'cs_CZ',
     url: 'https://svatbot.cz',
-    title: 'AI Svatební Asistent Zdarma | SvatBot.cz - První v ČR',
+    title: 'AI Svatební Asistent | SvatBot.cz',
     description: 'Jediný český svatební plánovač s AI asistentem! Naplánujte svatbu za 50+ hodin méně. Rozpočet, timeline, hosté, seating plan, svatební web. ⭐ 4.9/5 hodnocení',
     siteName: 'SvatBot.cz',
     images: [
@@ -128,8 +128,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AI Svatební Asistent Zdarma | SvatBot.cz - První v ČR',
-    description: 'Jediný český svatební plánovač s AI asistentem! Naplánujte svatbu za 50+ hodin méně. Vyzkoušejte zdarma! ⭐ 4.9/5',
+    title: 'AI Svatební Asistent | SvatBot.cz',
+    description: 'Jediný český svatební plánovač s AI asistentem! Naplánujte svatbu za 50+ hodin méně. ⭐ 4.9/5',
     images: ['/og-image.jpg'],
     creator: '@svatbot_cz',
     site: '@svatbot_cz',

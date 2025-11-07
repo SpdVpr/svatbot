@@ -831,8 +831,8 @@ export default function WeddingCountdownModule({ onWeddingSettingsClick }: Weddi
           </div>
         </div>
 
-        {/* Wedding Advisor Section */}
-        {currentRec && (
+        {/* Wedding Advisor Section - HIDDEN (functionality preserved for future use) */}
+        {false && currentRec && (
           <div className="mt-6 pt-6 border-t border-gray-100">
             <div
               className={`rounded-lg border p-4 transition-all duration-300 ${getPriorityColor(currentRec.priority)} ${
@@ -852,9 +852,9 @@ export default function WeddingCountdownModule({ onWeddingSettingsClick }: Weddi
                 </div>
                 {currentRec.action && (
                   <a
-                    href={currentRec.action.link}
+                    href={currentRec.action?.link || '#'}
                     className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg hover:bg-white/50 transition-colors group"
-                    title={currentRec.action.label}
+                    title={currentRec.action?.label || ''}
                   >
                     <svg className="w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
