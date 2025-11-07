@@ -391,7 +391,7 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
     return (
       <div className="space-y-4">
         {/* Overall statistics */}
-        <div className="bg-gradient-to-r from-primary-50 to-pink-50 p-4 rounded-lg border border-primary-100">
+        <div className="p-4 rounded-lg border" style={{ background: `linear-gradient(to right, var(--color-primary-50), var(--color-primary-100))`, borderColor: 'var(--color-primary-200)' }}>
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm text-gray-600 mb-1">Celkový pokrok</div>
@@ -474,7 +474,7 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
   return (
     <div className="space-y-6">
       {/* Header info */}
-      <div className="bg-gradient-to-r from-primary-50 to-pink-50 p-6 rounded-xl border border-primary-100">
+      <div className="p-6 rounded-xl border" style={{ background: `linear-gradient(to right, var(--color-primary-50), var(--color-primary-100))`, borderColor: 'var(--color-primary-200)' }}>
         <div className="flex items-start space-x-3">
           <Sparkles className="w-6 h-6 text-primary-600 flex-shrink-0 mt-1" />
           <div className="flex-1">

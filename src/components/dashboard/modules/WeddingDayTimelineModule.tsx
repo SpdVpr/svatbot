@@ -30,7 +30,7 @@ export default function WeddingDayTimelineModule() {
     <div className="wedding-card">
       <Link href="/svatebni-den" className="block mb-4">
         <h3 className="text-base sm:text-lg font-semibold flex items-center justify-start sm:justify-center space-x-2 hover:text-primary-600 transition-colors">
-          <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 flex-shrink-0" />
+          <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-primary-600 flex-shrink-0" />
           <span className="truncate">Harmonogram svatebního dne</span>
         </h3>
       </Link>
@@ -69,7 +69,7 @@ export default function WeddingDayTimelineModule() {
                 ))}
                 {timeline.filter(item => !item.isCompleted).length === 0 && (
                   <div className="text-xs text-gray-500 text-center py-2">
-                    <CheckCircle className="w-4 h-4 text-green-500 mx-auto mb-1" />
+                    <CheckCircle className="w-4 h-4 text-primary-600 mx-auto mb-1" />
                     Vše dokončeno!
                   </div>
                 )}

@@ -431,12 +431,13 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
                               }}
                               className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-300 border-2 ${
                                 colorTheme === theme
-                                  ? 'border-gray-400 shadow-md scale-105'
+                                  ? 'shadow-md scale-105'
                                   : 'border-transparent hover:border-gray-200 hover:scale-102'
                               }`}
                               style={{
                                 backgroundColor: palette.colors.primaryLight,
-                                color: palette.colors.primary700
+                                color: palette.colors.primary700,
+                                borderColor: colorTheme === theme ? palette.colors.primary400 : 'transparent'
                               }}
                             >
                               <div className="flex items-center justify-between">

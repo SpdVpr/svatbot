@@ -31,7 +31,7 @@ export default function WeddingWebsiteModule({ onResize }: WeddingWebsiteModuleP
       <div className="wedding-card">
         <Link href="/wedding-website" className="block mb-4">
           <h3 className="text-base sm:text-lg font-semibold flex items-center justify-start sm:justify-center space-x-2 hover:text-primary-600 transition-colors">
-            <Globe className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 flex-shrink-0" />
+            <Globe className="w-4 h-4 sm:w-5 sm:h-5 text-primary-600 flex-shrink-0" />
             <span className="truncate">Svatební web</span>
           </h3>
         </Link>
@@ -51,7 +51,7 @@ export default function WeddingWebsiteModule({ onResize }: WeddingWebsiteModuleP
       <div className="wedding-card">
         <Link href="/wedding-website" className="block mb-4">
           <h3 className="text-base sm:text-lg font-semibold flex items-center justify-start sm:justify-center space-x-2 hover:text-primary-600 transition-colors">
-            <Globe className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 flex-shrink-0" />
+            <Globe className="w-4 h-4 sm:w-5 sm:h-5 text-primary-600 flex-shrink-0" />
             <span className="truncate">Svatební web</span>
           </h3>
         </Link>
@@ -108,7 +108,7 @@ export default function WeddingWebsiteModule({ onResize }: WeddingWebsiteModuleP
     <div className="wedding-card">
       <Link href="/wedding-website" className="block mb-4">
         <h3 className="text-base sm:text-lg font-semibold flex items-center justify-start sm:justify-center space-x-2 hover:text-primary-600 transition-colors">
-          <Globe className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 flex-shrink-0" />
+          <Globe className="w-4 h-4 sm:w-5 sm:h-5 text-primary-600 flex-shrink-0" />
           <span className="truncate">Svatební web</span>
         </h3>
       </Link>

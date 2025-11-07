@@ -567,4 +567,99 @@
   font-family: var(--font-cormorant), 'Cormorant Upright', serif !important;
   font-weight: 600 !important;
   letter-spacing: 0.01em;
+  font-size: 1.4rem !important;
+}
+
+/* Dashboard module heading icons - use primary color */
+.wedding-card h3 svg,
+.wedding-card h2 svg,
+.wedding-card h1 svg,
+.wedding-card h3 svg.text-blue-600,
+.wedding-card h3 svg.text-purple-600,
+.wedding-card h3 svg.text-orange-600,
+.wedding-card h3 svg.text-indigo-600,
+.wedding-card h3 svg.text-green-600 {
+  color: var(--color-primary-600) !important;
+}
+
+/* Dashboard stat icons - use lighter shades of primary color palette */
+.wedding-card .bg-green-100,
+.wedding-card .bg-green-100.rounded-lg {
+  background-color: var(--color-primary-100) !important;
+}
+
+.wedding-card .bg-green-100 svg,
+.wedding-card .text-green-600,
+.wedding-card .text-green-500 {
+  color: var(--color-primary-600) !important;
+}
+
+.wedding-card .bg-yellow-100,
+.wedding-card .bg-yellow-100.rounded-lg {
+  background-color: var(--color-secondary-100) !important;
+}
+
+.wedding-card .bg-yellow-100 svg,
+.wedding-card .text-yellow-600 {
+  color: var(--color-secondary-600) !important;
+}
+
+.wedding-card .bg-red-100,
+.wedding-card .bg-red-100.rounded-lg {
+  background-color: var(--color-accent-100) !important;
+}
+
+.wedding-card .bg-red-100 svg,
+.wedding-card .text-red-600 {
+  color: var(--color-accent-600) !important;
+}
+
+.wedding-card .bg-blue-100,
+.wedding-card .bg-blue-100.rounded-lg {
+  background-color: var(--color-primary-200) !important;
+}
+
+.wedding-card .bg-blue-100 svg,
+.wedding-card .text-blue-600 {
+  color: var(--color-primary-700) !important;
+}
+
+.wedding-card .bg-orange-100,
+.wedding-card .bg-orange-100.rounded-lg {
+  background-color: var(--color-accent-200) !important;
+}
+
+.wedding-card .bg-orange-100 svg,
+.wedding-card .text-orange-600 {
+  color: var(--color-accent-700) !important;
+}
+
+.wedding-card .bg-indigo-100,
+.wedding-card .bg-indigo-100.rounded-lg {
+  background-color: var(--color-secondary-200) !important;
+}
+
+.wedding-card .bg-indigo-100 svg,
+.wedding-card .text-indigo-600 {
+  color: var(--color-secondary-700) !important;
+}
+
+.wedding-card .bg-purple-100,
+.wedding-card .bg-purple-100.rounded-lg {
+  background-color: var(--color-secondary-100) !important;
+}
+
+.wedding-card .bg-purple-100 svg,
+.wedding-card .text-purple-600 {
+  color: var(--color-secondary-600) !important;
+}
+
+.wedding-card .bg-pink-100,
+.wedding-card .bg-pink-100.rounded-lg {
+  background-color: var(--color-primary-100) !important;
+}
+
+.wedding-card .bg-pink-100 svg,
+.wedding-card .text-pink-600 {
+  color: var(--color-primary-600) !important;
 }

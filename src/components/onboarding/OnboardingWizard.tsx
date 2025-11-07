@@ -111,7 +111,7 @@ export default function OnboardingWizard({ onClose, autoShow = true }: Onboardin
         style={getViewTransitionName('onboarding-wizard')}
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-primary-500 to-pink-500 p-6 text-white relative">
+        <div className="p-6 text-white relative" style={{ background: `linear-gradient(to right, var(--color-primary-600), var(--color-primary-700))` }}>
           <button
             onClick={handleClose}
             className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors"

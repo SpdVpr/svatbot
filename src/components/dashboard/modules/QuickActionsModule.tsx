@@ -10,28 +10,28 @@ export default function QuickActionsModule() {
       title: 'Přidat úkol',
       description: 'Nový svatební úkol',
       href: '/tasks',
-      color: 'text-white bg-blue-600 hover:bg-blue-500'
+      color: 'text-white bg-primary-400 hover:bg-primary-300'
     },
     {
       icon: ListChecks,
       title: 'Svatební checklist',
       description: 'Předpřipravené úkoly',
       href: '/checklist',
-      color: 'text-white bg-pink-600 hover:bg-pink-500'
+      color: 'text-white bg-primary-600 hover:bg-primary-500'
     },
     {
       icon: Users,
       title: 'Přidat hosta',
       description: 'Nový host na seznam',
       href: '/guests',
-      color: 'text-white bg-purple-600 hover:bg-purple-500'
+      color: 'text-white bg-primary-700 hover:bg-primary-600'
     },
     {
       icon: DollarSign,
       title: 'Přidat výdaj',
       description: 'Nová položka rozpočtu',
       href: '/budget',
-      color: 'text-white bg-green-600 hover:bg-green-500'
+      color: 'text-white bg-primary-800 hover:bg-primary-700'
     }
   ]
 

@@ -11,7 +11,7 @@ export default function MusicPlaylistModule() {
     <div className="wedding-card">
       <Link href="/music" className="block mb-4">
         <h3 className="text-base sm:text-lg font-semibold flex items-center justify-start sm:justify-center space-x-2 hover:text-primary-600 transition-colors">
-          <Music className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 flex-shrink-0" />
+          <Music className="w-4 h-4 sm:w-5 sm:h-5 text-primary-600 flex-shrink-0" />
           <span className="truncate">Svatební hudba</span>
         </h3>
       </Link>
@@ -32,7 +32,7 @@ export default function MusicPlaylistModule() {
                   <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">{vendor.name}</p>
                   {vendor.type && <p className="text-xs text-primary-600">{vendor.type}</p>}
                 </div>
-                <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 ml-2" />
+                <CheckCircle2 className="w-4 h-4 text-primary-600 flex-shrink-0 ml-2" />
               </div>
             ))}
             {vendors.length > 2 && (
