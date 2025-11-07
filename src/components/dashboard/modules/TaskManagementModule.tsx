@@ -19,9 +19,8 @@ export default function TaskManagementModule() {
       return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
     })
 
-  // Show only 3 tasks initially
-  const displayedTasks = upcomingTasks.slice(0, 3)
-  const remainingTasksCount = upcomingTasks.length - 3
+  // Show only 2 tasks
+  const displayedTasks = upcomingTasks.slice(0, 2)
 
   const getTaskIcon = (category: string) => {
     switch (category) {
@@ -112,16 +111,6 @@ export default function TaskManagementModule() {
                     </div>
                   )
                 })}
-
-                {remainingTasksCount > 0 && (
-                  <Link
-                    href="/tasks"
-                    className="w-full text-sm text-primary-600 hover:text-primary-700 font-medium py-3 border border-primary-200 rounded-lg hover:bg-primary-50 transition-colors flex items-center justify-center space-x-2"
-                  >
-                    <span>Zobrazit více ({remainingTasksCount} {remainingTasksCount === 1 ? 'další' : remainingTasksCount < 5 ? 'další' : 'dalších'})</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                )}
               </>
             ) : (
               <div className="text-center py-6">

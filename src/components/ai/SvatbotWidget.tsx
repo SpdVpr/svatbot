@@ -194,7 +194,7 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
           </div>
         ) : activeSuggestions.length > 0 ? (
           <div className="space-y-3">
-            {(showAllSuggestions ? activeSuggestions : activeSuggestions.slice(0, 2)).map((suggestion) => (
+            {activeSuggestions.slice(0, 2).map((suggestion) => (
               <div
                 key={suggestion.id}
                 className={`p-4 rounded-lg border-l-4 ${getPriorityColor(suggestion.priority)} transition-all hover:shadow-md`}
@@ -223,24 +223,6 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
                 </div>
               </div>
             ))}
-
-            {!showAllSuggestions && activeSuggestions.length > 2 && (
-              <button
-                onClick={() => setShowAllSuggestions(true)}
-                className="w-full text-sm text-primary-600 hover:text-primary-700 font-medium py-3 border border-primary-200 rounded-lg hover:bg-primary-50 transition-colors"
-              >
-                Zobrazit všechny zprávy ({activeSuggestions.length - 2} dalších)
-              </button>
-            )}
-
-            {showAllSuggestions && activeSuggestions.length > 2 && (
-              <button
-                onClick={() => setShowAllSuggestions(false)}
-                className="w-full text-sm text-gray-600 hover:text-gray-700 font-medium py-2"
-              >
-                Zobrazit méně
-              </button>
-            )}
           </div>
         ) : (
           <div className="text-center py-8">

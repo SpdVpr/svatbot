@@ -893,7 +893,7 @@ function DraggableModule({
         left: position.x,
         top: position.y,
         width: size.width,
-        height: size.height,
+        maxHeight: size.height,
         willChange: isDragging || isResizing ? 'transform' : 'auto',
         transition: isDragging || isResizing ? 'none' : undefined
       }}
@@ -902,23 +902,23 @@ function DraggableModule({
       onMouseLeave={() => !isDragging && !isResizing && setIsHovered(false)}
     >
       <div
-        className={`relative w-full h-full rounded-3xl overflow-hidden backdrop-blur-xl transition-all duration-500 ease-out ${
-          isDragging
-            ? 'border-primary-400'
-            : module.isLocked
-            ? 'border-gray-200'
-            : isEditMode
-            ? 'border-primary-100'
-            : 'border-white/60'
-        }`}
+        className="relative w-full rounded-2xl overflow-hidden transition-all duration-200 ease-out"
         style={{
-          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%)',
-          border: '1px solid rgba(255, 255, 255, 0.6)',
-          boxShadow: isDragging || isResizing
-            ? '0 2px 4px rgba(0, 0, 0, 0.03), 0 8px 16px rgba(0, 0, 0, 0.06), 0 20px 40px rgba(0, 0, 0, 0.08), 0 40px 80px rgba(248, 187, 217, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.9)'
+          background: isDragging || isResizing
+            ? 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)'
             : isHovered
-            ? '0 2px 4px rgba(0, 0, 0, 0.03), 0 8px 16px rgba(0, 0, 0, 0.06), 0 20px 40px rgba(0, 0, 0, 0.08), 0 40px 80px rgba(248, 187, 217, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.9)'
-            : '0 1px 2px rgba(0, 0, 0, 0.02), 0 4px 8px rgba(0, 0, 0, 0.04), 0 12px 24px rgba(0, 0, 0, 0.06), 0 24px 48px rgba(248, 187, 217, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+            ? 'linear-gradient(135deg, #ffffff 0%, #fafbfc 100%)'
+            : 'linear-gradient(135deg, #ffffff 0%, #fcfcfd 100%)',
+          border: isDragging
+            ? '2px solid rgba(248, 187, 217, 0.6)'
+            : isHovered
+            ? '1.5px solid rgba(0, 0, 0, 0.12)'
+            : '1px solid rgba(0, 0, 0, 0.1)',
+          boxShadow: isDragging || isResizing
+            ? '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 12px 24px -8px rgba(248, 187, 217, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) inset'
+            : isHovered
+            ? '0 16px 32px -8px rgba(0, 0, 0, 0.15), 0 6px 16px -4px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.05) inset'
+            : '0 10px 24px -6px rgba(0, 0, 0, 0.1), 0 4px 12px -2px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(255, 255, 255, 0.03) inset'
         }}
       >
         {/* Shimmer effect on hover - iOS style */}
@@ -995,7 +995,7 @@ function DraggableModule({
             </div>
           </div>
         ) : (
-          <div className={`h-full ${isEditMode ? 'overflow-hidden pointer-events-none' : 'overflow-hidden'}`}>
+          <div className={isEditMode ? 'pointer-events-none' : ''}>
             {renderContent()}
           </div>
         )}
