@@ -299,17 +299,6 @@ export function useAdminPayments(onNewPayment?: (payment: AdminPaymentRecord) =>
     const thisWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
     const thisYear = new Date(now.getFullYear(), 0, 1)
 
-    console.log('📊 Calculating stats with:', {
-      paymentsCount: paymentsData.length,
-      subscriptionsCount: subscriptionsData.length,
-      payments: paymentsData.map(p => ({
-        amount: p.amount,
-        status: p.status,
-        createdAt: p.createdAt,
-        email: p.userEmail
-      }))
-    })
-
     // Revenue calculations
     let totalRevenue = 0
     let monthlyRevenue = 0
@@ -320,13 +309,6 @@ export function useAdminPayments(onNewPayment?: (payment: AdminPaymentRecord) =>
     let refundedPayments = 0
 
     paymentsData.forEach(payment => {
-      console.log('💰 Processing payment:', {
-        amount: payment.amount,
-        status: payment.status,
-        createdAt: payment.createdAt,
-        isThisMonth: payment.createdAt >= thisMonth
-      })
-
       if (payment.status === 'succeeded') {
         totalRevenue += payment.amount
         successfulPayments++
@@ -344,13 +326,6 @@ export function useAdminPayments(onNewPayment?: (payment: AdminPaymentRecord) =>
       } else if (payment.status === 'refunded') {
         refundedPayments++
       }
-    })
-
-    console.log('💵 Revenue totals:', {
-      totalRevenue,
-      monthlyRevenue,
-      yearlyRevenue,
-      successfulPayments
     })
 
     // Subscription calculations

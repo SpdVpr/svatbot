@@ -199,8 +199,6 @@ export function useUserAnalytics() {
 
     const unsubscribe = onSnapshot(analyticsQuery, async (snapshot) => {
       try {
-        console.log('📊 Loading user analytics, found', snapshot.docs.length, 'documents')
-
         // Get analytics data with AI queries
         const enrichedUsers = await Promise.all(
           snapshot.docs.map(async (analyticsDoc) => {
@@ -229,17 +227,6 @@ export function useUserAnalytics() {
             const isActuallyOnline = data.isOnline === true &&
                                      lastActivity &&
                                      (now.getTime() - lastActivity.getTime()) < 5 * 60 * 1000 // 5 minutes
-
-            console.log('User analytics:', {
-              id: analyticsDoc.id,
-              email,
-              displayName,
-              loginCount: data.loginCount,
-              isOnline: data.isOnline,
-              lastActivity: lastActivity?.toISOString(),
-              isActuallyOnline,
-              sessions: data.sessions?.length
-            })
 
             let analyticsData: any = {
               id: analyticsDoc.id,
@@ -273,7 +260,6 @@ export function useUserAnalytics() {
           })
         )
 
-        console.log('✅ Loaded', enrichedUsers.length, 'users with analytics')
         setUsers(enrichedUsers)
         setLoading(false)
       } catch (error) {
