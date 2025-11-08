@@ -6,46 +6,52 @@ import { Zap, Plus, Users, DollarSign, ListChecks, Music, Briefcase } from 'luci
 export default function QuickActionsModule() {
   const quickActions = [
     {
-      icon: Plus,
-      title: 'Přidat úkol',
-      description: 'Nový svatební úkol',
-      href: '/tasks',
-      color: 'text-white bg-primary-400 hover:bg-primary-300'
-    },
-    {
       icon: ListChecks,
       title: 'Svatební checklist',
       description: 'Předpřipravené úkoly',
       href: '/checklist',
-      color: 'text-white bg-primary-600 hover:bg-primary-500'
+      baseColor: 'bg-primary-400',
+      hoverColor: 'hover:bg-primary-300'
+    },
+    {
+      icon: Plus,
+      title: 'Přidat úkol',
+      description: 'Nový svatební úkol',
+      href: '/tasks',
+      baseColor: 'bg-primary-600',
+      hoverColor: 'hover:bg-primary-400'
     },
     {
       icon: Users,
       title: 'Přidat hosta',
       description: 'Nový host na seznam',
       href: '/guests',
-      color: 'text-white bg-primary-700 hover:bg-primary-600'
+      baseColor: 'bg-primary-700',
+      hoverColor: 'hover:bg-primary-600'
     },
     {
       icon: DollarSign,
       title: 'Přidat výdaj',
       description: 'Nová položka rozpočtu',
       href: '/budget',
-      color: 'text-white bg-primary-800 hover:bg-primary-700'
+      baseColor: 'bg-primary-800',
+      hoverColor: 'hover:bg-primary-700'
     },
     {
       icon: Music,
       title: 'Přidat hudbu',
       description: 'Nová píseň do playlistu',
       href: '/music',
-      color: 'text-white bg-purple-600 hover:bg-purple-500'
+      baseColor: 'bg-primary-900',
+      hoverColor: 'hover:bg-primary-800'
     },
     {
       icon: Briefcase,
       title: 'Přidat dodavatele',
       description: 'Nový dodavatel',
       href: '/vendors',
-      color: 'text-white bg-indigo-600 hover:bg-indigo-500'
+      baseColor: 'bg-primary-900',
+      hoverColor: 'hover:bg-primary-800'
     }
   ]
 
@@ -60,7 +66,7 @@ export default function QuickActionsModule() {
           <Link
             key={action.title}
             href={action.href}
-            className={`stagger-item flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-md ${action.color}`}
+            className={`stagger-item flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-md text-white ${action.baseColor} ${action.hoverColor}`}
             style={{ animationDelay: `${index * 80}ms` }}
           >
             <action.icon className="w-5 h-5 float" />

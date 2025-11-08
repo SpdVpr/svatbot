@@ -159,8 +159,23 @@ export default function TaskList({
     }
 
     // Priority filter
-    if (filters.priority && task.priority && !filters.priority.includes(task.priority)) {
-      return false
+    if (filters.priority && filters.priority.length > 0) {
+      // Check if filtering for "none" (no priority)
+      if (filters.priority.includes('none')) {
+        // If filtering for "none", show tasks without priority OR tasks with selected priorities
+        const otherPriorities = filters.priority.filter(p => p !== 'none')
+        const hasNoPriority = !task.priority
+        const hasSelectedPriority = task.priority && otherPriorities.includes(task.priority)
+
+        if (!hasNoPriority && !hasSelectedPriority) {
+          return false
+        }
+      } else {
+        // Normal priority filtering - only show tasks with selected priorities
+        if (!task.priority || !filters.priority.includes(task.priority)) {
+          return false
+        }
+      }
     }
 
     // Show completed filter
@@ -234,6 +249,7 @@ export default function TaskList({
   // Get category display name
   const getCategoryName = (category: string) => {
     const categoryNames = {
+      uncategorized: 'Bez kategorie',
       foundation: 'Základy',
       venue: 'Místo konání',
       guests: 'Hosté',
@@ -370,6 +386,7 @@ export default function TaskList({
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                   >
                     <option value="">Všechny kategorie</option>
+                    <option value="uncategorized">Bez kategorie</option>
                     <option value="foundation">Základy</option>
                     <option value="venue">Místo konání</option>
                     <option value="guests">Hosté</option>
@@ -398,6 +415,7 @@ export default function TaskList({
                     <option value="high">Vysoká</option>
                     <option value="medium">Střední</option>
                     <option value="low">Nízká</option>
+                    <option value="none">Bez priority</option>
                   </select>
                 </div>
               </div>
@@ -631,6 +649,32 @@ function getPriorityLabel(priority?: string): string {
   }
 }
 
+// Helper function to get category label in Czech
+function getCategoryLabel(category: string): string {
+  switch (category) {
+    case 'uncategorized':
+      return 'Bez kategorie'
+    case 'foundation':
+      return 'Základy'
+    case 'venue':
+      return 'Místo konání'
+    case 'guests':
+      return 'Hosté'
+    case 'budget':
+      return 'Rozpočet'
+    case 'design':
+      return 'Design'
+    case 'organization':
+      return 'Organizace'
+    case 'final':
+      return 'Finální přípravy'
+    case 'custom':
+      return 'Osobní úkoly'
+    default:
+      return category
+  }
+}
+
 // Helper function to group tasks
 function groupTasksBy(tasks: Task[], groupBy: string): Record<string, Task[]> {
   const grouped: Record<string, Task[]> = {}
@@ -640,7 +684,7 @@ function groupTasksBy(tasks: Task[], groupBy: string): Record<string, Task[]> {
 
     switch (groupBy) {
       case 'category':
-        key = task.category
+        key = getCategoryLabel(task.category)
         break
       case 'status':
         key = task.status

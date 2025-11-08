@@ -13,6 +13,7 @@ export type TaskCategory =
   | 'organization'  // Organizace a koordinace
   | 'final'         // Finální přípravy
   | 'custom'        // Vlastní úkoly
+  | 'uncategorized' // Bez kategorie (pro úkoly ze checklistu)
 
 export interface Task {
   id: string
@@ -61,7 +62,7 @@ export interface TaskProgress {
 export interface TaskFilters {
   status?: TaskStatus[]
   category?: TaskCategory[]
-  priority?: TaskPriority[]
+  priority?: (TaskPriority | 'none')[] // 'none' for filtering tasks without priority
   assignedTo?: string
   dueDateFrom?: Date
   dueDateTo?: Date

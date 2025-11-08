@@ -22,7 +22,8 @@
     "firebase:shell": "firebase functions:shell",
     "demo:create": "node scripts/create-demo-account.js",
     "demo:delete": "node scripts/delete-demo-account.js",
-    "demo:update": "node scripts/update-demo-data.js"
+    "demo:update": "node scripts/update-demo-data.js",
+    "demo:export-dashboard": "node scripts/export-demo-dashboard.js"
   },
   "keywords": [
     "wedding",

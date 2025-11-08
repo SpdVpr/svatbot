@@ -56,10 +56,10 @@ export const COLOR_PALETTES: Record<ColorTheme, ColorPalette> = {
     name: 'Růžová romance',
     description: 'Jemná růžová s fialovými odstíny',
     colors: {
-      // Primary - Pink
-      primary: '#F8BBD9',
+      // Primary - Pink (fixed order: light to dark)
+      primary: '#ec4899',
       primaryLight: '#fce7f3',
-      primaryDark: '#f472b6',
+      primaryDark: '#db2777',
       primary200: '#fbcfe8',
       primary300: '#f9a8d4',
       primary400: '#f472b6',
@@ -99,9 +99,9 @@ export const COLOR_PALETTES: Record<ColorTheme, ColorPalette> = {
     name: 'Levandulový sen',
     description: 'Uklidňující fialové tóny',
     colors: {
-      primary: '#D4C5F9',
+      primary: '#a855f7',
       primaryLight: '#f3e8ff',
-      primaryDark: '#c084fc',
+      primaryDark: '#9333ea',
       primary200: '#e9d5ff',
       primary300: '#d8b4fe',
       primary400: '#c084fc',
@@ -139,9 +139,9 @@ export const COLOR_PALETTES: Record<ColorTheme, ColorPalette> = {
     name: 'Nebeská modř',
     description: 'Svěží modré odstíny',
     colors: {
-      primary: '#BAE6FD',
+      primary: '#0ea5e9',
       primaryLight: '#e0f2fe',
-      primaryDark: '#38bdf8',
+      primaryDark: '#0284c7',
       primary200: '#bae6fd',
       primary300: '#7dd3fc',
       primary400: '#38bdf8',
@@ -179,9 +179,9 @@ export const COLOR_PALETTES: Record<ColorTheme, ColorPalette> = {
     name: 'Mátová svěžest',
     description: 'Osvěžující zelené tóny',
     colors: {
-      primary: '#BBF7D0',
+      primary: '#22c55e',
       primaryLight: '#dcfce7',
-      primaryDark: '#4ade80',
+      primaryDark: '#16a34a',
       primary200: '#bbf7d0',
       primary300: '#86efac',
       primary400: '#4ade80',
@@ -219,9 +219,9 @@ export const COLOR_PALETTES: Record<ColorTheme, ColorPalette> = {
     name: 'Broskvový západ',
     description: 'Teplé broskvové odstíny',
     colors: {
-      primary: '#FECACA',
+      primary: '#ef4444',
       primaryLight: '#fee2e2',
-      primaryDark: '#fb923c',
+      primaryDark: '#dc2626',
       primary200: '#fecaca',
       primary300: '#fca5a5',
       primary400: '#f87171',

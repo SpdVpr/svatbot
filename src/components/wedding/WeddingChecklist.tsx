@@ -176,20 +176,11 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
     try {
       setAddingToTasks(item.id)
 
-      // Map checklist category to task category
-      const categoryMap: Record<ChecklistItem['category'], TaskFormData['category']> = {
-        'beauty': 'design',
-        'preparation': 'organization',
-        'post-wedding': 'custom',
-        'legal': 'custom',
-        'other': 'custom'
-      }
-
-      // Don't set due date automatically - user will set it manually in tasks
+      // All checklist items go to "Bez kategorie" (uncategorized)
       const taskData: TaskFormData = {
         title: item.title,
         description: '',
-        category: categoryMap[item.category],
+        category: 'uncategorized',
         priority: undefined,
         dueDate: undefined,
         notes: item.tips?.join('\n') || '',

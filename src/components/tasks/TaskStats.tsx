@@ -107,7 +107,7 @@ export default function TaskStats({
             <AlertTriangle className="w-5 h-5 text-red-500" />
             <div>
               <p className="text-2xl font-bold text-red-600">{stats.overdue}</p>
-              <p className="text-sm text-text-muted">Prošlé</p>
+              <p className="text-sm text-text-muted">Po termínu</p>
             </div>
           </div>
         </div>
@@ -169,7 +169,7 @@ export default function TaskStats({
         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-text-muted">Prošlé termíny</p>
+              <p className="text-sm font-medium text-text-muted">Po termínu</p>
               <p className="text-3xl font-bold text-red-600 mt-1">{stats.overdue}</p>
             </div>
             <div className="p-3 bg-red-100 rounded-full">
@@ -228,14 +228,10 @@ export default function TaskStats({
           </div>
 
           {/* Progress breakdown */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          <div className="grid grid-cols-3 gap-4 text-sm">
             <div className="text-center">
               <p className="font-medium text-gray-900">{stats.completed}</p>
               <p className="text-text-muted">Dokončeno</p>
-            </div>
-            <div className="text-center">
-              <p className="font-medium text-blue-600">{stats.inProgress}</p>
-              <p className="text-text-muted">Probíhá</p>
             </div>
             <div className="text-center">
               <p className="font-medium text-gray-600">{stats.pending}</p>
@@ -243,7 +239,7 @@ export default function TaskStats({
             </div>
             <div className="text-center">
               <p className="font-medium text-red-600">{stats.overdue}</p>
-              <p className="text-text-muted">Prošlé</p>
+              <p className="text-text-muted">Po termínu</p>
             </div>
           </div>
         </div>
