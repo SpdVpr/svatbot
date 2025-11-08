@@ -41,7 +41,7 @@ export default function GuestForm({
     phone: initialData?.phone || '',
     address: initialData?.address || undefined,
     category: initialData?.category || 'other',
-    invitationType: initialData?.invitationType || 'ceremony-reception',
+    invitationType: initialData?.invitationType || 'full-wedding',
     hasPlusOne: initialData?.hasPlusOne || false,
     plusOneName: initialData?.plusOneName || '',
     hasChildren: initialData?.hasChildren || false,
@@ -79,9 +79,11 @@ export default function GuestForm({
 
   // Invitation type options
   const invitationTypeOptions = [
-    { value: 'ceremony-reception', label: 'Obřad + hostina', description: 'Celá svatba' },
-    { value: 'ceremony-only', label: 'Pouze obřad', description: 'Jen svatební obřad' },
-    { value: 'reception-only', label: 'Pouze hostina', description: 'Jen svatební hostina' }
+    { value: 'ceremony-only', label: 'Pouze obřad' },
+    { value: 'reception-only', label: 'Pouze hostina' },
+    { value: 'party-only', label: 'Pouze party' },
+    { value: 'ceremony-reception', label: 'Obřad + hostina' },
+    { value: 'full-wedding', label: 'Celá svatba' }
   ]
 
   // Dietary restrictions options
@@ -464,9 +466,6 @@ export default function GuestForm({
                     </option>
                   ))}
                 </select>
-                <p className="mt-1 text-xs text-gray-500">
-                  {invitationTypeOptions.find(opt => opt.value === formData.invitationType)?.description}
-                </p>
               </div>
             </div>
           </div>

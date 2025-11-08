@@ -257,7 +257,7 @@ export default function GuestCard({
           </span>
 
           {/* Invitation type indicator */}
-          {guest.invitationType && guest.invitationType !== 'ceremony-reception' && (
+          {guest.invitationType && (
             <span className={`inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${getInvitationTypeColor(guest.invitationType)}`}>
               <span>{getInvitationTypeIcon(guest.invitationType)}</span>
               <span className="whitespace-nowrap">{getInvitationTypeLabel(guest.invitationType)}</span>

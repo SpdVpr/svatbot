@@ -110,18 +110,37 @@ export default function GuestList({
     onGuestReorderRef.current = onGuestReorder
   }, [onGuestReorder])
 
-  // Sort guests by sortOrder first (to preserve drag and drop order)
+  // Sort guests by sortOrder first (to preserve drag and drop order), then alphabetically
   const sortedGuests = [...guests].sort((a, b) => {
     const orderA = a.sortOrder ?? 999999
     const orderB = b.sortOrder ?? 999999
+
+    // If sortOrder is the same, sort alphabetically by lastName, then firstName
+    if (orderA === orderB) {
+      const lastNameCompare = a.lastName.localeCompare(b.lastName, 'cs')
+      if (lastNameCompare !== 0) return lastNameCompare
+      return a.firstName.localeCompare(b.firstName, 'cs')
+    }
+
     return orderA - orderB
   })
 
   // Filter and sort guests
   const filteredGuests = sortedGuests.filter(guest => {
-    // Search filter
-    if (searchTerm && !`${guest.firstName} ${guest.lastName}`.toLowerCase().includes(searchTerm.toLowerCase())) {
-      return false
+    // Search filter - search in guest name, plus one name, and children names
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase()
+      const guestName = `${guest.firstName} ${guest.lastName}`.toLowerCase()
+      const plusOneName = guest.plusOneName?.toLowerCase() || ''
+      const childrenNames = guest.children?.map(child => child.name.toLowerCase()).join(' ') || ''
+
+      const matchesSearch = guestName.includes(searchLower) ||
+                           plusOneName.includes(searchLower) ||
+                           childrenNames.includes(searchLower)
+
+      if (!matchesSearch) {
+        return false
+      }
     }
 
     // Category filter
@@ -893,7 +912,7 @@ export default function GuestList({
                             )}
 
                             {/* Invitation type indicator */}
-                            {guest.invitationType && guest.invitationType !== 'ceremony-reception' && (
+                            {guest.invitationType && (
                               <span className={`text-xs px-2 py-1 rounded-full flex-shrink-0 whitespace-nowrap ${getInvitationTypeColor(guest.invitationType)}`}>
                                 {getInvitationTypeIcon(guest.invitationType)} {getInvitationTypeLabel(guest.invitationType)}
                               </span>
@@ -1134,23 +1153,14 @@ function groupGuestsBy(guests: Guest[], groupBy: string, preserveSortOrder: bool
     grouped[key].push(guest)
   })
 
-  // Sort guests within each group
-  if (!preserveSortOrder) {
-    Object.keys(grouped).forEach(key => {
-      grouped[key].sort((a, b) => {
-        return `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`)
-      })
+  // Sort guests within each group alphabetically by lastName, then firstName
+  Object.keys(grouped).forEach(key => {
+    grouped[key].sort((a, b) => {
+      const lastNameCompare = a.lastName.localeCompare(b.lastName, 'cs')
+      if (lastNameCompare !== 0) return lastNameCompare
+      return a.firstName.localeCompare(b.firstName, 'cs')
     })
-  } else {
-    // Keep sortOrder (guests are already sorted by sortOrder before grouping)
-    Object.keys(grouped).forEach(key => {
-      grouped[key].sort((a, b) => {
-        const orderA = a.sortOrder ?? 999999
-        const orderB = b.sortOrder ?? 999999
-        return orderA - orderB
-      })
-    })
-  }
+  })
 
   return grouped
 }

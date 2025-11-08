@@ -53,21 +53,27 @@ export function getGuestCategoryIcon(category: string): string {
 
 // Invitation type labels and colors
 export const INVITATION_TYPE_LABELS = {
-  'ceremony-reception': 'Obřad + Hostina',
   'ceremony-only': 'Pouze obřad',
-  'reception-only': 'Pouze hostina'
+  'reception-only': 'Pouze hostina',
+  'party-only': 'Pouze party',
+  'ceremony-reception': 'Obřad + hostina',
+  'full-wedding': 'Celá svatba'
 } as const
 
 export const INVITATION_TYPE_COLORS = {
-  'ceremony-reception': 'bg-purple-100 text-purple-700',
   'ceremony-only': 'bg-blue-100 text-blue-700',
-  'reception-only': 'bg-green-100 text-green-700'
+  'reception-only': 'bg-amber-100 text-amber-700',
+  'party-only': 'bg-pink-100 text-pink-700',
+  'ceremony-reception': 'bg-purple-100 text-purple-700',
+  'full-wedding': 'bg-green-100 text-green-700'
 } as const
 
 export const INVITATION_TYPE_ICONS = {
-  'ceremony-reception': '💒',
   'ceremony-only': '⛪',
-  'reception-only': '🍽️'
+  'reception-only': '🍽️',
+  'party-only': '🎉',
+  'ceremony-reception': '💒',
+  'full-wedding': '💍'
 } as const
 
 /**
@@ -81,14 +87,14 @@ export function getInvitationTypeLabel(invitationType: string): string {
  * Get color classes for invitation type
  */
 export function getInvitationTypeColor(invitationType: string): string {
-  return INVITATION_TYPE_COLORS[invitationType as keyof typeof INVITATION_TYPE_COLORS] || INVITATION_TYPE_COLORS['ceremony-reception']
+  return INVITATION_TYPE_COLORS[invitationType as keyof typeof INVITATION_TYPE_COLORS] || INVITATION_TYPE_COLORS['full-wedding']
 }
 
 /**
  * Get icon for invitation type
  */
 export function getInvitationTypeIcon(invitationType: string): string {
-  return INVITATION_TYPE_ICONS[invitationType as keyof typeof INVITATION_TYPE_ICONS] || INVITATION_TYPE_ICONS['ceremony-reception']
+  return INVITATION_TYPE_ICONS[invitationType as keyof typeof INVITATION_TYPE_ICONS] || INVITATION_TYPE_ICONS['full-wedding']
 }
 
 // Dietary restrictions labels

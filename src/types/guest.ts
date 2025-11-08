@@ -12,9 +12,11 @@ export type GuestCategory =
   | 'other'           // Ostatní
 
 export type InvitationType =
-  | 'ceremony-reception' // Obřad + hostina
   | 'ceremony-only'      // Pouze obřad
   | 'reception-only'     // Pouze hostina
+  | 'party-only'         // Pouze party
+  | 'ceremony-reception' // Obřad + hostina
+  | 'full-wedding'       // Celá svatba
 
 export type DietaryRestriction =
   | 'vegetarian'    // Vegetariánská
