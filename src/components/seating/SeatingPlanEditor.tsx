@@ -1435,9 +1435,9 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
           svgContent += `
             <text
               x="${seatX}"
-              y="${seatY - 12}"
+              y="${seatY - 15}"
               text-anchor="middle"
-              font-size="10"
+              font-size="8"
               font-weight="bold"
               fill="#2563eb"
             >
@@ -1452,7 +1452,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
               // Calculate name position based on seat sides configuration
               let nameX = seatX
               let nameY = seatY
-              const nameOffset = 25
+              const nameOffset = 30
 
               if (table.shape === 'round' || table.shape === 'oval') {
                 // For round tables, names go outward from center
@@ -1499,7 +1499,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                     x="${nameX}"
                     y="${nameY}"
                     text-anchor="middle"
-                    font-size="10"
+                    font-size="8"
                     font-weight="600"
                     fill="#1f2937"
                   >
@@ -1513,9 +1513,9 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                 svgContent += `
                   <text
                     x="${nameX}"
-                    y="${nameY + 12}"
+                    y="${nameY + 10}"
                     text-anchor="middle"
-                    font-size="10"
+                    font-size="8"
                     fill="#1f2937"
                   >
                     ${guestName.lastName}
@@ -1576,13 +1576,13 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
             />
           `
 
-          // Draw chair number
+          // Draw chair number - always above the chair with more spacing
           svgContent += `
             <text
               x="${finalX}"
-              y="${finalY - 12}"
+              y="${finalY - 20}"
               text-anchor="middle"
-              font-size="10"
+              font-size="8"
               font-weight="bold"
               fill="#059669"
             >
@@ -1590,13 +1590,13 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
             </text>
           `
 
-          // Draw guest name if assigned
+          // Draw guest name if assigned - always below the chair with more spacing
           if (chairSeat?.guestId) {
             const guestName = getGuestNameByPersonId(chairSeat.guestId)
             if (guestName?.fullName) {
-              // Position name below the chair
+              // Position name below the chair with sufficient spacing
               const nameX = finalX
-              const nameY = finalY + 20
+              const nameY = finalY + 25
 
               // First name
               if (guestName.firstName) {
@@ -1605,7 +1605,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                     x="${nameX}"
                     y="${nameY}"
                     text-anchor="middle"
-                    font-size="10"
+                    font-size="8"
                     font-weight="600"
                     fill="#1f2937"
                   >
@@ -1619,9 +1619,9 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                 svgContent += `
                   <text
                     x="${nameX}"
-                    y="${nameY + 12}"
+                    y="${nameY + 10}"
                     text-anchor="middle"
-                    font-size="10"
+                    font-size="8"
                     fill="#1f2937"
                   >
                     ${guestName.lastName}
@@ -3635,20 +3635,20 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
               {/* Table capacity */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Počet míst
+                  Počet míst (0 = stůl bez židlí)
                 </label>
                 <input
                   type="number"
-                  min="2"
+                  min="0"
                   max="20"
-                  value={tableFormData.capacity || ''}
+                  value={tableFormData.capacity === 0 ? 0 : (tableFormData.capacity || '')}
                   onChange={(e) => {
                     const value = e.target.value
                     if (value === '') {
                       setTableFormData(prev => ({ ...prev, capacity: '' as any }))
                     } else {
                       const numValue = parseInt(value)
-                      if (!isNaN(numValue)) {
+                      if (!isNaN(numValue) && numValue >= 0) {
                         setTableFormData(prev => ({ ...prev, capacity: numValue }))
                       }
                     }
@@ -3657,13 +3657,13 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                     // On blur, validate and clamp to min/max
                     const value = e.target.value
                     if (value === '') {
-                      setTableFormData(prev => ({ ...prev, capacity: 2 }))
+                      setTableFormData(prev => ({ ...prev, capacity: 0 }))
                     } else {
                       const numValue = parseInt(value)
                       if (!isNaN(numValue)) {
                         setTableFormData(prev => ({
                           ...prev,
-                          capacity: Math.max(2, Math.min(20, numValue))
+                          capacity: Math.max(0, Math.min(20, numValue))
                         }))
                       }
                     }
