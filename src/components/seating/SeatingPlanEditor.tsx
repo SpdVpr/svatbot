@@ -1527,6 +1527,126 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
         })
       })
 
+      // Add chair rows
+      ;(chairRows || []).forEach(chairRow => {
+        const rowChairSeats = (chairSeats || []).filter(s => s.chairRowId === chairRow.id)
+
+        const columns = chairRow.columns || chairRow.chairCount
+        const rows = chairRow.rows || 1
+        const spacing = chairRow.spacing || 40
+        const hasAisle = chairRow.hasAisle || false
+        const aisleWidth = chairRow.aisleWidth || 80
+
+        // Draw each chair
+        Array.from({ length: chairRow.chairCount }).forEach((_, index) => {
+          const chairSeat = rowChairSeats.find(s => s.position === index + 1)
+
+          // Calculate row and column position in grid
+          const row = Math.floor(index / columns)
+          const col = index % columns
+
+          // Calculate position with aisle consideration
+          const halfColumns = Math.floor(columns / 2)
+          let chairX = col * spacing
+
+          // Add aisle offset if chair is in right half and aisle is enabled
+          if (hasAisle && col >= halfColumns) {
+            chairX += aisleWidth
+          }
+
+          const chairY = row * spacing
+
+          // Apply rotation
+          const rotRad = (chairRow.rotation * Math.PI) / 180
+          const rotatedX = chairX * Math.cos(rotRad) - chairY * Math.sin(rotRad)
+          const rotatedY = chairX * Math.sin(rotRad) + chairY * Math.cos(rotRad)
+
+          const finalX = chairRow.position.x + rotatedX
+          const finalY = chairRow.position.y + rotatedY
+
+          // Draw chair circle
+          svgContent += `
+            <circle
+              cx="${finalX}"
+              cy="${finalY}"
+              r="6"
+              fill="${chairSeat?.guestId ? '#10b981' : '#e5e7eb'}"
+              stroke="#059669"
+              stroke-width="1"
+            />
+          `
+
+          // Draw chair number
+          svgContent += `
+            <text
+              x="${finalX}"
+              y="${finalY - 12}"
+              text-anchor="middle"
+              font-size="10"
+              font-weight="bold"
+              fill="#059669"
+            >
+              ${chairSeat?.position || index + 1}
+            </text>
+          `
+
+          // Draw guest name if assigned
+          if (chairSeat?.guestId) {
+            const guestName = getGuestNameByPersonId(chairSeat.guestId)
+            if (guestName?.fullName) {
+              // Position name below the chair
+              const nameX = finalX
+              const nameY = finalY + 20
+
+              // First name
+              if (guestName.firstName) {
+                svgContent += `
+                  <text
+                    x="${nameX}"
+                    y="${nameY}"
+                    text-anchor="middle"
+                    font-size="10"
+                    font-weight="600"
+                    fill="#1f2937"
+                  >
+                    ${guestName.firstName}
+                  </text>
+                `
+              }
+
+              // Last name
+              if (guestName.lastName) {
+                svgContent += `
+                  <text
+                    x="${nameX}"
+                    y="${nameY + 12}"
+                    text-anchor="middle"
+                    font-size="10"
+                    fill="#1f2937"
+                  >
+                    ${guestName.lastName}
+                  </text>
+                `
+              }
+            }
+          }
+        })
+
+        // Draw chair row label
+        svgContent += `
+          <text
+            x="${chairRow.position.x}"
+            y="${chairRow.position.y - 20}"
+            text-anchor="middle"
+            font-size="12"
+            font-weight="bold"
+            fill="#059669"
+          >
+            ${chairRow.name}
+          </text>
+        `
+      })
+
       return svgContent
     }
 
@@ -1551,8 +1671,9 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     const totalSeats = seats.length + (chairSeats?.length || 0)
     const occupancyRate = totalSeats > 0 ? Math.round((totalAssignedGuests / totalSeats) * 100) : 0
 
-    // Generate guest list by table
+    // Generate guest list by table and chair rows
     const generateGuestList = () => {
+      // Tables list
       const tablesList = tables.map(table => {
         const tableSeats = seats.filter(s => s.tableId === table.id && s.guestId)
         if (tableSeats.length === 0) return null
@@ -1580,7 +1701,35 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
         `
       }).filter(Boolean).join('')
 
-      return tablesList
+      // Chair rows list
+      const chairRowsList = (chairRows || []).map(chairRow => {
+        const rowChairSeats = (chairSeats || []).filter(s => s.chairRowId === chairRow.id && s.guestId)
+        if (rowChairSeats.length === 0) return null
+
+        const guestNames = rowChairSeats.map(chairSeat => {
+          const guestName = getGuestNameByPersonId(chairSeat.guestId)
+          return guestName?.fullName ? `${chairSeat.position || '?'}. ${guestName.fullName}` : null
+        }).filter(Boolean)
+
+        if (guestNames.length === 0) return null
+
+        return `
+          <div style="margin-bottom: 20px; page-break-inside: avoid;">
+            <h3 style="color: #10b981; margin: 0 0 10px 0; font-size: 14px;">
+              ${chairRow.name || 'Řada židlí'} (${guestNames.length} ${guestNames.length === 1 ? 'host' : guestNames.length < 5 ? 'hosté' : 'hostů'})
+            </h3>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; font-size: 12px;">
+              ${guestNames.map(name => `
+                <div style="padding: 4px 8px; background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 3px;">
+                  ${name}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `
+      }).filter(Boolean).join('')
+
+      return tablesList + chairRowsList
     }
 
     // Generate HTML for print
@@ -1695,6 +1844,12 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                 <span class="summary-label">Počet stolů:</span>
                 <span class="summary-value">${tables.length}</span>
               </div>
+              ${(chairRows || []).length > 0 ? `
+              <div class="summary-item">
+                <span class="summary-label">Počet řad židlí:</span>
+                <span class="summary-value">${(chairRows || []).length}</span>
+              </div>
+              ` : ''}
               <div class="summary-item">
                 <span class="summary-label">Celkem hostů:</span>
                 <span class="summary-value">${totalAssignedGuests}</span>
@@ -1705,7 +1860,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
               </div>
             </div>
 
-            <h2>Seznam hostů podle stolů</h2>
+            <h2>Seznam hostů podle stolů${(chairRows || []).length > 0 ? ' a řad židlí' : ''}</h2>
             <div class="guest-list-container">
               ${generateGuestList()}
             </div>
