@@ -45,14 +45,14 @@ export default function TaskCard({
         bg: 'bg-green-50'
       }
     }
-    if (isOverdue) {
+    if (task.status === 'overdue' || isOverdue) {
       return {
         icon: AlertTriangle,
         color: 'text-red-500',
         bg: 'bg-red-50'
       }
     }
-    if (task.status === 'in-progress') {
+    if (task.status === 'pending') {
       return {
         icon: Clock,
         color: 'text-blue-500',
@@ -350,8 +350,8 @@ export default function TaskCard({
             )}
           </div>
 
-          {/* Progress indicator for in-progress tasks */}
-          {task.status === 'in-progress' && !compact && (
+          {/* Progress indicator for pending tasks */}
+          {task.status === 'pending' && !compact && (
             <div className="mt-2">
               <div className="w-full bg-gray-200 rounded-full h-1">
                 <div className="bg-blue-500 h-1 rounded-full w-1/2"></div>

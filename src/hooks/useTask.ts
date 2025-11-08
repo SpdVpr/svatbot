@@ -21,6 +21,7 @@ import { useWedding } from './useWedding'
 import { useDemoLock } from './useDemoLock'
 import {
   Task,
+  TaskStatus,
   TaskFormData,
   TaskFilters,
   TaskStats,
@@ -148,12 +149,16 @@ export function useTask(): UseTaskReturn {
         setError(null)
         setLoading(true)
 
+      // Determine initial status based on due date
+      const now = new Date()
+      const isOverdue = data.dueDate && data.dueDate < now
+
       const taskData: Omit<Task, 'id'> = {
         weddingId: wedding.id,
         title: data.title,
         description: data.description,
         category: data.category,
-        status: 'pending',
+        status: isOverdue ? 'overdue' : 'pending',
         priority: data.priority,
         dueDate: data.dueDate,
         assignedTo: data.assignedTo,
@@ -327,13 +332,22 @@ export function useTask(): UseTaskReturn {
     }) as Promise<void>
   }
 
-  // Toggle task status (pending <-> completed)
+  // Toggle task status (pending/overdue <-> completed)
   const toggleTaskStatus = async (taskId: string): Promise<void> => {
     return withDemoCheck(async () => {
       const task = tasks.find(t => t.id === taskId)
       if (!task) return
 
-      const newStatus = task.status === 'completed' ? 'pending' : 'completed'
+      let newStatus: TaskStatus
+      if (task.status === 'completed') {
+        // When uncompleting, check if overdue
+        const now = new Date()
+        const isOverdue = task.dueDate && task.dueDate < now
+        newStatus = isOverdue ? 'overdue' : 'pending'
+      } else {
+        newStatus = 'completed'
+      }
+
       const updates: Partial<Task> = {
         status: newStatus,
         completedAt: newStatus === 'completed' ? new Date() : undefined
@@ -482,10 +496,8 @@ export function useTask(): UseTaskReturn {
     total: tasks.length,
     completed: tasks.filter(t => t.status === 'completed').length,
     pending: tasks.filter(t => t.status === 'pending').length,
-    inProgress: tasks.filter(t => t.status === 'in-progress').length,
-    overdue: tasks.filter(t =>
-      t.dueDate && t.dueDate < new Date() && t.status !== 'completed'
-    ).length,
+    inProgress: 0, // Removed - no longer used
+    overdue: tasks.filter(t => t.status === 'overdue').length,
     upcoming: tasks.filter(t => {
       if (!t.dueDate || t.status === 'completed') return false
       const now = new Date()

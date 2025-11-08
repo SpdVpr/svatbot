@@ -232,10 +232,10 @@ export default function TaskList({
     if (status === 'completed') {
       return <CheckCircle2 className="w-5 h-5 text-green-500" />
     }
-    if (isOverdue) {
+    if (status === 'overdue' || isOverdue) {
       return <AlertTriangle className="w-5 h-5 text-red-500" />
     }
-    if (status === 'in-progress') {
+    if (status === 'pending') {
       return <Clock className="w-5 h-5 text-blue-500" />
     }
     return <Circle className="w-5 h-5 text-gray-400" />
@@ -366,8 +366,8 @@ export default function TaskList({
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                   >
                     <option value="">Všechny stavy</option>
-                    <option value="pending">Čekající</option>
-                    <option value="in-progress">Probíhající</option>
+                    <option value="pending">Probíhající</option>
+                    <option value="overdue">Po termínu</option>
                     <option value="completed">Dokončené</option>
                   </select>
                 </div>

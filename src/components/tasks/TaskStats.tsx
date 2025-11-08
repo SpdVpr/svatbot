@@ -143,7 +143,7 @@ export default function TaskStats({
           </div>
           <div className="mt-4 flex items-center text-sm">
             <span className="text-text-muted">
-              {stats.pending} čekajících, {stats.inProgress} probíhajících
+              {stats.pending} probíhajících
             </span>
           </div>
         </div>
@@ -235,7 +235,7 @@ export default function TaskStats({
             </div>
             <div className="text-center">
               <p className="font-medium text-gray-600">{stats.pending}</p>
-              <p className="text-text-muted">Čeká</p>
+              <p className="text-text-muted">Probíhá</p>
             </div>
             <div className="text-center">
               <p className="font-medium text-red-600">{stats.overdue}</p>

@@ -1,6 +1,6 @@
 // Task Management Types for SvatBot.cz
 
-export type TaskStatus = 'pending' | 'in-progress' | 'completed' | 'cancelled'
+export type TaskStatus = 'pending' | 'overdue' | 'completed' | 'cancelled'
 
 export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent'
 

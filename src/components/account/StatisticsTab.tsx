@@ -209,15 +209,15 @@ function StatisticsTab({ subscriptionData }: StatisticsTabProps) {
                     </div>
                     <div className="text-center">
                       <p className="text-2xl font-bold text-blue-600">
-                        {tasks.filter(t => t.status === 'in-progress').length}
+                        {tasks.filter(t => t.status === 'pending').length}
                       </p>
                       <p className="text-xs text-gray-600">Probíhá</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-gray-600">
-                        {tasks.filter(t => t.status === 'pending').length}
+                      <p className="text-2xl font-bold text-red-600">
+                        {tasks.filter(t => t.status === 'overdue').length}
                       </p>
-                      <p className="text-xs text-gray-600">Nezahájeno</p>
+                      <p className="text-xs text-gray-600">Po termínu</p>
                     </div>
                   </div>
                 </>
