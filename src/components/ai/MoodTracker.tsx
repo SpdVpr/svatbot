@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { useAICoach, MoodEntry } from '@/hooks/useAICoach'
-import { TrendingUp, Heart } from 'lucide-react'
+import { TrendingUp, Heart, ChevronRight } from 'lucide-react'
+import Link from 'next/link'
 
 const moodOptions: Array<{
   value: MoodEntry['mood']
@@ -11,11 +12,11 @@ const moodOptions: Array<{
   color: string
   bgColor: string
 }> = [
-  { value: 'great', label: 'Skvělá', emoji: '😄', color: 'text-green-600', bgColor: 'bg-green-100 hover:bg-green-200' },
-  { value: 'good', label: 'Dobrá', emoji: '😊', color: 'text-blue-600', bgColor: 'bg-blue-100 hover:bg-blue-200' },
-  { value: 'okay', label: 'Ujde to', emoji: '😐', color: 'text-yellow-600', bgColor: 'bg-yellow-100 hover:bg-yellow-200' },
-  { value: 'stressed', label: 'Stres', emoji: '😟', color: 'text-orange-600', bgColor: 'bg-orange-100 hover:bg-orange-200' },
-  { value: 'overwhelmed', label: 'Přetížení', emoji: '😰', color: 'text-red-600', bgColor: 'bg-red-100 hover:bg-red-200' }
+  { value: 'great', label: 'Skvělá', emoji: '😄', color: 'text-white', bgColor: 'bg-primary-400 hover:bg-primary-300' },
+  { value: 'good', label: 'Dobrá', emoji: '😊', color: 'text-white', bgColor: 'bg-primary-500 hover:bg-primary-400' },
+  { value: 'okay', label: 'Ujde to', emoji: '😐', color: 'text-white', bgColor: 'bg-primary-600 hover:bg-primary-500' },
+  { value: 'stressed', label: 'Stres', emoji: '😟', color: 'text-white', bgColor: 'bg-primary-800 hover:bg-primary-700' },
+  { value: 'overwhelmed', label: 'Přetížení', emoji: '😰', color: 'text-white', bgColor: 'bg-primary-900 hover:bg-primary-800' }
 ]
 
 interface MoodTrackerProps {
@@ -27,6 +28,7 @@ export default function MoodTracker({ compact = false, onMoodSaved }: MoodTracke
   const [selectedMood, setSelectedMood] = useState<MoodEntry['mood'] | null>(null)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [currentMoodLabel, setCurrentMoodLabel] = useState<string | null>(null)
 
   const { saveMoodEntry, emotionalInsight, refreshEmotionalInsight } = useAICoach()
 
@@ -45,6 +47,16 @@ export default function MoodTracker({ compact = false, onMoodSaved }: MoodTracke
     }
     const autoStressLevel = stressDefaults[mood]
     const autoEnergyLevel = mood === 'great' ? 8 : mood === 'good' ? 7 : mood === 'okay' ? 5 : mood === 'stressed' ? 4 : 3
+
+    // Update current mood label immediately
+    const moodLabels = {
+      great: '😊 Skvělá',
+      good: '😊 Dobrá',
+      okay: '😐 Ujde to',
+      stressed: '😟 Stres',
+      overwhelmed: '😰 Přetížení'
+    }
+    setCurrentMoodLabel(moodLabels[mood])
 
     try {
       await saveMoodEntry(mood, autoStressLevel, autoEnergyLevel, '')
@@ -74,23 +86,28 @@ export default function MoodTracker({ compact = false, onMoodSaved }: MoodTracke
   if (compact) {
     return (
       <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Heart className="w-5 h-5 text-primary-500" />
-            <h3 className="font-semibold text-gray-900">Jak se dnes cítíte?</h3>
+        <Link href="/mood-stats" className="block">
+          <div className="flex items-center justify-between mb-3 group cursor-pointer">
+            <div className="flex items-center gap-2">
+              <Heart className="w-5 h-5 text-primary-500 group-hover:scale-110 transition-transform" />
+              <h3 className="font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
+                Jak se dnes cítíš?
+              </h3>
+            </div>
+            <div className="flex items-center gap-2">
+              {currentMoodLabel && (
+                <span className={`text-xs px-2 py-1 rounded-full ${
+                  currentMoodLabel.includes('Skvělá') || currentMoodLabel.includes('Dobrá') ? 'bg-green-100 text-green-700' :
+                  currentMoodLabel.includes('Ujde') ? 'bg-blue-100 text-blue-700' :
+                  'bg-orange-100 text-orange-700'
+                }`}>
+                  {currentMoodLabel}
+                </span>
+              )}
+              <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-primary-500 group-hover:translate-x-1 transition-all" />
+            </div>
           </div>
-          {emotionalInsight && (
-            <span className={`text-xs px-2 py-1 rounded-full ${
-              emotionalInsight.overallMood === 'positive' ? 'bg-green-100 text-green-700' :
-              emotionalInsight.overallMood === 'neutral' ? 'bg-blue-100 text-blue-700' :
-              'bg-orange-100 text-orange-700'
-            }`}>
-              {emotionalInsight.overallMood === 'positive' ? '😊 Pozitivní' :
-               emotionalInsight.overallMood === 'neutral' ? '😐 Neutrální' :
-               '😰 Stres'}
-            </span>
-          )}
-        </div>
+        </Link>
 
         <div className="grid grid-cols-5 gap-2">
           {moodOptions.map((option) => {
@@ -180,7 +197,7 @@ export default function MoodTracker({ compact = false, onMoodSaved }: MoodTracke
 
       {/* Mood Selection */}
       <div>
-        <p className="text-sm text-gray-600 mb-4">Jak se dnes cítíte?</p>
+        <p className="text-sm text-gray-600 mb-4">Jak se dnes cítíš?</p>
         <div className="grid grid-cols-5 gap-3">
           {moodOptions.map((option) => {
             return (

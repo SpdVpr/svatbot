@@ -2,8 +2,8 @@
 
 import { useState, useRef, useEffect, memo } from 'react'
 import Image from 'next/image'
-import { Heart, Trash2, Move, Sparkles } from 'lucide-react'
-import { MoodboardImage, WEDDING_CATEGORIES } from '@/hooks/useMoodboard'
+import { Heart, Trash2, Move } from 'lucide-react'
+import { MoodboardImage } from '@/hooks/useMoodboard'
 
 interface SimpleMoodboardCardProps {
   image: MoodboardImage
@@ -328,8 +328,6 @@ function SimpleMoodboardCard({
     }
   }, [isDragging, isResizing, handleMouseMove, handleMouseUp])
 
-  const category = WEDDING_CATEGORIES[image.category as keyof typeof WEDDING_CATEGORIES]
-
   return (
     <div
       ref={dragRef}
@@ -420,25 +418,7 @@ function SimpleMoodboardCard({
           </div>
         )}
 
-        {/* AI Generated badge */}
-        {image.source === 'ai-generated' && (
-          <div className="absolute top-2 left-2">
-            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg">
-              <Sparkles size={12} />
-              AI Generated
-            </span>
-          </div>
-        )}
 
-        {/* Category badge */}
-        {category && image.source !== 'ai-generated' && (
-          <div className="absolute top-2 left-2">
-            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${category.color}`}>
-              <span>{category.icon}</span>
-              {category.label}
-            </span>
-          </div>
-        )}
 
         {/* Drag handle */}
         <div className="absolute top-2 right-2 opacity-0 hover:opacity-100 transition-opacity">

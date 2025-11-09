@@ -78,8 +78,8 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
             </video>
           </div>
           <div>
-            <h3 className="font-bold text-gray-900">Svatbot - tvůj plánovací parťák</h3>
-            <p className="text-xs text-gray-600">💕 Jsem tu pro tebe!</p>
+            <h3 className="text-xl font-bold text-gray-900">Svatbot - tvůj plánovací parťák</h3>
+            <p className="text-xs text-gray-600">Jsem tu pro tebe!</p>
           </div>
         </div>
 
@@ -163,8 +163,8 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
             </video>
           </div>
           <div className="flex-1 min-w-0">
-            <h2 className="text-2xl font-bold mb-2 leading-tight">Svatbot - tvůj plánovací parťák 💕</h2>
-            <p className="text-white/90 text-base leading-relaxed">Jsem tu pro tebe! Povzbudím tě a budu ti dělat společnost! ✨</p>
+            <h2 className="text-2xl font-bold mb-2 leading-tight">Svatbot - tvůj plánovací parťák</h2>
+            <p className="text-white/90 text-base leading-relaxed">Jsem tu pro tebe! Povzbudím tě a budu ti dělat společnost!</p>
           </div>
         </div>
 
@@ -240,7 +240,7 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
         <div className="mt-4 pt-4 border-t border-gray-200">
           <Link
             href="/ai"
-            className="w-full bg-gradient-to-r from-primary-500 to-primary-400 hover:from-primary-600 hover:to-primary-500 text-white px-6 py-3 rounded-lg transition-all flex items-center justify-center gap-2 font-medium shadow-md hover:shadow-lg"
+            className="w-full bg-primary-500 hover:bg-primary-600 text-white px-6 py-3 rounded-lg transition-all flex items-center justify-center gap-2 font-medium shadow-md hover:shadow-lg"
           >
             <MessageCircle className="w-5 h-5" />
             <span>Popovídat si se Svatbotem</span>

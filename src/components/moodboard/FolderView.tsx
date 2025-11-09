@@ -187,26 +187,19 @@ export default function FolderView({
             </button>
           </div>
 
-          {/* Upload buttons */}
+          {/* Upload button */}
           <button
             onClick={handleQuickUpload}
-            className="btn-outline flex items-center space-x-2"
+            className="btn-primary flex items-center space-x-2"
             disabled={uploadingFiles.length > 0}
           >
             <Upload className="w-4 h-4" />
-            <span>Rychlé nahrání</span>
+            <span>Nahrát fotky</span>
             {uploadingFiles.length > 0 && (
-              <span className="ml-2 px-2 py-0.5 bg-pink-100 text-pink-600 text-xs rounded-full">
+              <span className="ml-2 px-2 py-0.5 bg-white/20 text-white text-xs rounded-full">
                 {uploadingFiles.length}
               </span>
             )}
-          </button>
-          <button
-            onClick={handleDetailedUploadClick}
-            className="btn-primary flex items-center space-x-2"
-          >
-            <Plus className="w-5 h-5" />
-            <span>Přidat s detaily</span>
           </button>
         </div>
       </div>
@@ -232,11 +225,11 @@ export default function FolderView({
             Přidejte své první svatební inspirace do této složky
           </p>
           <button
-            onClick={handleDetailedUploadClick}
+            onClick={handleQuickUpload}
             className="btn-primary flex items-center space-x-2"
           >
-            <Plus className="w-5 h-5" />
-            <span>Přidat první obrázek</span>
+            <Upload className="w-5 h-5" />
+            <span>Nahrát fotky</span>
           </button>
         </div>
       ) : viewMode === 'free' ? (

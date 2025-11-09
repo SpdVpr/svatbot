@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, Folder, Palette } from 'lucide-react'
+import { X, Folder } from 'lucide-react'
 import { MoodboardFolder } from '@/hooks/useMoodboard'
 
 interface FolderModalProps {
@@ -150,29 +150,7 @@ export default function FolderModal({ folder, onSave, onClose, loading }: Folder
             </div>
           </div>
 
-          {/* Color */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center space-x-2">
-              <Palette className="w-4 h-4" />
-              <span>Barva</span>
-            </label>
-            <div className="grid grid-cols-8 gap-2">
-              {FOLDER_COLORS.map((color) => (
-                <button
-                  key={color}
-                  type="button"
-                  onClick={() => setSelectedColor(color)}
-                  className={`w-10 h-10 rounded-lg border-2 transition-all ${
-                    selectedColor === color
-                      ? 'border-gray-900 scale-110'
-                      : 'border-gray-200 hover:border-gray-400'
-                  }`}
-                  style={{ backgroundColor: color }}
-                  disabled={loading}
-                />
-              ))}
-            </div>
-          </div>
+
 
           {/* Preview */}
           <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
