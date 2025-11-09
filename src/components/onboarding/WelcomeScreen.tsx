@@ -151,10 +151,10 @@ export default function WelcomeScreen() {
           <figure className="lg:w-1/2 flex justify-center animate-fade-in w-full" style={{ animationDelay: '0.4s' }}>
             <div className="w-full max-w-[745px] aspect-[5/3.5] rounded-2xl md:rounded-3xl shadow-2xl border-2 md:border-4 border-white overflow-hidden relative">
               <img
-                src="/front2.jpg"
+                src="/front3.jpg"
                 alt="Náhled dashboardu SvatBot.cz s AI asistentem, správou rozpočtu, timeline a dalšími nástroji pro plánování svatby"
                 className="w-full object-cover"
-                style={{ height: '114%' }}
+                style={{ height: '100%' }}
                 loading="eager"
                 fetchPriority="high"
               />
@@ -167,12 +167,12 @@ export default function WelcomeScreen() {
       <section id="features" className="py-16 md:py-24 lg:py-32 bg-white relative overflow-hidden touch-pan-y" aria-labelledby="features-heading">
         <div className="container mx-auto px-4 md:px-6 relative z-10">
           <header className="text-center mb-12 md:mb-16 lg:mb-20">
-            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-rose-100 to-purple-100 rounded-full mb-6 animate-fade-in" role="status">
-              <Star className="w-4 h-4 text-rose-600 mr-2" aria-hidden="true" />
+            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-pink-100 to-purple-100 rounded-full mb-6 animate-fade-in" role="status">
+              <Star className="w-4 h-4 text-pink-600 mr-2" aria-hidden="true" />
               <span className="text-sm font-semibold text-gray-800">Kompletní svatební plánovač</span>
             </div>
             <h2 id="features-heading" className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-gray-900 mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              Všechny nástroje pro <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-500 via-purple-500 to-blue-500">dokonalou svatbu</span>
+              Všechny nástroje pro <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-pink-600">dokonalou svatbu</span>
             </h2>
             <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
               Od AI asistenta po svatební web – vše, co potřebujete na jedné platformě
@@ -194,22 +194,16 @@ export default function WelcomeScreen() {
                 </div>
               </div>
               <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">AI Asistent</h3>
-              <p className="text-base text-gray-600 leading-relaxed mb-4">
+              <p className="text-base text-gray-600 leading-relaxed">
                 Inteligentní pomocník s nejnovějším GPT-5. Doporučení, rady a automatizace 24/7.
               </p>
-              <div className="flex items-center justify-center gap-2 pt-4 border-t border-rose-200">
-                <div className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-emerald-100 to-green-100 rounded-lg text-sm font-bold text-emerald-700 shadow-sm">
-                  <Sparkles className="w-4 h-4" />
-                  <span>GPT-5</span>
-                </div>
-              </div>
             </div>
 
             {/* Úkoly & Checklist */}
-            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-blue-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.4s' }}>
+            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-pink-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.4s' }}>
               <div className="relative mb-6">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
-                  <ListChecks className="w-10 h-10 text-blue-600" />
+                <div className="w-20 h-20 bg-gradient-to-br from-pink-100 to-rose-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
+                  <ListChecks className="w-10 h-10 text-pink-600" />
                 </div>
               </div>
               <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Úkoly & Checklist</h3>
@@ -232,10 +226,10 @@ export default function WelcomeScreen() {
             </div>
 
             {/* Rozpočet */}
-            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-green-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.6s' }}>
+            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-pink-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.6s' }}>
               <div className="relative mb-6">
-                <div className="w-20 h-20 bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
-                  <DollarSign className="w-10 h-10 text-green-600" />
+                <div className="w-20 h-20 bg-gradient-to-br from-pink-100 to-rose-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
+                  <DollarSign className="w-10 h-10 text-pink-600" />
                 </div>
               </div>
               <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Rozpočet</h3>
@@ -244,180 +238,41 @@ export default function WelcomeScreen() {
               </p>
             </div>
 
-            {/* Timeline & Kalendář */}
-            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-orange-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.7s' }}>
-              <div className="relative mb-6">
-                <div className="w-20 h-20 bg-gradient-to-br from-orange-100 to-amber-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
-                  <Calendar className="w-10 h-10 text-orange-600" />
-                </div>
-              </div>
-              <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Timeline & Kalendář</h3>
-              <p className="text-base text-gray-600 leading-relaxed">
-                Minutový plán svatebního dne a Google Calendar synchronizace.
-              </p>
-            </div>
 
-            {/* Seating Plan */}
-            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-indigo-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.8s' }}>
-              <div className="relative mb-6">
-                <div className="w-20 h-20 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
-                  <Grid3X3 className="w-10 h-10 text-indigo-600" />
-                </div>
-              </div>
-              <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Seating Plan</h3>
-              <p className="text-base text-gray-600 leading-relaxed">
-                Interaktivní editor s drag & drop a automatickým rozmístěním hostů.
-              </p>
-            </div>
-
-            {/* Svatební web */}
-            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-pink-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.9s' }}>
-              <div className="relative mb-6">
-                <div className="w-20 h-20 bg-gradient-to-br from-pink-100 to-rose-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
-                  <Globe className="w-10 h-10 text-pink-600" />
-                </div>
-              </div>
-              <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Svatební web</h3>
-              <p className="text-base text-gray-600 leading-relaxed">
-                Vlastní svatební web s RSVP, fotogalerií a vlastní doménou.
-              </p>
-            </div>
-
-            {/* Marketplace */}
-            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-yellow-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '1s' }}>
-              <div className="relative mb-6">
-                <div className="w-20 h-20 bg-gradient-to-br from-yellow-100 to-orange-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
-                  <Store className="w-10 h-10 text-yellow-600" />
-                </div>
-              </div>
-              <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Marketplace</h3>
-              <p className="text-base text-gray-600 leading-relaxed">
-                50+ ověřených dodavatelů s reálnými recenzemi a portfolii.
-              </p>
-            </div>
           </div>
         </div>
       </section>
 
-      {/* Jak to funguje - 3 kroky */}
-      <section className="py-16 md:py-24 lg:py-32 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 relative overflow-hidden touch-pan-y">
-        <div className="container mx-auto px-4 md:px-6 relative z-10">
-          <div className="text-center mb-12 md:mb-16 lg:mb-20">
-            <div className="inline-flex items-center px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full mb-6 shadow-sm animate-fade-in">
-              <Zap className="w-4 h-4 text-rose-600 mr-2" />
-              <span className="text-sm font-semibold text-gray-800">Jednoduché jako 1-2-3</span>
-            </div>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-gray-900 mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              Jak to <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-500 via-purple-500 to-blue-500">funguje</span>?
-            </h2>
-            <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              Začněte plánovat svatbu za pouhých 7 minut
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 max-w-6xl mx-auto">
-            {/* Krok 1 - Demo */}
-            <div className="relative text-center animate-fade-in" style={{ animationDelay: '0.3s' }}>
-              <div className="relative inline-block mb-6">
-                <div className="w-32 h-32 bg-gradient-to-br from-emerald-500 to-green-500 rounded-full flex items-center justify-center mx-auto shadow-2xl">
-                  <span className="text-5xl font-bold text-white">1</span>
-                </div>
-                <div className="absolute -top-2 -right-2 w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center animate-bounce">
-                  <Zap className="w-6 h-6 text-yellow-900" />
-                </div>
-              </div>
-              <h3 className="text-2xl md:text-3xl font-display font-bold text-gray-900 mb-4">Demo účet</h3>
-              <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-4">
-                Vyzkoušejte kompletní demo aplikaci na jeden klik. Bez registrace, bez závazků.
-              </p>
-              <div className="inline-flex items-center px-4 py-2 bg-white rounded-full shadow-md text-sm font-semibold text-gray-700">
-                <Zap className="w-4 h-4 mr-2 text-emerald-500" />
-                1 klik
-              </div>
-            </div>
-
-            {/* Krok 2 - Registrace */}
-            <div className="relative text-center animate-fade-in" style={{ animationDelay: '0.5s' }}>
-              <div className="relative inline-block mb-6">
-                <div className="w-32 h-32 bg-gradient-to-br from-rose-500 to-pink-500 rounded-full flex items-center justify-center mx-auto shadow-2xl">
-                  <span className="text-5xl font-bold text-white">2</span>
-                </div>
-                <div className="absolute -top-2 -right-2 w-12 h-12 bg-blue-400 rounded-full flex items-center justify-center animate-bounce" style={{ animationDelay: '0.2s' }}>
-                  <CheckCircle className="w-6 h-6 text-blue-900" />
-                </div>
-              </div>
-              <h3 className="text-2xl md:text-3xl font-display font-bold text-gray-900 mb-4">Registrace</h3>
-              <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-4">
-                Vytvořte si účet zdarma za 2 minuty. Žádná platební karta není potřeba. 30 dní zdarma!
-              </p>
-              <div className="inline-flex items-center px-4 py-2 bg-white rounded-full shadow-md text-sm font-semibold text-gray-700">
-                <Clock className="w-4 h-4 mr-2 text-rose-500" />
-                2 minuty
-              </div>
-            </div>
-
-            {/* Krok 3 - Nastavení */}
-            <div className="relative text-center animate-fade-in" style={{ animationDelay: '0.7s' }}>
-              <div className="relative inline-block mb-6">
-                <div className="w-32 h-32 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center mx-auto shadow-2xl">
-                  <span className="text-5xl font-bold text-white">3</span>
-                </div>
-                <div className="absolute -top-2 -right-2 w-12 h-12 bg-green-400 rounded-full flex items-center justify-center animate-bounce" style={{ animationDelay: '0.4s' }}>
-                  <Heart className="w-6 h-6 text-green-900 fill-current" />
-                </div>
-              </div>
-              <h3 className="text-2xl md:text-3xl font-display font-bold text-gray-900 mb-4">Nastavení</h3>
-              <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-4">
-                Zadejte datum svatby, místo konání a rozpočet. AI vám pomůže s nastavením a začnete plánovat!
-              </p>
-              <div className="inline-flex items-center px-4 py-2 bg-white rounded-full shadow-md text-sm font-semibold text-gray-700">
-                <Clock className="w-4 h-4 mr-2 text-purple-500" />
-                5 minut
-              </div>
-            </div>
-          </div>
-
-          {/* CTA */}
-          <div className="text-center mt-12 md:mt-16">
-            <button onClick={handleGetStarted} className="px-8 py-4 md:px-10 md:py-5 bg-gradient-to-r from-rose-500 to-purple-500 text-white font-semibold text-lg md:text-xl rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 button-glow flex items-center justify-center mx-auto">
-              <Heart className="w-6 h-6 mr-3 heartbeat" />
-              Začít plánovat svatbu zdarma
-              <ArrowRight className="w-6 h-6 ml-3" />
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <section id="features" className="py-16 md:py-24 lg:py-32 bg-gradient-to-br from-gray-50 via-white to-gray-50 relative overflow-hidden touch-pan-y">
+      <section id="features" className="py-16 md:py-24 lg:py-32 bg-gradient-to-br from-purple-100 via-pink-100 to-rose-100 relative overflow-hidden touch-pan-y">
         {/* Decorative background elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
-          <div className="absolute top-20 left-10 w-64 h-64 bg-rose-200 rounded-full blur-3xl"></div>
+          <div className="absolute top-20 left-10 w-64 h-64 bg-pink-200 rounded-full blur-3xl"></div>
           <div className="absolute bottom-20 right-10 w-80 h-80 bg-purple-200 rounded-full blur-3xl"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-200 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-200 rounded-full blur-3xl"></div>
         </div>
 
         <div className="container mx-auto px-4 md:px-6 relative z-10">
           <div className="text-center mb-12 md:mb-16 lg:mb-20">
-            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-rose-100 to-purple-100 rounded-full mb-6 animate-fade-in">
-              <Sparkles className="w-4 h-4 text-rose-600 mr-2" />
-              <span className="text-sm font-semibold text-gray-800">Pokročilé funkce</span>
+            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-pink-100 to-purple-100 rounded-full mb-6 animate-fade-in">
+              <Sparkles className="w-4 h-4 text-pink-600 mr-2" />
+              <span className="text-sm font-semibold text-gray-800">Kreativní nástroje & Networking</span>
             </div>
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-gray-900 mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              Vše pro <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-500 via-purple-500 to-blue-500">perfektní svatbu</span>
+              Vytvořte <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-pink-600">nezapomenutelný zážitek</span>
             </h2>
             <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              Kompletní sada nástrojů s moderními technologiemi a unikátními funkcemi.
+              Inspirace, vizualizace a spojení s nejlepšími svatebními dodavateli
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 max-w-7xl mx-auto">
             {/* Moodboard */}
-            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-rose-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.3s' }}>
+            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-pink-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.3s' }}>
               <div className="relative mb-6">
-                <div className="w-20 h-20 bg-gradient-to-br from-rose-100 to-pink-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
-                  <Image className="w-10 h-10 text-rose-600" />
+                <div className="w-20 h-20 bg-gradient-to-br from-pink-100 to-rose-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
+                  <Image className="w-10 h-10 text-pink-600" />
                 </div>
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-rose-500 rounded-full flex items-center justify-center">
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center">
                   <Sparkles className="w-3 h-3 text-white" />
                 </div>
               </div>
@@ -437,12 +292,12 @@ export default function WelcomeScreen() {
             </div>
 
             {/* Svatební web */}
-            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-blue-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.5s' }}>
+            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-pink-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.5s' }}>
               <div className="relative mb-6">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-teal-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
-                  <Cloud className="w-10 h-10 text-blue-600" />
+                <div className="w-20 h-20 bg-gradient-to-br from-pink-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
+                  <Cloud className="w-10 h-10 text-pink-600" />
                 </div>
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
                   <Crown className="w-3 h-3 text-white" />
                 </div>
               </div>
@@ -450,23 +305,23 @@ export default function WelcomeScreen() {
               <p className="text-base text-gray-600 leading-relaxed">Vytvořte vlastní svatební web s RSVP, fotogalerií a vlastní doménou – bez kódování.</p>
             </div>
 
-            {/* Integrace */}
-            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-orange-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.6s' }}>
+            {/* Marketplace */}
+            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-purple-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.6s' }}>
               <div className="relative mb-6">
-                <div className="w-20 h-20 bg-gradient-to-br from-orange-100 to-amber-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
-                  <Calendar className="w-10 h-10 text-orange-600" />
+                <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
+                  <Store className="w-10 h-10 text-purple-600" />
                 </div>
               </div>
-              <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Integrace</h3>
-              <p className="text-base text-gray-600 leading-relaxed">Google Calendar pro synchronizaci událostí a Spotify pro vytváření svatebních playlistů.</p>
+              <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Marketplace</h3>
+              <p className="text-base text-gray-600 leading-relaxed">50+ ověřených dodavatelů s reálnými recenzemi a portfolii. Spojení s dodavateli.</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-12 md:py-16 lg:py-20 bg-rose-50 touch-pan-y">
-        <div className="container mx-auto px-4 md:px-6 text-center">
-          <div className="max-w-4xl mx-auto p-6 md:p-10 lg:p-12 bg-white rounded-2xl md:rounded-3xl shadow-xl border border-rose-100">
+      <section className="py-12 md:py-16 lg:py-20 bg-white touch-pan-y">
+        <div className="container mx-auto px-4 md:px-6 text-center relative z-10">
+          <div className="max-w-4xl mx-auto p-6 md:p-10 lg:p-12 bg-gradient-to-br from-pink-50 via-purple-50 to-rose-50 rounded-2xl md:rounded-3xl shadow-xl border border-pink-200">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold text-gray-900 mb-4 md:mb-6">
               Připraveni vyzkoušet <span className="text-gradient-primary">plánování bez námahy</span>?
             </h2>
@@ -502,8 +357,8 @@ export default function WelcomeScreen() {
             </div>
             <div className="grid grid-cols-3 gap-4 md:gap-6 text-center max-w-2xl mx-auto mt-6 md:mt-8 lg:mt-10 border-t border-gray-100 pt-6 md:pt-8">
               <div className="flex flex-col items-center">
-                <div className="w-12 h-12 md:w-14 md:h-14 bg-rose-100 rounded-full flex items-center justify-center mb-2">
-                  <Sparkles className="w-6 h-6 md:w-7 md:h-7 text-rose-600" />
+                <div className="w-12 h-12 md:w-14 md:h-14 bg-pink-100 rounded-full flex items-center justify-center mb-2">
+                  <Sparkles className="w-6 h-6 md:w-7 md:h-7 text-pink-600" />
                 </div>
                 <div className="text-base md:text-lg font-bold text-gray-900 mb-1">AI asistent</div>
                 <div className="text-xs md:text-sm text-gray-500">GPT-5</div>
@@ -516,8 +371,8 @@ export default function WelcomeScreen() {
                 <div className="text-xs md:text-sm text-gray-500">Vše na jednom místě</div>
               </div>
               <div className="flex flex-col items-center">
-                <div className="w-12 h-12 md:w-14 md:h-14 bg-emerald-100 rounded-full flex items-center justify-center mb-2">
-                  <Clock className="w-6 h-6 md:w-7 md:h-7 text-emerald-600" />
+                <div className="w-12 h-12 md:w-14 md:h-14 bg-pink-100 rounded-full flex items-center justify-center mb-2">
+                  <Clock className="w-6 h-6 md:w-7 md:h-7 text-pink-600" />
                 </div>
                 <div className="text-base md:text-lg font-bold text-gray-900 mb-1">Ušetříte čas</div>
                 <div className="text-xs md:text-sm text-gray-500">-70% času plánování</div>
@@ -527,38 +382,22 @@ export default function WelcomeScreen() {
         </div>
       </section>
 
-      <section id="dashboard" className="py-12 md:py-16 lg:py-20 bg-gray-50 touch-pan-y">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center mb-8 md:mb-12 lg:mb-16">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-gray-900 mb-4 md:mb-6">
-              Váš přizpůsobitelný dashboard
-            </h2>
-            <p className="text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
-              Drag & drop dashboard s moduly včetně AI asistenta. Přesuňte, změňte velikost a skryjte moduly podle vašich potřeb.
-            </p>
-          </div>
-          <div className="relative max-w-6xl mx-auto animate-fade-in" style={{ animationDelay: '0.3s' }}>
-            <InteractiveDashboardDemo />
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 md:py-24 lg:py-32 bg-gradient-to-br from-rose-50 via-purple-50 to-blue-50 relative overflow-hidden touch-pan-y">
+      <section className="py-16 md:py-24 lg:py-32 bg-gradient-to-br from-purple-100 via-pink-100 to-rose-100 relative overflow-hidden touch-pan-y">
         {/* Decorative background elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
-          <div className="absolute top-10 left-20 w-72 h-72 bg-rose-300 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-10 right-20 w-96 h-96 bg-purple-300 rounded-full blur-3xl"></div>
-          <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-blue-300 rounded-full blur-3xl"></div>
+          <div className="absolute top-10 left-20 w-72 h-72 bg-pink-200 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-10 right-20 w-96 h-96 bg-purple-200 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-rose-200 rounded-full blur-3xl"></div>
         </div>
 
         <div className="container mx-auto px-4 md:px-6 relative z-10">
           <div className="text-center mb-12 md:mb-16 lg:mb-20">
             <div className="inline-flex items-center px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full mb-6 shadow-sm animate-fade-in">
-              <Star className="w-4 h-4 text-rose-600 mr-2" />
+              <Star className="w-4 h-4 text-pink-600 mr-2" />
               <span className="text-sm font-semibold text-gray-800">Naše výhody</span>
             </div>
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-gray-900 mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              Proč zvolit <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-500 via-purple-500 to-blue-500">SvatBot.cz</span>?
+              Proč zvolit <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-pink-600">SvatBot.cz</span>?
             </h2>
             <p className="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
               Moderní přístup k plánování svatby s nejnovějšími technologiemi a komplexními nástroji.
@@ -569,10 +408,10 @@ export default function WelcomeScreen() {
             {/* AI technologie */}
             <div className="group bg-white/90 backdrop-blur-sm rounded-3xl p-8 md:p-10 shadow-xl border-2 border-white/50 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.3s' }}>
               <div className="relative mb-6">
-                <div className="w-28 h-28 bg-gradient-to-br from-rose-100 to-pink-100 rounded-3xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
-                  <Sparkles className="w-14 h-14 text-rose-600" />
+                <div className="w-28 h-28 bg-gradient-to-br from-pink-100 to-rose-100 rounded-3xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
+                  <Sparkles className="w-14 h-14 text-pink-600" />
                 </div>
-                <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-rose-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
+                <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-pink-500 to-rose-500 rounded-full flex items-center justify-center shadow-lg">
                   <Zap className="w-4 h-4 text-white" />
                 </div>
               </div>
@@ -583,8 +422,8 @@ export default function WelcomeScreen() {
 
               {/* AI Logo */}
               <div className="flex items-center justify-center gap-4 pt-4 border-t border-gray-200">
-                <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-50 to-green-50 rounded-lg border-2 border-emerald-300 shadow-md">
-                  <div className="w-7 h-7 bg-gradient-to-br from-emerald-600 to-green-600 rounded flex items-center justify-center">
+                <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-50 to-purple-50 rounded-lg border-2 border-pink-300 shadow-md">
+                  <div className="w-7 h-7 bg-gradient-to-br from-pink-600 to-purple-600 rounded flex items-center justify-center">
                     <Sparkles className="text-white w-4 h-4" />
                   </div>
                   <span className="text-base font-bold text-gray-800">GPT-5</span>
@@ -595,10 +434,10 @@ export default function WelcomeScreen() {
             {/* Ušetříte čas */}
             <div className="group bg-white/90 backdrop-blur-sm rounded-3xl p-8 md:p-10 shadow-xl border-2 border-white/50 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.4s' }}>
               <div className="relative mb-6">
-                <div className="w-28 h-28 bg-gradient-to-br from-emerald-100 to-green-100 rounded-3xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
-                  <Clock className="w-14 h-14 text-emerald-600" />
+                <div className="w-28 h-28 bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
+                  <Clock className="w-14 h-14 text-purple-600" />
                 </div>
-                <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-500 rounded-full flex items-center justify-center shadow-lg">
+                <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
                   <TrendingUp className="w-4 h-4 text-white" />
                 </div>
               </div>
@@ -609,8 +448,8 @@ export default function WelcomeScreen() {
 
               {/* Time savings */}
               <div className="flex items-center justify-center gap-2 pt-4 border-t border-gray-200">
-                <div className="px-4 py-2 bg-gradient-to-r from-emerald-50 to-green-50 rounded-lg border border-emerald-200">
-                  <div className="text-2xl font-bold text-emerald-600">-70%</div>
+                <div className="px-4 py-2 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200">
+                  <div className="text-2xl font-bold text-purple-600">-70%</div>
                   <div className="text-xs text-gray-600">času</div>
                 </div>
               </div>
@@ -619,10 +458,10 @@ export default function WelcomeScreen() {
             {/* Vše na jednom místě */}
             <div className="group bg-white/90 backdrop-blur-sm rounded-3xl p-8 md:p-10 shadow-xl border-2 border-white/50 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.5s' }}>
               <div className="relative mb-6">
-                <div className="w-28 h-28 bg-gradient-to-br from-purple-100 to-blue-100 rounded-3xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
+                <div className="w-28 h-28 bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
                   <BarChart2 className="w-14 h-14 text-purple-600" />
                 </div>
-                <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
                   <CheckCircle className="w-4 h-4 text-white" />
                 </div>
               </div>
@@ -633,7 +472,7 @@ export default function WelcomeScreen() {
 
               {/* Time saved */}
               <div className="flex items-center justify-center gap-2 pt-4 border-t border-gray-200">
-                <div className="px-4 py-2 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-200">
+                <div className="px-4 py-2 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200">
                   <div className="text-2xl font-bold text-purple-600">50+</div>
                   <div className="text-xs text-gray-600">ušetřených hodin</div>
                 </div>
@@ -647,12 +486,12 @@ export default function WelcomeScreen() {
       <section className="py-16 md:py-24 lg:py-32 bg-white relative overflow-hidden touch-pan-y">
         <div className="container mx-auto px-4 md:px-6 relative z-10">
           <div className="text-center mb-12 md:mb-16 lg:mb-20">
-            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-yellow-100 to-orange-100 rounded-full mb-6 animate-fade-in">
-              <Star className="w-4 h-4 text-yellow-600 mr-2 fill-current" />
+            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-pink-100 to-purple-100 rounded-full mb-6 animate-fade-in">
+              <Star className="w-4 h-4 text-pink-600 mr-2 fill-current" />
               <span className="text-sm font-semibold text-gray-800">Co říkají naši uživatelé</span>
             </div>
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-gray-900 mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              Spokojené páry <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-500 via-purple-500 to-blue-500">po celém Česku</span>
+              Spokojené páry <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-pink-600">po celém Česku</span>
             </h2>
             <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
               Přečtěte si, jak SvatBot.cz pomohl stovkám párů naplánovat jejich vysněnou svatbu
@@ -661,17 +500,17 @@ export default function WelcomeScreen() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {/* Testimonial 1 */}
-            <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-3xl p-8 shadow-lg border-2 border-rose-100 hover:shadow-2xl transition-all duration-500 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+            <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-3xl p-8 shadow-lg border-2 border-pink-100 hover:shadow-2xl transition-all duration-500 animate-fade-in" style={{ animationDelay: '0.3s' }}>
               <div className="flex items-center mb-4">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                  <Star key={i} className="w-5 h-5 text-pink-400 fill-current" />
                 ))}
               </div>
               <p className="text-gray-700 text-base leading-relaxed mb-6 italic">
                 "SvatBot.cz nám ušetřil desítky hodin plánování! AI asistent nám pomohl s výběrem dodavatelů a rozpočet máme konečně pod kontrolou. Nemůžeme si vynachválit!"
               </p>
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-rose-400 to-pink-400 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-rose-400 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
                   JP
                 </div>
                 <div>
@@ -682,17 +521,17 @@ export default function WelcomeScreen() {
             </div>
 
             {/* Testimonial 2 */}
-            <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-3xl p-8 shadow-lg border-2 border-purple-100 hover:shadow-2xl transition-all duration-500 animate-fade-in" style={{ animationDelay: '0.5s' }}>
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl p-8 shadow-lg border-2 border-purple-100 hover:shadow-2xl transition-all duration-500 animate-fade-in" style={{ animationDelay: '0.5s' }}>
               <div className="flex items-center mb-4">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                  <Star key={i} className="w-5 h-5 text-purple-400 fill-current" />
                 ))}
               </div>
               <p className="text-gray-700 text-base leading-relaxed mb-6 italic">
                 "Seating plan editor je naprosto geniální! Za 30 minut jsme měli rozmístění 120 hostů hotové. A svatební web vypadá profesionálně, přitom jsme ho vytvořili sami."
               </p>
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-indigo-400 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
                   MT
                 </div>
                 <div>
@@ -703,17 +542,17 @@ export default function WelcomeScreen() {
             </div>
 
             {/* Testimonial 3 */}
-            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-3xl p-8 shadow-lg border-2 border-blue-100 hover:shadow-2xl transition-all duration-500 animate-fade-in" style={{ animationDelay: '0.7s' }}>
+            <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-3xl p-8 shadow-lg border-2 border-pink-100 hover:shadow-2xl transition-all duration-500 animate-fade-in" style={{ animationDelay: '0.7s' }}>
               <div className="flex items-center mb-4">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                  <Star key={i} className="w-5 h-5 text-pink-400 fill-current" />
                 ))}
               </div>
               <p className="text-gray-700 text-base leading-relaxed mb-6 italic">
                 "Marketplace s ověřenými dodavateli je skvělý! Našli jsme fotografa i kapelu během pár dní. RSVP systém nám ušetřil spoustu telefonátů a emailů."
               </p>
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-400 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
                   LM
                 </div>
                 <div>
@@ -727,25 +566,25 @@ export default function WelcomeScreen() {
           {/* Statistiky */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 max-w-5xl mx-auto mt-16 md:mt-20">
             <div className="text-center animate-fade-in" style={{ animationDelay: '0.9s' }}>
-              <div className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-pink-500 mb-2">
+              <div className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-rose-500 mb-2">
                 <NumberCounter end={50} suffix="+" />
               </div>
               <div className="text-sm md:text-base text-gray-600 font-medium">Ušetřených hodin práce</div>
             </div>
             <div className="text-center animate-fade-in" style={{ animationDelay: '1s' }}>
-              <div className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-indigo-500 mb-2">
+              <div className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500 mb-2">
                 <NumberCounter end={2025} />
               </div>
               <div className="text-sm md:text-base text-gray-600 font-medium">Vznik aplikace</div>
             </div>
             <div className="text-center animate-fade-in" style={{ animationDelay: '1.1s' }}>
-              <div className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-cyan-500 mb-2">
+              <div className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500 mb-2">
                 <span className="text-4xl md:text-5xl font-bold">GPT-5</span>
               </div>
               <div className="text-sm md:text-base text-gray-600 font-medium">Nejnovější AI</div>
             </div>
             <div className="text-center animate-fade-in" style={{ animationDelay: '1.2s' }}>
-              <div className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-emerald-500 mb-2">
+              <div className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500 mb-2">
                 <NumberCounter end={30} />
               </div>
               <div className="text-sm md:text-base text-gray-600 font-medium">Dní zdarma</div>
@@ -754,94 +593,13 @@ export default function WelcomeScreen() {
         </div>
       </section>
 
-      {/* Moderní technologie - Nová sekce */}
-      <section className="py-12 md:py-16 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-full h-full" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
-        </div>
-
-        <div className="container mx-auto px-4 md:px-6 relative z-10">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-8 md:mb-12">
-              <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-4 animate-fade-in">
-                <Zap className="w-4 h-4 text-yellow-400 mr-2" />
-                <span className="text-sm font-semibold text-white">Nejmodernější technologie</span>
-              </div>
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-extrabold text-white mb-4 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-                Postaveno na <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400">špičkových technologiích</span>
-              </h2>
-              <p className="text-base md:text-lg text-gray-300 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                Český svatební plánovač využívající nejnovější AI a moderní cloudové technologie
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-              {/* GPT-5 */}
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300 text-center animate-fade-in" style={{ animationDelay: '0.3s' }}>
-                <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-green-500 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                  <Sparkles className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-lg font-bold text-white mb-2">GPT-5</h3>
-                <p className="text-sm text-gray-300">Nejnovější AI model</p>
-              </div>
-
-              {/* Firebase */}
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300 text-center animate-fade-in" style={{ animationDelay: '0.4s' }}>
-                <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                  <Zap className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-lg font-bold text-white mb-2">Firebase</h3>
-                <p className="text-sm text-gray-300">Google Cloud</p>
-              </div>
-
-              {/* Next.js */}
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300 text-center animate-fade-in" style={{ animationDelay: '0.5s' }}>
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                  <Code className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-lg font-bold text-white mb-2">Next.js 16</h3>
-                <p className="text-sm text-gray-300">React framework</p>
-              </div>
-
-              {/* Real-time */}
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300 text-center animate-fade-in" style={{ animationDelay: '0.6s' }}>
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                  <Zap className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-lg font-bold text-white mb-2">Real-time</h3>
-                <p className="text-sm text-gray-300">Okamžitá sync</p>
-              </div>
-            </div>
-
-            {/* Výhody */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 md:mt-12">
-              <div className="text-center animate-fade-in" style={{ animationDelay: '0.7s' }}>
-                <div className="text-3xl md:text-4xl font-bold text-yellow-400 mb-2">⚡</div>
-                <h4 className="text-lg font-semibold text-white mb-2">Bleskově rychlé</h4>
-                <p className="text-sm text-gray-300">Optimalizováno pro maximální výkon</p>
-              </div>
-              <div className="text-center animate-fade-in" style={{ animationDelay: '0.8s' }}>
-                <div className="text-3xl md:text-4xl font-bold text-green-400 mb-2">🔒</div>
-                <h4 className="text-lg font-semibold text-white mb-2">100% Bezpečné</h4>
-                <p className="text-sm text-gray-300">SSL šifrování a GDPR compliant</p>
-              </div>
-              <div className="text-center animate-fade-in" style={{ animationDelay: '0.9s' }}>
-                <div className="text-3xl md:text-4xl font-bold text-blue-400 mb-2">☁️</div>
-                <h4 className="text-lg font-semibold text-white mb-2">Cloud-based</h4>
-                <p className="text-sm text-gray-300">Přístup odkudkoliv, kdykoliv</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Pricing Section */}
       <PricingSection onGetStarted={handleGetStarted} />
 
-      <section id="vendors" className="py-12 md:py-16 lg:py-20 bg-gradient-to-br from-yellow-50 to-orange-50 touch-pan-y">
+      <section id="vendors" className="py-12 md:py-16 lg:py-20 bg-gradient-to-br from-pink-50 via-rose-50 to-purple-50 touch-pan-y">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-6xl mx-auto bg-white rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
-            <div className="md:w-1/2 p-6 md:p-10 lg:p-12 bg-gradient-to-br from-rose-500 to-purple-500 text-white flex flex-col justify-between">
+            <div className="md:w-1/2 p-6 md:p-10 lg:p-12 bg-gradient-to-br from-pink-500 to-purple-500 text-white flex flex-col justify-between">
               <div>
                 <div className="flex items-center space-x-2 md:space-x-3 mb-4 md:mb-6">
                   <Briefcase className="w-7 h-7 md:w-9 md:h-9" />
@@ -891,15 +649,15 @@ export default function WelcomeScreen() {
             </div>
             <div className="md:w-1/2 p-6 md:p-10 lg:p-12 flex flex-col justify-center bg-gradient-to-br from-gray-50 to-white">
               <div className="mb-6 md:mb-8">
-                <div className="inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-emerald-100 rounded-full mb-4 md:mb-6 shadow-sm">
-                  <Zap className="w-3 h-3 md:w-4 md:h-4 text-emerald-600 mr-1.5 md:mr-2" />
-                  <span className="text-xs md:text-sm font-medium text-emerald-700">Rychlé 5minutové nastavení!</span>
+                <div className="inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-pink-100 rounded-full mb-4 md:mb-6 shadow-sm">
+                  <Zap className="w-3 h-3 md:w-4 md:h-4 text-pink-600 mr-1.5 md:mr-2" />
+                  <span className="text-xs md:text-sm font-medium text-pink-700">Rychlé 5minutové nastavení!</span>
                 </div>
                 <h3 className="text-2xl md:text-3xl font-display font-bold text-gray-900 mb-3 md:mb-4">Začněte růst svůj byznys ještě dnes</h3>
                 <p className="text-sm md:text-base text-gray-600 mb-6 md:mb-8 leading-relaxed">
                   Vyplňte jednoduchý formulář, nahrajte úžasné fotografie z vašich předchozích svateb a začněte získávat nové klienty.
                 </p>
-                <button onClick={handleVendorRegister} className="w-full flex items-center justify-center space-x-2 md:space-x-3 px-6 py-3 md:px-8 md:py-5 text-base md:text-lg font-semibold rounded-full bg-rose-500 text-white shadow-lg hover:bg-rose-600 transition-all duration-300 button-glow mb-4 md:mb-6">
+                <button onClick={handleVendorRegister} className="w-full flex items-center justify-center space-x-2 md:space-x-3 px-6 py-3 md:px-8 md:py-5 text-base md:text-lg font-semibold rounded-full bg-pink-500 text-white shadow-lg hover:bg-pink-600 transition-all duration-300 button-glow mb-4 md:mb-6">
                   <Award className="w-5 h-5 md:w-6 md:h-6" />
                   <span>Registrovat se jako dodavatel</span>
                   <ArrowRight className="w-5 h-5 md:w-6 md:h-6" />
@@ -910,11 +668,11 @@ export default function WelcomeScreen() {
               </div>
               <div className="grid grid-cols-3 gap-3 md:gap-4 pt-6 md:pt-8 border-t border-gray-100">
                 <div className="text-center">
-                  <div className="text-xl md:text-2xl font-bold text-orange-600 mb-1">Moderní</div>
+                  <div className="text-xl md:text-2xl font-bold text-purple-600 mb-1">Moderní</div>
                   <div className="text-xs text-gray-600">Platforma</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-xl md:text-2xl font-bold text-rose-600 mb-1">100%</div>
+                  <div className="text-xl md:text-2xl font-bold text-pink-600 mb-1">100%</div>
                   <div className="text-xs text-gray-600">Zdarma</div>
                 </div>
                 <div className="text-center">
@@ -928,75 +686,77 @@ export default function WelcomeScreen() {
       </section>
 
       {/* Kontakt sekce */}
-      <section id="contact" className="py-16 md:py-24 lg:py-32 bg-gradient-to-br from-rose-500 via-purple-500 to-blue-500 relative overflow-hidden touch-pan-y">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-full h-full" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '50px 50px' }}></div>
+      <section id="contact" className="py-16 md:py-24 lg:py-32 bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 relative overflow-hidden touch-pan-y">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
+          <div className="absolute top-20 left-10 w-96 h-96 bg-pink-200 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-80 h-80 bg-purple-200 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-rose-200 rounded-full blur-3xl"></div>
         </div>
 
         <div className="container mx-auto px-4 md:px-6 relative z-10">
           <div className="text-center mb-12 md:mb-16">
-            <div className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full mb-6 animate-fade-in">
-              <Mail className="w-4 h-4 text-white mr-2" />
-              <span className="text-sm font-semibold text-white">Jsme tu pro vás</span>
+            <div className="inline-flex items-center px-4 py-2 bg-pink-100 rounded-full mb-6 animate-fade-in">
+              <Mail className="w-4 h-4 text-pink-600 mr-2" />
+              <span className="text-sm font-semibold text-pink-600">Jsme tu pro vás</span>
             </div>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-white mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              Máte otázky? <span className="text-yellow-300">Kontaktujte nás!</span>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-gray-900 mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              Máte otázky? <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-pink-600">Kontaktujte nás!</span>
             </h2>
-            <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
               Náš tým je připraven vám pomoci s čímkoliv potřebujete
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {/* Kontaktní informace */}
-            <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 md:p-10 border-2 border-white/20 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-              <h3 className="text-2xl font-display font-bold text-white mb-8">Kontaktní údaje</h3>
+            <div className="bg-white rounded-3xl p-8 md:p-10 border-2 border-gray-200 shadow-lg animate-fade-in" style={{ animationDelay: '0.3s' }}>
+              <h3 className="text-2xl font-display font-bold text-gray-900 mb-8">Kontaktní údaje</h3>
 
               <div className="space-y-6">
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Mail className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Mail className="w-6 h-6 text-pink-600" />
                   </div>
                   <div>
-                    <div className="text-sm text-white/70 mb-1">Email</div>
-                    <a href="mailto:info@svatbot.cz" className="text-lg font-semibold text-white hover:text-yellow-300 transition-colors">
+                    <div className="text-sm text-gray-500 mb-1">Email</div>
+                    <a href="mailto:info@svatbot.cz" className="text-lg font-semibold text-gray-900 hover:text-pink-600 transition-colors">
                       info@svatbot.cz
                     </a>
                   </div>
                 </div>
 
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Phone className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Phone className="w-6 h-6 text-purple-600" />
                   </div>
                   <div>
-                    <div className="text-sm text-white/70 mb-1">Telefon</div>
-                    <a href="tel:+420732264276" className="text-lg font-semibold text-white hover:text-yellow-300 transition-colors">
+                    <div className="text-sm text-gray-500 mb-1">Telefon</div>
+                    <a href="tel:+420732264276" className="text-lg font-semibold text-gray-900 hover:text-purple-600 transition-colors">
                       +420 732 264 276
                     </a>
                   </div>
                 </div>
 
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Clock className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Clock className="w-6 h-6 text-rose-600" />
                   </div>
                   <div>
-                    <div className="text-sm text-white/70 mb-1">Pracovní doba</div>
-                    <div className="text-lg font-semibold text-white">
+                    <div className="text-sm text-gray-500 mb-1">Pracovní doba</div>
+                    <div className="text-lg font-semibold text-gray-900">
                       Po-Pá: 9:00 - 18:00
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-8 pt-8 border-t border-white/20">
-                <div className="text-sm text-white/70 mb-3">Nebo nám napište přímo:</div>
+              <div className="mt-8 pt-8 border-t border-gray-200">
+                <div className="text-sm text-gray-600 mb-3">Nebo nám napište přímo:</div>
                 <div className="flex space-x-4">
-                  <button onClick={handleGetStarted} className="flex-1 px-6 py-3 bg-white text-rose-600 rounded-full font-semibold hover:bg-yellow-300 hover:text-gray-900 transition-all duration-300 shadow-lg">
+                  <button onClick={handleGetStarted} className="flex-1 px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full font-semibold hover:shadow-lg transition-all duration-300 shadow-md">
                     Začít zdarma
                   </button>
-                  <button onClick={handleDemoLogin} className="flex-1 px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-full font-semibold hover:bg-white/30 transition-all duration-300 border-2 border-white/30">
+                  <button onClick={handleDemoLogin} className="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-full font-semibold hover:bg-gray-200 transition-all duration-300 border-2 border-gray-200">
                     Vyzkoušet demo
                   </button>
                 </div>
@@ -1008,8 +768,8 @@ export default function WelcomeScreen() {
               <h3 className="text-2xl font-display font-bold text-gray-900 mb-6">Napište nám</h3>
 
               {contactFormSuccess && (
-                <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
-                  <p className="text-emerald-800 font-medium">✓ Děkujeme za zprávu! Brzy se vám ozveme.</p>
+                <div className="mb-6 p-4 bg-pink-50 border border-pink-200 rounded-lg">
+                  <p className="text-pink-800 font-medium">✓ Děkujeme za zprávu! Brzy se vám ozveme.</p>
                 </div>
               )}
 
@@ -1021,7 +781,7 @@ export default function WelcomeScreen() {
                     placeholder="Vaše jméno"
                     value={contactForm.name}
                     onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-rose-500 focus:outline-none transition-colors"
+                    className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-pink-500 focus:outline-none transition-colors"
                     required
                   />
                 </div>
@@ -1033,7 +793,7 @@ export default function WelcomeScreen() {
                     placeholder="vas@email.cz"
                     value={contactForm.email}
                     onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-rose-500 focus:outline-none transition-colors"
+                    className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-pink-500 focus:outline-none transition-colors"
                     required
                   />
                 </div>
@@ -1045,7 +805,7 @@ export default function WelcomeScreen() {
                     rows={4}
                     value={contactForm.message}
                     onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-rose-500 focus:outline-none transition-colors resize-none"
+                    className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-pink-500 focus:outline-none transition-colors resize-none"
                     required
                   ></textarea>
                 </div>
@@ -1053,7 +813,7 @@ export default function WelcomeScreen() {
                 <button
                   type="submit"
                   disabled={isContactFormSubmitting}
-                  className="w-full px-6 py-4 bg-gradient-to-r from-rose-500 to-purple-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center button-glow disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-6 py-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center button-glow disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Send className="w-5 h-5 mr-2" />
                   {isContactFormSubmitting ? 'Odesílám...' : 'Odeslat zprávu'}
@@ -1062,7 +822,7 @@ export default function WelcomeScreen() {
 
               <div className="mt-6 pt-6 border-t border-gray-200 text-center">
                 <p className="text-sm text-gray-600">
-                  Odpovídáme obvykle do <strong className="text-rose-600">24 hodin</strong>
+                  Odpovídáme obvykle do <strong className="text-pink-600">24 hodin</strong>
                 </p>
               </div>
             </div>
@@ -1071,7 +831,7 @@ export default function WelcomeScreen() {
       </section>
 
       {/* FAQ Section - SEO Optimized */}
-      <section id="faq" className="py-16 md:py-24 bg-gradient-to-br from-gray-50 to-white" aria-labelledby="faq-heading">
+      <section id="faq" className="py-16 md:py-24 bg-gradient-to-br from-purple-100 via-pink-100 to-rose-100" aria-labelledby="faq-heading">
         <div className="container mx-auto px-4 md:px-6">
           <header className="text-center mb-12 md:mb-16">
             <h2 id="faq-heading" className="text-3xl md:text-4xl lg:text-5xl font-display font-extrabold text-gray-900 mb-4">
