@@ -1,9 +1,9 @@
 /**
  * Invoice Numbering System
- * 
+ *
  * Ensures chronological, sequential invoice numbering without gaps
- * Format: YYYYMM-NNN (e.g., 202511-001, 202511-002, etc.)
- * 
+ * Format: YYYYMM-NNNN (e.g., 202511-0001, 202511-0002, etc.)
+ *
  * This system is compliant with Czech accounting legislation which requires:
  * - Chronological order
  * - Ascending sequence
@@ -16,9 +16,9 @@ import { Timestamp, FieldValue } from 'firebase-admin/firestore'
 /**
  * Get next invoice number for the current month
  * Uses Firestore transaction to ensure no duplicate numbers
- * 
+ *
  * @param date - Date for which to generate invoice number (defaults to now)
- * @returns Promise<string> - Invoice number in format YYYYMM-NNN
+ * @returns Promise<string> - Invoice number in format YYYYMM-NNNN
  */
 export async function getNextInvoiceNumber(date: Date = new Date()): Promise<string> {
   const adminDb = getAdminDb()
@@ -56,8 +56,8 @@ export async function getNextInvoiceNumber(date: Date = new Date()): Promise<str
         })
       }
       
-      // Format: YYYYMM-NNN (e.g., 202511-001)
-      const invoiceNumber = `${period}-${String(nextNumber).padStart(3, '0')}`
+      // Format: YYYYMM-NNNN (e.g., 202511-0001)
+      const invoiceNumber = `${period}-${String(nextNumber).padStart(4, '0')}`
       return invoiceNumber
     })
     
@@ -90,8 +90,8 @@ export async function getCurrentCounter(year: number, month: number): Promise<nu
  * Validate invoice number format
  */
 export function validateInvoiceNumber(invoiceNumber: string): boolean {
-  // Format: YYYYMM-NNN
-  const regex = /^\d{6}-\d{3}$/
+  // Format: YYYYMM-NNNN
+  const regex = /^\d{6}-\d{4}$/
   return regex.test(invoiceNumber)
 }
 
@@ -116,7 +116,7 @@ export function parseInvoiceNumber(invoiceNumber: string): { period: string; seq
  */
 export function generateVariableSymbol(invoiceNumber: string): string {
   // Remove dashes and use the full number
-  // Format: YYYYMMNNN (e.g., 202511001)
+  // Format: YYYYMMNNNN (e.g., 2025110001)
   return invoiceNumber.replace(/-/g, '')
 }
 
