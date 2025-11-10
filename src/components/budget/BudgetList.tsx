@@ -411,27 +411,29 @@ export default function BudgetList({
       {/* Budget items list */}
       <div className="space-y-4">
         {Object.entries(groupedItems).map(([groupKey, groupItems]) => (
-          <div key={groupKey} className="space-y-2">
+          <div key={groupKey} className="space-y-3">
             {/* Group header */}
-            <div className="flex items-center justify-between py-2 border-b border-gray-200">
-              <h3 className="font-medium text-gray-900 flex items-center space-x-2">
-                {viewOptions.groupBy === 'category' && BUDGET_CATEGORIES[groupKey as keyof typeof BUDGET_CATEGORIES] && (
-                  <span>{BUDGET_CATEGORIES[groupKey as keyof typeof BUDGET_CATEGORIES].icon}</span>
-                )}
-                <span>
-                  {viewOptions.groupBy === 'category' 
-                    ? BUDGET_CATEGORIES[groupKey as keyof typeof BUDGET_CATEGORIES]?.name || groupKey
-                    : groupKey
-                  }
+            <div className="bg-primary-50 px-4 py-3 rounded-lg border border-primary-200 shadow-sm">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-gray-900 flex items-center space-x-2">
+                  {viewOptions.groupBy === 'category' && BUDGET_CATEGORIES[groupKey as keyof typeof BUDGET_CATEGORIES] && (
+                    <span>{BUDGET_CATEGORIES[groupKey as keyof typeof BUDGET_CATEGORIES].icon}</span>
+                  )}
+                  <span>
+                    {viewOptions.groupBy === 'category'
+                      ? BUDGET_CATEGORIES[groupKey as keyof typeof BUDGET_CATEGORIES]?.name || groupKey
+                      : groupKey
+                    }
+                  </span>
+                </h3>
+                <span className="text-sm font-medium text-primary-700">
+                  {groupItems.length} položek
                 </span>
-              </h3>
-              <span className="text-sm text-text-muted">
-                {groupItems.length} položek
-              </span>
+              </div>
             </div>
 
             {/* Items in group */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               {groupItems.map((item) => {
                 const statusDisplay = getPaymentStatusDisplay(item.paymentStatus)
                 const priorityDisplay = getPriorityDisplay(item.priority)

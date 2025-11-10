@@ -122,7 +122,7 @@ export default function VendorList({
 
   if (loading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-3">
         {[...Array(3)].map((_, i) => (
           <div key={i} className="wedding-card animate-pulse">
             <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
@@ -319,7 +319,7 @@ export default function VendorList({
           )}
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {filteredVendors.map((vendor) => {
             const categoryConfig = getCategoryConfig(vendor.category)
             const statusConfig = getStatusConfig(vendor.status)

@@ -13,10 +13,10 @@
 
 // GoPay configuration
 export const GOPAY_CONFIG = {
-  goId: process.env.NEXT_PUBLIC_GOPAY_GOID || '8208931819',
-  clientId: process.env.NEXT_PUBLIC_GOPAY_CLIENT_ID || '1270557640',
-  clientSecret: process.env.GOPAY_CLIENT_SECRET || 'fGe9aSFX',
-  environment: (process.env.NEXT_PUBLIC_GOPAY_ENVIRONMENT || 'test') as 'test' | 'production',
+  goId: process.env.NEXT_PUBLIC_GOPAY_GOID || '1510449039',
+  clientId: process.env.NEXT_PUBLIC_GOPAY_CLIENT_ID || '1510449039',
+  clientSecret: process.env.GOPAY_CLIENT_SECRET || 'h4trTFwx',
+  environment: (process.env.NEXT_PUBLIC_GOPAY_ENVIRONMENT || 'production') as 'test' | 'production',
   
   // API URLs
   get apiUrl() {

@@ -233,7 +233,7 @@ export default function SeatingPage() {
                 <Info className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mt-0.5 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <h3 className="font-medium text-sm sm:text-base text-blue-900 mb-2 sm:mb-3">Ovládání editoru</h3>
-                  <div className="grid grid-cols-1 gap-2 sm:gap-3 text-xs sm:text-sm text-blue-800">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-x-6 sm:gap-y-2 text-xs sm:text-sm text-blue-800">
                     <div className="flex items-start space-x-2">
                       <MousePointerClick className="w-3 h-3 sm:w-4 sm:h-4 mt-0.5 flex-shrink-0" />
                       <div className="min-w-0">
@@ -246,9 +246,9 @@ export default function SeatingPage() {
                         <span className="font-medium">Klik na číslo židle:</span> Přiřazení hosta
                       </div>
                     </div>
-                    <div className="hidden sm:flex items-start space-x-2">
-                      <Trash2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      <div>
+                    <div className="flex items-start space-x-2">
+                      <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 mt-0.5 flex-shrink-0" />
+                      <div className="min-w-0">
                         <span className="font-medium">Pravý klik na židli:</span> Smazání židle
                       </div>
                     </div>

@@ -104,9 +104,9 @@ export default function BudgetPieChart({ categoryStats }: BudgetPieChartProps) {
     cumulativePercentage += percentage
 
     // Výpočet SVG path pro segment
-    const radius = 80
-    const centerX = 100
-    const centerY = 100
+    const radius = 120
+    const centerX = 150
+    const centerY = 150
 
     const startAngleRad = (startAngle - 90) * (Math.PI / 180)
     const endAngleRad = (endAngle - 90) * (Math.PI / 180)
@@ -148,14 +148,14 @@ export default function BudgetPieChart({ categoryStats }: BudgetPieChartProps) {
 
       {/* SVG Koláčový graf */}
       <div className="flex justify-center mb-6">
-        <svg width="200" height="200" viewBox="0 0 200 200" className="drop-shadow-sm">
+        <svg width="300" height="300" viewBox="0 0 300 300" className="drop-shadow-sm">
           {slices.map((slice, index) => (
             <g key={index}>
               <path
                 d={slice.pathData}
                 fill={slice.color}
                 stroke="#fff"
-                strokeWidth="2"
+                strokeWidth="3"
                 className="hover:opacity-80 transition-opacity cursor-pointer"
 
               />
@@ -165,14 +165,14 @@ export default function BudgetPieChart({ categoryStats }: BudgetPieChartProps) {
       </div>
 
       {/* Legenda */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
         {slices.map((slice, index) => (
-          <div key={index} className="flex items-center space-x-2 p-2 rounded hover:bg-gray-50">
+          <div key={index} className="flex items-center space-x-3 p-3 rounded hover:bg-gray-50">
             <div
-              className="w-4 h-4 rounded-full flex-shrink-0"
+              className="w-5 h-5 rounded-full flex-shrink-0"
               style={{ backgroundColor: slice.color }}
             />
-            <span className="text-lg flex-shrink-0">{slice.icon}</span>
+            <span className="text-2xl flex-shrink-0">{slice.icon}</span>
             <div className="flex-1 min-w-0">
               <p className="font-medium text-gray-900 truncate">{slice.name}</p>
               <p className="text-xs text-gray-600">

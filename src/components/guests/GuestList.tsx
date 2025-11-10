@@ -803,21 +803,23 @@ export default function GuestList({
           }, 0)
 
           return (
-          <div key={groupKey} className="space-y-2">
+          <div key={groupKey} className="space-y-3">
             {/* Group header */}
-            <div className="flex items-center justify-between py-2 border-b border-gray-200">
-              <h3 className="font-medium text-gray-900">
-                {viewOptions.groupBy === 'category' ? getCategoryName(groupKey) : groupKey}
-              </h3>
-              <span className="text-sm text-text-muted">
-                {totalPeopleInGroup} {totalPeopleInGroup === 1 ? 'host' : 'hostů'}
-              </span>
+            <div className="bg-primary-50 px-4 py-3 rounded-lg border border-primary-200 shadow-sm">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-gray-900">
+                  {viewOptions.groupBy === 'category' ? getCategoryName(groupKey) : groupKey}
+                </h3>
+                <span className="text-sm font-medium text-primary-700">
+                  {totalPeopleInGroup} {totalPeopleInGroup === 1 ? 'host' : 'hostů'}
+                </span>
+              </div>
             </div>
 
             {/* Guests in group */}
             <div className={viewMode === 'grid'
               ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'
-              : 'space-y-2'
+              : 'space-y-3'
             }>
               {groupGuests.map((guest, groupIndex) => {
                 if (viewMode === 'grid') {

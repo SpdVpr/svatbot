@@ -18,7 +18,7 @@ export default function QuickActionsModule() {
       title: 'Přidat úkol',
       description: 'Nový svatební úkol',
       href: '/tasks',
-      baseColor: 'bg-primary-600',
+      baseColor: 'bg-primary-500',
       hoverColor: 'hover:bg-primary-400'
     },
     {
@@ -26,24 +26,24 @@ export default function QuickActionsModule() {
       title: 'Přidat hosta',
       description: 'Nový host na seznam',
       href: '/guests',
-      baseColor: 'bg-primary-700',
-      hoverColor: 'hover:bg-primary-600'
+      baseColor: 'bg-primary-600',
+      hoverColor: 'hover:bg-primary-500'
     },
     {
       icon: DollarSign,
       title: 'Přidat výdaj',
       description: 'Nová položka rozpočtu',
       href: '/budget',
-      baseColor: 'bg-primary-800',
-      hoverColor: 'hover:bg-primary-700'
+      baseColor: 'bg-primary-700',
+      hoverColor: 'hover:bg-primary-600'
     },
     {
       icon: Music,
       title: 'Přidat hudbu',
       description: 'Nová píseň do playlistu',
       href: '/music',
-      baseColor: 'bg-primary-900',
-      hoverColor: 'hover:bg-primary-800'
+      baseColor: 'bg-primary-800',
+      hoverColor: 'hover:bg-primary-700'
     },
     {
       icon: Briefcase,

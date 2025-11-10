@@ -71,11 +71,9 @@ export default function ModuleHeader({
 
               {/* Module icon in square */}
               <div
-                className={`w-8 h-8 sm:w-12 sm:h-12 ${
-                  iconGradient ? `bg-gradient-to-br ${iconGradient}` : 'bg-gray-100'
-                } rounded-lg flex items-center justify-center flex-shrink-0`}
+                className="w-8 h-8 sm:w-12 sm:h-12 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0"
               >
-                <Icon className={`w-4 h-4 sm:w-6 sm:h-6 ${iconColor || 'text-white'}`} />
+                <Icon className="w-4 h-4 sm:w-6 sm:h-6 text-primary-600" />
               </div>
 
               {/* Title and subtitle */}

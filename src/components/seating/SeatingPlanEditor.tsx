@@ -1632,12 +1632,15 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
           }
         })
 
-        // Draw chair row label
+        // Draw chair row label - positioned to the left to avoid overlapping with chair numbers
+        const labelX = chairRow.position.x - 60 // Move label 60px to the left
+        const labelY = chairRow.position.y + (rows * spacing) / 2 // Center vertically
+
         svgContent += `
           <text
-            x="${chairRow.position.x}"
-            y="${chairRow.position.y - 20}"
-            text-anchor="middle"
+            x="${labelX}"
+            y="${labelY}"
+            text-anchor="end"
             font-size="12"
             font-weight="bold"
             fill="#059669"

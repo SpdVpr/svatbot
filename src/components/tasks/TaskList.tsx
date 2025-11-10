@@ -443,19 +443,21 @@ export default function TaskList({
       {/* Task list */}
       <div className="space-y-4">
         {Object.entries(groupedTasks).map(([groupKey, groupTasks]) => (
-          <div key={groupKey} className="space-y-2">
+          <div key={groupKey} className="space-y-3">
             {/* Group header */}
-            <div className="flex items-center justify-between py-2 border-b border-gray-200">
-              <h3 className="font-medium text-gray-900">
-                {viewOptions.groupBy === 'category' ? getCategoryName(groupKey) : groupKey}
-              </h3>
-              <span className="text-sm text-text-muted">
-                {groupTasks.length} úkolů
-              </span>
+            <div className="bg-primary-50 px-4 py-3 rounded-lg border border-primary-200 shadow-sm">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-gray-900">
+                  {viewOptions.groupBy === 'category' ? getCategoryName(groupKey) : groupKey}
+                </h3>
+                <span className="text-sm font-medium text-primary-700">
+                  {groupTasks.length} úkolů
+                </span>
+              </div>
             </div>
 
             {/* Tasks in group */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               {groupTasks.map((task) => {
                 const isOverdue = isTaskOverdue(task)
                 const priorityDisplay = getPriorityDisplay(task.priority)

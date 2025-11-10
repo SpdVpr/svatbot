@@ -2,7 +2,6 @@
 
 import { useBudget } from '@/hooks/useBudget'
 import { BUDGET_CATEGORIES } from '@/types/budget'
-import BudgetPieChart from './BudgetPieChart'
 import BudgetList from './BudgetList'
 import {
   DollarSign,
@@ -425,67 +424,58 @@ export default function BudgetStats({
           <span>Rozpočet podle kategorií</span>
         </h3>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Compact Pie Chart */}
-          <div className="flex flex-col items-center justify-center">
-            <div className="scale-75">
-              <BudgetPieChart categoryStats={categoryStats} />
-            </div>
-          </div>
+        {/* Category Grid - Full Width Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {categoryStats.map((stat) => (
+            <div
+              key={stat.key}
+              className="p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-2">
+                  <span className="text-2xl">{stat.category.icon}</span>
+                  <span className="text-sm font-medium text-gray-900">{stat.category.name}</span>
+                  {stat.isOverBudget && (
+                    <div title="Překročen rozpočet">
+                      <AlertTriangle className="w-4 h-4 text-red-500" />
+                    </div>
+                  )}
+                </div>
+                <span className="text-xs text-text-muted">{stat.itemCount}×</span>
+              </div>
 
-          {/* Category Grid - Compact Cards */}
-          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {categoryStats.map((stat) => (
-              <div
-                key={stat.key}
-                className="p-3 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-base">{stat.category.icon}</span>
-                    <span className="text-sm font-medium text-gray-900">{stat.category.name}</span>
-                    {stat.isOverBudget && (
-                      <div title="Překročen rozpočet">
-                        <AlertTriangle className="w-3 h-3 text-red-500" />
-                      </div>
-                    )}
-                  </div>
-                  <span className="text-xs text-text-muted">{stat.itemCount}×</span>
+              <div className="space-y-2">
+                <div className="flex justify-between items-baseline">
+                  <span className="text-xs text-text-muted">Rozpočet:</span>
+                  <span className="text-sm font-semibold text-gray-900">
+                    {formatCurrency(stat.budgeted)}
+                  </span>
                 </div>
 
-                <div className="space-y-1.5">
-                  <div className="flex justify-between items-baseline">
-                    <span className="text-xs text-text-muted">Rozpočet:</span>
-                    <span className="text-sm font-semibold text-gray-900">
-                      {formatCurrency(stat.budgeted)}
-                    </span>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="flex h-2 rounded-full overflow-hidden">
+                    <div
+                      className="bg-green-500"
+                      style={{ width: `${Math.min((stat.paid / stat.budgeted) * 100, 100)}%` }}
+                      title={`Zaplaceno: ${formatCurrency(stat.paid)}`}
+                    ></div>
+                    <div
+                      className={stat.isOverBudget ? "bg-red-500" : "bg-orange-500"}
+                      style={{ width: `${Math.min(((stat.actual - stat.paid) / stat.budgeted) * 100, 100)}%` }}
+                      title={`Nezaplaceno: ${formatCurrency(stat.actual - stat.paid)}`}
+                    ></div>
                   </div>
+                </div>
 
-                  <div className="w-full bg-gray-200 rounded-full h-1.5">
-                    <div className="flex h-1.5 rounded-full overflow-hidden">
-                      <div
-                        className="bg-green-500"
-                        style={{ width: `${Math.min((stat.paid / stat.budgeted) * 100, 100)}%` }}
-                        title={`Zaplaceno: ${formatCurrency(stat.paid)}`}
-                      ></div>
-                      <div
-                        className={stat.isOverBudget ? "bg-red-500" : "bg-orange-500"}
-                        style={{ width: `${Math.min(((stat.actual - stat.paid) / stat.budgeted) * 100, 100)}%` }}
-                        title={`Nezaplaceno: ${formatCurrency(stat.actual - stat.paid)}`}
-                      ></div>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between text-xs">
-                    <span className="text-green-600">✓ {formatCurrency(stat.paid)}</span>
-                    <span className={stat.isOverBudget ? "text-red-600" : "text-orange-600"}>
-                      ⏳ {formatCurrency(stat.remaining)}
-                    </span>
-                  </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-green-600">✓ {formatCurrency(stat.paid)}</span>
+                  <span className={stat.isOverBudget ? "text-red-600" : "text-orange-600"}>
+                    ⏳ {formatCurrency(stat.remaining)}
+                  </span>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
 

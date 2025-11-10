@@ -281,7 +281,7 @@ function DashboardContent() {
               onClick={openWeddingSettings}
               className="text-left w-full hover:bg-gray-50 p-2 rounded-lg transition-colors"
             >
-              <h2 className="text-sm font-semibold text-gray-900">
+              <h2 className="text-sm font-bold text-gray-900" style={{ fontFamily: "var(--font-cormorant), 'Cormorant Upright', serif" }}>
                 {wedding.brideName} & {wedding.groomName}
               </h2>
               <p className="text-xs text-text-muted">
@@ -361,7 +361,7 @@ function DashboardContent() {
                   className="text-left hover:text-primary-600 transition-colors group"
                   title="Klikněte pro úpravu"
                 >
-                  <h1 className="heading-4 group-hover:text-primary-600 transition-colors">
+                  <h1 className="text-xl md:text-2xl font-bold text-text-primary leading-tight group-hover:text-primary-600 transition-colors" style={{ fontFamily: "var(--font-cormorant), 'Cormorant Upright', serif" }}>
                     Svatba {wedding.brideName} & {wedding.groomName}
                     <Edit className="w-4 h-4 inline ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </h1>
