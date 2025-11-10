@@ -124,6 +124,14 @@ export async function createGoPayPaymentServer(params: {
     ]
   }
 
+  console.log('💳 Creating GoPay payment with data:', {
+    goId: GOPAY_CONFIG.goId,
+    amount: product.amount,
+    currency: product.currency,
+    plan,
+    apiUrl: GOPAY_CONFIG.apiUrl
+  })
+
   // Add recurrence for monthly subscription (automatic recurring payments)
   if (plan === 'premium_monthly') {
     paymentData.recurrence = {
@@ -144,6 +152,7 @@ export async function createGoPayPaymentServer(params: {
   }
 
   // Create payment
+  console.log('📤 Sending payment request to GoPay API...')
   const response = await fetch(`${GOPAY_CONFIG.apiUrl}/payments/payment`, {
     method: 'POST',
     headers: {
@@ -154,13 +163,34 @@ export async function createGoPayPaymentServer(params: {
     body: JSON.stringify(paymentData)
   })
 
+  const responseText = await response.text()
+  console.log('📥 GoPay API response:', {
+    status: response.status,
+    statusText: response.statusText,
+    body: responseText
+  })
+
   if (!response.ok) {
-    const error = await response.text()
-    console.error('GoPay payment creation error:', error)
-    throw new Error('Nepodařilo se vytvořit platbu v GoPay')
+    console.error('❌ GoPay payment creation error:', {
+      status: response.status,
+      statusText: response.statusText,
+      error: responseText
+    })
+
+    // Try to parse error details
+    let errorDetails = responseText
+    try {
+      const errorJson = JSON.parse(responseText)
+      errorDetails = JSON.stringify(errorJson, null, 2)
+    } catch (e) {
+      // Keep as text if not JSON
+    }
+
+    throw new Error(`GoPay API error (${response.status}): ${errorDetails}`)
   }
 
-  const payment = await response.json()
+  const payment = JSON.parse(responseText)
+  console.log('✅ Payment created:', { id: payment.id, state: payment.state })
   
   // Store payment info in Firestore using Admin SDK
   const adminDb = getAdminDb()
