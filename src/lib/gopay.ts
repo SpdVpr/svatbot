@@ -13,7 +13,7 @@
 
 // GoPay configuration
 export const GOPAY_CONFIG = {
-  goId: process.env.NEXT_PUBLIC_GOPAY_GOID || '1510449039',
+  goId: process.env.NEXT_PUBLIC_GOPAY_GOID || '8340144076',
   clientId: process.env.NEXT_PUBLIC_GOPAY_CLIENT_ID || '1510449039',
   clientSecret: process.env.GOPAY_CLIENT_SECRET || 'h4trTFwx',
   environment: (process.env.NEXT_PUBLIC_GOPAY_ENVIRONMENT || 'production') as 'test' | 'production',
