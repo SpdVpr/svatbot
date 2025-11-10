@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminDb } from '@/config/firebase-admin'
 import { Timestamp } from 'firebase-admin/firestore'
-import { generateInvoiceNumber, generateVariableSymbol } from '@/lib/invoiceGenerator'
+import { getNextInvoiceNumber, generateVariableSymbol } from '@/lib/invoiceNumbering'
 
 /**
  * Create Test Invoice
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
 
     const adminDb = getAdminDb()
     const now = new Date()
-    const invoiceNumber = generateInvoiceNumber(now)
+    const invoiceNumber = await getNextInvoiceNumber(now)
     const variableSymbol = generateVariableSymbol(invoiceNumber)
 
     // Company info for SvatBot.cz (only include defined values)

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getPaymentStatus } from '@/lib/gopay-server'
 import { getAdminDb } from '@/config/firebase-admin'
 import { Timestamp } from 'firebase-admin/firestore'
-import { generateInvoiceNumber, generateVariableSymbol } from '@/lib/invoiceGenerator'
+import { getNextInvoiceNumber, generateVariableSymbol } from '@/lib/invoiceNumbering'
 
 /**
  * GoPay Webhook Handler
@@ -216,9 +216,9 @@ async function createInvoiceForPayment(
     const userDoc = await adminDb.collection('users').doc(userId).get()
     const userEmail = userDoc.exists ? userDoc.data().email : 'unknown@svatbot.cz'
 
-    // Generate invoice number and variable symbol
+    // Generate invoice number and variable symbol using sequential numbering
     const now = new Date()
-    const invoiceNumber = generateInvoiceNumber(now)
+    const invoiceNumber = await getNextInvoiceNumber(now)
     const variableSymbol = generateVariableSymbol(invoiceNumber)
 
     // Determine plan name

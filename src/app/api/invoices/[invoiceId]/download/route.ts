@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAdminDb } from '@/config/firebase-admin'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import { Roboto_Regular_base64, Roboto_Bold_base64 } from '@/lib/fonts'
 
 /**
  * Server-side PDF generation endpoint
@@ -55,7 +56,7 @@ export async function GET(
 
 /**
  * Generate PDF invoice on server-side
- * Uses Helvetica font which supports Latin Extended characters
+ * Uses Roboto font which supports Czech characters with diacritics
  */
 async function generateInvoicePDFServer(invoice: any): Promise<Buffer> {
   const doc = new jsPDF({
@@ -65,54 +66,43 @@ async function generateInvoicePDFServer(invoice: any): Promise<Buffer> {
     compress: true
   })
 
-  // Use Helvetica font (built-in, supports Czech characters)
-  doc.setFont('helvetica', 'normal')
+  // Add Roboto fonts to jsPDF
+  doc.addFileToVFS('Roboto-Regular.ttf', Roboto_Regular_base64)
+  doc.addFont('Roboto-Regular.ttf', 'Roboto', 'normal')
+
+  doc.addFileToVFS('Roboto-Bold.ttf', Roboto_Bold_base64)
+  doc.addFont('Roboto-Bold.ttf', 'Roboto', 'bold')
+
+  // Set Roboto as default font
+  doc.setFont('Roboto', 'normal')
 
   // Colors
   const primaryColor: [number, number, number] = [99, 102, 241] // Indigo-500
   const darkColor: [number, number, number] = [17, 24, 39] // Gray-900
   const grayColor: [number, number, number] = [107, 114, 128] // Gray-500
 
-  // Helper function to remove Czech diacritics for PDF compatibility
-  const cleanText = (text: string) => text
-    .replace(/č/g, 'c').replace(/Č/g, 'C')
-    .replace(/ď/g, 'd').replace(/Ď/g, 'D')
-    .replace(/ě/g, 'e').replace(/Ě/g, 'E')
-    .replace(/ň/g, 'n').replace(/Ň/g, 'N')
-    .replace(/ř/g, 'r').replace(/Ř/g, 'R')
-    .replace(/š/g, 's').replace(/Š/g, 'S')
-    .replace(/ť/g, 't').replace(/Ť/g, 'T')
-    .replace(/ů/g, 'u').replace(/Ů/g, 'U')
-    .replace(/ý/g, 'y').replace(/Ý/g, 'Y')
-    .replace(/ž/g, 'z').replace(/Ž/g, 'Z')
-    .replace(/á/g, 'a').replace(/Á/g, 'A')
-    .replace(/é/g, 'e').replace(/É/g, 'E')
-    .replace(/í/g, 'i').replace(/Í/g, 'I')
-    .replace(/ó/g, 'o').replace(/Ó/g, 'O')
-    .replace(/ú/g, 'u').replace(/Ú/g, 'U')
-
-  // Helper function to add text
+  // Helper function to add text (no need to clean text anymore - Roboto supports Czech!)
   const addText = (text: string, x: number, y: number, options?: { align?: 'left' | 'center' | 'right' }) => {
-    doc.text(cleanText(text), x, y, options)
+    doc.text(text, x, y, options)
   }
 
   // Header with logo/brand
   let yPos = 20
   doc.setFontSize(24)
-  doc.setFont('helvetica', 'bold')
+  doc.setFont('Roboto', 'bold')
   doc.setTextColor(...primaryColor)
   addText('SvatBot.cz', 20, yPos)
-  
+
   doc.setFontSize(10)
-  doc.setFont('helvetica', 'normal')
+  doc.setFont('Roboto', 'normal')
   doc.setTextColor(...grayColor)
   yPos += 6
-  addText('Vas svatebni planovac', 20, yPos)
+  addText('Váš svatební plánovač', 20, yPos)
 
   // Invoice title and details box
   yPos += 15
   doc.setFontSize(20)
-  doc.setFont('helvetica', 'bold')
+  doc.setFont('Roboto', 'bold')
   doc.setTextColor(...darkColor)
   addText('FAKTURA', 20, yPos)
 
@@ -131,27 +121,27 @@ async function generateInvoicePDFServer(invoice: any): Promise<Buffer> {
   // Invoice details inside box
   let boxY = yPos
   doc.setFontSize(9)
-  doc.setFont('helvetica', 'bold')
+  doc.setFont('Roboto', 'bold')
   doc.setTextColor(...grayColor)
-  addText('Cislo faktury:', rightX + 3, boxY)
-  doc.setFont('helvetica', 'normal')
+  addText('Číslo faktury:', rightX + 3, boxY)
+  doc.setFont('Roboto', 'normal')
   doc.setTextColor(...darkColor)
   addText(invoice.invoiceNumber || 'N/A', rightX + boxWidth - 3, boxY, { align: 'right' })
 
   boxY += 6
-  doc.setFont('helvetica', 'bold')
+  doc.setFont('Roboto', 'bold')
   doc.setTextColor(...grayColor)
-  addText('Datum vystaveni:', rightX + 3, boxY)
-  doc.setFont('helvetica', 'normal')
+  addText('Datum vystavení:', rightX + 3, boxY)
+  doc.setFont('Roboto', 'normal')
   doc.setTextColor(...darkColor)
   const issueDate = invoice.issueDate?.toDate?.() || invoice.issuedAt?.toDate?.() || new Date()
   addText(formatDate(issueDate), rightX + boxWidth - 3, boxY, { align: 'right' })
 
   boxY += 6
-  doc.setFont('helvetica', 'bold')
+  doc.setFont('Roboto', 'bold')
   doc.setTextColor(...grayColor)
-  addText('Variabilni symbol:', rightX + 3, boxY)
-  doc.setFont('helvetica', 'normal')
+  addText('Variabilní symbol:', rightX + 3, boxY)
+  doc.setFont('Roboto', 'normal')
   doc.setTextColor(...darkColor)
   addText(invoice.variableSymbol || 'N/A', rightX + boxWidth - 3, boxY, { align: 'right' })
 
@@ -165,13 +155,13 @@ async function generateInvoicePDFServer(invoice: any): Promise<Buffer> {
   // Supplier info (left column)
   let supplierY = yPos
   doc.setFontSize(11)
-  doc.setFont('helvetica', 'bold')
+  doc.setFont('Roboto', 'bold')
   doc.setTextColor(...darkColor)
   addText('Dodavatel:', leftColX, supplierY)
 
   supplierY += 6
   doc.setFontSize(10)
-  doc.setFont('helvetica', 'normal')
+  doc.setFont('Roboto', 'normal')
   doc.setTextColor(...darkColor)
   addText(invoice.supplierName || 'SvatBot.cz', leftColX, supplierY)
 
@@ -198,28 +188,28 @@ async function generateInvoicePDFServer(invoice: any): Promise<Buffer> {
   }
 
   if (invoice.supplierICO) {
-    addText(`IC: ${invoice.supplierICO}`, leftColX, supplierY)
+    addText(`IČ: ${invoice.supplierICO}`, leftColX, supplierY)
     supplierY += 5
   }
 
   if (invoice.supplierDIC) {
-    addText(`DIC: ${invoice.supplierDIC}`, leftColX, supplierY)
+    addText(`DIČ: ${invoice.supplierDIC}`, leftColX, supplierY)
     supplierY += 5
   } else {
-    addText('Neplatce DPH', leftColX, supplierY)
+    addText('Neplátce DPH', leftColX, supplierY)
     supplierY += 5
   }
 
   // Customer info (right column)
   let customerY = yPos
   doc.setFontSize(11)
-  doc.setFont('helvetica', 'bold')
+  doc.setFont('Roboto', 'bold')
   doc.setTextColor(...darkColor)
-  addText('Odberatel:', rightColX, customerY)
+  addText('Odběratel:', rightColX, customerY)
 
   customerY += 6
   doc.setFontSize(10)
-  doc.setFont('helvetica', 'normal')
+  doc.setFont('Roboto', 'normal')
   doc.setTextColor(...darkColor)
   addText(invoice.customerName || invoice.userEmail || 'N/A', rightColX, customerY)
 
@@ -237,7 +227,7 @@ async function generateInvoicePDFServer(invoice: any): Promise<Buffer> {
   yPos += 10
 
   const tableData = (invoice.items || []).map((item: any) => [
-    cleanText(item.description || item.name || 'N/A'),
+    item.description || item.name || 'N/A',
     item.quantity?.toString() || '1',
     `${formatCurrency(item.unitPrice || 0)} ${invoice.currency || 'CZK'}`,
     `${item.vatRate || 0}%`,
@@ -246,11 +236,11 @@ async function generateInvoicePDFServer(invoice: any): Promise<Buffer> {
 
   autoTable(doc, {
     startY: yPos,
-    head: [['Polozka', 'Mnozstvi', 'Jedn. cena', 'DPH', 'Celkem']],
+    head: [['Položka', 'Množství', 'Jedn. cena', 'DPH', 'Celkem']],
     body: tableData,
     theme: 'striped',
     styles: {
-      font: 'helvetica',
+      font: 'Roboto',
       fontStyle: 'normal'
     },
     headStyles: {
@@ -258,12 +248,12 @@ async function generateInvoicePDFServer(invoice: any): Promise<Buffer> {
       textColor: [255, 255, 255],
       fontStyle: 'bold',
       fontSize: 10,
-      font: 'helvetica'
+      font: 'Roboto'
     },
     bodyStyles: {
       fontSize: 10,
       textColor: darkColor,
-      font: 'helvetica'
+      font: 'Roboto'
     },
     columnStyles: {
       0: { cellWidth: 70 },
@@ -291,9 +281,9 @@ async function generateInvoicePDFServer(invoice: any): Promise<Buffer> {
 
   yPos += 8
   doc.setFontSize(10)
-  doc.setFont('helvetica', 'normal')
+  doc.setFont('Roboto', 'normal')
   doc.setTextColor(...grayColor)
-  addText('Zaklad:', summaryX + 5, yPos)
+  addText('Základ:', summaryX + 5, yPos)
   doc.setTextColor(...darkColor)
   addText(`${formatCurrency(invoice.subtotal || 0)} ${invoice.currency || 'CZK'}`, summaryX + summaryWidth - 5, yPos, { align: 'right' })
 
@@ -311,9 +301,9 @@ async function generateInvoicePDFServer(invoice: any): Promise<Buffer> {
 
   yPos += 6
   doc.setFontSize(11)
-  doc.setFont('helvetica', 'bold')
+  doc.setFont('Roboto', 'bold')
   doc.setTextColor(...primaryColor)
-  addText('Celkem k uhrade:', summaryX + 5, yPos)
+  addText('Celkem k úhradě:', summaryX + 5, yPos)
   doc.setFontSize(13)
   addText(`${formatCurrency(invoice.total || 0)} ${invoice.currency || 'CZK'}`, summaryX + summaryWidth - 5, yPos, { align: 'right' })
 
@@ -332,22 +322,22 @@ async function generateInvoicePDFServer(invoice: any): Promise<Buffer> {
 
   yPos += 7
   doc.setFontSize(10)
-  doc.setFont('helvetica', 'bold')
+  doc.setFont('Roboto', 'bold')
   doc.setTextColor(...darkColor)
-  addText('Platebni udaje:', 25, yPos)
+  addText('Platební údaje:', 25, yPos)
 
   yPos += 6
-  doc.setFont('helvetica', 'normal')
+  doc.setFont('Roboto', 'normal')
   doc.setFontSize(9)
   doc.setTextColor(...grayColor)
-  addText(`Zpusob platby: ${cleanText(invoice.paymentMethod || 'Platebni karta')}`, 25, yPos)
+  addText(`Způsob platby: ${invoice.paymentMethod || 'Platební karta'}`, 25, yPos)
 
   if (invoice.status === 'paid' && invoice.paidAt) {
     yPos += 5
     doc.setFillColor(220, 252, 231) // Green-100
     doc.rect(25, yPos - 3, paymentBoxWidth - 10, 8, 'F')
     doc.setTextColor(22, 163, 74) // Green-600
-    doc.setFont('helvetica', 'bold')
+    doc.setFont('Roboto', 'bold')
     doc.setFontSize(10)
     const paidDate = invoice.paidAt?.toDate?.() || new Date()
     addText(`ZAPLACENO dne ${formatDate(paidDate)}`, 28, yPos + 2)
@@ -358,9 +348,9 @@ async function generateInvoicePDFServer(invoice: any): Promise<Buffer> {
   // Footer
   const footerY = 280
   doc.setFontSize(8)
-  doc.setFont('helvetica', 'normal')
+  doc.setFont('Roboto', 'normal')
   doc.setTextColor(...grayColor)
-  addText('Dekujeme za Vasi duveru!', 105, footerY, { align: 'center' })
+  addText('Děkujeme za Vaši důvěru!', 105, footerY, { align: 'center' })
   addText(`${invoice.supplierEmail || 'info@svatbot.cz'} | svatbot.cz`, 105, footerY + 4, { align: 'center' })
 
   // Return PDF as Buffer

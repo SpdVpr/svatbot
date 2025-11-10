@@ -306,14 +306,18 @@ function formatCurrency(amount: number): string {
 
 /**
  * Generate invoice number
- * Format: YYYYMMDD-XXXX (e.g., 20250107-0001)
+ * Format: YYYYMM-NNN (e.g., 202511-001)
+ * This is a placeholder - actual number should be generated server-side with proper sequencing
+ *
+ * IMPORTANT: This function should NOT be used directly for creating invoices.
+ * Use the server-side API endpoint which ensures proper sequential numbering.
  */
 export function generateInvoiceNumber(date: Date = new Date()): string {
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  const random = String(Math.floor(Math.random() * 10000)).padStart(4, '0')
-  return `${year}${month}${day}-${random}`
+  // This is just a placeholder - real implementation is server-side
+  const placeholder = String(Math.floor(Math.random() * 1000)).padStart(3, '0')
+  return `${year}${month}-${placeholder}`
 }
 
 /**
