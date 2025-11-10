@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAdminDb } from '@/lib/firebase-admin'
+import { getAdminDb } from '@/config/firebase-admin'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
@@ -9,10 +9,10 @@ import autoTable from 'jspdf-autotable'
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { invoiceId: string } }
+  { params }: { params: Promise<{ invoiceId: string }> }
 ) {
   try {
-    const { invoiceId } = params
+    const { invoiceId } = await params
 
     // Get invoice from Firestore
     const adminDb = getAdminDb()

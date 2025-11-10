@@ -12,6 +12,7 @@ declare module 'jspdf' {
 /**
  * Generate PDF invoice
  * Creates a professional Czech invoice with all required fields
+ * NOTE: This function is deprecated - use server-side endpoint /api/invoices/[invoiceId]/download instead
  */
 export async function generateInvoicePDF(invoice: Invoice): Promise<Blob> {
   const doc = new jsPDF({
@@ -20,19 +21,12 @@ export async function generateInvoicePDF(invoice: Invoice): Promise<Blob> {
     format: 'a4'
   })
 
-  // Add Roboto fonts
-  doc.addFileToVFS('Roboto-Regular.woff', RobotoRegularBase64)
-  doc.addFont('Roboto-Regular.woff', 'Roboto', 'normal')
+  // Use Helvetica font (built-in, supports Czech characters)
+  doc.setFont('helvetica', 'normal')
 
-  doc.addFileToVFS('Roboto-Bold.woff', RobotoBoldBase64)
-  doc.addFont('Roboto-Bold.woff', 'Roboto', 'bold')
-
-  // Set default font to Roboto
-  doc.setFont('Roboto', 'normal')
-
-  // Helper function to add text without spacing issues
+  // Helper function to add text
   const addText = (text: string, x: number, y: number, options?: any) => {
-    doc.text(text, x, y, { ...options, charSpace: 0 })
+    doc.text(text, x, y, options)
   }
 
   // Colors
@@ -45,26 +39,26 @@ export async function generateInvoicePDF(invoice: Invoice): Promise<Blob> {
   // Header - Company Logo/Name
   doc.setFontSize(24)
   doc.setTextColor(...primaryColor)
-  doc.setFont('Roboto', 'bold')
+  doc.setFont('helvetica', 'bold')
   addText('SvatBot.cz', 20, yPos)
 
   yPos += 5
   doc.setFontSize(10)
   doc.setTextColor(...grayColor)
-  doc.setFont('Roboto', 'normal')
+  doc.setFont('helvetica', 'normal')
   addText('Váš svatební plánovač', 20, yPos)
 
   // Invoice title and number
   yPos = 20
   doc.setFontSize(28)
   doc.setTextColor(...darkColor)
-  doc.setFont('Roboto', 'bold')
+  doc.setFont('helvetica', 'bold')
   addText('FAKTURA', 150, yPos, { align: 'right' })
 
   yPos += 10
   doc.setFontSize(12)
   doc.setTextColor(...grayColor)
-  doc.setFont('Roboto', 'normal')
+  doc.setFont('helvetica', 'normal')
   addText(`Číslo: ${invoice.invoiceNumber}`, 150, yPos, { align: 'right' })
 
   yPos = 50
@@ -72,11 +66,11 @@ export async function generateInvoicePDF(invoice: Invoice): Promise<Blob> {
   // Supplier info (left column)
   doc.setFontSize(11)
   doc.setTextColor(...darkColor)
-  doc.setFont('Roboto', 'bold')
+  doc.setFont('helvetica', 'bold')
   addText('Dodavatel:', 20, yPos)
 
   yPos += 6
-  doc.setFont('Roboto', 'normal')
+  doc.setFont('helvetica', 'normal')
   doc.setFontSize(10)
   addText(invoice.supplierName, 20, yPos)
   yPos += 5
@@ -109,11 +103,11 @@ export async function generateInvoicePDF(invoice: Invoice): Promise<Blob> {
   // Customer info (right column)
   yPos = 50
   doc.setFontSize(11)
-  doc.setFont('Roboto', 'bold')
+  doc.setFont('helvetica', 'bold')
   addText('Odběratel:', 120, yPos)
 
   yPos += 6
-  doc.setFont('Roboto', 'normal')
+  doc.setFont('helvetica', 'normal')
   doc.setFontSize(10)
   addText(invoice.customerName || invoice.userEmail, 120, yPos)
   if (invoice.customerAddress) {
@@ -151,13 +145,13 @@ export async function generateInvoicePDF(invoice: Invoice): Promise<Blob> {
 
   yPos += 6
   doc.setTextColor(...darkColor)
-  doc.setFont('Roboto', 'bold')
+  doc.setFont('helvetica', 'bold')
   addText(formatDate(invoice.issueDate), 25, yPos)
   addText(formatDate(invoice.dueDate), 85, yPos)
   addText(formatDate(invoice.taxableDate), 145, yPos)
 
   yPos += 6
-  doc.setFont('Roboto', 'normal')
+  doc.setFont('helvetica', 'normal')
   doc.setFontSize(9)
   doc.setTextColor(...grayColor)
   addText(`Variabilní symbol: ${invoice.variableSymbol}`, 25, yPos)
@@ -179,7 +173,7 @@ export async function generateInvoicePDF(invoice: Invoice): Promise<Blob> {
     body: tableData,
     theme: 'striped',
     styles: {
-      font: 'Roboto',
+      font: 'helvetica',
       fontStyle: 'normal'
     },
     headStyles: {
@@ -187,12 +181,12 @@ export async function generateInvoicePDF(invoice: Invoice): Promise<Blob> {
       textColor: [255, 255, 255],
       fontStyle: 'bold',
       fontSize: 10,
-      font: 'Roboto'
+      font: 'helvetica'
     },
     bodyStyles: {
       fontSize: 10,
       textColor: darkColor,
-      font: 'Roboto'
+      font: 'helvetica'
     },
     columnStyles: {
       0: { cellWidth: 70 },
@@ -228,7 +222,7 @@ export async function generateInvoicePDF(invoice: Invoice): Promise<Blob> {
 
   yPos += 10
   doc.setFontSize(11)
-  doc.setFont('Roboto', 'bold')
+  doc.setFont('helvetica', 'bold')
   doc.setTextColor(...primaryColor)
   addText('Celkem zaplaceno:', summaryX + 5, yPos)
   doc.setFontSize(14)
@@ -237,12 +231,12 @@ export async function generateInvoicePDF(invoice: Invoice): Promise<Blob> {
   // Payment info
   yPos += 15
   doc.setFontSize(10)
-  doc.setFont('Roboto', 'bold')
+  doc.setFont('helvetica', 'bold')
   doc.setTextColor(...darkColor)
   addText('Platební údaje:', 20, yPos)
 
   yPos += 6
-  doc.setFont('Roboto', 'normal')
+  doc.setFont('helvetica', 'normal')
   doc.setFontSize(9)
   doc.setTextColor(...grayColor)
   addText(`Způsob platby: ${invoice.paymentMethod}`, 20, yPos)
@@ -250,14 +244,14 @@ export async function generateInvoicePDF(invoice: Invoice): Promise<Blob> {
   if (invoice.status === 'paid' && invoice.paidAt) {
     yPos += 5
     doc.setTextColor(34, 197, 94) // Green-500
-    doc.setFont('Roboto', 'bold')
+    doc.setFont('helvetica', 'bold')
     addText(`✓ ZAPLACENO dne ${formatDate(invoice.paidAt)}`, 20, yPos)
   }
 
   if (invoice.supplierBankAccount) {
     yPos += 5
     doc.setTextColor(...grayColor)
-    doc.setFont('Roboto', 'normal')
+    doc.setFont('helvetica', 'normal')
     addText(`Číslo účtu: ${invoice.supplierBankAccount}`, 20, yPos)
   }
 
@@ -280,7 +274,7 @@ export async function generateInvoicePDF(invoice: Invoice): Promise<Blob> {
   // Footer
   const footerY = 280
   doc.setFontSize(8)
-  doc.setFont('Roboto', 'normal')
+  doc.setFont('helvetica', 'normal')
   doc.setTextColor(...grayColor)
   addText('Děkujeme za Vaši důvěru!', 105, footerY, { align: 'center' })
   addText(`${invoice.supplierEmail} | ${invoice.supplierPhone || 'svatbot.cz'}`, 105, footerY + 4, { align: 'center' })
