@@ -36,6 +36,7 @@
   "author": "SvatBot.cz Team",
   "license": "MIT",
   "dependencies": {
+    "@fontsource/roboto": "^5.2.8",
     "@headlessui/react": "^2.2.9",
     "@heroicons/react": "^2.0.0",
     "@hookform/resolvers": "^3.3.0",

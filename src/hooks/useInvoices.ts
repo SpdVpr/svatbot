@@ -19,11 +19,11 @@ import { generateInvoicePDF, generateInvoiceNumber, generateVariableSymbol } fro
 
 // Company info for SvatBot.cz
 const SVATBOT_INFO = {
-  supplierName: 'Michal Vesecky',
-  supplierAddress: 'Zapska 1149',
-  supplierCity: 'Nehvizdy',
-  supplierZip: '250 71',
-  supplierCountry: 'Ceska republika',
+  supplierName: 'SvatBot.cz',
+  supplierAddress: 'Michal Vesecky, Zapska 1149, Nehvizdy',
+  supplierCity: '',
+  supplierZip: '25081',
+  supplierCountry: '',
   supplierICO: '88320090',
   supplierDIC: undefined, // Not VAT payer
   supplierEmail: 'info@svatbot.cz',
