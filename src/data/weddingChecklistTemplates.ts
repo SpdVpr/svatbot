@@ -28,7 +28,7 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
     id: '12-months-before',
     title: '12+ měsíců před svatbou',
     description: 'Základní plán a rozhodnutí',
-    icon: '🕛',
+    icon: '💌',
     items: [
       {
         id: '12m-001',
@@ -146,7 +146,7 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
     id: '6-9-months-before',
     title: '6–9 měsíců před svatbou',
     description: 'Rezervace, klíčoví dodavatelé, outfit',
-    icon: '🕘',
+    icon: '🔍',
     items: [
       {
         id: '6-9m-001',
@@ -242,7 +242,7 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
     id: '3-5-months-before',
     title: '3–5 měsíců před svatbou',
     description: 'Detailní plánování a ladění stylu',
-    icon: '✨',
+    icon: '💡',
     items: [
       {
         id: '3-5m-001',
@@ -593,7 +593,7 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
     id: 'after-wedding',
     title: 'Po svatbě',
     description: 'Uzavření a líbánky',
-    icon: '✅',
+    icon: '🏝️',
     items: [
       {
         id: 'after-001',

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { WEDDING_CHECKLIST, ChecklistItem, ChecklistPhase } from '@/data/weddingChecklistTemplates'
 import { useTask } from '@/hooks/useTask'
 import { useWedding } from '@/hooks/useWedding'
@@ -36,6 +36,16 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
   const [completedItems, setCompletedItems] = useState<Set<string>>(new Set())
   const [hiddenItems, setHiddenItems] = useState<Set<string>>(new Set())
   const [isLoading, setIsLoading] = useState(true)
+  const [itemPhaseMap, setItemPhaseMap] = useState<Record<string, string>>({})
+
+  const [draggedItem, setDraggedItem] = useState<string | null>(null)
+  const [dragOverPhase, setDragOverPhase] = useState<string | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [touchStartY, setTouchStartY] = useState<number | null>(null)
+  const [touchCurrentY, setTouchCurrentY] = useState<number | null>(null)
+  const dragTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const longPressTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const touchMoveDistanceRef = useRef(0)
 
   // Check if user is demo user
   const isDemoUser = user?.email === 'demo@svatbot.cz'
@@ -53,6 +63,7 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
           // Load from sessionStorage for demo user
           const completedKey = `checklist_completed_${wedding.id}`
           const hiddenKey = `checklist_hidden_${wedding.id}`
+          const phaseMapKey = `checklist_phasemap_${wedding.id}`
 
           const storedCompleted = sessionStorage.getItem(completedKey)
           if (storedCompleted) {
@@ -65,6 +76,11 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
             const itemIds = JSON.parse(storedHidden) as string[]
             setHiddenItems(new Set(itemIds))
           }
+
+          const storedPhaseMap = sessionStorage.getItem(phaseMapKey)
+          if (storedPhaseMap) {
+            setItemPhaseMap(JSON.parse(storedPhaseMap))
+          }
         } else if (user) {
           // Load from Firestore for real user
           const checklistRef = doc(db, 'checklist_completed', wedding.id)
@@ -74,8 +90,10 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
             const data = checklistDoc.data()
             const completedIds = data.completedItems || []
             const hiddenIds = data.hiddenItems || []
+            const phaseMap = data.itemPhaseMap || {}
             setCompletedItems(new Set(completedIds))
             setHiddenItems(new Set(hiddenIds))
+            setItemPhaseMap(phaseMap)
           }
         }
       } catch (error) {
@@ -89,19 +107,22 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
   }, [wedding, user, isDemoUser])
 
   // Save completed and hidden items to storage
-  const saveChecklistData = async (completed: Set<string>, hidden: Set<string>) => {
+  const saveChecklistData = async (completed: Set<string>, hidden: Set<string>, phaseMap?: Record<string, string>) => {
     try {
       if (!wedding) return
 
       const completedArray = Array.from(completed)
       const hiddenArray = Array.from(hidden)
+      const phaseMapToSave = phaseMap !== undefined ? phaseMap : itemPhaseMap
 
       if (isDemoUser) {
         // Save to sessionStorage for demo user
         const completedKey = `checklist_completed_${wedding.id}`
         const hiddenKey = `checklist_hidden_${wedding.id}`
+        const phaseMapKey = `checklist_phasemap_${wedding.id}`
         sessionStorage.setItem(completedKey, JSON.stringify(completedArray))
         sessionStorage.setItem(hiddenKey, JSON.stringify(hiddenArray))
+        sessionStorage.setItem(phaseMapKey, JSON.stringify(phaseMapToSave))
       } else if (user) {
         // Save to Firestore for real user
         const checklistRef = doc(db, 'checklist_completed', wedding.id)
@@ -110,6 +131,7 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
           userId: user.id,
           completedItems: completedArray,
           hiddenItems: hiddenArray,
+          itemPhaseMap: phaseMapToSave,
           updatedAt: new Date()
         })
       }
@@ -342,6 +364,218 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
     })
   }
 
+  // Drag and drop handlers
+  const handleDragStart = useCallback((e: React.DragEvent, itemId: string, phaseId: string) => {
+    setDraggedItem(itemId)
+    setIsDragging(true)
+    setDragOverPhase(null)
+
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/plain', `${itemId}|${phaseId}`)
+
+    if (dragTimeoutRef.current) {
+      clearTimeout(dragTimeoutRef.current)
+    }
+  }, [])
+
+  const handleDragEnd = useCallback((e: React.DragEvent) => {
+    dragTimeoutRef.current = setTimeout(() => {
+      setDraggedItem(null)
+      setDragOverPhase(null)
+      setIsDragging(false)
+    }, 50)
+  }, [])
+
+  const handleDragOver = useCallback((e: React.DragEvent, phaseId: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (!draggedItem || !isDragging) {
+      return
+    }
+
+    e.dataTransfer.dropEffect = 'move'
+
+    if (dragOverPhase !== phaseId) {
+      setDragOverPhase(phaseId)
+    }
+  }, [draggedItem, isDragging, dragOverPhase])
+
+  const handleDrop = useCallback(async (e: React.DragEvent, targetPhaseId: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (!draggedItem || !isDragging) {
+      return
+    }
+
+    const data = e.dataTransfer.getData('text/plain')
+    const [itemId, sourcePhaseId] = data.split('|')
+
+    if (sourcePhaseId === targetPhaseId) {
+      setDraggedItem(null)
+      setDragOverPhase(null)
+      setIsDragging(false)
+      return
+    }
+
+    const sourcePhase = WEDDING_CHECKLIST.find(p => p.id === sourcePhaseId)
+    const item = sourcePhase?.items.find(i => i.id === itemId)
+
+    if (!item) {
+      setDraggedItem(null)
+      setDragOverPhase(null)
+      setIsDragging(false)
+      return
+    }
+
+    try {
+      await withDemoCheck(async () => {
+        const newPhaseMap = { ...itemPhaseMap, [itemId]: targetPhaseId }
+        setItemPhaseMap(newPhaseMap)
+        await saveChecklistData(completedItems, hiddenItems, newPhaseMap)
+
+        setShowSuccess(itemId)
+        setTimeout(() => setShowSuccess(null), 2000)
+      })
+    } catch (error) {
+      console.error('Error moving item:', error)
+    } finally {
+      setDraggedItem(null)
+      setDragOverPhase(null)
+      setIsDragging(false)
+
+      if (dragTimeoutRef.current) {
+        clearTimeout(dragTimeoutRef.current)
+      }
+    }
+  }, [draggedItem, isDragging, itemPhaseMap, completedItems, hiddenItems, withDemoCheck])
+
+  // Touch handlers for mobile with long press detection
+  const handleTouchStart = useCallback((e: React.TouchEvent, itemId: string, phaseId: string) => {
+    const touch = e.touches[0]
+    setTouchStartY(touch.clientY)
+    setTouchCurrentY(touch.clientY)
+    touchMoveDistanceRef.current = 0
+
+    longPressTimerRef.current = setTimeout(() => {
+      if (touchMoveDistanceRef.current < 10) {
+        setDraggedItem(itemId)
+        setIsDragging(true)
+
+        if ('vibrate' in navigator) {
+          navigator.vibrate(50)
+        }
+
+        const element = e.currentTarget as HTMLElement
+        element.classList.add('haptic-feedback')
+        setTimeout(() => {
+          element.classList.remove('haptic-feedback')
+        }, 100)
+      }
+    }, 500)
+  }, [])
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    const touch = e.touches[0]
+
+    if (touchStartY) {
+      touchMoveDistanceRef.current = Math.abs(touch.clientY - touchStartY)
+    }
+
+    if (touchMoveDistanceRef.current > 10 && longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current)
+      longPressTimerRef.current = null
+      return
+    }
+
+    if (!draggedItem || !touchStartY || !isDragging) return
+
+    e.preventDefault()
+    setTouchCurrentY(touch.clientY)
+
+    const elements = document.querySelectorAll('[data-phase-id]')
+    let newDragOverPhase = null
+
+    elements.forEach((element) => {
+      const rect = element.getBoundingClientRect()
+      if (touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+        newDragOverPhase = element.getAttribute('data-phase-id')
+      }
+    })
+
+    if (newDragOverPhase !== null && newDragOverPhase !== dragOverPhase) {
+      setDragOverPhase(newDragOverPhase)
+    }
+  }, [draggedItem, touchStartY, dragOverPhase, isDragging])
+
+  const handleTouchEnd = useCallback(async (e: React.TouchEvent) => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current)
+      longPressTimerRef.current = null
+    }
+
+    if (!draggedItem) {
+      setDraggedItem(null)
+      setIsDragging(false)
+      setDragOverPhase(null)
+      setTouchStartY(null)
+      setTouchCurrentY(null)
+      return
+    }
+
+    if (isDragging && dragOverPhase) {
+      const currentPhase = itemPhaseMap[draggedItem] || WEDDING_CHECKLIST.find(phase => 
+        phase.items.some(item => item.id === draggedItem)
+      )?.id
+
+      if (currentPhase !== dragOverPhase) {
+        try {
+          await withDemoCheck(async () => {
+            const newPhaseMap = { ...itemPhaseMap, [draggedItem]: dragOverPhase }
+            setItemPhaseMap(newPhaseMap)
+            await saveChecklistData(completedItems, hiddenItems, newPhaseMap)
+
+            if ('vibrate' in navigator) {
+              navigator.vibrate([50, 50, 50])
+            }
+
+            setShowSuccess(draggedItem)
+            setTimeout(() => setShowSuccess(null), 2000)
+          })
+        } catch (error) {
+          console.error('Error moving item:', error)
+        }
+      }
+    }
+
+    setDraggedItem(null)
+    setDragOverPhase(null)
+    setIsDragging(false)
+    setTouchStartY(null)
+    setTouchCurrentY(null)
+  }, [draggedItem, isDragging, dragOverPhase, itemPhaseMap, completedItems, hiddenItems, withDemoCheck])
+
+  // Get organized checklist with items moved to custom phases
+  const organizedChecklist = useMemo((): ChecklistPhase[] => {
+    const organized = WEDDING_CHECKLIST.map(phase => ({
+      ...phase,
+      items: [] as ChecklistItem[]
+    }))
+
+    WEDDING_CHECKLIST.forEach(originalPhase => {
+      originalPhase.items.forEach(item => {
+        const targetPhaseId = itemPhaseMap[item.id] || originalPhase.id
+        const targetPhase = organized.find(p => p.id === targetPhaseId)
+        if (targetPhase) {
+          targetPhase.items.push(item)
+        }
+      })
+    })
+
+    return organized
+  }, [itemPhaseMap])
+
   // Get priority color
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -372,8 +606,8 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
 
   if (compact) {
     // Calculate overall statistics
-    const totalItems = WEDDING_CHECKLIST.reduce((sum, phase) => sum + phase.items.length, 0)
-    const completedCount = WEDDING_CHECKLIST.reduce((sum, phase) =>
+    const totalItems = organizedChecklist.reduce((sum, phase) => sum + phase.items.length, 0)
+    const completedCount = organizedChecklist.reduce((sum, phase) =>
       sum + phase.items.filter(item => isItemCompleted(item)).length, 0
     )
     const overallPercentage = Math.round((completedCount / totalItems) * 100)
@@ -382,26 +616,18 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
     return (
       <div className="space-y-4">
         {/* Overall statistics */}
-        <div className="p-4 rounded-lg border" style={{ background: `linear-gradient(to right, var(--color-primary-50), var(--color-primary-100))`, borderColor: 'var(--color-primary-200)' }}>
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-sm text-gray-600 mb-1">Celkový pokrok</div>
-              <div className="text-2xl font-bold text-primary-600">
-                {completedCount} / {totalItems}
-              </div>
+        <div className="p-3 rounded-lg glass-morphism bg-primary-50">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-primary-600">
+              {completedCount} / {totalItems}
             </div>
-            <div className="text-right">
-              <div className="text-3xl font-bold text-green-600">
-                {overallPercentage}%
-              </div>
-              <div className="text-xs text-gray-600">dokončeno</div>
-            </div>
+            <div className="text-sm text-primary-700">Celkový pokrok</div>
           </div>
         </div>
 
         {/* Phase categories with statistics */}
-        <div className="space-y-2">
-          {WEDDING_CHECKLIST.filter(phase => phase.id !== 'after-wedding').map((phase) => {
+        <div className="space-y-2.5">
+          {organizedChecklist.map((phase) => {
             const itemsCompleted = phase.items.filter(item => isItemCompleted(item)).length
             const totalPhaseItems = phase.items.length
             const phasePercentage = Math.round((itemsCompleted / totalPhaseItems) * 100)
@@ -409,7 +635,7 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
             return (
               <div
                 key={phase.id}
-                className="flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+                className="flex items-center justify-between p-3.5 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <div className="flex items-center space-x-3 flex-1 min-w-0">
                   <span className="text-2xl flex-shrink-0">{phase.icon}</span>
@@ -417,18 +643,12 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
                     <div className="text-sm font-medium text-gray-900 truncate">
                       {phase.title}
                     </div>
-                    <div className="text-xs text-gray-500">
-                      {phase.description}
-                    </div>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3 flex-shrink-0">
                   <div className="text-right">
                     <div className="text-sm font-semibold text-green-600">
-                      {itemsCompleted} / {totalPhaseItems}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {phasePercentage}%
+                      {itemsCompleted}/{totalPhaseItems}
                     </div>
                   </div>
                   {itemsCompleted === totalPhaseItems ? (
@@ -446,8 +666,8 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
   }
 
   // Calculate overall statistics
-  const totalItems = WEDDING_CHECKLIST.reduce((sum, phase) => sum + phase.items.length, 0)
-  const completedCount = WEDDING_CHECKLIST.reduce((sum, phase) =>
+  const totalItems = organizedChecklist.reduce((sum, phase) => sum + phase.items.length, 0)
+  const completedCount = organizedChecklist.reduce((sum, phase) =>
     sum + phase.items.filter(item => isItemCompleted(item)).length, 0
   )
   const overallPercentage = Math.round((completedCount / totalItems) * 100)
@@ -463,45 +683,49 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
 
   // Full view for dedicated page
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 ${isDragging ? 'dragging-active' : ''}`}>
       {/* Header info */}
-      <div className="p-6 rounded-xl border" style={{ background: `linear-gradient(to right, var(--color-primary-50), var(--color-primary-100))`, borderColor: 'var(--color-primary-200)' }}>
-        <div className="flex items-start space-x-3">
-          <Sparkles className="w-6 h-6 text-primary-600 flex-shrink-0 mt-1" />
-          <div className="flex-1">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Svatební checklist
-              </h3>
-              <div className="text-right">
-                <div className="text-2xl font-bold text-green-600">
-                  {completedCount} / {totalItems}
-                </div>
-                <div className="text-xs text-gray-600">
-                  {overallPercentage}% dokončeno
-                </div>
-              </div>
-            </div>
-            <p className="text-gray-700 mb-3">
-              Předpřipravené úkoly pro vaši svatbu. Můžete je rychle označit jako hotové nebo přidat do modulu Úkoly pro detailní sledování.
+      <div className="p-4 rounded-lg border" style={{ background: `linear-gradient(to right, var(--color-primary-50), var(--color-primary-100))`, borderColor: 'var(--color-primary-200)' }}>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 flex-1">
+            <Sparkles className="w-5 h-5 text-primary-600 flex-shrink-0" />
+            <p className="text-sm text-gray-700">
+              Předpřipravené úkoly pro vaši svatbu. Úkoly můžete přesouvat mezi kategoriemi, označit jako hotové nebo přidat do modulu Úkoly.
             </p>
+          </div>
+          <div className="text-right flex-shrink-0">
+            <div className="text-xl font-bold text-green-600">
+              {completedCount} / {totalItems}
+            </div>
+            <div className="text-xs text-gray-600">
+              {overallPercentage}% dokončeno
+            </div>
           </div>
         </div>
       </div>
 
       {/* Checklist phases */}
       <div className="space-y-4">
-        {WEDDING_CHECKLIST.map((phase) => {
+        {organizedChecklist.map((phase) => {
           const isExpanded = expandedPhases.includes(phase.id)
           const itemsCompleted = phase.items.filter(item => isItemCompleted(item)).length
           const itemsInTasks = phase.items.filter(item => isItemInTasks(item)).length
           const totalItems = phase.items.length
           const completionPercentage = Math.round((itemsCompleted / totalItems) * 100)
 
+          const isDragOverPhase = dragOverPhase === phase.id
+
           return (
             <div
               key={phase.id}
-              className="bg-white rounded-xl border border-gray-200 overflow-hidden"
+              data-phase-id={phase.id}
+              className={`bg-white rounded-xl border overflow-hidden transition-all ${
+                isDragOverPhase
+                  ? 'border-primary-500 bg-primary-50'
+                  : 'border-gray-200'
+              }`}
+              onDragOver={(e) => handleDragOver(e, phase.id)}
+              onDrop={(e) => handleDrop(e, phase.id)}
             >
               {/* Phase header */}
               <button
@@ -542,12 +766,15 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
                     const isCompleted = isItemCompleted(item)
                     const isAdding = addingToTasks === item.id
                     const justAdded = showSuccess === item.id
+                    const isDraggedItem = draggedItem === item.id
 
                     return (
                       <div
                         key={item.id}
-                        className={`p-3 sm:p-4 rounded-lg border transition-all ${
-                          isCompleted
+                        className={`p-3 sm:p-4 rounded-lg border transition-all touch-drag-item cursor-move select-none ${
+                          isDraggedItem
+                            ? 'dragging'
+                            : isCompleted
                             ? 'bg-green-50 border-green-200'
                             : inTasks
                             ? 'bg-blue-50 border-blue-200'
@@ -555,6 +782,12 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
                             ? 'bg-primary-50 border-primary-200'
                             : 'bg-gray-50 border-gray-200'
                         }`}
+                        draggable={true}
+                        onDragStart={(e) => handleDragStart(e, item.id, phase.id)}
+                        onDragEnd={handleDragEnd}
+                        onTouchStart={(e) => handleTouchStart(e, item.id, phase.id)}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={handleTouchEnd}
                       >
                         {/* Mobile: Stack layout, Desktop: Horizontal */}
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
@@ -684,7 +917,7 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
             Skryté úkoly ({hiddenItems.size})
           </h3>
           <div className="space-y-2">
-            {WEDDING_CHECKLIST.flatMap(phase =>
+            {organizedChecklist.flatMap(phase =>
               phase.items.filter(item => isItemHidden(item))
             ).map(item => (
               <div

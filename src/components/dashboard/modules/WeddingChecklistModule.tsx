@@ -9,9 +9,9 @@ export default function WeddingChecklistModule() {
   const router = useRouter()
 
   return (
-    <div className="wedding-card h-full flex flex-col">
+    <div className="wedding-card h-[756px] flex flex-col">
       {/* Header */}
-      <Link href="/checklist" className="block mb-4">
+      <Link href="/checklist" className="block mb-4 flex-shrink-0">
         <h3 className="text-base sm:text-lg font-semibold flex items-center justify-start sm:justify-center space-x-2 hover:text-primary-600 transition-colors">
           <ListChecks className="w-4 h-4 sm:w-5 sm:h-5 text-violet-600 flex-shrink-0" />
           <span className="truncate">Svatební checklist</span>
@@ -19,12 +19,12 @@ export default function WeddingChecklistModule() {
       </Link>
 
       {/* Compact checklist */}
-      <div className="flex-1 overflow-y-auto mb-4">
+      <div className="flex-1 overflow-y-auto mb-4 min-h-0">
         <WeddingChecklist compact={true} />
       </div>
 
       {/* Action button */}
-      <div className="mt-4 pt-4 border-t border-gray-200">
+      <div className="pt-4 border-t border-gray-200 flex-shrink-0">
         <Link
           href="/checklist"
           className="btn-primary w-full flex items-center justify-center space-x-2"
