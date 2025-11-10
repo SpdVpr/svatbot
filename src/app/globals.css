@@ -198,16 +198,14 @@
     @apply bg-primary-600 hover:bg-primary-500 text-white font-button font-medium rounded-2xl transition-all duration-300 active:scale-95;
     @apply px-2 py-2 sm:px-6 sm:py-3;
     box-shadow:
-      0 2px 8px rgba(251, 113, 133, 0.25),
-      0 4px 16px rgba(251, 113, 133, 0.15),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      0 2px 8px rgba(0, 0, 0, 0.1),
+      0 4px 16px rgba(0, 0, 0, 0.08);
   }
 
   .btn-primary:hover {
     box-shadow:
-      0 4px 12px rgba(251, 113, 133, 0.3),
-      0 8px 24px rgba(251, 113, 133, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      0 4px 12px rgba(0, 0, 0, 0.12),
+      0 8px 24px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
   }
 
@@ -237,17 +235,12 @@
     @apply text-primary-600 hover:bg-primary-50 font-button font-medium rounded-2xl transition-all duration-300 backdrop-blur-xl;
     @apply px-2 py-2 sm:px-6 sm:py-3;
     background: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(251, 113, 133, 0.3);
-    box-shadow:
-      0 2px 8px rgba(0, 0, 0, 0.06),
-      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    border: 1px solid #d1dae3;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   }
 
   .btn-outline:hover {
-    border-color: rgba(251, 113, 133, 0.5);
-    box-shadow:
-      0 4px 12px rgba(251, 113, 133, 0.15),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     transform: translateY(-2px);
   }
 

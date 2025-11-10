@@ -454,7 +454,7 @@ export function useMoodboard() {
       // Use local images state to count
       const folderImages = images.filter(img => img.folderId === folderId)
       const imageCount = folderImages.length
-      const coverImageUrl = folderImages[0]?.thumbnailUrl || folderImages[0]?.url || null
+      const coverImageUrl = folderImages[0]?.url || null
 
       await updateDoc(doc(db, 'moodboardFolders', folderId), {
         imageCount,

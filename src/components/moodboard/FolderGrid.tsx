@@ -107,6 +107,8 @@ export default function FolderGrid({
                   fill
                   className="object-cover"
                   sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                  quality={95}
+                  priority={false}
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -171,12 +173,6 @@ export default function FolderGrid({
                 <span className="text-xs text-gray-400">
                   {folder.imageCount} {folder.imageCount === 1 ? 'obrázek' : folder.imageCount < 5 ? 'obrázky' : 'obrázků'}
                 </span>
-                {folder.color && (
-                  <div
-                    className="w-4 h-4 rounded-full border border-gray-200"
-                    style={{ backgroundColor: folder.color }}
-                  />
-                )}
               </div>
             </div>
           </div>

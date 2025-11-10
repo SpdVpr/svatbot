@@ -45,6 +45,11 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
     }
   }
 
+  // Remove emojis from text
+  const removeEmojis = (text: string) => {
+    return text.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F000}-\u{1F02F}\u{1F0A0}-\u{1F0FF}\u{1F100}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{FE00}-\u{FE0F}\u{200D}\u{20E3}\u{E0020}-\u{E007F}]/gu, '').trim()
+  }
+
   const getPriorityColor = (priority: CoachSuggestion['priority']) => {
     switch (priority) {
       case 'high': return 'border-l-red-500 bg-primary-50'
@@ -178,7 +183,7 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
       <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <Heart className="w-5 h-5 text-pink-500" />
+            <Heart className="w-5 h-5 text-primary-600" />
             <h3 className="text-lg font-bold text-gray-900">Zprávy od Svatbota</h3>
           </div>
           {activeSuggestions.length > 0 && (
@@ -202,8 +207,8 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
                 <div className="flex items-start gap-3">
                   <span className="text-2xl flex-shrink-0">{getSuggestionIcon(suggestion.type)}</span>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-gray-900 mb-1">{suggestion.title}</h4>
-                    <p className="text-sm text-gray-700">{suggestion.message}</p>
+                    <h4 className="font-semibold text-gray-900 mb-1">{removeEmojis(suggestion.title)}</h4>
+                    <p className="text-sm text-gray-700">{removeEmojis(suggestion.message)}</p>
                     {suggestion.actionUrl && (
                       <Link
                         href={suggestion.actionUrl}
@@ -240,7 +245,7 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
         <div className="mt-4 pt-4 border-t border-gray-200">
           <Link
             href="/ai"
-            className="w-full bg-primary-500 hover:bg-primary-600 text-white px-6 py-3 rounded-lg transition-all flex items-center justify-center gap-2 font-medium shadow-md hover:shadow-lg"
+            className="btn-primary w-full flex items-center justify-center gap-2"
           >
             <MessageCircle className="w-5 h-5" />
             <span>Popovídat si se Svatbotem</span>

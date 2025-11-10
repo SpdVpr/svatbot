@@ -42,11 +42,11 @@ export default function OnboardingWidget() {
 
   return (
     <>
-      <div className="wedding-card border-2 border-primary-200 bg-gradient-to-br from-primary-50 to-pink-50">
+      <div className="wedding-card border-2 border-primary-200 bg-primary-50">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-pink-500 rounded-full flex items-center justify-center shadow-md">
+            <div className="w-12 h-12 bg-primary-500 rounded-full flex items-center justify-center shadow-md">
               <span className="text-2xl">🤖</span>
             </div>
             <div>

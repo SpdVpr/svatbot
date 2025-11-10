@@ -314,9 +314,9 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
               </div>
             ) : (
               <div
-                className="flex items-center space-x-3 px-5 py-3 bg-gradient-to-r from-primary-50 to-pink-50 rounded-2xl border border-primary-200/50 backdrop-blur-xl shadow-lg"
+                className="flex items-center space-x-3 px-5 py-3 bg-primary-50 rounded-2xl border border-primary-200/50 backdrop-blur-xl shadow-lg"
                 style={{
-                  boxShadow: '0 4px 12px rgba(251, 113, 133, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)'
                 }}
               >
                 <div className="flex items-center space-x-2">
@@ -879,6 +879,9 @@ function DraggableModule({
     }
   }, [isResizing, handleResizeMove, handleResizeEnd])
 
+  // Disable hover scale for svatbot-coach module
+  const shouldDisableHoverScale = module.type === 'svatbot-coach'
+
   return (
     <div
       ref={dragRef}
@@ -886,8 +889,8 @@ function DraggableModule({
         isDragging || isResizing
           ? 'z-50 scale-105 cursor-grabbing'
           : isEditMode && !module.isLocked
-          ? 'z-10 hover:z-20 cursor-grab hover:scale-[1.03] transition-all duration-500 ease-out'
-          : 'z-10 hover:scale-[1.03] transition-all duration-500 ease-out'
+          ? `z-10 hover:z-20 cursor-grab ${shouldDisableHoverScale ? '' : 'hover:scale-[1.03]'} transition-all duration-500 ease-out`
+          : `z-10 ${shouldDisableHoverScale ? '' : 'hover:scale-[1.03]'} transition-all duration-500 ease-out`
       } ${isHidden && isEditMode ? 'opacity-40' : ''}`}
       style={{
         ...getViewTransitionName(`dashboard-module-${module.id}`),

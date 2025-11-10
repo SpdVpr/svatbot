@@ -22,7 +22,7 @@ import logger from '@/lib/logger'
 
 export function useWedding() {
   const { user } = useAuthStore()
-  const { currentWedding, setCurrentWedding, setLoading } = useWeddingStore()
+  const { currentWedding, setCurrentWedding, setLoading, isLoading } = useWeddingStore()
   const { withDemoCheck } = useDemoLock()
   const [error, setError] = useState<string | null>(null)
   const loadingRef = useRef(false)
@@ -319,9 +319,12 @@ export function useWedding() {
   // Load wedding when user changes
   useEffect(() => {
     if (user && !currentWedding && !loadingRef.current) {
+      // Set loading immediately to prevent flickering
+      setLoading(true)
       loadUserWedding()
     } else if (!user) {
       setCurrentWedding(null)
+      setLoading(false)
       loadingRef.current = false
     }
   }, [user, currentWedding])
@@ -331,6 +334,7 @@ export function useWedding() {
 
   return {
     wedding: currentWedding,
+    isLoading,
     error,
     createWedding,
     updateWedding,

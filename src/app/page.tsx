@@ -12,7 +12,7 @@ import logger from '@/lib/logger'
 
 function HomePageContent() {
   const { user, isInitialized, login } = useAuth()
-  const { wedding } = useWedding()
+  const { wedding, isLoading: isWeddingLoading } = useWedding()
   const [showContent, setShowContent] = useState(false)
   const [isDemoLoading, setIsDemoLoading] = useState(false)
   const searchParams = useSearchParams()
@@ -35,17 +35,18 @@ function HomePageContent() {
     }
   }, [searchParams, isInitialized, user, login, isDemoLoading])
 
-  // Show content immediately after initialization to prevent flickering
+  // Show content only after both auth and wedding data are loaded
   useEffect(() => {
-    if (isInitialized) {
+    if (isInitialized && !isWeddingLoading) {
       // Small delay to ensure smooth transition
       const timer = setTimeout(() => setShowContent(true), 50)
       return () => clearTimeout(timer)
     }
-  }, [isInitialized])
+  }, [isInitialized, isWeddingLoading])
 
   // Show minimal loading with fade - no text or icons
-  if (!isInitialized || !showContent || isDemoLoading) {
+  // Wait for both auth initialization AND wedding data loading to complete
+  if (!isInitialized || !showContent || isDemoLoading || (user && isWeddingLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
         <motion.div

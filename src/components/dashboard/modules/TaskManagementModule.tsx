@@ -44,33 +44,26 @@ export default function TaskManagementModule() {
       <div className="flex-1 flex flex-col justify-between min-h-0">
         <div className="space-y-3">
           {/* Quick Stats */}
-          <div className="grid grid-cols-3 gap-2">
-            <div className="text-center hover-lift">
-              <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg mx-auto mb-1 float-enhanced">
-                <CheckCircle className="w-4 h-4 text-green-600" />
+          <div className="bg-primary-50 p-3 rounded-lg glass-morphism">
+            <div className="grid grid-cols-3 gap-2">
+              <div className="text-center hover-lift">
+                <div className="text-2xl font-bold text-primary-600">
+                  <NumberCounter end={stats.completed} duration={1500} />
+                </div>
+                <div className="text-sm text-primary-700">Dokončeno</div>
               </div>
-              <div className="text-sm font-bold text-gray-900">
-                <NumberCounter end={stats.completed} duration={1500} />
+              <div className="text-center hover-lift">
+                <div className="text-2xl font-bold text-primary-600">
+                  <NumberCounter end={stats.inProgress} duration={1500} />
+                </div>
+                <div className="text-sm text-primary-700">Probíhá</div>
               </div>
-              <div className="text-xs text-gray-500">Dokončeno</div>
-            </div>
-            <div className="text-center hover-lift">
-              <div className="flex items-center justify-center w-8 h-8 bg-yellow-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.2s' }}>
-                <Clock className="w-4 h-4 text-yellow-600" />
+              <div className="text-center hover-lift">
+                <div className="text-2xl font-bold text-primary-600">
+                  <NumberCounter end={stats.overdue} duration={1500} />
+                </div>
+                <div className="text-sm text-primary-700">Po termínu</div>
               </div>
-              <div className="text-sm font-bold text-gray-900">
-                <NumberCounter end={stats.inProgress} duration={1500} />
-              </div>
-              <div className="text-xs text-gray-500">Probíhá</div>
-            </div>
-            <div className="text-center hover-lift">
-              <div className="flex items-center justify-center w-8 h-8 bg-red-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.4s' }}>
-                <AlertTriangle className="w-4 h-4 text-red-600" />
-              </div>
-              <div className="text-sm font-bold text-gray-900">
-                <NumberCounter end={stats.overdue} duration={1500} />
-              </div>
-              <div className="text-xs text-gray-500">Po termínu</div>
             </div>
           </div>
 
