@@ -29,6 +29,7 @@ export function useAdminInvoices() {
   const [stats, setStats] = useState<AdminInvoiceStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState<string | null>(null)
 
   useEffect(() => {
     loadInvoices()
@@ -282,15 +283,63 @@ export function useAdminInvoices() {
     }
   }
 
+  /**
+   * Delete invoice
+   */
+  const deleteInvoice = async (invoiceId: string) => {
+    try {
+      setDeleting(invoiceId)
+
+      const response = await fetch(`/api/invoices/${invoiceId}/delete`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete invoice')
+      }
+
+      // Remove from local state
+      setInvoices(prev => prev.filter(inv => inv.id !== invoiceId))
+
+      // Recalculate stats
+      const updatedInvoices = invoices.filter(inv => inv.id !== invoiceId)
+      calculateStats(updatedInvoices)
+
+      return true
+    } catch (err) {
+      console.error('Error deleting invoice:', err)
+      throw err
+    } finally {
+      setDeleting(null)
+    }
+  }
+
+  /**
+   * Delete multiple invoices
+   */
+  const deleteMultipleInvoices = async (invoiceIds: string[]) => {
+    const results = await Promise.allSettled(
+      invoiceIds.map(id => deleteInvoice(id))
+    )
+
+    const successful = results.filter(r => r.status === 'fulfilled').length
+    const failed = results.filter(r => r.status === 'rejected').length
+
+    return { successful, failed }
+  }
+
   return {
     invoices,
     stats,
     loading,
     error,
+    deleting,
     downloadInvoice,
     downloadMultipleInvoices,
     exportToCSV,
     exportToExcel,
+    deleteInvoice,
+    deleteMultipleInvoices,
     refresh: loadInvoices
   }
 }

@@ -17,17 +17,34 @@ import {
   Package,
   FileDown,
   Archive,
-  TestTube
+  TestTube,
+  Trash2,
+  Settings
 } from 'lucide-react'
 import { showSimpleToast } from '@/components/notifications/SimpleToast'
 
 export default function InvoicesTab() {
-  const { invoices, stats, loading, downloadInvoice, downloadMultipleInvoices, exportToCSV, exportToExcel, refresh } = useAdminInvoices()
+  const {
+    invoices,
+    stats,
+    loading,
+    deleting,
+    downloadInvoice,
+    downloadMultipleInvoices,
+    exportToCSV,
+    exportToExcel,
+    deleteInvoice,
+    deleteMultipleInvoices,
+    refresh
+  } = useAdminInvoices()
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [selectedInvoices, setSelectedInvoices] = useState<string[]>([])
   const [downloading, setDownloading] = useState<string | null>(null)
   const [creatingTest, setCreatingTest] = useState(false)
+  const [showCounterModal, setShowCounterModal] = useState(false)
+  const [counterPeriod, setCounterPeriod] = useState('')
+  const [counterValue, setCounterValue] = useState('')
 
   if (loading) {
     return (
@@ -145,6 +162,81 @@ export default function InvoicesTab() {
     }
   }
 
+  const handleDeleteInvoice = async (invoiceId: string) => {
+    if (!confirm('Opravdu chcete smazat tuto fakturu? Tato akce je nevratná.')) {
+      return
+    }
+
+    try {
+      await deleteInvoice(invoiceId)
+      showSimpleToast('success', 'Úspěch', 'Faktura byla smazána')
+      setSelectedInvoices(prev => prev.filter(id => id !== invoiceId))
+    } catch (err) {
+      showSimpleToast('error', 'Chyba', 'Nepodařilo se smazat fakturu')
+    }
+  }
+
+  const handleBulkDelete = async () => {
+    if (selectedInvoices.length === 0) {
+      showSimpleToast('warning', 'Upozornění', 'Vyberte alespoň jednu fakturu')
+      return
+    }
+
+    if (!confirm(`Opravdu chcete smazat ${selectedInvoices.length} faktur? Tato akce je nevratná.`)) {
+      return
+    }
+
+    try {
+      const result = await deleteMultipleInvoices(selectedInvoices)
+      showSimpleToast('success', 'Úspěch', `Smazáno ${result.successful} faktur`)
+      setSelectedInvoices([])
+
+      if (result.failed > 0) {
+        showSimpleToast('warning', 'Upozornění', `${result.failed} faktur se nepodařilo smazat`)
+      }
+    } catch (err) {
+      showSimpleToast('error', 'Chyba', 'Nepodařilo se smazat faktury')
+    }
+  }
+
+  const handleSetCounter = async () => {
+    if (!counterPeriod || !counterValue) {
+      showSimpleToast('warning', 'Upozornění', 'Vyplňte období a hodnotu')
+      return
+    }
+
+    try {
+      const response = await fetch('/api/invoices/counter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          period: counterPeriod,
+          lastNumber: parseInt(counterValue, 10)
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to set counter')
+      }
+
+      showSimpleToast('success', 'Úspěch', `Číselná řada nastavena: ${counterPeriod} -> ${counterValue}`)
+      setShowCounterModal(false)
+      setCounterPeriod('')
+      setCounterValue('')
+    } catch (err) {
+      showSimpleToast('error', 'Chyba', 'Nepodařilo se nastavit číselnou řadu')
+    }
+  }
+
+  const getCurrentPeriod = () => {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    return `${year}${month}`
+  }
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'paid':
@@ -239,6 +331,16 @@ export default function InvoicesTab() {
         </div>
         <div className="flex items-center gap-2">
           <button
+            onClick={() => {
+              setCounterPeriod(getCurrentPeriod())
+              setShowCounterModal(true)
+            }}
+            className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <Settings className="w-4 h-4" />
+            <span>Číselná řada</span>
+          </button>
+          <button
             onClick={handleCreateTestInvoice}
             disabled={creatingTest}
             className="flex items-center gap-2 px-4 py-2 text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -321,6 +423,13 @@ export default function InvoicesTab() {
               <Package className="w-4 h-4" />
               Export Excel
             </button>
+            <button
+              onClick={handleBulkDelete}
+              className="flex items-center gap-2 px-3 py-1.5 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+              Smazat vybrané
+            </button>
           </div>
         )}
       </div>
@@ -397,17 +506,32 @@ export default function InvoicesTab() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button
-                      onClick={() => handleDownload(invoice)}
-                      disabled={downloading === invoice.id}
-                      className="text-blue-600 hover:text-blue-900 disabled:opacity-50"
-                    >
-                      {downloading === invoice.id ? (
-                        <RefreshCw className="w-4 h-4 animate-spin inline" />
-                      ) : (
-                        <Download className="w-4 h-4 inline" />
-                      )}
-                    </button>
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => handleDownload(invoice)}
+                        disabled={downloading === invoice.id}
+                        className="text-blue-600 hover:text-blue-900 disabled:opacity-50"
+                        title="Stáhnout fakturu"
+                      >
+                        {downloading === invoice.id ? (
+                          <RefreshCw className="w-4 h-4 animate-spin inline" />
+                        ) : (
+                          <Download className="w-4 h-4 inline" />
+                        )}
+                      </button>
+                      <button
+                        onClick={() => handleDeleteInvoice(invoice.id)}
+                        disabled={deleting === invoice.id}
+                        className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                        title="Smazat fakturu"
+                      >
+                        {deleting === invoice.id ? (
+                          <RefreshCw className="w-4 h-4 animate-spin inline" />
+                        ) : (
+                          <Trash2 className="w-4 h-4 inline" />
+                        )}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -429,6 +553,78 @@ export default function InvoicesTab() {
           </div>
         )}
       </div>
+
+      {/* Counter Modal */}
+      {showCounterModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">
+              Nastavit číselnou řadu faktur
+            </h3>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Období (RRRRMMM)
+                </label>
+                <input
+                  type="text"
+                  value={counterPeriod}
+                  onChange={(e) => setCounterPeriod(e.target.value)}
+                  placeholder="202511"
+                  maxLength={6}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Formát: RRRRMMM (např. 202511 pro listopad 2025)
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Poslední číslo faktury
+                </label>
+                <input
+                  type="number"
+                  value={counterValue}
+                  onChange={(e) => setCounterValue(e.target.value)}
+                  placeholder="0"
+                  min="0"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Další faktura bude mít číslo {counterPeriod}-{String(parseInt(counterValue || '0') + 1).padStart(3, '0')}
+                </p>
+              </div>
+
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                <p className="text-sm text-amber-800">
+                  <strong>Upozornění:</strong> Změna číselné řady může ovlivnit legislativní požadavky na chronologické číslování faktur.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 mt-6">
+              <button
+                onClick={handleSetCounter}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Nastavit
+              </button>
+              <button
+                onClick={() => {
+                  setShowCounterModal(false)
+                  setCounterPeriod('')
+                  setCounterValue('')
+                }}
+                className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                Zrušit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
