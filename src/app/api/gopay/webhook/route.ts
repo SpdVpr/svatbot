@@ -231,19 +231,15 @@ async function createInvoiceForPayment(
 
     const amount = payment.amount / 100 // Convert from cents
 
-    // Company info for SvatBot.cz
+    // Company info for SvatBot.cz (only include defined values)
     const supplierInfo = {
       supplierName: 'SvatBot.cz',
-      supplierAddress: 'Příkladová 123',
-      supplierCity: 'Praha',
-      supplierZip: '110 00',
-      supplierCountry: 'Česká republika',
-      supplierICO: '12345678',
-      supplierEmail: 'info@svatbot.cz',
-      supplierPhone: '+420 XXX XXX XXX',
-      supplierBankAccount: 'XXXX-XXXXXX/XXXX',
-      supplierIBAN: 'CZ XX XXXX XXXX XXXX XXXX XXXX',
-      supplierSWIFT: 'XXXXXXXX'
+      supplierAddress: 'Michal Vesecky, Zapska 1149, Nehvizdy',
+      supplierCity: '',
+      supplierZip: '25081',
+      supplierCountry: '',
+      supplierICO: '88320090',
+      supplierEmail: 'info@svatbot.cz'
     }
 
     // Create invoice document

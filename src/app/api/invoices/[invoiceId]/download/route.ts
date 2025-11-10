@@ -61,7 +61,8 @@ async function generateInvoicePDFServer(invoice: any): Promise<Buffer> {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
-    format: 'a4'
+    format: 'a4',
+    compress: true
   })
 
   // Use Helvetica font (built-in, supports Czech characters)
@@ -72,9 +73,27 @@ async function generateInvoicePDFServer(invoice: any): Promise<Buffer> {
   const darkColor: [number, number, number] = [17, 24, 39] // Gray-900
   const grayColor: [number, number, number] = [107, 114, 128] // Gray-500
 
+  // Helper function to remove Czech diacritics for PDF compatibility
+  const cleanText = (text: string) => text
+    .replace(/č/g, 'c').replace(/Č/g, 'C')
+    .replace(/ď/g, 'd').replace(/Ď/g, 'D')
+    .replace(/ě/g, 'e').replace(/Ě/g, 'E')
+    .replace(/ň/g, 'n').replace(/Ň/g, 'N')
+    .replace(/ř/g, 'r').replace(/Ř/g, 'R')
+    .replace(/š/g, 's').replace(/Š/g, 'S')
+    .replace(/ť/g, 't').replace(/Ť/g, 'T')
+    .replace(/ů/g, 'u').replace(/Ů/g, 'U')
+    .replace(/ý/g, 'y').replace(/Ý/g, 'Y')
+    .replace(/ž/g, 'z').replace(/Ž/g, 'Z')
+    .replace(/á/g, 'a').replace(/Á/g, 'A')
+    .replace(/é/g, 'e').replace(/É/g, 'E')
+    .replace(/í/g, 'i').replace(/Í/g, 'I')
+    .replace(/ó/g, 'o').replace(/Ó/g, 'O')
+    .replace(/ú/g, 'u').replace(/Ú/g, 'U')
+
   // Helper function to add text
   const addText = (text: string, x: number, y: number, options?: { align?: 'left' | 'center' | 'right' }) => {
-    doc.text(text, x, y, options)
+    doc.text(cleanText(text), x, y, options)
   }
 
   // Header with logo/brand
@@ -88,96 +107,137 @@ async function generateInvoicePDFServer(invoice: any): Promise<Buffer> {
   doc.setFont('helvetica', 'normal')
   doc.setTextColor(...grayColor)
   yPos += 6
-  addText('Váš svatební plánovač', 20, yPos)
+  addText('Vas svatebni planovac', 20, yPos)
 
-  // Invoice title
+  // Invoice title and details box
   yPos += 15
-  doc.setFontSize(18)
+  doc.setFontSize(20)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(...darkColor)
   addText('FAKTURA', 20, yPos)
 
-  // Invoice details (right side)
-  const rightX = 120
-  doc.setFontSize(10)
-  doc.setFont('helvetica', 'bold')
-  addText('Číslo:', rightX, yPos)
-  doc.setFont('helvetica', 'normal')
-  addText(invoice.invoiceNumber || 'N/A', rightX + 20, yPos)
+  // Invoice details box (right side)
+  const rightX = 115
+  const boxWidth = 75
+  const boxHeight = 25
 
-  yPos += 6
-  doc.setFont('helvetica', 'bold')
-  addText('Datum vystavení:', rightX, yPos)
-  doc.setFont('helvetica', 'normal')
-  addText(formatDate(invoice.issuedAt?.toDate() || new Date()), rightX + 35, yPos)
+  // Draw box
+  doc.setFillColor(249, 250, 251) // Gray-50
+  doc.rect(rightX, yPos - 5, boxWidth, boxHeight, 'F')
+  doc.setDrawColor(...grayColor)
+  doc.setLineWidth(0.3)
+  doc.rect(rightX, yPos - 5, boxWidth, boxHeight)
 
-  yPos += 6
+  // Invoice details inside box
+  let boxY = yPos
+  doc.setFontSize(9)
   doc.setFont('helvetica', 'bold')
-  addText('Variabilní symbol:', rightX, yPos)
+  doc.setTextColor(...grayColor)
+  addText('Cislo faktury:', rightX + 3, boxY)
   doc.setFont('helvetica', 'normal')
-  addText(invoice.variableSymbol || 'N/A', rightX + 35, yPos)
+  doc.setTextColor(...darkColor)
+  addText(invoice.invoiceNumber || 'N/A', rightX + boxWidth - 3, boxY, { align: 'right' })
 
-  // Supplier info
-  yPos += 15
+  boxY += 6
+  doc.setFont('helvetica', 'bold')
+  doc.setTextColor(...grayColor)
+  addText('Datum vystaveni:', rightX + 3, boxY)
+  doc.setFont('helvetica', 'normal')
+  doc.setTextColor(...darkColor)
+  const issueDate = invoice.issueDate?.toDate?.() || invoice.issuedAt?.toDate?.() || new Date()
+  addText(formatDate(issueDate), rightX + boxWidth - 3, boxY, { align: 'right' })
+
+  boxY += 6
+  doc.setFont('helvetica', 'bold')
+  doc.setTextColor(...grayColor)
+  addText('Variabilni symbol:', rightX + 3, boxY)
+  doc.setFont('helvetica', 'normal')
+  doc.setTextColor(...darkColor)
+  addText(invoice.variableSymbol || 'N/A', rightX + boxWidth - 3, boxY, { align: 'right' })
+
+  yPos += boxHeight + 5
+
+  // Supplier and Customer info side by side
+  yPos += 10
+  const leftColX = 20
+  const rightColX = 110
+
+  // Supplier info (left column)
+  let supplierY = yPos
   doc.setFontSize(11)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(...darkColor)
-  addText('Dodavatel:', 20, yPos)
+  addText('Dodavatel:', leftColX, supplierY)
 
-  yPos += 6
+  supplierY += 6
   doc.setFontSize(10)
   doc.setFont('helvetica', 'normal')
-  doc.setTextColor(...grayColor)
-  addText(invoice.supplierName || 'SvatBot.cz', 20, yPos)
+  doc.setTextColor(...darkColor)
+  addText(invoice.supplierName || 'SvatBot.cz', leftColX, supplierY)
 
-  yPos += 5
-  const addressParts = []
-  if (invoice.supplierAddress) addressParts.push(invoice.supplierAddress)
-  if (invoice.supplierCity) addressParts.push(invoice.supplierCity)
-  if (invoice.supplierZip) addressParts.push(invoice.supplierZip)
-  if (invoice.supplierCountry) addressParts.push(invoice.supplierCountry)
-  
-  if (addressParts.length > 0) {
-    addText(addressParts.join(', '), 20, yPos)
-    yPos += 5
+  supplierY += 5
+  doc.setTextColor(...grayColor)
+  // Build address string - only include non-empty parts
+  if (invoice.supplierAddress) {
+    addText(invoice.supplierAddress, leftColX, supplierY)
+    supplierY += 5
+  }
+
+  // Add city and zip on same line if both exist
+  const cityZipParts = []
+  if (invoice.supplierZip) cityZipParts.push(invoice.supplierZip)
+  if (invoice.supplierCity) cityZipParts.push(invoice.supplierCity)
+  if (cityZipParts.length > 0) {
+    addText(cityZipParts.join(' '), leftColX, supplierY)
+    supplierY += 5
+  }
+
+  if (invoice.supplierCountry) {
+    addText(invoice.supplierCountry, leftColX, supplierY)
+    supplierY += 5
   }
 
   if (invoice.supplierICO) {
-    addText(`IČ: ${invoice.supplierICO}`, 20, yPos)
-    yPos += 5
+    addText(`IC: ${invoice.supplierICO}`, leftColX, supplierY)
+    supplierY += 5
   }
 
   if (invoice.supplierDIC) {
-    addText(`DIČ: ${invoice.supplierDIC}`, 20, yPos)
-    yPos += 5
+    addText(`DIC: ${invoice.supplierDIC}`, leftColX, supplierY)
+    supplierY += 5
   } else {
-    addText('Neplátce DPH', 20, yPos)
-    yPos += 5
+    addText('Neplatce DPH', leftColX, supplierY)
+    supplierY += 5
   }
 
-  // Customer info
-  yPos += 5
+  // Customer info (right column)
+  let customerY = yPos
   doc.setFontSize(11)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(...darkColor)
-  addText('Odběratel:', 20, yPos)
+  addText('Odberatel:', rightColX, customerY)
 
-  yPos += 6
+  customerY += 6
   doc.setFontSize(10)
   doc.setFont('helvetica', 'normal')
-  doc.setTextColor(...grayColor)
-  addText(invoice.customerName || 'N/A', 20, yPos)
+  doc.setTextColor(...darkColor)
+  addText(invoice.customerName || invoice.userEmail || 'N/A', rightColX, customerY)
 
-  yPos += 5
-  if (invoice.customerEmail) {
-    addText(invoice.customerEmail, 20, yPos)
-    yPos += 5
+  customerY += 5
+  doc.setTextColor(...grayColor)
+  if (invoice.customerEmail && invoice.customerEmail !== invoice.customerName) {
+    addText(invoice.customerEmail, rightColX, customerY)
+    customerY += 5
   }
+
+  // Use the larger Y position
+  yPos = Math.max(supplierY, customerY)
 
   // Items table
   yPos += 10
+
   const tableData = (invoice.items || []).map((item: any) => [
-    item.name || 'N/A',
+    cleanText(item.description || item.name || 'N/A'),
     item.quantity?.toString() || '1',
     `${formatCurrency(item.unitPrice || 0)} ${invoice.currency || 'CZK'}`,
     `${item.vatRate || 0}%`,
@@ -186,7 +246,7 @@ async function generateInvoicePDFServer(invoice: any): Promise<Buffer> {
 
   autoTable(doc, {
     startY: yPos,
-    head: [['Položka', 'Množství', 'Jedn. cena', 'DPH', 'Celkem']],
+    head: [['Polozka', 'Mnozstvi', 'Jedn. cena', 'DPH', 'Celkem']],
     body: tableData,
     theme: 'striped',
     styles: {
@@ -217,17 +277,23 @@ async function generateInvoicePDFServer(invoice: any): Promise<Buffer> {
   // Get Y position after table
   yPos = (doc as any).lastAutoTable.finalY + 10
 
-  // Summary box
-  const summaryX = 130
-  const summaryWidth = 60
-  doc.setDrawColor(...grayColor)
-  doc.setLineWidth(0.5)
-  doc.rect(summaryX, yPos, summaryWidth, 30)
+  // Summary box with better styling
+  const summaryX = 125
+  const summaryWidth = 65
+  const summaryHeight = 35
 
-  yPos += 7
+  // Draw box with background
+  doc.setFillColor(249, 250, 251) // Gray-50
+  doc.rect(summaryX, yPos, summaryWidth, summaryHeight, 'F')
+  doc.setDrawColor(...grayColor)
+  doc.setLineWidth(0.3)
+  doc.rect(summaryX, yPos, summaryWidth, summaryHeight)
+
+  yPos += 8
   doc.setFontSize(10)
+  doc.setFont('helvetica', 'normal')
   doc.setTextColor(...grayColor)
-  addText('Základ:', summaryX + 5, yPos)
+  addText('Zaklad:', summaryX + 5, yPos)
   doc.setTextColor(...darkColor)
   addText(`${formatCurrency(invoice.subtotal || 0)} ${invoice.currency || 'CZK'}`, summaryX + summaryWidth - 5, yPos, { align: 'right' })
 
@@ -237,40 +303,64 @@ async function generateInvoicePDFServer(invoice: any): Promise<Buffer> {
   doc.setTextColor(...darkColor)
   addText(`${formatCurrency(invoice.vatAmount || 0)} ${invoice.currency || 'CZK'}`, summaryX + summaryWidth - 5, yPos, { align: 'right' })
 
-  yPos += 10
+  // Separator line
+  yPos += 4
+  doc.setDrawColor(...grayColor)
+  doc.setLineWidth(0.3)
+  doc.line(summaryX + 5, yPos, summaryX + summaryWidth - 5, yPos)
+
+  yPos += 6
   doc.setFontSize(11)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(...primaryColor)
-  addText('Celkem zaplaceno:', summaryX + 5, yPos)
-  doc.setFontSize(14)
+  addText('Celkem k uhrade:', summaryX + 5, yPos)
+  doc.setFontSize(13)
   addText(`${formatCurrency(invoice.total || 0)} ${invoice.currency || 'CZK'}`, summaryX + summaryWidth - 5, yPos, { align: 'right' })
 
-  // Payment info
+  yPos += summaryHeight - 18
+
+  // Payment info box
   yPos += 15
+  const paymentBoxWidth = 170
+  const paymentBoxHeight = invoice.status === 'paid' ? 20 : 15
+
+  doc.setFillColor(249, 250, 251) // Gray-50
+  doc.rect(20, yPos, paymentBoxWidth, paymentBoxHeight, 'F')
+  doc.setDrawColor(...grayColor)
+  doc.setLineWidth(0.3)
+  doc.rect(20, yPos, paymentBoxWidth, paymentBoxHeight)
+
+  yPos += 7
   doc.setFontSize(10)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(...darkColor)
-  addText('Platební údaje:', 20, yPos)
+  addText('Platebni udaje:', 25, yPos)
 
   yPos += 6
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(9)
   doc.setTextColor(...grayColor)
-  addText(`Způsob platby: ${invoice.paymentMethod || 'Platební karta'}`, 20, yPos)
+  addText(`Zpusob platby: ${cleanText(invoice.paymentMethod || 'Platebni karta')}`, 25, yPos)
 
   if (invoice.status === 'paid' && invoice.paidAt) {
     yPos += 5
-    doc.setTextColor(34, 197, 94) // Green-500
+    doc.setFillColor(220, 252, 231) // Green-100
+    doc.rect(25, yPos - 3, paymentBoxWidth - 10, 8, 'F')
+    doc.setTextColor(22, 163, 74) // Green-600
     doc.setFont('helvetica', 'bold')
-    addText(`✓ ZAPLACENO dne ${formatDate(invoice.paidAt.toDate())}`, 20, yPos)
+    doc.setFontSize(10)
+    const paidDate = invoice.paidAt?.toDate?.() || new Date()
+    addText(`ZAPLACENO dne ${formatDate(paidDate)}`, 28, yPos + 2)
   }
+
+  yPos += paymentBoxHeight - 10
 
   // Footer
   const footerY = 280
   doc.setFontSize(8)
   doc.setFont('helvetica', 'normal')
   doc.setTextColor(...grayColor)
-  addText('Děkujeme za Vaši důvěru!', 105, footerY, { align: 'center' })
+  addText('Dekujeme za Vasi duveru!', 105, footerY, { align: 'center' })
   addText(`${invoice.supplierEmail || 'info@svatbot.cz'} | svatbot.cz`, 105, footerY + 4, { align: 'center' })
 
   // Return PDF as Buffer

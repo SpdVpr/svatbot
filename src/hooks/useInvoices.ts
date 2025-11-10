@@ -17,7 +17,7 @@ import { db, storage } from '@/config/firebase'
 import { Invoice, Payment } from '@/types/subscription'
 import { generateInvoiceNumber, generateVariableSymbol } from '@/lib/invoiceGenerator'
 
-// Company info for SvatBot.cz
+// Company info for SvatBot.cz (only include defined values to avoid Firestore errors)
 const SVATBOT_INFO = {
   supplierName: 'SvatBot.cz',
   supplierAddress: 'Michal Vesecky, Zapska 1149, Nehvizdy',
@@ -25,12 +25,9 @@ const SVATBOT_INFO = {
   supplierZip: '25081',
   supplierCountry: '',
   supplierICO: '88320090',
-  supplierDIC: undefined, // Not VAT payer
-  supplierEmail: 'info@svatbot.cz',
-  supplierPhone: undefined,
-  supplierBankAccount: undefined,
-  supplierIBAN: undefined,
-  supplierSWIFT: undefined
+  supplierEmail: 'info@svatbot.cz'
+  // Note: We don't include undefined values (supplierDIC, supplierPhone, etc.)
+  // as Firestore doesn't accept undefined values
 }
 
 export function useInvoices(userId?: string) {

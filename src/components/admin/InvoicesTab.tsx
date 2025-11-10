@@ -16,7 +16,8 @@ import {
   TrendingUp,
   Package,
   FileDown,
-  Archive
+  Archive,
+  TestTube
 } from 'lucide-react'
 import { showSimpleToast } from '@/components/notifications/SimpleToast'
 
@@ -26,6 +27,7 @@ export default function InvoicesTab() {
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [selectedInvoices, setSelectedInvoices] = useState<string[]>([])
   const [downloading, setDownloading] = useState<string | null>(null)
+  const [creatingTest, setCreatingTest] = useState(false)
 
   if (loading) {
     return (
@@ -103,11 +105,44 @@ export default function InvoicesTab() {
   }
 
   const toggleSelectInvoice = (invoiceId: string) => {
-    setSelectedInvoices(prev => 
+    setSelectedInvoices(prev =>
       prev.includes(invoiceId)
         ? prev.filter(id => id !== invoiceId)
         : [...prev, invoiceId]
     )
+  }
+
+  const handleCreateTestInvoice = async () => {
+    try {
+      setCreatingTest(true)
+
+      // Use admin user for test invoice
+      const response = await fetch('/api/invoices/test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: 'test-user-id',
+          userEmail: 'test@svatbot.cz'
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to create test invoice')
+      }
+
+      const data = await response.json()
+      showSimpleToast('success', 'Úspěch', `Testovací faktura ${data.invoiceNumber} byla vytvořena`)
+
+      // Refresh invoices list
+      await refresh()
+    } catch (err) {
+      console.error('Error creating test invoice:', err)
+      showSimpleToast('error', 'Chyba', 'Nepodařilo se vytvořit testovací fakturu')
+    } finally {
+      setCreatingTest(false)
+    }
   }
 
   const getStatusIcon = (status: string) => {
@@ -203,6 +238,23 @@ export default function InvoicesTab() {
           <p className="text-gray-600 mt-1">Správa všech vystavených faktur</p>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={handleCreateTestInvoice}
+            disabled={creatingTest}
+            className="flex items-center gap-2 px-4 py-2 text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {creatingTest ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                Vytváření...
+              </>
+            ) : (
+              <>
+                <TestTube className="w-4 h-4" />
+                Testovací faktura
+              </>
+            )}
+          </button>
           <button
             onClick={refresh}
             className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
