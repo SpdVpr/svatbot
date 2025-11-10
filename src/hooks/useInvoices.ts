@@ -15,7 +15,7 @@ import {
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { db, storage } from '@/config/firebase'
 import { Invoice, Payment } from '@/types/subscription'
-import { generateInvoicePDF, generateInvoiceNumber, generateVariableSymbol } from '@/lib/invoiceGenerator'
+import { generateInvoiceNumber, generateVariableSymbol } from '@/lib/invoiceGenerator'
 
 // Company info for SvatBot.cz
 const SVATBOT_INFO = {
@@ -220,8 +220,14 @@ export function useInvoices(userId?: string) {
    */
   const downloadInvoice = async (invoice: Invoice) => {
     try {
-      // Generate PDF on-demand (no storage upload needed)
-      const pdfBlob = await generateInvoicePDF(invoice)
+      // Call server-side PDF generation endpoint
+      const response = await fetch(`/api/invoices/${invoice.id}/download`)
+
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF')
+      }
+
+      const pdfBlob = await response.blob()
 
       // Download PDF directly
       const url = window.URL.createObjectURL(pdfBlob)

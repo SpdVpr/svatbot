@@ -14,7 +14,6 @@ import { db } from '@/config/firebase'
 import { Invoice } from '@/types/subscription'
 import JSZip from 'jszip'
 import { saveAs } from 'file-saver'
-import { generateInvoicePDF } from '@/lib/invoiceGenerator'
 
 export interface AdminInvoiceStats {
   totalInvoices: number
@@ -135,8 +134,14 @@ export function useAdminInvoices() {
    */
   const downloadInvoice = async (invoice: Invoice) => {
     try {
-      // Generate PDF on-demand (same as user download)
-      const pdfBlob = await generateInvoicePDF(invoice)
+      // Call server-side PDF generation endpoint
+      const response = await fetch(`/api/invoices/${invoice.id}/download`)
+
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF')
+      }
+
+      const pdfBlob = await response.blob()
 
       // Download PDF directly
       const url = window.URL.createObjectURL(pdfBlob)
@@ -163,8 +168,14 @@ export function useAdminInvoices() {
 
       for (const invoice of selectedInvoices) {
         try {
-          // Generate PDF on-demand for each invoice
-          const pdfBlob = await generateInvoicePDF(invoice)
+          // Call server-side PDF generation endpoint
+          const response = await fetch(`/api/invoices/${invoice.id}/download`)
+
+          if (!response.ok) {
+            throw new Error('Failed to generate PDF')
+          }
+
+          const pdfBlob = await response.blob()
           zip.file(`Faktura-${invoice.invoiceNumber}.pdf`, pdfBlob)
         } catch (err) {
           console.error(`Error generating invoice ${invoice.invoiceNumber}:`, err)

@@ -1,8 +1,6 @@
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { Invoice, InvoiceItem } from '@/types/subscription'
-import { RobotoRegularBase64 } from './fonts/roboto-regular'
-import { RobotoBoldBase64 } from './fonts/roboto-bold'
 
 // Extend jsPDF type to include autoTable
 declare module 'jspdf' {

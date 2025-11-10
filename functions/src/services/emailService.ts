@@ -164,7 +164,16 @@ export async function sendPaymentSuccessEmail(
   invoiceUrl?: string
 ): Promise<boolean> {
   try {
-    const planName = plan === 'premium_monthly' ? 'Premium Měsíční' : 'Premium Roční'
+    // Map plan to display name
+    let planName = 'Premium'
+    if (plan === 'premium_monthly') {
+      planName = 'Premium Měsíční'
+    } else if (plan === 'premium_yearly') {
+      planName = 'Premium Roční'
+    } else if (plan === 'test_daily') {
+      planName = 'Test Denní'
+    }
+
     const formattedAmount = new Intl.NumberFormat('cs-CZ', {
       style: 'currency',
       currency: currency
