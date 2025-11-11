@@ -222,6 +222,11 @@ export function useOnboarding() {
     const checkCompletedSteps = async () => {
       const autoCompletedSteps: string[] = [...onboardingState.completedSteps]
 
+      // Check if welcome step is completed - if user has a wedding, they've seen the welcome
+      if (wedding && !autoCompletedSteps.includes('welcome')) {
+        autoCompletedSteps.push('welcome')
+      }
+
       // Check if basic info is set
       if (wedding.weddingDate && wedding.brideName && wedding.groomName) {
         if (!autoCompletedSteps.includes('basic-info')) {

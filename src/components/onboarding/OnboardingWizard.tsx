@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useOnboarding } from '@/hooks/useOnboarding'
+import { useColorThemeContext } from '@/components/theme/ColorThemeProvider'
 import {
   X,
   ChevronRight,
@@ -24,6 +25,7 @@ interface OnboardingWizardProps {
 export default function OnboardingWizard({ onClose, autoShow = true }: OnboardingWizardProps) {
   const router = useRouter()
   const { startTransition } = useViewTransition()
+  const { currentPalette } = useColorThemeContext()
   const {
     onboardingState,
     steps,
@@ -111,7 +113,12 @@ export default function OnboardingWizard({ onClose, autoShow = true }: Onboardin
         style={getViewTransitionName('onboarding-wizard')}
       >
         {/* Header */}
-        <div className="p-6 text-white relative" style={{ background: `linear-gradient(to right, var(--color-primary-600), var(--color-primary-700))` }}>
+        <div
+          className="p-6 text-white relative"
+          style={{
+            background: `linear-gradient(to right, ${currentPalette.colors.primary600}, ${currentPalette.colors.primary700})`
+          }}
+        >
           <button
             onClick={handleClose}
             className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors"
@@ -136,7 +143,7 @@ export default function OnboardingWizard({ onClose, autoShow = true }: Onboardin
 
           {/* Progress bar */}
           <div className="w-full bg-white/20 rounded-full h-2">
-            <div 
+            <div
               className="bg-white h-2 rounded-full transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
@@ -151,15 +158,36 @@ export default function OnboardingWizard({ onClose, autoShow = true }: Onboardin
 
           {/* Tips */}
           {currentStep.tips && currentStep.tips.length > 0 && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <div
+              className="rounded-lg p-4 mb-6 border"
+              style={{
+                backgroundColor: currentPalette.colors.primaryLight,
+                borderColor: currentPalette.colors.primary200
+              }}
+            >
               <div className="flex items-center gap-2 mb-3">
-                <BookOpen className="w-5 h-5 text-blue-600" />
-                <h3 className="font-semibold text-blue-900">Tipy od Svatbota:</h3>
+                <BookOpen
+                  className="w-5 h-5"
+                  style={{ color: currentPalette.colors.primary600 }}
+                />
+                <h3
+                  className="font-semibold"
+                  style={{ color: currentPalette.colors.primary900 }}
+                >
+                  Tipy od Svatbota:
+                </h3>
               </div>
               <ul className="space-y-2">
                 {currentStep.tips.map((tip, index) => (
-                  <li key={index} className="flex items-start gap-2 text-sm text-blue-800">
-                    <Check className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <li
+                    key={index}
+                    className="flex items-start gap-2 text-sm"
+                    style={{ color: currentPalette.colors.primary800 }}
+                  >
+                    <Check
+                      className="w-4 h-4 mt-0.5 flex-shrink-0"
+                      style={{ color: currentPalette.colors.primary600 }}
+                    />
                     <span>{tip}</span>
                   </li>
                 ))}
@@ -183,13 +211,15 @@ export default function OnboardingWizard({ onClose, autoShow = true }: Onboardin
               <button
                 key={step.id}
                 onClick={() => setCurrentStepIndex(index)}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  index === currentStepIndex
-                    ? 'w-8 bg-primary-500'
+                className="w-2 h-2 rounded-full transition-all"
+                style={{
+                  width: index === currentStepIndex ? '32px' : '8px',
+                  backgroundColor: index === currentStepIndex
+                    ? currentPalette.colors.primary
                     : step.completed
-                    ? 'bg-green-500'
-                    : 'bg-gray-300'
-                }`}
+                    ? '#10b981'
+                    : '#d1d5db'
+                }}
                 title={step.title}
               />
             ))}
@@ -222,7 +252,17 @@ export default function OnboardingWizard({ onClose, autoShow = true }: Onboardin
               {currentStep.actionUrl && (
                 <button
                   onClick={handleAction}
-                  className="px-6 py-2 bg-white border-2 border-primary-500 text-primary-600 rounded-lg font-medium hover:bg-primary-50 transition-colors flex items-center gap-2"
+                  className="px-6 py-2 bg-white rounded-lg font-medium hover:shadow-md transition-all flex items-center gap-2 border-2"
+                  style={{
+                    borderColor: currentPalette.colors.primary,
+                    color: currentPalette.colors.primary600
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = currentPalette.colors.primaryLight
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'white'
+                  }}
                 >
                   {currentStep.actionLabel || 'Přejít'}
                   <ArrowRight className="w-4 h-4" />
@@ -231,7 +271,10 @@ export default function OnboardingWizard({ onClose, autoShow = true }: Onboardin
 
               <button
                 onClick={handleNext}
-                className="px-6 py-2 bg-gradient-to-r from-primary-500 to-pink-500 text-white rounded-lg font-medium hover:shadow-lg transition-all flex items-center gap-2"
+                className="px-6 py-2 text-white rounded-lg font-medium hover:shadow-lg transition-all flex items-center gap-2"
+                style={{
+                  background: `linear-gradient(to right, ${currentPalette.colors.primary}, ${currentPalette.colors.secondary600})`
+                }}
               >
                 {isLastStep ? 'Dokončit' : 'Další'}
                 {!isLastStep && <ChevronRight className="w-4 h-4" />}

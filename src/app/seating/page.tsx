@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useWedding } from '@/hooks/useWedding'
 import { useSeating } from '@/hooks/useSeating'
+import { useColorThemeContext } from '@/components/theme/ColorThemeProvider'
 import SeatingPlanEditor from '@/components/seating/SeatingPlanEditor'
 import ModuleHeader from '@/components/common/ModuleHeader'
 import {
@@ -25,6 +26,7 @@ export default function SeatingPage() {
   const { user } = useAuth()
   const { wedding } = useWedding()
   const { seatingPlans, currentPlan, loading, createSeatingPlan, setCurrentPlan, deleteSeatingPlan } = useSeating()
+  const { currentPalette } = useColorThemeContext()
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
@@ -228,12 +230,29 @@ export default function SeatingPage() {
           /* Seating plan editor */
           <>
             {/* Legend / Instructions - Responsive */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+            <div
+              className="rounded-lg p-3 sm:p-4 mb-4 sm:mb-6 border"
+              style={{
+                backgroundColor: currentPalette.colors.primaryLight,
+                borderColor: currentPalette.colors.primary200
+              }}
+            >
               <div className="flex items-start space-x-2 sm:space-x-3">
-                <Info className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                <Info
+                  className="w-4 h-4 sm:w-5 sm:h-5 mt-0.5 flex-shrink-0"
+                  style={{ color: currentPalette.colors.primary600 }}
+                />
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-sm sm:text-base text-blue-900 mb-2 sm:mb-3">Ovládání editoru</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-x-6 sm:gap-y-2 text-xs sm:text-sm text-blue-800">
+                  <h3
+                    className="font-medium text-sm sm:text-base mb-2 sm:mb-3"
+                    style={{ color: currentPalette.colors.primary900 }}
+                  >
+                    Ovládání editoru
+                  </h3>
+                  <div
+                    className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-x-6 sm:gap-y-2 text-xs sm:text-sm"
+                    style={{ color: currentPalette.colors.primary800 }}
+                  >
                     <div className="flex items-start space-x-2">
                       <MousePointerClick className="w-3 h-3 sm:w-4 sm:h-4 mt-0.5 flex-shrink-0" />
                       <div className="min-w-0">
