@@ -185,7 +185,7 @@ export default function MenuPage() {
                   {stats.totalMenuItems + stats.totalDrinkItems}
                 </p>
               </div>
-              <List className="w-8 h-8 text-pink-600" />
+              <List className="w-8 h-8 text-primary-600" />
             </div>
           </div>
 
@@ -195,7 +195,7 @@ export default function MenuPage() {
                 <p className="text-sm text-gray-600">Jídla</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.totalMenuItems}</p>
               </div>
-              <UtensilsCrossed className="w-8 h-8 text-orange-600" />
+              <UtensilsCrossed className="w-8 h-8 text-primary-600" />
             </div>
           </div>
 
@@ -205,7 +205,7 @@ export default function MenuPage() {
                 <p className="text-sm text-gray-600">Nápoje</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.totalDrinkItems}</p>
               </div>
-              <Wine className="w-8 h-8 text-purple-600" />
+              <Wine className="w-8 h-8 text-accent-600" />
             </div>
           </div>
 
@@ -232,7 +232,7 @@ export default function MenuPage() {
               }}
               className={`px-6 py-3 font-medium transition-colors ${
                 activeTab === 'food'
-                  ? 'text-pink-600 border-b-2 border-pink-600'
+                  ? 'text-primary-600 border-b-2 border-primary-600'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -248,7 +248,7 @@ export default function MenuPage() {
               }}
               className={`px-6 py-3 font-medium transition-colors ${
                 activeTab === 'drinks'
-                  ? 'text-purple-600 border-b-2 border-purple-600'
+                  ? 'text-accent-600 border-b-2 border-accent-600'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -268,7 +268,7 @@ export default function MenuPage() {
                 placeholder={activeTab === 'food' ? 'Hledat jídlo...' : 'Hledat nápoj...'}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
             </div>
 
@@ -278,7 +278,7 @@ export default function MenuPage() {
                 onClick={() => setSelectedCategory('all')}
                 className={`px-3 py-1 rounded-full text-sm transition-colors ${
                   selectedCategory === 'all'
-                    ? 'bg-pink-600 text-white'
+                    ? activeTab === 'food' ? 'bg-primary-600 text-white' : 'bg-accent-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -291,7 +291,7 @@ export default function MenuPage() {
                     onClick={() => setSelectedCategory(value)}
                     className={`px-3 py-1 rounded-full text-sm transition-colors ${
                       selectedCategory === value
-                        ? 'bg-pink-600 text-white'
+                        ? 'bg-primary-600 text-white'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
@@ -305,7 +305,7 @@ export default function MenuPage() {
                     onClick={() => setSelectedCategory(value)}
                     className={`px-3 py-1 rounded-full text-sm transition-colors ${
                       selectedCategory === value
-                        ? 'bg-purple-600 text-white'
+                        ? 'bg-accent-600 text-white'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
