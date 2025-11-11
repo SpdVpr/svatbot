@@ -116,7 +116,7 @@ export default function WelcomeScreen() {
               <Sparkles className="w-3 h-3 md:w-4 md:h-4 mr-1.5 md:mr-2 text-rose-500" aria-hidden="true" /> Český svatební plánovač s AI
             </span>
             <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-display font-extrabold leading-tight mb-4 md:mb-6 text-gray-900">
-              Naplánujte svatbu <span className="text-gradient-primary">s SvatBot</span> asistentem
+              Naplánujte svatbu <span className="text-gray-900">s</span> <span className="text-pink-500">SvatBot</span> asistentem
             </h1>
             <p className="text-base md:text-lg lg:text-xl text-gray-600 mb-6 md:mb-10 max-w-lg lg:max-w-xl mx-auto">
               SvatBot.cz kombinuje AI technologie s intuitivními nástroji: inteligentní asistent, rozpočet, timeline, hosté, seating plan, svatební web a marketplace ověřených dodavatelů – vše na jedné platformě.
@@ -172,7 +172,7 @@ export default function WelcomeScreen() {
               <span className="text-sm font-semibold text-gray-800">Kompletní svatební plánovač</span>
             </div>
             <h2 id="features-heading" className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-gray-900 mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              Všechny nástroje pro <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-pink-600">dokonalou svatbu</span>
+              Všechny nástroje pro <span className="text-pink-500">dokonalou svatbu</span>
             </h2>
             <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
               Od AI asistenta po svatební web – vše, co potřebujete na jedné platformě
@@ -253,12 +253,12 @@ export default function WelcomeScreen() {
 
         <div className="container mx-auto px-4 md:px-6 relative z-10">
           <div className="text-center mb-12 md:mb-16 lg:mb-20">
-            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-pink-100 to-purple-100 rounded-full mb-6 animate-fade-in">
-              <Sparkles className="w-4 h-4 text-pink-600 mr-2" />
-              <span className="text-sm font-semibold text-gray-800">Kreativní nástroje & Networking</span>
+            <div className="inline-flex items-center px-4 py-2 bg-pink-500 rounded-full mb-6 animate-fade-in">
+              <Sparkles className="w-4 h-4 text-white mr-2" />
+              <span className="text-sm font-semibold text-white">Kreativní nástroje & Networking</span>
             </div>
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-gray-900 mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              Vytvořte <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-pink-600">nezapomenutelný zážitek</span>
+              Vytvořte nezapomenutelný <span className="text-pink-500">zážitek</span>
             </h2>
             <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
               Inspirace, vizualizace a spojení s nejlepšími svatebními dodavateli
@@ -323,7 +323,7 @@ export default function WelcomeScreen() {
         <div className="container mx-auto px-4 md:px-6 text-center relative z-10">
           <div className="max-w-4xl mx-auto p-6 md:p-10 lg:p-12 bg-gradient-to-br from-pink-50 via-purple-50 to-rose-50 rounded-2xl md:rounded-3xl shadow-xl border border-pink-200">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold text-gray-900 mb-4 md:mb-6">
-              Připraveni vyzkoušet <span className="text-gradient-primary">plánování bez námahy</span>?
+              Připraveni vyzkoušet <span className="text-pink-500">plánování bez námahy</span>?
             </h2>
             <p className="text-base md:text-lg lg:text-xl text-gray-600 mb-6 md:mb-8 lg:mb-10 max-w-2xl mx-auto">
               Udělejte krok k vaší dokonalé svatbě. Vyzkoušejte naše demo nebo se zaregistrujte zdarma ještě dnes!
@@ -397,7 +397,7 @@ export default function WelcomeScreen() {
               <span className="text-sm font-semibold text-gray-800">Naše výhody</span>
             </div>
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-gray-900 mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              Proč zvolit <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-pink-600">SvatBot.cz</span>?
+              Proč zvolit <span className="text-pink-500">SvatBot.cz</span>?
             </h2>
             <p className="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
               Moderní přístup k plánování svatby s nejnovějšími technologiemi a komplexními nástroji.
@@ -491,7 +491,7 @@ export default function WelcomeScreen() {
               <span className="text-sm font-semibold text-gray-800">Co říkají naši uživatelé</span>
             </div>
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-gray-900 mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              Spokojené páry <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-pink-600">po celém Česku</span>
+              Spokojené páry <span className="text-pink-500">po celém Česku</span>
             </h2>
             <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
               Přečtěte si, jak SvatBot.cz pomohl stovkám párů naplánovat jejich vysněnou svatbu
@@ -566,25 +566,25 @@ export default function WelcomeScreen() {
           {/* Statistiky */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 max-w-5xl mx-auto mt-16 md:mt-20">
             <div className="text-center animate-fade-in" style={{ animationDelay: '0.9s' }}>
-              <div className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-rose-500 mb-2">
+              <div className="text-4xl md:text-5xl font-bold text-pink-500 mb-2">
                 <NumberCounter end={50} suffix="+" />
               </div>
               <div className="text-sm md:text-base text-gray-600 font-medium">Ušetřených hodin práce</div>
             </div>
             <div className="text-center animate-fade-in" style={{ animationDelay: '1s' }}>
-              <div className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500 mb-2">
+              <div className="text-4xl md:text-5xl font-bold text-pink-500 mb-2">
                 <NumberCounter end={2025} />
               </div>
               <div className="text-sm md:text-base text-gray-600 font-medium">Vznik aplikace</div>
             </div>
             <div className="text-center animate-fade-in" style={{ animationDelay: '1.1s' }}>
-              <div className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500 mb-2">
+              <div className="text-4xl md:text-5xl font-bold text-pink-500 mb-2">
                 <span className="text-4xl md:text-5xl font-bold">GPT-5</span>
               </div>
               <div className="text-sm md:text-base text-gray-600 font-medium">Nejnovější AI</div>
             </div>
             <div className="text-center animate-fade-in" style={{ animationDelay: '1.2s' }}>
-              <div className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500 mb-2">
+              <div className="text-4xl md:text-5xl font-bold text-pink-500 mb-2">
                 <NumberCounter end={30} />
               </div>
               <div className="text-sm md:text-base text-gray-600 font-medium">Dní zdarma</div>
@@ -605,7 +605,7 @@ export default function WelcomeScreen() {
                   <Briefcase className="w-7 h-7 md:w-9 md:h-9" />
                   <span className="text-xs md:text-sm font-semibold uppercase tracking-wide">Pro dodavatele</span>
                 </div>
-                <h2 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold mb-4 md:mb-6">Jste poskytovatel svatebních služeb?</h2>
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold mb-4 md:mb-6 text-white">Jste poskytovatel svatebních služeb?</h2>
                 <p className="text-base md:text-lg lg:text-xl text-white/90 mb-6 md:mb-8 leading-relaxed">
                   Zaregistrujte se na našem tržišti a spojte se s tisíci párů, které aktivně plánují svou svatbu.
                 </p>
@@ -700,7 +700,7 @@ export default function WelcomeScreen() {
               <span className="text-sm font-semibold text-pink-600">Jsme tu pro vás</span>
             </div>
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-gray-900 mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              Máte otázky? <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-pink-600">Kontaktujte nás!</span>
+              Máte otázky? <span className="text-pink-500">Kontaktujte nás!</span>
             </h2>
             <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
               Náš tým je připraven vám pomoci s čímkoliv potřebujete

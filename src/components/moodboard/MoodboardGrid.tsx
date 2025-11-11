@@ -175,7 +175,7 @@ export default function MoodboardGrid({
               onClick={() => setFilter(filterOption.key as any)}
               className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
                 filter === filterOption.key
-                  ? 'bg-pink-100 text-pink-700 border border-pink-200'
+                  ? 'bg-primary-100 text-primary-700 border border-primary-200'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >

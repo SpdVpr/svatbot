@@ -70,7 +70,7 @@ export default function TrialExpiredModal({ onUpgrade }: TrialExpiredModalProps)
         style={getViewTransitionName('trial-expired-modal')}
       >
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-gradient-to-r from-amber-500 to-orange-600 text-white px-6 py-8 text-center">
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-primary-500 to-accent-600 text-white px-6 py-8 text-center">
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
               <Lock className="w-8 h-8" />
@@ -100,9 +100,9 @@ export default function TrialExpiredModal({ onUpgrade }: TrialExpiredModalProps)
           </div>
 
           {/* Benefits */}
-          <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl mb-6 border border-green-200">
+          <div className="bg-gradient-to-br from-primary-50 to-accent-50 p-6 rounded-xl mb-6 border border-primary-200">
             <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-              <Sparkles className="w-6 h-6 text-green-600 mr-2" />
+              <Sparkles className="w-6 h-6 text-primary-600 mr-2" />
               Co získáte s Premium plánem
             </h3>
             <div className="grid md:grid-cols-2 gap-3">
@@ -112,7 +112,6 @@ export default function TrialExpiredModal({ onUpgrade }: TrialExpiredModalProps)
                 'Svatební web s RSVP systémem',
                 'Neomezený počet hostů',
                 'Pokročilá analytika a reporty',
-                'Prioritní podpora 7 dní v týdnu',
                 'Pravidelné aktualizace',
                 'Všechna vaše data ihned dostupná'
               ].map((benefit, index) => (
@@ -130,58 +129,95 @@ export default function TrialExpiredModal({ onUpgrade }: TrialExpiredModalProps)
               Vyberte si svůj plán
             </h3>
             <div className="grid md:grid-cols-2 gap-4">
-              {plans.map((plan) => (
-                <button
-                  key={plan.id}
-                  onClick={() => setSelectedPlan(plan.id)}
-                  className={`relative p-6 rounded-xl border-2 transition-all text-left ${
-                    selectedPlan === plan.id
-                      ? 'border-green-500 bg-green-50 shadow-lg scale-105'
-                      : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md'
-                  }`}
-                >
-                  {plan.popular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-green-500 text-white px-4 py-1 rounded-full text-sm font-bold">
-                      NEJLEPŠÍ VOLBA
-                    </div>
-                  )}
-                  
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <h4 className="font-bold text-lg text-gray-900">{plan.name}</h4>
-                      <p className="text-sm text-gray-600">{plan.description}</p>
-                    </div>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                      selectedPlan === plan.id
-                        ? 'border-green-500 bg-green-500'
-                        : 'border-gray-300'
-                    }`}>
-                      {selectedPlan === plan.id && (
-                        <Check className="w-4 h-4 text-white" />
-                      )}
-                    </div>
+              {/* Monthly Plan */}
+              <div
+                onClick={() => setSelectedPlan('premium_monthly')}
+                className={`relative border-2 rounded-xl p-6 cursor-pointer transition-all ${
+                  selectedPlan === 'premium_monthly'
+                    ? 'border-primary-600 bg-primary-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-xl font-bold text-gray-900">Měsíční</h4>
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                    selectedPlan === 'premium_monthly'
+                      ? 'border-primary-600 bg-primary-600'
+                      : 'border-gray-300'
+                  }`}>
+                    {selectedPlan === 'premium_monthly' && (
+                      <Check className="w-4 h-4 text-white" />
+                    )}
                   </div>
+                </div>
 
-                  <div className="mb-3">
-                    <div className="flex items-baseline">
-                      <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
-                      <span className="text-gray-600 ml-2">Kč</span>
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      za {plan.period}
-                      {plan.pricePerMonth && (
-                        <span className="ml-1">({plan.pricePerMonth} Kč/měsíc)</span>
-                      )}
-                    </div>
+                <div className="mb-4">
+                  <div className="flex items-baseline space-x-1">
+                    <span className="text-4xl font-bold text-gray-900">299</span>
+                    <span className="text-gray-600">Kč / měsíc</span>
                   </div>
+                  <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-xs text-blue-900 font-semibold mb-1">
+                      🔄 Opakovaná platba každý měsíc
+                    </p>
+                    <p className="text-xs text-blue-800">
+                      Platba 299 Kč se automaticky strhává každý měsíc. Můžete zrušit kdykoliv.
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-                  {plan.savings && (
-                    <div className="bg-green-100 text-green-800 px-3 py-2 rounded-lg text-sm font-semibold inline-block">
-                      🎉 Ušetříte {plan.savings} Kč
-                    </div>
-                  )}
-                </button>
-              ))}
+              {/* Yearly Plan */}
+              <div
+                onClick={() => setSelectedPlan('premium_yearly')}
+                className={`relative border-2 rounded-xl p-6 cursor-pointer transition-all ${
+                  selectedPlan === 'premium_yearly'
+                    ? 'border-primary-600 bg-primary-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                {/* Best Value Badge */}
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                  <span className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center space-x-1">
+                    <Sparkles className="w-3 h-3" />
+                    <span>NEJVÝHODNĚJŠÍ</span>
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-xl font-bold text-gray-900">Roční</h4>
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                    selectedPlan === 'premium_yearly'
+                      ? 'border-primary-600 bg-primary-600'
+                      : 'border-gray-300'
+                  }`}>
+                    {selectedPlan === 'premium_yearly' && (
+                      <Check className="w-4 h-4 text-white" />
+                    )}
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <div className="flex items-baseline space-x-1">
+                    <span className="text-4xl font-bold text-gray-900">2 999</span>
+                    <span className="text-gray-600">Kč / rok</span>
+                  </div>
+                  <p className="text-sm text-green-600 font-medium mt-1">
+                    Ušetříte 589 Kč (17%)
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    To je jen 250 Kč/měsíc
+                  </p>
+                  <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-xs text-green-900 font-semibold mb-1">
+                      ✓ Jednorázová platba
+                    </p>
+                    <p className="text-xs text-green-800">
+                      Zaplatíte pouze jednou 2 999 Kč za celý rok. Žádné automatické obnovení.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -190,7 +226,7 @@ export default function TrialExpiredModal({ onUpgrade }: TrialExpiredModalProps)
             <button
               onClick={handleUpgrade}
               disabled={isProcessing || loading}
-              className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-lg"
+              className="w-full bg-gradient-to-r from-primary-500 to-accent-600 hover:from-primary-600 hover:to-accent-700 text-white font-bold py-4 px-6 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-lg"
             >
               {isProcessing || loading ? (
                 <>

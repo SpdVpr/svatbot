@@ -216,15 +216,15 @@ function MusicPageContent() {
             </div>
 
             {/* Spotify Tip */}
-            <div className="wedding-card bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+            <div className="wedding-card bg-gradient-to-br from-primary-50 to-accent-50 border-primary-200">
               <div className="flex items-start space-x-3">
-                <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Sparkles className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-1 flex items-center space-x-2">
                     <span>Spotify integrace</span>
-                    <span className="text-xs px-2 py-0.5 bg-green-500 text-white rounded-full">NOVÉ</span>
+                    <span className="text-xs px-2 py-0.5 bg-primary-500 text-white rounded-full">NOVÉ</span>
                   </h3>
                   <p className="text-sm text-gray-600 mb-2">
                     Vyhledávejte písně přímo na Spotify a přehrávejte ukázky!
@@ -355,10 +355,10 @@ function MusicPageContent() {
 
                 {/* Spotify Search */}
                 {showAddSong === category.id && (
-                  <div className="mt-4 p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg border-2 border-purple-200 space-y-3 relative z-[10000]">
+                  <div className="mt-4 p-4 bg-gradient-to-br from-primary-50 to-accent-50 rounded-lg border-2 border-primary-200 space-y-3 relative z-[10000]">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-medium text-gray-900 flex items-center space-x-2">
-                        <Sparkles className="w-5 h-5 text-purple-500" />
+                        <Sparkles className="w-5 h-5 text-primary-500" />
                         <span>Vyhledat na Spotify</span>
                       </h4>
                       <button

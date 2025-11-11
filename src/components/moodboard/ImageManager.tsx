@@ -126,8 +126,8 @@ export default function ImageManager({ images, folders, onMoveToFolder, onClose 
                     onClick={() => toggleImageSelection(image.id)}
                     className={`relative w-full rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${
                       selectedImages.has(image.id)
-                        ? 'border-pink-500 ring-2 ring-pink-200'
-                        : 'border-gray-200 hover:border-pink-300'
+                        ? 'border-primary-500 ring-2 ring-primary-200'
+                        : 'border-gray-200 hover:border-primary-300'
                     }`}
                     style={{ paddingBottom: '100%' }}
                   >
@@ -141,8 +141,8 @@ export default function ImageManager({ images, folders, onMoveToFolder, onClose 
                       />
                     </div>
                     {selectedImages.has(image.id) && (
-                      <div className="absolute inset-0 bg-pink-500/20 flex items-center justify-center">
-                        <div className="w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center">
+                      <div className="absolute inset-0 bg-primary-500/20 flex items-center justify-center">
+                        <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
                           <Check className="w-5 h-5 text-white" />
                         </div>
                       </div>

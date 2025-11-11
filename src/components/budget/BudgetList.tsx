@@ -116,13 +116,13 @@ export default function BudgetList({
       case 'paid':
         return { icon: CheckCircle2, color: 'text-green-500', bg: 'bg-green-50', label: 'Zaplaceno' }
       case 'partial':
-        return { icon: Clock, color: 'text-blue-500', bg: 'bg-blue-50', label: 'Částečně' }
+        return { icon: Clock, color: 'text-accent-500', bg: 'bg-accent-50', label: 'Částečně' }
       case 'overdue':
         return { icon: AlertTriangle, color: 'text-red-500', bg: 'bg-red-50', label: 'Po splatnosti' }
       case 'cancelled':
         return { icon: X, color: 'text-gray-500', bg: 'bg-gray-50', label: 'Zrušeno' }
       case 'pending':
-        return { icon: Clock, color: 'text-yellow-500', bg: 'bg-yellow-50', label: 'Čeká' }
+        return { icon: Clock, color: 'text-accent-600', bg: 'bg-accent-50', label: 'Čeká' }
       default:
         return { icon: Clock, color: 'text-gray-500', bg: 'bg-gray-50', label: 'Čeká' }
     }
@@ -134,9 +134,9 @@ export default function BudgetList({
       case 'critical':
         return { color: 'text-red-600', bg: 'bg-red-100', label: 'Kritická' }
       case 'high':
-        return { color: 'text-orange-600', bg: 'bg-orange-100', label: 'Vysoká' }
+        return { color: 'text-accent-600', bg: 'bg-accent-100', label: 'Vysoká' }
       case 'medium':
-        return { color: 'text-blue-600', bg: 'bg-blue-100', label: 'Střední' }
+        return { color: 'text-primary-600', bg: 'bg-primary-100', label: 'Střední' }
       case 'low':
         return { color: 'text-gray-600', bg: 'bg-gray-100', label: 'Nízká' }
       default:
@@ -170,11 +170,11 @@ export default function BudgetList({
   const getPaymentPeriodDisplay = (period?: string) => {
     switch (period) {
       case 'before-wedding':
-        return { icon: '📅', label: 'Před svatbou', color: 'text-blue-600', bg: 'bg-blue-50' }
+        return { icon: '📅', label: 'Před svatbou', color: 'text-primary-600', bg: 'bg-primary-50' }
       case 'at-wedding':
-        return { icon: '💒', label: 'Na svatbě', color: 'text-pink-600', bg: 'bg-pink-50' }
+        return { icon: '💒', label: 'Na svatbě', color: 'text-accent-600', bg: 'bg-accent-50' }
       case 'after-wedding':
-        return { icon: '✨', label: 'Po svatbě', color: 'text-purple-600', bg: 'bg-purple-50' }
+        return { icon: '✨', label: 'Po svatbě', color: 'text-gray-600', bg: 'bg-gray-50' }
       default:
         return null
     }

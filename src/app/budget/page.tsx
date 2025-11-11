@@ -169,7 +169,7 @@ export default function BudgetPage() {
         icon={DollarSign}
         title="Rozpočet"
         subtitle={`${Math.round(stats.totalBudget / 1000)}k Kč rozpočet • ${stats.budgetUsed}% využito`}
-        iconGradient="from-green-500 to-emerald-500"
+        iconGradient="from-primary-500 to-accent-500"
         actions={
           <div className="flex items-center space-x-2">
             <button
@@ -247,8 +247,8 @@ export default function BudgetPage() {
               {/* Features preview */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 max-w-4xl mx-auto">
                 <div className="text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 bg-blue-100 rounded-full flex items-center justify-center">
-                    <DollarSign className="w-6 h-6 text-blue-600" />
+                  <div className="w-12 h-12 mx-auto mb-3 bg-primary-100 rounded-full flex items-center justify-center">
+                    <DollarSign className="w-6 h-6 text-primary-600" />
                   </div>
                   <h3 className="font-medium text-gray-900 mb-2">Správa rozpočtu</h3>
                   <p className="text-sm text-text-muted">
@@ -257,8 +257,8 @@ export default function BudgetPage() {
                 </div>
 
                 <div className="text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 bg-green-100 rounded-full flex items-center justify-center">
-                    <BarChart3 className="w-6 h-6 text-green-600" />
+                  <div className="w-12 h-12 mx-auto mb-3 bg-accent-100 rounded-full flex items-center justify-center">
+                    <BarChart3 className="w-6 h-6 text-accent-600" />
                   </div>
                   <h3 className="font-medium text-gray-900 mb-2">Analýzy a reporty</h3>
                   <p className="text-sm text-text-muted">
@@ -267,8 +267,8 @@ export default function BudgetPage() {
                 </div>
 
                 <div className="text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 bg-purple-100 rounded-full flex items-center justify-center">
-                    <FileText className="w-6 h-6 text-purple-600" />
+                  <div className="w-12 h-12 mx-auto mb-3 bg-gray-100 rounded-full flex items-center justify-center">
+                    <FileText className="w-6 h-6 text-gray-600" />
                   </div>
                   <h3 className="font-medium text-gray-900 mb-2">Export a sdílení</h3>
                   <p className="text-sm text-text-muted">

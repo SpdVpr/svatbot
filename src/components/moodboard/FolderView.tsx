@@ -287,7 +287,7 @@ export default function FolderView({
                   width={400}
                   height={viewMode === 'grid' ? 400 : 600}
                   className={`w-full ${viewMode === 'grid' ? 'aspect-square' : ''} object-cover`}
-                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 400px"
                   quality={95}
                 />
 

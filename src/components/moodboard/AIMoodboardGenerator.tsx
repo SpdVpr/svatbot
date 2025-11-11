@@ -150,7 +150,7 @@ export default function AIMoodboardGenerator({
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent-600 rounded-xl flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div>
@@ -172,7 +172,7 @@ export default function AIMoodboardGenerator({
           {step === 'select' && (
             <div className="space-y-6">
               {/* Instructions */}
-              <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-xl p-4 border border-pink-200">
+              <div className="bg-gradient-to-br from-primary-50 to-accent-50 rounded-xl p-4 border border-primary-200">
                 <h3 className="font-semibold text-gray-900 mb-2">Jak to funguje?</h3>
                 <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
                   <li>Vyberte 2-10 inspiračních fotek z vašeho moodboardu</li>
@@ -220,7 +220,7 @@ export default function AIMoodboardGenerator({
               )}
 
               {/* User prompt input */}
-              <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-4">
+              <div className="bg-gradient-to-r from-accent-50 to-primary-50 border border-accent-200 rounded-lg p-4">
                 <label className="block text-sm font-medium text-gray-900 mb-2">
                   ✨ Vlastní instrukce pro AI (volitelné)
                 </label>
@@ -228,7 +228,7 @@ export default function AIMoodboardGenerator({
                   value={userPrompt}
                   onChange={(e) => setUserPrompt(e.target.value)}
                   placeholder="Např: 'Chci romantickou atmosféru s pastelové barvami', 'Moderní minimalistický styl', 'Vintage svatba na venkově'..."
-                  className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                  className="w-full px-3 py-2 border border-accent-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-transparent resize-none"
                   rows={3}
                   maxLength={500}
                 />
@@ -251,7 +251,7 @@ export default function AIMoodboardGenerator({
                   {selectedImageIds.length > 0 && (
                     <button
                       onClick={() => setSelectedImageIds([])}
-                      className="text-sm text-pink-600 hover:text-pink-700"
+                      className="text-sm text-primary-600 hover:text-primary-700"
                     >
                       Zrušit výběr
                     </button>
@@ -266,7 +266,7 @@ export default function AIMoodboardGenerator({
                   onClick={() => setSelectedFolder('all')}
                   className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
                     selectedFolder === 'all'
-                      ? 'bg-pink-500 text-white'
+                      ? 'bg-primary-500 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -282,7 +282,7 @@ export default function AIMoodboardGenerator({
                       onClick={() => setSelectedFolder(folder.id)}
                       className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
                         selectedFolder === folder.id
-                          ? 'bg-pink-500 text-white'
+                          ? 'bg-primary-500 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
@@ -296,7 +296,7 @@ export default function AIMoodboardGenerator({
                     onClick={() => setSelectedFolder('unassigned')}
                     className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
                       selectedFolder === 'unassigned'
-                        ? 'bg-pink-500 text-white'
+                        ? 'bg-primary-500 text-white'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
@@ -308,7 +308,7 @@ export default function AIMoodboardGenerator({
               {/* Loading state */}
               {externalLoading ? (
                 <div className="text-center py-12">
-                  <Loader2 className="w-12 h-12 text-pink-500 mx-auto mb-4 animate-spin" />
+                  <Loader2 className="w-12 h-12 text-primary-500 mx-auto mb-4 animate-spin" />
                   <p className="text-gray-600">Načítám fotky z Firebase...</p>
                 </div>
               ) : uploadedImages.length === 0 ? (
@@ -337,7 +337,7 @@ export default function AIMoodboardGenerator({
                             <button
                               key={folder.id}
                               onClick={() => selectAllFromFolder(folder.id)}
-                              className="text-xs px-2 py-1 bg-white border border-gray-200 rounded-md hover:border-pink-300 hover:bg-pink-50 transition-colors"
+                              className="text-xs px-2 py-1 bg-white border border-gray-200 rounded-md hover:border-primary-300 hover:bg-primary-50 transition-colors"
                             >
                               {folder.icon || '📁'} Vybrat {folder.name}
                             </button>
@@ -359,8 +359,8 @@ export default function AIMoodboardGenerator({
                           onClick={() => toggleImageSelection(image.id)}
                           className={`relative w-full rounded-lg overflow-hidden border-2 transition-all ${
                             isSelected
-                              ? 'border-pink-500 ring-2 ring-pink-200 scale-95'
-                              : 'border-gray-200 hover:border-pink-300'
+                              ? 'border-primary-500 ring-2 ring-primary-200 scale-95'
+                              : 'border-gray-200 hover:border-primary-300'
                           }`}
                           style={{ aspectRatio: '1 / 1' }}
                         >
@@ -383,8 +383,8 @@ export default function AIMoodboardGenerator({
 
                           {/* Selection indicator */}
                           {isSelected && (
-                            <div className="absolute inset-0 bg-pink-500/20 flex items-center justify-center z-10">
-                              <div className="w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center shadow-lg">
+                            <div className="absolute inset-0 bg-primary-500/20 flex items-center justify-center z-10">
+                              <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center shadow-lg">
                                 <Check className="w-5 h-5 text-white" />
                               </div>
                             </div>
@@ -412,7 +412,7 @@ export default function AIMoodboardGenerator({
             <div className="space-y-8 py-8">
               {/* Progress */}
               <div className="text-center">
-                <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full mb-4 animate-pulse">
+                <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary-500 to-accent-600 rounded-full mb-4 animate-pulse">
                   <Sparkles className="w-10 h-10 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">
@@ -434,7 +434,7 @@ export default function AIMoodboardGenerator({
                     <div
                       key={phase.id}
                       className={`flex items-center space-x-3 p-3 rounded-lg transition-all ${
-                        isCurrent ? 'bg-pink-50 border border-pink-200' : 'bg-gray-50'
+                        isCurrent ? 'bg-primary-50 border border-primary-200' : 'bg-gray-50'
                       }`}
                     >
                       <div className={`text-2xl ${isCurrent ? 'animate-bounce' : ''}`}>
@@ -448,7 +448,7 @@ export default function AIMoodboardGenerator({
                         <Check className="w-5 h-5 text-green-500" />
                       )}
                       {isCurrent && (
-                        <Loader2 className="w-5 h-5 text-pink-500 animate-spin" />
+                        <Loader2 className="w-5 h-5 text-primary-500 animate-spin" />
                       )}
                     </div>
                   )
@@ -491,7 +491,7 @@ export default function AIMoodboardGenerator({
                       <ul className="space-y-2">
                         {result.description.recommendations.map((rec: string, index: number) => (
                           <li key={index} className="flex items-start space-x-2">
-                            <span className="text-pink-500 mt-1">•</span>
+                            <span className="text-primary-500 mt-1">•</span>
                             <span className="text-gray-700">{rec}</span>
                           </li>
                         ))}

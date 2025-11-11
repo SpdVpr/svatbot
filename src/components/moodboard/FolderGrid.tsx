@@ -64,7 +64,7 @@ export default function FolderGrid({
           {uploadedImagesCount >= 2 && onAIGeneratorClick && (
             <button
               onClick={onAIGeneratorClick}
-              className="inline-flex items-center px-3 py-2 sm:px-4 sm:py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-medium rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all shadow-sm hover:shadow-md flex-1 sm:flex-initial justify-center"
+              className="inline-flex items-center px-3 py-2 sm:px-4 sm:py-2.5 bg-gradient-to-r from-primary-600 to-accent-600 text-white text-sm font-medium rounded-lg hover:from-primary-700 hover:to-accent-700 transition-all shadow-sm hover:shadow-md flex-1 sm:flex-initial justify-center"
             >
               <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 sm:mr-2" />
               <span className="whitespace-nowrap">AI Moodboard</span>
@@ -74,7 +74,7 @@ export default function FolderGrid({
           {/* New Folder Button */}
           <button
             onClick={onCreateFolder}
-            className="inline-flex items-center px-3 py-2 sm:px-4 sm:py-2.5 bg-pink-600 text-white text-sm font-medium rounded-lg hover:bg-pink-700 transition-all shadow-sm hover:shadow-md flex-1 sm:flex-initial justify-center"
+            className="inline-flex items-center px-3 py-2 sm:px-4 sm:py-2.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-all shadow-sm hover:shadow-md flex-1 sm:flex-initial justify-center"
           >
             <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 sm:mr-2" />
             <span className="whitespace-nowrap">Nová složka</span>
@@ -88,7 +88,7 @@ export default function FolderGrid({
           <div
             key={folder.id}
             onClick={() => onFolderClick(folder)}
-            className="group relative bg-white rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer overflow-hidden border border-gray-200 hover:border-pink-300 flex flex-col"
+            className="group relative bg-white rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer overflow-hidden border border-gray-200 hover:border-primary-300 flex flex-col"
           >
             {/* Cover Image or Placeholder */}
             <div
@@ -96,8 +96,8 @@ export default function FolderGrid({
               style={{
                 minHeight: '200px',
                 height: '200px',
-                backgroundColor: folder.color ? `${folder.color}15` : '#FDF2F8',
-                backgroundImage: folder.coverImageUrl ? 'none' : `linear-gradient(135deg, ${folder.color || '#EC4899'}15 0%, ${folder.color || '#EC4899'}30 100%)`
+                backgroundColor: folder.color ? `${folder.color}15` : 'var(--color-primary-50, #FDF2F8)',
+                backgroundImage: folder.coverImageUrl ? 'none' : `linear-gradient(135deg, ${folder.color || 'var(--color-primary-600, #EC4899)'}15 0%, ${folder.color || 'var(--color-primary-600, #EC4899)'}30 100%)`
               }}
             >
               {folder.coverImageUrl ? (
@@ -106,16 +106,20 @@ export default function FolderGrid({
                   alt={folder.name}
                   fill
                   className="object-cover"
-                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 400px"
                   quality={95}
                   priority={false}
+                  unoptimized={false}
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center">
                   {folder.icon ? (
                     <div className="text-6xl">{folder.icon}</div>
                   ) : (
-                    <Folder className="w-16 h-16" style={{ color: folder.color || '#EC4899' }} />
+                    <Folder
+                      className="w-16 h-16"
+                      style={{ color: folder.color || 'var(--color-primary-600, #EC4899)' }}
+                    />
                   )}
                 </div>
               )}
@@ -226,7 +230,7 @@ export default function FolderGrid({
                     width={400}
                     height={600}
                     className="w-full object-cover"
-                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 400px"
                     quality={95}
                   />
 

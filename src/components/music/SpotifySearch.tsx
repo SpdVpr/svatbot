@@ -173,7 +173,7 @@ export default function SpotifySearch({ onSelectTrack, placeholder }: SpotifySea
             <div className="flex-1 overflow-y-auto">
               {loading ? (
                 <div className="p-8 text-center">
-                  <Loader2 className="w-8 h-8 text-purple-500 animate-spin mx-auto mb-2" />
+                  <Loader2 className="w-8 h-8 text-primary-500 animate-spin mx-auto mb-2" />
                   <p className="text-sm text-gray-600">Vyhledávání na Spotify...</p>
                 </div>
               ) : results.length > 0 ? (
@@ -182,7 +182,7 @@ export default function SpotifySearch({ onSelectTrack, placeholder }: SpotifySea
                     <div
                       key={track.id}
                       onClick={() => handleSelectTrack(track)}
-                      className="flex items-center space-x-3 p-3 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 transition-all cursor-pointer group"
+                      className="flex items-center space-x-3 p-3 hover:bg-gradient-to-r hover:from-primary-50 hover:to-accent-50 transition-all cursor-pointer group"
                     >
                       {/* Album Cover */}
                       <div className="relative w-12 h-12 flex-shrink-0 bg-gray-100 rounded overflow-hidden">
