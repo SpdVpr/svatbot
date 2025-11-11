@@ -274,24 +274,24 @@ export function useAICoach() {
       const morningMessagesFemale = [
         { title: '☀️ Dobré ráno, krásko!', message: 'Nový den, nové možnosti! Dnes budeš zářit ještě víc než včera! ✨' },
         { title: '🌅 Krásné ráno!', message: 'Začni den s úsměvem - tvoje svatba bude úžasná, protože TY jsi úžasná! 💕' },
-        { title: '☕ Dobré ráno!', message: 'Dej si kafe, nadechni se a pamatuj - jsi silná a zvládneš to! 🌟' },
+        { title: '☕ Dobré ráno!', message: 'Dej si kafe, nadechni se a pamatuj, že jsi silná a zvládneš to! 🌟' },
         { title: '🌸 Nový den!', message: 'Každé ráno je šance začít znovu. Dnes to bude skvělý den! 💕' },
         { title: '✨ Ahoj!', message: 'Vstávej, krásko! Svět potřebuje tvůj úsměv. A tvůj budoucí manžel taky! 😊' },
         { title: '🌞 Dobré ráno!', message: 'Dnes je perfektní den na to, udělat něco pro svatbu. Nebo si jen odpočinout. Obojí je v pohodě! 💪' },
         { title: '☕ Ranní káva?', message: 'Začni den v klidu. Svatební plánování může počkat, dokud si nedáš kafe! ☕' },
-        { title: '🌺 Krásný den!', message: 'Pamatuj - nemusíš být dokonalá. Stačí být ty sama. A to je víc než dost! 💕' },
+        { title: '🌺 Krásný den!', message: 'Pamatuj, že nemusíš být dokonalá. Stačí být sama sebou. A to je víc než dost! 💕' },
         { title: '🦋 Dobré ráno!', message: 'Dnes zkus udělat jednu věc, která tě udělá šťastnou. Jen pro sebe! ✨' },
         { title: '🌈 Nový začátek!', message: 'Každý den tě přibližuje k tvému velkému dni. Ale nezapomeň si užívat i cestu! 🌟' }
       ]
       const morningMessagesMale = [
         { title: '☀️ Dobré ráno, šampione!', message: 'Nový den, nové možnosti! Dnes to zvládneš skvěle! ✨' },
         { title: '🌅 Krásné ráno!', message: 'Začni den s úsměvem - tvoje svatba bude úžasná, protože TY jsi úžasný! 💪' },
-        { title: '☕ Dobré ráno!', message: 'Dej si kafe, nadechni se a pamatuj - jsi silný a zvládneš to! 🌟' },
+        { title: '☕ Dobré ráno!', message: 'Dej si kafe, nadechni se a pamatuj, že jsi silný a zvládneš to! 🌟' },
         { title: '🔥 Nový den!', message: 'Každé ráno je šance začít znovu. Dnes to bude skvělý den! 💪' },
         { title: '✨ Ahoj!', message: 'Vstávej, šampione! Svět potřebuje tvou energii. A tvoje budoucí manželka taky! 😊' },
         { title: '🌞 Dobré ráno!', message: 'Dnes je perfektní den na to, udělat něco pro svatbu. Nebo si jen odpočinout. Obojí je v pohodě! 💪' },
         { title: '☕ Ranní káva?', message: 'Začni den v klidu. Svatební plánování může počkat, dokud si nedáš kafe! ☕' },
-        { title: '💪 Krásný den!', message: 'Pamatuj - nemusíš být dokonalý. Stačí být ty sám. A to je víc než dost! 🌟' },
+        { title: '💪 Krásný den!', message: 'Pamatuj, že nemusíš být dokonalý. Stačí být sám sebou. A to je víc než dost! 🌟' },
         { title: '🎯 Dobré ráno!', message: 'Dnes zkus udělat jednu věc, která tě udělá šťastným. Jen pro sebe! ✨' },
         { title: '🌈 Nový začátek!', message: 'Každý den tě přibližuje k tvému velkému dni. Ale nezapomeň si užívat i cestu! 💪' }
       ]
@@ -336,7 +336,7 @@ export function useAICoach() {
       } else {
         // General encouragement if no tasks completed today
         const afternoonMessagesFemale = [
-          { title: '💪 Jsi skvělá!', message: 'Tvoje budoucí manžel má štěstí! Nezapomeň si dát pauzu a něco dobrého k jídlu. 🥗' },
+          { title: '💪 Jsi skvělá!', message: 'Tvůj budoucí manžel má štěstí! Nezapomeň si dát pauzu a něco dobrého k jídlu. 🥗' },
           { title: '✨ Máš to!', message: 'Každý krok tě přibližuje k tvému velkému dni. A budeš v něm vypadat úžasně! 👰' },
           { title: '🌟 Pokračuj!', message: 'Jsi na skvělé cestě! Nezapomeň si užívat i cestu, ne jen cíl. 💕' },
           { title: '🌸 Pauza je OK!', message: 'Nemusíš dělat všechno najednou. Někdy je nejlepší si jen odpočinout. 💆‍♀️' },
@@ -411,12 +411,16 @@ export function useAICoach() {
 
       if ([365, 180, 100, 60, 30, 14, 7, 3, 1].includes(daysUntil)) {
         const messageFemale = daysUntil === 1 ? 'Zítra je ten velký den! Budeš v něm vypadat jako princezna! 👑💕' :
-                              daysUntil <= 7 ? 'Už je to za rohem! Tvůj velký den se blíží a ty budeš zářit! ✨' :
-                              daysUntil <= 30 ? 'Měsíc do svatby! Jsi na skvělé cestě a budeš nádherná nevěsta! 💕' :
+                              daysUntil <= 3 ? 'Už je to za rohem! Tvůj velký den se blíží, ty budeš zářit! ✨' :
+                              daysUntil <= 7 ? 'Už je to za rohem! Tvůj velký den se blíží, ty budeš zářit! ✨' :
+                              daysUntil <= 14 ? 'Už je to za rohem! Tvůj velký den se blíží, ty budeš zářit! ✨' :
+                              daysUntil <= 30 ? 'Měsíc do svatby! Jsi na skvělé cestě, budeš nádherná nevěsta! 💕' :
                               'Máš ještě čas, ale už se můžeš těšit! Bude to úžasný den! 🌟'
 
         const messageMale = daysUntil === 1 ? 'Zítra je ten velký den! Bude to úžasný zážitek! 🤵💪' :
+                            daysUntil <= 3 ? 'Už je to za rohem! Tvůj velký den se blíží! Jsi připravený! ✨' :
                             daysUntil <= 7 ? 'Už je to za rohem! Tvůj velký den se blíží! Jsi připravený! ✨' :
+                            daysUntil <= 14 ? 'Už je to za rohem! Tvůj velký den se blíží! Jsi připravený! ✨' :
                             daysUntil <= 30 ? 'Měsíc do svatby! Jsi na skvělé cestě! Bude to bomba! 💪' :
                             'Máš ještě čas, ale už se můžeš těšit! Bude to úžasný den! 🌟'
 
@@ -545,7 +549,7 @@ export function useAICoach() {
         { title: '🎵 Hudba', message: 'Vytvoř si playlist pro různé části svatby. Pomůže to DJ nebo kapele! 🎶' },
         { title: '🍽️ Catering', message: 'Nezapomeň na vegetariánské a bezlepkové varianty. Hosté ti poděkují! 🥗' },
         { title: '⏰ Časový plán', message: 'Naplánuj si časovou rezervu. Vždycky něco trvá déle, než čekáš! ⌚' },
-        { title: '👥 Delegování', message: 'Vyber si svědky nebo kamarády, kteří ti pomohou v den svatby. Nemusíš všechno řešit sama/sám! 🤝' },
+        { title: '👥 Delegování', message: 'Vyber si svědky nebo kamarády, kteří ti pomohou v den svatby. Nemusíš všechno dělat sám ani sama! 🤝' },
         { title: '🎁 Dárky', message: 'Připrav malé dárky pro hosty. Nemusí být drahé, stačí milé! 🎀' },
         { title: '📋 Checklist', message: 'Měsíc před svatbou si udělej finální checklist. Nic nezapomeneš! ✓' }
       ]
@@ -562,9 +566,9 @@ export function useAICoach() {
     // Stress management - NEW CATEGORY!
     if (Math.random() > 0.8) {
       const stressManagement = [
-        { title: '🧘 Dýchej', message: 'Cítíš stres? Zkus 4-7-8 dýchání: 4 sekundy nádech, 7 zadržet, 8 výdech. Opakuj 3x! 🌬️' },
+        { title: '🧘 Dýchej', message: 'Cítíš stres? Zkus 4-7-8 dýchání: 4 sekundy nádech, 7 zadržet, 8 výdech. Opakuj 3×! 🌬️' },
         { title: '📱 Digital detox', message: 'Zkus jeden večer bez telefonu a sociálních sítí. Tvoje mysl ti poděkuje! 🔌' },
-        { title: '🌳 Příroda', message: 'Procházka v přírodě snižuje stres o 30%. Zkus to dnes! 🌲' },
+        { title: '🌳 Příroda', message: 'Procházka v přírodě snižuje stres o 30 %. Zkus to dnes! 🌲' },
         { title: '😊 Smích', message: 'Kdy naposledy jsi se pořádně zasmál/a? Pusť si komedii nebo zavolej kamarádovi! 😄' },
         { title: '✍️ Deník', message: 'Zkus si psát deník. Pomáhá to zpracovat emoce a snížit stres! 📖' },
         { title: '🎨 Kreativita', message: 'Udělej něco kreativního - malování, vaření, zahradničení. Pomáhá to vypnout! 🖌️' },
@@ -586,7 +590,7 @@ export function useAICoach() {
       const friendshipMessages = [
         { title: '🤗 Jsem tu pro tebe', message: 'Potřebuješ si promluvit? Jsem tu! Můžeš mi napsat cokoliv. 💬' },
         { title: '💪 Nejsi sám/sama', message: 'Tisíce párů prošly stejnou cestou. Zvládli to a ty to taky zvládneš! 🌟' },
-        { title: '🌈 Lepší dny', message: 'I když je dnes těžký den, zítra může být lepší. Drž se! 💕' },
+        { title: '🌈 Lepší dny', message: 'I když je dnes těžký den, pamatuj, že lepší dny přijdou. 🌟' },
         { title: '🎯 Tvůj úspěch', message: 'Už jsi toho tolik zvládl/a! Podívej se, jak daleko jsi došel/došla! 🏆' },
         { title: '💬 Potřebuješ pomoc?', message: 'Není hanba požádat o pomoc. Naopak, je to známka síly! 🤝' },
         { title: '🌟 Věřím v tebe', message: 'Možná dnes nevěříš sama/sám sobě. Ale já v tebe věřím! 💪' },
