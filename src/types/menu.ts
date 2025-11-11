@@ -34,46 +34,59 @@ export type ServingStyle =
   | 'family-style'    // Rodinný styl
   | 'cocktail'        // Koktejlový styl
 
+// Sub-item for multi-item dishes
+export interface MenuSubItem {
+  id: string
+  name: string
+  quantity?: number // Množství (např. 3 kusy)
+  weight?: string // Gramáž (např. "200g")
+  price?: number // Cena za tuto položku
+}
+
 export interface MenuItem {
   id: string
   weddingId: string
-  
+
   // Basic info
   name: string
   description?: string
   category: FoodCategory
-  
+
+  // Multi-item support
+  isMultiItem?: boolean // Vícepoložkové jídlo
+  subItems?: MenuSubItem[] // Položky vícepoložkového jídla
+
   // Details
   servingSize?: string // "100g", "1 porce", etc.
   estimatedQuantity: number // Počet porcí
   actualQuantity?: number
-  
+
   // Dietary info
   isVegetarian: boolean
   isVegan: boolean
   isGlutenFree: boolean
   isLactoseFree: boolean
   allergens: string[] // ['ořechy', 'mléko', 'vejce', etc.]
-  
+
   // Cost
   pricePerServing?: number
   totalPrice?: number // Celková cena (např. u dortu)
   totalCost?: number
   currency: string // 'CZK'
-  
+
   // Vendor
   vendorId?: string
   vendorName?: string
-  
+
   // Status
   status: MenuItemStatus
   servingStyle?: ServingStyle
   servingTime?: string // "18:00", "Po obřadu", etc.
-  
+
   // Notes
   notes?: string
   tags: string[]
-  
+
   // Metadata
   createdAt: Date
   updatedAt: Date
@@ -124,6 +137,8 @@ export interface MenuFormData {
   name: string
   description?: string
   category: FoodCategory
+  isMultiItem?: boolean
+  subItems?: MenuSubItem[]
   servingSize?: string
   estimatedQuantity: number
   isVegetarian: boolean

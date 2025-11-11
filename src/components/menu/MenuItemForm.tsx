@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { X } from 'lucide-react'
-import { MenuFormData, FOOD_CATEGORY_LABELS, MENU_STATUS_LABELS, SERVING_STYLE_OPTIONS, COMMON_ALLERGENS } from '@/types/menu'
+import { X, Plus, Trash2 } from 'lucide-react'
+import { MenuFormData, MenuSubItem, FOOD_CATEGORY_LABELS, MENU_STATUS_LABELS, SERVING_STYLE_OPTIONS, COMMON_ALLERGENS } from '@/types/menu'
 
 interface MenuItemFormProps {
   onSubmit: (data: MenuFormData) => Promise<void>
@@ -16,6 +16,8 @@ export default function MenuItemForm({ onSubmit, onCancel, initialData, loading 
     name: initialData?.name || '',
     description: initialData?.description || '',
     category: initialData?.category || 'main-course',
+    isMultiItem: initialData?.isMultiItem || false,
+    subItems: initialData?.subItems || [],
     servingSize: initialData?.servingSize || '',
     estimatedQuantity: initialData?.estimatedQuantity || 0,
     isVegetarian: initialData?.isVegetarian || false,
@@ -45,6 +47,42 @@ export default function MenuItemForm({ onSubmit, onCancel, initialData, loading 
         ? prev.allergens.filter(a => a !== allergen)
         : [...prev.allergens, allergen]
     }))
+  }
+
+  const addSubItem = () => {
+    const newSubItem: MenuSubItem = {
+      id: Date.now().toString(),
+      name: '',
+      quantity: undefined,
+      weight: '',
+      price: undefined
+    }
+    setFormData(prev => ({
+      ...prev,
+      subItems: [...(prev.subItems || []), newSubItem]
+    }))
+  }
+
+  const removeSubItem = (id: string) => {
+    setFormData(prev => ({
+      ...prev,
+      subItems: prev.subItems?.filter(item => item.id !== id) || []
+    }))
+  }
+
+  const updateSubItem = (id: string, field: keyof MenuSubItem, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      subItems: prev.subItems?.map(item =>
+        item.id === id ? { ...item, [field]: value } : item
+      ) || []
+    }))
+  }
+
+  // Calculate total price from sub-items
+  const calculateTotalFromSubItems = () => {
+    if (!formData.isMultiItem || !formData.subItems) return 0
+    return formData.subItems.reduce((sum, item) => sum + (item.price || 0), 0)
   }
 
   return (
@@ -125,6 +163,93 @@ export default function MenuItemForm({ onSubmit, onCancel, initialData, loading 
                 </select>
               </div>
             </div>
+
+            {/* Multi-item checkbox */}
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="isMultiItem"
+                checked={formData.isMultiItem}
+                onChange={(e) => setFormData({ ...formData, isMultiItem: e.target.checked })}
+                className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+              />
+              <label htmlFor="isMultiItem" className="text-sm font-medium text-gray-700">
+                Vícepoložkové jídlo (např. menu se salátem, hlavním chodem a dezertem)
+              </label>
+            </div>
+
+            {/* Sub-items section */}
+            {formData.isMultiItem && (
+              <div className="p-4 bg-gray-50 rounded-lg space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Položky jídla
+                  </label>
+                  <button
+                    type="button"
+                    onClick={addSubItem}
+                    className="text-sm text-primary-600 hover:text-primary-700 flex items-center space-x-1"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Přidat položku</span>
+                  </button>
+                </div>
+
+                {formData.subItems && formData.subItems.length > 0 ? (
+                  <div className="space-y-2">
+                    {formData.subItems.map((subItem) => (
+                      <div key={subItem.id} className="flex items-start space-x-2 p-3 bg-white rounded-lg border border-gray-200">
+                        <div className="flex-1 grid grid-cols-4 gap-2">
+                          <input
+                            type="text"
+                            placeholder="Název položky"
+                            value={subItem.name}
+                            onChange={(e) => updateSubItem(subItem.id, 'name', e.target.value)}
+                            className="col-span-2 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          />
+                          <input
+                            type="number"
+                            placeholder="Počet"
+                            value={subItem.quantity || ''}
+                            onChange={(e) => updateSubItem(subItem.id, 'quantity', e.target.value ? parseInt(e.target.value) : undefined)}
+                            className="px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Gramáž"
+                            value={subItem.weight || ''}
+                            onChange={(e) => updateSubItem(subItem.id, 'weight', e.target.value)}
+                            className="px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          />
+                          <input
+                            type="number"
+                            placeholder="Cena (Kč)"
+                            value={subItem.price || ''}
+                            onChange={(e) => updateSubItem(subItem.id, 'price', e.target.value ? parseFloat(e.target.value) : undefined)}
+                            className="col-span-3 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeSubItem(subItem.id)}
+                          className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                    <div className="flex justify-between items-center pt-2 border-t border-gray-200">
+                      <span className="text-sm font-medium text-gray-700">Celková cena:</span>
+                      <span className="text-lg font-bold text-primary-600">{calculateTotalFromSubItems()} Kč</span>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500 text-center py-4">
+                    Klikněte na "Přidat položku" pro vytvoření vícepoložkového jídla
+                  </p>
+                )}
+              </div>
+            )}
 
             <div className="grid grid-cols-2 gap-4">
               <div>

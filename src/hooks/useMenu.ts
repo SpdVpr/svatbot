@@ -102,8 +102,16 @@ export function useMenu(): UseMenuReturn {
       if (!wedding?.id) throw new Error('Není vybrána svatba')
 
       try {
-      // Calculate total cost: use totalPrice if available, otherwise calculate from pricePerServing
-      const totalCost = data.totalPrice || ((data.pricePerServing || 0) * data.estimatedQuantity)
+      // Calculate total cost
+      let totalCost = 0
+      if (data.isMultiItem && data.subItems && data.subItems.length > 0) {
+        // For multi-item, sum up all sub-item prices
+        totalCost = data.subItems.reduce((sum, item) => sum + (item.price || 0), 0)
+      } else {
+        // Use totalPrice if available, otherwise calculate from pricePerServing
+        totalCost = data.totalPrice || ((data.pricePerServing || 0) * data.estimatedQuantity)
+      }
+
       const now = new Date()
 
       // Save to Firestore for all users
@@ -129,6 +137,8 @@ export function useMenu(): UseMenuReturn {
       // Add optional fields only if they are defined
       if (data.description !== undefined) menuItemData.description = data.description
       if (data.servingSize !== undefined) menuItemData.servingSize = data.servingSize
+      if (data.isMultiItem !== undefined) menuItemData.isMultiItem = data.isMultiItem
+      if (data.subItems !== undefined) menuItemData.subItems = data.subItems
       if (data.pricePerServing !== undefined) menuItemData.pricePerServing = data.pricePerServing
       if (data.totalPrice !== undefined) menuItemData.totalPrice = data.totalPrice
       if (data.vendorId !== undefined) menuItemData.vendorId = data.vendorId
@@ -157,14 +167,22 @@ export function useMenu(): UseMenuReturn {
     return withDemoCheck(async () => {
       try {
       // Recalculate total cost if relevant fields changed
-      if (updates.pricePerServing !== undefined || updates.estimatedQuantity !== undefined || updates.totalPrice !== undefined) {
+      if (updates.pricePerServing !== undefined || updates.estimatedQuantity !== undefined || updates.totalPrice !== undefined || updates.subItems !== undefined || updates.isMultiItem !== undefined) {
         const item = menuItems.find(i => i.id === itemId)
         if (item) {
-          const totalPrice = updates.totalPrice ?? item.totalPrice
-          const pricePerServing = updates.pricePerServing ?? item.pricePerServing ?? 0
-          const estimatedQuantity = updates.estimatedQuantity ?? item.estimatedQuantity
-          // Use totalPrice if available, otherwise calculate from pricePerServing
-          updates.totalCost = totalPrice || (pricePerServing * estimatedQuantity)
+          const isMultiItem = updates.isMultiItem ?? item.isMultiItem
+          const subItems = updates.subItems ?? item.subItems
+
+          if (isMultiItem && subItems && subItems.length > 0) {
+            // For multi-item, sum up all sub-item prices
+            updates.totalCost = subItems.reduce((sum, subItem) => sum + (subItem.price || 0), 0)
+          } else {
+            const totalPrice = updates.totalPrice ?? item.totalPrice
+            const pricePerServing = updates.pricePerServing ?? item.pricePerServing ?? 0
+            const estimatedQuantity = updates.estimatedQuantity ?? item.estimatedQuantity
+            // Use totalPrice if available, otherwise calculate from pricePerServing
+            updates.totalCost = totalPrice || (pricePerServing * estimatedQuantity)
+          }
         }
       }
 

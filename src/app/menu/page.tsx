@@ -160,9 +160,9 @@ export default function MenuPage() {
       {/* Header */}
       <ModuleHeader
         icon={UtensilsCrossed}
-        title="Jídlo a Pití"
+        title="Jídlo a pití"
         subtitle={`${stats.totalMenuItems} jídel • ${stats.totalDrinkItems} nápojů • ${(stats.totalEstimatedCost / 1000).toFixed(0)}k Kč`}
-        iconGradient="from-red-500 to-pink-500"
+        iconGradient="from-primary-500 to-accent-500"
         actions={
           <button
             onClick={() => activeTab === 'food' ? setShowFoodForm(true) : setShowDrinkForm(true)}
@@ -346,7 +346,7 @@ export default function MenuPage() {
                     {Object.entries(groupedMenuItems).map(([category, items]) => (
                       <div key={category}>
                         <h3 className="text-lg font-semibold mb-4 flex items-center">
-                          <span className="bg-pink-100 text-pink-700 px-3 py-1 rounded-full text-sm">
+                          <span className="bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm">
                             {FOOD_CATEGORY_LABELS[category as FoodCategory]}
                           </span>
                           <span className="ml-2 text-gray-500 text-sm">({items.length})</span>
@@ -371,9 +371,32 @@ export default function MenuPage() {
                                 </button>
                               </div>
                               <h4 className="font-semibold text-lg mb-2 pr-20">{item.name}</h4>
-                              {item.description && (
-                                <p className="text-sm text-gray-600 mb-3">{item.description}</p>
+                              {item.servingSize && (
+                                <p className="text-xs text-gray-500 mb-2">Velikost porce: {item.servingSize}</p>
                               )}
+                              {item.description && (
+                                <p className="text-sm text-gray-600 mb-3 whitespace-pre-wrap">{item.description}</p>
+                              )}
+
+                              {/* Multi-item display */}
+                              {item.isMultiItem && item.subItems && item.subItems.length > 0 && (
+                                <div className="mb-3 p-3 bg-gray-50 rounded-lg">
+                                  <p className="text-xs font-semibold text-gray-700 mb-2">Složení:</p>
+                                  <div className="space-y-1">
+                                    {item.subItems.map((subItem) => (
+                                      <div key={subItem.id} className="flex justify-between text-xs text-gray-600">
+                                        <span>
+                                          {subItem.name}
+                                          {subItem.quantity && ` (${subItem.quantity}×)`}
+                                          {subItem.weight && ` - ${subItem.weight}`}
+                                        </span>
+                                        {subItem.price && <span className="font-medium">{subItem.price} Kč</span>}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
                               <div className="space-y-2 text-sm">
                                 <div className="flex justify-between">
                                   <span className="text-gray-600">Množství:</span>
@@ -433,7 +456,7 @@ export default function MenuPage() {
                     {Object.entries(groupedDrinkItems).map(([category, items]) => (
                       <div key={category}>
                         <h3 className="text-lg font-semibold mb-4 flex items-center">
-                          <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm">
+                          <span className="bg-accent-100 text-accent-700 px-3 py-1 rounded-full text-sm">
                             {DRINK_CATEGORY_LABELS[category as DrinkCategory]}
                           </span>
                           <span className="ml-2 text-gray-500 text-sm">({items.length})</span>
