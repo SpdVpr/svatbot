@@ -18,12 +18,12 @@
 "SvatBot.cz je moderní svatební plánovač s AI asistentem, který vám pomůže naplánovat dokonalou svatbu. Všechno na jednom místě - hosté, rozpočet, úkoly, svatební web. Žádný stres, jen radost z plánování."
 
 ### 60 sekund
-"Plánujete svatbu a nevíte, kde začít? SvatBot.cz je váš osobní svatební asistent. Inteligentní AI chatbot odpovídá na všechny vaše otázky - od 'Kdo má alergii na lepek?' po 'Jsem v rozpočtu?'. Spravujte hosty, sledujte výdaje, vytvořte si vlastní svatební web na vaše-jmena.svatbot.cz. Vše v češtině, přizpůsobeno českým tradicím. Začněte zdarma, premium od 99 Kč/měsíc."
+"Plánujete svatbu a nevíte, kde začít? SvatBot.cz je váš osobní svatební asistent. Inteligentní AI chatbot odpovídá na všechny vaše otázky - od 'Kdo má alergii na lepek?' po 'Jsem v rozpočtu?'. Spravujte hosty, sledujte výdaje, vytvořte si vlastní svatební web na vaše-jmena.svatbot.cz. Vše v češtině, přizpůsobeno českým tradicím. Začněte zdarma s 30denním trial obdobím."
 
 ### 2 minuty (Investor pitch)
 "Svatební průmysl v ČR má obrat 15-25 miliard Kč ročně, ale digitální nástroje využívá méně než 5% párů. Existující řešení jsou zastaralá nebo zahraniční bez české lokalizace.
 
-SvatBot.cz je first-mover v moderním svatebním plánování v ČR. Kombinujeme nejlepší funkce světových lídrů (Zola, WeddingWire) s AI technologiemi a českou lokalizací.
+SvatBot.cz je moderní svatební plánovač v ČR. Kombinujeme nejlepší funkce světových lídrů (Zola, WeddingWire) s AI technologiemi a českou lokalizací.
 
 Naše konkurenční výhody:
 - AI asistent s přístupem k reálným datům uživatele
@@ -31,7 +31,7 @@ Naše konkurenční výhody:
 - Komplexní řešení all-in-one
 - Moderní tech stack (Next.js, Firebase, OpenAI)
 
-Monetizace: Freemium model, premium 99 Kč/měsíc, cílíme na 1000+ platících uživatelů do konce 2025. LTV 2000+ Kč, CAC < 500 Kč.
+Monetizace: Freemium model s 30denním trial obdobím, měsíční členství 299 Kč/měsíc nebo roční 2 999 Kč, cílíme na 1000+ platících uživatelů do konce 2025. LTV 2000+ Kč, CAC < 500 Kč.
 
 Aplikace je production-ready, nasazená na svatbot.cz, připravená k růstu."
 
@@ -83,7 +83,7 @@ Aplikace je production-ready, nasazená na svatbot.cz, připravená k růstu."
 
 **Headline 1:** Svatební plánovač s AI | SvatBot.cz
 **Headline 2:** Všechno pro svatbu na jednom místě
-**Headline 3:** Začněte zdarma, premium od 99 Kč
+**Headline 3:** 30 dní zdarma | Vyzkoušejte bez rizika
 
 **Description 1:** Naplánujte dokonalou svatbu s AI asistentem. Hosté, rozpočet, úkoly, svatební web. Vše v češtině. Zkuste zdarma!
 
@@ -133,7 +133,7 @@ vase-jmena.svatbot.cz
 
 📱 Funguje všude - mobil, tablet, počítač
 
-💰 Od 99 Kč/měsíc | Zkuste zdarma
+💰 30 dní zdarma | Pak 299 Kč/měsíc
 
 👉 svatbot.cz
 ```
@@ -224,11 +224,11 @@ Jana (28) a Petr (30) se zasnoubili a plánují svatbu za 10 měsíců. Chtějí
 **Situace:**
 Markéta je profesionální svatební koordinátorka, která organizuje 15-20 svateb ročně. Používá Excel, Google Docs a různé nástroje. Chce profesionální řešení.
 
-**Řešení s SvatBot.cz Pro:**
+**Řešení s SvatBot.cz:**
 
 1. **Setup**
-   - Registrace Pro účtu (299 Kč/měsíc)
-   - Vytvoření 5 svateb najednou
+   - Registrace účtu (299 Kč/měsíc nebo 2 999 Kč/rok)
+   - Vytvoření svatebních projektů
    - Nastavení brandingu (logo, barvy)
 
 2. **Práce s klienty**
@@ -353,7 +353,7 @@ Praha, 20+ svateb ročně
 
 **TISKOVÉ ZPRÁVA**
 
-**SvatBot.cz: První český svatební plánovač s AI asistentem vstupuje na trh**
+**SvatBot.cz: Český svatební plánovač s AI asistentem vstupuje na trh**
 
 *Praha, Leden 2025* – Český svatební průmysl dostává moderní digitální nástroj. SvatBot.cz, nová webová aplikace pro plánování svateb, kombinuje pokročilé AI technologie s komplexním svatebním plánovačem.
 
@@ -381,7 +381,7 @@ Aplikace je postavena na moderním tech stacku (Next.js, Firebase, OpenAI GPT-4)
 
 **Dostupnost a ceny**
 
-SvatBot.cz je dostupný ve freemium modelu. Základní verze je zdarma, premium verze stojí 99 Kč/měsíc a zahrnuje všechny funkce včetně AI asistenta a svatebního webu.
+SvatBot.cz je dostupný s 30denním trial obdobím zdarma. Po trial období je měsíční členství 299 Kč/měsíc nebo roční členství 2 999 Kč jako jednorázová platba. Zahrnuje všechny funkce včetně AI asistenta a svatebního webu.
 
 **Kontakt pro média:**
 Email: info@svatbot.cz
@@ -468,7 +468,7 @@ Link v bio! 💕
 ✅ Přehled rozpočtu
 ✅ Vlastní svatební web
 
-💰 Od 99 Kč/měsíc | Zkuste ZDARMA
+💰 30 dní ZDARMA | Pak 299 Kč/měsíc
 
 👉 svatbot.cz
 
@@ -532,7 +532,7 @@ Caption:
 💍 Všechno, co potřebujete pro dokonalou svatbu!
 
 ✨ Začněte zdarma na svatbot.cz
-Premium od 99 Kč/měsíc
+30 dní trial zdarma, pak 299 Kč/měsíc
 
 Co oceníte nejvíc? 👇 Napište do komentářů!
 
@@ -577,9 +577,9 @@ Zeptejte se na cokoliv o vaší svatbě:
 • Kontaktní formuláře
 
 💰 CENA:
-• FREE verze - Základní funkce zdarma
-• PREMIUM - 99 Kč/měsíc (všechny funkce)
-• PRO - 299 Kč/měsíc (pro koordinátory)
+• TRIAL - 30 dní zdarma (všechny funkce)
+• MĚSÍČNÍ - 299 Kč/měsíc
+• ROČNÍ - 2 999 Kč jednorázově
 
 👉 Začněte zdarma na svatbot.cz
 
@@ -710,7 +710,7 @@ Zkuste zdarma: svatbot.cz
 
 Příležitost pro moderní řešení? Určitě! 🚀
 
-SvatBot.cz - první český svatební plánovač s AI
+SvatBot.cz - český svatební plánovač s AI
 
 svatbot.cz
 
@@ -748,7 +748,7 @@ Vítejte v SvatBot.cz! Jsme rádi, že jste se k nám připojili. 💕
 💡 TIP: Začněte s checklistem úkolů. AI vám pomůže s prioritizací!
 
 🎁 SPECIÁLNÍ NABÍDKA:
-Prvních 30 dní Premium ZDARMA!
+30 dní Premium ZDARMA!
 Použijte kód: WELCOME30
 
 👉 Začít plánovat: [Link na dashboard]
@@ -843,12 +843,12 @@ Víte, že s Premium verzí získáte mnohem víc?
 • Integrace (Calendar, Spotify)
 • Export bez watermarku
 
-💰 CENA: Jen 99 Kč/měsíc
-(Méně než 2 kávy! ☕)
+💰 CENA: 299 Kč/měsíc nebo 2 999 Kč/rok
+(Méně než 10 Kč denně! ☕)
 
 🎁 SPECIÁLNÍ NABÍDKA:
-První měsíc za 49 Kč!
-Použijte kód: UPGRADE50
+30 dní ZDARMA!
+Vyzkoušejte bez rizika
 
 👉 Upgradovat nyní: [Link]
 
@@ -922,7 +922,7 @@ Tento dokument obsahuje kompletní marketingové texty a komunikační strategie
 - Všechno na jednom místě
 - Vlastní svatební web
 - Česká lokalizace
-- Dostupná cena (od 99 Kč/měsíc)
+- 30 dní zdarma, pak 299 Kč/měsíc nebo 2 999 Kč/rok
 
 ---
 

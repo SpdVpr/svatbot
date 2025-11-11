@@ -18,7 +18,6 @@ import {
   Download,
   Settings,
   Loader2,
-  ExternalLink,
   Home,
   ArrowLeft
 } from 'lucide-react'
@@ -802,21 +801,18 @@ export default function AffiliateDashboardPage() {
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Marketingové materiály</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Stažení loga</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Stáhněte si naše logo pro použití ve vašich propagačních materiálech.
+                  </p>
                   <div className="space-y-3">
                     <a
-                      href="/affiliate/materials"
-                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                      href="/logo-svatbot-affil.png"
+                      download="svatbot-logo.png"
+                      className="flex items-center justify-between p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors group"
                     >
-                      <span className="font-semibold text-gray-900">Bannery a obrázky</span>
-                      <ExternalLink className="w-5 h-5 text-gray-400" />
-                    </a>
-                    <a
-                      href="/affiliate/materials"
-                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                    >
-                      <span className="font-semibold text-gray-900">Textové šablony</span>
-                      <ExternalLink className="w-5 h-5 text-gray-400" />
+                      <span className="font-semibold text-gray-900">Stáhnout logo SvatBot</span>
+                      <Download className="w-5 h-5 text-purple-600 group-hover:translate-y-0.5 transition-transform" />
                     </a>
                   </div>
                 </div>

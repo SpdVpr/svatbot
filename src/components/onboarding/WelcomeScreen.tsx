@@ -326,7 +326,7 @@ export default function WelcomeScreen() {
               Připraveni vyzkoušet <span className="text-gradient-primary">plánování bez námahy</span>?
             </h2>
             <p className="text-base md:text-lg lg:text-xl text-gray-600 mb-6 md:mb-8 lg:mb-10 max-w-2xl mx-auto">
-              Udělejte první krok k vaší dokonalé svatbě. Vyzkoušejte naše demo nebo se zaregistrujte zdarma ještě dnes!
+              Udělejte krok k vaší dokonalé svatbě. Vyzkoušejte naše demo nebo se zaregistrujte zdarma ještě dnes!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center">
               <button
@@ -864,7 +864,7 @@ export default function WelcomeScreen() {
               </summary>
               <div className="mt-4 text-gray-600 leading-relaxed" itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
                 <p itemProp="text">
-                  Ano! První měsíc po registraci je zcela zdarma s přístupem ke všem funkcím. Pokud se vám aplikace bude líbit, můžete si zvolit měsíční členství za 299 Kč/měsíc nebo roční členství za 2 999 Kč jako jednorázovou platbu. Platby jsou zpracovány bezpečně přes GoPay platební bránu.
+                  Ano! 30 dní po registraci je zcela zdarma s přístupem ke všem funkcím. Pokud se vám aplikace bude líbit, můžete si zvolit měsíční členství za 299 Kč/měsíc nebo roční členství za 2 999 Kč jako jednorázovou platbu. Platby jsou zpracovány bezpečně přes GoPay platební bránu.
                 </p>
               </div>
             </details>

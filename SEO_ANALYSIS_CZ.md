@@ -112,14 +112,14 @@
 **Současný stav:**
 ```
 Title: SvatBot.cz - Svatební Plánovač s AI | Plánování Svatby Online Zdarma
-Description: První český svatební plánovač s AI asistentem. Ušetřete 50+ hodin práce...
+Description: Český svatební plánovač s AI asistentem. Ušetřete 50+ hodin práce...
 ```
 
 **DOPORUČENÍ - 3 varianty pro A/B testování:**
 
 **Varianta 1 (Zaměření na AI - Blue Ocean strategie):**
 ```
-Title: AI Svatební Asistent Zdarma | SvatBot.cz - První v ČR
+Title: AI Svatební Asistent Zdarma | SvatBot.cz
 Description: Jediný český svatební plánovač s AI asistentem! Naplánujte svatbu za 50+ hodin méně. Rozpočet, timeline, hosté, seating plan, svatební web. Vyzkoušejte zdarma! ⭐ 4.9/5
 ```
 
@@ -132,13 +132,13 @@ Description: Plánování svatby vás stresuje? SvatBot.cz vám ušetří 50+ ho
 **Varianta 3 (Zaměření na výsledek - Benefit):**
 ```
 Title: Naplánujte Svatbu za 50+ Hodin Méně | SvatBot.cz
-Description: První český svatební plánovač s AI, který vám ušetří desítky hodin práce. Rozpočet, timeline, hosté, seating plan, RSVP, svatební web. Vyzkoušejte živé demo zdarma!
+Description: Český svatební plánovač s AI, který vám ušetří desítky hodin práce. Rozpočet, timeline, hosté, seating plan, RSVP, svatební web. Vyzkoušejte živé demo zdarma!
 ```
 
 **🎯 DOPORUČUJI: Varianta 1 (AI Blue Ocean)**
 - Důvod: Žádná konkurence v ČR nemá AI
 - Vytváříme novou kategorii
-- Budeme první ve vyhledávání pro "AI svatba"
+- Cílíme na top pozice ve vyhledávání pro "AI svatba"
 
 ---
 
@@ -153,7 +153,7 @@ Description: První český svatební plánovač s AI, který vám ušetří des
 
 **Varianta 1 (Keyword-rich):**
 ```html
-<h1>Plánování Svatby s AI Asistentem | První Český Svatební Plánovač Zdarma</h1>
+<h1>Plánování Svatby s AI Asistentem | Český Svatební Plánovač Zdarma</h1>
 ```
 
 **Varianta 2 (Benefit-focused):**
@@ -284,7 +284,7 @@ Homepage (hub)
 **1. PR články (high authority):**
 - iDNES.cz - "Jak AI mění svatební průmysl"
 - Zeny.cz - "Nový český startup pomáhá s plánováním svatby"
-- E15.cz - "Svatební tech: Český startup získal první uživatele"
+- E15.cz - "Svatební tech: Český startup získává uživatele"
 
 **2. Guest posting:**
 - Svatební blogy (Bridee blog, Deník nevěsty blog)
@@ -344,7 +344,7 @@ Homepage (hub)
 - 2,000-5,000 organických návštěv/měsíc
 - Pozice 5-10 pro hlavní keywords
 - 200-500 registrací
-- První pozice pro "AI svatební asistent"
+- Top pozice pro "AI svatební asistent"
 
 ### **Měsíc 7-12:**
 - 10,000+ organických návštěv/měsíc
@@ -364,7 +364,7 @@ Homepage (hub)
 - [ ] Vytvořit Google Analytics 4
 
 ### **TÝDEN 2:**
-- [ ] Napsat první 3 blog články
+- [ ] Napsat 3 blog články
 - [ ] Přidat HowTo schema markup
 - [ ] Vytvořit internal linking strukturu
 - [ ] Optimalizovat obrázky (alt texty)
@@ -373,7 +373,7 @@ Homepage (hub)
 - [ ] Napsat dalších 7 blog článků
 - [ ] Začít PR kampaň (iDNES, Zeny.cz)
 - [ ] Vytvořit Instagram @svatbot.cz
-- [ ] První guest posty
+- [ ] Začít s guest posty
 
 ### **MĚSÍC 2-3:**
 - [ ] Backlink building
@@ -410,7 +410,7 @@ Homepage (hub)
 4. ✅ **Nízká konkurence** - Bridee a Deník nevěsty jsou zastaralé
 5. ✅ **High-intent keywords** - lidé aktivně hledají řešení
 
-**Odhadovaný čas do první pozice: 6-9 měsíců**
+**Odhadovaný čas do top pozic: 6-9 měsíců**
 **Investice: Primárně čas (content creation), minimální finanční náklady**
 
 ---

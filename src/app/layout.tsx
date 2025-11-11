@@ -122,7 +122,7 @@ export const metadata: Metadata = {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'SvatBot.cz - První český svatební plánovač s AI asistentem pro moderní plánování svatby',
+        alt: 'SvatBot.cz - Český svatební plánovač s AI asistentem pro moderní plánování svatby',
       },
     ],
   },
@@ -200,7 +200,7 @@ export default function RootLayout({
         '@id': 'https://svatbot.cz/#website',
         url: 'https://svatbot.cz',
         name: 'SvatBot.cz - Svatební Plánovač s AI',
-        description: 'První český svatební plánovač s AI asistentem pro moderní plánování svatby',
+        description: 'Český svatební plánovač s AI asistentem pro moderní plánování svatby',
         publisher: {
           '@id': 'https://svatbot.cz/#organization',
         },
@@ -281,8 +281,9 @@ export default function RootLayout({
       cormorantUpright.variable
     )}>
       <head>
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/logo-svatbot.ico" type="image/x-icon" />
+        <link rel="icon" href="/logo-svatbot.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/logo-svatbot.ico" />
         <meta name="theme-color" content="#F8BBD9" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />

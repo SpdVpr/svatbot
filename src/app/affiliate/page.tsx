@@ -7,7 +7,7 @@ import {
   DollarSign,
   TrendingUp,
   Users,
-  Gift,
+  Download,
   CheckCircle,
   ArrowRight,
   BarChart3,
@@ -139,24 +139,24 @@ export default function AffiliateHomePage() {
 
           <div className="bg-white rounded-2xl shadow-xl p-8 hover:shadow-2xl transition-shadow">
             <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mb-6">
-              <Gift className="w-8 h-8 text-white" />
+              <Download className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-4">
-              Marketingové materiály
+              Stažení loga
             </h3>
             <p className="text-gray-600 mb-4">
-              Přístup k profesionálním bannerům, textovým šablonám a propagačním materiálům pro snadnou propagaci.
+              Stáhněte si naše logo pro použití ve vašich propagačních materiálech.
             </p>
-            <ul className="space-y-2 text-gray-600">
-              <li className="flex items-center space-x-2">
-                <CheckCircle className="w-5 h-5 text-purple-500" />
-                <span>Bannery a obrázky</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <CheckCircle className="w-5 h-5 text-purple-500" />
-                <span>Textové šablony</span>
-              </li>
-            </ul>
+            <div className="space-y-3">
+              <a
+                href="/logo-svatbot-affil.png"
+                download="svatbot-logo.png"
+                className="flex items-center justify-between p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors group"
+              >
+                <span className="font-medium text-gray-900">Stáhnout logo SvatBot</span>
+                <Download className="w-5 h-5 text-purple-600 group-hover:translate-y-0.5 transition-transform" />
+              </a>
+            </div>
           </div>
         </div>
       </div>
