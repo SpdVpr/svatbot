@@ -19,7 +19,7 @@ export default function TimelinePlanningModule() {
 
       <div className="space-y-3 sm:space-y-4">
         {/* Calendar Overview */}
-        <div className="bg-primary-50 p-3 sm:p-4 rounded-lg glass-morphism">
+        <div className="bg-primary-50 p-3 rounded-lg glass-morphism">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs sm:text-sm font-medium text-primary-900">Celkem událostí</span>
             <span className="text-base sm:text-lg font-bold text-primary-600">

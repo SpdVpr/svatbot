@@ -473,44 +473,44 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
 
           {layout.isEditMode && (
             <div
-              className="mt-4 p-5 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200/50 rounded-2xl backdrop-blur-xl shadow-lg"
+              className="mt-4 p-4 bg-gradient-to-br from-primary-50 to-rose-50 border border-primary-200/50 rounded-2xl backdrop-blur-xl shadow-lg"
               style={{
-                boxShadow: '0 4px 12px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+                boxShadow: '0 4px 12px rgba(244, 63, 94, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
               }}
             >
               <div className="flex items-start space-x-3">
                 <span className="text-2xl">💡</span>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-blue-900 mb-3">
+                  <p className="text-sm font-semibold text-primary-900 mb-2">
                     {layoutMode === 'grid' ? 'Grid layout s přichytáváním:' : 'Volný layout:'}
                   </p>
-                  <ul className="text-sm text-blue-800 space-y-2">
-                    <li className="flex items-start">
-                      <span className="mr-2 text-blue-600">•</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 text-sm text-primary-800">
+                    <div className="flex items-start">
+                      <span className="mr-2 text-primary-600">•</span>
                       <span>
                         <strong>Přesunout modul:</strong> Klikněte a táhněte modul
                         {layoutMode === 'grid' && ' - automaticky se přichytí k mřížce'}
                       </span>
-                    </li>
+                    </div>
                     {layoutMode === 'grid' && (
-                      <li className="flex items-start">
-                        <span className="mr-2 text-blue-600">•</span>
+                      <div className="flex items-start">
+                        <span className="mr-2 text-primary-600">•</span>
                         <span><strong>Vodící čáry:</strong> Modré čáry se zobrazí při přetahování pro snadné zarovnání</span>
-                      </li>
+                      </div>
                     )}
-                    <li className="flex items-start">
-                      <span className="mr-2 text-blue-600">•</span>
+                    <div className="flex items-start">
+                      <span className="mr-2 text-primary-600">•</span>
                       <span><strong>Změnit velikost:</strong> Táhněte za pravý dolní roh modulu</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2 text-blue-600">•</span>
+                    </div>
+                    <div className="flex items-start">
+                      <span className="mr-2 text-primary-600">•</span>
                       <span><strong>Skrýt/Zobrazit:</strong> Klikněte na ikonu oka</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-2 text-blue-600">•</span>
+                    </div>
+                    <div className="flex items-start">
+                      <span className="mr-2 text-primary-600">•</span>
                       <span><strong>Zamknout:</strong> Klikněte na ikonu zámku</span>
-                    </li>
-                  </ul>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

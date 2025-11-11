@@ -50,6 +50,22 @@ export default function WeddingCountdownModule({ onWeddingSettingsClick }: Weddi
 
   const daysUntilWedding = weddingDate ? dateUtils.daysUntilWedding(weddingDate) : null
 
+  // Calculate time progress from account creation to wedding date
+  const timeProgress = useMemo(() => {
+    if (!wedding || !weddingDate) return 0
+    
+    const createdAt = wedding.createdAt
+    const now = new Date()
+    
+    const totalTime = weddingDate.getTime() - createdAt.getTime()
+    const elapsedTime = now.getTime() - createdAt.getTime()
+    
+    if (totalTime <= 0) return 100 // Wedding date is in the past or same as creation
+    
+    const progress = Math.min(100, Math.max(0, (elapsedTime / totalTime) * 100))
+    return Math.round(progress)
+  }, [wedding, weddingDate])
+
   // Generate intelligent recommendations
   const recommendations = useMemo(() => {
     const recs: Recommendation[] = []
@@ -780,25 +796,16 @@ export default function WeddingCountdownModule({ onWeddingSettingsClick }: Weddi
 
           <div className="max-w-md mx-auto">
             <div className="flex justify-between items-center mb-1">
-              <span className="text-xs text-text-muted">Celkový pokrok</span>
-              <span className="text-xs font-semibold">{wedding?.progress?.overall || 0}%</span>
+              <span className="text-xs text-text-muted">Uběhlý čas</span>
+              <span className="text-xs font-semibold">{timeProgress}%</span>
             </div>
             <div className="progress-bar h-1.5">
               <div
                 className="progress-fill"
-                style={{ width: `${wedding?.progress?.overall || 0}%` }}
+                style={{ width: `${timeProgress}%` }}
               />
             </div>
           </div>
-
-          <p className="text-xs text-text-secondary leading-tight">
-            {wedding.progress.overall < 30
-              ? "Skvělý začátek! Pokračujte v základním plánování."
-              : wedding.progress.overall < 70
-                ? "Výborně! Máte za sebou většinu příprav."
-                : "Fantastické! Blížíte se k cíli."
-            }
-          </p>
         </div>
 
         {/* Bottom section - stats */}

@@ -244,7 +244,7 @@ function DashboardContent() {
                 <Menu className="w-5 h-5" />
               </button>
               <img
-                src="/logo2.png"
+                src="/logo-svatbot.svg"
                 alt="SvatBot.cz"
                 className="h-10 w-auto"
               />
@@ -347,13 +347,13 @@ function DashboardContent() {
         </div>
 
         {/* Desktop Header */}
-        <div className={`hidden sm:block mx-auto px-4 sm:px-6 lg:px-8 py-6 ${getCanvasMaxWidth()}`}>
+        <div className={`hidden sm:block mx-auto px-4 sm:px-6 lg:px-8 py-4 ${getCanvasMaxWidth()}`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-6">
               <img
-                src="/logo2.png"
+                src="/logo-svatbot.svg"
                 alt="SvatBot.cz"
-                className="h-14 w-auto"
+                className="h-20 w-auto"
               />
               <div className="border-l border-gray-300 pl-6">
                 <button

@@ -10,9 +10,7 @@ import {
   TrendingUp,
   Calendar,
   AlertCircle,
-  BarChart3,
-  Activity,
-  Zap
+  BarChart3
 } from 'lucide-react'
 
 export default function MoodStatsPage() {
@@ -76,12 +74,6 @@ export default function MoodStatsPage() {
   // Calculate statistics
   const stats = {
     totalEntries: allMoods.length,
-    avgStress: allMoods.length > 0 
-      ? Math.round(allMoods.reduce((sum, m) => sum + m.stressLevel, 0) / allMoods.length * 10) / 10
-      : 0,
-    avgEnergy: allMoods.length > 0
-      ? Math.round(allMoods.reduce((sum, m) => sum + m.energyLevel, 0) / allMoods.length * 10) / 10
-      : 0,
     moodDistribution: {
       great: allMoods.filter(m => m.mood === 'great').length,
       good: allMoods.filter(m => m.mood === 'good').length,
@@ -112,7 +104,7 @@ export default function MoodStatsPage() {
       <ModuleHeader
         icon={Heart}
         title="Statistiky nálad"
-        subtitle={`${stats.totalEntries} záznamů • Průměrný stres ${stats.avgStress}/10`}
+        subtitle={`${stats.totalEntries} záznamů za posledních ${timeRange} dní`}
         iconGradient="from-pink-500 to-rose-500"
       />
 
@@ -165,7 +157,7 @@ export default function MoodStatsPage() {
           ) : (
             <>
               {/* Stats Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-white rounded-xl shadow-sm p-6">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-gray-600 text-sm">Celkem záznamů</span>
@@ -173,38 +165,6 @@ export default function MoodStatsPage() {
                 </div>
                 <div className="text-3xl font-bold text-gray-900">{stats.totalEntries}</div>
                 <p className="text-xs text-gray-500 mt-1">Za posledních {timeRange} dní</p>
-              </div>
-
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-600 text-sm">Průměrný stres</span>
-                  <Activity className="w-5 h-5 text-gray-400" />
-                </div>
-                <div className="text-3xl font-bold text-gray-900">{stats.avgStress}/10</div>
-                <div className="mt-2 bg-gray-200 rounded-full h-2">
-                  <div 
-                    className={`h-2 rounded-full transition-all ${
-                      stats.avgStress >= 7 ? 'bg-red-500' :
-                      stats.avgStress >= 5 ? 'bg-orange-500' :
-                      'bg-green-500'
-                    }`}
-                    style={{ width: `${stats.avgStress * 10}%` }}
-                  />
-                </div>
-              </div>
-
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-600 text-sm">Průměrná energie</span>
-                  <Zap className="w-5 h-5 text-gray-400" />
-                </div>
-                <div className="text-3xl font-bold text-gray-900">{stats.avgEnergy}/10</div>
-                <div className="mt-2 bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="h-2 rounded-full bg-blue-500 transition-all"
-                    style={{ width: `${stats.avgEnergy * 10}%` }}
-                  />
-                </div>
               </div>
 
               <div className="bg-white rounded-xl shadow-sm p-6">
@@ -266,8 +226,6 @@ export default function MoodStatsPage() {
                       <tr className="border-b border-gray-200">
                         <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Datum</th>
                         <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Nálada</th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Stres</th>
-                        <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Energie</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -284,22 +242,8 @@ export default function MoodStatsPage() {
                           </td>
                           <td className="py-3 px-4">
                             <span className="inline-flex items-center gap-2">
-                              <span className="text-xl">{getMoodEmoji(mood.mood)}</span>
-                              <span className="text-sm font-medium">{getMoodLabel(mood.mood)}</span>
-                            </span>
-                          </td>
-                          <td className="py-3 px-4">
-                            <span className={`inline-block px-2 py-1 rounded text-sm font-medium ${
-                              mood.stressLevel >= 7 ? 'bg-red-100 text-red-700' :
-                              mood.stressLevel >= 5 ? 'bg-orange-100 text-orange-700' :
-                              'bg-green-100 text-green-700'
-                            }`}>
-                              {mood.stressLevel}/10
-                            </span>
-                          </td>
-                          <td className="py-3 px-4">
-                            <span className="inline-block px-2 py-1 rounded text-sm font-medium bg-blue-100 text-blue-700">
-                              {mood.energyLevel}/10
+                              <span className="text-2xl">{getMoodEmoji(mood.mood)}</span>
+                              <span className="text-base font-medium">{getMoodLabel(mood.mood)}</span>
                             </span>
                           </td>
                         </tr>

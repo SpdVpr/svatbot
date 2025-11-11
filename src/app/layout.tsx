@@ -178,9 +178,9 @@ export default function RootLayout({
         url: 'https://svatbot.cz',
         logo: {
           '@type': 'ImageObject',
-          url: 'https://svatbot.cz/logo.png',
-          width: 512,
-          height: 512,
+          url: 'https://svatbot.cz/logo-svatbot.svg',
+          width: 312,
+          height: 543,
         },
         sameAs: [
           'https://www.facebook.com/svatbot.cz',

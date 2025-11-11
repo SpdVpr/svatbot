@@ -84,7 +84,7 @@ export default function WelcomeScreen() {
       <header className="relative z-20 w-full bg-white bg-opacity-80 backdrop-blur-sm shadow-sm py-3 md:py-4">
         <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
           <div className="flex items-center space-x-2 md:space-x-3">
-            <img src="/logo-mensi.jpg" alt="SvatBot.cz logo" className="header-logo rounded-lg object-cover" />
+            <img src="/logo-svatbot.svg" alt="SvatBot.cz logo" className="header-logo" />
             <a href="#" className="font-display text-xl md:text-3xl font-bold text-gray-900">SvatBot.cz</a>
           </div>
           <nav className="hidden lg:flex items-center space-x-8">

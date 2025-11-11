@@ -52,10 +52,10 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
 
   const getPriorityColor = (priority: CoachSuggestion['priority']) => {
     switch (priority) {
-      case 'high': return 'border-l-red-500 bg-primary-50'
-      case 'medium': return 'border-l-yellow-500 bg-primary-50'
-      case 'low': return 'border-l-primary-500 bg-primary-50'
-      default: return 'border-l-gray-500 bg-primary-50'
+      case 'high': return 'bg-primary-50'
+      case 'medium': return 'bg-primary-50'
+      case 'low': return 'bg-primary-50'
+      default: return 'bg-primary-50'
     }
   }
 
@@ -97,7 +97,7 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
             {activeSuggestions.slice(0, 2).map((suggestion) => (
               <div
                 key={suggestion.id}
-                className={`p-3 rounded-lg border-l-4 ${getPriorityColor(suggestion.priority)}`}
+                className={`p-3 rounded-lg ${getPriorityColor(suggestion.priority)}`}
               >
                 <div className="flex items-start gap-2">
                   <span className="text-lg flex-shrink-0">{getSuggestionIcon(suggestion.type)}</span>
@@ -202,7 +202,7 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
             {activeSuggestions.slice(0, 2).map((suggestion) => (
               <div
                 key={suggestion.id}
-                className={`p-4 rounded-lg border-l-4 ${getPriorityColor(suggestion.priority)} transition-all hover:shadow-md`}
+                className={`p-4 rounded-lg ${getPriorityColor(suggestion.priority)} transition-all hover:shadow-md`}
               >
                 <div className="flex items-start gap-3">
                   <span className="text-2xl flex-shrink-0">{getSuggestionIcon(suggestion.type)}</span>

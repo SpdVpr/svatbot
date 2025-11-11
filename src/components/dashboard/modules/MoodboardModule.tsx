@@ -88,13 +88,6 @@ export default function MoodboardModule() {
                   </div>
                 )}
 
-                {/* Source indicator */}
-                <div className="absolute bottom-2 left-2">
-                  {image.source === 'upload' && (
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  )}
-                </div>
-
                 {/* Show +X more overlay on last image if there are more */}
                 {index === 5 && totalImages > 6 && (
                   <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center">
