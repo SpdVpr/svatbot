@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { Clock, Calendar, Plus, Trash2, X, Heart, Edit2 } from 'lucide-react'
+import { useState, useRef } from 'react'
+import { Clock, Calendar, Plus, Trash2, X, Heart, Edit2, GripVertical } from 'lucide-react'
 import Link from 'next/link'
 import { useWeddingDayTimeline } from '@/hooks/useWeddingDayTimeline'
 import ModuleHeader from '@/components/common/ModuleHeader'
@@ -30,7 +30,7 @@ const PREDEFINED_ACTIVITIES = [
 ]
 
 export default function SvatebniDenPage() {
-  const { timeline, loading, createTimelineItem, updateTimelineItem, deleteTimelineItem } = useWeddingDayTimeline()
+  const { timeline, loading, createTimelineItem, updateTimelineItem, deleteTimelineItem, reorderTimeline } = useWeddingDayTimeline()
   const [showCustomForm, setShowCustomForm] = useState(false)
   const [selectedActivity, setSelectedActivity] = useState<typeof PREDEFINED_ACTIVITIES[0] | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -42,6 +42,11 @@ export default function SvatebniDenPage() {
     location: '',
     notes: ''
   })
+
+  const [draggedItem, setDraggedItem] = useState<string | null>(null)
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const dragTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const handleSelectPredefined = (activity: typeof PREDEFINED_ACTIVITIES[0]) => {
     setSelectedActivity(activity)
@@ -125,6 +130,7 @@ export default function SvatebniDenPage() {
       location: item.location,
       notes: item.notes
     })
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleUpdate = async (e: React.FormEvent) => {
@@ -162,6 +168,76 @@ export default function SvatebniDenPage() {
         console.error('Error deleting activity:', err)
         alert('Chyba při mazání aktivity')
       }
+    }
+  }
+
+  const handleDragStart = (e: React.DragEvent, itemId: string, index: number) => {
+    setDraggedItem(itemId)
+    setIsDragging(true)
+    setDragOverIndex(null)
+
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/plain', itemId)
+
+    if (dragTimeoutRef.current) {
+      clearTimeout(dragTimeoutRef.current)
+    }
+  }
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    dragTimeoutRef.current = setTimeout(() => {
+      setDraggedItem(null)
+      setDragOverIndex(null)
+      setIsDragging(false)
+    }, 50)
+  }
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (!draggedItem || !isDragging) return
+
+    e.dataTransfer.dropEffect = 'move'
+
+    if (dragOverIndex !== index) {
+      setDragOverIndex(index)
+    }
+  }
+
+  const handleDrop = async (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (!draggedItem || !isDragging) return
+
+    const sortedTimeline = [...timeline].sort((a, b) => a.order - b.order)
+    const draggedIndex = sortedTimeline.findIndex(item => item.id === draggedItem)
+
+    if (draggedIndex === -1 || draggedIndex === dropIndex) {
+      setDraggedItem(null)
+      setDragOverIndex(null)
+      setIsDragging(false)
+      return
+    }
+
+    const newTimeline = [...sortedTimeline]
+    const [removed] = newTimeline.splice(draggedIndex, 1)
+    newTimeline.splice(dropIndex, 0, removed)
+
+    try {
+      await reorderTimeline(newTimeline)
+    } catch (err) {
+      console.error('Error reordering timeline:', err)
+      alert('Chyba při změně pořadí')
+    }
+
+    setDraggedItem(null)
+    setDragOverIndex(null)
+    setIsDragging(false)
+
+    if (dragTimeoutRef.current) {
+      clearTimeout(dragTimeoutRef.current)
     }
   }
 
@@ -531,17 +607,26 @@ export default function SvatebniDenPage() {
 
             {/* Timeline */}
             <div className="space-y-0">
-              {[...timeline].sort((a, b) => {
-                if (!a.time) return 1
-                if (!b.time) return -1
-                return a.time.localeCompare(b.time)
-              }).map((item, index, sortedArray) => {
+              {[...timeline].sort((a, b) => a.order - b.order).map((item, index, sortedArray) => {
                 const isLast = index === sortedArray.length - 1
 
                 return (
-                  <div key={item.id} className="group relative">
+                  <div 
+                    key={item.id} 
+                    className={`group relative cursor-grab active:cursor-grabbing ${draggedItem === item.id ? 'opacity-50' : ''} ${dragOverIndex === index ? 'ring-2 ring-primary-400' : ''}`}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, item.id, index)}
+                    onDragEnd={handleDragEnd}
+                    onDragOver={(e) => handleDragOver(e, index)}
+                    onDrop={(e) => handleDrop(e, index)}
+                  >
                     {/* Timeline row - Responsive layout */}
                     <div className="flex items-start">
+                      {/* Drag handle */}
+                      <div className="flex-shrink-0 pt-4 sm:pt-6 pr-2">
+                        <GripVertical className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400 group-hover:text-primary-500 transition-colors" />
+                      </div>
+
                       {/* Time column - Smaller on mobile */}
                       <div className="w-16 sm:w-32 flex-shrink-0 pt-4 sm:pt-6">
                         <div className="text-right pr-2 sm:pr-8">
