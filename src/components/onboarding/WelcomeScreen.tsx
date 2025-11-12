@@ -10,6 +10,8 @@ import ScrollProgress from '@/components/animations/ScrollProgress'
 import NumberCounter from '@/components/animations/NumberCounter'
 import InteractiveDashboardDemo from './InteractiveDashboardDemo'
 import PricingSection from './PricingSection'
+import VendorCard from '@/components/marketplace/VendorCard'
+import { MarketplaceVendor } from '@/types/vendor'
 
 export default function WelcomeScreen() {
   const router = useRouter()
@@ -75,6 +77,216 @@ export default function WelcomeScreen() {
       setIsContactFormSubmitting(false)
     }
   }
+
+  const mockVendors: MarketplaceVendor[] = [
+    {
+      id: 'demo-photographer-001',
+      name: 'Jan Novák',
+      category: 'photographer',
+      description: 'Svatební fotograf s 8 lety zkušeností a moderním přístupem k fotografii.',
+      shortDescription: 'Svatební fotograf - moderní styl',
+      website: 'https://example.com',
+      email: 'demo@example.com',
+      phone: '+420 XXX XXX XXX',
+      address: {
+        street: 'Demo ulice 123',
+        city: 'Praha',
+        postalCode: '110 00',
+        region: 'Praha'
+      },
+      businessName: 'Jan Novák Photography',
+      services: [
+        {
+          id: 'demo-service-1',
+          name: 'Svatební focení - celý den',
+          description: 'Kompletní svatební reportáž',
+          price: 25000,
+          priceType: 'package',
+          duration: '12 hodin',
+          includes: ['Celý den fotografování', '300+ fotografií'],
+          popular: true
+        }
+      ],
+      priceRange: {
+        min: 20000,
+        max: 30000,
+        currency: 'CZK',
+        unit: 'per-event'
+      },
+      images: [
+        'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800&q=80'
+      ],
+      portfolioImages: [
+        'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=1200&q=80'
+      ],
+      rating: {
+        overall: 4.8,
+        count: 95,
+        breakdown: {
+          quality: 4.9,
+          communication: 4.8,
+          value: 4.7,
+          professionalism: 4.9
+        }
+      },
+      features: ['8 let zkušeností', 'Moderní styl', 'Profesionální přístup'],
+      specialties: ['Svatební fotografie', 'Reportáž'],
+      workingRadius: 200,
+      availability: {
+        workingDays: ['friday', 'saturday', 'sunday'],
+        workingHours: { start: '08:00', end: '22:00' }
+      },
+      testimonials: [],
+      yearsInBusiness: 8,
+      verified: true,
+      featured: true,
+      premium: false,
+      responseTime: '< 12 hours',
+      tags: ['fotografie', 'svatba', 'Praha'],
+      keywords: ['fotograf', 'svatba', 'Praha'],
+      createdAt: new Date('2024-01-01'),
+      updatedAt: new Date('2024-12-01'),
+      lastActive: new Date('2024-12-01')
+    },
+    {
+      id: 'demo-catering-001',
+      name: 'Marie Svobodová Catering',
+      category: 'catering',
+      description: 'Catering pro svatby s důrazem na čerstvé suroviny a moderní gastronomii.',
+      shortDescription: 'Svatební catering - moderní gastronomie',
+      website: 'https://example.com',
+      email: 'demo@example.com',
+      phone: '+420 XXX XXX XXX',
+      address: {
+        street: 'Demo ulice 456',
+        city: 'Brno',
+        postalCode: '602 00',
+        region: 'Jihomoravský kraj'
+      },
+      businessName: 'Svobodová Catering s.r.o.',
+      services: [
+        {
+          id: 'demo-service-2',
+          name: 'Svatební menu - standard',
+          description: 'Kompletní svatební menu pro vaše hosty',
+          price: 850,
+          priceType: 'per-person',
+          duration: 'celý den',
+          includes: ['Předkrm', 'Hlavní chod', 'Dezert', 'Obsluha'],
+          popular: true
+        }
+      ],
+      priceRange: {
+        min: 650,
+        max: 1200,
+        currency: 'CZK',
+        unit: 'per-person'
+      },
+      images: [
+        'https://images.unsplash.com/photo-1555244162-803834f70033?w=800&q=80'
+      ],
+      portfolioImages: [
+        'https://images.unsplash.com/photo-1555244162-803834f70033?w=1200&q=80'
+      ],
+      rating: {
+        overall: 4.9,
+        count: 142,
+        breakdown: {
+          quality: 5.0,
+          communication: 4.9,
+          value: 4.8,
+          professionalism: 4.9
+        }
+      },
+      features: ['Čerstvé suroviny', 'Flexibilní menu', 'Profesionální obsluha'],
+      specialties: ['Svatební catering', 'Moderní kuchyně'],
+      workingRadius: 150,
+      availability: {
+        workingDays: ['friday', 'saturday', 'sunday'],
+        workingHours: { start: '06:00', end: '23:00' }
+      },
+      testimonials: [],
+      yearsInBusiness: 12,
+      verified: true,
+      featured: false,
+      premium: true,
+      responseTime: '< 6 hours',
+      tags: ['catering', 'svatba', 'Brno'],
+      keywords: ['catering', 'svatba', 'Brno'],
+      createdAt: new Date('2024-01-01'),
+      updatedAt: new Date('2024-12-01'),
+      lastActive: new Date('2024-12-01')
+    },
+    {
+      id: 'demo-music-001',
+      name: 'DJ Petr Dvořák',
+      category: 'music',
+      description: 'Zkušený DJ pro svatby s širokým hudebním repertoárem a profesionální technikou.',
+      shortDescription: 'Svatební DJ - široký repertoár',
+      website: 'https://example.com',
+      email: 'demo@example.com',
+      phone: '+420 XXX XXX XXX',
+      address: {
+        street: 'Demo ulice 789',
+        city: 'Ostrava',
+        postalCode: '702 00',
+        region: 'Moravskoslezský kraj'
+      },
+      businessName: 'DJ Petr Dvořák',
+      services: [
+        {
+          id: 'demo-service-3',
+          name: 'DJ na svatbu',
+          description: 'Profesionální DJ služby pro vaši svatbu',
+          price: 12000,
+          priceType: 'package',
+          duration: '8 hodin',
+          includes: ['Profesionální ozvučení', 'Světelná show', 'Konzultace playlistu'],
+          popular: true
+        }
+      ],
+      priceRange: {
+        min: 10000,
+        max: 18000,
+        currency: 'CZK',
+        unit: 'per-event'
+      },
+      images: [
+        'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&q=80'
+      ],
+      portfolioImages: [
+        'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1200&q=80'
+      ],
+      rating: {
+        overall: 4.7,
+        count: 78,
+        breakdown: {
+          quality: 4.8,
+          communication: 4.7,
+          value: 4.6,
+          professionalism: 4.8
+        }
+      },
+      features: ['10 let zkušeností', 'Profesionální technika', 'Široký repertoár'],
+      specialties: ['Svatební hudba', 'DJ'],
+      workingRadius: 250,
+      availability: {
+        workingDays: ['friday', 'saturday'],
+        workingHours: { start: '16:00', end: '04:00' }
+      },
+      testimonials: [],
+      yearsInBusiness: 10,
+      verified: true,
+      featured: false,
+      premium: false,
+      responseTime: '< 24 hours',
+      tags: ['dj', 'hudba', 'Ostrava'],
+      keywords: ['dj', 'hudba', 'Ostrava'],
+      createdAt: new Date('2024-01-01'),
+      updatedAt: new Date('2024-12-01'),
+      lastActive: new Date('2024-12-01')
+    }
+  ]
 
   return (
     <>
@@ -179,7 +391,15 @@ export default function WelcomeScreen() {
             </p>
           </header>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 max-w-7xl mx-auto relative">
+            <div className="hidden min-[1500px]:block absolute opacity-20 pointer-events-none" style={{ width: '30rem', bottom: '-5rem', right: '-28%' }}>
+              <img 
+                src="/wed3.png" 
+                alt="" 
+                className="w-full h-auto"
+                aria-hidden="true"
+              />
+            </div>
             {/* AI Asistent - HLAVNÍ DIFERENCIÁTOR */}
             <div className="group bg-gradient-to-br from-rose-50 to-purple-50 rounded-3xl p-8 shadow-lg border-2 border-rose-200 hover:border-rose-400 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105 relative overflow-hidden" style={{ animationDelay: '0.3s' }}>
               <div className="absolute top-0 right-0 bg-gradient-to-br from-rose-500 to-purple-500 text-white text-xs font-bold px-3 py-1 rounded-bl-xl">
@@ -265,7 +485,15 @@ export default function WelcomeScreen() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 max-w-7xl mx-auto relative">
+            <div className="hidden min-[1500px]:block absolute opacity-15 pointer-events-none" style={{ width: '30rem', bottom: '-5rem', left: '-28%' }}>
+              <img 
+                src="/wed4.png" 
+                alt="" 
+                className="w-full h-auto"
+                aria-hidden="true"
+              />
+            </div>
             {/* Moodboard */}
             <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-pink-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.3s' }}>
               <div className="relative mb-6">
@@ -404,9 +632,25 @@ export default function WelcomeScreen() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 max-w-6xl mx-auto relative">
+            <div className="hidden min-[1500px]:block absolute opacity-15 pointer-events-none" style={{ width: '21rem', bottom: '-5rem', left: '-25%' }}>
+              <img 
+                src="/wed6.png" 
+                alt="" 
+                className="w-full h-auto"
+                aria-hidden="true"
+              />
+            </div>
+            <div className="hidden min-[1500px]:block absolute opacity-15 pointer-events-none" style={{ width: '30rem', bottom: '-5rem', right: '-34%' }}>
+              <img 
+                src="/wed7.png" 
+                alt="" 
+                className="w-full h-auto"
+                aria-hidden="true"
+              />
+            </div>
             {/* AI technologie */}
-            <div className="group bg-white/90 backdrop-blur-sm rounded-3xl p-8 md:p-10 shadow-xl border-2 border-white/50 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.3s' }}>
+            <div className="group bg-white rounded-3xl p-8 md:p-10 shadow-xl border-2 border-gray-100 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.3s' }}>
               <div className="relative mb-6">
                 <div className="w-28 h-28 bg-gradient-to-br from-pink-100 to-rose-100 rounded-3xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
                   <Sparkles className="w-14 h-14 text-pink-600" />
@@ -432,7 +676,7 @@ export default function WelcomeScreen() {
             </div>
 
             {/* Ušetříte čas */}
-            <div className="group bg-white/90 backdrop-blur-sm rounded-3xl p-8 md:p-10 shadow-xl border-2 border-white/50 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.4s' }}>
+            <div className="group bg-white rounded-3xl p-8 md:p-10 shadow-xl border-2 border-gray-100 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.4s' }}>
               <div className="relative mb-6">
                 <div className="w-28 h-28 bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
                   <Clock className="w-14 h-14 text-purple-600" />
@@ -456,7 +700,7 @@ export default function WelcomeScreen() {
             </div>
 
             {/* Vše na jednom místě */}
-            <div className="group bg-white/90 backdrop-blur-sm rounded-3xl p-8 md:p-10 shadow-xl border-2 border-white/50 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.5s' }}>
+            <div className="group bg-white rounded-3xl p-8 md:p-10 shadow-xl border-2 border-gray-100 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.5s' }}>
               <div className="relative mb-6">
                 <div className="w-28 h-28 bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
                   <BarChart2 className="w-14 h-14 text-purple-600" />
@@ -498,7 +742,15 @@ export default function WelcomeScreen() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto relative">
+            <div className="hidden min-[1500px]:block absolute opacity-10 pointer-events-none" style={{ width: '41rem', bottom: '-5rem', right: '20%' }}>
+              <img 
+                src="/wed5.png" 
+                alt="" 
+                className="w-full h-auto"
+                aria-hidden="true"
+              />
+            </div>
             {/* Testimonial 1 */}
             <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-3xl p-8 shadow-lg border-2 border-pink-100 hover:shadow-2xl transition-all duration-500 animate-fade-in" style={{ animationDelay: '0.3s' }}>
               <div className="flex items-center mb-4">
@@ -596,91 +848,125 @@ export default function WelcomeScreen() {
       {/* Pricing Section */}
       <PricingSection onGetStarted={handleGetStarted} />
 
-      <section id="vendors" className="py-12 md:py-16 lg:py-20 bg-gradient-to-br from-pink-50 via-rose-50 to-purple-50 touch-pan-y">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="max-w-6xl mx-auto bg-white rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
-            <div className="md:w-1/2 p-6 md:p-10 lg:p-12 bg-gradient-to-br from-pink-500 to-purple-500 text-white flex flex-col justify-between">
-              <div>
-                <div className="flex items-center space-x-2 md:space-x-3 mb-4 md:mb-6">
-                  <Briefcase className="w-7 h-7 md:w-9 md:h-9" />
-                  <span className="text-xs md:text-sm font-semibold uppercase tracking-wide">Pro dodavatele</span>
+      {/* Marketplace Vendors Section */}
+      <section id="vendors" className="py-16 md:py-24 lg:py-32 bg-white relative overflow-hidden touch-pan-y">
+        <div className="container mx-auto px-4 md:px-6 relative z-10">
+          {/* Section Header */}
+          <div className="text-center mb-12 md:mb-16 lg:mb-20">
+            <div className="inline-flex items-center px-4 py-2 bg-pink-500 rounded-full mb-6 animate-fade-in">
+              <Store className="w-4 h-4 text-white mr-2" />
+              <span className="text-sm font-semibold text-white">Marketplace dodavatelů</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-gray-900 mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              Jste poskytovatel <span className="text-pink-500">svatebních služeb</span>?
+            </h2>
+            <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              Zaregistrujte se na našem tržišti a spojte se s tisíci párů, které aktivně plánují svou svatbu
+            </p>
+          </div>
+
+          {/* Benefits Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 max-w-6xl mx-auto mb-12 md:mb-16">
+            {/* Zvyšte viditelnost */}
+            <div className="group bg-white rounded-3xl p-8 md:p-10 shadow-xl border-2 border-gray-100 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.3s' }}>
+              <div className="relative mb-6">
+                <div className="w-28 h-28 bg-pink-100 rounded-3xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
+                  <Eye className="w-14 h-14 text-pink-600" />
                 </div>
-                <h2 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold mb-4 md:mb-6 text-white">Jste poskytovatel svatebních služeb?</h2>
-                <p className="text-base md:text-lg lg:text-xl text-white/90 mb-6 md:mb-8 leading-relaxed">
-                  Zaregistrujte se na našem tržišti a spojte se s tisíci párů, které aktivně plánují svou svatbu.
-                </p>
-                <div className="space-y-4 mb-8">
-                  <div className="flex items-start space-x-4">
-                    <div className="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                      <Eye className="w-4 h-4 text-white" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold mb-1 text-lg">Zvyšte svou viditelnost</h4>
-                      <p className="text-white/80 text-sm">Vaše služby uvidí páry, které aktivně hledají dodavatele.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-4">
-                    <div className="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                      <TrendingUp className="w-4 h-4 text-white" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold mb-1 text-lg">Získejte nové klienty</h4>
-                      <p className="text-white/80 text-sm">Přímé spojení s potenciálními klienty a páry.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-4">
-                    <div className="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                      <Image className="w-4 h-4 text-white" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold mb-1 text-lg">Ukažte své portfolio</h4>
-                      <p className="text-white/80 text-sm">Zobrazte fotografie, recenze a detailní popisy služeb.</p>
-                    </div>
-                  </div>
+                <div className="absolute -top-2 -right-2 w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center shadow-lg">
+                  <TrendingUp className="w-4 h-4 text-white" />
                 </div>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20 shadow-inner">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-lg font-medium">Registrace dodavatele</span>
-                  <span className="text-3xl font-bold">ZDARMA</span>
+              <h3 className="text-2xl md:text-3xl font-display font-bold text-gray-900 mb-4">Zvyšte viditelnost</h3>
+              <p className="text-base md:text-lg text-gray-600 leading-relaxed">
+                Vaše služby uvidí páry, které aktivně hledají dodavatele pro svou svatbu.
+              </p>
+            </div>
+
+            {/* Získejte klienty */}
+            <div className="group bg-white rounded-3xl p-8 md:p-10 shadow-xl border-2 border-gray-100 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.4s' }}>
+              <div className="relative mb-6">
+                <div className="w-28 h-28 bg-purple-100 rounded-3xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
+                  <Users className="w-14 h-14 text-purple-600" />
                 </div>
-                <p className="text-sm text-white/70">Žádné skryté poplatky • Schválení do 24-48 hodin</p>
+                <div className="absolute -top-2 -right-2 w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center shadow-lg">
+                  <Sparkles className="w-4 h-4 text-white" />
+                </div>
+              </div>
+              <h3 className="text-2xl md:text-3xl font-display font-bold text-gray-900 mb-4">Získejte klienty</h3>
+              <p className="text-base md:text-lg text-gray-600 leading-relaxed">
+                Přímé spojení s potenciálními klienty a páry připravenými rezervovat vaše služby.
+              </p>
+            </div>
+
+            {/* Ukažte portfolio */}
+            <div className="group bg-white rounded-3xl p-8 md:p-10 shadow-xl border-2 border-gray-100 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.5s' }}>
+              <div className="relative mb-6">
+                <div className="w-28 h-28 bg-pink-100 rounded-3xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
+                  <Image className="w-14 h-14 text-pink-600" />
+                </div>
+                <div className="absolute -top-2 -right-2 w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center shadow-lg">
+                  <Star className="w-4 h-4 text-white" />
+                </div>
+              </div>
+              <h3 className="text-2xl md:text-3xl font-display font-bold text-gray-900 mb-4">Ukažte portfolio</h3>
+              <p className="text-base md:text-lg text-gray-600 leading-relaxed">
+                Zobrazte fotografie, recenze a detailní popisy vašich služeb profesionálně.
+              </p>
+            </div>
+          </div>
+
+          {/* CTA Box */}
+          <div className="max-w-4xl mx-auto mb-16 md:mb-20">
+            <div className="bg-pink-50 rounded-3xl p-8 md:p-12 border-2 border-pink-200 shadow-xl text-center">
+              <div className="inline-flex items-center px-4 py-2 bg-pink-100 rounded-full mb-6">
+                <Zap className="w-4 h-4 text-pink-600 mr-2" />
+                <span className="text-sm font-semibold text-pink-700">Rychlé 5minutové nastavení!</span>
+              </div>
+              <h3 className="text-3xl md:text-4xl font-display font-bold text-gray-900 mb-4">
+                Začněte růst svůj byznys ještě dnes
+              </h3>
+              <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+                Vyplňte jednoduchý formulář, nahrajte úžasné fotografie z vašich předchozích svateb a začněte získávat nové klienty.
+              </p>
+              <button
+                onClick={handleVendorRegister}
+                className="inline-flex items-center space-x-3 px-8 md:px-10 py-4 md:py-5 text-lg md:text-xl font-semibold rounded-full bg-pink-500 text-white shadow-lg hover:bg-pink-600 transition-all duration-300 button-glow mb-6"
+              >
+                <Award className="w-6 h-6" />
+                <span>Registrovat se jako dodavatel</span>
+                <ArrowRight className="w-6 h-6" />
+              </button>
+              <div className="grid grid-cols-3 gap-6 max-w-xl mx-auto pt-6 border-t border-pink-200">
+                <div className="text-center">
+                  <div className="text-2xl md:text-3xl font-bold text-purple-600 mb-1">100%</div>
+                  <div className="text-sm text-gray-600">Zdarma</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl md:text-3xl font-bold text-pink-600 mb-1">24-48h</div>
+                  <div className="text-sm text-gray-600">Schválení</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl md:text-3xl font-bold text-purple-600 mb-1">50+</div>
+                  <div className="text-sm text-gray-600">Dodavatelů</div>
+                </div>
               </div>
             </div>
-            <div className="md:w-1/2 p-6 md:p-10 lg:p-12 flex flex-col justify-center bg-gradient-to-br from-gray-50 to-white">
-              <div className="mb-6 md:mb-8">
-                <div className="inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 bg-pink-100 rounded-full mb-4 md:mb-6 shadow-sm">
-                  <Zap className="w-3 h-3 md:w-4 md:h-4 text-pink-600 mr-1.5 md:mr-2" />
-                  <span className="text-xs md:text-sm font-medium text-pink-700">Rychlé 5minutové nastavení!</span>
-                </div>
-                <h3 className="text-2xl md:text-3xl font-display font-bold text-gray-900 mb-3 md:mb-4">Začněte růst svůj byznys ještě dnes</h3>
-                <p className="text-sm md:text-base text-gray-600 mb-6 md:mb-8 leading-relaxed">
-                  Vyplňte jednoduchý formulář, nahrajte úžasné fotografie z vašich předchozích svateb a začněte získávat nové klienty.
-                </p>
-                <button onClick={handleVendorRegister} className="w-full flex items-center justify-center space-x-2 md:space-x-3 px-6 py-3 md:px-8 md:py-5 text-base md:text-lg font-semibold rounded-full bg-pink-500 text-white shadow-lg hover:bg-pink-600 transition-all duration-300 button-glow mb-4 md:mb-6">
-                  <Award className="w-5 h-5 md:w-6 md:h-6" />
-                  <span>Registrovat se jako dodavatel</span>
-                  <ArrowRight className="w-5 h-5 md:w-6 md:h-6" />
-                </button>
-                <div className="text-center">
-                  <p className="text-xs md:text-sm text-gray-500">Už máte účet? <button onClick={handleLogin} className="text-rose-600 hover:text-rose-700 font-medium">Přihlásit se</button></p>
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-3 md:gap-4 pt-6 md:pt-8 border-t border-gray-100">
-                <div className="text-center">
-                  <div className="text-xl md:text-2xl font-bold text-purple-600 mb-1">Moderní</div>
-                  <div className="text-xs text-gray-600">Platforma</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xl md:text-2xl font-bold text-pink-600 mb-1">100%</div>
-                  <div className="text-xs text-gray-600">Zdarma</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xl md:text-2xl font-bold text-purple-600 mb-1">24-48h</div>
-                  <div className="text-xs text-gray-600">Schválení</div>
-                </div>
-              </div>
-            </div>
+          </div>
+
+          {/* Vendor Cards Preview */}
+          <div className="text-center mb-12">
+            <h3 className="text-3xl md:text-4xl font-display font-bold text-gray-900 mb-4">
+              Jak vypadají karty dodavatelů
+            </h3>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Ilustrační příklad karet dodavatelů z marketplace
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+            <VendorCard vendor={mockVendors[0]} disableLink={true} />
+            <VendorCard vendor={mockVendors[1]} disableLink={true} />
+            <VendorCard vendor={mockVendors[2]} disableLink={true} />
           </div>
         </div>
       </section>

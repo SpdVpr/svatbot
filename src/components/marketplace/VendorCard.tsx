@@ -26,9 +26,10 @@ interface VendorCardProps {
   compact?: boolean
   isFavorite?: (vendorId: string) => boolean
   toggleFavorite?: (vendorId: string) => Promise<boolean>
+  disableLink?: boolean
 }
 
-export default function VendorCard({ vendor, compact = false, isFavorite, toggleFavorite }: VendorCardProps) {
+export default function VendorCard({ vendor, compact = false, isFavorite, toggleFavorite, disableLink = false }: VendorCardProps) {
   const [isAdding, setIsAdding] = useState(false)
   const [isAdded, setIsAdded] = useState(false)
 
@@ -106,12 +107,11 @@ export default function VendorCard({ vendor, compact = false, isFavorite, toggle
   // Get popular service
   const popularService = vendor.services.find(s => s.popular) || vendor.services[0]
 
-  return (
-    <Link href={`/marketplace/vendor/${vendor.id}`} className="block">
-      <div
-        className="wedding-card group hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer"
-        style={getViewTransitionName(`vendor-card-${vendor.id}`)}
-      >
+  const cardContent = (
+    <div
+      className={`wedding-card group hover:shadow-lg transition-all duration-300 overflow-hidden ${!disableLink ? 'cursor-pointer' : ''}`}
+      style={getViewTransitionName(`vendor-card-${vendor.id}`)}
+    >
         {/* Image */}
         <div className="relative h-48 overflow-hidden rounded-t-xl">
           <img
@@ -263,7 +263,7 @@ export default function VendorCard({ vendor, compact = false, isFavorite, toggle
           {/* Actions */}
           <div className="space-y-2">
             {/* Add to my vendors button */}
-            {user && (
+            {user && !disableLink && (
               <button
                 onClick={(e) => {
                   e.preventDefault()
@@ -305,6 +305,11 @@ export default function VendorCard({ vendor, compact = false, isFavorite, toggle
           </div>
         </div>
       </div>
+  )
+
+  return disableLink ? cardContent : (
+    <Link href={`/marketplace/vendor/${vendor.id}`} className="block">
+      {cardContent}
     </Link>
   )
 }
