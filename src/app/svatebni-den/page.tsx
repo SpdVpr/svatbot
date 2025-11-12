@@ -47,6 +47,7 @@ export default function SvatebniDenPage() {
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const dragTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const editFormRef = useRef<HTMLDivElement | null>(null)
 
   const handleSelectPredefined = (activity: typeof PREDEFINED_ACTIVITIES[0]) => {
     setSelectedActivity(activity)
@@ -130,7 +131,9 @@ export default function SvatebniDenPage() {
       location: item.location,
       notes: item.notes
     })
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    setTimeout(() => {
+      editFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 100)
   }
 
   const handleUpdate = async (e: React.FormEvent) => {
@@ -388,7 +391,7 @@ export default function SvatebniDenPage() {
 
         {/* Edit Activity Form */}
         {editingId && (
-          <div className="wedding-card mb-8 animate-fade-in">
+          <div ref={editFormRef} className="wedding-card mb-8 animate-fade-in">
             <div className="flex items-center space-x-3 mb-6">
               <div className="w-12 h-12 bg-secondary-100 rounded-full flex items-center justify-center">
                 <Clock className="w-6 h-6 text-secondary-600" />
