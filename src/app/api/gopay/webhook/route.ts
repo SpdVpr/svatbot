@@ -177,6 +177,46 @@ export async function GET(request: NextRequest) {
 
       if (isRecurring) {
         console.log('✅ Subscription RENEWED (recurring payment) for user:', userId)
+
+        // For recurring payments, send email directly since trigger won't fire
+        try {
+          // Get user data for email
+          const userDoc = await adminDb.collection('users').doc(userId).get()
+          if (userDoc.exists) {
+            const userData = userDoc.data()
+            if (userData?.email && userData?.firstName) {
+              // Call Firebase Function to send email
+              const functionUrl = process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_URL ||
+                                 'https://europe-west1-svatbot-app.cloudfunctions.net'
+
+              const emailResponse = await fetch(`${functionUrl}/sendPaymentEmail`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  email: userData.email,
+                  firstName: userData.firstName,
+                  userId,
+                  plan,
+                  amount: payment.amount / 100,
+                  currency: payment.currency,
+                  isRecurring: true
+                })
+              })
+
+              if (emailResponse.ok) {
+                console.log('✅ Recurring payment email sent to:', userData.email)
+              } else {
+                const errorText = await emailResponse.text()
+                console.error('❌ Failed to send recurring payment email:', errorText)
+              }
+            }
+          }
+        } catch (emailError) {
+          console.error('❌ Error sending recurring payment email:', emailError)
+          // Don't fail the webhook if email fails
+        }
       } else {
         console.log('✅ Subscription ACTIVATED (initial payment) for user:', userId)
       }

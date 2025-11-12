@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setAdminRole = exports.createVendor = exports.getVendors = exports.sendVendorContactEmails = exports.onMarketplaceVendorUpdate = exports.onMarketplaceVendorCreate = exports.checkTrialExpiry = exports.onPaymentSuccess = exports.scheduledCleanup = exports.onInquiryCreate = exports.onReviewUpdate = exports.onReviewCreate = exports.onVendorUpdate = exports.onUserCreate = exports.api = void 0;
+exports.setAdminRole = exports.createVendor = exports.getVendors = exports.sendPaymentEmail = exports.sendVendorContactEmails = exports.onMarketplaceVendorUpdate = exports.onMarketplaceVendorCreate = exports.checkTrialExpiry = exports.onPaymentSuccess = exports.scheduledCleanup = exports.onInquiryCreate = exports.onReviewUpdate = exports.onReviewCreate = exports.onVendorUpdate = exports.onUserCreate = exports.api = void 0;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const express_1 = __importDefault(require("express"));
@@ -164,6 +164,8 @@ Object.defineProperty(exports, "onMarketplaceVendorUpdate", { enumerable: true, 
 // HTTPS functions
 var sendVendorContactEmails_1 = require("./https/sendVendorContactEmails");
 Object.defineProperty(exports, "sendVendorContactEmails", { enumerable: true, get: function () { return sendVendorContactEmails_1.sendVendorContactEmails; } });
+var sendPaymentEmail_1 = require("./https/sendPaymentEmail");
+Object.defineProperty(exports, "sendPaymentEmail", { enumerable: true, get: function () { return sendPaymentEmail_1.sendPaymentEmail; } });
 // Callable functions for client-side
 var getVendors_1 = require("./callable/getVendors");
 Object.defineProperty(exports, "getVendors", { enumerable: true, get: function () { return __importDefault(getVendors_1).default; } });
