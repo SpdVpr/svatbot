@@ -473,9 +473,9 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
 
           {layout.isEditMode && (
             <div
-              className="mt-4 p-4 bg-gradient-to-br from-primary-50 to-rose-50 border border-primary-200/50 rounded-2xl backdrop-blur-xl shadow-lg"
+              className="mt-4 p-4 bg-primary-50 border border-primary-200/50 rounded-2xl backdrop-blur-xl shadow-lg"
               style={{
-                boxShadow: '0 4px 12px rgba(244, 63, 94, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
               }}
             >
               <div className="flex items-start space-x-3">
@@ -492,12 +492,6 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
                         {layoutMode === 'grid' && ' - automaticky se přichytí k mřížce'}
                       </span>
                     </div>
-                    {layoutMode === 'grid' && (
-                      <div className="flex items-start">
-                        <span className="mr-2 text-primary-600">•</span>
-                        <span><strong>Vodící čáry:</strong> Modré čáry se zobrazí při přetahování pro snadné zarovnání</span>
-                      </div>
-                    )}
                     <div className="flex items-start">
                       <span className="mr-2 text-primary-600">•</span>
                       <span><strong>Změnit velikost:</strong> Táhněte za pravý dolní roh modulu</span>

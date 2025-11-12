@@ -1291,26 +1291,25 @@ export default function WelcomeScreen() {
               </div>
             </div>
             <div>
-              <h3 className="font-semibold text-xl mb-5 text-white">Funkce</h3>
+              <h3 className="font-semibold text-xl mb-5 text-white">Navigace</h3>
               <ul className="space-y-3 text-gray-300">
-                <li><a href="#features" className="hover:text-rose-300 transition-colors">AI Asistent</a></li>
-                <li><a href="#features" className="hover:text-rose-300 transition-colors">Správa hostů & RSVP</a></li>
-                <li><a href="#features" className="hover:text-rose-300 transition-colors">Rozpočet</a></li>
-                <li><a href="#features" className="hover:text-rose-300 transition-colors">Úkoly & Timeline</a></li>
-                <li><a href="#features" className="hover:text-rose-300 transition-colors">Seating Plan</a></li>
-                <li><a href="#features" className="hover:text-rose-300 transition-colors">Svatební web</a></li>
+                <li><a href="#features" className="hover:text-rose-300 transition-colors">Funkce</a></li>
+                <li><a href="#pricing" className="hover:text-rose-300 transition-colors">Ceník</a></li>
+                <li><a href="#benefits" className="hover:text-rose-300 transition-colors">Výhody</a></li>
+                <li><a href="#testimonials" className="hover:text-rose-300 transition-colors">Reference</a></li>
                 <li><a href="#vendors" className="hover:text-rose-300 transition-colors">Marketplace</a></li>
+                <li><a href="#faq" className="hover:text-rose-300 transition-colors">FAQ</a></li>
+                <li><a href="#contact" className="hover:text-rose-300 transition-colors">Kontakt</a></li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold text-xl mb-5 text-white">Podpora</h3>
               <ul className="space-y-3 text-gray-300">
-                <li><a href="#contact" className="hover:text-rose-300 transition-colors">Kontakt</a></li>
-                <li><a href="#pricing" className="hover:text-rose-300 transition-colors">Ceník</a></li>
-                <li><a href="#dashboard" className="hover:text-rose-300 transition-colors">Demo</a></li>
-                <li><a href="#vendors" className="hover:text-rose-300 transition-colors">Pro dodavatele</a></li>
+                <li><button onClick={handleDemoLogin} className="hover:text-rose-300 transition-colors text-left">Demo účet</button></li>
                 <li><a href="/affiliate" className="hover:text-rose-300 transition-colors">Affiliate program</a></li>
                 <li><a href="/ochrana-soukromi" className="hover:text-rose-300 transition-colors">Ochrana soukromí</a></li>
+                <li><a href="/obchodni-podminky" className="hover:text-rose-300 transition-colors">Obchodní podmínky</a></li>
+                <li><a href="/podminky-sluzby" className="hover:text-rose-300 transition-colors">Podmínky služby</a></li>
                 <li><a href="/gdpr" className="hover:text-rose-300 transition-colors">GDPR</a></li>
               </ul>
             </div>

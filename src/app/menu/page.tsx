@@ -18,7 +18,8 @@ import {
   Upload,
   Edit,
   List,
-  Trash2
+  Trash2,
+  Coins
 } from 'lucide-react'
 import Link from 'next/link'
 import { FOOD_CATEGORY_LABELS, DRINK_CATEGORY_LABELS, FoodCategory, DrinkCategory } from '@/types/menu'
@@ -214,10 +215,10 @@ export default function MenuPage() {
               <div>
                 <p className="text-sm text-gray-600">Odhadované náklady</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {(stats.totalEstimatedCost / 1000).toFixed(0)}k
+                  {(stats.totalEstimatedCost / 1000).toFixed(0)}k Kč
                 </p>
               </div>
-              <div className="text-green-600 text-2xl">Kč</div>
+              <Coins className="w-8 h-8 text-primary-600" />
             </div>
           </div>
         </div>

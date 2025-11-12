@@ -235,6 +235,17 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
         estimatedDuration: '2-3 týdny',
         icon: '🎵',
         order: 8
+      },
+      {
+        id: '6-9m-009',
+        title: 'Vybrat a rezervovat floristku',
+        description: 'Rezervovat floristku pro květinovou výzdobu',
+        category: 'preparation',
+        phase: 'before-wedding',
+        priority: 'high',
+        estimatedDuration: '1-2 týdny',
+        icon: '💐',
+        order: 9
       }
     ]
   },
@@ -687,5 +698,16 @@ export const CHECKLIST_TO_TASK_CATEGORY_MAP: Record<ChecklistItem['category'], s
   'post-wedding': 'other',
   'legal': 'legal',
   'other': 'other'
+}
+
+// Defaultní přesuny položek do jiných fází
+// Tyto položky se defaultně zobrazí v jiné fázi než je jejich původní umístění
+export const DEFAULT_PHASE_MAP: Record<string, string> = {
+  '3-5m-001': '6-9-months-before',  // Vizážistka → 6-9 měsíců
+  '6-9m-005': '3-5-months-before',  // Snubní prstýnky → 3-5 měsíců
+  '2m-003': '3-5-months-before',    // Dekorace → 3-5 měsíců
+  '2m-004': '3-5-months-before',    // Sweet bar → 3-5 měsíců
+  '12m-005': '6-9-months-before',   // Oddávající → 6-9 měsíců
+  '2m-011': '3-5-months-before'     // Doprava pro hosty → 3-5 měsíců
 }
 

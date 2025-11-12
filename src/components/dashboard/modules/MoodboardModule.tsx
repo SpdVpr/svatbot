@@ -122,15 +122,6 @@ export default function MoodboardModule() {
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-
-          {/* Recent Activity */}
-          {images.length > 0 && (
-            <div className="pt-2 border-t border-gray-100">
-              <p className="text-xs text-gray-500">
-                Poslední přidáno: {images[0]?.createdAt.toLocaleDateString('cs-CZ')}
-              </p>
-            </div>
-          )}
         </div>
       )}
     </div>

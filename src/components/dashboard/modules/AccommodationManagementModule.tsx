@@ -38,20 +38,11 @@ export default function AccommodationManagementModule() {
         <div className="flex-1 flex flex-col justify-between min-h-0">
           <div className="space-y-3">
             {/* Progress Overview */}
-            <div className="bg-primary-50 p-3 rounded-lg glass-morphism">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-primary-900">Obsazenost</span>
-                <span className="text-lg font-bold text-primary-600">{stats.occupancyRate}%</span>
+            <div className="bg-primary-50 p-2 rounded-lg glass-morphism text-center">
+              <div className="text-xl sm:text-2xl font-bold text-primary-600 mb-1">
+                {stats.occupancyRate}%
               </div>
-              <div className="w-full bg-primary-200 rounded-full h-2">
-                <div
-                  className="bg-primary-600 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${stats.occupancyRate}%` }}
-                />
-              </div>
-              <div className="text-xs text-primary-700 mt-1">
-                {stats.occupiedRooms} z {stats.totalRooms} pokojů
-              </div>
+              <div className="text-xs sm:text-sm text-primary-700">Obsazenost pokojů</div>
             </div>
 
             {/* Quick Stats */}

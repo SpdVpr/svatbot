@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
-import { WEDDING_CHECKLIST, ChecklistItem, ChecklistPhase } from '@/data/weddingChecklistTemplates'
+import { WEDDING_CHECKLIST, ChecklistItem, ChecklistPhase, DEFAULT_PHASE_MAP } from '@/data/weddingChecklistTemplates'
 import { useTask } from '@/hooks/useTask'
 import { useWedding } from '@/hooks/useWedding'
 import { useAuth } from '@/hooks/useAuth'
@@ -17,7 +17,8 @@ import {
   Info,
   ArrowRight,
   Sparkles,
-  X
+  X,
+  RotateCcw
 } from 'lucide-react'
 
 interface WeddingChecklistProps {
@@ -80,6 +81,9 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
           const storedPhaseMap = sessionStorage.getItem(phaseMapKey)
           if (storedPhaseMap) {
             setItemPhaseMap(JSON.parse(storedPhaseMap))
+          } else {
+            // Use default phase map for new demo users
+            setItemPhaseMap(DEFAULT_PHASE_MAP)
           }
         } else if (user) {
           // Load from Firestore for real user
@@ -90,10 +94,13 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
             const data = checklistDoc.data()
             const completedIds = data.completedItems || []
             const hiddenIds = data.hiddenItems || []
-            const phaseMap = data.itemPhaseMap || {}
+            const phaseMap = data.itemPhaseMap || DEFAULT_PHASE_MAP
             setCompletedItems(new Set(completedIds))
             setHiddenItems(new Set(hiddenIds))
             setItemPhaseMap(phaseMap)
+          } else {
+            // Use default phase map for new users
+            setItemPhaseMap(DEFAULT_PHASE_MAP)
           }
         }
       } catch (error) {
@@ -273,6 +280,25 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
     })
   }
 
+  // Reset all items to default positions
+  const handleResetPositions = async () => {
+    return withDemoCheck(async () => {
+      try {
+        if (!confirm('Opravdu chcete resetovat všechny položky do výchozích pozic? Tato akce neovlivní dokončené úkoly.')) {
+          return
+        }
+
+        setItemPhaseMap(DEFAULT_PHASE_MAP)
+        await saveChecklistData(completedItems, hiddenItems, DEFAULT_PHASE_MAP)
+
+        alert('Všechny položky byly resetovány do výchozích pozic.')
+      } catch (error) {
+        console.error('Error resetting positions:', error)
+        alert('Chyba při resetování pozic')
+      }
+    })
+  }
+
   // Mark item as complete
   const handleMarkComplete = async (item: ChecklistItem) => {
     return withDemoCheck(async () => {
@@ -412,15 +438,25 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
     const data = e.dataTransfer.getData('text/plain')
     const [itemId, sourcePhaseId] = data.split('|')
 
-    if (sourcePhaseId === targetPhaseId) {
+    // Get current phase from itemPhaseMap or original phase
+    const currentPhaseId = itemPhaseMap[itemId] || sourcePhaseId
+
+    if (currentPhaseId === targetPhaseId) {
       setDraggedItem(null)
       setDragOverPhase(null)
       setIsDragging(false)
       return
     }
 
-    const sourcePhase = WEDDING_CHECKLIST.find(p => p.id === sourcePhaseId)
-    const item = sourcePhase?.items.find(i => i.id === itemId)
+    // Find item in original WEDDING_CHECKLIST (items never move from there, only their mapping changes)
+    let item: ChecklistItem | undefined
+    for (const phase of WEDDING_CHECKLIST) {
+      const foundItem = phase.items.find(i => i.id === itemId)
+      if (foundItem) {
+        item = foundItem
+        break
+      }
+    }
 
     if (!item) {
       setDraggedItem(null)
@@ -525,9 +561,18 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
     }
 
     if (isDragging && dragOverPhase) {
-      const currentPhase = itemPhaseMap[draggedItem] || WEDDING_CHECKLIST.find(phase => 
-        phase.items.some(item => item.id === draggedItem)
-      )?.id
+      // Get current phase from itemPhaseMap first, then fallback to original phase
+      let currentPhase = itemPhaseMap[draggedItem]
+
+      if (!currentPhase) {
+        // Find original phase if not in itemPhaseMap
+        for (const phase of WEDDING_CHECKLIST) {
+          if (phase.items.some(item => item.id === draggedItem)) {
+            currentPhase = phase.id
+            break
+          }
+        }
+      }
 
       if (currentPhase !== dragOverPhase) {
         try {
@@ -693,12 +738,22 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
               Předpřipravené úkoly pro vaši svatbu. Úkoly můžete přesouvat mezi kategoriemi, označit jako hotové nebo přidat do modulu Úkoly.
             </p>
           </div>
-          <div className="text-right flex-shrink-0">
-            <div className="text-xl font-bold text-green-600">
-              {completedCount} / {totalItems}
-            </div>
-            <div className="text-xs text-gray-600">
-              {overallPercentage}% dokončeno
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <button
+              onClick={handleResetPositions}
+              className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-1.5"
+              title="Resetovat všechny položky do výchozích pozic"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Reset pozic</span>
+            </button>
+            <div className="text-right">
+              <div className="text-xl font-bold text-green-600">
+                {completedCount} / {totalItems}
+              </div>
+              <div className="text-xs text-gray-600">
+                {overallPercentage}% dokončeno
+              </div>
             </div>
           </div>
         </div>

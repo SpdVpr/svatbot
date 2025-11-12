@@ -114,9 +114,9 @@ export default function BudgetList({
   const getPaymentStatusDisplay = (status: string) => {
     switch (status) {
       case 'paid':
-        return { icon: CheckCircle2, color: 'text-green-500', bg: 'bg-green-50', label: 'Zaplaceno' }
+        return { icon: CheckCircle2, color: 'text-green-700', bg: 'bg-green-100', label: 'Zaplaceno' }
       case 'partial':
-        return { icon: Clock, color: 'text-accent-500', bg: 'bg-accent-50', label: 'Částečně' }
+        return { icon: CheckCircle2, color: 'text-green-700', bg: 'bg-green-100', label: 'Částečně zaplaceno' }
       case 'overdue':
         return { icon: AlertTriangle, color: 'text-red-500', bg: 'bg-red-50', label: 'Po splatnosti' }
       case 'cancelled':
@@ -132,11 +132,11 @@ export default function BudgetList({
   const getPriorityDisplay = (priority?: string) => {
     switch (priority) {
       case 'critical':
-        return { color: 'text-red-600', bg: 'bg-red-100', label: 'Kritická' }
+        return { color: 'text-red-700', bg: 'bg-red-100', label: 'Kritická' }
       case 'high':
-        return { color: 'text-accent-600', bg: 'bg-accent-100', label: 'Vysoká' }
+        return { color: 'text-orange-700', bg: 'bg-orange-100', label: 'Vysoká' }
       case 'medium':
-        return { color: 'text-primary-600', bg: 'bg-primary-100', label: 'Střední' }
+        return { color: 'text-yellow-700', bg: 'bg-yellow-100', label: 'Střední' }
       case 'low':
         return { color: 'text-gray-600', bg: 'bg-gray-100', label: 'Nízká' }
       default:

@@ -35,7 +35,7 @@ export default function SeatingPlanModule() {
 
       <div className="space-y-3 sm:space-y-4">
         {/* Seating Overview */}
-        <div className="bg-primary-50 p-3 rounded-lg text-center glass-morphism">
+        <div className="bg-primary-50 p-2.5 rounded-lg text-center glass-morphism">
           <div className="text-xl sm:text-2xl font-bold text-primary-600 mb-1">
             <NumberCounter end={seatingStats.totalTables} duration={1800} />
           </div>
