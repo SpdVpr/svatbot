@@ -184,7 +184,7 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Heart className="w-5 h-5 text-primary-600" />
-            <h3 className="text-lg text-gray-900" style={{ fontWeight: 600 }}>Zprávy od Svatbota</h3>
+            <h3 className="font-semibold text-gray-900">Zprávy od Svatbota</h3>
           </div>
           {activeSuggestions.length > 0 && (
             <span className="text-sm text-gray-600">

@@ -247,14 +247,14 @@ export default function WeddingWebsitePage() {
         </div>
 
         {/* Quick actions */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Link
             href="/wedding-website/builder"
-            className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
+            className="group bg-white rounded-lg shadow-sm p-6 border-2 border-transparent hover:border-pink-500 hover:shadow-lg transition-all cursor-pointer"
           >
-            <Edit className="w-8 h-8 text-pink-500 mb-3" />
-            <h3 className="font-semibold text-gray-900 mb-2">
-              Upravit obsah
+            <Edit className="w-8 h-8 text-pink-500 mb-3 group-hover:scale-110 transition-transform" />
+            <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-pink-600 transition-colors">
+              Upravit obsah →
             </h3>
             <p className="text-sm text-gray-600">
               Změňte texty, fotky a nastavení webu
@@ -263,11 +263,11 @@ export default function WeddingWebsitePage() {
 
           <Link
             href="/wedding-website/rsvp"
-            className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
+            className="group bg-white rounded-lg shadow-sm p-6 border-2 border-transparent hover:border-blue-500 hover:shadow-lg transition-all cursor-pointer"
           >
-            <MessageSquare className="w-8 h-8 text-blue-500 mb-3" />
-            <h3 className="font-semibold text-gray-900 mb-2">
-              Správa RSVP
+            <MessageSquare className="w-8 h-8 text-blue-500 mb-3 group-hover:scale-110 transition-transform" />
+            <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+              Správa RSVP →
             </h3>
             <p className="text-sm text-gray-600">
               Zobrazit a spravovat odpovědi hostů
@@ -276,102 +276,79 @@ export default function WeddingWebsitePage() {
 
           <Link
             href="/wedding-website/analytics"
-            className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
+            className="group bg-white rounded-lg shadow-sm p-6 border-2 border-transparent hover:border-green-500 hover:shadow-lg transition-all cursor-pointer"
           >
-            <BarChart3 className="w-8 h-8 text-green-500 mb-3" />
-            <h3 className="font-semibold text-gray-900 mb-2">
-              Statistiky
+            <BarChart3 className="w-8 h-8 text-green-500 mb-3 group-hover:scale-110 transition-transform" />
+            <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-green-600 transition-colors">
+              Statistiky →
             </h3>
             <p className="text-sm text-gray-600">
               Sledujte návštěvnost a aktivitu
             </p>
           </Link>
+        </div>
 
-          {/* QR Code Card */}
-          {website.isPublished && (
-            <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-              <QrCode className="w-8 h-8 text-purple-500 mb-3" />
-              <h3 className="font-semibold text-gray-900 mb-2">
+        {/* Website Preview */}
+        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-gray-900">
+              Náhled webu
+            </h3>
+          </div>
+          <div className="border border-gray-200 rounded-lg overflow-hidden bg-gradient-to-br from-pink-50 to-purple-50 p-8">
+            <div className="text-center">
+              <div className="mb-6">
+                <Eye className="w-12 h-12 text-pink-500 mx-auto mb-4" />
+                <h4 className="text-lg font-semibold text-gray-900 mb-2">
+                  Váš svatební web je připraven!
+                </h4>
+                <p className="text-gray-600 mb-2 text-sm">
+                  URL: <span className="font-mono text-pink-600">{previewUrl}</span>
+                </p>
+                <p className="text-xs text-gray-500">
+                  Klikněte na tlačítko níže pro zobrazení webu
+                </p>
+              </div>
+              <Link
+                href={previewUrl}
+                target="_blank"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white px-6 py-3 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all"
+              >
+                <Eye className="w-5 h-5" />
+                Zobrazit svatební web
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* QR Code Section */}
+        {website.isPublished && (
+          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200 mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-gray-900">
                 QR kód webu
               </h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Sdílejte web pomocí QR kódu
-              </p>
-              <div className="flex justify-center">
+            </div>
+            <div className="border border-gray-200 rounded-lg overflow-hidden bg-gradient-to-br from-purple-50 to-pink-50 p-8">
+              <div className="text-center">
+                <div className="mb-4">
+                  <QrCode className="w-12 h-12 text-purple-500 mx-auto mb-4" />
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2">
+                    Sdílejte web pomocí QR kódu
+                  </h4>
+                  <p className="text-xs text-gray-500 mb-6">
+                    Hosté mohou naskenovat kód a okamžitě se dostat na váš svatební web
+                  </p>
+                </div>
                 <WeddingWebsiteQRCode
                   url={websiteUrl}
-                  size={120}
-                  showDownload={false}
+                  size={200}
+                  showDownload={true}
                 />
               </div>
             </div>
-          )}
-        </div>
-
-        {/* Website Preview and QR Code */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Website Preview */}
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-gray-900">
-                Náhled webu
-              </h3>
-            </div>
-            <div className="border border-gray-200 rounded-lg overflow-hidden bg-gradient-to-br from-pink-50 to-purple-50 p-8">
-              <div className="text-center">
-                <div className="mb-6">
-                  <Eye className="w-12 h-12 text-pink-500 mx-auto mb-4" />
-                  <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                    Váš svatební web je připraven!
-                  </h4>
-                  <p className="text-gray-600 mb-2 text-sm">
-                    URL: <span className="font-mono text-pink-600">{previewUrl}</span>
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Klikněte na tlačítko níže pro zobrazení webu
-                  </p>
-                </div>
-                <Link
-                  href={previewUrl}
-                  target="_blank"
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white px-6 py-3 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all"
-                >
-                  <Eye className="w-5 h-5" />
-                  Zobrazit svatební web
-                </Link>
-              </div>
-            </div>
           </div>
-
-          {/* QR Code Section */}
-          {website.isPublished && (
-            <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-900">
-                  QR kód webu
-                </h3>
-              </div>
-              <div className="border border-gray-200 rounded-lg overflow-hidden bg-gradient-to-br from-purple-50 to-pink-50 p-8">
-                <div className="text-center">
-                  <div className="mb-4">
-                    <QrCode className="w-12 h-12 text-purple-500 mx-auto mb-4" />
-                    <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                      Sdílejte web pomocí QR kódu
-                    </h4>
-                    <p className="text-xs text-gray-500 mb-6">
-                      Hosté mohou naskenovat kód a okamžitě se dostat na váš svatební web
-                    </p>
-                  </div>
-                  <WeddingWebsiteQRCode
-                    url={websiteUrl}
-                    size={200}
-                    showDownload={true}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+        )}
 
         {/* Danger zone */}
         <div className="bg-white rounded-lg shadow-sm p-6 border border-red-200">

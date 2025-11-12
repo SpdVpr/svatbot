@@ -114,15 +114,15 @@ export default function BudgetList({
   const getPaymentStatusDisplay = (status: string) => {
     switch (status) {
       case 'paid':
-        return { icon: CheckCircle2, color: 'text-green-700', bg: 'bg-green-100', label: 'Zaplaceno' }
+        return { icon: CheckCircle2, color: 'text-primary-700', bg: 'bg-primary-100', label: 'Zaplaceno' }
       case 'partial':
-        return { icon: CheckCircle2, color: 'text-green-700', bg: 'bg-green-100', label: 'Částečně zaplaceno' }
+        return { icon: CheckCircle2, color: 'text-primary-700', bg: 'bg-primary-100', label: 'Částečně zaplaceno' }
       case 'overdue':
         return { icon: AlertTriangle, color: 'text-red-500', bg: 'bg-red-50', label: 'Po splatnosti' }
       case 'cancelled':
         return { icon: X, color: 'text-gray-500', bg: 'bg-gray-50', label: 'Zrušeno' }
       case 'pending':
-        return { icon: Clock, color: 'text-accent-600', bg: 'bg-accent-50', label: 'Čeká' }
+        return { icon: Clock, color: 'text-primary-600', bg: 'bg-primary-50', label: 'Čeká' }
       default:
         return { icon: Clock, color: 'text-gray-500', bg: 'bg-gray-50', label: 'Čeká' }
     }
@@ -148,19 +148,15 @@ export default function BudgetList({
   const getPaymentMethodDisplay = (method?: string) => {
     switch (method) {
       case 'cash':
-        return { icon: '💵', label: 'Hotovost', color: 'text-green-600', bg: 'bg-green-50' }
+        return { icon: '💵', label: 'Hotovost', color: 'text-primary-600', bg: 'bg-primary-50' }
       case 'card':
-        return { icon: '💳', label: 'Karta', color: 'text-blue-600', bg: 'bg-blue-50' }
+        return { icon: '💳', label: 'Karta', color: 'text-primary-600', bg: 'bg-primary-50' }
       case 'transfer':
-        return { icon: '🏦', label: 'Převod', color: 'text-purple-600', bg: 'bg-purple-50' }
+        return { icon: '🏦', label: 'Převod', color: 'text-primary-600', bg: 'bg-primary-50' }
       case 'invoice':
-        return { icon: '📝', label: 'Faktura', color: 'text-orange-600', bg: 'bg-orange-50' }
-      case 'after_wedding':
-        return { icon: '💒', label: 'Po svatbě', color: 'text-pink-600', bg: 'bg-pink-50' }
-      case 'at_wedding':
-        return { icon: '🎉', label: 'Na svatbě', color: 'text-rose-600', bg: 'bg-rose-50' }
+        return { icon: '📝', label: 'Faktura', color: 'text-primary-600', bg: 'bg-primary-50' }
       case 'other':
-        return { icon: '💰', label: 'Jiné', color: 'text-gray-600', bg: 'bg-gray-50' }
+        return { icon: '💰', label: 'Jiné', color: 'text-primary-600', bg: 'bg-primary-50' }
       default:
         return null
     }
@@ -172,9 +168,9 @@ export default function BudgetList({
       case 'before-wedding':
         return { icon: '📅', label: 'Před svatbou', color: 'text-primary-600', bg: 'bg-primary-50' }
       case 'at-wedding':
-        return { icon: '💒', label: 'Na svatbě', color: 'text-accent-600', bg: 'bg-accent-50' }
+        return { icon: '💒', label: 'Na svatbě', color: 'text-primary-600', bg: 'bg-primary-50' }
       case 'after-wedding':
-        return { icon: '✨', label: 'Po svatbě', color: 'text-gray-600', bg: 'bg-gray-50' }
+        return { icon: '✨', label: 'Po svatbě', color: 'text-primary-600', bg: 'bg-primary-50' }
       default:
         return null
     }
@@ -470,7 +466,7 @@ export default function BudgetList({
                         <div className="flex items-center flex-wrap gap-2 mb-2">
                           {/* Payment Status */}
                           <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${statusDisplay.bg} flex-shrink-0`}>
-                            <statusDisplay.icon className={`w-3 h-3 ${statusDisplay.color}`} />
+                            <statusDisplay.icon className={`w-3.5 h-3.5 ${statusDisplay.color}`} />
                             <span className={`text-xs font-medium ${statusDisplay.color} whitespace-nowrap`}>
                               {statusDisplay.label}
                             </span>
@@ -479,7 +475,7 @@ export default function BudgetList({
                           {/* Payment Method */}
                           {item.paymentMethod && getPaymentMethodDisplay(item.paymentMethod) && (
                             <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${getPaymentMethodDisplay(item.paymentMethod)!.bg} flex-shrink-0`}>
-                              <span>{getPaymentMethodDisplay(item.paymentMethod)!.icon}</span>
+                              <span className="text-xs leading-none">{getPaymentMethodDisplay(item.paymentMethod)!.icon}</span>
                               <span className={`text-xs font-medium ${getPaymentMethodDisplay(item.paymentMethod)!.color} whitespace-nowrap`}>
                                 {getPaymentMethodDisplay(item.paymentMethod)!.label}
                               </span>
@@ -489,7 +485,7 @@ export default function BudgetList({
                           {/* Payment Period */}
                           {item.paymentPeriod && getPaymentPeriodDisplay(item.paymentPeriod) && (
                             <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${getPaymentPeriodDisplay(item.paymentPeriod)!.bg} flex-shrink-0`}>
-                              <span>{getPaymentPeriodDisplay(item.paymentPeriod)!.icon}</span>
+                              <span className="text-xs leading-none">{getPaymentPeriodDisplay(item.paymentPeriod)!.icon}</span>
                               <span className={`text-xs font-medium ${getPaymentPeriodDisplay(item.paymentPeriod)!.color} whitespace-nowrap`}>
                                 {getPaymentPeriodDisplay(item.paymentPeriod)!.label}
                               </span>
@@ -498,7 +494,7 @@ export default function BudgetList({
 
                           {/* Priority */}
                           {priorityDisplay && (
-                            <div className={`flex items-center px-2 py-1 rounded-full ${priorityDisplay.bg} flex-shrink-0`}>
+                            <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${priorityDisplay.bg} flex-shrink-0`}>
                               <span className={`text-xs font-medium ${priorityDisplay.color} whitespace-nowrap`}>
                                 {priorityDisplay.label}
                               </span>
@@ -539,23 +535,23 @@ export default function BudgetList({
 
                         {/* Sub-items breakdown */}
                         {item.subItems && item.subItems.length > 0 && (
-                          <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                          <div className="mt-3 p-3 bg-primary-50 rounded-lg border border-primary-200">
                             <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm font-medium text-blue-900">
+                              <span className="text-sm font-medium text-primary-900">
                                 Rozdělení položky ({item.subItems.length})
                               </span>
-                              <span className="text-sm font-bold text-blue-600">
+                              <span className="text-sm font-bold text-primary-600">
                                 Celkem: {formatCurrency(item.subItems.reduce((sum, sub) => sum + sub.amount, 0), item.currency)}
                               </span>
                             </div>
                             <div className="space-y-1">
                               {item.subItems.map((subItem, index) => (
                                 <div key={subItem.id} className="flex items-center justify-between text-sm">
-                                  <span className="text-blue-800">
+                                  <span className="text-primary-800">
                                     {index + 1}. {subItem.name}
-                                    {subItem.notes && <span className="text-blue-600 ml-1">({subItem.notes})</span>}
+                                    {subItem.notes && <span className="text-primary-600 ml-1">({subItem.notes})</span>}
                                   </span>
-                                  <span className="font-medium text-blue-900">
+                                  <span className="font-medium text-primary-900">
                                     {formatCurrency(subItem.amount, subItem.currency)}
                                   </span>
                                 </div>
@@ -593,8 +589,8 @@ export default function BudgetList({
                                 <div key={payment.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs">
                                   <div className="flex items-center space-x-2 flex-wrap">
                                     <span className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                                      payment.status === 'completed' ? 'bg-green-500' :
-                                      payment.status === 'pending' ? 'bg-yellow-500' :
+                                      payment.status === 'completed' ? 'bg-primary-500' :
+                                      payment.status === 'pending' ? 'bg-primary-300' :
                                       payment.status === 'failed' ? 'bg-red-500' :
                                       'bg-gray-500'
                                     }`} />

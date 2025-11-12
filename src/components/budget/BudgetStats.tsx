@@ -212,7 +212,7 @@ export default function BudgetStats({
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-base font-semibold text-gray-900">Přehled rozpočtu</h3>
             <span className={`
-              px-3 py-1 rounded-full text-sm font-medium
+              px-2 py-1 rounded-full text-xs font-medium
               ${getBudgetHealthColor(stats.budgetUsed)}
             `}>
               {stats.budgetUsed}% využito
@@ -306,7 +306,7 @@ export default function BudgetStats({
           {/* At Wedding */}
           <div className="p-4 rounded-lg border border-gray-200">
             <div className="flex items-center space-x-2 mb-3">
-              <div className="w-2 h-2 rounded-full bg-accent-500"></div>
+              <div className="w-2 h-2 rounded-full bg-primary-500"></div>
               <h4 className="font-medium text-gray-900">Na svatbě</h4>
             </div>
             <div className="space-y-2 text-sm">
@@ -339,7 +339,7 @@ export default function BudgetStats({
           {/* After Wedding */}
           <div className="p-4 rounded-lg border border-gray-200">
             <div className="flex items-center space-x-2 mb-3">
-              <div className="w-2 h-2 rounded-full bg-gray-400"></div>
+              <div className="w-2 h-2 rounded-full bg-primary-500"></div>
               <h4 className="font-medium text-gray-900">Po svatbě</h4>
             </div>
             <div className="space-y-2 text-sm">

@@ -770,8 +770,8 @@ export default function BudgetForm({
                           Platba #{index + 1}
                         </span>
                         <span className={`px-2 py-1 rounded-full text-xs ${
-                          payment.status === 'completed' ? 'bg-green-100 text-green-700' :
-                          payment.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                          payment.status === 'completed' ? 'bg-primary-100 text-primary-700' :
+                          payment.status === 'pending' ? 'bg-primary-50 text-primary-600' :
                           payment.status === 'failed' ? 'bg-red-100 text-red-700' :
                           'bg-gray-100 text-gray-700'
                         }`}>
@@ -784,7 +784,7 @@ export default function BudgetForm({
                         <button
                           type="button"
                           onClick={() => editPayment(payment)}
-                          className="text-blue-500 hover:text-blue-700"
+                          className="text-primary-500 hover:text-primary-700"
                           title="Upravit platbu"
                         >
                           <Edit className="w-4 h-4" />
