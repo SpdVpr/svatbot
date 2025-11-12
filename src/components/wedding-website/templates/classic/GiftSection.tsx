@@ -1,20 +1,23 @@
 import type { GiftContent } from '@/types/wedding-website'
+import { useColorTheme } from '../ColorThemeContext'
 
 interface GiftSectionProps {
   content: GiftContent
 }
 
 export default function GiftSection({ content }: GiftSectionProps) {
+  const { theme } = useColorTheme()
+
   if (!content.enabled) return null
 
   return (
-    <section className="py-20 bg-gradient-to-br from-rose-50 to-amber-50">
+    <section className="py-20" style={{ backgroundColor: theme.bgGradientFrom }}>
       <div className="max-w-4xl mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4 font-serif">
             Svatební dary
           </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-amber-400 to-rose-400 mx-auto"></div>
+          <div className="w-24 h-1 mx-auto" style={{ backgroundColor: theme.primary }}></div>
         </div>
 
         <div className="text-center">

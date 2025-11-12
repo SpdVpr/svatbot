@@ -3,12 +3,14 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import type { FAQContent } from '@/types/wedding-website'
+import { useColorTheme } from '../ColorThemeContext'
 
 interface FAQSectionProps {
   content: FAQContent
 }
 
 export default function ClassicFAQSection({ content }: FAQSectionProps) {
+  const { theme } = useColorTheme()
   const [openIndex, setOpenIndex] = useState<number | null>(0)
 
   if (!content.enabled || !content.items || content.items.length === 0) {
@@ -26,14 +28,15 @@ export default function ClassicFAQSection({ content }: FAQSectionProps) {
           <h2 className="text-4xl font-bold text-gray-900 mb-4 font-serif">
             Často kladené otázky
           </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-amber-400 to-rose-400 mx-auto"></div>
+          <div className="w-24 h-1 mx-auto" style={{ backgroundColor: theme.primary }}></div>
         </div>
-        
+
         <div className="space-y-4">
           {content.items.map((item, index) => (
             <div
               key={index}
-              className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-xl shadow-md overflow-hidden border border-pink-100"
+              className="bg-white rounded-xl shadow-md overflow-hidden border"
+              style={{ borderColor: `${theme.primary}20` }}
             >
               <button
                 onClick={() => toggleFAQ(index)}

@@ -3,12 +3,14 @@
 import { useState } from 'react'
 import { Camera, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import type { GalleryContent, GalleryImage } from '@/types/wedding-website'
+import { useColorTheme } from '../ColorThemeContext'
 
 interface GallerySectionProps {
   content: GalleryContent
 }
 
 export default function ClassicGallerySection({ content }: GallerySectionProps) {
+  const { theme } = useColorTheme()
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [showAll, setShowAll] = useState(false)
@@ -45,7 +47,7 @@ export default function ClassicGallerySection({ content }: GallerySectionProps) 
 
   if (images.length === 0) {
     return (
-      <section className="py-24 bg-gradient-to-br from-pink-50 to-purple-50">
+      <section className="py-24" style={{ backgroundColor: theme.bgGradientFrom }}>
         <div className="max-w-6xl mx-auto px-4 text-center">
           <div className="mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
@@ -76,14 +78,14 @@ export default function ClassicGallerySection({ content }: GallerySectionProps) 
 
   return (
     <>
-      <section className="py-24 bg-gradient-to-br from-pink-50 to-purple-50">
+      <section className="py-24" style={{ backgroundColor: theme.bgGradientFrom }}>
         <div className="max-w-6xl mx-auto px-4">
           {/* Section Header */}
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4 scale-in">
               {content.title || 'Fotogalerie'}
             </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-pink-500 to-purple-500 mx-auto mb-6 slide-in-left" style={{ animationDelay: '0.2s' }}></div>
+            <div className="w-24 h-1 mx-auto mb-6 slide-in-left" style={{ animationDelay: '0.2s', backgroundColor: theme.primary }}></div>
             {content.subtitle && (
               <p className="text-xl text-gray-600 mb-4 slide-in-bottom" style={{ animationDelay: '0.3s' }}>{content.subtitle}</p>
             )}
@@ -134,7 +136,10 @@ export default function ClassicGallerySection({ content }: GallerySectionProps) 
             <div className="text-center">
               <button
                 onClick={() => setShowAll(true)}
-                className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-8 py-3 rounded-full font-semibold hover:from-pink-600 hover:to-purple-600 transition-all duration-300 shadow-lg hover:shadow-xl"
+                className="text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+                style={{ backgroundColor: theme.primary }}
+                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
+                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
               >
                 Zobrazit více fotek ({images.length - 9} dalších)
               </button>
@@ -146,7 +151,7 @@ export default function ClassicGallerySection({ content }: GallerySectionProps) 
             <div className="text-center">
               <button
                 onClick={() => setShowAll(false)}
-                className="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-8 py-3 rounded-full font-semibold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 shadow-lg hover:shadow-xl"
+                className="bg-gray-500 text-white px-8 py-3 rounded-full font-semibold hover:bg-gray-600 transition-all duration-300 shadow-lg hover:shadow-xl"
               >
                 Zobrazit méně
               </button>

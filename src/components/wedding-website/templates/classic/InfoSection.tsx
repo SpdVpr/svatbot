@@ -3,6 +3,7 @@
 import { MapPin, Clock, Car, Info } from 'lucide-react'
 import type { InfoContent } from '@/types/wedding-website'
 import GoogleMapsEmbed from '../../GoogleMapsEmbed'
+import { useColorTheme } from '../ColorThemeContext'
 
 interface InfoSectionProps {
   content: InfoContent
@@ -10,6 +11,7 @@ interface InfoSectionProps {
 
 export default function InfoSection({ content }: InfoSectionProps) {
   const { ceremony, reception, parking, customInfo } = content
+  const { theme } = useColorTheme()
 
   // Check which venue sections are filled
   const hasCeremony = ceremony && (ceremony.venue || ceremony.time || ceremony.address)
@@ -35,14 +37,14 @@ export default function InfoSection({ content }: InfoSectionProps) {
   }
 
   return (
-    <section className="py-20 bg-gradient-to-b from-white to-amber-50/30">
+    <section className="py-20" style={{ backgroundColor: theme.bgGradientFrom }}>
       <div className="max-w-7xl mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-5xl font-bold text-gray-900 mb-4 font-serif scale-in">
             {ceremony?.venue || reception?.venue || 'Místo konání'}
           </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-amber-400 to-rose-400 mx-auto mb-6 slide-in-left" style={{ animationDelay: '0.2s' }}></div>
+          <div className="w-24 h-1 mx-auto mb-6 slide-in-left" style={{ animationDelay: '0.2s', backgroundColor: theme.primary }}></div>
           <p className="text-gray-600 text-lg leading-relaxed max-w-3xl mx-auto slide-in-bottom" style={{ animationDelay: '0.3s' }}>
             {ceremony?.address || reception?.address || 'Všechny důležité informace o našem velkém dni'}
           </p>
@@ -54,13 +56,16 @@ export default function InfoSection({ content }: InfoSectionProps) {
             <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-amber-100">
               {/* Venue Images - First */}
               {allVenueImages.length > 0 && (
-                <div className="p-8">
-                  <div className={`${getImageGridClasses()} gap-6`}>
+                <div className="p-8 flex justify-center">
+                  <div className={`${getImageGridClasses()} gap-6 max-w-4xl`}>
                     {allVenueImages.map((image, index) => (
                       <div
                         key={index}
-                        className="stagger-item aspect-video rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 group"
-                        style={{ animationDelay: `${index * 150}ms` }}
+                        className="stagger-item rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 group"
+                        style={{
+                          animationDelay: `${index * 150}ms`,
+                          aspectRatio: '16/8'
+                        }}
                       >
                         <img
                           src={image}
@@ -89,7 +94,7 @@ export default function InfoSection({ content }: InfoSectionProps) {
                 </div>
 
                 {/* Right: Info */}
-                <div className="p-12 bg-gradient-to-br from-amber-50/50 to-rose-50/50">
+                <div className="p-12" style={{ backgroundColor: `${theme.bgGradientFrom}80` }}>
                   <div className="space-y-8">
                     {/* Venue Name */}
                     {(ceremony?.venue || reception?.venue) && (
@@ -106,8 +111,8 @@ export default function InfoSection({ content }: InfoSectionProps) {
                     {/* Time */}
                     {(ceremony?.time || reception?.time) && (
                       <div className="flex items-start space-x-4">
-                        <div className="p-3 bg-gradient-to-br from-amber-100 to-rose-100 rounded-full flex-shrink-0">
-                          <Clock className="w-6 h-6 text-amber-600" />
+                        <div className="p-3 rounded-full flex-shrink-0" style={{ backgroundColor: theme.bgGradientTo }}>
+                          <Clock className="w-6 h-6" style={{ color: theme.primary }} />
                         </div>
                         <div>
                           <h4 className="font-semibold text-gray-900 mb-2 text-lg">Čas začátku</h4>
@@ -146,7 +151,10 @@ export default function InfoSection({ content }: InfoSectionProps) {
                           href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ceremony?.address || reception?.address || '')}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-rose-500 text-white rounded-full hover:from-amber-600 hover:to-rose-600 transition-all shadow-md hover:shadow-lg font-semibold"
+                          className="inline-flex items-center space-x-2 px-6 py-3 text-white rounded-full transition-all shadow-md hover:shadow-lg font-semibold"
+                          style={{ backgroundColor: theme.primary }}
+                          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
+                          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
                         >
                           <MapPin className="w-5 h-5" />
                           <span>Otevřít v Google Maps</span>
@@ -214,7 +222,7 @@ export default function InfoSection({ content }: InfoSectionProps) {
 
         {/* Decorative bottom section */}
         <div className="mt-16 text-center">
-          <div className="inline-flex items-center gap-4 px-10 py-5 bg-gradient-to-r from-amber-100 via-rose-100 to-amber-100 rounded-full shadow-lg">
+          <div className="inline-flex items-center gap-4 px-10 py-5 rounded-full shadow-lg" style={{ backgroundColor: theme.bgGradientTo }}>
             <div className="text-3xl">💒</div>
             <p className="text-gray-800 font-bold text-lg font-serif">
               Těšíme se na vás!

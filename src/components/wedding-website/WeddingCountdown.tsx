@@ -101,27 +101,6 @@ export default function WeddingCountdown({ weddingDate, className = '', style = 
 
   return (
     <div className={`text-center ${className}`}>
-      {/* Hlavní text */}
-      {!compact && (
-        <div className="mb-6">
-          <h3 className={`text-lg md:text-xl font-semibold mb-2 ${
-            modernStyle ? 'text-gray-700' : 'text-gray-800'
-          }`}>
-            DO SVATBY ZBÝVÁ
-          </h3>
-        </div>
-      )}
-
-      {compact && (
-        <div className="mb-3">
-          <p className={`text-sm font-medium ${
-            modernStyle ? 'text-gray-600' : 'text-gray-700'
-          }`}>
-            Do svatby zbývá
-          </p>
-        </div>
-      )}
-
       {/* Countdown čísla */}
       <div className={`grid grid-cols-2 md:grid-cols-4 ${
         compact ? 'gap-2 md:gap-3' : 'gap-4 md:gap-6'
@@ -129,16 +108,18 @@ export default function WeddingCountdown({ weddingDate, className = '', style = 
         {/* Dny */}
         <div className={`${
           modernStyle
-            ? 'bg-white bg-opacity-90 backdrop-blur-sm border border-gray-200'
-            : 'bg-gradient-to-br from-pink-50 to-rose-50 border border-pink-200'
-        } rounded-lg ${compact ? 'p-3 md:p-4' : 'p-4 md:p-6'} shadow-sm`}>
+            ? 'bg-white/30 backdrop-blur-md border border-white/40'
+            : 'bg-white/30 backdrop-blur-md border border-white/40'
+        } rounded-lg ${compact ? 'p-3 md:p-4' : 'p-4 md:p-6'} shadow-lg relative overflow-hidden group hover:bg-white/40 transition-all duration-300`}>
+          {/* Jemný dekorativní prvek */}
+          <div className="absolute top-0 right-0 w-8 h-8 bg-gradient-to-br from-white/20 to-transparent rounded-bl-full"></div>
           <div className={`${compact ? 'text-2xl md:text-3xl' : 'text-3xl md:text-4xl'} font-bold mb-1 ${
-            modernStyle ? 'text-gray-900' : 'text-pink-600'
+            modernStyle ? 'text-white drop-shadow-lg' : 'text-white drop-shadow-lg'
           }`}>
             {countdown.days}
           </div>
           <div className={`text-xs md:text-sm font-medium ${
-            modernStyle ? 'text-gray-600' : 'text-pink-700'
+            modernStyle ? 'text-white/90' : 'text-white/90'
           }`}>
             DNÍ
           </div>
@@ -147,16 +128,18 @@ export default function WeddingCountdown({ weddingDate, className = '', style = 
         {/* Hodiny */}
         <div className={`${
           modernStyle
-            ? 'bg-white bg-opacity-90 backdrop-blur-sm border border-gray-200'
-            : 'bg-gradient-to-br from-pink-50 to-rose-50 border border-pink-200'
-        } rounded-lg ${compact ? 'p-3 md:p-4' : 'p-4 md:p-6'} shadow-sm`}>
+            ? 'bg-white/30 backdrop-blur-md border border-white/40'
+            : 'bg-white/30 backdrop-blur-md border border-white/40'
+        } rounded-lg ${compact ? 'p-3 md:p-4' : 'p-4 md:p-6'} shadow-lg relative overflow-hidden group hover:bg-white/40 transition-all duration-300`}>
+          {/* Jemný dekorativní prvek */}
+          <div className="absolute top-0 right-0 w-8 h-8 bg-gradient-to-br from-white/20 to-transparent rounded-bl-full"></div>
           <div className={`${compact ? 'text-2xl md:text-3xl' : 'text-3xl md:text-4xl'} font-bold mb-1 ${
-            modernStyle ? 'text-gray-900' : 'text-pink-600'
+            modernStyle ? 'text-white drop-shadow-lg' : 'text-white drop-shadow-lg'
           }`}>
             {countdown.hours}
           </div>
           <div className={`text-xs md:text-sm font-medium ${
-            modernStyle ? 'text-gray-600' : 'text-pink-700'
+            modernStyle ? 'text-white/90' : 'text-white/90'
           }`}>
             HODIN
           </div>
@@ -165,16 +148,18 @@ export default function WeddingCountdown({ weddingDate, className = '', style = 
         {/* Minuty */}
         <div className={`${
           modernStyle
-            ? 'bg-white bg-opacity-90 backdrop-blur-sm border border-gray-200'
-            : 'bg-gradient-to-br from-pink-50 to-rose-50 border border-pink-200'
-        } rounded-lg ${compact ? 'p-3 md:p-4' : 'p-4 md:p-6'} shadow-sm`}>
+            ? 'bg-white/30 backdrop-blur-md border border-white/40'
+            : 'bg-white/30 backdrop-blur-md border border-white/40'
+        } rounded-lg ${compact ? 'p-3 md:p-4' : 'p-4 md:p-6'} shadow-lg relative overflow-hidden group hover:bg-white/40 transition-all duration-300`}>
+          {/* Jemný dekorativní prvek */}
+          <div className="absolute top-0 right-0 w-8 h-8 bg-gradient-to-br from-white/20 to-transparent rounded-bl-full"></div>
           <div className={`${compact ? 'text-2xl md:text-3xl' : 'text-3xl md:text-4xl'} font-bold mb-1 ${
-            modernStyle ? 'text-gray-900' : 'text-pink-600'
+            modernStyle ? 'text-white drop-shadow-lg' : 'text-white drop-shadow-lg'
           }`}>
             {countdown.minutes}
           </div>
           <div className={`text-xs md:text-sm font-medium ${
-            modernStyle ? 'text-gray-600' : 'text-pink-700'
+            modernStyle ? 'text-white/90' : 'text-white/90'
           }`}>
             MINUT
           </div>
@@ -183,16 +168,18 @@ export default function WeddingCountdown({ weddingDate, className = '', style = 
         {/* Sekundy */}
         <div className={`${
           modernStyle
-            ? 'bg-white bg-opacity-90 backdrop-blur-sm border border-gray-200'
-            : 'bg-gradient-to-br from-pink-50 to-rose-50 border border-pink-200'
-        } rounded-lg ${compact ? 'p-3 md:p-4' : 'p-4 md:p-6'} shadow-sm`}>
+            ? 'bg-white/30 backdrop-blur-md border border-white/40'
+            : 'bg-white/30 backdrop-blur-md border border-white/40'
+        } rounded-lg ${compact ? 'p-3 md:p-4' : 'p-4 md:p-6'} shadow-lg relative overflow-hidden group hover:bg-white/40 transition-all duration-300`}>
+          {/* Jemný dekorativní prvek */}
+          <div className="absolute top-0 right-0 w-8 h-8 bg-gradient-to-br from-white/20 to-transparent rounded-bl-full"></div>
           <div className={`${compact ? 'text-2xl md:text-3xl' : 'text-3xl md:text-4xl'} font-bold mb-1 ${
-            modernStyle ? 'text-gray-900' : 'text-pink-600'
+            modernStyle ? 'text-white drop-shadow-lg' : 'text-white drop-shadow-lg'
           }`}>
             {countdown.seconds}
           </div>
           <div className={`text-xs md:text-sm font-medium ${
-            modernStyle ? 'text-gray-600' : 'text-pink-700'
+            modernStyle ? 'text-white/90' : 'text-white/90'
           }`}>
             SEKUND
           </div>

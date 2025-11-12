@@ -5,6 +5,7 @@ import { Calendar, Heart } from 'lucide-react'
 import type { HeroContent } from '@/types/wedding-website'
 import { Timestamp } from 'firebase/firestore'
 import WeddingCountdown from '../../WeddingCountdown'
+import { useColorTheme } from '../ColorThemeContext'
 
 // Helper funkce pro formátování data
 const formatDate = (date: any): string => {
@@ -55,6 +56,7 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ content }: HeroSectionProps) {
+  const { theme } = useColorTheme()
   const { bride, groom, weddingDate, tagline, mainImage } = content
 
   // Generate random positions only on client side to avoid hydration mismatch
@@ -79,18 +81,21 @@ export default function HeroSection({ content }: HeroSectionProps) {
 
 
   return (
-    <section 
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+    <section
+      className="relative flex items-center justify-center overflow-hidden"
       style={mainImage ? {
         backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${mainImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
-      } : {}}
+        backgroundAttachment: 'fixed',
+        minHeight: '85vh'
+      } : {
+        minHeight: '85vh'
+      }}
     >
       {/* Background pattern overlay */}
       {!mainImage && (
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-50 via-white to-rose-50">
+        <div className="absolute inset-0" style={{ backgroundColor: theme.bgGradientFrom }}>
           <div className="absolute inset-0 opacity-10">
             <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
               <defs>
@@ -123,15 +128,15 @@ export default function HeroSection({ content }: HeroSectionProps) {
             mainImage ? 'text-white' : 'text-gray-900'
           }`}>
             {bride && groom ? (
-              <>
-                <span className="block slide-in-left">{bride}</span>
-                <span className={`text-3xl md:text-4xl mx-4 heartbeat ${
+              <div className="flex items-baseline justify-center gap-3 md:gap-6 flex-wrap">
+                <span className="slide-in-left">{bride}</span>
+                <span className={`text-5xl md:text-7xl heartbeat ${
                   mainImage ? 'text-amber-200' : 'text-amber-600'
                 }`} style={{ animationDelay: '0.3s' }}>
                   &
                 </span>
-                <span className="block slide-in-right" style={{ animationDelay: '0.2s' }}>{groom}</span>
-              </>
+                <span className="slide-in-right" style={{ animationDelay: '0.2s' }}>{groom}</span>
+              </div>
             ) : (
               <span className="text-gray-400">Jména snoubenců</span>
             )}
@@ -189,17 +194,6 @@ export default function HeroSection({ content }: HeroSectionProps) {
             </p>
           </div>
         )}
-
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <div className={`w-6 h-10 border-2 rounded-full flex justify-center ${
-            mainImage ? 'border-white' : 'border-gray-400'
-          }`}>
-            <div className={`w-1 h-3 rounded-full mt-2 ${
-              mainImage ? 'bg-white' : 'bg-gray-400'
-            }`}></div>
-          </div>
-        </div>
       </div>
 
       {/* Floating hearts animation */}

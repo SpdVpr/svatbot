@@ -22,6 +22,18 @@ export default function AccommodationSection({ content }: AccommodationSectionPr
     return null
   }
 
+  // Determine grid layout based on number of accommodations
+  const getGridClass = () => {
+    const count = activeAccommodations.length
+    if (count === 1) {
+      return 'grid grid-cols-1 max-w-2xl mx-auto' // Single item centered and wider
+    } else if (count === 2) {
+      return 'grid grid-cols-1 md:grid-cols-2 gap-8' // Two items side by side
+    } else {
+      return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8' // Three items max per row
+    }
+  }
+
   return (
     <section className="py-16 bg-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -41,7 +53,7 @@ export default function AccommodationSection({ content }: AccommodationSectionPr
         </div>
 
         {/* Accommodations Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        <div className={`${getGridClass()} mb-12`}>
           {activeAccommodations.map((accommodation) => (
             <div key={accommodation.id} className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
               {/* Image */}

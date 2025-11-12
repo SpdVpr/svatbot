@@ -5,6 +5,7 @@ import { Calendar, Users, Utensils, Music, Send, CheckCircle, Phone, Mail } from
 import { collection, addDoc, Timestamp } from 'firebase/firestore'
 import { db } from '@/config/firebase'
 import type { RSVPContent } from '@/types/wedding-website'
+import { useColorTheme } from '../ColorThemeContext'
 
 interface RSVPSectionProps {
   content: RSVPContent
@@ -25,6 +26,7 @@ interface RSVPFormData {
 }
 
 export default function RSVPSection({ content, websiteId, weddingId }: RSVPSectionProps) {
+  const { theme } = useColorTheme()
   const [formData, setFormData] = useState<RSVPFormData>({
     name: '',
     email: '',
@@ -87,7 +89,7 @@ export default function RSVPSection({ content, websiteId, weddingId }: RSVPSecti
 
   if (isSubmitted) {
     return (
-      <section className="py-20 bg-gradient-to-br from-green-50 to-emerald-50">
+      <section className="py-20 bg-green-50">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div className="bg-white rounded-2xl p-12 shadow-lg scale-in">
             <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-6 bounce-in" />
@@ -122,14 +124,14 @@ export default function RSVPSection({ content, websiteId, weddingId }: RSVPSecti
   }
 
   return (
-    <section className="py-20 bg-gradient-to-br from-rose-50 to-amber-50">
+    <section className="py-20" style={{ backgroundColor: theme.bgGradientFrom }}>
       <div className="max-w-4xl mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-gray-900 mb-4 font-serif scale-in">
             Potvrzení účasti
           </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-amber-400 to-rose-400 mx-auto mb-6 slide-in-left" style={{ animationDelay: '0.2s' }}></div>
+          <div className="w-24 h-1 mx-auto mb-6 slide-in-left" style={{ animationDelay: '0.2s', backgroundColor: theme.primary }}></div>
           
           {content.message && (
             <p className="text-gray-700 text-lg max-w-2xl mx-auto mb-6">
@@ -337,7 +339,10 @@ export default function RSVPSection({ content, websiteId, weddingId }: RSVPSecti
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-500 to-amber-500 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:from-rose-600 hover:to-amber-600 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="inline-flex items-center gap-2 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                style={{ backgroundColor: theme.primary }}
+                onMouseEnter={(e) => !isSubmitting && (e.currentTarget.style.opacity = '0.9')}
+                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
               >
                 {isSubmitting ? (
                   <>

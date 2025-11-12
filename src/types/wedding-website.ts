@@ -259,6 +259,15 @@ export interface WebsiteStyle {
   fontFamily: string
   fontHeading: string
   backgroundColor: string
+  colorTheme?: string // 'amber' | 'purple' | 'blue' | 'green' | 'rose' | 'burgundy' | 'navy' | 'sage' | 'custom'
+  customColors?: {
+    name: string
+    primary: string
+    secondary: string
+    accent: string
+    bgGradientFrom: string
+    bgGradientTo: string
+  }
 }
 
 // Website Settings

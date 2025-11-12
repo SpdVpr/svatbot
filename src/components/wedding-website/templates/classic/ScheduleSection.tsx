@@ -2,12 +2,14 @@
 
 import { Clock, MapPin } from 'lucide-react'
 import type { ScheduleContent } from '@/types/wedding-website'
+import { useColorTheme } from '../ColorThemeContext'
 
 interface ScheduleSectionProps {
   content: ScheduleContent
 }
 
 export default function ScheduleSection({ content }: ScheduleSectionProps) {
+  const { theme } = useColorTheme()
   // Sample schedule items if none provided
   const sampleSchedule = [
     {
@@ -58,7 +60,7 @@ export default function ScheduleSection({ content }: ScheduleSectionProps) {
           <h2 className="text-4xl font-bold text-gray-900 mb-4 font-serif">
             Program svatby
           </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-amber-400 to-rose-400 mx-auto mb-6"></div>
+          <div className="w-24 h-1 mx-auto mb-6" style={{ backgroundColor: theme.primary }}></div>
           <p className="text-gray-600 text-lg">
             Jak bude náš velký den probíhat
           </p>
@@ -67,7 +69,7 @@ export default function ScheduleSection({ content }: ScheduleSectionProps) {
         {/* Timeline */}
         <div className="relative">
           {/* Vertical line - hide on mobile */}
-          <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-amber-400 to-rose-400 hidden sm:block"></div>
+          <div className="absolute left-8 top-0 bottom-0 w-0.5 hidden sm:block" style={{ backgroundColor: theme.primary }}></div>
 
           {/* Schedule items */}
           <div className="space-y-8">
@@ -95,7 +97,7 @@ export default function ScheduleSection({ content }: ScheduleSectionProps) {
                     </div>
 
                     <div className="flex-shrink-0">
-                      <div className="bg-gradient-to-r from-amber-100 to-rose-100 px-3 sm:px-4 py-2 rounded-full inline-block">
+                      <div className="px-3 sm:px-4 py-2 rounded-full inline-block" style={{ backgroundColor: theme.bgGradientTo }}>
                         <span className="font-bold text-gray-900 text-sm sm:text-base whitespace-nowrap">
                           {item.time}
                         </span>
@@ -110,7 +112,7 @@ export default function ScheduleSection({ content }: ScheduleSectionProps) {
 
         {/* Bottom note */}
         <div className="mt-16 text-center">
-          <div className="bg-gradient-to-r from-amber-50 to-rose-50 rounded-xl p-6">
+          <div className="rounded-xl p-6" style={{ backgroundColor: theme.bgGradientFrom }}>
             <p className="text-gray-700 italic">
               Program je orientační a může se během dne mírně změnit. 
               Hlavní je, že si to všichni užijeme! 🎉

@@ -8,6 +8,7 @@ import { useWeddingWebsite } from '@/hooks/useWeddingWebsite'
 import { useDemoLock } from '@/hooks/useDemoLock'
 import { ArrowLeft, ArrowRight, Save, Eye, Rocket, Home, ExternalLink } from 'lucide-react'
 import TemplateSelector from '@/components/wedding-website/builder/TemplateSelector'
+import ColorThemeSelector from '@/components/wedding-website/builder/ColorThemeSelector'
 import UrlConfigurator from '@/components/wedding-website/builder/UrlConfigurator'
 import ContentEditor from '@/components/wedding-website/builder/ContentEditor'
 import DomainStatus from '@/components/wedding-website/DomainStatus'
@@ -29,6 +30,15 @@ export default function WeddingWebsiteBuilderPage() {
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateType | null>(
     website?.template || null
   )
+  const [colorTheme, setColorTheme] = useState<string>(website?.style?.colorTheme || 'amber')
+  const [customColors, setCustomColors] = useState(website?.style?.customColors || {
+    name: 'Vlastní',
+    primary: '#f59e0b',
+    secondary: '#f43f5e',
+    accent: '#fbbf24',
+    bgGradientFrom: '#fef3c7',
+    bgGradientTo: '#fecdd3',
+  })
   const [customUrl, setCustomUrl] = useState(website?.customUrl || '')
   const [content, setContent] = useState<WebsiteContent>(website?.content || {
     hero: {
@@ -76,6 +86,15 @@ export default function WeddingWebsiteBuilderPage() {
   useEffect(() => {
     if (website) {
       setSelectedTemplate(website.template)
+      setColorTheme(website.style?.colorTheme || 'amber')
+      setCustomColors(website.style?.customColors || {
+        name: 'Vlastní',
+        primary: '#f59e0b',
+        secondary: '#f43f5e',
+        accent: '#fbbf24',
+        bgGradientFrom: '#fef3c7',
+        bgGradientTo: '#fecdd3',
+      })
       setCustomUrl(website.customUrl)
       // Ensure dressCode exists in content (for backward compatibility)
       setContent({
@@ -114,6 +133,10 @@ export default function WeddingWebsiteBuilderPage() {
             customUrl,
             template: 'classic-elegance', // Výchozí šablona
             content,
+            style: {
+              colorTheme,
+              customColors: colorTheme === 'custom' ? customColors : undefined,
+            },
           })
         })
         // Po vytvoření přejdeme na výběr šablony
@@ -139,6 +162,11 @@ export default function WeddingWebsiteBuilderPage() {
             template: selectedTemplate,
             customUrl,
             content,
+            style: {
+              ...website?.style,
+              colorTheme,
+              customColors: colorTheme === 'custom' ? customColors : undefined,
+            },
           })
         })
       } catch (error) {
@@ -183,6 +211,10 @@ export default function WeddingWebsiteBuilderPage() {
             customUrl,
             template: selectedTemplate,
             content,
+            style: {
+              colorTheme,
+              customColors: colorTheme === 'custom' ? customColors : undefined,
+            },
           })
         } else {
           // Aktualizace existujícího webu
@@ -190,6 +222,11 @@ export default function WeddingWebsiteBuilderPage() {
             template: selectedTemplate,
             customUrl,
             content,
+            style: {
+              ...website?.style,
+              colorTheme,
+              customColors: colorTheme === 'custom' ? customColors : undefined,
+            },
           })
         }
       })
@@ -218,6 +255,11 @@ export default function WeddingWebsiteBuilderPage() {
             template,
             customUrl,
             content,
+            style: {
+              ...website?.style,
+              colorTheme,
+              customColors: colorTheme === 'custom' ? customColors : undefined,
+            },
           })
         })
         console.log('✅ Template saved successfully')
@@ -229,6 +271,72 @@ export default function WeddingWebsiteBuilderPage() {
         }
         console.error('❌ Error updating template:', error)
         alert('Chyba při ukládání šablony. Zkuste to prosím znovu.')
+      } finally {
+        setIsSaving(false)
+      }
+    }
+  }
+
+  // Handler pro změnu barevné palety
+  const handleColorThemeChange = async (theme: string) => {
+    setColorTheme(theme)
+
+    // Pokud už web existuje, automaticky uložíme změnu barevné palety
+    if (website) {
+      setIsSaving(true)
+      try {
+        console.log('💾 Saving color theme change:', theme)
+        await withDemoCheck(async () => {
+          await updateWebsite({
+            style: {
+              ...website?.style,
+              colorTheme: theme,
+              customColors: theme === 'custom' ? customColors : undefined,
+            },
+          })
+        })
+        console.log('✅ Color theme saved successfully')
+      } catch (error) {
+        if (error instanceof Error && error.message === 'DEMO_LOCKED') {
+          // Demo locked - alert already shown, revert color theme selection
+          setColorTheme(website.style?.colorTheme || 'amber')
+          return
+        }
+        console.error('❌ Error updating color theme:', error)
+        alert('Chyba při ukládání barevné palety. Zkuste to prosím znovu.')
+      } finally {
+        setIsSaving(false)
+      }
+    }
+  }
+
+  // Handler pro změnu vlastních barev
+  const handleCustomColorsChange = async (colors: any) => {
+    setCustomColors(colors)
+
+    // Pokud už web existuje a máme vybranou custom paletu, automaticky uložíme změnu
+    if (website && colorTheme === 'custom') {
+      setIsSaving(true)
+      try {
+        console.log('💾 Saving custom colors change:', colors)
+        await withDemoCheck(async () => {
+          await updateWebsite({
+            style: {
+              ...website?.style,
+              colorTheme: 'custom',
+              customColors: colors,
+            },
+          })
+        })
+        console.log('✅ Custom colors saved successfully')
+      } catch (error) {
+        if (error instanceof Error && error.message === 'DEMO_LOCKED') {
+          // Demo locked - alert already shown, revert custom colors
+          setCustomColors(website.style?.customColors || customColors)
+          return
+        }
+        console.error('❌ Error updating custom colors:', error)
+        // Nebudeme zobrazovat alert při každé změně barvy, jen logujeme
       } finally {
         setIsSaving(false)
       }
@@ -279,7 +387,7 @@ export default function WeddingWebsiteBuilderPage() {
     <div className="min-h-screen">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+        <div className="mx-auto px-4 py-4" style={{ maxWidth: '1240px' }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
@@ -368,7 +476,7 @@ export default function WeddingWebsiteBuilderPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-5xl mx-auto px-4 py-8">
+      <div className="mx-auto px-4 py-8" style={{ maxWidth: '1240px' }}>
         {currentStep === 'url' && (
           <UrlConfigurator
             customUrl={customUrl}
@@ -378,13 +486,14 @@ export default function WeddingWebsiteBuilderPage() {
         )}
 
         {currentStep === 'template' && (
-          <div className="space-y-6">
+          <div className="space-y-8">
+            {/* Status Messages */}
             {isSaving && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                 <div className="flex items-center gap-3">
                   <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-yellow-600"></div>
                   <p className="text-sm text-yellow-800">
-                    <strong>Ukládám šablonu...</strong>
+                    <strong>Ukládám změny...</strong>
                   </p>
                 </div>
               </div>
@@ -392,16 +501,57 @@ export default function WeddingWebsiteBuilderPage() {
             {website && !isSaving && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <p className="text-sm text-blue-800">
-                  <strong>Tip:</strong> Změna šablony zachová všechna vaše data a nastavení.
+                  <strong>Tip:</strong> Změna šablony nebo barevné palety zachová všechna vaše data a nastavení.
                   Změní se pouze design webu na adrese <strong>{customUrl}.svatbot.cz</strong>
                 </p>
               </div>
             )}
-            <TemplateSelector
-              selectedTemplate={selectedTemplate}
-              onSelect={handleTemplateChange}
-              disabled={Boolean(isLocked)}
-            />
+
+            {/* Template Selection Section */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 px-6 py-4 border-b border-gray-200">
+                <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                  <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white text-sm font-bold">
+                    1
+                  </span>
+                  Vyberte šablonu webu
+                </h3>
+                <p className="text-sm text-gray-600 mt-1 ml-10">
+                  Zvolte design, který nejlépe odpovídá stylu vaší svatby
+                </p>
+              </div>
+              <div className="p-6">
+                <TemplateSelector
+                  selectedTemplate={selectedTemplate}
+                  onSelect={handleTemplateChange}
+                  disabled={Boolean(isLocked)}
+                />
+              </div>
+            </div>
+
+            {/* Color Theme Selection Section */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="bg-gradient-to-r from-purple-50 to-pink-50 px-6 py-4 border-b border-gray-200">
+                <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                  <span className="flex items-center justify-center w-8 h-8 rounded-full bg-purple-600 text-white text-sm font-bold">
+                    2
+                  </span>
+                  Nastavte barevnou paletu
+                </h3>
+                <p className="text-sm text-gray-600 mt-1 ml-10">
+                  Vyberte předpřipravenou paletu nebo si vytvořte vlastní barvy
+                </p>
+              </div>
+              <div className="p-6">
+                <ColorThemeSelector
+                  selectedTheme={colorTheme}
+                  customColors={customColors}
+                  onSelect={handleColorThemeChange}
+                  onCustomColorsChange={handleCustomColorsChange}
+                  disabled={Boolean(isLocked)}
+                />
+              </div>
+            </div>
           </div>
         )}
 
@@ -489,6 +639,11 @@ export default function WeddingWebsiteBuilderPage() {
                       customUrl,
                       template: selectedTemplate,
                       content,
+                      style: {
+                        ...website?.style,
+                        colorTheme,
+                        customColors: colorTheme === 'custom' ? customColors : undefined,
+                      },
                       isPublished: false,
                       createdAt: new Date(),
                       updatedAt: new Date()
@@ -504,6 +659,11 @@ export default function WeddingWebsiteBuilderPage() {
                       customUrl,
                       template: selectedTemplate,
                       content,
+                      style: {
+                        ...website?.style,
+                        colorTheme,
+                        customColors: colorTheme === 'custom' ? customColors : undefined,
+                      },
                       isPublished: false,
                       createdAt: new Date(),
                       updatedAt: new Date()
@@ -519,6 +679,11 @@ export default function WeddingWebsiteBuilderPage() {
                       customUrl,
                       template: selectedTemplate,
                       content,
+                      style: {
+                        ...website?.style,
+                        colorTheme,
+                        customColors: colorTheme === 'custom' ? customColors : undefined,
+                      },
                       isPublished: false,
                       createdAt: new Date(),
                       updatedAt: new Date()

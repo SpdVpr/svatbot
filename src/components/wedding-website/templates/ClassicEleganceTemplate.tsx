@@ -2,6 +2,8 @@
 
 import { Calendar, MapPin, Clock, Users, Mail, Phone } from 'lucide-react'
 import type { WeddingWebsite, SectionType } from '@/types/wedding-website'
+import { ColorThemeProvider } from './ColorThemeContext'
+import Navigation from './classic/Navigation'
 import HeroSection from './classic/HeroSection'
 import InfoSection from './classic/InfoSection'
 import DressCodeSection from './classic/DressCodeSection'
@@ -47,7 +49,9 @@ interface ClassicEleganceTemplateProps {
 }
 
 export default function ClassicEleganceTemplate({ website }: ClassicEleganceTemplateProps) {
-  const { content } = website
+  const { content, style } = website
+  const colorTheme = style?.colorTheme || 'amber'
+  const customTheme = style?.customColors
 
   // Default section order if not specified
   const DEFAULT_SECTION_ORDER: SectionType[] = [
@@ -65,62 +69,83 @@ export default function ClassicEleganceTemplate({ website }: ClassicEleganceTemp
 
       case 'story':
         return content.story.enabled ? (
-          <StorySection key="story" content={content.story} />
+          <div id="story" key="story">
+            <StorySection content={content.story} />
+          </div>
         ) : null
 
       case 'info':
         return content.info.enabled ? (
-          <InfoSection key="info" content={content.info} />
+          <div id="info" key="info">
+            <InfoSection content={content.info} />
+          </div>
         ) : null
 
       case 'dressCode':
         return content.dressCode?.enabled ? (
-          <DressCodeSection key="dressCode" content={content.dressCode} />
+          <div id="dressCode" key="dressCode">
+            <DressCodeSection content={content.dressCode} />
+          </div>
         ) : null
 
       case 'schedule':
         return content.schedule.enabled ? (
-          <ScheduleSection key="schedule" content={content.schedule} />
+          <div id="schedule" key="schedule">
+            <ScheduleSection content={content.schedule} />
+          </div>
         ) : null
 
       case 'rsvp':
         return content.rsvp.enabled ? (
-          <RSVPSection
-            key="rsvp"
-            content={content.rsvp}
-            websiteId={website.id}
-            weddingId={website.weddingId}
-          />
+          <div id="rsvp" key="rsvp">
+            <RSVPSection
+              content={content.rsvp}
+              websiteId={website.id}
+              weddingId={website.weddingId}
+            />
+          </div>
         ) : null
 
       case 'accommodation':
         return content.accommodation?.enabled ? (
-          <AccommodationSection key="accommodation" content={content.accommodation} />
+          <div id="accommodation" key="accommodation">
+            <AccommodationSection content={content.accommodation} />
+          </div>
         ) : null
 
       case 'gift':
         return content.gift?.enabled ? (
-          <GiftSection key="gift" content={content.gift} />
+          <div id="gift" key="gift">
+            <GiftSection content={content.gift} />
+          </div>
         ) : null
 
       case 'gallery':
         return content.gallery?.enabled ? (
-          <GallerySection key="gallery" content={content.gallery} />
+          <div id="gallery" key="gallery">
+            <GallerySection content={content.gallery} />
+          </div>
         ) : null
 
       case 'menu':
         return content.menu?.enabled ? (
-          <MenuSection key="menu" content={content.menu} />
+          <div id="menu" key="menu">
+            <MenuSection content={content.menu} />
+          </div>
         ) : null
 
       case 'contact':
         return content.contact?.enabled ? (
-          <ContactSection key="contact" content={content.contact} heroContent={content.hero} />
+          <div id="contact" key="contact">
+            <ContactSection content={content.contact} heroContent={content.hero} />
+          </div>
         ) : null
 
       case 'faq':
         return content.faq?.enabled ? (
-          <FAQSection key="faq" content={content.faq} />
+          <div id="faq" key="faq">
+            <FAQSection content={content.faq} />
+          </div>
         ) : null
 
       default:
@@ -129,31 +154,36 @@ export default function ClassicEleganceTemplate({ website }: ClassicEleganceTemp
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-rose-50">
-      {/* Render sections in custom order */}
-      {sectionOrder.map(sectionType => renderSection(sectionType))}
+    <ColorThemeProvider themeName={colorTheme} customTheme={customTheme}>
+      <div className="min-h-screen bg-white">
+        {/* Navigation */}
+        <Navigation content={content} />
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="mb-6">
-            <h3 className="text-2xl font-bold mb-2 font-serif">
-              {content.hero.bride} & {content.hero.groom}
-            </h3>
-            {content.hero.weddingDate && (
-              <p className="text-gray-300">
-                {formatDate(content.hero.weddingDate)}
+        {/* Render sections in custom order */}
+        {sectionOrder.map(sectionType => renderSection(sectionType))}
+
+        {/* Footer */}
+        <footer className="bg-gray-900 text-white py-12">
+          <div className="max-w-4xl mx-auto px-4 text-center">
+            <div className="mb-6">
+              <h3 className="text-2xl font-bold mb-2 font-serif">
+                {content.hero.bride} & {content.hero.groom}
+              </h3>
+              {content.hero.weddingDate && (
+                <p className="text-gray-300">
+                  {formatDate(content.hero.weddingDate)}
+                </p>
+              )}
+            </div>
+
+            <div className="border-t border-gray-700 pt-6">
+              <p className="text-gray-400 text-sm">
+                Vytvořeno s ❤️ pomocí SvatBot.cz
               </p>
-            )}
+            </div>
           </div>
-          
-          <div className="border-t border-gray-700 pt-6">
-            <p className="text-gray-400 text-sm">
-              Vytvořeno s ❤️ pomocí SvatBot.cz
-            </p>
-          </div>
-        </div>
-      </footer>
-    </div>
+        </footer>
+      </div>
+    </ColorThemeProvider>
   )
 }

@@ -2,21 +2,24 @@
 
 import { Heart } from 'lucide-react'
 import type { StoryContent } from '@/types/wedding-website'
+import { useColorTheme } from '../ColorThemeContext'
 
 interface StorySectionProps {
   content: StoryContent
 }
 
 export default function StorySection({ content }: StorySectionProps) {
+  const { theme } = useColorTheme()
+
   return (
-    <section className="py-20 bg-gradient-to-br from-rose-50 to-amber-50">
+    <section className="py-20" style={{ backgroundColor: theme.bgGradientFrom }}>
       <div className="max-w-6xl mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4 font-serif">
             {content.title || 'Snoubenci a jejich příběh'}
           </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-amber-400 to-rose-400 mx-auto mb-6"></div>
+          <div className="w-24 h-1 mx-auto mb-6" style={{ backgroundColor: theme.primary }}></div>
           <p className="text-gray-600 text-lg">
             {content.subtitle || 'Poznejte nás a náš příběh lásky'}
           </p>
@@ -83,7 +86,7 @@ export default function StorySection({ content }: StorySectionProps) {
               {content.timeline.map((item, index) => (
                 <div key={item.id} className="text-center">
                   {/* Fotka nebo ikona */}
-                  <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-rose-100 to-amber-100">
+                  <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden flex items-center justify-center" style={{ backgroundColor: theme.bgGradientTo }}>
                     {item.image ? (
                       <img
                         src={item.image}

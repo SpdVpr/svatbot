@@ -206,7 +206,7 @@ export default function TemplateSelector({ selectedTemplate, onSelect, disabled 
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {TEMPLATES.map((template) => {
           const isSelected = selectedTemplate === template.id
           const isHovered = hoveredTemplate === template.id
@@ -357,34 +357,6 @@ export default function TemplateSelector({ selectedTemplate, onSelect, disabled 
             </div>
           )
         })}
-      </div>
-
-      {/* Coming soon templates */}
-      <div className="bg-gray-50 rounded-lg p-6">
-        <h3 className="font-semibold text-gray-900 mb-3">
-          🚧 Připravujeme další šablony
-        </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {[
-            { name: 'Rustic Romance', icon: '🌾' },
-            { name: 'Bohemian Dream', icon: '🌸' },
-            { name: 'Garden Party', icon: '🌿' },
-            { name: 'Beach Vibes', icon: '🌊' },
-          ].map((template, index) => (
-            <div
-              key={index}
-              className="bg-white rounded-lg p-4 text-center border border-gray-200 opacity-50"
-            >
-              <div className="text-3xl mb-2">{template.icon}</div>
-              <div className="text-sm font-medium text-gray-600">
-                {template.name}
-              </div>
-              <div className="text-xs text-gray-400 mt-1">
-                Již brzy
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   )
