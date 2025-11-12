@@ -35,7 +35,7 @@ export function useEmail(): UseEmailReturn {
       venue: typeof wedding?.venue === 'string' ? wedding.venue : wedding?.venue?.name || 'TBD',
       weddingUrl: `${window.location.origin}`,
       rsvpUrl: `${window.location.origin}/rsvp`,
-      contactEmail: user?.email || 'svatbot@example.com'
+      contactEmail: user?.email || 'info@svatbot.cz'
     }
   }, [wedding, user])
 

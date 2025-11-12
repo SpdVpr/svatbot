@@ -33,7 +33,7 @@ export default function ContactSection({ content, heroContent }: ContactSectionP
                 </div>
                 <div className="flex items-center justify-center gap-2">
                   <Mail className="w-4 h-4" />
-                  <span>nevesta@example.com</span>
+                  <span>info@svatbot.cz</span>
                 </div>
               </div>
             </div>
@@ -52,7 +52,7 @@ export default function ContactSection({ content, heroContent }: ContactSectionP
                 </div>
                 <div className="flex items-center justify-center gap-2">
                   <Mail className="w-4 h-4" />
-                  <span>zenich@example.com</span>
+                  <span>info@svatbot.cz</span>
                 </div>
               </div>
             </div>

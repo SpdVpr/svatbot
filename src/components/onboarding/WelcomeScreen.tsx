@@ -86,7 +86,7 @@ export default function WelcomeScreen() {
       description: 'Svatební fotograf s 8 lety zkušeností a moderním přístupem k fotografii.',
       shortDescription: 'Svatební fotograf - moderní styl',
       website: 'https://example.com',
-      email: 'demo@example.com',
+      email: 'info@svatbot.cz',
       phone: '+420 XXX XXX XXX',
       address: {
         street: 'Demo ulice 123',
@@ -155,7 +155,7 @@ export default function WelcomeScreen() {
       description: 'Catering pro svatby s důrazem na čerstvé suroviny a moderní gastronomii.',
       shortDescription: 'Svatební catering - moderní gastronomie',
       website: 'https://example.com',
-      email: 'demo@example.com',
+      email: 'info@svatbot.cz',
       phone: '+420 XXX XXX XXX',
       address: {
         street: 'Demo ulice 456',
@@ -224,7 +224,7 @@ export default function WelcomeScreen() {
       description: 'Zkušený DJ pro svatby s širokým hudebním repertoárem a profesionální technikou.',
       shortDescription: 'Svatební DJ - široký repertoár',
       website: 'https://example.com',
-      email: 'demo@example.com',
+      email: 'info@svatbot.cz',
       phone: '+420 XXX XXX XXX',
       address: {
         street: 'Demo ulice 789',
@@ -301,10 +301,10 @@ export default function WelcomeScreen() {
           </div>
           <nav className="hidden lg:flex items-center space-x-8">
             <a href="#features" className="text-gray-600 hover:text-rose-500 transition-colors duration-200 font-medium">Funkce</a>
-            <a href="#dashboard" className="text-gray-600 hover:text-rose-500 transition-colors duration-200 font-medium">Dashboard</a>
             <a href="#pricing" className="text-gray-600 hover:text-rose-500 transition-colors duration-200 font-medium">Ceník</a>
-            <a href="#vendors" className="text-gray-600 hover:text-rose-500 transition-colors duration-200 font-medium">Dodavatelé</a>
-            <a href="#about" className="text-gray-600 hover:text-rose-500 transition-colors duration-200 font-medium">O nás</a>
+            <a href="#benefits" className="text-gray-600 hover:text-rose-500 transition-colors duration-200 font-medium">Výhody</a>
+            <a href="#testimonials" className="text-gray-600 hover:text-rose-500 transition-colors duration-200 font-medium">Reference</a>
+            <a href="#vendors" className="text-gray-600 hover:text-rose-500 transition-colors duration-200 font-medium">Marketplace</a>
             <a href="#contact" className="text-gray-600 hover:text-rose-500 transition-colors duration-200 font-medium">Kontakt</a>
           </nav>
           <div className="flex items-center space-x-2 md:space-x-4">
@@ -363,7 +363,7 @@ export default function WelcomeScreen() {
           <figure className="lg:w-1/2 flex justify-center animate-fade-in w-full" style={{ animationDelay: '0.4s' }}>
             <div className="w-full max-w-[745px] aspect-[5/3.5] rounded-2xl md:rounded-3xl shadow-2xl border-2 md:border-4 border-white overflow-hidden relative">
               <img
-                src="/front3.jpg"
+                src="/front5.jpg"
                 alt="Náhled dashboardu SvatBot.cz s AI asistentem, správou rozpočtu, timeline a dalšími nástroji pro plánování svatby"
                 className="w-full object-cover"
                 style={{ height: '100%' }}
@@ -610,12 +610,12 @@ export default function WelcomeScreen() {
         </div>
       </section>
 
-      <section className="py-16 md:py-24 lg:py-32 bg-gradient-to-br from-purple-100 via-pink-100 to-rose-100 relative overflow-hidden touch-pan-y">
+      <section id="benefits" className="py-16 md:py-24 lg:py-32 bg-gradient-to-br from-purple-100 via-pink-100 to-rose-100 relative overflow-hidden touch-pan-y">
         {/* Decorative background elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
-          <div className="absolute top-10 left-20 w-72 h-72 bg-pink-200 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-10 right-20 w-96 h-96 bg-purple-200 rounded-full blur-3xl"></div>
-          <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-rose-200 rounded-full blur-3xl"></div>
+        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
+          <div className="absolute top-20 left-10 w-64 h-64 bg-pink-200 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-80 h-80 bg-purple-200 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-200 rounded-full blur-3xl"></div>
         </div>
 
         <div className="container mx-auto px-4 md:px-6 relative z-10">
@@ -627,107 +627,81 @@ export default function WelcomeScreen() {
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-gray-900 mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
               Proč zvolit <span className="text-pink-500">SvatBot.cz</span>?
             </h2>
-            <p className="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              Moderní přístup k plánování svatby s nejnovějšími technologiemi a komplexními nástroji.
+            <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              Moderní přístup k plánování svatby s nejnovějšími technologiemi
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 max-w-6xl mx-auto relative">
-            <div className="hidden min-[1500px]:block absolute opacity-15 pointer-events-none" style={{ width: '21rem', bottom: '-5rem', left: '-25%' }}>
-              <img 
-                src="/wed6.png" 
-                alt="" 
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto relative">
+            <div className="hidden min-[1500px]:block absolute opacity-15 pointer-events-none" style={{ width: '18rem', bottom: '-5rem', left: '-20%' }}>
+              <img
+                src="/wed6.png"
+                alt=""
                 className="w-full h-auto"
                 aria-hidden="true"
               />
             </div>
-            <div className="hidden min-[1500px]:block absolute opacity-15 pointer-events-none" style={{ width: '30rem', bottom: '-5rem', right: '-34%' }}>
-              <img 
-                src="/wed7.png" 
-                alt="" 
+            <div className="hidden min-[1500px]:block absolute opacity-15 pointer-events-none" style={{ width: '26rem', bottom: '-5rem', right: '-28%' }}>
+              <img
+                src="/wed7.png"
+                alt=""
                 className="w-full h-auto"
                 aria-hidden="true"
               />
             </div>
             {/* AI technologie */}
-            <div className="group bg-white rounded-3xl p-8 md:p-10 shadow-xl border-2 border-gray-100 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.3s' }}>
+            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-pink-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.3s' }}>
               <div className="relative mb-6">
-                <div className="w-28 h-28 bg-gradient-to-br from-pink-100 to-rose-100 rounded-3xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
-                  <Sparkles className="w-14 h-14 text-pink-600" />
+                <div className="w-20 h-20 bg-gradient-to-br from-pink-100 to-rose-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
+                  <Sparkles className="w-10 h-10 text-pink-600" />
                 </div>
-                <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-pink-500 to-rose-500 rounded-full flex items-center justify-center shadow-lg">
-                  <Zap className="w-4 h-4 text-white" />
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center">
+                  <Zap className="w-3 h-3 text-white" />
                 </div>
               </div>
-              <h3 className="text-2xl md:text-3xl font-display font-bold text-gray-900 mb-4">AI technologie</h3>
-              <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-6">
-                Český svatební plánovač s pokročilými AI technologiemi pro inteligentní doporučení a automatizaci.
+              <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">AI technologie</h3>
+              <p className="text-base text-gray-600 leading-relaxed">
+                Pokročilé AI technologie pro inteligentní doporučení a automatizaci plánování.
               </p>
-
-              {/* AI Logo */}
-              <div className="flex items-center justify-center gap-4 pt-4 border-t border-gray-200">
-                <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-50 to-purple-50 rounded-lg border-2 border-pink-300 shadow-md">
-                  <div className="w-7 h-7 bg-gradient-to-br from-pink-600 to-purple-600 rounded flex items-center justify-center">
-                    <Sparkles className="text-white w-4 h-4" />
-                  </div>
-                  <span className="text-base font-bold text-gray-800">GPT-5</span>
-                </div>
-              </div>
             </div>
 
             {/* Ušetříte čas */}
-            <div className="group bg-white rounded-3xl p-8 md:p-10 shadow-xl border-2 border-gray-100 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.4s' }}>
+            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-purple-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.4s' }}>
               <div className="relative mb-6">
-                <div className="w-28 h-28 bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
-                  <Clock className="w-14 h-14 text-purple-600" />
+                <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
+                  <Clock className="w-10 h-10 text-purple-600" />
                 </div>
-                <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
-                  <TrendingUp className="w-4 h-4 text-white" />
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                  <TrendingUp className="w-3 h-3 text-white" />
                 </div>
               </div>
-              <h3 className="text-2xl md:text-3xl font-display font-bold text-gray-900 mb-4">Ušetříte čas</h3>
-              <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-6">
-                Automatizované procesy, AI asistent a předpřipravené šablony zkrátí plánování o týdny.
+              <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Ušetříte čas</h3>
+              <p className="text-base text-gray-600 leading-relaxed">
+                Automatizované procesy a předpřipravené šablony zkrátí plánování o týdny.
               </p>
-
-              {/* Time savings */}
-              <div className="flex items-center justify-center gap-2 pt-4 border-t border-gray-200">
-                <div className="px-4 py-2 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200">
-                  <div className="text-2xl font-bold text-purple-600">-70%</div>
-                  <div className="text-xs text-gray-600">času</div>
-                </div>
-              </div>
             </div>
 
             {/* Vše na jednom místě */}
-            <div className="group bg-white rounded-3xl p-8 md:p-10 shadow-xl border-2 border-gray-100 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.5s' }}>
+            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-pink-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.5s' }}>
               <div className="relative mb-6">
-                <div className="w-28 h-28 bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
-                  <BarChart2 className="w-14 h-14 text-purple-600" />
+                <div className="w-20 h-20 bg-gradient-to-br from-pink-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
+                  <BarChart2 className="w-10 h-10 text-pink-600" />
                 </div>
-                <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
-                  <CheckCircle className="w-4 h-4 text-white" />
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-3 h-3 text-white" />
                 </div>
               </div>
-              <h3 className="text-2xl md:text-3xl font-display font-bold text-gray-900 mb-4">Vše na jednom místě</h3>
-              <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-6">
-                Kompletní sada 17+ modulů pro plánování svatby – od hostů po rozpočet, vše přehledně na jedné platformě.
+              <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Vše na jednom místě</h3>
+              <p className="text-base text-gray-600 leading-relaxed">
+                17+ modulů pro plánování svatby – od hostů po rozpočet na jedné platformě.
               </p>
-
-              {/* Time saved */}
-              <div className="flex items-center justify-center gap-2 pt-4 border-t border-gray-200">
-                <div className="px-4 py-2 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200">
-                  <div className="text-2xl font-bold text-purple-600">50+</div>
-                  <div className="text-xs text-gray-600">ušetřených hodin</div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Testimonials - Recenze */}
-      <section className="py-16 md:py-24 lg:py-32 bg-white relative overflow-hidden touch-pan-y">
+      <section id="testimonials" className="py-16 md:py-24 lg:py-32 bg-white relative overflow-hidden touch-pan-y">
         <div className="container mx-auto px-4 md:px-6 relative z-10">
           <div className="text-center mb-12 md:mb-16 lg:mb-20">
             <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-pink-100 to-purple-100 rounded-full mb-6 animate-fade-in">
@@ -743,10 +717,10 @@ export default function WelcomeScreen() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto relative">
-            <div className="hidden min-[1500px]:block absolute opacity-10 pointer-events-none" style={{ width: '41rem', bottom: '-5rem', right: '20%' }}>
-              <img 
-                src="/wed5.png" 
-                alt="" 
+            <div className="hidden min-[1500px]:block absolute opacity-10 pointer-events-none" style={{ width: '41rem', bottom: '-17rem', right: '20%' }}>
+              <img
+                src="/wed5.png"
+                alt=""
                 className="w-full h-auto"
                 aria-hidden="true"
               />
@@ -1039,7 +1013,7 @@ export default function WelcomeScreen() {
               <div className="mt-8 pt-8 border-t border-gray-200">
                 <div className="text-sm text-gray-600 mb-3">Nebo nám napište přímo:</div>
                 <div className="flex space-x-4">
-                  <button onClick={handleGetStarted} className="flex-1 px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full font-semibold hover:shadow-lg transition-all duration-300 shadow-md">
+                  <button onClick={handleGetStarted} className="flex-1 px-6 py-3 bg-pink-500 text-white rounded-full font-semibold hover:bg-pink-600 hover:shadow-lg transition-all duration-300 shadow-md">
                     Začít zdarma
                   </button>
                   <button onClick={handleDemoLogin} className="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-full font-semibold hover:bg-gray-200 transition-all duration-300 border-2 border-gray-200">
@@ -1099,7 +1073,7 @@ export default function WelcomeScreen() {
                 <button
                   type="submit"
                   disabled={isContactFormSubmitting}
-                  className="w-full px-6 py-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center button-glow disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-6 py-4 bg-pink-500 text-white font-semibold rounded-lg shadow-lg hover:bg-pink-600 hover:shadow-xl transition-all duration-300 flex items-center justify-center button-glow disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Send className="w-5 h-5 mr-2" />
                   {isContactFormSubmitting ? 'Odesílám...' : 'Odeslat zprávu'}
@@ -1335,6 +1309,7 @@ export default function WelcomeScreen() {
                 <li><a href="#pricing" className="hover:text-rose-300 transition-colors">Ceník</a></li>
                 <li><a href="#dashboard" className="hover:text-rose-300 transition-colors">Demo</a></li>
                 <li><a href="#vendors" className="hover:text-rose-300 transition-colors">Pro dodavatele</a></li>
+                <li><a href="/affiliate" className="hover:text-rose-300 transition-colors">Affiliate program</a></li>
                 <li><a href="/ochrana-soukromi" className="hover:text-rose-300 transition-colors">Ochrana soukromí</a></li>
                 <li><a href="/gdpr" className="hover:text-rose-300 transition-colors">GDPR</a></li>
               </ul>

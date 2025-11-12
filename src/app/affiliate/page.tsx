@@ -309,8 +309,8 @@ export default function AffiliateHomePage() {
         <div className="max-w-6xl mx-auto px-4 text-center">
           <p className="text-gray-400">
             Máte otázky? Kontaktujte nás na{' '}
-            <a href="mailto:affiliate@svatbot.cz" className="text-pink-400 hover:underline">
-              affiliate@svatbot.cz
+            <a href="mailto:info@svatbot.cz" className="text-pink-400 hover:underline">
+              info@svatbot.cz
             </a>
           </p>
         </div>

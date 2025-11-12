@@ -41,25 +41,25 @@ export default function PricingSection({ onGetStarted }: PricingSectionProps) {
   ]
 
   return (
-    <section id="pricing" className="py-16 md:py-24 lg:py-32 bg-gradient-to-br from-gray-900 via-purple-900 to-rose-900 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-rose-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+    <section id="pricing" className="py-16 md:py-24 lg:py-32 bg-gradient-to-br from-purple-100 via-pink-100 to-rose-100 relative overflow-hidden touch-pan-y">
+      {/* Decorative background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
+        <div className="absolute top-20 left-10 w-64 h-64 bg-pink-200 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 right-10 w-80 h-80 bg-purple-200 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-pink-200 rounded-full blur-3xl"></div>
       </div>
 
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         {/* Header */}
         <div className="text-center mb-12 md:mb-16 lg:mb-20">
-          <div className="inline-flex items-center px-4 py-2 bg-rose-500/20 backdrop-blur-sm border border-rose-400/30 rounded-full mb-6 animate-fade-in">
-            <Sparkles className="w-4 h-4 text-rose-300 mr-2" />
-            <span className="text-sm font-semibold text-rose-200">Speciální nabídka</span>
+          <div className="inline-flex items-center px-4 py-2 bg-white rounded-full mb-6 animate-fade-in shadow-sm border border-pink-200">
+            <Sparkles className="w-4 h-4 text-pink-600 mr-2" />
+            <span className="text-sm font-semibold text-gray-800">Speciální nabídka</span>
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-white mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            Začněte <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 via-purple-400 to-blue-400">zdarma</span>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-gray-900 mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+            Začněte <span className="text-pink-500">zdarma</span>
           </h2>
-          <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
+          <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
             První měsíc je na nás! Vyzkoušejte všechny funkce bez rizika a závazků.
           </p>
         </div>
@@ -70,51 +70,51 @@ export default function PricingSection({ onGetStarted }: PricingSectionProps) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {/* Free Trial Card */}
           <div
-            className="relative bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10 hover:border-rose-400/50 transition-all duration-500 animate-fade-in hover:scale-105"
+            className="relative bg-white rounded-3xl p-8 border-2 border-gray-200 hover:border-pink-300 transition-all duration-500 animate-fade-in hover:scale-105 shadow-lg hover:shadow-2xl"
             style={{ animationDelay: '0.4s' }}
             onMouseEnter={() => setHoveredCard('free')}
             onMouseLeave={() => setHoveredCard(null)}
           >
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-2">
-                <Zap className="w-6 h-6 text-rose-400" />
-                <h3 className="text-2xl font-bold text-white">Zkušební měsíc</h3>
+                <Zap className="w-6 h-6 text-pink-500" />
+                <h3 className="text-2xl font-bold text-gray-900">Zkušební měsíc</h3>
               </div>
-              <p className="text-gray-400 text-sm">Vyzkoušejte všechny funkce</p>
+              <p className="text-gray-600 text-sm">Vyzkoušejte všechny funkce</p>
             </div>
 
             <div className="mb-8">
               <div className="flex items-baseline gap-2">
-                <span className="text-5xl md:text-6xl font-extrabold text-white">0 Kč</span>
+                <span className="text-5xl md:text-6xl font-extrabold text-gray-900">0 Kč</span>
               </div>
-              <p className="text-gray-400 text-sm mt-2">První měsíc zdarma</p>
+              <p className="text-gray-600 text-sm mt-2">První měsíc zdarma</p>
             </div>
 
             <button
               onClick={onGetStarted}
-              className="w-full py-4 bg-gradient-to-r from-rose-500 to-purple-500 text-white font-semibold rounded-xl hover:from-rose-600 hover:to-purple-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 mb-8"
+              className="w-full py-4 bg-pink-500 text-white font-semibold rounded-xl hover:bg-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 mb-8"
             >
               Začít zdarma
             </button>
 
             <div className="space-y-3">
-              <p className="text-sm font-semibold text-gray-300 mb-4">Plný přístup k funkcím:</p>
+              <p className="text-sm font-semibold text-gray-900 mb-4">Plný přístup k funkcím:</p>
               {freeFeatures.map((feature, index) => (
                 <div key={index} className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-300 text-sm">{feature}</span>
+                  <Check className="w-5 h-5 text-pink-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700 text-sm">{feature}</span>
                 </div>
               ))}
 
-              <div className="pt-4 border-t border-white/10">
-                <p className="text-sm font-semibold text-amber-400 mb-3 flex items-center gap-2">
+              <div className="pt-4 border-t border-gray-200">
+                <p className="text-sm font-semibold text-purple-600 mb-3 flex items-center gap-2">
                   <Sparkles className="w-4 h-4" />
                   Omezené AI funkce:
                 </p>
                 {freeLimitedFeatures.map((feature, index) => (
                   <div key={index} className="flex items-start gap-3 mb-2">
-                    <Bot className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-400 text-sm">{feature}</span>
+                    <Bot className="w-5 h-5 text-purple-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-gray-600 text-sm">{feature}</span>
                   </div>
                 ))}
               </div>
@@ -123,14 +123,14 @@ export default function PricingSection({ onGetStarted }: PricingSectionProps) {
 
           {/* Monthly Card - POPULAR */}
           <div
-            className="relative bg-gradient-to-br from-rose-500/20 to-purple-500/20 backdrop-blur-sm rounded-3xl p-8 border-2 border-rose-400/50 hover:border-rose-400 transition-all duration-500 animate-fade-in hover:scale-105 shadow-2xl"
+            className="relative bg-pink-50 rounded-3xl p-8 border-2 border-pink-400 hover:border-pink-500 transition-all duration-500 animate-fade-in hover:scale-105 shadow-2xl"
             style={{ animationDelay: '0.5s' }}
             onMouseEnter={() => setHoveredCard('monthly')}
             onMouseLeave={() => setHoveredCard(null)}
           >
             {/* Popular badge */}
             <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-              <div className="px-6 py-2 bg-gradient-to-r from-rose-500 to-purple-500 text-white text-sm font-bold rounded-full shadow-lg flex items-center gap-2">
+              <div className="px-6 py-2 bg-pink-500 text-white text-sm font-bold rounded-full shadow-lg flex items-center gap-2">
                 <Crown className="w-4 h-4" />
                 NEJOBLÍBENĚJŠÍ
               </div>
@@ -138,50 +138,50 @@ export default function PricingSection({ onGetStarted }: PricingSectionProps) {
 
             <div className="mb-6 mt-4">
               <div className="flex items-center gap-2 mb-2">
-                <Bot className="w-6 h-6 text-rose-300" />
-                <h3 className="text-2xl font-bold text-white">Měsíční předplatné</h3>
+                <Bot className="w-6 h-6 text-pink-600" />
+                <h3 className="text-2xl font-bold text-gray-900">Měsíční předplatné</h3>
               </div>
-              <p className="text-gray-300 text-sm">Neomezené AI funkce + vše ostatní</p>
+              <p className="text-gray-700 text-sm">Neomezené AI funkce + vše ostatní</p>
             </div>
 
             <div className="mb-8">
               <div className="flex items-baseline gap-2">
-                <span className="text-5xl md:text-6xl font-extrabold text-white whitespace-nowrap">299 Kč</span>
-                <span className="text-gray-400 text-base md:text-lg">/měsíc</span>
+                <span className="text-5xl md:text-6xl font-extrabold text-gray-900 whitespace-nowrap">299 Kč</span>
+                <span className="text-gray-600 text-base md:text-lg">/měsíc</span>
               </div>
-              <p className="text-gray-400 text-sm mt-2">Fakturováno měsíčně</p>
+              <p className="text-gray-600 text-sm mt-2">Fakturováno měsíčně</p>
             </div>
 
             <button
               onClick={onGetStarted}
-              className="w-full py-4 bg-white text-gray-900 font-bold rounded-xl hover:bg-gray-100 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 mb-8"
+              className="w-full py-4 bg-pink-500 text-white font-bold rounded-xl hover:bg-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 mb-8"
             >
               Začít s prvním měsícem zdarma
             </button>
 
             <div className="space-y-3">
-              <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl p-4 mb-4 border border-blue-400/30">
-                <p className="text-sm font-bold text-blue-300 mb-3 flex items-center gap-2">
+              <div className="bg-purple-100 rounded-xl p-4 mb-4 border border-purple-200">
+                <p className="text-sm font-bold text-purple-700 mb-3 flex items-center gap-2">
                   <Wand2 className="w-5 h-5" />
                   Naše konkurenční výhody:
                 </p>
                 <div className="space-y-2">
                   <div className="flex items-start gap-2">
-                    <Bot className="w-5 h-5 text-blue-300 flex-shrink-0 mt-0.5" />
-                    <span className="text-white text-sm font-semibold">Neomezený AI asistent 🤖</span>
+                    <Bot className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-gray-900 text-sm font-semibold">Neomezený AI asistent 🤖</span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <Globe className="w-5 h-5 text-blue-300 flex-shrink-0 mt-0.5" />
-                    <span className="text-white text-sm font-semibold">Tvorba svatebního webu 🌐</span>
+                    <Globe className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-gray-900 text-sm font-semibold">Tvorba svatebního webu 🌐</span>
                   </div>
                 </div>
               </div>
 
-              <p className="text-sm font-semibold text-white mb-3">Všechny funkce:</p>
+              <p className="text-sm font-semibold text-gray-900 mb-3">Všechny funkce:</p>
               {paidFeatures.map((feature, index) => (
                 <div key={index} className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
-                  <span className="text-white text-sm font-medium">{feature}</span>
+                  <Check className="w-5 h-5 text-pink-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700 text-sm font-medium">{feature}</span>
                 </div>
               ))}
             </div>
@@ -189,14 +189,14 @@ export default function PricingSection({ onGetStarted }: PricingSectionProps) {
 
           {/* Yearly Card */}
           <div
-            className="relative bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-emerald-400/30 hover:border-emerald-400/50 transition-all duration-500 animate-fade-in hover:scale-105"
+            className="relative bg-white rounded-3xl p-8 border-2 border-purple-300 hover:border-purple-400 transition-all duration-500 animate-fade-in hover:scale-105 shadow-lg hover:shadow-2xl"
             style={{ animationDelay: '0.6s' }}
             onMouseEnter={() => setHoveredCard('yearly')}
             onMouseLeave={() => setHoveredCard(null)}
           >
             {/* Savings badge */}
             <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-              <div className="px-6 py-2 bg-gradient-to-r from-emerald-500 to-green-500 text-white text-sm font-bold rounded-full shadow-lg flex items-center gap-2">
+              <div className="px-6 py-2 bg-purple-500 text-white text-sm font-bold rounded-full shadow-lg flex items-center gap-2">
                 <TrendingUp className="w-4 h-4" />
                 UŠETŘÍTE 17%
               </div>
@@ -204,76 +204,76 @@ export default function PricingSection({ onGetStarted }: PricingSectionProps) {
 
             <div className="mb-6 mt-4">
               <div className="flex items-center gap-2 mb-2">
-                <Crown className="w-6 h-6 text-emerald-400" />
-                <h3 className="text-2xl font-bold text-white">Roční předplatné</h3>
+                <Crown className="w-6 h-6 text-purple-600" />
+                <h3 className="text-2xl font-bold text-gray-900">Roční předplatné</h3>
               </div>
-              <p className="text-gray-300 text-sm">Nejlepší hodnota za peníze</p>
+              <p className="text-gray-600 text-sm">Nejlepší hodnota za peníze</p>
             </div>
 
             <div className="mb-8">
               <div className="flex items-baseline gap-1">
-                <span className="text-4xl md:text-5xl font-extrabold text-white">2 999 Kč</span>
-                <span className="text-gray-400 text-base">/rok</span>
+                <span className="text-4xl md:text-5xl font-extrabold text-gray-900">2 999 Kč</span>
+                <span className="text-gray-600 text-base">/rok</span>
               </div>
               <div className="mt-3 space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-emerald-400 text-sm font-semibold">= 250 Kč/měsíc</span>
+                  <span className="text-purple-600 text-sm font-semibold">= 250 Kč/měsíc</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-emerald-400 text-sm font-semibold">Ušetříte 589 Kč ročně!</span>
-                  <TrendingUp className="w-4 h-4 text-emerald-400" />
+                  <span className="text-purple-600 text-sm font-semibold">Ušetříte 589 Kč ročně!</span>
+                  <TrendingUp className="w-4 h-4 text-purple-600" />
                 </div>
               </div>
-              <p className="text-gray-400 text-sm mt-2">Jednorázová platba • Bez automatického obnovení</p>
+              <p className="text-gray-600 text-sm mt-2">Jednorázová platba • Bez automatického obnovení</p>
             </div>
 
             <button
               onClick={onGetStarted}
-              className="w-full py-4 bg-gradient-to-r from-emerald-500 to-green-500 text-white font-bold rounded-xl hover:from-emerald-600 hover:to-green-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 mb-8"
+              className="w-full py-4 bg-purple-500 text-white font-bold rounded-xl hover:bg-purple-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 mb-8"
             >
               Začít s prvním měsícem zdarma
             </button>
 
             <div className="space-y-3">
-              <div className="bg-gradient-to-r from-emerald-500/20 to-green-500/20 rounded-xl p-4 mb-4 border border-emerald-400/30">
-                <p className="text-sm font-bold text-emerald-300 mb-2 flex items-center gap-2">
+              <div className="bg-pink-100 rounded-xl p-4 mb-4 border border-pink-200">
+                <p className="text-sm font-bold text-pink-700 mb-2 flex items-center gap-2">
                   <Sparkles className="w-5 h-5" />
                   Stejné funkce jako měsíční
                 </p>
-                <p className="text-gray-300 text-xs">
+                <p className="text-gray-700 text-xs">
                   Vše co měsíční členství + úspora 589 Kč ročně • Jednorázová platba
                 </p>
               </div>
 
-              <p className="text-sm font-semibold text-gray-300 mb-3">Zahrnuje:</p>
+              <p className="text-sm font-semibold text-gray-900 mb-3">Zahrnuje:</p>
               {paidFeatures.slice(0, 7).map((feature, index) => (
                 <div key={index} className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-300 text-sm">{feature}</span>
+                  <Check className="w-5 h-5 text-purple-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700 text-sm">{feature}</span>
                 </div>
               ))}
-              <p className="text-xs text-gray-500 pt-2">+ všechny ostatní funkce</p>
+              <p className="text-xs text-gray-600 pt-2">+ všechny ostatní funkce</p>
             </div>
           </div>
         </div>
 
         {/* Trust indicators */}
         <div className="mt-16 md:mt-20 text-center animate-fade-in" style={{ animationDelay: '0.7s' }}>
-          <div className="inline-flex flex-wrap items-center justify-center gap-8 md:gap-12 text-gray-400">
+          <div className="inline-flex flex-wrap items-center justify-center gap-8 md:gap-12 text-gray-600">
             <div className="flex items-center gap-2">
-              <Check className="w-5 h-5 text-emerald-400" />
+              <Check className="w-5 h-5 text-pink-500" />
               <span className="text-sm">Bez závazků</span>
             </div>
             <div className="flex items-center gap-2">
-              <Check className="w-5 h-5 text-emerald-400" />
+              <Check className="w-5 h-5 text-pink-500" />
               <span className="text-sm">Zrušit kdykoliv</span>
             </div>
             <div className="flex items-center gap-2">
-              <Check className="w-5 h-5 text-emerald-400" />
+              <Check className="w-5 h-5 text-pink-500" />
               <span className="text-sm">Bezpečné platby</span>
             </div>
             <div className="flex items-center gap-2">
-              <Check className="w-5 h-5 text-emerald-400" />
+              <Check className="w-5 h-5 text-pink-500" />
               <span className="text-sm">30denní záruka vrácení peněz</span>
             </div>
           </div>
@@ -281,11 +281,11 @@ export default function PricingSection({ onGetStarted }: PricingSectionProps) {
 
         {/* GoPay Payment Gateway */}
         <div className="mt-12 md:mt-16 text-center animate-fade-in" style={{ animationDelay: '0.8s' }}>
-          <p className="text-gray-400 text-sm mb-4">Bezpečné platby zajištěny přes</p>
-          <div className="flex items-center justify-center">
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-8 py-4 border border-white/20 hover:border-white/30 transition-all">
+          <p className="text-gray-600 text-sm mb-4">Bezpečné platby zajištěny přes</p>
+          <div className="flex items-center justify-center mb-6">
+            <div className="bg-gray-50 rounded-2xl px-8 py-4 border border-gray-200 hover:border-pink-300 transition-all">
               <Image
-                src="/GoPay loga/white.svg"
+                src="/GoPay loga/colorfull.svg"
                 alt="GoPay - Bezpečná platební brána"
                 width={120}
                 height={40}
@@ -293,9 +293,36 @@ export default function PricingSection({ onGetStarted }: PricingSectionProps) {
               />
             </div>
           </div>
-          <p className="text-gray-500 text-xs mt-3">
-            Podporujeme Visa, Mastercard, American Express a Maestro
-          </p>
+
+          {/* Payment methods */}
+          <div className="max-w-3xl mx-auto">
+            <p className="text-gray-600 text-sm mb-4 font-medium">Podporované platební metody:</p>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              {/* Platební karty */}
+              <div className="flex items-center gap-2">
+                <Image src="/visa.png" alt="Visa" width={50} height={32} className="hover:scale-110 transition-transform" />
+                <Image src="/mastercard.png" alt="Mastercard" width={50} height={32} className="hover:scale-110 transition-transform" />
+              </div>
+
+              {/* Česká spořitelna */}
+              <Image src="/ceska-sporitelna.png" alt="Česká spořitelna" width={50} height={32} className="hover:scale-110 transition-transform" />
+
+              {/* ČSOB */}
+              <Image src="/csob.png" alt="ČSOB" width={50} height={32} className="hover:scale-110 transition-transform" />
+
+              {/* Fio banka */}
+              <Image src="/fio.png" alt="Fio banka" width={50} height={32} className="hover:scale-110 transition-transform" />
+
+              {/* mBank */}
+              <Image src="/mbank.png" alt="mBank" width={50} height={32} className="hover:scale-110 transition-transform" />
+
+              {/* Google Pay */}
+              <Image src="/gpay.png" alt="Google Pay" width={50} height={32} className="hover:scale-110 transition-transform" />
+
+              {/* Bitcoin */}
+              <Image src="/bitcoin.png" alt="Bitcoin" width={50} height={32} className="hover:scale-110 transition-transform" />
+            </div>
+          </div>
         </div>
       </div>
     </section>

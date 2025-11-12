@@ -796,7 +796,7 @@ export default function WeddingCountdownModule({ onWeddingSettingsClick }: Weddi
 
           <div className="max-w-md mx-auto">
             <div className="flex justify-between items-center mb-1">
-              <span className="text-xs text-text-muted">Uběhlý čas</span>
+              <span className="text-xs text-text-muted">Uplynulý čas</span>
               <span className="text-xs font-semibold">{timeProgress}%</span>
             </div>
             <div className="progress-bar h-1.5">
