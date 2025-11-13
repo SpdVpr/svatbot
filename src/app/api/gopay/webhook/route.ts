@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
         goPayId: payment.id,
         parentGoPayId: parseInt(parentId),
         orderNumber: payment.order_number,
-        amount: payment.amount / 100,
+        amount: payment.amount, // Store in cents (haléře) for consistency
         currency: payment.currency,
         status: payment.state === 'PAID' ? 'succeeded' : 'pending',
         plan,
@@ -146,7 +146,7 @@ export async function GET(request: NextRequest) {
         await subscriptionRef.update({
           plan,
           status: 'active',
-          amount: payment.amount / 100,
+          amount: payment.amount, // Store in cents (haléře) for consistency
           currency: payment.currency,
           currentPeriodStart: Timestamp.fromDate(now),
           currentPeriodEnd: Timestamp.fromDate(periodEnd),
@@ -162,7 +162,7 @@ export async function GET(request: NextRequest) {
           userId,
           plan,
           status: 'active',
-          amount: payment.amount / 100,
+          amount: payment.amount, // Store in cents (haléře) for consistency
           currency: payment.currency,
           currentPeriodStart: Timestamp.fromDate(now),
           currentPeriodEnd: Timestamp.fromDate(periodEnd),
@@ -199,7 +199,7 @@ export async function GET(request: NextRequest) {
                   firstName: userData.firstName,
                   userId,
                   plan,
-                  amount: payment.amount / 100,
+                  amount: payment.amount, // Already in cents (haléře)
                   currency: payment.currency,
                   isRecurring: true
                 })

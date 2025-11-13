@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
           currentPeriodStart: startDate,
           currentPeriodEnd: endDate,
           cancelAtPeriodEnd: false,
-          amount: payment.amount / 100,
+          amount: payment.amount, // Already in cents (haléře)
           currency: payment.currency,
           goPayPaymentId: payment.id.toString(),
           updatedAt: Timestamp.now()
@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
           currentPeriodStart: startDate,
           currentPeriodEnd: endDate,
           cancelAtPeriodEnd: false,
-          amount: payment.amount / 100,
+          amount: payment.amount, // Already in cents (haléře)
           currency: payment.currency,
           goPayPaymentId: payment.id.toString(),
           createdAt: Timestamp.now(),

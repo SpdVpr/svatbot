@@ -381,7 +381,7 @@ function DashboardContent() {
                 muted
                 playsInline
                 className="h-20 w-auto"
-                style={{ width: '240px', height: '80px' }}
+                style={{ width: '80px', height: '80px' }}
               />
               <div className="border-l border-gray-300 pl-6">
                 <button

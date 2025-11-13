@@ -199,7 +199,7 @@ export async function createGoPayPaymentServer(params: {
     userEmail,
     goPayId: payment.id,
     orderNumber: payment.order_number,
-    amount: product.amount / 100, // Convert to CZK
+    amount: product.amount, // Store in cents (haléře) for consistency
     currency: product.currency,
     status: 'pending',
     plan,

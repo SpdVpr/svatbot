@@ -26,7 +26,7 @@ export default function DashboardSkeleton() {
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-6">
               {/* Logo placeholder with exact dimensions */}
-              <div className="h-20 w-[240px] bg-gray-200 rounded animate-pulse" />
+              <div className="h-20 w-[80px] bg-gray-200 rounded animate-pulse" />
               <div className="border-l border-gray-300 pl-6">
                 <div className="h-8 w-64 bg-gray-200 rounded animate-pulse mb-2" />
                 <div className="h-4 w-48 bg-gray-200 rounded animate-pulse" />

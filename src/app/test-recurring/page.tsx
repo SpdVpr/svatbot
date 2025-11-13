@@ -111,7 +111,7 @@ export default function TestRecurringPage() {
                 <div>
                   <span className="text-gray-600">Částka:</span>
                   <span className="ml-2 font-medium text-gray-900">
-                    {subscription.amount} {subscription.currency}
+                    {(subscription.amount / 100).toFixed(2)} {subscription.currency}
                   </span>
                 </div>
 
@@ -218,7 +218,7 @@ export default function TestRecurringPage() {
               <div>
                 <span className="text-gray-600">Částka:</span>
                 <span className="ml-2 font-medium text-gray-900">
-                  {result.subscription.amount} {result.subscription.currency}
+                  {(result.subscription.amount / 100).toFixed(2)} {result.subscription.currency}
                 </span>
               </div>
             </div>
