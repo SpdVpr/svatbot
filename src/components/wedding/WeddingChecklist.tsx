@@ -903,22 +903,22 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
                                 </button>
                               </div>
                             ) : (
-                              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                              <div className="flex flex-row items-center gap-2 flex-wrap">
                                 {/* Hotovo button */}
                                 <button
                                   onClick={() => handleMarkComplete(item)}
                                   disabled={markingComplete === item.id}
-                                  className="flex items-center justify-center space-x-1 sm:space-x-2 px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                  className="flex items-center justify-center space-x-1 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm font-medium"
                                 >
                                   {markingComplete === item.id ? (
                                     <>
                                       <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                      <span className="text-xs sm:text-sm font-medium">Označuji...</span>
+                                      <span className="hidden sm:inline">Označuji...</span>
                                     </>
                                   ) : (
                                     <>
                                       <Check className="w-3 h-3 sm:w-4 sm:h-4" />
-                                      <span className="text-xs sm:text-sm font-medium">Hotovo</span>
+                                      <span>Hotovo</span>
                                     </>
                                   )}
                                 </button>
@@ -927,17 +927,17 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
                                 <button
                                   onClick={() => handleAddToTasks(item)}
                                   disabled={isAdding}
-                                  className="flex items-center justify-center space-x-1 sm:space-x-2 px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                  className="flex items-center justify-center space-x-1 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm font-medium"
                                 >
                                   {isAdding ? (
                                     <>
                                       <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                      <span className="text-xs sm:text-sm font-medium">Přidávám...</span>
+                                      <span className="hidden sm:inline">Přidávám...</span>
                                     </>
                                   ) : (
                                     <>
                                       <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
-                                      <span className="text-xs sm:text-sm font-medium">Do úkolů</span>
+                                      <span>Do úkolů</span>
                                     </>
                                   )}
                                 </button>
@@ -945,10 +945,10 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
                                 {/* Skrýt button */}
                                 <button
                                   onClick={() => handleHideItem(item)}
-                                  className="flex items-center justify-center space-x-1 px-3 py-2 text-xs sm:text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                                  className="flex items-center justify-center space-x-1 px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                                   title="Skrýt tento úkol"
                                 >
-                                  <X className="w-4 h-4" />
+                                  <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                   <span>Skrýt</span>
                                 </button>
                               </div>

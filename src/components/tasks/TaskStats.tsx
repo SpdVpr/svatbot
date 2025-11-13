@@ -128,79 +128,79 @@ export default function TaskStats({
 
   return (
     <div className="space-y-6">
-      {/* Main stats grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Main stats grid - Mobile optimized */}
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         {/* Total tasks */}
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-text-muted">Celkem úkolů</p>
-              <p className="text-3xl font-bold text-gray-900 mt-1">{stats.total}</p>
+        <div className="bg-white p-3 md:p-6 rounded-xl border border-gray-200 shadow-sm">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div className="flex-1">
+              <p className="text-xs md:text-sm font-medium text-text-muted">Celkem</p>
+              <p className="text-2xl md:text-3xl font-bold text-gray-900 mt-0.5 md:mt-1">{stats.total}</p>
             </div>
-            <div className="p-3 bg-gray-100 rounded-full">
+            <div className="hidden md:block p-3 bg-gray-100 rounded-full">
               <Circle className="w-6 h-6 text-gray-600" />
             </div>
           </div>
-          <div className="mt-4 flex items-center text-sm">
-            <span className="text-text-muted">
-              {stats.pending} probíhajících
+          <div className="mt-2 md:mt-4 flex items-center text-xs md:text-sm">
+            <span className="text-text-muted truncate">
+              {stats.pending} aktivních
             </span>
           </div>
         </div>
 
         {/* Completed tasks */}
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-text-muted">Dokončeno</p>
-              <p className="text-3xl font-bold text-green-600 mt-1">{stats.completed}</p>
+        <div className="bg-white p-3 md:p-6 rounded-xl border border-gray-200 shadow-sm">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div className="flex-1">
+              <p className="text-xs md:text-sm font-medium text-text-muted">Hotovo</p>
+              <p className="text-2xl md:text-3xl font-bold text-green-600 mt-0.5 md:mt-1">{stats.completed}</p>
             </div>
-            <div className="p-3 bg-green-100 rounded-full">
+            <div className="hidden md:block p-3 bg-green-100 rounded-full">
               <CheckCircle2 className="w-6 h-6 text-green-600" />
             </div>
           </div>
-          <div className="mt-4 flex items-center text-sm">
-            <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
-            <span className="text-green-600 font-medium">{stats.completionRate}% úspěšnost</span>
+          <div className="mt-2 md:mt-4 flex items-center text-xs md:text-sm">
+            <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-green-500 mr-1" />
+            <span className="text-green-600 font-medium">{stats.completionRate}%</span>
           </div>
         </div>
 
         {/* Overdue tasks */}
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-text-muted">Po termínu</p>
-              <p className="text-3xl font-bold text-red-600 mt-1">{stats.overdue}</p>
+        <div className="bg-white p-3 md:p-6 rounded-xl border border-gray-200 shadow-sm">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div className="flex-1">
+              <p className="text-xs md:text-sm font-medium text-text-muted">Po termínu</p>
+              <p className="text-2xl md:text-3xl font-bold text-red-600 mt-0.5 md:mt-1">{stats.overdue}</p>
             </div>
-            <div className="p-3 bg-red-100 rounded-full">
+            <div className="hidden md:block p-3 bg-red-100 rounded-full">
               <AlertTriangle className="w-6 h-6 text-red-600" />
             </div>
           </div>
-          <div className="mt-4 flex items-center text-sm">
+          <div className="mt-2 md:mt-4 flex items-center text-xs md:text-sm">
             {stats.overdue > 0 ? (
-              <span className="text-red-600">Vyžaduje pozornost</span>
+              <span className="text-red-600 truncate">Vyžaduje</span>
             ) : (
-              <span className="text-green-600">Vše v termínu</span>
+              <span className="text-green-600 truncate">V termínu</span>
             )}
           </div>
         </div>
 
         {/* Urgent tasks */}
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-text-muted">Urgentní úkoly</p>
-              <p className="text-3xl font-bold text-orange-600 mt-1">{urgentTasks.length}</p>
+        <div className="bg-white p-3 md:p-6 rounded-xl border border-gray-200 shadow-sm">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div className="flex-1">
+              <p className="text-xs md:text-sm font-medium text-text-muted">Urgentní</p>
+              <p className="text-2xl md:text-3xl font-bold text-orange-600 mt-0.5 md:mt-1">{urgentTasks.length}</p>
             </div>
-            <div className="p-3 bg-orange-100 rounded-full">
+            <div className="hidden md:block p-3 bg-orange-100 rounded-full">
               <Target className="w-6 h-6 text-orange-600" />
             </div>
           </div>
-          <div className="mt-4 flex items-center text-sm">
+          <div className="mt-2 md:mt-4 flex items-center text-xs md:text-sm">
             {urgentTasks.length > 0 ? (
-              <span className="text-orange-600">Prioritní pozornost</span>
+              <span className="text-orange-600 truncate">Prioritní</span>
             ) : (
-              <span className="text-green-600">Žádné urgentní</span>
+              <span className="text-green-600 truncate">Žádné</span>
             )}
           </div>
         </div>

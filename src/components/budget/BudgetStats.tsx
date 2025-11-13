@@ -151,35 +151,35 @@ export default function BudgetStats({
 
   return (
     <div className="space-y-6">
-      {/* Main stats - Simplified 3-column layout */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Main stats - Mobile optimized */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6">
         {/* Total budget */}
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex items-start space-x-3">
-            <div className="p-2 bg-primary-100 rounded-lg flex-shrink-0">
-              <Target className="w-5 h-5 text-primary-600" />
+        <div className="bg-white p-4 md:p-6 rounded-xl border border-gray-200 shadow-sm">
+          <div className="flex items-start space-x-2 md:space-x-3">
+            <div className="p-1.5 md:p-2 bg-primary-100 rounded-lg flex-shrink-0">
+              <Target className="w-4 h-4 md:w-5 md:h-5 text-primary-600" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-text-muted mb-1">Celkový rozpočet</p>
-              <p className="text-3xl font-bold text-gray-900">{formatCurrency(stats.totalBudget)}</p>
-              <p className="text-xs text-text-muted mt-2">{budgetItems.length} položek</p>
+              <p className="text-xs font-medium text-text-muted mb-0.5 md:mb-1">Celkový rozpočet</p>
+              <p className="text-xl md:text-3xl font-bold text-gray-900 truncate">{formatCurrency(stats.totalBudget)}</p>
+              <p className="text-xs text-text-muted mt-1 md:mt-2">{budgetItems.length} položek</p>
             </div>
           </div>
         </div>
 
         {/* Total actual with progress */}
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex items-start space-x-3 mb-3">
-            <div className="p-2 bg-accent-100 rounded-lg flex-shrink-0">
-              <TrendingUp className="w-5 h-5 text-accent-600" />
+        <div className="bg-white p-4 md:p-6 rounded-xl border border-gray-200 shadow-sm">
+          <div className="flex items-start space-x-2 md:space-x-3 mb-2 md:mb-3">
+            <div className="p-1.5 md:p-2 bg-accent-100 rounded-lg flex-shrink-0">
+              <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-accent-600" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-text-muted mb-1">Skutečné náklady</p>
-              <p className="text-3xl font-bold text-gray-900">{formatCurrency(stats.totalActual)}</p>
+              <p className="text-xs font-medium text-text-muted mb-0.5 md:mb-1">Skutečné</p>
+              <p className="text-xl md:text-3xl font-bold text-gray-900 truncate">{formatCurrency(stats.totalActual)}</p>
             </div>
           </div>
           <div className="flex items-center justify-between text-xs">
-            <span className="text-text-muted">Využití rozpočtu</span>
+            <span className="text-text-muted truncate">Využití</span>
             <span className={`font-bold ${stats.budgetUsed > 100 ? 'text-red-600' : 'text-accent-600'}`}>
               {stats.budgetUsed}%
             </span>
@@ -187,19 +187,19 @@ export default function BudgetStats({
         </div>
 
         {/* Payment Status */}
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex items-start space-x-3 mb-3">
-            <div className="p-2 bg-green-100 rounded-lg flex-shrink-0">
-              <CreditCard className="w-5 h-5 text-green-600" />
+        <div className="bg-white p-4 md:p-6 rounded-xl border border-gray-200 shadow-sm">
+          <div className="flex items-start space-x-2 md:space-x-3 mb-2 md:mb-3">
+            <div className="p-1.5 md:p-2 bg-green-100 rounded-lg flex-shrink-0">
+              <CreditCard className="w-4 h-4 md:w-5 md:h-5 text-green-600" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-text-muted mb-1">Zaplaceno</p>
-              <p className="text-3xl font-bold text-green-600">{formatCurrency(stats.totalPaid)}</p>
+              <p className="text-xs font-medium text-text-muted mb-0.5 md:mb-1">Zaplaceno</p>
+              <p className="text-xl md:text-3xl font-bold text-green-600 truncate">{formatCurrency(stats.totalPaid)}</p>
             </div>
           </div>
           <div className="flex items-center justify-between text-xs">
-            <span className="text-text-muted">Zbývá zaplatit</span>
-            <span className="font-bold text-gray-900">
+            <span className="text-text-muted truncate">Zbývá</span>
+            <span className="font-bold text-gray-900 truncate">
               {formatCurrency(stats.totalActual - stats.totalPaid)}
             </span>
           </div>
