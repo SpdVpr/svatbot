@@ -25,55 +25,57 @@ export default function SeatingPlanModule() {
   }
 
   return (
-    <div className="wedding-card">
-      <Link href="/seating" className="block mb-4">
+    <div className="wedding-card h-[353px] flex flex-col">
+      <Link href="/seating" className="block mb-4 flex-shrink-0">
         <h3 className="text-base sm:text-lg font-semibold flex items-center justify-start sm:justify-center space-x-2 hover:text-primary-600 transition-colors">
           <Grid3X3 className="w-4 h-4 sm:w-5 sm:h-5 text-primary-600 flex-shrink-0" />
           <span className="truncate">Zasedací pořádek</span>
         </h3>
       </Link>
 
-      <div className="space-y-3 sm:space-y-4">
-        {/* Seating Overview */}
-        <div className="bg-primary-50 p-2.5 rounded-lg text-center glass-morphism">
-          <div className="text-xl sm:text-2xl font-bold text-primary-600 mb-1">
-            <NumberCounter end={seatingStats.totalTables} duration={1800} />
+      <div className="flex-1 flex flex-col justify-between min-h-0">
+        <div className="space-y-3">
+          {/* Seating Overview */}
+          <div className="bg-primary-50 p-3 rounded-lg text-center glass-morphism">
+            <div className="text-2xl font-bold text-primary-600">
+              <NumberCounter end={seatingStats.totalTables} duration={1800} />
+            </div>
+            <div className="text-sm text-primary-700">Stolů naplánováno</div>
           </div>
-          <div className="text-xs sm:text-sm text-primary-700">Stolů naplánováno</div>
+
+          {/* Assignment Stats */}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="text-center hover-lift">
+              <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg mx-auto mb-1 float-enhanced">
+                <Users className="w-4 h-4 text-green-600" />
+              </div>
+              <div className="text-sm font-bold text-gray-900">
+                <NumberCounter end={seatingStats.assignedGuests} duration={1500} />
+              </div>
+              <div className="text-xs text-gray-500">Přiřazeno</div>
+            </div>
+            <div className="text-center hover-lift">
+              <div className="flex items-center justify-center w-8 h-8 bg-yellow-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.2s' }}>
+                <Table className="w-4 h-4 text-yellow-600" />
+              </div>
+              <div className="text-sm font-bold text-gray-900">
+                <NumberCounter end={seatingStats.unassignedGuests} duration={1500} />
+              </div>
+              <div className="text-xs text-gray-500">Nepřiřazeno</div>
+            </div>
+          </div>
         </div>
 
-        {/* Assignment Stats */}
-        <div className="grid grid-cols-2 gap-2 sm:gap-3">
-          <div className="text-center hover-lift">
-            <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg mx-auto mb-1 float-enhanced">
-              <Users className="w-4 h-4 text-green-600" />
-            </div>
-            <div className="text-sm font-bold text-gray-900">
-              <NumberCounter end={seatingStats.assignedGuests} duration={1500} />
-            </div>
-            <div className="text-xs text-gray-500">Přiřazeno</div>
-          </div>
-          <div className="text-center hover-lift">
-            <div className="flex items-center justify-center w-8 h-8 bg-yellow-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.2s' }}>
-              <Table className="w-4 h-4 text-yellow-600" />
-            </div>
-            <div className="text-sm font-bold text-gray-900">
-              <NumberCounter end={seatingStats.unassignedGuests} duration={1500} />
-            </div>
-            <div className="text-xs text-gray-500">Nepřiřazeno</div>
-          </div>
+        <div className="pt-4 border-t border-gray-200 flex-shrink-0">
+          <Link
+            href="/seating"
+            className="btn-primary w-full flex items-center justify-center space-x-2"
+          >
+            <Grid3X3 className="w-4 h-4" />
+            <span>Vytvořit plán</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
-      </div>
-
-      <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
-        <Link
-          href="/seating"
-          className="btn-primary w-full flex items-center justify-center space-x-2 text-sm sm:text-base"
-        >
-          <Grid3X3 className="w-4 h-4" />
-          <span>Vytvořit plán</span>
-          <ArrowRight className="w-4 h-4" />
-        </Link>
       </div>
     </div>
   )

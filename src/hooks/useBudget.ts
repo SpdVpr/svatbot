@@ -146,6 +146,10 @@ export function useBudget(): UseBudgetReturn {
       recurringFrequency: data.recurringFrequency,
       payments: payments,
       subItems: data.subItems || [],
+      documents: (data.documents || []).map((doc: any) => ({
+        ...doc,
+        uploadedAt: doc.uploadedAt?.toDate ? doc.uploadedAt.toDate() : new Date(doc.uploadedAt)
+      })),
       createdAt: data.createdAt?.toDate() || new Date(),
       updatedAt: data.updatedAt?.toDate() || new Date(),
       createdBy: data.createdBy
@@ -195,6 +199,12 @@ export function useBudget(): UseBudgetReturn {
       }))
     }
     if (item.subItems !== undefined) result.subItems = item.subItems || []
+    if (item.documents !== undefined) {
+      result.documents = (item.documents || []).map(doc => ({
+        ...doc,
+        uploadedAt: doc.uploadedAt instanceof Date ? Timestamp.fromDate(doc.uploadedAt) : doc.uploadedAt
+      }))
+    }
     if (item.createdAt !== undefined) result.createdAt = Timestamp.fromDate(item.createdAt)
     if (item.updatedAt !== undefined) result.updatedAt = Timestamp.fromDate(item.updatedAt)
     if (item.createdBy !== undefined) result.createdBy = item.createdBy
@@ -242,6 +252,7 @@ export function useBudget(): UseBudgetReturn {
         isEstimate: data.isEstimate,
         isRecurring: false,
         payments: data.payments || [],
+        documents: data.documents || [],
         createdAt: new Date(),
         updatedAt: new Date(),
         createdBy: user.id

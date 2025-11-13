@@ -19,7 +19,9 @@ import {
   CreditCard,
   TrendingUp,
   TrendingDown,
-  Coins
+  Coins,
+  FileText,
+  Download
 } from 'lucide-react'
 import { getViewTransitionName } from '@/hooks/useViewTransition'
 
@@ -460,6 +462,12 @@ export default function BudgetList({
                               Odhad
                             </span>
                           )}
+                          {item.documents && item.documents.length > 0 && (
+                            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full flex-shrink-0 whitespace-nowrap flex items-center gap-1">
+                              <FileText className="w-3 h-3" />
+                              {item.documents.length}
+                            </span>
+                          )}
                         </div>
 
                         {/* Badges - Second Row with wrapping */}
@@ -535,9 +543,9 @@ export default function BudgetList({
 
                         {/* Sub-items breakdown */}
                         {item.subItems && item.subItems.length > 0 && (
-                          <div className="mt-3 p-3 bg-primary-50 rounded-lg border border-primary-200">
+                          <div className="mt-3 p-3 bg-primary-50/50 rounded-lg border border-primary-200/50">
                             <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm font-medium text-primary-900">
+                              <span className="text-sm font-medium text-gray-900">
                                 Rozdělení položky ({item.subItems.length})
                               </span>
                               <span className="text-sm font-bold text-primary-600">
@@ -547,11 +555,11 @@ export default function BudgetList({
                             <div className="space-y-1">
                               {item.subItems.map((subItem, index) => (
                                 <div key={subItem.id} className="flex items-center justify-between text-sm">
-                                  <span className="text-primary-800">
+                                  <span className="text-gray-700">
                                     {index + 1}. {subItem.name}
-                                    {subItem.notes && <span className="text-primary-600 ml-1">({subItem.notes})</span>}
+                                    {subItem.notes && <span className="text-gray-600 ml-1">({subItem.notes})</span>}
                                   </span>
-                                  <span className="font-medium text-primary-900">
+                                  <span className="font-medium text-gray-900">
                                     {formatCurrency(subItem.amount, subItem.currency)}
                                   </span>
                                 </div>
@@ -589,10 +597,10 @@ export default function BudgetList({
                                 <div key={payment.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs">
                                   <div className="flex items-center space-x-2 flex-wrap">
                                     <span className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                                      payment.status === 'completed' ? 'bg-primary-500' :
-                                      payment.status === 'pending' ? 'bg-primary-300' :
+                                      payment.status === 'completed' ? 'bg-primary-600' :
+                                      payment.status === 'pending' ? 'bg-primary-400' :
                                       payment.status === 'failed' ? 'bg-red-500' :
-                                      'bg-gray-500'
+                                      'bg-gray-400'
                                     }`} />
                                     <span className="font-medium">{formatCurrency(payment.amount, payment.currency)}</span>
                                     <span className="text-gray-500">
@@ -614,6 +622,54 @@ export default function BudgetList({
                                   ... a {item.payments.length - 3} dalších plateb
                                 </div>
                               )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Documents */}
+                        {item.documents && item.documents.length > 0 && (
+                          <div className="mt-3">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <FileText className="w-4 h-4 text-gray-500" />
+                              <span className="text-sm font-medium text-gray-700">
+                                Dokumenty ({item.documents.length})
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                              {item.documents.map((doc) => {
+                                const docTypeLabel = doc.type === 'invoice' ? 'Faktura' :
+                                  doc.type === 'receipt' ? 'Účtenka' :
+                                  doc.type === 'contract' ? 'Smlouva' :
+                                  doc.type === 'quote' ? 'Nabídka' :
+                                  doc.type === 'delivery-note' ? 'Dodací list' :
+                                  doc.type === 'payment-proof' ? 'Doklad o platbě' :
+                                  doc.type === 'insurance' ? 'Pojištění' :
+                                  doc.type === 'license' ? 'Licence' :
+                                  doc.type === 'portfolio' ? 'Portfolio' :
+                                  'Ostatní'
+
+                                return (
+                                  <a
+                                    key={doc.id}
+                                    href={doc.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="group relative aspect-square bg-gray-50 hover:bg-gray-100 border border-gray-200 hover:border-primary-300 rounded-lg p-3 flex flex-col items-center justify-center transition-all hover:shadow-sm"
+                                    title={`${doc.name}${doc.notes ? ` - ${doc.notes}` : ''}`}
+                                  >
+                                    <FileText className="w-8 h-8 text-gray-400 group-hover:text-primary-600 transition-colors mb-2" />
+                                    <p className="text-xs font-medium text-gray-700 text-center line-clamp-2 mb-1">
+                                      {doc.name}
+                                    </p>
+                                    <p className="text-[10px] text-gray-500 text-center">
+                                      {docTypeLabel}
+                                    </p>
+                                    <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                      <Download className="w-3.5 h-3.5 text-primary-600" />
+                                    </div>
+                                  </a>
+                                )
+                              })}
                             </div>
                           </div>
                         )}

@@ -48,8 +48,10 @@ export default function SvatebniDenPage() {
   const [isDragging, setIsDragging] = useState(false)
   const dragTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const editFormRef = useRef<HTMLDivElement | null>(null)
+  const addFormRef = useRef<HTMLDivElement | null>(null)
 
   const handleSelectPredefined = (activity: typeof PREDEFINED_ACTIVITIES[0]) => {
+    setEditingId(null) // Zavřít editační formulář pokud je otevřený
     setSelectedActivity(activity)
     setFormData({
       time: '',
@@ -59,6 +61,9 @@ export default function SvatebniDenPage() {
       location: '',
       notes: ''
     })
+    setTimeout(() => {
+      addFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 100)
   }
 
   const handleAddPredefined = async (e: React.FormEvent) => {
@@ -122,6 +127,7 @@ export default function SvatebniDenPage() {
   }
 
   const handleEdit = (item: any) => {
+    setSelectedActivity(null) // Zavřít formulář pro přidání pokud je otevřený
     setEditingId(item.id)
     setFormData({
       time: item.time,
@@ -132,7 +138,7 @@ export default function SvatebniDenPage() {
       notes: item.notes
     })
     setTimeout(() => {
-      editFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      editFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }, 100)
   }
 
@@ -304,7 +310,7 @@ export default function SvatebniDenPage() {
 
         {/* Predefined Activity Form */}
         {selectedActivity && (
-          <div className="wedding-card mb-8 animate-fade-in">
+          <div ref={addFormRef} className="wedding-card mb-8 animate-fade-in">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-4">
                 <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center">
@@ -653,8 +659,8 @@ export default function SvatebniDenPage() {
                         <div className="bg-neutral-50 border border-primary-100 rounded-xl p-3 sm:p-6 hover:shadow-soft hover:border-primary-300 transition-all duration-300 group-hover:bg-white">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 min-w-0">
-                              <h3 className="font-display text-base sm:text-xl font-semibold text-text-primary mb-2 sm:mb-3 capitalize">
-                                {item.activity.toLowerCase()}
+                              <h3 className="font-display text-base sm:text-xl font-semibold text-text-primary mb-2 sm:mb-3">
+                                {item.activity}
                               </h3>
 
                               {/* Duration on mobile (hidden on desktop) */}

@@ -13,10 +13,12 @@ import {
   Globe,
   MapPin,
   Tag,
-  DollarSign
+  DollarSign,
+  FileText
 } from 'lucide-react'
-import { VendorFormData, VendorCategory, VendorStatus, VENDOR_CATEGORIES, VENDOR_STATUSES } from '@/types/vendor'
+import { VendorFormData, VendorCategory, VendorStatus, VendorDocument, VENDOR_CATEGORIES, VENDOR_STATUSES } from '@/types/vendor'
 import { ensureUrlProtocol } from '@/utils/url'
+import DocumentUpload, { DocumentItem } from '@/components/common/DocumentUpload'
 
 interface VendorFormProps {
   onSubmit: (data: VendorFormData) => Promise<void>
@@ -50,8 +52,16 @@ export default function VendorForm({ onSubmit, onCancel, initialData, isEditing 
     status: initialData?.status || 'potential',
     priority: initialData?.priority || undefined,
     notes: initialData?.notes || '',
-    tags: initialData?.tags || []
+    tags: initialData?.tags || [],
+    documents: initialData?.documents || []
   })
+
+  const [documents, setDocuments] = useState<DocumentItem[]>(
+    (initialData?.documents || []).map(doc => ({
+      ...doc,
+      uploadedAt: doc.uploadedAt instanceof Date ? doc.uploadedAt : new Date(doc.uploadedAt)
+    }))
+  )
 
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [saving, setSaving] = useState(false)
@@ -600,6 +610,26 @@ export default function VendorForm({ onSubmit, onCancel, initialData, isEditing 
                 </select>
               </div>
             </div>
+          </div>
+
+          {/* Documents Section */}
+          <div className="space-y-3">
+            <div className="flex items-center space-x-2">
+              <FileText className="w-5 h-5 text-gray-400" />
+              <h3 className="text-lg font-medium text-gray-900">Dokumenty</h3>
+            </div>
+            <p className="text-sm text-gray-600">
+              Nahrajte smlouvy, faktury, nabídky nebo jiné dokumenty související s tímto dodavatelem
+            </p>
+            <DocumentUpload
+              documents={documents}
+              onDocumentsChange={(newDocs) => {
+                setDocuments(newDocs)
+                setFormData(prev => ({ ...prev, documents: newDocs }))
+              }}
+              folder="vendor-documents"
+              disabled={saving}
+            />
           </div>
 
           {/* Actions */}

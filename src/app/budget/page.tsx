@@ -85,7 +85,8 @@ export default function BudgetPage() {
         tags: data.tags,
         isEstimate: data.isEstimate,
         payments: data.payments,
-        subItems: data.subItems
+        subItems: data.subItems,
+        documents: data.documents
       }
 
       await updateBudgetItem(editingItem.id, updateData)
@@ -191,7 +192,7 @@ export default function BudgetPage() {
       />
 
       {/* Main content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 !p-4">
         {/* Stats view - most informative display */}
         <div className="space-y-6">
           <BudgetStats
@@ -309,7 +310,8 @@ export default function BudgetPage() {
             tags: editingItem.tags,
             isEstimate: editingItem.isEstimate,
             payments: editingItem.payments,
-            subItems: editingItem.subItems
+            subItems: editingItem.subItems,
+            documents: editingItem.documents
           } : undefined}
         />
       )}

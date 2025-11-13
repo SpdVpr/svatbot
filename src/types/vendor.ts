@@ -20,6 +20,12 @@ export type VendorCategory =
   | 'stationery'      // Tiskoviny
   | 'other'           // Ostatní
 
+// Import shared document types from budget
+import { DocumentType, Document } from './budget'
+
+export type VendorDocumentType = DocumentType
+export type VendorDocument = Document
+
 // Marketplace vendor - předpřipravený dodavatel
 export interface MarketplaceVendor {
   id: string
@@ -316,6 +322,9 @@ export interface Vendor {
     date: Date
   }[]
 
+  // Documents (smlouvy, faktury, atd.)
+  documents: VendorDocument[]
+
   // Metadata
   createdAt: Date
   updatedAt: Date
@@ -457,6 +466,9 @@ export interface VendorFormData {
   // Notes
   notes?: string
   tags: string[]
+
+  // Documents
+  documents?: VendorDocument[]
 }
 
 // Vendor category configurations

@@ -121,6 +121,31 @@ service firebase.storage {
       allow delete: if isAdmin();
     }
 
+    // Helper function for valid document files
+    function isValidDocumentFile() {
+      return request.resource.size < 10 * 1024 * 1024 && // 10MB limit
+             (request.resource.contentType.matches('image/.*') ||
+              request.resource.contentType.matches('application/pdf') ||
+              request.resource.contentType.matches('application/msword') ||
+              request.resource.contentType.matches('application/vnd.openxmlformats-officedocument.wordprocessingml.document') ||
+              request.resource.contentType.matches('application/vnd.ms-excel') ||
+              request.resource.contentType.matches('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'));
+    }
+
+    // Budget documents
+    match /budget-documents/{userId}/{fileName} {
+      allow read: if isAuthenticated() && isOwner(userId);
+      allow write: if isAuthenticated() && isOwner(userId) && isValidDocumentFile();
+      allow delete: if isAuthenticated() && isOwner(userId);
+    }
+
+    // Vendor documents
+    match /vendor-documents/{userId}/{fileName} {
+      allow read: if isAuthenticated() && isOwner(userId);
+      allow write: if isAuthenticated() && isOwner(userId) && isValidDocumentFile();
+      allow delete: if isAuthenticated() && isOwner(userId);
+    }
+
     // Deny all other access
     match /{allPaths=**} {
       allow read, write: if false;

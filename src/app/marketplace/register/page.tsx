@@ -207,13 +207,22 @@ export default function MarketplaceRegisterPage() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <Link
-            href="/marketplace"
-            className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            Zpět na marketplace
-          </Link>
+          <div className="flex justify-between items-center">
+            <Link
+              href="/marketplace"
+              className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              Zpět na marketplace
+            </Link>
+            <Link
+              href="/marketplace"
+              className="inline-flex items-center px-4 py-2 bg-primary-50 text-primary-700 rounded-lg hover:bg-primary-100 transition-colors font-medium"
+            >
+              <Store className="w-5 h-5 mr-2" />
+              Prohlédnout marketplace
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -223,9 +232,24 @@ export default function MarketplaceRegisterPage() {
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Staňte se součástí SvatBot Marketplace
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
             Oslovte stovky párů, které plánují svatbu. Prezentujte své služby a získejte nové zákazníky.
           </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <button
+              onClick={() => setShowForm(true)}
+              className="bg-primary-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary-700 transition-colors shadow-lg inline-flex items-center"
+            >
+              Zaregistrovat se nyní
+            </button>
+            <Link
+              href="/marketplace"
+              className="bg-white text-primary-600 border-2 border-primary-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary-50 transition-colors inline-flex items-center"
+            >
+              <Store className="w-5 h-5 mr-2" />
+              Prohlédnout marketplace
+            </Link>
+          </div>
         </div>
 
         {/* Benefits Grid */}
@@ -332,12 +356,21 @@ export default function MarketplaceRegisterPage() {
           <p className="text-xl text-primary-100 mb-8 max-w-2xl mx-auto">
             Registrace je zdarma. Vytvořte si profil a začněte získávat nové zákazníky ještě dnes.
           </p>
-          <button
-            onClick={() => setShowForm(true)}
-            className="bg-white text-primary-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary-50 transition-colors shadow-lg"
-          >
-            Zaregistrovat se nyní
-          </button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <button
+              onClick={() => setShowForm(true)}
+              className="bg-white text-primary-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary-50 transition-colors shadow-lg"
+            >
+              Zaregistrovat se nyní
+            </button>
+            <Link
+              href="/marketplace"
+              className="bg-primary-800 text-white border-2 border-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary-900 transition-colors inline-flex items-center"
+            >
+              <Store className="w-5 h-5 mr-2" />
+              Prohlédnout marketplace
+            </Link>
+          </div>
           <p className="text-sm text-primary-100 mt-4">
             Registrace trvá 5-10 minut
           </p>

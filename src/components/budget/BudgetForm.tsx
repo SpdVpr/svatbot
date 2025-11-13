@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { BudgetFormData, BudgetCategory, PaymentStatus, PaymentMethod, PaymentPeriod, BudgetItemPayment, BudgetSubItem, BUDGET_CATEGORIES } from '@/types/budget'
+import { BudgetFormData, BudgetCategory, PaymentStatus, PaymentMethod, PaymentPeriod, BudgetItemPayment, BudgetSubItem, BUDGET_CATEGORIES, Document } from '@/types/budget'
 import { useVendor } from '@/hooks/useVendor'
+import DocumentUpload, { DocumentItem } from '@/components/common/DocumentUpload'
 import {
   X,
   DollarSign,
@@ -13,7 +14,8 @@ import {
   Building,
   CreditCard,
   Edit,
-  Coins
+  Coins,
+  FileText
 } from 'lucide-react'
 
 interface BudgetFormProps {
@@ -51,8 +53,16 @@ export default function BudgetForm({
     tags: initialData?.tags || [],
     isEstimate: initialData?.isEstimate || false,
     payments: initialData?.payments || [],
-    subItems: initialData?.subItems || []
+    subItems: initialData?.subItems || [],
+    documents: initialData?.documents || []
   })
+
+  const [documents, setDocuments] = useState<DocumentItem[]>(
+    (initialData?.documents || []).map(doc => ({
+      ...doc,
+      uploadedAt: doc.uploadedAt instanceof Date ? doc.uploadedAt : new Date(doc.uploadedAt)
+    }))
+  )
 
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [showPaymentModal, setShowPaymentModal] = useState(false)
@@ -837,6 +847,26 @@ export default function BudgetForm({
               <Plus className="w-4 h-4" />
               <span>Přidat platbu</span>
             </button>
+          </div>
+
+          {/* Documents Section */}
+          <div className="space-y-3">
+            <div className="flex items-center space-x-2">
+              <FileText className="w-5 h-5 text-gray-400" />
+              <h3 className="text-lg font-medium text-gray-900">Dokumenty</h3>
+            </div>
+            <p className="text-sm text-gray-600">
+              Nahrajte faktury, dodací listy, výpisy nebo jiné dokumenty související s touto položkou
+            </p>
+            <DocumentUpload
+              documents={documents}
+              onDocumentsChange={(newDocs) => {
+                setDocuments(newDocs)
+                setFormData(prev => ({ ...prev, documents: newDocs }))
+              }}
+              folder="budget-documents"
+              disabled={loading}
+            />
           </div>
 
           {/* Actions */}

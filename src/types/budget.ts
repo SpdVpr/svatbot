@@ -47,6 +47,30 @@ export type VendorStatus =
   | 'confirmed'       // Potvrzeno
   | 'cancelled'       // Zrušeno
 
+export type DocumentType =
+  | 'invoice'         // Faktura
+  | 'receipt'         // Účtenka
+  | 'contract'        // Smlouva
+  | 'quote'           // Nabídka
+  | 'delivery-note'   // Dodací list
+  | 'payment-proof'   // Doklad o platbě
+  | 'insurance'       // Pojištění
+  | 'license'         // Licence
+  | 'portfolio'       // Portfolio
+  | 'other'           // Ostatní
+
+export interface Document {
+  id: string
+  name: string
+  type: DocumentType
+  url: string
+  size: number
+  mimeType: string
+  uploadedAt: Date
+  uploadedBy: string
+  notes?: string
+}
+
 export interface BudgetItem {
   id: string
   weddingId: string
@@ -81,12 +105,15 @@ export interface BudgetItem {
 
   // Sub-items for complex budget items
   subItems?: BudgetSubItem[]
-  
+
+  // Documents (faktury, dodací listy, atd.)
+  documents: Document[]
+
   // Tracking
   isEstimate: boolean
   isRecurring: boolean
   recurringFrequency?: 'monthly' | 'quarterly' | 'yearly'
-  
+
   // Metadata
   createdAt: Date
   updatedAt: Date
@@ -275,6 +302,7 @@ export interface BudgetFormData {
   isEstimate: boolean
   payments?: BudgetItemPayment[]
   subItems?: BudgetSubItem[]
+  documents?: Document[]
 }
 
 export interface VendorFormData {

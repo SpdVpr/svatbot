@@ -298,6 +298,28 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
         estimatedDuration: '1-2 týdny',
         icon: '🎁',
         order: 4
+      },
+      {
+        id: '3-5m-005',
+        title: 'Vytvořit předběžný harmonogram dne',
+        description: 'Sestavit časový harmonogram svatebního dne',
+        category: 'preparation',
+        phase: 'before-wedding',
+        priority: 'high',
+        estimatedDuration: '2-3 hodiny',
+        icon: '📋',
+        order: 5
+      },
+      {
+        id: '3-5m-006',
+        title: 'Vybrat koordinátorku / zodpovědnou osobu',
+        description: 'Vybrat osobu, která bude koordinovat svatební den',
+        category: 'preparation',
+        phase: 'before-wedding',
+        priority: 'high',
+        estimatedDuration: '1 týden',
+        icon: '👥',
+        order: 6
       }
     ]
   },
@@ -545,8 +567,8 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: 'week-002',
-        title: 'Vyzvednout svatební šaty',
-        description: 'Vyzvednout šaty z salonu',
+        title: 'Vyzvednout svatební šaty / oblek',
+        description: 'Vyzvednout šaty / oblek z salonu',
         category: 'preparation',
         phase: '1-week-before',
         priority: 'urgent',
@@ -556,8 +578,8 @@ export const WEDDING_CHECKLIST: ChecklistPhase[] = [
       },
       {
         id: 'week-003',
-        title: 'Potvrdit časy všem dodavatelům',
-        description: 'Potvrdit přesné časy příjezdu',
+        title: 'Přepotvrdit si časy s dodavateli',
+        description: 'Potvrdit přesné časy příjezdu všem dodavatelům',
         category: 'preparation',
         phase: '1-week-before',
         priority: 'urgent',

@@ -106,6 +106,10 @@ export function useVendor(): UseVendorReturn {
       tags: data.tags || [],
       portfolio: data.portfolio || [],
       testimonials: data.testimonials || [],
+      documents: (data.documents || []).map((doc: any) => ({
+        ...doc,
+        uploadedAt: doc.uploadedAt?.toDate ? doc.uploadedAt.toDate() : new Date(doc.uploadedAt)
+      })),
       createdAt: data.createdAt?.toDate() || new Date(),
       updatedAt: data.updatedAt?.toDate() || new Date(),
       createdBy: data.createdBy
@@ -173,6 +177,10 @@ export function useVendor(): UseVendorReturn {
       tags: vendor.tags || [],
       portfolio: vendor.portfolio || [],
       testimonials: vendor.testimonials || [],
+      documents: (vendor.documents || []).map(doc => ({
+        ...doc,
+        uploadedAt: doc.uploadedAt instanceof Date ? Timestamp.fromDate(doc.uploadedAt) : doc.uploadedAt
+      })),
       createdAt: Timestamp.fromDate(vendor.createdAt),
       updatedAt: Timestamp.fromDate(vendor.updatedAt),
       createdBy: vendor.createdBy
@@ -217,6 +225,12 @@ export function useVendor(): UseVendorReturn {
     if (updates.tags !== undefined) data.tags = updates.tags || []
     if (updates.portfolio !== undefined) data.portfolio = updates.portfolio || []
     if (updates.testimonials !== undefined) data.testimonials = updates.testimonials || []
+    if (updates.documents !== undefined) {
+      data.documents = (updates.documents || []).map(doc => ({
+        ...doc,
+        uploadedAt: doc.uploadedAt instanceof Date ? Timestamp.fromDate(doc.uploadedAt) : doc.uploadedAt
+      }))
+    }
     if (updates.updatedAt !== undefined) data.updatedAt = Timestamp.fromDate(updates.updatedAt)
 
     console.log('📦 Firestore data before removeUndefined:', data)
@@ -285,6 +299,7 @@ export function useVendor(): UseVendorReturn {
         tags: data.tags,
         portfolio: [],
         testimonials: [],
+        documents: data.documents || [],
         createdAt: new Date(),
         updatedAt: new Date(),
         createdBy: user.id

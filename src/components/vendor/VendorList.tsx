@@ -16,7 +16,9 @@ import {
   DollarSign,
   Eye,
   MoreVertical,
-  ShoppingBag
+  ShoppingBag,
+  FileText,
+  Download
 } from 'lucide-react'
 import Link from 'next/link'
 import { Vendor, VendorFilters, VENDOR_CATEGORIES, VENDOR_STATUSES } from '@/types/vendor'
@@ -358,6 +360,14 @@ export default function VendorList({
                                 {getPriorityLabel(vendor.priority)}
                               </span>
                             )}
+
+                            {/* Documents Badge */}
+                            {vendor.documents && vendor.documents.length > 0 && (
+                              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full flex-shrink-0 whitespace-nowrap flex items-center gap-1">
+                                <FileText className="w-3 h-3" />
+                                {vendor.documents.length}
+                              </span>
+                            )}
                           </div>
                         </div>
 
@@ -574,6 +584,54 @@ export default function VendorList({
                     <span>Smazat</span>
                   </button>
                 </div>
+
+                {/* Documents */}
+                {vendor.documents && vendor.documents.length > 0 && (
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <div className="flex items-center space-x-2 mb-3">
+                      <FileText className="w-4 h-4 text-gray-500" />
+                      <span className="text-sm font-medium text-gray-700">
+                        Dokumenty ({vendor.documents.length})
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                      {vendor.documents.map((doc) => {
+                        const docTypeLabel = doc.type === 'contract' ? 'Smlouva' :
+                          doc.type === 'invoice' ? 'Faktura' :
+                          doc.type === 'quote' ? 'Nabídka' :
+                          doc.type === 'receipt' ? 'Účtenka' :
+                          doc.type === 'insurance' ? 'Pojištění' :
+                          doc.type === 'license' ? 'Licence' :
+                          doc.type === 'portfolio' ? 'Portfolio' :
+                          doc.type === 'delivery-note' ? 'Dodací list' :
+                          doc.type === 'payment-proof' ? 'Doklad o platbě' :
+                          'Ostatní'
+
+                        return (
+                          <a
+                            key={doc.id}
+                            href={doc.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group relative aspect-square bg-gray-50 hover:bg-gray-100 border border-gray-200 hover:border-primary-300 rounded-lg p-3 flex flex-col items-center justify-center transition-all hover:shadow-sm"
+                            title={`${doc.name}${doc.notes ? ` - ${doc.notes}` : ''}`}
+                          >
+                            <FileText className="w-8 h-8 text-gray-400 group-hover:text-primary-600 transition-colors mb-2" />
+                            <p className="text-xs font-medium text-gray-700 text-center line-clamp-2 mb-1">
+                              {doc.name}
+                            </p>
+                            <p className="text-[10px] text-gray-500 text-center">
+                              {docTypeLabel}
+                            </p>
+                            <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Download className="w-3.5 h-3.5 text-primary-600" />
+                            </div>
+                          </a>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
 
                 {/* Tags */}
                 {vendor.tags.length > 0 && (

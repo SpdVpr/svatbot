@@ -94,7 +94,8 @@ export default function VendorsPage() {
           status: data.status,
           priority: data.priority,
           notes: data.notes,
-          tags: data.tags
+          tags: data.tags,
+          documents: data.documents
         })
       } else {
         // Create new vendor
@@ -197,7 +198,8 @@ export default function VendorsPage() {
             status: editingVendor.status,
             priority: editingVendor.priority,
             notes: editingVendor.notes,
-            tags: editingVendor.tags
+            tags: editingVendor.tags,
+            documents: editingVendor.documents
           } : undefined}
           isEditing={!!editingVendor}
         />
