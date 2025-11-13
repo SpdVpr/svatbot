@@ -57,6 +57,7 @@ function DashboardContent() {
   const [showMobileMenu, setShowMobileMenu] = useState(false)
   const [showTrialExpiredModal, setShowTrialExpiredModal] = useState(false)
   const [showOnboardingWizardFromDashboard, setShowOnboardingWizardFromDashboard] = useState(false)
+  const [isSafari, setIsSafari] = useState(false)
   const searchParams = useSearchParams()
 
   // Use DEMO-aware wedding date
@@ -78,6 +79,12 @@ function DashboardContent() {
       setShowTrialExpiredModal(true)
     }
   }, [isTrialExpired, user])
+
+  // Detect Safari browser for logo fallback
+  useEffect(() => {
+    const isSafariBrowser = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+    setIsSafari(isSafariBrowser)
+  }, [])
 
   // Initialize auto-notifications system
   useAutoNotifications()
@@ -255,9 +262,9 @@ function DashboardContent() {
         showNotesModal || showAccountModal || showWeddingSettings || showOnboardingWizardFromDashboard ? 'hidden' : ''
       }`}>
         {/* Mobile Header */}
-        <div className="sm:hidden min-h-[64px]">
-          <div className="mobile-header">
-            <div className="flex items-center space-x-2">
+        <div className="sm:hidden">
+          <div className="h-14 px-3 flex items-center justify-between">
+            <div className="flex items-center space-x-1">
               <button
                 onClick={openMobileMenu}
                 className="mobile-nav-button text-gray-600 hover:text-gray-900 hover:bg-gray-100"
@@ -265,16 +272,27 @@ function DashboardContent() {
               >
                 <Menu className="w-5 h-5" />
               </button>
-              <video
-                src="/Animation-logo.webm"
-                autoPlay
-                muted
-                playsInline
-                className="h-10 w-auto"
-                style={{ width: '120px', height: '40px' }}
-              />
+              {/* Animated logo with Safari fallback */}
+              {isSafari ? (
+                <img
+                  src="/logo-svatbot.svg"
+                  alt="SvatBot.cz"
+                  className="h-9 w-auto"
+                  style={{ width: '100px', height: '36px' }}
+                />
+              ) : (
+                <video
+                  src="/Animation-logo.webm"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="h-9 w-auto"
+                  style={{ width: '100px', height: '36px' }}
+                />
+              )}
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1.5">
               <LiveNotifications />
               <button
                 onClick={openNotesModal}
@@ -300,57 +318,49 @@ function DashboardContent() {
             </div>
           </div>
 
-          {/* Mobile wedding info */}
-          <div className="px-4 pb-3 border-t border-gray-100">
+          {/* Mobile wedding info - compact single line */}
+          <div className="px-3 py-2 border-t border-gray-100">
             <button
               onClick={openWeddingSettings}
-              className="text-left w-full hover:bg-gray-50 p-2 rounded-lg transition-colors"
+              className="text-left w-full hover:bg-gray-50 px-2 py-1.5 rounded-lg transition-colors flex items-center justify-between gap-2"
             >
-              <h2 className="text-sm font-bold text-gray-900" style={{ fontFamily: "var(--font-cormorant), 'Cormorant Upright', serif" }}>
-                {wedding.brideName} & {wedding.groomName}
-              </h2>
-              <p className="text-xs text-text-muted">
-                {weddingDate
-                  ? `${dateUtils.format(weddingDate, 'dd.MM.yyyy')}`
-                  : 'Klikněte pro nastavení data'
-                }
-              </p>
-            </button>
+              <div className="flex items-center gap-2 min-w-0 flex-1">
+                <h2 className="text-xs font-bold text-gray-900 truncate" style={{ fontFamily: "var(--font-cormorant), 'Cormorant Upright', serif" }}>
+                  {wedding.brideName} & {wedding.groomName}
+                </h2>
+                <span className="text-xs text-text-muted whitespace-nowrap">
+                  {weddingDate
+                    ? `• ${dateUtils.format(weddingDate, 'dd.MM.yyyy')}`
+                    : '• Nastavit datum'
+                  }
+                </span>
+              </div>
 
-            {/* Subscription info */}
-            {subscription?.status === 'trialing' && subscription?.isTrialActive && trialDaysRemaining !== null && (
-              <div className="mt-2 px-2">
-                <button
-                  onClick={() => openAccountModal('subscription')}
-                  className="flex items-center gap-1.5 text-xs hover:opacity-80 transition-opacity"
-                >
-                  <Clock className="w-3.5 h-3.5 text-amber-600" />
-                  <span className={`font-medium ${trialDaysRemaining <= 3 ? 'text-red-600' : 'text-amber-600'}`}>
+              {/* Subscription info - inline */}
+              {subscription?.status === 'trialing' && subscription?.isTrialActive && trialDaysRemaining !== null && (
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <Clock className="w-3 h-3 text-amber-600" />
+                  <span className={`text-xs font-medium whitespace-nowrap ${trialDaysRemaining <= 3 ? 'text-red-600' : 'text-amber-600'}`}>
                     {trialDaysRemaining === 0
-                      ? 'Trial vyprší dnes!'
-                      : `Trial vyprší za ${trialDaysRemaining} ${trialDaysRemaining === 1 ? 'den' : trialDaysRemaining <= 4 ? 'dny' : 'dní'}`
+                      ? 'Trial dnes!'
+                      : `${trialDaysRemaining}d`
                     }
                   </span>
-                </button>
-              </div>
-            )}
+                </div>
+              )}
 
-            {/* Premium status */}
-            {subscription?.status === 'active' && hasPremiumAccess && (
-              <div className="mt-2 px-2">
-                <button
-                  onClick={() => openAccountModal('subscription')}
-                  className="flex items-center gap-1.5 text-xs hover:opacity-80 transition-opacity"
-                >
-                  <Crown className="w-3.5 h-3.5 text-primary-600" fill="currentColor" />
-                  <span className="font-medium text-primary-600">
-                    {subscription.plan === 'premium_monthly' && 'Premium měsíční'}
-                    {subscription.plan === 'premium_yearly' && 'Premium roční'}
-                    {subscription.plan === 'test_daily' && 'Test denní'}
+              {/* Premium status - inline */}
+              {subscription?.status === 'active' && hasPremiumAccess && (
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <Crown className="w-3 h-3 text-primary-600" fill="currentColor" />
+                  <span className="text-xs font-medium text-primary-600 whitespace-nowrap">
+                    {subscription.plan === 'premium_monthly' && 'Premium'}
+                    {subscription.plan === 'premium_yearly' && 'Premium'}
+                    {subscription.plan === 'test_daily' && 'Test'}
                   </span>
-                </button>
-              </div>
-            )}
+                </div>
+              )}
+            </button>
           </div>
         </div>
 
@@ -358,14 +368,24 @@ function DashboardContent() {
         <div className={`hidden sm:block mx-auto px-4 sm:px-6 lg:px-8 py-4 min-h-[112px] ${getCanvasMaxWidth()}`}>
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-6">
-              <video
-                src="/Animation-logo.webm"
-                autoPlay
-                muted
-                playsInline
-                className="h-20 w-auto"
-                style={{ width: '80px', height: '80px' }}
-              />
+              {isSafari ? (
+                <img
+                  src="/logo-svatbot.svg"
+                  alt="SvatBot.cz"
+                  className="h-20 w-auto"
+                  style={{ width: '80px', height: '80px' }}
+                />
+              ) : (
+                <video
+                  src="/Animation-logo.webm"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="h-20 w-auto"
+                  style={{ width: '80px', height: '80px' }}
+                />
+              )}
               <div className="border-l border-gray-300 pl-6">
                 <button
                   onClick={openWeddingSettings}

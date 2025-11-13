@@ -93,14 +93,14 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     <>
       {/* Backdrop with View Transition */}
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 z-[150] sm:hidden backdrop-blur-sm"
+        className="fixed inset-0 bg-black bg-opacity-50 z-[250] sm:hidden backdrop-blur-sm"
         style={getViewTransitionName('mobile-menu-backdrop')}
         onClick={onClose}
       />
 
       {/* Slide-in Menu with View Transition */}
       <div
-        className="fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-white shadow-xl z-[150] sm:hidden transform transition-transform duration-300 ease-in-out"
+        className="fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-white shadow-xl z-[250] sm:hidden transform transition-transform duration-300 ease-in-out"
         style={getViewTransitionName('mobile-menu-sidebar')}
       >
         {/* Header */}

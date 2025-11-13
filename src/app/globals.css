@@ -323,6 +323,25 @@
     @apply w-8 h-8 flex items-center justify-center rounded-lg transition-colors;
   }
 
+  /* Safari fallback for animated logo */
+  @supports not (aspect-ratio: 1) {
+    .safari-logo-fallback {
+      content: url('/logo-svatbot.svg');
+    }
+  }
+
+  /* Detect Safari and use static logo */
+  @media not all and (min-resolution:.001dpcm) {
+    @supports (-webkit-appearance:none) {
+      .safari-logo-fallback {
+        display: none;
+      }
+      .safari-logo-fallback + img {
+        display: block;
+      }
+    }
+  }
+
   .mobile-modal {
     @apply p-2 sm:p-4;
   }
