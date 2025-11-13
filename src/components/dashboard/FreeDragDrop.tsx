@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, lazy, Suspense } from 'react'
 import { useDashboard } from '@/hooks/useDashboard'
 import { useOnboarding } from '@/hooks/useOnboarding'
 import { DashboardModule } from '@/types/dashboard'
@@ -12,26 +12,35 @@ import { useIsDemoUser } from '@/hooks/useDemoSettings'
 import { useColorTheme } from '@/hooks/useColorTheme'
 import { COLOR_PALETTES, ColorTheme } from '@/types/colorTheme'
 
-// Module components
-import WeddingCountdownModule from './modules/WeddingCountdownModule'
-import QuickActionsModule from './modules/QuickActionsModule'
-import MarketplaceModule from './modules/MarketplaceModule'
-import TaskManagementModule from './modules/TaskManagementModule'
-import GuestManagementModule from './modules/GuestManagementModule'
-import BudgetTrackingModule from './modules/BudgetTrackingModule'
-import TimelinePlanningModule from './modules/TimelinePlanningModule'
-import VendorManagementModule from './modules/VendorManagementModule'
-import SeatingPlanModule from './modules/SeatingPlanModule'
-import WeddingDayTimelineModule from './modules/WeddingDayTimelineModule'
-import MoodboardModule from './modules/MoodboardModule'
-import WeddingChecklistModule from './modules/WeddingChecklistModule'
-import MusicPlaylistModule from './modules/MusicPlaylistModule'
-import FoodDrinksModule from './modules/FoodDrinksModule'
-import WeddingWebsiteModule from './modules/WeddingWebsiteModule'
-import AccommodationManagementModule from './modules/AccommodationManagementModule'
-import ShoppingListModule from './modules/ShoppingListModule'
-import SvatbotCoachModule from './modules/SvatbotCoachModule'
+// Lazy load module components for better performance
+const WeddingCountdownModule = lazy(() => import('./modules/WeddingCountdownModule'))
+const QuickActionsModule = lazy(() => import('./modules/QuickActionsModule'))
+const MarketplaceModule = lazy(() => import('./modules/MarketplaceModule'))
+const TaskManagementModule = lazy(() => import('./modules/TaskManagementModule'))
+const GuestManagementModule = lazy(() => import('./modules/GuestManagementModule'))
+const BudgetTrackingModule = lazy(() => import('./modules/BudgetTrackingModule'))
+const TimelinePlanningModule = lazy(() => import('./modules/TimelinePlanningModule'))
+const VendorManagementModule = lazy(() => import('./modules/VendorManagementModule'))
+const SeatingPlanModule = lazy(() => import('./modules/SeatingPlanModule'))
+const WeddingDayTimelineModule = lazy(() => import('./modules/WeddingDayTimelineModule'))
+const MoodboardModule = lazy(() => import('./modules/MoodboardModule'))
+const WeddingChecklistModule = lazy(() => import('./modules/WeddingChecklistModule'))
+const MusicPlaylistModule = lazy(() => import('./modules/MusicPlaylistModule'))
+const FoodDrinksModule = lazy(() => import('./modules/FoodDrinksModule'))
+const WeddingWebsiteModule = lazy(() => import('./modules/WeddingWebsiteModule'))
+const AccommodationManagementModule = lazy(() => import('./modules/AccommodationManagementModule'))
+const ShoppingListModule = lazy(() => import('./modules/ShoppingListModule'))
+const SvatbotCoachModule = lazy(() => import('./modules/SvatbotCoachModule'))
 import OnboardingWidget from '../onboarding/OnboardingWidget'
+
+// Module loading fallback
+const ModuleSkeleton = () => (
+  <div className="animate-pulse space-y-3">
+    <div className="h-4 bg-white/10 rounded w-3/4" />
+    <div className="h-4 bg-white/10 rounded w-1/2" />
+    <div className="h-4 bg-white/10 rounded w-5/6" />
+  </div>
+)
 
 interface FreeDragDropProps {
   onWeddingSettingsClick?: () => void
@@ -124,48 +133,56 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [showCanvasMenu, showColorMenu])
 
-  // Render module content
+  // Render module content with Suspense for lazy loading
   const renderModule = (module: DashboardModule) => {
-    switch (module.type) {
-      case 'wedding-countdown':
-        return <WeddingCountdownModule onWeddingSettingsClick={onWeddingSettingsClick || (() => {})} />
-      case 'quick-actions':
-        return <QuickActionsModule />
-      case 'marketplace':
-        return <MarketplaceModule />
-      case 'task-management':
-        return <TaskManagementModule />
-      case 'guest-management':
-        return <GuestManagementModule />
-      case 'budget-tracking':
-        return <BudgetTrackingModule />
-      case 'timeline-planning':
-        return <TimelinePlanningModule />
-      case 'vendor-management':
-        return <VendorManagementModule />
-      case 'seating-plan':
-        return <SeatingPlanModule />
-      case 'wedding-day-timeline':
-        return <WeddingDayTimelineModule />
-      case 'moodboard':
-        return <MoodboardModule />
-      case 'wedding-checklist':
-        return <WeddingChecklistModule />
-      case 'music-playlist':
-        return <MusicPlaylistModule />
-      case 'food-drinks':
-        return <FoodDrinksModule />
-      case 'wedding-website':
-        return <WeddingWebsiteModule />
-      case 'accommodation-management':
-        return <AccommodationManagementModule />
-      case 'shopping-list':
-        return <ShoppingListModule />
-      case 'svatbot-coach':
-        return <SvatbotCoachModule />
-      default:
-        return <div className="p-4">Modul není k dispozici</div>
-    }
+    const content = (() => {
+      switch (module.type) {
+        case 'wedding-countdown':
+          return <WeddingCountdownModule onWeddingSettingsClick={onWeddingSettingsClick || (() => {})} />
+        case 'quick-actions':
+          return <QuickActionsModule />
+        case 'marketplace':
+          return <MarketplaceModule />
+        case 'task-management':
+          return <TaskManagementModule />
+        case 'guest-management':
+          return <GuestManagementModule />
+        case 'budget-tracking':
+          return <BudgetTrackingModule />
+        case 'timeline-planning':
+          return <TimelinePlanningModule />
+        case 'vendor-management':
+          return <VendorManagementModule />
+        case 'seating-plan':
+          return <SeatingPlanModule />
+        case 'wedding-day-timeline':
+          return <WeddingDayTimelineModule />
+        case 'moodboard':
+          return <MoodboardModule />
+        case 'wedding-checklist':
+          return <WeddingChecklistModule />
+        case 'music-playlist':
+          return <MusicPlaylistModule />
+        case 'food-drinks':
+          return <FoodDrinksModule />
+        case 'wedding-website':
+          return <WeddingWebsiteModule />
+        case 'accommodation-management':
+          return <AccommodationManagementModule />
+        case 'shopping-list':
+          return <ShoppingListModule />
+        case 'svatbot-coach':
+          return <SvatbotCoachModule />
+        default:
+          return <div className="p-4">Modul není k dispozici</div>
+      }
+    })()
+
+    return (
+      <Suspense fallback={<ModuleSkeleton />}>
+        {content}
+      </Suspense>
+    )
   }
 
   const visibleModules = getVisibleModules()

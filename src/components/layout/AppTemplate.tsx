@@ -11,6 +11,14 @@ interface AppTemplateProps {
 export default function AppTemplate({ children }: AppTemplateProps) {
   const pathname = usePathname()
   const [displayPath, setDisplayPath] = useState(pathname)
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
+
+  useEffect(() => {
+    // Mark as not initial load after first render
+    if (isInitialLoad) {
+      setIsInitialLoad(false)
+    }
+  }, [])
 
   useEffect(() => {
     // Smooth page transition with View Transitions API fallback
@@ -30,9 +38,14 @@ export default function AppTemplate({ children }: AppTemplateProps) {
     }
   }, [pathname])
 
+  // Skip animation on initial load (dashboard)
+  if (isInitialLoad || pathname === '/') {
+    return <div className="w-full">{children}</div>
+  }
+
   return (
     <>
-      {/* Smooth page content transition - Slower for testing */}
+      {/* Smooth page content transition */}
       <AnimatePresence mode="wait">
         <motion.div
           key={displayPath}
@@ -40,8 +53,8 @@ export default function AppTemplate({ children }: AppTemplateProps) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -12 }}
           transition={{
-            duration: 0.4, // Increased from 0.25 to 0.4 for testing
-            ease: [0.4, 0, 0.2, 1] // Smooth easing curve
+            duration: 0.3,
+            ease: [0.4, 0, 0.2, 1]
           }}
           className="w-full"
         >

@@ -6,6 +6,8 @@ import { useAuth } from './useAuth'
 import { useWedding } from './useWedding'
 import { useIsDemoUser } from './useDemoSettings'
 import logger from '@/lib/logger'
+import { db } from '@/config/firebase'
+import { doc, onSnapshot, setDoc } from 'firebase/firestore'
 
 const DASHBOARD_STORAGE_KEY = 'svatbot-dashboard-layout'
 
@@ -56,16 +58,14 @@ export function useDashboard() {
 
     setLoading(true)
 
-    // Setup Firebase listener
-    import('@/config/firebase').then(({ db }) => {
-      import('firebase/firestore').then(({ doc, onSnapshot, getDoc }) => {
-        const dashboardRef = doc(db, 'dashboards', `${user.id}_${wedding.id}`)
-        logger.log('📄 Loading from document ID:', `${user.id}_${wedding.id}`)
+    // Setup Firebase listener (no dynamic imports - already imported at top)
+    const dashboardRef = doc(db, 'dashboards', `${user.id}_${wedding.id}`)
+    logger.log('📄 Loading from document ID:', `${user.id}_${wedding.id}`)
 
-        // Setup real-time listener
-        const unsubscribe = onSnapshot(
-          dashboardRef,
-          (snapshot) => {
+    // Setup real-time listener
+    const unsubscribe = onSnapshot(
+      dashboardRef,
+      (snapshot) => {
             if (snapshot.exists()) {
               const data = snapshot.data()
 
@@ -215,12 +215,7 @@ export function useDashboard() {
           }
         )
 
-        unsubscribeRef.current = unsubscribe
-      })
-    }).catch((error) => {
-      logger.warn('⚠️ Failed to load Firebase modules:', error)
-      setLoading(false)
-    })
+    unsubscribeRef.current = unsubscribe
 
     // Cleanup listener on unmount
     return () => {
@@ -263,53 +258,44 @@ export function useDashboard() {
     logger.log('💾 Saving layout to Firebase...')
     isSavingRef.current = true
 
-    // Save to Firebase
-    import('@/config/firebase').then(({ db }) => {
-      import('firebase/firestore').then(({ doc, setDoc }) => {
-        const dashboardRef = doc(db, 'dashboards', `${user.id}_${wedding.id}`)
-        logger.log('📄 Saving to document ID:', `${user.id}_${wedding.id}`)
+    // Save to Firebase (no dynamic imports - already imported at top)
+    const dashboardRef = doc(db, 'dashboards', `${user.id}_${wedding.id}`)
+    logger.log('📄 Saving to document ID:', `${user.id}_${wedding.id}`)
 
-        const layoutData = {
-          modules: layout.modules,
-          isEditMode: layout.isEditMode,
-          isLocked: layout.isLocked,
-          layoutMode: layout.layoutMode || 'grid',
-          userId: user.id,
-          weddingId: wedding.id,
-          updatedAt: new Date()
-        }
+    const layoutData = {
+      modules: layout.modules,
+      isEditMode: layout.isEditMode,
+      isLocked: layout.isLocked,
+      layoutMode: layout.layoutMode || 'grid',
+      userId: user.id,
+      weddingId: wedding.id,
+      updatedAt: new Date()
+    }
 
-        logger.log('💾 Saving to Firebase:', {
-          layoutMode: layoutData.layoutMode,
-          isEditMode: layoutData.isEditMode,
-          modulesCount: layoutData.modules.length,
-          sampleModulePositions: layout.modules.slice(0, 3).map(m => ({ id: m.id, position: m.position }))
-        })
-
-        setDoc(dashboardRef, layoutData, { merge: true })
-          .then(() => {
-            logger.log('✅ Layout saved to Firebase successfully')
-            // Update the ref with the saved data
-            lastFirebaseDataRef.current = currentDataString
-            // Also save to localStorage as backup
-            localStorage.setItem(`${DASHBOARD_STORAGE_KEY}-${user.id}`, JSON.stringify(layout))
-            setTimeout(() => {
-              isSavingRef.current = false
-            }, 100)
-          })
-          .catch((error) => {
-            logger.warn('⚠️ Firebase save failed:', error.message)
-            // Fallback to localStorage
-            localStorage.setItem(`${DASHBOARD_STORAGE_KEY}-${user.id}`, JSON.stringify(layout))
-            isSavingRef.current = false
-          })
-      })
-    }).catch((error) => {
-      logger.warn('⚠️ Failed to load Firebase modules:', error)
-      // Fallback to localStorage
-      localStorage.setItem(`${DASHBOARD_STORAGE_KEY}-${user.id}`, JSON.stringify(layout))
-      isSavingRef.current = false
+    logger.log('💾 Saving to Firebase:', {
+      layoutMode: layoutData.layoutMode,
+      isEditMode: layoutData.isEditMode,
+      modulesCount: layoutData.modules.length,
+      sampleModulePositions: layout.modules.slice(0, 3).map(m => ({ id: m.id, position: m.position }))
     })
+
+    setDoc(dashboardRef, layoutData, { merge: true })
+      .then(() => {
+        logger.log('✅ Layout saved to Firebase successfully')
+        // Update the ref with the saved data
+        lastFirebaseDataRef.current = currentDataString
+        // Also save to localStorage as backup
+        localStorage.setItem(`${DASHBOARD_STORAGE_KEY}-${user.id}`, JSON.stringify(layout))
+        setTimeout(() => {
+          isSavingRef.current = false
+        }, 100)
+      })
+      .catch((error) => {
+        logger.warn('⚠️ Firebase save failed:', error.message)
+        // Fallback to localStorage
+        localStorage.setItem(`${DASHBOARD_STORAGE_KEY}-${user.id}`, JSON.stringify(layout))
+        isSavingRef.current = false
+      })
   }, [layout, user?.id, wedding?.id, loading])
 
   const updateModuleOrder = (modules: DashboardModule[]) => {
@@ -458,12 +444,9 @@ export function useDashboard() {
     }
     setLayout(newLayout)
 
-    // Save to Firebase with grid layoutMode
+    // Save to Firebase with grid layoutMode (no dynamic imports - already imported at top)
     if (user && wedding?.id) {
       try {
-        const { doc, setDoc } = await import('firebase/firestore')
-        const { db } = await import('@/config/firebase')
-
         const dashboardRef = doc(db, 'dashboards', `${user.id}_${wedding.id}`)
         await setDoc(dashboardRef, newLayout)
         logger.log('✅ Dashboard layout reset to grid in Firebase')

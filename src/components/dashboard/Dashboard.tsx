@@ -5,6 +5,7 @@ import { useWeddingStore } from '@/stores/weddingStore'
 import { useAuth } from '@/hooks/useAuth'
 import { useSubscription } from '@/hooks/useSubscription'
 import { useWeddingDate } from '@/hooks/useDemoSettings'
+import { useDataPrefetch } from '@/hooks/useDataPrefetch'
 import { dateUtils } from '@/utils'
 import DragDropWrapper from './DragDropWrapper'
 import { CanvasProvider, useCanvas } from '@/contexts/CanvasContext'
@@ -19,10 +20,12 @@ import {
   Menu
 } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import WeddingSettings from '@/components/wedding/WeddingSettings'
 import AccountModal from '@/components/account/AccountModal'
 import AIAssistant from '@/components/ai/AIAssistant'
 import NotesModal from '@/components/notes/NotesModal'
+import DashboardSkeleton from './DashboardSkeleton'
 import { useViewTransition } from '@/hooks/useViewTransition'
 import MobileMenu from '@/components/navigation/MobileMenu'
 import LiveNotifications, { LiveToastNotifications } from '@/components/notifications/LiveNotifications'
@@ -46,6 +49,7 @@ function DashboardContent() {
   const { getCanvasMaxWidth } = useCanvas()
   const { startTransition } = useViewTransition()
   const [showWeddingSettings, setShowWeddingSettings] = useState(false)
+  const [isReady, setIsReady] = useState(false)
   const [showNotesModal, setShowNotesModal] = useState(false)
   const [showAccountModal, setShowAccountModal] = useState(false)
   const [accountInitialTab, setAccountInitialTab] = useState<'profile' | 'subscription' | 'payments' | 'statistics' | 'settings' | 'feedback'>('profile')
@@ -196,17 +200,23 @@ function DashboardContent() {
   // Use wedding from store (loaded from Firestore for all users including demo)
   const wedding = currentWedding
 
+  // Prefetch data in parallel for faster dashboard loading
+  useDataPrefetch(user?.id, wedding?.id)
 
+  // Wait for everything to be ready before showing content
+  useEffect(() => {
+    if (wedding && user) {
+      // Small delay to ensure all resources are loaded
+      const timer = setTimeout(() => {
+        setIsReady(true)
+      }, 100)
+      return () => clearTimeout(timer)
+    }
+  }, [wedding, user])
 
-  if (!wedding) {
-    return (
-      <div className="min-h-screen wedding-gradient flex items-center justify-center">
-        <div className="text-center">
-          <Heart className="w-16 h-16 text-primary-500 mx-auto mb-4" />
-          <h2 className="heading-3 mb-2">Načítáme vaši svatbu...</h2>
-        </div>
-      </div>
-    )
+  // Show skeleton while loading
+  if (!wedding || !isReady) {
+    return <DashboardSkeleton />
   }
 
 

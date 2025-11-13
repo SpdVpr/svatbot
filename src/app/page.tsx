@@ -59,7 +59,12 @@ function HomePageContent() {
     )
   }
 
-  // Wrap content in AnimatePresence for smooth transitions
+  // Show dashboard without animation for faster perceived load
+  if (user && (user?.email === 'demo@svatbot.cz' || wedding)) {
+    return <Dashboard />
+  }
+
+  // Wrap other content in AnimatePresence for smooth transitions
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -72,8 +77,6 @@ function HomePageContent() {
       >
         {!user ? (
           <WelcomeScreen />
-        ) : user?.email === 'demo@svatbot.cz' ? (
-          <Dashboard />
         ) : !wedding ? (
           <OnboardingFlow
             onComplete={() => {
@@ -83,9 +86,7 @@ function HomePageContent() {
               logger.log('Onboarding skipped - will be handled in OnboardingFlow')
             }}
           />
-        ) : (
-          <Dashboard />
-        )}
+        ) : null}
       </motion.div>
     </AnimatePresence>
   )
