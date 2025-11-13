@@ -50,6 +50,7 @@ function DashboardContent() {
   const { startTransition } = useViewTransition()
   const [showWeddingSettings, setShowWeddingSettings] = useState(false)
   const [isReady, setIsReady] = useState(false)
+  const [logoLoaded, setLogoLoaded] = useState(false)
   const [showNotesModal, setShowNotesModal] = useState(false)
   const [showAccountModal, setShowAccountModal] = useState(false)
   const [accountInitialTab, setAccountInitialTab] = useState<'profile' | 'subscription' | 'payments' | 'statistics' | 'settings' | 'feedback'>('profile')
@@ -203,19 +204,30 @@ function DashboardContent() {
   // Prefetch data in parallel for faster dashboard loading
   useDataPrefetch(user?.id, wedding?.id)
 
+  // Preload logo video
+  useEffect(() => {
+    const video = document.createElement('video')
+    video.src = '/Animation-logo.webm'
+    video.preload = 'auto'
+    video.onloadeddata = () => {
+      setLogoLoaded(true)
+    }
+    video.load()
+  }, [])
+
   // Wait for everything to be ready before showing content
   useEffect(() => {
-    if (wedding && user) {
+    if (wedding && user && logoLoaded) {
       // Small delay to ensure all resources are loaded
       const timer = setTimeout(() => {
         setIsReady(true)
-      }, 100)
+      }, 50)
       return () => clearTimeout(timer)
     }
-  }, [wedding, user])
+  }, [wedding, user, logoLoaded])
 
   // Show skeleton while loading
-  if (!wedding || !isReady) {
+  if (!wedding || !isReady || !logoLoaded) {
     return <DashboardSkeleton />
   }
 
@@ -243,7 +255,7 @@ function DashboardContent() {
         showNotesModal || showAccountModal || showWeddingSettings || showOnboardingWizardFromDashboard ? 'hidden' : ''
       }`}>
         {/* Mobile Header */}
-        <div className="sm:hidden">
+        <div className="sm:hidden min-h-[64px]">
           <div className="mobile-header">
             <div className="flex items-center space-x-2">
               <button
@@ -259,6 +271,7 @@ function DashboardContent() {
                 muted
                 playsInline
                 className="h-10 w-auto"
+                style={{ width: '120px', height: '40px' }}
               />
             </div>
             <div className="flex items-center space-x-2">
@@ -359,8 +372,8 @@ function DashboardContent() {
         </div>
 
         {/* Desktop Header */}
-        <div className={`hidden sm:block mx-auto px-4 sm:px-6 lg:px-8 py-4 ${getCanvasMaxWidth()}`}>
-          <div className="flex items-center justify-between">
+        <div className={`hidden sm:block mx-auto px-4 sm:px-6 lg:px-8 py-4 min-h-[112px] ${getCanvasMaxWidth()}`}>
+          <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-6">
               <video
                 src="/Animation-logo.webm"
@@ -368,6 +381,7 @@ function DashboardContent() {
                 muted
                 playsInline
                 className="h-20 w-auto"
+                style={{ width: '240px', height: '80px' }}
               />
               <div className="border-l border-gray-300 pl-6">
                 <button

@@ -8,17 +8,11 @@ export default function DashboardSkeleton() {
       {/* Header Skeleton - Match exact header style */}
       <header className="bg-gray-50/95 backdrop-blur-xl border-b border-gray-100/50 shadow-sm sticky top-0 z-[200]">
         {/* Mobile Header */}
-        <div className="sm:hidden">
+        <div className="sm:hidden min-h-[64px]">
           <div className="mobile-header">
             <div className="flex items-center space-x-2">
               <div className="w-10 h-10 bg-gray-200 rounded-lg animate-pulse" />
-              <video
-                src="/Animation-logo.webm"
-                autoPlay
-                muted
-                playsInline
-                className="h-10 w-auto"
-              />
+              <div className="h-10 w-[120px] bg-gray-200 rounded animate-pulse" />
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-10 h-10 bg-gray-200 rounded-lg animate-pulse" />
@@ -28,17 +22,11 @@ export default function DashboardSkeleton() {
         </div>
 
         {/* Desktop Header */}
-        <div className="hidden sm:block max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
+        <div className="hidden sm:block max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 py-4 min-h-[112px]">
+          <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-6">
-              {/* Logo */}
-              <video
-                src="/Animation-logo.webm"
-                autoPlay
-                muted
-                playsInline
-                className="h-20 w-auto"
-              />
+              {/* Logo placeholder with exact dimensions */}
+              <div className="h-20 w-[240px] bg-gray-200 rounded animate-pulse" />
               <div className="border-l border-gray-300 pl-6">
                 <div className="h-8 w-64 bg-gray-200 rounded animate-pulse mb-2" />
                 <div className="h-4 w-48 bg-gray-200 rounded animate-pulse" />
