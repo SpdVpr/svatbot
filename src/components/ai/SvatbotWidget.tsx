@@ -144,9 +144,9 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
 
   // Full version
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col h-[797px]">
       {/* Svatbot Header */}
-      <div className="bg-gradient-to-r from-primary-500 to-primary-400 rounded-xl p-6 text-white shadow-lg">
+      <div className="bg-gradient-to-r from-primary-500 to-primary-400 rounded-xl p-6 text-white shadow-lg flex-shrink-0">
         <div className="flex items-start gap-4">
           <div className="bg-white rounded-full flex items-center justify-center shadow-md flex-shrink-0 overflow-hidden" style={{ width: '80px', height: '130px', padding: '0' }}>
             <video
@@ -172,16 +172,18 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
             <p className="text-white/90 text-base leading-relaxed">Jsem tu pro tebe! Povzbudím tě a budu ti dělat společnost!</p>
           </div>
         </div>
-
-
       </div>
 
       {/* Mood Tracker */}
-      {showMoodTracker && <MoodTracker compact />}
+      {showMoodTracker && (
+        <div className="mt-6 flex-shrink-0">
+          <MoodTracker compact />
+        </div>
+      )}
 
       {/* Messages from Svatbot */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mt-6 flex-1 flex flex-col min-h-0">
+        <div className="flex items-center justify-between mb-4 flex-shrink-0">
           <div className="flex items-center gap-2">
             <Heart className="w-5 h-5 text-primary-600" />
             <h3 className="font-semibold text-gray-900">Zprávy od Svatbota</h3>
@@ -193,56 +195,58 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
           )}
         </div>
 
-        {loading ? (
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="w-6 h-6 animate-spin text-primary-500" />
-          </div>
-        ) : activeSuggestions.length > 0 ? (
-          <div className="space-y-3">
-            {activeSuggestions.slice(0, 2).map((suggestion) => (
-              <div
-                key={suggestion.id}
-                className={`p-4 rounded-lg ${getPriorityColor(suggestion.priority)} transition-all hover:shadow-md`}
-              >
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl flex-shrink-0">{getSuggestionIcon(suggestion.type)}</span>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-gray-900 mb-1">{removeEmojis(suggestion.title)}</h4>
-                    <p className="text-sm text-gray-700">{removeEmojis(suggestion.message)}</p>
-                    {suggestion.actionUrl && (
-                      <Link
-                        href={suggestion.actionUrl}
-                        className="text-sm text-primary-600 hover:text-primary-700 font-medium mt-2 inline-flex items-center gap-1"
-                      >
-                        Přejít na akci <ChevronRight className="w-4 h-4" />
-                      </Link>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => handleDismiss(suggestion.id)}
-                    className="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
-                    title="Zavřít"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-8">
-            <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span className="text-3xl">💕</span>
+        <div className="flex-1 overflow-y-auto min-h-0">
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="w-6 h-6 animate-spin text-primary-500" />
             </div>
-            <p className="text-gray-900 font-semibold mb-1">Jsi úžasná! ✨</p>
-            <p className="text-sm text-gray-600">
-              Zatím tu pro tebe nemám žádnou zprávu, ale jsem tu, kdyby ses chtěla popovídat! 💬
-            </p>
-          </div>
-        )}
+          ) : activeSuggestions.length > 0 ? (
+            <div className="space-y-3">
+              {activeSuggestions.slice(0, 2).map((suggestion) => (
+                <div
+                  key={suggestion.id}
+                  className={`p-4 rounded-lg ${getPriorityColor(suggestion.priority)} transition-all hover:shadow-md`}
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl flex-shrink-0">{getSuggestionIcon(suggestion.type)}</span>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-gray-900 mb-1">{removeEmojis(suggestion.title)}</h4>
+                      <p className="text-sm text-gray-700">{removeEmojis(suggestion.message)}</p>
+                      {suggestion.actionUrl && (
+                        <Link
+                          href={suggestion.actionUrl}
+                          className="text-sm text-primary-600 hover:text-primary-700 font-medium mt-2 inline-flex items-center gap-1"
+                        >
+                          Přejít na akci <ChevronRight className="w-4 h-4" />
+                        </Link>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => handleDismiss(suggestion.id)}
+                      className="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
+                      title="Zavřít"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <span className="text-3xl">💕</span>
+              </div>
+              <p className="text-gray-900 font-semibold mb-1">Jsi úžasná! ✨</p>
+              <p className="text-sm text-gray-600">
+                Zatím tu pro tebe nemám žádnou zprávu, ale jsem tu, kdyby ses chtěla popovídat! 💬
+              </p>
+            </div>
+          )}
+        </div>
 
         {/* Chat Button */}
-        <div className="mt-4 pt-4 border-t border-gray-200">
+        <div className="mt-4 pt-4 border-t border-gray-200 flex-shrink-0">
           <Link
             href="/ai"
             className="btn-primary w-full flex items-center justify-center gap-2"

@@ -7,6 +7,7 @@ import CookieBanner from '@/components/common/CookieBanner'
 import AffiliateTracker from '@/components/affiliate/AffiliateTracker'
 import GlobalFeedbackButton from '@/components/common/GlobalFeedbackButton'
 import UserTrackingWrapper from '@/components/common/UserTrackingWrapper'
+import QRTrackingWrapper from '@/components/common/QRTrackingWrapper'
 import DemoLockBanner from '@/components/common/DemoLockBanner'
 import ColorThemeProvider from '@/components/theme/ColorThemeProvider'
 import WeddingPattern from '@/components/theme/WeddingPattern'
@@ -305,29 +306,31 @@ export default function RootLayout({
           {/* Wedding Pattern Background */}
           <WeddingPattern />
 
-          <UserTrackingWrapper>
-            {/* Demo Lock Banner - Shows when demo account is locked */}
-            <Suspense fallback={null}>
-              <DemoLockBanner />
-            </Suspense>
+          <QRTrackingWrapper>
+            <UserTrackingWrapper>
+              {/* Demo Lock Banner - Shows when demo account is locked */}
+              <Suspense fallback={null}>
+                <DemoLockBanner />
+              </Suspense>
 
-            <div id="root" className="relative">
-              {children}
-            </div>
+              <div id="root" className="relative">
+                {children}
+              </div>
 
-            {/* Affiliate Tracking */}
-            <Suspense fallback={null}>
-              <AffiliateTracker />
-            </Suspense>
+              {/* Affiliate Tracking */}
+              <Suspense fallback={null}>
+                <AffiliateTracker />
+              </Suspense>
 
-            {/* Cookie Banner */}
-            <CookieBanner />
+              {/* Cookie Banner */}
+              <CookieBanner />
 
-            {/* Global Feedback Button */}
-            <Suspense fallback={null}>
-              <GlobalFeedbackButton />
-            </Suspense>
-          </UserTrackingWrapper>
+              {/* Global Feedback Button */}
+              <Suspense fallback={null}>
+                <GlobalFeedbackButton />
+              </Suspense>
+            </UserTrackingWrapper>
+          </QRTrackingWrapper>
         </ColorThemeProvider>
 
         {/* Portal for modals */}

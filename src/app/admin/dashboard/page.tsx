@@ -12,6 +12,8 @@ import EmailStatsPanel from '@/components/admin/EmailStatsPanel'
 import EmailTestPanel from '@/components/admin/EmailTestPanel'
 import ReviewModeration from '@/components/admin/ReviewModeration'
 import DemoAccountPanel from '@/components/admin/DemoAccountPanel'
+import AdminQRCode from '@/components/admin/AdminQRCode'
+import QRCodeStats from '@/components/admin/QRCodeStats'
 import {
   Users,
   Clock,
@@ -23,10 +25,11 @@ import {
   MessageCircle,
   ShoppingBag,
   Star,
-  FileText
+  FileText,
+  QrCode
 } from 'lucide-react'
 
-type TabType = 'overview' | 'users' | 'messages' | 'feedback' | 'payments' | 'invoices' | 'vendors' | 'reviews'
+type TabType = 'overview' | 'users' | 'messages' | 'feedback' | 'payments' | 'invoices' | 'vendors' | 'reviews' | 'marketing'
 
 export default function AdminDashboard() {
   const { stats, loading } = useAdminStats()
@@ -50,6 +53,7 @@ export default function AdminDashboard() {
   const tabs = [
     { id: 'overview' as TabType, label: 'Přehled', icon: LayoutDashboard },
     { id: 'users' as TabType, label: 'Uživatelé', icon: Users },
+    { id: 'marketing' as TabType, label: 'Marketing', icon: QrCode },
     { id: 'payments' as TabType, label: 'Platby', icon: DollarSign },
     { id: 'invoices' as TabType, label: 'Faktury', icon: FileText },
     { id: 'reviews' as TabType, label: 'Recenze', icon: Star },
@@ -94,6 +98,7 @@ export default function AdminDashboard() {
       {/* Content */}
       {activeTab === 'overview' && <OverviewTab stats={stats} />}
       {activeTab === 'users' && <UserAnalyticsTable />}
+      {activeTab === 'marketing' && <MarketingTab />}
       {activeTab === 'payments' && <PaymentsTab />}
       {activeTab === 'invoices' && <InvoicesTab />}
       {activeTab === 'reviews' && <ReviewModeration />}
@@ -219,6 +224,76 @@ function OverviewTab({ stats }: { stats: any }) {
             </span>
           </div>
         </div>
+      </div>
+    </div>
+  )
+}
+
+function MarketingTab() {
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl shadow-lg p-8 text-white">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="h-16 w-16 bg-white/20 rounded-full flex items-center justify-center">
+            <QrCode className="w-8 h-8" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold">Marketing & QR Kód</h2>
+            <p className="text-purple-100 mt-1">
+              Sledujte návštěvnost z offline materiálů
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* QR Code Statistics */}
+      <div>
+        <h3 className="text-xl font-semibold text-gray-900 mb-4">
+          Statistiky návštěvnosti
+        </h3>
+        <QRCodeStats />
+      </div>
+
+      {/* QR Code Generator */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+        <div className="text-center mb-6">
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            QR Kód pro svatbot.cz
+          </h3>
+          <p className="text-gray-600">
+            Použijte tento QR kód v tištěných materiálech, letácích, vizitách nebo na akcích.
+            Každá návštěva přes QR kód bude automaticky zaznamenána.
+          </p>
+        </div>
+
+        <AdminQRCode url="https://svatbot.cz" size={300} />
+      </div>
+
+      {/* Usage Tips */}
+      <div className="bg-blue-50 rounded-xl border border-blue-200 p-6">
+        <h4 className="text-lg font-semibold text-blue-900 mb-3 flex items-center gap-2">
+          <TrendingUp className="w-5 h-5" />
+          Tipy pro použití QR kódu
+        </h4>
+        <ul className="space-y-2 text-blue-800">
+          <li className="flex items-start gap-2">
+            <span className="text-blue-600 mt-1">•</span>
+            <span>Vytiskněte QR kód na vizitky, letáky nebo roll-up bannery</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-blue-600 mt-1">•</span>
+            <span>Umístěte QR kód na svatební veletrhy a akce</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-blue-600 mt-1">•</span>
+            <span>Přidejte QR kód do tištěných reklam v časopisech</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="text-blue-600 mt-1">•</span>
+            <span>Všechny návštěvy jsou automaticky sledovány v reálném čase</span>
+          </li>
+        </ul>
       </div>
     </div>
   )

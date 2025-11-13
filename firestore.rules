@@ -1168,6 +1168,18 @@ service cloud.firestore {
                        resource.data.userId == request.auth.uid;
     }
 
+    // QR Code Visits - Marketing tracking
+    match /qrCodeVisits/{visitId} {
+      // Anyone can create a visit (for tracking from QR codes)
+      allow create: if true;
+
+      // Only admins can read visits (for statistics)
+      allow read: if isAdmin();
+
+      // Only admins can update/delete visits
+      allow update, delete: if isAdmin();
+    }
+
     // Deny all other access
     match /{document=**} {
       allow read, write: if false;
