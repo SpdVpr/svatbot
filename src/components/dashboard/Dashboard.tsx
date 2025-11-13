@@ -243,9 +243,11 @@ function DashboardContent() {
               >
                 <Menu className="w-5 h-5" />
               </button>
-              <img
-                src="/logo-svatbot.svg"
-                alt="SvatBot.cz"
+              <video
+                src="/Animation-logo.webm"
+                autoPlay
+                muted
+                playsInline
                 className="h-10 w-auto"
               />
             </div>
@@ -350,9 +352,11 @@ function DashboardContent() {
         <div className={`hidden sm:block mx-auto px-4 sm:px-6 lg:px-8 py-4 ${getCanvasMaxWidth()}`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-6">
-              <img
-                src="/logo-svatbot.svg"
-                alt="SvatBot.cz"
+              <video
+                src="/Animation-logo.webm"
+                autoPlay
+                muted
+                playsInline
                 className="h-20 w-auto"
               />
               <div className="border-l border-gray-300 pl-6">

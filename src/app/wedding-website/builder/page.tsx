@@ -440,7 +440,15 @@ export default function WeddingWebsiteBuilderPage() {
               return (
                 <div key={step.id} className="flex items-center">
                   <button
-                    onClick={() => isClickable && setCurrentStep(step.id)}
+                    onClick={() => {
+                      if (!isClickable) return
+                      // Pokud je to preview krok, otevři web v novém okně
+                      if (step.id === 'preview' && customUrl) {
+                        window.open(`/wedding/${customUrl}`, '_blank')
+                      } else {
+                        setCurrentStep(step.id)
+                      }
+                    }}
                     disabled={Boolean(!isClickable)}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                       currentStep === step.id
