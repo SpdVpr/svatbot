@@ -285,7 +285,6 @@ function DashboardContent() {
                   src="/Animation-logo.webm"
                   autoPlay
                   muted
-                  loop
                   playsInline
                   className="h-9 w-auto"
                   style={{ width: '100px', height: '36px' }}
@@ -380,7 +379,6 @@ function DashboardContent() {
                   src="/Animation-logo.webm"
                   autoPlay
                   muted
-                  loop
                   playsInline
                   className="h-20 w-auto"
                   style={{ width: '80px', height: '80px' }}
