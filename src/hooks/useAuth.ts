@@ -11,7 +11,7 @@ import {
   signInWithPopup,
   User as FirebaseUser
 } from 'firebase/auth'
-import { doc, setDoc, getDoc } from 'firebase/firestore'
+import { doc, setDoc, getDoc, updateDoc, increment, Timestamp } from 'firebase/firestore'
 import { auth, db } from '@/config/firebase'
 import { useAuthStore } from '@/stores/authStore'
 import { User } from '@/types'
@@ -112,6 +112,44 @@ export function useAuth() {
     }
   }
 
+  // Update login statistics
+  const updateLoginStats = async (userId: string) => {
+    try {
+      const statsRef = doc(db, 'usageStats', userId)
+      const statsDoc = await getDoc(statsRef)
+
+      if (statsDoc.exists()) {
+        await updateDoc(statsRef, {
+          lastLoginAt: Timestamp.fromDate(new Date()),
+          totalLogins: increment(1),
+          updatedAt: Timestamp.fromDate(new Date())
+        })
+      } else {
+        await setDoc(statsRef, {
+          userId: userId,
+          weddingId: '',
+          guestsCount: 0,
+          tasksCount: 0,
+          budgetItemsCount: 0,
+          vendorsCount: 0,
+          photosCount: 0,
+          lastLoginAt: Timestamp.fromDate(new Date()),
+          totalLogins: 1,
+          weddingWebsiteViews: 0,
+          rsvpResponses: 0,
+          aiQueriesCount: 0,
+          aiChatQueriesToday: 0,
+          aiMoodboardsToday: 0,
+          lastAIResetDate: new Date().toISOString().split('T')[0],
+          updatedAt: Timestamp.fromDate(new Date())
+        })
+      }
+      logger.log('✅ Login statistics updated')
+    } catch (error) {
+      logger.warn('Error updating login statistics:', error)
+    }
+  }
+
   // Register with email and password
   const register = async (data: RegisterData): Promise<void> => {
     try {
@@ -179,6 +217,9 @@ export function useAuth() {
       // Convert and set user
       const user = await convertFirebaseUser(firebaseUser)
       setUser(user)
+
+      // Update login statistics
+      await updateLoginStats(firebaseUser.uid)
     } catch (error: any) {
       logger.error('Login error:', error)
       setError({
@@ -206,6 +247,9 @@ export function useAuth() {
       // Convert and set user
       const user = await convertFirebaseUser(firebaseUser)
       setUser(user)
+
+      // Update login statistics
+      await updateLoginStats(firebaseUser.uid)
     } catch (error: any) {
       logger.error('Google login error:', error)
       setError({

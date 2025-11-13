@@ -342,28 +342,11 @@ function DashboardContent() {
                   onClick={() => openAccountModal('subscription')}
                   className="flex items-center gap-1.5 text-xs hover:opacity-80 transition-opacity"
                 >
-                  <Crown className="w-3.5 h-3.5 text-rose-600" />
-                  <span className="font-medium text-rose-600">
+                  <Crown className="w-3.5 h-3.5 text-primary-600" fill="currentColor" />
+                  <span className="font-medium text-primary-600">
                     {subscription.plan === 'premium_monthly' && 'Premium měsíční'}
                     {subscription.plan === 'premium_yearly' && 'Premium roční'}
                     {subscription.plan === 'test_daily' && 'Test denní'}
-                  </span>
-                </button>
-              </div>
-            )}
-
-            {/* Premium subscription info */}
-            {subscription?.status === 'active' && hasPremiumAccess && (
-              <div className="mt-2 px-2">
-                <button
-                  onClick={() => openAccountModal('subscription')}
-                  className="flex items-center gap-1.5 text-xs hover:opacity-80 transition-opacity"
-                >
-                  <Crown className="w-3.5 h-3.5 text-primary-600" fill="currentColor" />
-                  <span className="font-medium text-primary-600">
-                    {subscription.plan === 'premium_monthly' && 'Premium Měsíční'}
-                    {subscription.plan === 'premium_yearly' && 'Premium Roční'}
-                    {subscription.plan === 'test_daily' && '🧪 Test Denní'}
                   </span>
                 </button>
               </div>
@@ -423,8 +406,8 @@ function DashboardContent() {
                     onClick={() => openAccountModal('subscription')}
                     className="flex items-center gap-1.5 hover:opacity-80 transition-opacity mt-1"
                   >
-                    <Crown className="w-4 h-4 text-rose-600" />
-                    <span className="text-sm font-medium text-rose-600">
+                    <Crown className="w-4 h-4 text-primary-600" fill="currentColor" />
+                    <span className="text-sm font-medium text-primary-600">
                       {subscription.plan === 'premium_monthly' && 'Premium měsíční'}
                       {subscription.plan === 'premium_yearly' && 'Premium roční'}
                       {subscription.plan === 'test_daily' && 'Test denní'}

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
-import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, arrayUnion, serverTimestamp, Timestamp, increment } from 'firebase/firestore'
+import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, arrayUnion, serverTimestamp, Timestamp, increment, addDoc } from 'firebase/firestore'
 import { db } from '@/config/firebase'
 import { UserFeedback } from '@/types/admin'
 import {
@@ -18,7 +18,9 @@ import {
   ChevronUp,
   Send,
   Loader2,
-  Bell
+  Bell,
+  Plus,
+  X
 } from 'lucide-react'
 
 export default function FeedbackTab() {
@@ -28,6 +30,14 @@ export default function FeedbackTab() {
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [replyText, setReplyText] = useState<{ [key: string]: string }>({})
   const [sendingReply, setSendingReply] = useState<{ [key: string]: boolean }>({})
+  const [showNewFeedbackForm, setShowNewFeedbackForm] = useState(false)
+  const [newFeedback, setNewFeedback] = useState({
+    type: 'other' as 'bug' | 'feature' | 'improvement' | 'other',
+    subject: '',
+    message: '',
+    rating: 0
+  })
+  const [sendingNewFeedback, setSendingNewFeedback] = useState(false)
 
   useEffect(() => {
     if (!user?.id) return
@@ -163,6 +173,46 @@ export default function FeedbackTab() {
     }
   }
 
+  const handleSubmitNewFeedback = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!user || !newFeedback.subject.trim() || !newFeedback.message.trim()) return
+
+    setSendingNewFeedback(true)
+
+    try {
+      await addDoc(collection(db, 'feedback'), {
+        userId: user.id,
+        userEmail: user.email,
+        userName: user.displayName || 'Unknown',
+        type: newFeedback.type,
+        subject: newFeedback.subject.trim(),
+        message: newFeedback.message.trim(),
+        rating: newFeedback.rating > 0 ? newFeedback.rating : null,
+        page: window.location.pathname,
+        status: 'new',
+        priority: newFeedback.type === 'bug' ? 'high' : 'medium',
+        createdAt: serverTimestamp(),
+        unreadAdminReplies: 0,
+        unreadUserReplies: 0
+      })
+
+      // Reset form
+      setNewFeedback({
+        type: 'other',
+        subject: '',
+        message: '',
+        rating: 0
+      })
+      setShowNewFeedbackForm(false)
+    } catch (error) {
+      console.error('Error sending feedback:', error)
+      alert('Nepodařilo se odeslat feedback. Zkuste to prosím znovu.')
+    } finally {
+      setSendingNewFeedback(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="space-y-4">
@@ -178,17 +228,191 @@ export default function FeedbackTab() {
 
   if (feedback.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-        <MessageCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
-          Zatím žádný feedback
-        </h3>
-        <p className="text-gray-600 mb-6">
-          Máte nápad, našli jste chybu nebo chcete něco vylepšit?
-        </p>
-        <p className="text-sm text-gray-500">
-          Použijte tlačítko s ikonou zprávy v pravém dolním rohu obrazovky
-        </p>
+      <div className="space-y-4">
+        {!showNewFeedbackForm ? (
+          <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
+            <MessageCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Zatím žádný feedback
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Máte nápad, našli jste chybu nebo chcete něco vylepšit?
+            </p>
+            <button
+              onClick={() => setShowNewFeedbackForm(true)}
+              className="btn-primary flex items-center space-x-2 mx-auto"
+            >
+              <Plus className="w-5 h-5" />
+              <span>Napsat feedback</span>
+            </button>
+          </div>
+        ) : (
+          <div className="bg-white rounded-lg border-2 border-primary-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Nový feedback</h3>
+              <button
+                onClick={() => {
+                  setShowNewFeedbackForm(false)
+                  setNewFeedback({
+                    type: 'other',
+                    subject: '',
+                    message: '',
+                    rating: 0
+                  })
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmitNewFeedback} className="space-y-4">
+              {/* Type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Typ zprávy
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setNewFeedback({ ...newFeedback, type: 'bug' })}
+                    className={`p-3 rounded-lg border-2 text-sm font-medium transition-colors ${
+                      newFeedback.type === 'bug'
+                        ? 'border-red-500 bg-red-50 text-red-700'
+                        : 'border-gray-200 text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    🐛 Bug
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setNewFeedback({ ...newFeedback, type: 'feature' })}
+                    className={`p-3 rounded-lg border-2 text-sm font-medium transition-colors ${
+                      newFeedback.type === 'feature'
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    💡 Nápad
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setNewFeedback({ ...newFeedback, type: 'improvement' })}
+                    className={`p-3 rounded-lg border-2 text-sm font-medium transition-colors ${
+                      newFeedback.type === 'improvement'
+                        ? 'border-green-500 bg-green-50 text-green-700'
+                        : 'border-gray-200 text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    📈 Zlepšení
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setNewFeedback({ ...newFeedback, type: 'other' })}
+                    className={`p-3 rounded-lg border-2 text-sm font-medium transition-colors ${
+                      newFeedback.type === 'other'
+                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        : 'border-gray-200 text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    💬 Jiné
+                  </button>
+                </div>
+              </div>
+
+              {/* Subject */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Předmět
+                </label>
+                <input
+                  type="text"
+                  value={newFeedback.subject}
+                  onChange={(e) => setNewFeedback({ ...newFeedback, subject: e.target.value })}
+                  placeholder="Stručně popište problém nebo nápad..."
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  required
+                />
+              </div>
+
+              {/* Message */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Zpráva
+                </label>
+                <textarea
+                  value={newFeedback.message}
+                  onChange={(e) => setNewFeedback({ ...newFeedback, message: e.target.value })}
+                  placeholder="Podrobně popište, co se stalo nebo co byste chtěli..."
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  rows={5}
+                  required
+                />
+              </div>
+
+              {/* Rating */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Jak jste spokojeni s aplikací? (volitelné)
+                </label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setNewFeedback({ ...newFeedback, rating: star })}
+                      className="transition-transform hover:scale-110"
+                    >
+                      <Star
+                        className={`w-8 h-8 ${
+                          star <= newFeedback.rating
+                            ? 'text-yellow-400 fill-yellow-400'
+                            : 'text-gray-300'
+                        }`}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Submit */}
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowNewFeedbackForm(false)
+                    setNewFeedback({
+                      type: 'other',
+                      subject: '',
+                      message: '',
+                      rating: 0
+                    })
+                  }}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Zrušit
+                </button>
+                <button
+                  type="submit"
+                  disabled={sendingNewFeedback || !newFeedback.subject.trim() || !newFeedback.message.trim()}
+                  className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                >
+                  {sendingNewFeedback ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Odesílám...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      Odeslat
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
       </div>
     )
   }
@@ -219,6 +443,183 @@ export default function FeedbackTab() {
           </div>
         </div>
       </div>
+
+      {/* New Feedback Button/Form */}
+      {!showNewFeedbackForm ? (
+        <button
+          onClick={() => setShowNewFeedbackForm(true)}
+          className="w-full btn-primary flex items-center justify-center space-x-2 py-3"
+        >
+          <Plus className="w-5 h-5" />
+          <span>Napsat nový feedback</span>
+        </button>
+      ) : (
+        <div className="bg-white rounded-lg border-2 border-primary-200 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Nový feedback</h3>
+            <button
+              onClick={() => {
+                setShowNewFeedbackForm(false)
+                setNewFeedback({
+                  type: 'other',
+                  subject: '',
+                  message: '',
+                  rating: 0
+                })
+              }}
+              className="text-gray-400 hover:text-gray-600"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmitNewFeedback} className="space-y-4">
+            {/* Type */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Typ zprávy
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setNewFeedback({ ...newFeedback, type: 'bug' })}
+                  className={`p-3 rounded-lg border-2 text-sm font-medium transition-colors ${
+                    newFeedback.type === 'bug'
+                      ? 'border-red-500 bg-red-50 text-red-700'
+                      : 'border-gray-200 text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  🐛 Bug
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setNewFeedback({ ...newFeedback, type: 'feature' })}
+                  className={`p-3 rounded-lg border-2 text-sm font-medium transition-colors ${
+                    newFeedback.type === 'feature'
+                      ? 'border-blue-500 bg-blue-50 text-blue-700'
+                      : 'border-gray-200 text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  💡 Nápad
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setNewFeedback({ ...newFeedback, type: 'improvement' })}
+                  className={`p-3 rounded-lg border-2 text-sm font-medium transition-colors ${
+                    newFeedback.type === 'improvement'
+                      ? 'border-green-500 bg-green-50 text-green-700'
+                      : 'border-gray-200 text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  📈 Zlepšení
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setNewFeedback({ ...newFeedback, type: 'other' })}
+                  className={`p-3 rounded-lg border-2 text-sm font-medium transition-colors ${
+                    newFeedback.type === 'other'
+                      ? 'border-purple-500 bg-purple-50 text-purple-700'
+                      : 'border-gray-200 text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  💬 Jiné
+                </button>
+              </div>
+            </div>
+
+            {/* Subject */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Předmět
+              </label>
+              <input
+                type="text"
+                value={newFeedback.subject}
+                onChange={(e) => setNewFeedback({ ...newFeedback, subject: e.target.value })}
+                placeholder="Stručně popište problém nebo nápad..."
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                required
+              />
+            </div>
+
+            {/* Message */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Zpráva
+              </label>
+              <textarea
+                value={newFeedback.message}
+                onChange={(e) => setNewFeedback({ ...newFeedback, message: e.target.value })}
+                placeholder="Podrobně popište, co se stalo nebo co byste chtěli..."
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                rows={5}
+                required
+              />
+            </div>
+
+            {/* Rating */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Jak jste spokojeni s aplikací? (volitelné)
+              </label>
+              <div className="flex gap-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setNewFeedback({ ...newFeedback, rating: star })}
+                    className="transition-transform hover:scale-110"
+                  >
+                    <Star
+                      className={`w-8 h-8 ${
+                        star <= newFeedback.rating
+                          ? 'text-yellow-400 fill-yellow-400'
+                          : 'text-gray-300'
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Submit */}
+            <div className="flex gap-3 pt-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowNewFeedbackForm(false)
+                  setNewFeedback({
+                    type: 'other',
+                    subject: '',
+                    message: '',
+                    rating: 0
+                  })
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Zrušit
+              </button>
+              <button
+                type="submit"
+                disabled={sendingNewFeedback || !newFeedback.subject.trim() || !newFeedback.message.trim()}
+                className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+              >
+                {sendingNewFeedback ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Odesílám...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    Odeslat
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
 
       {feedback.map((item) => {
         const TypeIcon = getTypeIcon(item.type)

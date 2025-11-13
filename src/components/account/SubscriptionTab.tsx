@@ -418,26 +418,6 @@ function SubscriptionTab({ subscriptionData }: SubscriptionTabProps) {
               <p className="text-sm text-gray-600">Inteligentní pomocník pro plánování</p>
             </div>
           </div>
-
-          <div className="flex items-start space-x-3">
-            <div className="w-8 h-8 rounded-lg bg-primary-100 flex items-center justify-center flex-shrink-0">
-              <Check className="w-5 h-5 text-primary-600" />
-            </div>
-            <div>
-              <p className="font-medium text-gray-900">Pokročilá analytika</p>
-              <p className="text-sm text-gray-600">Detailní statistiky a reporty</p>
-            </div>
-          </div>
-
-          <div className="flex items-start space-x-3">
-            <div className="w-8 h-8 rounded-lg bg-primary-100 flex items-center justify-center flex-shrink-0">
-              <Check className="w-5 h-5 text-primary-600" />
-            </div>
-            <div>
-              <p className="font-medium text-gray-900">Prioritní podpora</p>
-              <p className="text-sm text-gray-600">Rychlejší odpovědi na dotazy</p>
-            </div>
-          </div>
         </div>
       </div>
     </div>

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { useAffiliate } from '@/hooks/useAffiliate'
 import { auth, db } from '@/config/firebase'
-import { updateProfile, updateEmail, sendEmailVerification } from 'firebase/auth'
+import { updateProfile, updateEmail, sendEmailVerification, sendPasswordResetEmail } from 'firebase/auth'
 import { doc, updateDoc } from 'firebase/firestore'
 import {
   User,
@@ -198,6 +198,41 @@ function ProfileTab() {
     }
   }
 
+  const handlePasswordReset = async () => {
+    if (!auth.currentUser?.email) return
+
+    try {
+      setLoading(true)
+
+      await sendPasswordResetEmail(auth, auth.currentUser.email, {
+        url: `${window.location.origin}/login`,
+        handleCodeInApp: false,
+      })
+
+      setMessage({
+        type: 'success',
+        text: 'Email pro obnovení hesla byl odeslán. Zkontrolujte svou schránku.'
+      })
+    } catch (error: any) {
+      console.error('Error sending password reset:', error)
+
+      let errorMessage = 'Chyba při odesílání emailu pro obnovení hesla'
+
+      if (error.code === 'auth/too-many-requests') {
+        errorMessage = 'Příliš mnoho pokusů. Zkuste to prosím za chvíli.'
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+
+      setMessage({
+        type: 'error',
+        text: errorMessage
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Message */}
@@ -246,7 +281,7 @@ function ProfileTab() {
           )}
         </div>
 
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           {/* Display Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -399,7 +434,7 @@ function ProfileTab() {
           </div>
 
           {/* User ID */}
-          <div>
+          <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center space-x-2">
               <Shield className="w-4 h-4" />
               <span>ID uživatele</span>
@@ -585,21 +620,25 @@ function ProfileTab() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium text-gray-900">Heslo</p>
-              <p className="text-sm text-gray-600">Změňte své heslo</p>
+              {auth.currentUser?.providerData[0]?.providerId === 'password' ? (
+                <p className="text-sm text-gray-600">Změňte své heslo</p>
+              ) : (
+                <p className="text-sm text-gray-600">Heslo je spravováno přes Google</p>
+              )}
             </div>
-            <button className="btn-outline">
-              Změnit heslo
-            </button>
-          </div>
-
-          <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-            <div>
-              <p className="font-medium text-gray-900">Dvoufaktorové ověření</p>
-              <p className="text-sm text-gray-600">Přidejte další vrstvu zabezpečení</p>
-            </div>
-            <button className="btn-outline" disabled>
-              Brzy dostupné
-            </button>
+            {auth.currentUser?.providerData[0]?.providerId === 'password' ? (
+              <button 
+                onClick={handlePasswordReset}
+                disabled={loading}
+                className="btn-outline"
+              >
+                {loading ? 'Odesílání...' : 'Změnit heslo'}
+              </button>
+            ) : (
+              <button className="btn-outline" disabled>
+                Spravováno Googlem
+              </button>
+            )}
           </div>
         </div>
       </div>
