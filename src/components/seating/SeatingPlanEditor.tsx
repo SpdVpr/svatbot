@@ -64,6 +64,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
   const { guests } = useGuest()
 
   const canvasRef = useRef<HTMLDivElement>(null)
+  const canvasContainerRef = useRef<HTMLDivElement | null>(null)
   const [selectedTable, setSelectedTable] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
@@ -134,7 +135,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     showStats: true,
     highlightUnassigned: true,
     highlightViolations: false,
-    zoom: 1.0
+    zoom: 0.6
   })
   const [guestSearchQuery, setGuestSearchQuery] = useState('')
 
@@ -437,7 +438,12 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
 
   // Mobile long press handlers
-  const handleTouchStart = (tableId: string) => {
+  const handleTouchStart = (tableId: string, e: React.TouchEvent) => {
+    // Ignore multi-touch gestures (these are used for pinch-zoom on canvas)
+    if (e.touches.length > 1) {
+      return
+    }
+
     setIsLongPress(false)
     const timer = setTimeout(() => {
       setIsLongPress(true)
@@ -463,6 +469,74 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     if (longPressTimer) {
       clearTimeout(longPressTimer)
       setLongPressTimer(null)
+    }
+  }
+
+  // Multi-touch pinch zoom for mobile (canvas-level)
+  const pinchStateRef = useRef<{
+    initialDistance: number
+    initialZoom: number
+    centerClientX: number
+    centerClientY: number
+    scrollLeft: number
+    scrollTop: number
+  } | null>(null)
+
+  const handleCanvasTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length === 2) {
+      const [t1, t2] = [e.touches[0], e.touches[1]]
+      const distance = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY)
+      const centerClientX = (t1.clientX + t2.clientX) / 2
+      const centerClientY = (t1.clientY + t2.clientY) / 2
+      const container = canvasContainerRef.current
+
+      pinchStateRef.current = {
+        initialDistance: distance,
+        initialZoom: viewOptions.zoom,
+        centerClientX,
+        centerClientY,
+        scrollLeft: container?.scrollLeft ?? 0,
+        scrollTop: container?.scrollTop ?? 0
+      }
+    }
+  }
+
+  const handleCanvasTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length === 2 && pinchStateRef.current) {
+      e.preventDefault()
+
+      const [t1, t2] = [e.touches[0], e.touches[1]]
+      const newDistance = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY)
+      const pinch = pinchStateRef.current
+
+      if (pinch.initialDistance === 0) return
+
+      const scaleFactor = newDistance / pinch.initialDistance
+      const newZoomUnclamped = pinch.initialZoom * scaleFactor
+      const newZoom = Math.min(2.0, Math.max(0.5, newZoomUnclamped))
+
+      setViewOptions(prev => ({
+        ...prev,
+        zoom: newZoom
+      }))
+
+      const container = canvasContainerRef.current
+      if (container) {
+        const centerClientX = (t1.clientX + t2.clientX) / 2
+        const centerClientY = (t1.clientY + t2.clientY) / 2
+
+        const deltaX = centerClientX - pinch.centerClientX
+        const deltaY = centerClientY - pinch.centerClientY
+
+        container.scrollLeft = pinch.scrollLeft - deltaX
+        container.scrollTop = pinch.scrollTop - deltaY
+      }
+    }
+  }
+
+  const handleCanvasTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length < 2) {
+      pinchStateRef.current = null
     }
   }
 
@@ -2598,10 +2672,13 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
         {/* Canvas - Mobile optimized */}
         <div className="lg:col-span-3">
-          <div className="bg-white rounded-xl border border-gray-200 overflow-auto max-h-[60vh] sm:max-h-[70vh] lg:max-h-none">
+          <div
+            ref={canvasContainerRef}
+            className="bg-white rounded-xl border border-gray-200 overflow-auto max-h-[60vh] sm:max-h-[70vh] lg:max-h-none"
+          >
             <div
               ref={canvasRef}
-              className="relative bg-gray-50 cursor-crosshair border-2 sm:border-4 border-dashed border-blue-300 touch-none"
+              className="relative bg-gray-50 cursor-crosshair border-2 sm:border-4 border-dashed border-blue-300 touch-pan-x touch-pan-y"
               style={{
                 transform: `scale(${viewOptions.zoom})`,
                 transformOrigin: 'top left',
@@ -2611,6 +2688,9 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                 minHeight: currentPlan.venueLayout.height,
                 boxShadow: 'inset 0 0 0 1px rgba(59, 130, 246, 0.3)'
               }}
+              onTouchStart={handleCanvasTouchStart}
+              onTouchMove={handleCanvasTouchMove}
+              onTouchEnd={handleCanvasTouchEnd}
               onMouseMove={(e) => {
                 handleTableDrag(e)
                 handleCustomAreaDrag(e)
@@ -2775,7 +2855,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                       }}
                       onMouseDown={(e) => handleTableDragStart(table.id, e)}
                       onDoubleClick={() => handleEditTable(table)}
-                      onTouchStart={() => handleTouchStart(table.id)}
+                      onTouchStart={(e) => handleTouchStart(table.id, e)}
                       onTouchEnd={handleTouchEnd}
                       onTouchMove={handleTouchMove}
                       title={

@@ -318,53 +318,54 @@ function DashboardContent() {
           </div>
 
           {/* Mobile wedding info - compact layout */}
-          <div className="px-3 py-2 border-t border-gray-100 space-y-1.5">
-            {/* Names and date */}
+          <div className="px-3 py-2 border-t border-gray-100">
+            {/* Names and trial/premium/date info in one row */}
             <button
               onClick={openWeddingSettings}
               className="text-left w-full hover:bg-gray-50 px-2 py-1.5 rounded-lg transition-colors flex items-center gap-2"
             >
-              <h2 className="text-xs font-bold text-gray-900 truncate flex-1" style={{ fontFamily: "var(--font-cormorant), 'Cormorant Upright', serif" }}>
+              <h2 className="text-base font-bold text-gray-900 truncate flex-1 leading-tight" style={{ fontFamily: "var(--font-cormorant), 'Cormorant Upright', serif" }}>
                 {wedding.brideName} & {wedding.groomName}
               </h2>
-              <span className="text-xs text-text-muted whitespace-nowrap">
-                {weddingDate
-                  ? dateUtils.format(weddingDate, 'dd.MM.yyyy')
-                  : 'Nastavit datum'
-                }
-              </span>
-            </button>
-
-            {/* Subscription info - separate clickable row */}
-            {subscription?.status === 'trialing' && subscription?.isTrialActive && trialDaysRemaining !== null && (
-              <button
-                onClick={() => openAccountModal('subscription')}
-                className="w-full flex items-center gap-1.5 px-2 py-1.5 hover:bg-amber-50 rounded-lg transition-colors"
-              >
-                <Clock className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
-                <span className={`text-xs font-medium ${trialDaysRemaining <= 3 ? 'text-red-600' : 'text-amber-600'}`}>
-                  {trialDaysRemaining === 0
-                    ? 'Trial vyprší dnes!'
-                    : `Trial vyprší za ${trialDaysRemaining} ${trialDaysRemaining === 1 ? 'den' : trialDaysRemaining <= 4 ? 'dny' : 'dní'}`
+              {/* Show trial info instead of date on mobile */}
+              {subscription?.status === 'trialing' && subscription?.isTrialActive && trialDaysRemaining !== null ? (
+                <div
+                  className="flex items-center gap-1 flex-shrink-0"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    openAccountModal('subscription')
+                  }}
+                >
+                  <Clock className="w-3.5 h-3.5 text-amber-600" />
+                  <span className={`text-xs font-medium whitespace-nowrap ${trialDaysRemaining <= 3 ? 'text-red-600' : 'text-amber-600'}`}>
+                    {trialDaysRemaining === 0
+                      ? 'Vyprší dnes!'
+                      : `Vyprší za ${trialDaysRemaining} ${trialDaysRemaining === 1 ? 'den' : trialDaysRemaining <= 4 ? 'dny' : 'dní'}`
+                    }
+                  </span>
+                </div>
+              ) : subscription?.status === 'active' && hasPremiumAccess ? (
+                <div
+                  className="flex items-center gap-1 flex-shrink-0"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    openAccountModal('subscription')
+                  }}
+                >
+                  <Crown className="w-3.5 h-3.5 text-primary-600" fill="currentColor" />
+                  <span className="text-xs font-medium text-primary-600 whitespace-nowrap">
+                    Premium
+                  </span>
+                </div>
+              ) : (
+                <span className="text-xs text-text-muted whitespace-nowrap">
+                  {weddingDate
+                    ? dateUtils.format(weddingDate, 'dd.MM.yyyy')
+                    : 'Nastavit datum'
                   }
                 </span>
-              </button>
-            )}
-
-            {/* Premium status - separate clickable row */}
-            {subscription?.status === 'active' && hasPremiumAccess && (
-              <button
-                onClick={() => openAccountModal('subscription')}
-                className="w-full flex items-center gap-1.5 px-2 py-1.5 hover:bg-primary-50 rounded-lg transition-colors"
-              >
-                <Crown className="w-3.5 h-3.5 text-primary-600 flex-shrink-0" fill="currentColor" />
-                <span className="text-xs font-medium text-primary-600">
-                  {subscription.plan === 'premium_monthly' && 'Premium měsíční předplatné'}
-                  {subscription.plan === 'premium_yearly' && 'Premium roční předplatné'}
-                  {subscription.plan === 'test_daily' && 'Test denní předplatné'}
-                </span>
-              </button>
-            )}
+              )}
+            </button>
           </div>
         </div>
 

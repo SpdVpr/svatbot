@@ -144,11 +144,12 @@ export default function SpotifySearch({ onSelectTrack, placeholder }: SpotifySea
 
         {/* Search Results Dropdown */}
         {showResults && (
-          <div className="fixed z-[102] bg-white rounded-xl shadow-2xl border-2 border-purple-200 max-h-[500px] w-[600px] flex flex-col overflow-hidden"
+          <div
+            className="fixed z-[102] bg-white rounded-xl shadow-2xl border-2 border-purple-200 max-h-[70vh] w-full max-w-[600px] flex flex-col overflow-hidden mx-4"
             style={{
-              top: '50%',
+              top: '10vh',
               left: '50%',
-              transform: 'translate(-50%, -50%)'
+              transform: 'translateX(-50%)'
             }}
           >
             {/* Header */}
@@ -182,7 +183,7 @@ export default function SpotifySearch({ onSelectTrack, placeholder }: SpotifySea
                     <div
                       key={track.id}
                       onClick={() => handleSelectTrack(track)}
-                      className="flex items-center space-x-3 p-3 hover:bg-gradient-to-r hover:from-primary-50 hover:to-accent-50 transition-all cursor-pointer group"
+                      className="flex flex-wrap sm:flex-nowrap items-center gap-3 p-3 hover:bg-gradient-to-r hover:from-primary-50 hover:to-accent-50 transition-all cursor-pointer group"
                     >
                       {/* Album Cover */}
                       <div className="relative w-12 h-12 flex-shrink-0 bg-gray-100 rounded overflow-hidden">
@@ -203,10 +204,10 @@ export default function SpotifySearch({ onSelectTrack, placeholder }: SpotifySea
 
                       {/* Track Info */}
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-gray-900 truncate">
+                        <p className="font-medium text-gray-900 leading-snug">
                           {track.name}
                         </p>
-                        <p className="text-sm text-gray-600 truncate">
+                        <p className="text-sm text-gray-600">
                           {track.artists.map(a => a.name).join(', ')}
                         </p>
                         <p className="text-xs text-gray-500">
@@ -247,9 +248,12 @@ export default function SpotifySearch({ onSelectTrack, placeholder }: SpotifySea
                         </a>
                       </div>
 
-                      {/* Add Icon - Always visible */}
-                      <div className="flex-shrink-0">
-                        <Plus className="w-5 h-5 text-purple-500 group-hover:scale-110 transition-transform" />
+                      {/* Add Icon - Prominent button */}
+                      <div className="flex-shrink-0 mr-1">
+                        <div className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-purple-300 bg-purple-50 text-purple-600 text-xs font-medium">
+                          <Plus className="w-4 h-4" />
+                          <span>Přidat</span>
+                        </div>
                       </div>
                     </div>
                   ))}

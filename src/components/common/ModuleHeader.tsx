@@ -66,7 +66,7 @@ export default function ModuleHeader({
                 className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
                 title="Dashboard"
               >
-                <Home className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400 hover:text-gray-600" />
+                <Home className="w-4 h-4 text-gray-400 hover:text-gray-600" />
               </Link>
 
               {/* Module icon in square */}

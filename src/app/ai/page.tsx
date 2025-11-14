@@ -91,7 +91,7 @@ function AIPageContent() {
         actions={
           <div className="flex items-center space-x-1 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-full">
             <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-            <span className="text-xs font-medium text-blue-700">GPT-4o</span>
+            <span className="text-xs font-medium text-blue-700">GPT-5</span>
           </div>
         }
       />

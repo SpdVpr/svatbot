@@ -30,7 +30,7 @@ export default function SongCard({ song, onRemove, isPlaying, onPlayToggle }: So
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all group">
-      <div className="flex items-center space-x-3 p-3">
+      <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 p-3">
         {/* Drag Handle - Hidden for now, can be enabled later */}
         {/* <div className="opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing">
           <GripVertical className="w-5 h-5 text-gray-400" />
@@ -54,10 +54,10 @@ export default function SongCard({ song, onRemove, isPlaying, onPlayToggle }: So
 
         {/* Song Info */}
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-gray-900 truncate">
+          <p className="font-medium text-gray-900 leading-snug">
             {song.title}
           </p>
-          <p className="text-sm text-gray-600 truncate">
+          <p className="text-sm text-gray-600">
             {song.artist}
           </p>
           {song.duration && (
@@ -75,8 +75,8 @@ export default function SongCard({ song, onRemove, isPlaying, onPlayToggle }: So
           )}
         </div>
 
-        {/* Actions - Always visible */}
-        <div className="flex items-center space-x-1">
+        {/* Actions - Always visible, responsive for mobile */}
+        <div className="flex items-center flex-wrap gap-1 w-full sm:w-auto justify-center sm:justify-end mt-2 sm:mt-0">
           {/* Play Button - Toggle Spotify Embed Player */}
           {song.spotifyTrackId && (
             <button

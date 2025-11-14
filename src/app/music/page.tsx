@@ -266,11 +266,11 @@ function MusicPageContent() {
 
             {categories.filter(cat => showHidden || !cat.hidden).map(category => (
               <div key={category.id} className="wedding-card">
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
                   <div className="flex items-center space-x-3 flex-1">
                     <span className="text-2xl">{category.icon}</span>
                     <div className="flex-1">
-                      <div className="flex items-center justify-between">
+                      <div className="space-y-1 sm:flex sm:items-center sm:justify-between">
                         <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
                           <span>{category.name}</span>
                           {category.required && (
@@ -297,7 +297,7 @@ function MusicPageContent() {
                       <p className="text-sm text-gray-600">{category.description}</p>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2 ml-4">
+                  <div className="flex items-center space-x-2 mt-2 sm:mt-0 sm:ml-4 w-full sm:w-auto justify-end">
                     {!category.required && (
                       <button
                         onClick={() => toggleCategoryVisibility(category.id)}

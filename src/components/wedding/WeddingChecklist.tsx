@@ -855,7 +855,7 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
                           {/* Action buttons - Stack on mobile, side by side on desktop */}
                           <div className="flex-shrink-0 w-full sm:w-auto">
                             {isItemCompleted(item) ? (
-                              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                              <div className="flex flex-row items-stretch items-center gap-2 flex-wrap">
                                 {/* Hotovo badge */}
                                 <div className="flex items-center justify-center space-x-2 text-green-600 bg-green-100 px-3 py-2 rounded-lg">
                                   <Check className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -877,7 +877,7 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
                                 <span className="text-xs sm:text-sm font-medium">Přidáno!</span>
                               </div>
                             ) : inTasks ? (
-                              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                              <div className="flex flex-row items-stretch items-center gap-2 flex-wrap">
                                 {/* V úkolech badge */}
                                 <div className="flex items-center justify-center space-x-2 text-primary-600 bg-primary-100 px-3 py-2 rounded-lg">
                                   <Check className="w-4 h-4 sm:w-5 sm:h-5" />
