@@ -7,9 +7,11 @@ import FeaturedVendors from '@/components/marketplace/FeaturedVendors'
 import CategoryGrid from '@/components/marketplace/CategoryGrid'
 import VendorGrid from '@/components/marketplace/VendorGrid'
 import MarketplaceFilters from '@/components/marketplace/MarketplaceFilters'
-import { Search, Filter, TrendingUp, ArrowLeft, Home, Plus, Heart } from 'lucide-react'
+import ModuleHeader from '@/components/common/ModuleHeader'
+import { Search, Filter, TrendingUp, Store, Plus, Heart } from 'lucide-react'
 import Link from 'next/link'
 import { useFavoriteVendors } from '@/hooks/useFavoriteVendors'
+import { useColorTheme } from '@/hooks/useColorTheme'
 
 export default function MarketplacePage() {
   const {
@@ -23,6 +25,8 @@ export default function MarketplacePage() {
     getFeaturedVendors,
     clearFilters
   } = useMarketplace()
+
+  const { currentPalette } = useColorTheme()
 
   // Removed viewMode - using browse view as default (most comprehensive)
   const [showFilters, setShowFilters] = useState(false)
@@ -72,48 +76,50 @@ export default function MarketplacePage() {
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      <div className="bg-white border-b border-neutral-200">
-        <div className="container-desktop py-4 md:py-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-            <div className="flex items-center space-x-4">
-              <Link href="/" className="btn-ghost p-2">
-                <ArrowLeft className="w-5 h-5" />
-              </Link>
-              <div>
-                <h1 className="heading-2">Marketplace</h1>
-                <p className="body-normal text-text-secondary hidden sm:block">
-                  Najděte perfektní dodavatele pro váš velký den
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between md:justify-end space-x-3">
-              <div className="flex items-center space-x-2 text-text-muted">
-                <TrendingUp className="w-4 h-4" />
-                <span className="body-small">{stats.totalVendors} dodavatelů</span>
-              </div>
-
-              <Link
-                href="/marketplace/register"
-                className="btn-primary flex items-center space-x-2 whitespace-nowrap"
-              >
-                <Plus className="w-4 h-4" />
-                <span className="hidden sm:inline">Přidat inzerát</span>
-                <span className="sm:hidden">Přidat</span>
-              </Link>
-            </div>
+      {/* Standardní horní lišta */}
+      <ModuleHeader
+        icon={Store}
+        title="Marketplace"
+        subtitle="Najděte perfektní dodavatele pro váš velký den"
+        stats={
+          <div className="flex items-center space-x-2 text-text-muted">
+            <TrendingUp className="w-4 h-4" />
+            <span className="body-small">{stats.totalVendors} dodavatelů</span>
           </div>
+        }
+        actions={
+          <Link
+            href="/marketplace/register"
+            className="btn-primary flex items-center space-x-2 whitespace-nowrap"
+          >
+            <Plus className="w-4 h-4" />
+            <span className="hidden sm:inline">Přidat inzerát</span>
+            <span className="sm:hidden">Přidat</span>
+          </Link>
+        }
+      />
 
+      {/* Vyhledávací pole a kategorie se světlým pozadím z barevné palety */}
+      <div
+        className="border-b border-neutral-200"
+        style={{ backgroundColor: currentPalette.colors.primaryLight }}
+      >
+        <div className="container-desktop py-4 md:py-6">
           {/* Search and View Toggle */}
           <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
             <div className="flex-1 w-full lg:max-w-md">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted w-4 h-4" />
+                <Search
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4"
+                  style={{ color: currentPalette.colors.primary600 }}
+                />
                 <input
                   type="text"
                   placeholder="Hledat dodavatele..."
-                  className="input-field pl-10 w-full"
+                  className="w-full pl-10 pr-4 py-2 rounded-lg border-0 bg-white/70 backdrop-blur-sm focus:bg-white focus:outline-none focus:ring-2 transition-all"
+                  style={{
+                    '--tw-ring-color': currentPalette.colors.primary400
+                  } as React.CSSProperties}
                   value={filters.search || ''}
                   onChange={(e) => handleSearch(e.target.value)}
                 />
@@ -122,21 +128,32 @@ export default function MarketplacePage() {
 
             <div className="flex items-center gap-2 md:gap-3 w-full lg:w-auto">
               {/* Browse view indicator */}
-              <div className="hidden md:flex bg-primary-100 rounded-lg px-3 py-2">
-                <span className="text-sm font-medium text-primary-700 whitespace-nowrap">Procházet všechny dodavatele</span>
+              <div
+                className="hidden md:flex rounded-lg px-3 py-2"
+                style={{
+                  backgroundColor: currentPalette.colors.primary200,
+                  color: currentPalette.colors.primary700
+                }}
+              >
+                <span className="text-sm font-medium whitespace-nowrap">Procházet všechny dodavatele</span>
               </div>
 
               {/* Filters Toggle */}
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className={`btn-outline flex items-center space-x-2 whitespace-nowrap ${
-                  showFilters ? 'bg-primary-50 border-primary-200' : ''
-                }`}
+                className="btn-outline flex items-center space-x-2 whitespace-nowrap bg-white/70 backdrop-blur-sm hover:bg-white"
+                style={showFilters ? {
+                  backgroundColor: currentPalette.colors.primaryLight,
+                  borderColor: currentPalette.colors.primary300
+                } : {}}
               >
                 <Filter className="w-4 h-4" />
                 <span>Filtry</span>
                 {Object.keys(filters).length > 0 && (
-                  <span className="bg-primary-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  <span
+                    className="text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+                    style={{ backgroundColor: currentPalette.colors.primary }}
+                  >
                     {Object.keys(filters).length}
                   </span>
                 )}
@@ -164,9 +181,13 @@ export default function MarketplacePage() {
                 onClick={handleClearFilters}
                 className={`flex flex-col items-center justify-center px-2 py-3 rounded-xl transition-all ${
                   !selectedCategory && !showFavoritesOnly
-                    ? 'bg-primary-500 text-white shadow-lg scale-105'
-                    : 'bg-white border border-neutral-200 hover:border-primary-300 hover:shadow-md'
+                    ? 'shadow-lg scale-105'
+                    : 'bg-white/70 backdrop-blur-sm border border-neutral-200 hover:border-primary-300 hover:shadow-md hover:bg-white'
                 }`}
+                style={!selectedCategory && !showFavoritesOnly ? {
+                  backgroundColor: currentPalette.colors.primary,
+                  color: 'white'
+                } : {}}
               >
                 <span className="text-2xl mb-1">🎯</span>
                 <span className="text-xs font-medium text-center">Vše</span>
@@ -178,7 +199,7 @@ export default function MarketplacePage() {
                 className={`flex flex-col items-center justify-center px-2 py-3 rounded-xl transition-all ${
                   showFavoritesOnly
                     ? 'bg-red-500 text-white shadow-lg scale-105'
-                    : 'bg-white border border-neutral-200 hover:border-red-300 hover:shadow-md'
+                    : 'bg-white/70 backdrop-blur-sm border border-neutral-200 hover:border-red-300 hover:shadow-md hover:bg-white'
                 }`}
               >
                 <Heart className={`w-6 h-6 mb-1 ${showFavoritesOnly ? 'fill-current' : ''}`} />
@@ -195,9 +216,13 @@ export default function MarketplacePage() {
                   onClick={() => handleCategorySelect(key as VendorCategory)}
                   className={`flex flex-col items-center justify-center px-2 py-3 rounded-xl transition-all ${
                     selectedCategory === key
-                      ? 'bg-primary-500 text-white shadow-lg scale-105'
-                      : 'bg-white border border-neutral-200 hover:border-primary-300 hover:shadow-md'
+                      ? 'shadow-lg scale-105'
+                      : 'bg-white/70 backdrop-blur-sm border border-neutral-200 hover:border-primary-300 hover:shadow-md hover:bg-white'
                   }`}
+                  style={selectedCategory === key ? {
+                    backgroundColor: currentPalette.colors.primary,
+                    color: 'white'
+                  } : {}}
                 >
                   <span className="text-2xl mb-1">{category.icon}</span>
                   <span className="text-xs font-medium text-center leading-tight">
@@ -216,7 +241,11 @@ export default function MarketplacePage() {
                 {filters.category?.map(category => (
                   <span
                     key={category}
-                    className="inline-flex items-center space-x-1 bg-primary-100 text-primary-700 px-2 py-1 rounded-md text-xs"
+                    className="inline-flex items-center space-x-1 px-2 py-1 rounded-md text-xs"
+                    style={{
+                      backgroundColor: currentPalette.colors.primary200,
+                      color: currentPalette.colors.primary700
+                    }}
                   >
                     <span>{VENDOR_CATEGORIES[category].name}</span>
                     <button
@@ -224,18 +253,26 @@ export default function MarketplacePage() {
                         const newCategories = filters.category?.filter(c => c !== category) || []
                         setFilters({ ...filters, category: newCategories.length > 0 ? newCategories : undefined })
                       }}
-                      className="hover:text-primary-900"
+                      style={{ color: currentPalette.colors.primary900 }}
+                      className="hover:opacity-80"
                     >
                       ×
                     </button>
                   </span>
                 ))}
                 {filters.search && (
-                  <span className="inline-flex items-center space-x-1 bg-primary-100 text-primary-700 px-2 py-1 rounded-md text-xs">
+                  <span
+                    className="inline-flex items-center space-x-1 px-2 py-1 rounded-md text-xs"
+                    style={{
+                      backgroundColor: currentPalette.colors.primary200,
+                      color: currentPalette.colors.primary700
+                    }}
+                  >
                     <span>"{filters.search}"</span>
                     <button
                       onClick={() => setFilters({ ...filters, search: undefined })}
-                      className="hover:text-primary-900"
+                      style={{ color: currentPalette.colors.primary900 }}
+                      className="hover:opacity-80"
                     >
                       ×
                     </button>
