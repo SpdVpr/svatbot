@@ -87,15 +87,30 @@ export function useBudget(): UseBudgetReturn {
   const [loading, setLoading] = useState(() => budgetItems.length === 0)
   const [error, setError] = useState<string | null>(null)
 
+  // Helper to safely convert to Date with validation
+  const safeConvertToDate = (value: any): Date | undefined => {
+    if (!value) return undefined
+
+    // If it's a Firestore Timestamp
+    if (value.toDate) {
+      const date = value.toDate()
+      return isNaN(date.getTime()) ? undefined : date
+    }
+
+    // If it's already a Date or can be converted
+    const date = new Date(value)
+    return isNaN(date.getTime()) ? undefined : date
+  }
+
   // Convert Firestore data to BudgetItem
   const convertFirestoreBudgetItem = (id: string, data: any): BudgetItem => {
     const rawPayments = data.payments || []
 
-    // Convert payment dates from Firestore Timestamps to Date objects
+    // Convert payment dates from Firestore Timestamps to Date objects with validation
     const payments = rawPayments.map((payment: any) => ({
       ...payment,
-      date: payment.date?.toDate ? payment.date.toDate() : new Date(payment.date),
-      createdAt: payment.createdAt?.toDate ? payment.createdAt.toDate() : new Date(payment.createdAt || Date.now())
+      date: safeConvertToDate(payment.date) || new Date(),
+      createdAt: safeConvertToDate(payment.createdAt) || new Date()
     }))
 
     // Calculate paidAmount from completed payments
@@ -148,10 +163,10 @@ export function useBudget(): UseBudgetReturn {
       subItems: data.subItems || [],
       documents: (data.documents || []).map((doc: any) => ({
         ...doc,
-        uploadedAt: doc.uploadedAt?.toDate ? doc.uploadedAt.toDate() : new Date(doc.uploadedAt)
+        uploadedAt: safeConvertToDate(doc.uploadedAt) || new Date()
       })),
-      createdAt: data.createdAt?.toDate() || new Date(),
-      updatedAt: data.updatedAt?.toDate() || new Date(),
+      createdAt: safeConvertToDate(data.createdAt) || new Date(),
+      updatedAt: safeConvertToDate(data.updatedAt) || new Date(),
       createdBy: data.createdBy
     }
   }
@@ -183,8 +198,20 @@ export function useBudget(): UseBudgetReturn {
       result.paymentPeriod = item.paymentPeriod ?? null
       console.log('💰 Converting paymentPeriod:', item.paymentPeriod, '→', result.paymentPeriod)
     }
-    if (item.dueDate !== undefined) result.dueDate = item.dueDate ? Timestamp.fromDate(item.dueDate) : null
-    if (item.paidDate !== undefined) result.paidDate = item.paidDate ? Timestamp.fromDate(item.paidDate) : null
+    if (item.dueDate !== undefined) {
+      if (item.dueDate && item.dueDate instanceof Date && !isNaN(item.dueDate.getTime())) {
+        result.dueDate = Timestamp.fromDate(item.dueDate)
+      } else {
+        result.dueDate = null
+      }
+    }
+    if (item.paidDate !== undefined) {
+      if (item.paidDate && item.paidDate instanceof Date && !isNaN(item.paidDate.getTime())) {
+        result.paidDate = Timestamp.fromDate(item.paidDate)
+      } else {
+        result.paidDate = null
+      }
+    }
     if (item.priority !== undefined) result.priority = item.priority || null
     if (item.notes !== undefined) result.notes = item.notes || null
     if (item.tags !== undefined) result.tags = item.tags
@@ -194,19 +221,37 @@ export function useBudget(): UseBudgetReturn {
     if (item.payments !== undefined) {
       result.payments = (item.payments || []).map(payment => ({
         ...payment,
-        date: payment.date instanceof Date ? Timestamp.fromDate(payment.date) : payment.date,
-        createdAt: payment.createdAt instanceof Date ? Timestamp.fromDate(payment.createdAt) : payment.createdAt
+        date: payment.date instanceof Date && !isNaN(payment.date.getTime())
+          ? Timestamp.fromDate(payment.date)
+          : payment.date,
+        createdAt: payment.createdAt instanceof Date && !isNaN(payment.createdAt.getTime())
+          ? Timestamp.fromDate(payment.createdAt)
+          : payment.createdAt
       }))
     }
     if (item.subItems !== undefined) result.subItems = item.subItems || []
     if (item.documents !== undefined) {
       result.documents = (item.documents || []).map(doc => ({
         ...doc,
-        uploadedAt: doc.uploadedAt instanceof Date ? Timestamp.fromDate(doc.uploadedAt) : doc.uploadedAt
+        uploadedAt: doc.uploadedAt instanceof Date && !isNaN(doc.uploadedAt.getTime())
+          ? Timestamp.fromDate(doc.uploadedAt)
+          : doc.uploadedAt
       }))
     }
-    if (item.createdAt !== undefined) result.createdAt = Timestamp.fromDate(item.createdAt)
-    if (item.updatedAt !== undefined) result.updatedAt = Timestamp.fromDate(item.updatedAt)
+    if (item.createdAt !== undefined) {
+      if (item.createdAt instanceof Date && !isNaN(item.createdAt.getTime())) {
+        result.createdAt = Timestamp.fromDate(item.createdAt)
+      } else {
+        result.createdAt = Timestamp.now()
+      }
+    }
+    if (item.updatedAt !== undefined) {
+      if (item.updatedAt instanceof Date && !isNaN(item.updatedAt.getTime())) {
+        result.updatedAt = Timestamp.fromDate(item.updatedAt)
+      } else {
+        result.updatedAt = Timestamp.now()
+      }
+    }
     if (item.createdBy !== undefined) result.createdBy = item.createdBy
 
     // Remove undefined values (Firestore doesn't accept undefined)

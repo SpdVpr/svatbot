@@ -27,6 +27,21 @@ export function useWedding() {
   const [error, setError] = useState<string | null>(null)
   const loadingRef = useRef(false)
 
+  // Helper to safely convert to Date with validation
+  const safeConvertToDate = (value: any): Date | null => {
+    if (!value) return null
+
+    // If it's a Firestore Timestamp
+    if (value.toDate) {
+      const date = value.toDate()
+      return isNaN(date.getTime()) ? null : date
+    }
+
+    // If it's already a Date or can be converted
+    const date = new Date(value)
+    return isNaN(date.getTime()) ? null : date
+  }
+
   // Convert Firestore data to Wedding type
   const convertFirestoreWedding = (id: string, data: any): Wedding => {
     return {
@@ -34,7 +49,7 @@ export function useWedding() {
       userId: data.userId,
       brideName: data.brideName,
       groomName: data.groomName,
-      weddingDate: data.weddingDate?.toDate() || null,
+      weddingDate: safeConvertToDate(data.weddingDate),
       estimatedGuestCount: data.estimatedGuestCount,
       budget: data.budget,
       style: data.style,
@@ -51,8 +66,8 @@ export function useWedding() {
         organization: 0,
         final: 0
       },
-      createdAt: data.createdAt?.toDate() || new Date(),
-      updatedAt: data.updatedAt?.toDate() || new Date()
+      createdAt: safeConvertToDate(data.createdAt) || new Date(),
+      updatedAt: safeConvertToDate(data.updatedAt) || new Date()
     }
   }
 
@@ -60,15 +75,30 @@ export function useWedding() {
   const convertToFirestoreData = (wedding: Partial<Wedding>) => {
     const data: any = { ...wedding }
 
-    // Convert dates to Firestore Timestamps
+    // Convert dates to Firestore Timestamps with validation
     if (data.weddingDate) {
-      data.weddingDate = Timestamp.fromDate(data.weddingDate)
+      if (data.weddingDate instanceof Date && !isNaN(data.weddingDate.getTime())) {
+        data.weddingDate = Timestamp.fromDate(data.weddingDate)
+      } else {
+        console.warn('Invalid weddingDate, setting to null:', data.weddingDate)
+        data.weddingDate = null
+      }
     }
     if (data.createdAt) {
-      data.createdAt = Timestamp.fromDate(data.createdAt)
+      if (data.createdAt instanceof Date && !isNaN(data.createdAt.getTime())) {
+        data.createdAt = Timestamp.fromDate(data.createdAt)
+      } else {
+        console.warn('Invalid createdAt, using current date:', data.createdAt)
+        data.createdAt = Timestamp.now()
+      }
     }
     if (data.updatedAt) {
-      data.updatedAt = Timestamp.fromDate(data.updatedAt)
+      if (data.updatedAt instanceof Date && !isNaN(data.updatedAt.getTime())) {
+        data.updatedAt = Timestamp.fromDate(data.updatedAt)
+      } else {
+        console.warn('Invalid updatedAt, using current date:', data.updatedAt)
+        data.updatedAt = Timestamp.now()
+      }
     }
 
     return data

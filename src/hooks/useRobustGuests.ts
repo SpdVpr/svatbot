@@ -130,14 +130,23 @@ const cleanForFirestore = (obj: any): any => {
   const cleaned: any = {}
   for (const [key, value] of Object.entries(obj)) {
     if (value !== undefined) {
+      // Handle Date objects - validate before passing through
+      if (value instanceof Date) {
+        // Check if date is valid
+        if (isNaN(value.getTime())) {
+          console.warn(`Invalid date found for key ${key}, skipping:`, value)
+          continue // Skip invalid dates
+        }
+        cleaned[key] = value
+      }
       // Handle arrays (like children)
-      if (Array.isArray(value)) {
+      else if (Array.isArray(value)) {
         cleaned[key] = value.map(item =>
           typeof item === 'object' && item !== null ? cleanForFirestore(item) : item
         )
       }
       // Handle nested objects
-      else if (typeof value === 'object' && value !== null && !(value instanceof Date)) {
+      else if (typeof value === 'object' && value !== null) {
         cleaned[key] = cleanForFirestore(value)
       }
       // Handle primitive values

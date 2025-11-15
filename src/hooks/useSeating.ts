@@ -263,48 +263,53 @@ export function useSeating(): UseSeatingReturn {
     }
   }, [wedding?.id])
 
+  // Helper function to safely convert to Date and validate
+  const safeConvertToDate = (value: any): Date => {
+    if (!value) return new Date()
+
+    // If it's a Firestore Timestamp
+    if (value.toDate) {
+      const date = value.toDate()
+      return isNaN(date.getTime()) ? new Date() : date
+    }
+
+    // If it's already a Date or can be converted
+    const date = new Date(value)
+    return isNaN(date.getTime()) ? new Date() : date
+  }
+
   // Convert Firestore data
   const convertFirestoreSeatingPlan = (id: string, data: any): SeatingPlan => {
-    // Handle both Firestore Timestamp and Date objects
-    const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() :
-                      data.createdAt ? new Date(data.createdAt) : new Date()
-    const updatedAt = data.updatedAt?.toDate ? data.updatedAt.toDate() :
-                      data.updatedAt ? new Date(data.updatedAt) : new Date()
+    // Handle both Firestore Timestamp and Date objects with validation
+    const createdAt = safeConvertToDate(data.createdAt)
+    const updatedAt = safeConvertToDate(data.updatedAt)
 
-    // Convert tables with proper date handling
+    // Convert tables with proper date handling and validation
     const tables = (data.tables || []).map((table: any) => ({
       ...table,
-      createdAt: table.createdAt?.toDate ? table.createdAt.toDate() :
-                 table.createdAt ? new Date(table.createdAt) : new Date(),
-      updatedAt: table.updatedAt?.toDate ? table.updatedAt.toDate() :
-                 table.updatedAt ? new Date(table.updatedAt) : new Date()
+      createdAt: safeConvertToDate(table.createdAt),
+      updatedAt: safeConvertToDate(table.updatedAt)
     }))
 
-    // Convert seats with proper date handling
+    // Convert seats with proper date handling and validation
     const seats = (data.seats || []).map((seat: any) => ({
       ...seat,
-      createdAt: seat.createdAt?.toDate ? seat.createdAt.toDate() :
-                 seat.createdAt ? new Date(seat.createdAt) : new Date(),
-      updatedAt: seat.updatedAt?.toDate ? seat.updatedAt.toDate() :
-                 seat.updatedAt ? new Date(seat.updatedAt) : new Date()
+      createdAt: safeConvertToDate(seat.createdAt),
+      updatedAt: safeConvertToDate(seat.updatedAt)
     }))
 
-    // Convert chair rows with proper date handling
+    // Convert chair rows with proper date handling and validation
     const chairRows = (data.chairRows || []).map((row: any) => ({
       ...row,
-      createdAt: row.createdAt?.toDate ? row.createdAt.toDate() :
-                 row.createdAt ? new Date(row.createdAt) : new Date(),
-      updatedAt: row.updatedAt?.toDate ? row.updatedAt.toDate() :
-                 row.updatedAt ? new Date(row.updatedAt) : new Date()
+      createdAt: safeConvertToDate(row.createdAt),
+      updatedAt: safeConvertToDate(row.updatedAt)
     }))
 
-    // Convert chair seats with proper date handling
+    // Convert chair seats with proper date handling and validation
     const chairSeats = (data.chairSeats || []).map((seat: any) => ({
       ...seat,
-      createdAt: seat.createdAt?.toDate ? seat.createdAt.toDate() :
-                 seat.createdAt ? new Date(seat.createdAt) : new Date(),
-      updatedAt: seat.updatedAt?.toDate ? seat.updatedAt.toDate() :
-                 seat.updatedAt ? new Date(seat.updatedAt) : new Date()
+      createdAt: safeConvertToDate(seat.createdAt),
+      updatedAt: safeConvertToDate(seat.updatedAt)
     }))
 
     return {
@@ -341,8 +346,8 @@ export function useSeating(): UseSeatingReturn {
     headSeats: data.headSeats || 0,
     isHighlighted: data.isHighlighted,
     notes: data.notes,
-    createdAt: data.createdAt?.toDate() || new Date(),
-    updatedAt: data.updatedAt?.toDate() || new Date()
+    createdAt: safeConvertToDate(data.createdAt),
+    updatedAt: safeConvertToDate(data.updatedAt)
   })
 
   // Create seating plan
@@ -608,6 +613,11 @@ export function useSeating(): UseSeatingReturn {
           }
 
           if (obj instanceof Date) {
+            // Check if date is valid before converting to Timestamp
+            if (isNaN(obj.getTime())) {
+              console.warn('Invalid date found in data, replacing with current date:', obj)
+              return Timestamp.now()
+            }
             return Timestamp.fromDate(obj)
           }
 

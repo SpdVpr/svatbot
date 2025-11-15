@@ -110,7 +110,9 @@ export function useGuest(isActive: boolean = true): UseGuestReturn {
       category: guest.category,
       invitationType: guest.invitationType,
       rsvpStatus: guest.rsvpStatus,
-      rsvpDate: guest.rsvpDate ? Timestamp.fromDate(guest.rsvpDate) : null,
+      rsvpDate: guest.rsvpDate && guest.rsvpDate instanceof Date && !isNaN(guest.rsvpDate.getTime())
+        ? Timestamp.fromDate(guest.rsvpDate)
+        : null,
       hasPlusOne: guest.hasPlusOne,
       plusOneName: guest.plusOneName || null,
       plusOneRsvpStatus: guest.plusOneRsvpStatus || null,
@@ -126,12 +128,20 @@ export function useGuest(isActive: boolean = true): UseGuestReturn {
       accommodationPayment: guest.accommodationPayment,
       invitationSent: guest.invitationSent,
       invitationMethod: guest.invitationMethod,
-      invitationSentDate: guest.invitationSentDate ? Timestamp.fromDate(guest.invitationSentDate) : null,
+      invitationSentDate: guest.invitationSentDate && guest.invitationSentDate instanceof Date && !isNaN(guest.invitationSentDate.getTime())
+        ? Timestamp.fromDate(guest.invitationSentDate)
+        : null,
       reminderSent: guest.reminderSent,
-      reminderSentDate: guest.reminderSentDate ? Timestamp.fromDate(guest.reminderSentDate) : null,
+      reminderSentDate: guest.reminderSentDate && guest.reminderSentDate instanceof Date && !isNaN(guest.reminderSentDate.getTime())
+        ? Timestamp.fromDate(guest.reminderSentDate)
+        : null,
       sortOrder: guest.sortOrder || 0,
-      createdAt: Timestamp.fromDate(guest.createdAt),
-      updatedAt: Timestamp.fromDate(guest.updatedAt),
+      createdAt: guest.createdAt instanceof Date && !isNaN(guest.createdAt.getTime())
+        ? Timestamp.fromDate(guest.createdAt)
+        : Timestamp.now(),
+      updatedAt: guest.updatedAt instanceof Date && !isNaN(guest.updatedAt.getTime())
+        ? Timestamp.fromDate(guest.updatedAt)
+        : Timestamp.now(),
       createdBy: guest.createdBy
     }
   }
