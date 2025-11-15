@@ -60,64 +60,53 @@ export default function MoodboardModule() {
             </div>
           </div>
 
-          {/* Image Grid Preview - Pinterest/Masonry style */}
+          {/* Image Grid Preview - 2 rows of 3 images */}
           <div className="flex-1 mb-3 overflow-hidden">
-            <div className="grid grid-cols-3 gap-2 auto-rows-[80px]">
-              {displayImages.map((image, index) => {
-                // Create varied heights for Pinterest effect
-                const heights = ['row-span-2', 'row-span-3', 'row-span-2', 'row-span-3', 'row-span-2', 'row-span-3']
-                const heightClass = heights[index % heights.length]
+            <div className="grid grid-cols-3 grid-rows-2 gap-2 h-full">
+              {displayImages.map((image, index) => (
+                <div
+                  key={image.id}
+                  className="relative rounded-xl overflow-hidden bg-gray-100 shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <Image
+                    src={image.url}
+                    alt={image.title || 'Moodboard image'}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 33vw, (max-width: 1024px) 20vw, 15vw"
+                    quality={90}
+                  />
 
-                return (
-                  <div
-                    key={image.id}
-                    className={`relative rounded-xl overflow-hidden bg-gray-100 shadow-sm hover:shadow-md transition-shadow ${heightClass}`}
-                  >
-                    <Image
-                      src={image.url}
-                      alt={image.title || 'Moodboard image'}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 33vw, (max-width: 1024px) 20vw, 15vw"
-                      quality={90}
-                    />
+                  {/* Gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
 
-                    {/* Gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
+                  {image.isFavorite && (
+                    <div className="absolute top-2 right-2 bg-pink-500 text-white p-1 rounded-full shadow-lg">
+                      <Heart className="w-2.5 h-2.5 fill-current" />
+                    </div>
+                  )}
 
-                    {image.isFavorite && (
-                      <div className="absolute top-2 right-2 bg-pink-500 text-white p-1 rounded-full shadow-lg">
-                        <Heart className="w-2.5 h-2.5 fill-current" />
-                      </div>
-                    )}
-
-                    {/* Show +X more overlay on last image if there are more */}
-                    {index === 5 && totalImages > 6 && (
-                      <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center">
-                        <span className="text-white text-sm font-semibold">
-                          +{totalImages - 6}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
+                  {/* Show +X more overlay on last image if there are more */}
+                  {index === 5 && totalImages > 6 && (
+                    <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center">
+                      <span className="text-white text-sm font-semibold">
+                        +{totalImages - 6}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ))}
 
               {/* Fill empty slots if less than 6 images */}
-              {displayImages.length < 6 && Array.from({ length: 6 - displayImages.length }).map((_, index) => {
-                const heights = ['row-span-2', 'row-span-3', 'row-span-2', 'row-span-3', 'row-span-2', 'row-span-3']
-                const heightClass = heights[(displayImages.length + index) % heights.length]
-
-                return (
-                  <div
-                    key={`empty-${index}`}
-                    className={`rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center hover:border-pink-300 hover:bg-pink-50 transition-colors cursor-pointer ${heightClass}`}
-                    onClick={() => window.location.href = '/moodboard'}
-                  >
-                    <Plus className="w-5 h-5 text-gray-400" />
-                  </div>
-                )
-              })}
+              {displayImages.length < 6 && Array.from({ length: 6 - displayImages.length }).map((_, index) => (
+                <div
+                  key={`empty-${index}`}
+                  className="rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center hover:border-pink-300 hover:bg-pink-50 transition-colors cursor-pointer"
+                  onClick={() => window.location.href = '/moodboard'}
+                >
+                  <Plus className="w-5 h-5 text-gray-400" />
+                </div>
+              ))}
             </div>
           </div>
 

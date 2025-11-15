@@ -54,7 +54,7 @@ export default function WeddingWebsiteModule({ onResize }: WeddingWebsiteModuleP
 
         {loading ? (
           <div className="flex-1 flex flex-col justify-center items-center text-center">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-500 mb-3"></div>
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-600 mb-3"></div>
             <p className="text-gray-600 text-sm">Načítání webu...</p>
           </div>
         ) : (
@@ -74,19 +74,21 @@ export default function WeddingWebsiteModule({ onResize }: WeddingWebsiteModuleP
               </Link>
             </div>
 
-            <div className="pt-4 border-t border-gray-200 flex-shrink-0">
-              <div className="grid grid-cols-3 gap-3 text-center">
-                <div>
-                  <div className="text-xs text-gray-500 mb-1">Šablony</div>
-                  <div className="text-sm font-semibold text-gray-900">8+</div>
-                </div>
-                <div>
-                  <div className="text-xs text-gray-500 mb-1">RSVP</div>
-                  <div className="text-sm font-semibold text-gray-900">✓</div>
-                </div>
-                <div>
-                  <div className="text-xs text-gray-500 mb-1">Galerie</div>
-                  <div className="text-sm font-semibold text-gray-900">✓</div>
+            <div className="pt-3 border-t border-gray-200 flex-shrink-0">
+              <div className="bg-primary-50 p-3 rounded-lg glass-morphism">
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div className="hover-lift">
+                    <div className="text-lg font-bold text-primary-600">8+</div>
+                    <div className="text-xs text-primary-700">Šablony</div>
+                  </div>
+                  <div className="hover-lift">
+                    <div className="text-lg font-bold text-primary-600">✓</div>
+                    <div className="text-xs text-primary-700">RSVP</div>
+                  </div>
+                  <div className="hover-lift">
+                    <div className="text-lg font-bold text-primary-600">✓</div>
+                    <div className="text-xs text-primary-700">Galerie</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -109,75 +111,44 @@ export default function WeddingWebsiteModule({ onResize }: WeddingWebsiteModuleP
         </h3>
       </Link>
 
-      <div className="flex-1 flex flex-col justify-between min-h-0">
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-600 truncate">
-              {website.customUrl}.svatbot.cz
-            </p>
-            {/* Status badge */}
-            <span
-              className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
-                website.isPublished
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-yellow-100 text-yellow-800'
-              }`}
-            >
-              <span className={`w-1.5 h-1.5 rounded-full ${
-                website.isPublished ? 'bg-green-500' : 'bg-yellow-500'
-              }`}></span>
-              {website.isPublished ? 'Publikováno' : 'Koncept'}
-            </span>
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-3">
+      <div className="flex-1 flex flex-col min-h-0">
+        {/* Stats */}
+        <div className="bg-primary-50 p-3 rounded-lg glass-morphism mb-3 h-[78px] flex items-center">
+          <div className="grid grid-cols-3 gap-2 w-full">
             <div className="text-center hover-lift">
-              <div className="text-sm font-bold text-gray-900">
+              <div className="text-lg font-bold text-primary-600">
                 {website.analytics.views}
               </div>
-              <div className="text-xs text-gray-500">Zobrazení</div>
+              <div className="text-xs text-primary-700">Zobrazení</div>
             </div>
             <div className="text-center hover-lift">
-              <div className="text-sm font-bold text-gray-900">
+              <div className="text-lg font-bold text-primary-600">
                 {website.analytics.uniqueVisitors}
               </div>
-              <div className="text-xs text-gray-500">Návštěvníci</div>
+              <div className="text-xs text-primary-700">Návštěvníci</div>
             </div>
             <div className="text-center hover-lift">
-              <div className="text-sm font-bold text-gray-900">
+              <div className="text-lg font-bold text-primary-600">
                 0
               </div>
-              <div className="text-xs text-gray-500">RSVP</div>
+              <div className="text-xs text-primary-700">RSVP</div>
             </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex items-center gap-2">
-            <Link
-              href={previewUrl}
-              target="_blank"
-              className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm"
-            >
-              <Eye className="w-4 h-4" />
-              <span>Náhled</span>
-            </Link>
-
-            {website.isPublished && (
-              <a
-                href={websiteUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm"
-              >
-                <ExternalLink className="w-4 h-4" />
-                <span>Otevřít</span>
-              </a>
-            )}
           </div>
         </div>
 
-        <div className="pt-4 border-t border-gray-200 flex-shrink-0">
+        {/* Actions - centered in remaining space */}
+        <div className="flex-1 flex items-center justify-center px-3">
+          <Link
+            href={previewUrl}
+            target="_blank"
+            className="w-full inline-flex items-center justify-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+          >
+            <Eye className="w-4 h-4" />
+            <span>Náhled webu</span>
+          </Link>
+        </div>
+
+        <div className="pt-3 border-t border-gray-200 flex-shrink-0">
           <Link
             href="/wedding-website"
             className="btn-primary w-full flex items-center justify-center space-x-2"

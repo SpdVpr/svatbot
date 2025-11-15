@@ -30,25 +30,25 @@ const menuItems = [
   {
     category: 'Hlavní',
     items: [
-      { icon: CheckSquare, label: 'Úkoly', href: '/tasks', color: 'text-blue-600', bg: 'bg-blue-50' },
-      { icon: Users, label: 'Hosté', href: '/guests', color: 'text-pink-600', bg: 'bg-pink-50' },
+      { icon: CheckSquare, label: 'Správa úkolů', href: '/tasks', color: 'text-blue-600', bg: 'bg-blue-50' },
+      { icon: Users, label: 'Správa hostů', href: '/guests', color: 'text-pink-600', bg: 'bg-pink-50' },
       { icon: DollarSign, label: 'Rozpočet', href: '/budget', color: 'text-green-600', bg: 'bg-green-50' },
-      { icon: Calendar, label: 'Kalendář', href: '/calendar', color: 'text-purple-600', bg: 'bg-purple-50' }
+      { icon: Calendar, label: 'Časová osa', href: '/calendar', color: 'text-purple-600', bg: 'bg-purple-50' }
     ]
   },
   {
     category: 'Plánování',
     items: [
       { icon: Briefcase, label: 'Dodavatelé', href: '/vendors', color: 'text-orange-600', bg: 'bg-orange-50' },
-      { icon: Users2, label: 'Zasedací pořádek', href: '/seating', color: 'text-cyan-600', bg: 'bg-cyan-50' },
-      { icon: Calendar, label: 'Svatební den', href: '/svatebni-den', color: 'text-purple-600', bg: 'bg-purple-50' },
-      { icon: UtensilsCrossed, label: 'Menu', href: '/menu', color: 'text-red-600', bg: 'bg-red-50' }
+      { icon: Users2, label: 'Rozmístění hostů', href: '/seating', color: 'text-cyan-600', bg: 'bg-cyan-50' },
+      { icon: Calendar, label: 'Harmonogram dne', href: '/svatebni-den', color: 'text-purple-600', bg: 'bg-purple-50' },
+      { icon: UtensilsCrossed, label: 'Jídlo a Pití', href: '/menu', color: 'text-red-600', bg: 'bg-red-50' }
     ]
   },
   {
     category: 'Kreativní',
     items: [
-      { icon: Music, label: 'Hudba', href: '/music', color: 'text-purple-600', bg: 'bg-purple-50' },
+      { icon: Music, label: 'Svatební hudba', href: '/music', color: 'text-purple-600', bg: 'bg-purple-50' },
       { icon: Palette, label: 'Moodboard', href: '/moodboard', color: 'text-pink-600', bg: 'bg-pink-50' },
       { icon: Globe, label: 'Svatební web', href: '/wedding-website', color: 'text-purple-600', bg: 'bg-purple-50' }
     ]
@@ -56,10 +56,10 @@ const menuItems = [
   {
     category: 'Organizace',
     items: [
-      { icon: ListChecks, label: 'Checklist', href: '/checklist', color: 'text-violet-600', bg: 'bg-violet-50' },
+      { icon: ListChecks, label: 'Svatební checklist', href: '/checklist', color: 'text-violet-600', bg: 'bg-violet-50' },
       { icon: Building2, label: 'Ubytování', href: '/accommodation', color: 'text-teal-600', bg: 'bg-teal-50' },
-      { icon: ShoppingCart, label: 'Nákupy', href: '/shopping', color: 'text-amber-600', bg: 'bg-amber-50' },
-      { icon: MapPin, label: 'Marketplace', href: '/marketplace', color: 'text-primary-600', bg: 'bg-primary-50' }
+      { icon: ShoppingCart, label: 'Nákupní seznam', href: '/shopping', color: 'text-amber-600', bg: 'bg-amber-50' },
+      { icon: MapPin, label: 'Najít dodavatele', href: '/marketplace', color: 'text-primary-600', bg: 'bg-primary-50' }
     ]
   }
 ]

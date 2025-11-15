@@ -49,6 +49,7 @@ export default function SvatebniDenPage() {
   const dragTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const editFormRef = useRef<HTMLDivElement | null>(null)
   const addFormRef = useRef<HTMLDivElement | null>(null)
+  const customFormRef = useRef<HTMLDivElement | null>(null)
 
   const handleSelectPredefined = (activity: typeof PREDEFINED_ACTIVITIES[0]) => {
     setEditingId(null) // Zavřít editační formulář pokud je otevřený
@@ -501,7 +502,14 @@ export default function SvatebniDenPage() {
         {!editingId && (
           <div className="text-center mb-8">
             <button
-              onClick={() => setShowCustomForm(!showCustomForm)}
+              onClick={() => {
+                setShowCustomForm(!showCustomForm)
+                if (!showCustomForm) {
+                  setTimeout(() => {
+                    customFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                  }, 100)
+                }
+              }}
               className="inline-flex items-center space-x-2 px-8 py-3 border-2 border-primary-300 text-primary-600 hover:bg-primary-50 font-button font-medium rounded-xl transition-all duration-200"
             >
               <Plus className="w-5 h-5" />
@@ -511,7 +519,7 @@ export default function SvatebniDenPage() {
         )}
 
         {showCustomForm && (
-          <div className="wedding-card mb-8 animate-fade-in">
+          <div ref={customFormRef} className="wedding-card mb-8 animate-fade-in">
             <div className="flex items-center space-x-3 mb-6">
               <div className="w-12 h-12 bg-accent-100 rounded-full flex items-center justify-center">
                 <Plus className="w-6 h-6 text-accent-600" />

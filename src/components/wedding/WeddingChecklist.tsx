@@ -650,10 +650,12 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
   }
 
   if (compact) {
-    // Calculate overall statistics
-    const totalItems = organizedChecklist.reduce((sum, phase) => sum + phase.items.length, 0)
+    // Calculate overall statistics - exclude hidden items
+    const totalItems = organizedChecklist.reduce((sum, phase) =>
+      sum + phase.items.filter(item => !isItemHidden(item)).length, 0
+    )
     const completedCount = organizedChecklist.reduce((sum, phase) =>
-      sum + phase.items.filter(item => isItemCompleted(item)).length, 0
+      sum + phase.items.filter(item => !isItemHidden(item) && isItemCompleted(item)).length, 0
     )
     const overallPercentage = Math.round((completedCount / totalItems) * 100)
 
@@ -673,9 +675,10 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
         {/* Phase categories with statistics */}
         <div className="space-y-2.5">
           {organizedChecklist.map((phase) => {
-            const itemsCompleted = phase.items.filter(item => isItemCompleted(item)).length
-            const totalPhaseItems = phase.items.length
-            const phasePercentage = Math.round((itemsCompleted / totalPhaseItems) * 100)
+            const visibleItems = phase.items.filter(item => !isItemHidden(item))
+            const itemsCompleted = visibleItems.filter(item => isItemCompleted(item)).length
+            const totalPhaseItems = visibleItems.length
+            const phasePercentage = totalPhaseItems > 0 ? Math.round((itemsCompleted / totalPhaseItems) * 100) : 0
 
             return (
               <div
@@ -710,12 +713,14 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
     )
   }
 
-  // Calculate overall statistics
-  const totalItems = organizedChecklist.reduce((sum, phase) => sum + phase.items.length, 0)
-  const completedCount = organizedChecklist.reduce((sum, phase) =>
-    sum + phase.items.filter(item => isItemCompleted(item)).length, 0
+  // Calculate overall statistics - exclude hidden items
+  const totalItems = organizedChecklist.reduce((sum, phase) =>
+    sum + phase.items.filter(item => !isItemHidden(item)).length, 0
   )
-  const overallPercentage = Math.round((completedCount / totalItems) * 100)
+  const completedCount = organizedChecklist.reduce((sum, phase) =>
+    sum + phase.items.filter(item => !isItemHidden(item) && isItemCompleted(item)).length, 0
+  )
+  const overallPercentage = totalItems > 0 ? Math.round((completedCount / totalItems) * 100) : 0
 
   // Show loading state
   if (isLoading) {
@@ -763,10 +768,11 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
       <div className="space-y-4">
         {organizedChecklist.map((phase) => {
           const isExpanded = expandedPhases.includes(phase.id)
-          const itemsCompleted = phase.items.filter(item => isItemCompleted(item)).length
-          const itemsInTasks = phase.items.filter(item => isItemInTasks(item)).length
-          const totalItems = phase.items.length
-          const completionPercentage = Math.round((itemsCompleted / totalItems) * 100)
+          const visibleItems = phase.items.filter(item => !isItemHidden(item))
+          const itemsCompleted = visibleItems.filter(item => isItemCompleted(item)).length
+          const itemsInTasks = visibleItems.filter(item => isItemInTasks(item)).length
+          const totalItems = visibleItems.length
+          const completionPercentage = totalItems > 0 ? Math.round((itemsCompleted / totalItems) * 100) : 0
 
           const isDragOverPhase = dragOverPhase === phase.id
 
