@@ -23,6 +23,7 @@ import {
 import Link from 'next/link'
 import { Vendor, VendorFilters, VENDOR_CATEGORIES, VENDOR_STATUSES } from '@/types/vendor'
 import { currencyUtils, dateUtils } from '@/utils'
+import { useColorTheme } from '@/hooks/useColorTheme'
 
 interface VendorListProps {
   vendors: Vendor[]
@@ -41,6 +42,7 @@ export default function VendorList({
   onViewVendor,
   loading = false
 }: VendorListProps) {
+  const { currentPalette } = useColorTheme()
   const [filters, setFilters] = useState<VendorFilters>({
     search: '',
     showCompleted: true
@@ -335,7 +337,13 @@ export default function VendorList({
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start space-x-3 sm:space-x-4">
                       {/* Category Icon */}
-                      <div className={`p-2 sm:p-3 rounded-xl ${categoryConfig.color} flex-shrink-0`}>
+                      <div
+                        className="p-2 sm:p-3 rounded-xl flex-shrink-0"
+                        style={{
+                          backgroundColor: currentPalette.colors.primaryLight,
+                          color: currentPalette.colors.primary600
+                        }}
+                      >
                         <span className="text-base sm:text-lg">{categoryConfig.icon}</span>
                       </div>
 

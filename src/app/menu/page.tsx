@@ -354,17 +354,27 @@ export default function MenuPage() {
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                           {items.map((item) => (
-                            <div key={item.id} className="wedding-card p-4 relative">
+                            <div
+                              key={item.id}
+                              className="wedding-card p-4 relative cursor-pointer hover:shadow-lg transition-shadow"
+                              onClick={() => handleEditMenuItem(item)}
+                            >
                               <div className="absolute top-2 right-2 flex space-x-1">
                                 <button
-                                  onClick={() => handleEditMenuItem(item)}
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleEditMenuItem(item)
+                                  }}
                                   className="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors"
                                   title="Upravit"
                                 >
                                   <Edit className="w-4 h-4" />
                                 </button>
                                 <button
-                                  onClick={() => handleDeleteMenuItem(item.id)}
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleDeleteMenuItem(item.id)
+                                  }}
                                   className="p-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors"
                                   title="Smazat"
                                 >
@@ -464,17 +474,27 @@ export default function MenuPage() {
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                           {items.map((item) => (
-                            <div key={item.id} className="wedding-card p-4 relative">
+                            <div
+                              key={item.id}
+                              className="wedding-card p-4 relative cursor-pointer hover:shadow-lg transition-shadow"
+                              onClick={() => handleEditDrinkItem(item)}
+                            >
                               <div className="absolute top-2 right-2 flex space-x-1">
                                 <button
-                                  onClick={() => handleEditDrinkItem(item)}
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleEditDrinkItem(item)
+                                  }}
                                   className="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors"
                                   title="Upravit"
                                 >
                                   <Edit className="w-4 h-4" />
                                 </button>
                                 <button
-                                  onClick={() => handleDeleteDrinkItem(item.id)}
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleDeleteDrinkItem(item.id)
+                                  }}
                                   className="p-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors"
                                   title="Smazat"
                                 >
@@ -482,6 +502,9 @@ export default function MenuPage() {
                                 </button>
                               </div>
                               <h4 className="font-semibold text-lg mb-2 pr-20">{item.name}</h4>
+                              {item.volume && (
+                                <p className="text-xs text-gray-500 mb-2">Objem: {item.volume}</p>
+                              )}
                               {item.brand && (
                                 <p className="text-sm text-gray-600 mb-2">Značka: {item.brand}</p>
                               )}

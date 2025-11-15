@@ -17,6 +17,32 @@ function generateEditToken(): string {
   })
 }
 
+// Recursively remove undefined values from objects (Firestore doesn't accept undefined)
+function cleanForFirestore(obj: any): any {
+  if (obj === null || obj === undefined) {
+    return null
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(item => cleanForFirestore(item)).filter(item => item !== null && item !== undefined)
+  }
+
+  if (typeof obj === 'object') {
+    const cleaned: any = {}
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== undefined) {
+        const cleanedValue = cleanForFirestore(value)
+        if (cleanedValue !== null && cleanedValue !== undefined) {
+          cleaned[key] = cleanedValue
+        }
+      }
+    }
+    return cleaned
+  }
+
+  return obj
+}
+
 export default function MarketplaceRegisterPage() {
   const router = useRouter()
   const [showForm, setShowForm] = useState(false)
@@ -32,9 +58,7 @@ export default function MarketplaceRegisterPage() {
       const token = generateEditToken()
 
       // Remove undefined values from data (Firestore doesn't accept undefined)
-      const cleanData = Object.fromEntries(
-        Object.entries(data).filter(([_, value]) => value !== undefined)
-      ) as MarketplaceVendorFormData
+      const cleanData = cleanForFirestore(data) as MarketplaceVendorFormData
 
       // Prepare data for Firestore
       const vendorData = {

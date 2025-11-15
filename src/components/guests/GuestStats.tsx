@@ -379,34 +379,22 @@ export default function GuestStats({
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <UserPlus className="w-4 h-4 text-blue-500" />
-                <span className="text-gray-700">Doprovody</span>
-              </div>
+              <span className="text-gray-700">Doprovody</span>
               <span className="font-medium">{stats.totalWithPlusOnes}</span>
             </div>
 
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Users className="w-4 h-4 text-green-500" />
-                <span className="text-gray-700">Hostů s dětmi</span>
-              </div>
+              <span className="text-gray-700">Hostů s dětmi</span>
               <span className="font-medium">{guestsWithChildren}</span>
             </div>
 
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Users className="w-4 h-4 text-pink-500" />
-                <span className="text-gray-700">Celkem dětí</span>
-              </div>
+              <span className="text-gray-700">Celkem dětí</span>
               <span className="font-medium">{stats.totalChildren}</span>
             </div>
 
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Utensils className="w-4 h-4 text-orange-500" />
-                <span className="text-gray-700">Dietní omezení</span>
-              </div>
+              <span className="text-gray-700">Dietní omezení</span>
               <span className="font-medium">{guestsWithDietaryRestrictions}</span>
             </div>
           </div>

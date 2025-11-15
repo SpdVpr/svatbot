@@ -107,7 +107,7 @@ export default function VendorStats({
   return (
     <div className="space-y-6">
       {/* Main stats grid - Mobile optimized (similar style as tasks) */}
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6">
         {/* Total vendors */}
         <div className="bg-white p-3 md:p-6 rounded-xl border border-gray-200 shadow-sm">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
@@ -161,79 +161,6 @@ export default function VendorStats({
               Čeká na potvrzení
             </span>
           </div>
-        </div>
-
-        {/* Researching vendors */}
-        <div className="bg-white p-3 md:p-6 rounded-xl border border-gray-200 shadow-sm">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div className="flex-1">
-              <p className="text-xs md:text-sm font-medium text-text-muted">Hledání</p>
-              <p className="text-2xl md:text-3xl font-bold text-red-600 mt-0.5 md:mt-1">{stats.researching}</p>
-            </div>
-            <div className="hidden md:block p-3 bg-red-100 rounded-full">
-              <AlertTriangle className="w-6 h-6 text-red-600" />
-            </div>
-          </div>
-          <div className="mt-2 md:mt-4 flex items-center text-xs md:text-sm">
-            <span className="text-text-muted">
-              Potřebuje pozornost
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Category breakdown - Compact version (hidden on mobile) */}
-      <div className="hidden md:block bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-          <PieChart className="w-5 h-5" />
-          <span>Dodavatelé podle kategorií</span>
-        </h3>
-
-        {/* Category Grid - Compact Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-          {categoryStats.map((stat) => (
-            <div
-              key={stat.key}
-              className="p-3 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
-            >
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center space-x-2">
-                  <span className="text-base">{stat.category.icon}</span>
-                  <span className="text-sm font-medium text-gray-900">{stat.category.name}</span>
-                </div>
-                <span className="text-xs text-text-muted">{stat.total}×</span>
-              </div>
-
-              <div className="space-y-1.5">
-                <div className="flex justify-between items-baseline">
-                  <span className="text-xs text-text-muted">Stav:</span>
-                  <span className="text-sm font-semibold text-gray-900">
-                    {stat.confirmed + stat.booked} / {stat.total}
-                  </span>
-                </div>
-
-                <div className="w-full bg-gray-200 rounded-full h-1.5">
-                  <div className="flex h-1.5 rounded-full overflow-hidden">
-                    <div
-                      className="bg-green-500"
-                      style={{ width: `${Math.min((stat.confirmed / stat.total) * 100, 100)}%` }}
-                      title={`Potvrzeno: ${stat.confirmed}`}
-                    ></div>
-                    <div
-                      className="bg-yellow-500"
-                      style={{ width: `${Math.min((stat.booked / stat.total) * 100, 100)}%` }}
-                      title={`Rezervováno: ${stat.booked}`}
-                    ></div>
-                  </div>
-                </div>
-
-                <div className="flex justify-between text-xs">
-                  <span className="text-green-600">✓ {stat.confirmed}</span>
-                  <span className="text-yellow-600">⏳ {stat.booked}</span>
-                </div>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
 
