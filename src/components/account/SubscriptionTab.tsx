@@ -31,7 +31,7 @@ function SubscriptionTab({ subscriptionData }: SubscriptionTabProps) {
     loading
   } = subscriptionData
 
-  const [selectedPlan, setSelectedPlan] = useState<'premium_monthly' | 'premium_yearly' | 'test_daily'>('premium_yearly')
+  const [selectedPlan, setSelectedPlan] = useState<'premium_monthly' | 'premium_yearly'>('premium_yearly')
 
   const handleUpgrade = async () => {
     await upgradeToPremium(selectedPlan)
@@ -65,13 +65,11 @@ function SubscriptionTab({ subscriptionData }: SubscriptionTabProps) {
                   {subscription.status === 'trialing' && 'Zkušební období'}
                   {subscription.status === 'active' && subscription.plan === 'premium_monthly' && 'Premium měsíční'}
                   {subscription.status === 'active' && subscription.plan === 'premium_yearly' && 'Premium roční'}
-                  {subscription.status === 'active' && subscription.plan === 'test_daily' && '🧪 Test denní'}
                   {subscription.status === 'expired' && 'Předplatné vypršelo'}
                 </h3>
                 <p className="text-sm text-gray-600">
                   {subscription.status === 'trialing' && `Zbývá ${trialDaysRemaining} ${trialDaysRemaining === 1 ? 'den' : trialDaysRemaining < 5 ? 'dny' : 'dní'}`}
-                  {subscription.status === 'active' && subscription.plan === 'test_daily' && `⚠️ TESTOVACÍ - Opakování každý den - Aktivní do ${new Date(subscription.currentPeriodEnd).toLocaleDateString('cs-CZ')}`}
-                  {subscription.status === 'active' && subscription.plan !== 'test_daily' && `Aktivní do ${new Date(subscription.currentPeriodEnd).toLocaleDateString('cs-CZ')}`}
+                  {subscription.status === 'active' && `Aktivní do ${new Date(subscription.currentPeriodEnd).toLocaleDateString('cs-CZ')}`}
                   {subscription.status === 'expired' && 'Obnovte pro pokračování'}
                 </p>
               </div>
@@ -289,58 +287,6 @@ function SubscriptionTab({ subscriptionData }: SubscriptionTabProps) {
             </div>
           </div>
 
-          {/* Test Daily Plan - Only visible in subscription settings */}
-          <div className="mt-6">
-            <div
-              onClick={() => setSelectedPlan('test_daily')}
-              className={`relative border-2 rounded-xl p-6 cursor-pointer transition-all ${
-                selectedPlan === 'test_daily'
-                  ? 'border-orange-600 bg-orange-50'
-                  : 'border-orange-200 hover:border-orange-300'
-              }`}
-            >
-              {/* Test Badge */}
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center space-x-1">
-                  <AlertCircle className="w-3 h-3" />
-                  <span>POUZE PRO TESTOVÁNÍ</span>
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between mb-4">
-                <h4 className="text-xl font-bold text-gray-900">🧪 Test denní</h4>
-                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                  selectedPlan === 'test_daily'
-                    ? 'border-orange-600 bg-orange-600'
-                    : 'border-gray-300'
-                }`}>
-                  {selectedPlan === 'test_daily' && (
-                    <Check className="w-4 h-4 text-white" />
-                  )}
-                </div>
-              </div>
-
-              <div className="mb-4">
-                <div className="flex items-baseline space-x-1">
-                  <span className="text-4xl font-bold text-gray-900">10</span>
-                  <span className="text-gray-600">Kč / den</span>
-                </div>
-                <p className="text-sm text-orange-600 font-medium mt-1">
-                  ⚠️ Opakování každý den - pouze pro testování
-                </p>
-              </div>
-
-              <ul className="space-y-3">
-                {SUBSCRIPTION_PLANS[3].features.map((feature, index) => (
-                  <li key={index} className="flex items-start space-x-2">
-                    <AlertCircle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
-                    <span className="text-sm text-gray-700">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
           {/* Upgrade Button */}
           <div className="mt-6">
             <button
@@ -358,9 +304,7 @@ function SubscriptionTab({ subscriptionData }: SubscriptionTabProps) {
                   <Crown className="w-5 h-5" />
                   <span>
                     Upgradovat na {
-                      selectedPlan === 'premium_monthly' ? 'měsíční' :
-                      selectedPlan === 'premium_yearly' ? 'roční' :
-                      'testovací denní'
+                      selectedPlan === 'premium_monthly' ? 'měsíční' : 'roční'
                     } tarif
                   </span>
                 </>

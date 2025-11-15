@@ -17,12 +17,14 @@ import {
   StickyNote,
   Crown,
   Clock,
-  Menu
+  Menu,
+  UserPlus
 } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import WeddingSettings from '@/components/wedding/WeddingSettings'
 import AccountModal from '@/components/account/AccountModal'
+import AuthModal from '@/components/auth/AuthModal'
 import AIAssistant from '@/components/ai/AIAssistant'
 import NotesModal from '@/components/notes/NotesModal'
 import DashboardSkeleton from './DashboardSkeleton'
@@ -48,6 +50,9 @@ function DashboardContent() {
   const { subscription, trialDaysRemaining, hasPremiumAccess } = useSubscription()
   const { getCanvasMaxWidth } = useCanvas()
   const { startTransition } = useViewTransition()
+
+  // Check if user is demo
+  const isDemoUserCheck = user?.email === 'demo@svatbot.cz'
   const [showWeddingSettings, setShowWeddingSettings] = useState(false)
   const [isReady, setIsReady] = useState(false)
   const [logoLoaded, setLogoLoaded] = useState(false)
@@ -58,6 +63,8 @@ function DashboardContent() {
   const [showTrialExpiredModal, setShowTrialExpiredModal] = useState(false)
   const [showOnboardingWizardFromDashboard, setShowOnboardingWizardFromDashboard] = useState(false)
   const [isSafari, setIsSafari] = useState(false)
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('register')
   const searchParams = useSearchParams()
 
   // Use DEMO-aware wedding date
@@ -144,6 +151,11 @@ function DashboardContent() {
 
   const closeAccountModal = () => {
     startTransition(() => setShowAccountModal(false))
+  }
+
+  const openRegistration = () => {
+    setAuthMode('register')
+    setShowAuthModal(true)
   }
 
   const openMobileMenu = () => {
@@ -300,13 +312,23 @@ function DashboardContent() {
               >
                 <StickyNote className="w-4 h-4" />
               </button>
-              <button
-                onClick={() => openAccountModal()}
-                className="mobile-nav-button text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                title="Účet"
-              >
-                <User className="w-4 h-4" />
-              </button>
+              {isDemoUserCheck ? (
+                <button
+                  onClick={openRegistration}
+                  className="mobile-nav-button text-primary-600 hover:text-primary-700 hover:bg-primary-50"
+                  title="Registrace"
+                >
+                  <UserPlus className="w-4 h-4" />
+                </button>
+              ) : (
+                <button
+                  onClick={() => openAccountModal()}
+                  className="mobile-nav-button text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  title="Účet"
+                >
+                  <User className="w-4 h-4" />
+                </button>
+              )}
               <button
                 onClick={logout}
                 className="mobile-nav-button text-gray-600 hover:text-gray-900 hover:bg-gray-100"
@@ -434,7 +456,6 @@ function DashboardContent() {
                     <span className="text-sm font-medium text-primary-600">
                       {subscription.plan === 'premium_monthly' && 'Premium měsíční'}
                       {subscription.plan === 'premium_yearly' && 'Premium roční'}
-                      {subscription.plan === 'test_daily' && 'Test denní'}
                     </span>
                   </button>
                 )}
@@ -455,14 +476,25 @@ function DashboardContent() {
                 <StickyNote className="w-4 h-4" />
                 <span className="hidden sm:inline">Poznámky</span>
               </button>
-              <button
-                onClick={() => openAccountModal()}
-                className="btn-outline flex items-center space-x-2"
-                title="Účet"
-              >
-                <User className="w-4 h-4" />
-                <span className="hidden sm:inline">Účet</span>
-              </button>
+              {isDemoUserCheck ? (
+                <button
+                  onClick={openRegistration}
+                  className="btn-primary flex items-center space-x-2"
+                  title="Registrace"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  <span className="hidden sm:inline">Registrace</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => openAccountModal()}
+                  className="btn-outline flex items-center space-x-2"
+                  title="Účet"
+                >
+                  <User className="w-4 h-4" />
+                  <span className="hidden sm:inline">Účet</span>
+                </button>
+              )}
               <button
                 onClick={logout}
                 className="btn-outline flex items-center space-x-2"
@@ -552,6 +584,16 @@ function DashboardContent() {
         <AccountModal
           onClose={closeAccountModal}
           initialTab={accountInitialTab}
+        />
+      )}
+
+      {/* Auth Modal for Demo Users */}
+      {showAuthModal && (
+        <AuthModal
+          mode={authMode}
+          onClose={() => setShowAuthModal(false)}
+          onSwitchMode={(mode) => setAuthMode(mode)}
+          showDemoOption={false}
         />
       )}
 

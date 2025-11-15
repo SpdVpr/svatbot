@@ -72,7 +72,7 @@ async function getAccessToken(scope: 'payment-create' | 'payment-all' = 'payment
 export async function createGoPayPaymentServer(params: {
   userId: string
   userEmail: string
-  plan: 'premium_monthly' | 'premium_yearly' | 'test_daily'
+  plan: 'premium_monthly' | 'premium_yearly'
   successUrl: string
   cancelUrl: string
 }): Promise<any> {
@@ -140,13 +140,6 @@ export async function createGoPayPaymentServer(params: {
       recurrence_date_to: '2099-12-31' // Valid until end of century
     }
     console.log('🔄 Setting up automatic recurring payment for monthly subscription')
-  } else if (plan === 'test_daily') {
-    paymentData.recurrence = {
-      recurrence_cycle: 'DAY',         // Daily cycle for testing
-      recurrence_period: 1,            // Every 1 day
-      recurrence_date_to: '2099-12-31' // Valid until end of century
-    }
-    console.log('🧪 Setting up DAILY recurring payment for TESTING')
   } else {
     console.log('💰 One-time payment for yearly subscription')
   }

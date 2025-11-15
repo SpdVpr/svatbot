@@ -241,7 +241,7 @@ export function useSubscription() {
 
     // Active paid subscription ONLY
     if (subscription.status === 'active' &&
-        (subscription.plan === 'premium_monthly' || subscription.plan === 'premium_yearly' || subscription.plan === 'test_daily')) {
+        (subscription.plan === 'premium_monthly' || subscription.plan === 'premium_yearly')) {
       return true
     }
 
@@ -260,7 +260,7 @@ export function useSubscription() {
   }
 
   // Upgrade to premium
-  const upgradeToPremium = async (plan: 'premium_monthly' | 'premium_yearly' | 'test_daily') => {
+  const upgradeToPremium = async (plan: 'premium_monthly' | 'premium_yearly') => {
     if (!user || !subscription) return
 
     try {

@@ -43,10 +43,10 @@ export async function POST(request: NextRequest) {
 
     const subscription = subscriptionDoc.data()
 
-    // Only monthly and test daily subscriptions have recurring payments
-    if (subscription?.plan !== 'premium_monthly' && subscription?.plan !== 'test_daily') {
+    // Only monthly subscriptions have recurring payments
+    if (subscription?.plan !== 'premium_monthly') {
       return NextResponse.json(
-        { error: 'Only monthly and test daily subscriptions have recurring payments' },
+        { error: 'Only monthly subscriptions have recurring payments' },
         { status: 400 }
       )
     }
@@ -59,16 +59,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Calculate new period dates (extend by 1 month or 1 day)
+    // Calculate new period dates (extend by 1 month)
     const currentEnd = subscription.currentPeriodEnd.toDate()
     const newStart = new Date(currentEnd)
     const newEnd = new Date(currentEnd)
-
-    if (subscription.plan === 'test_daily') {
-      newEnd.setDate(newEnd.getDate() + 1) // Add 1 day for testing
-    } else {
-      newEnd.setMonth(newEnd.getMonth() + 1) // Add 1 month for monthly
-    }
+    newEnd.setMonth(newEnd.getMonth() + 1) // Add 1 month for monthly
 
     console.log('📅 Extending subscription:', {
       currentEnd: currentEnd.toISOString(),

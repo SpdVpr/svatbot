@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate plan type
-    if (plan !== 'premium_monthly' && plan !== 'premium_yearly' && plan !== 'test_daily') {
+    if (plan !== 'premium_monthly' && plan !== 'premium_yearly') {
       console.error('❌ Invalid plan type:', plan)
       return NextResponse.json(
         { error: 'Invalid plan type' },
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     const payment = await createGoPayPaymentServer({
       userId,
       userEmail,
-      plan: plan as 'premium_monthly' | 'premium_yearly' | 'test_daily',
+      plan: plan as 'premium_monthly' | 'premium_yearly',
       successUrl,
       cancelUrl
     })
