@@ -231,7 +231,8 @@ export interface BudgetStats {
   totalActual: number
   totalPaid: number
   totalRemaining: number
-  
+  totalEstimated: number // Total amount of items marked as estimates
+
   // Percentages
   budgetUsed: number // percentage
   paidPercentage: number

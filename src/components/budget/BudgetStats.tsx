@@ -183,15 +183,9 @@ export default function BudgetStats({
                 {formatCurrency(stats.totalActual)}
               </p>
               <p className="text-xs text-text-muted mt-1">
-                Využití rozpočtu:{' '}
-                <span
-                  className={
-                    stats.budgetUsed > 100
-                      ? 'text-red-600 font-semibold'
-                      : 'text-accent-600 font-semibold'
-                  }
-                >
-                  {stats.budgetUsed}%
+                Odhadované:{' '}
+                <span className="text-gray-900 font-semibold">
+                  {formatCurrency(stats.totalEstimated)}
                 </span>
               </p>
             </div>
@@ -261,15 +255,9 @@ export default function BudgetStats({
             </div>
           </div>
           <div className="flex items-center justify-between text-xs">
-            <span className="text-text-muted truncate">Využití</span>
-            <span
-              className={
-                stats.budgetUsed > 100
-                  ? 'font-bold text-red-600'
-                  : 'font-bold text-accent-600'
-              }
-            >
-              {stats.budgetUsed}%
+            <span className="text-text-muted truncate">Odhadované</span>
+            <span className="font-bold text-gray-900 truncate">
+              {formatCurrency(stats.totalEstimated)}
             </span>
           </div>
         </div>
