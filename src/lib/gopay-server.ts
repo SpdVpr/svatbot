@@ -281,10 +281,25 @@ export async function stopRecurrence(paymentId: number): Promise<void> {
 
   if (!response.ok) {
     const error = await response.text()
-    console.error('GoPay stop recurrence error:', error)
-    throw new Error('Nepodařilo se zastavit opakované platby')
+    console.error('GoPay stop recurrence error:', {
+      status: response.status,
+      statusText: response.statusText,
+      error
+    })
+
+    // Try to parse error details
+    let errorMessage = error
+    try {
+      const errorJson = JSON.parse(error)
+      errorMessage = JSON.stringify(errorJson, null, 2)
+    } catch (e) {
+      // Keep as text if not JSON
+    }
+
+    throw new Error(`GoPay API error (${response.status}): ${errorMessage}`)
   }
 
-  console.log('✅ Recurrence stopped successfully')
+  const result = await response.text()
+  console.log('✅ Recurrence stopped successfully:', result)
 }
 
