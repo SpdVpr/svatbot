@@ -14,6 +14,7 @@ import ReviewModeration from '@/components/admin/ReviewModeration'
 import DemoAccountPanel from '@/components/admin/DemoAccountPanel'
 import AdminQRCode from '@/components/admin/AdminQRCode'
 import QRCodeStats from '@/components/admin/QRCodeStats'
+import TestFeedbackManagement from '@/components/admin/TestFeedbackManagement'
 import {
   Users,
   Clock,
@@ -26,10 +27,11 @@ import {
   ShoppingBag,
   Star,
   FileText,
-  QrCode
+  QrCode,
+  ClipboardCheck
 } from 'lucide-react'
 
-type TabType = 'overview' | 'users' | 'messages' | 'feedback' | 'payments' | 'invoices' | 'vendors' | 'reviews' | 'marketing'
+type TabType = 'overview' | 'users' | 'messages' | 'feedback' | 'payments' | 'invoices' | 'vendors' | 'reviews' | 'marketing' | 'testing'
 
 export default function AdminDashboard() {
   const { stats, loading } = useAdminStats()
@@ -54,6 +56,7 @@ export default function AdminDashboard() {
     { id: 'overview' as TabType, label: 'Přehled', icon: LayoutDashboard },
     { id: 'users' as TabType, label: 'Uživatelé', icon: Users },
     { id: 'marketing' as TabType, label: 'Marketing', icon: QrCode },
+    { id: 'testing' as TabType, label: 'Testování', icon: ClipboardCheck },
     { id: 'payments' as TabType, label: 'Platby', icon: DollarSign },
     { id: 'invoices' as TabType, label: 'Faktury', icon: FileText },
     { id: 'reviews' as TabType, label: 'Recenze', icon: Star },
@@ -99,6 +102,7 @@ export default function AdminDashboard() {
       {activeTab === 'overview' && <OverviewTab stats={stats} />}
       {activeTab === 'users' && <UserAnalyticsTable />}
       {activeTab === 'marketing' && <MarketingTab />}
+      {activeTab === 'testing' && <TestFeedbackManagement />}
       {activeTab === 'payments' && <PaymentsTab />}
       {activeTab === 'invoices' && <InvoicesTab />}
       {activeTab === 'reviews' && <ReviewModeration />}
