@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { Check, Lock, Crown } from 'lucide-react'
 import type { TemplateType, TemplateConfig } from '@/types/wedding-website'
 import { useSubscription } from '@/hooks/useSubscription'
+import { useIsDemoUser } from '@/hooks/useDemoSettings'
+import { useAuthStore } from '@/stores/authStore'
 import Link from 'next/link'
 
 interface TemplateSelectorProps {
@@ -149,22 +151,51 @@ const TEMPLATES: TemplateConfig[] = [
       'Přírodní prostředí',
     ],
   },
+  {
+    id: 'winter-elegance',
+    name: 'Winter Elegance',
+    description: 'Elegantní zimní design s teplými tóny a jemnými detaily',
+    thumbnail: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800',
+    category: 'Zimní',
+    colors: {
+      primary: '#78716c',
+      secondary: '#f5f5f4',
+      accent: '#1e2a5e',
+    },
+    fonts: {
+      heading: 'Playfair Display',
+      body: 'Inter',
+    },
+    features: [
+      'Serif fonty',
+      'Teplé barvy',
+      'Zimní atmosféra',
+      'Elegantní design',
+    ],
+    suitableFor: [
+      'Zimní svatby',
+      'Elegantní události',
+      'Venkovské svatby',
+    ],
+  },
 ]
 
 export default function TemplateSelector({ selectedTemplate, onSelect, disabled = false }: TemplateSelectorProps) {
   const [hoveredTemplate, setHoveredTemplate] = useState<TemplateType | null>(null)
   const { subscription, hasPremiumAccess } = useSubscription()
+  const { user } = useAuthStore()
+  const { isDemoUser } = useIsDemoUser(user?.id)
 
   // Get subscription plan details
   const plan = subscription?.plan || 'free_trial'
-  const canAccessAllTemplates = hasPremiumAccess
+  const canAccessAllTemplates = hasPremiumAccess || isDemoUser // Demo user má přístup ke všem šablonám
 
   // First 2 templates are free (classic-elegance, modern-minimalist)
   const FREE_TEMPLATES = ['classic-elegance', 'modern-minimalist']
 
   const isTemplateLocked = (templateId: string) => {
     if (disabled) return true // Lock all templates if disabled
-    if (canAccessAllTemplates) return false
+    if (canAccessAllTemplates) return false // Premium nebo demo user má přístup ke všem
     return !FREE_TEMPLATES.includes(templateId)
   }
 

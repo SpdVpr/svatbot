@@ -11,6 +11,7 @@ export type TemplateType =
   | 'garden-party'
   | 'beach-vibes'
   | 'winter-wonderland'
+  | 'winter-elegance'
   | 'vintage-charm'
 
 export type RSVPStatus = 'attending' | 'declined' | 'maybe'
@@ -220,6 +221,14 @@ export interface FAQContent {
 }
 
 // Menu Section (Food & Drinks)
+export interface MenuItem {
+  id: string
+  name: string
+  description?: string
+  category: 'appetizer' | 'soup' | 'main' | 'dessert' | 'drink' | 'other'
+  dietaryInfo?: string[]
+}
+
 export interface MenuContent {
   enabled: boolean
   title?: string
@@ -229,6 +238,7 @@ export interface MenuContent {
   showDrinks: boolean
   showSideDishes: boolean
   showDesserts: boolean
+  items?: MenuItem[]
 }
 
 // Section order type
