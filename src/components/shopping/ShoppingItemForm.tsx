@@ -125,7 +125,7 @@ export default function ShoppingItemForm({ item, onClose }: ShoppingItemFormProp
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[150] p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-purple-500 to-pink-500 p-6 flex items-center justify-between">
+        <div className="sticky top-0 bg-primary-600 p-6 flex items-center justify-between z-10">
           <h2 className="text-2xl font-bold text-white">
             {item ? 'Upravit produkt' : 'Přidat produkt'}
           </h2>
@@ -151,11 +151,11 @@ export default function ShoppingItemForm({ item, onClose }: ShoppingItemFormProp
                 value={formData.url}
                 onChange={(e) => handleChange('url', e.target.value)}
                 placeholder="https://..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
               {fetchingMetadata && (
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  <Loader className="w-5 h-5 text-purple-600 animate-spin" />
+                  <Loader className="w-5 h-5 text-primary-600 animate-spin" />
                 </div>
               )}
             </div>
@@ -178,7 +178,7 @@ export default function ShoppingItemForm({ item, onClose }: ShoppingItemFormProp
               onChange={(e) => handleChange('name', e.target.value)}
               placeholder="Např. Svatební dekorace"
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
           </div>
 
@@ -206,7 +206,7 @@ export default function ShoppingItemForm({ item, onClose }: ShoppingItemFormProp
                 value={formData.imageUrl}
                 onChange={(e) => handleChange('imageUrl', e.target.value)}
                 placeholder="https://..."
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -225,7 +225,7 @@ export default function ShoppingItemForm({ item, onClose }: ShoppingItemFormProp
                 placeholder="0"
                 min="0"
                 step="0.01"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
             </div>
             <div>
@@ -239,7 +239,7 @@ export default function ShoppingItemForm({ item, onClose }: ShoppingItemFormProp
                 placeholder="1"
                 min="1"
                 step="1"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
             </div>
             <div>
@@ -249,7 +249,7 @@ export default function ShoppingItemForm({ item, onClose }: ShoppingItemFormProp
               <select
                 value={formData.currency}
                 onChange={(e) => handleChange('currency', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >
                 <option value="CZK">CZK</option>
                 <option value="EUR">EUR</option>
@@ -260,10 +260,10 @@ export default function ShoppingItemForm({ item, onClose }: ShoppingItemFormProp
 
           {/* Total Price Display */}
           {formData.price && formData.quantity && formData.quantity > 1 && (
-            <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+            <div className="bg-primary-50 border border-primary-200 rounded-lg p-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-700">Celková cena:</span>
-                <span className="text-lg font-bold text-purple-600">
+                <span className="text-lg font-bold text-primary-600">
                   {(formData.price * formData.quantity).toFixed(2)} {formData.currency}
                 </span>
               </div>
@@ -280,7 +280,7 @@ export default function ShoppingItemForm({ item, onClose }: ShoppingItemFormProp
               onChange={(e) => handleChange('description', e.target.value)}
               placeholder="Popis produktu..."
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
             />
           </div>
 
@@ -294,7 +294,7 @@ export default function ShoppingItemForm({ item, onClose }: ShoppingItemFormProp
               <select
                 value={formData.category || ''}
                 onChange={(e) => handleChange('category', e.target.value || undefined)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >
                 <option value="">Bez kategorie</option>
                 {SHOPPING_CATEGORIES.map(cat => (
@@ -311,7 +311,7 @@ export default function ShoppingItemForm({ item, onClose }: ShoppingItemFormProp
               <select
                 value={formData.priority || ''}
                 onChange={(e) => handleChange('priority', e.target.value || undefined)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >
                 <option value="">Bez priority</option>
                 <option value="low">Nízká</option>
@@ -329,7 +329,7 @@ export default function ShoppingItemForm({ item, onClose }: ShoppingItemFormProp
             <select
               value={formData.status}
               onChange={(e) => handleChange('status', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             >
               <option value="wishlist">💭 Přání</option>
               <option value="to-buy">🛒 Koupit</option>
@@ -349,7 +349,7 @@ export default function ShoppingItemForm({ item, onClose }: ShoppingItemFormProp
               onChange={(e) => handleChange('notes', e.target.value)}
               placeholder="Další poznámky..."
               rows={2}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
             />
           </div>
 

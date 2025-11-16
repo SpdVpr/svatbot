@@ -58,7 +58,7 @@ export default function ShoppingItemCard({ item, viewMode }: ShoppingItemCardPro
             {item.isPurchased ? (
               <CheckCircle className="w-6 h-6 text-green-600" />
             ) : (
-              <Circle className="w-6 h-6 text-gray-400 hover:text-purple-600" />
+              <Circle className="w-6 h-6 text-gray-400 hover:text-primary-600" />
             )}
           </button>
 
@@ -96,12 +96,12 @@ export default function ShoppingItemCard({ item, viewMode }: ShoppingItemCardPro
                           <span className="text-xs text-gray-500">
                             {item.quantity}× {currencyUtils.format(item.price, item.currency)}
                           </span>
-                          <span className="text-sm font-semibold text-purple-600">
+                          <span className="text-sm font-semibold text-primary-600">
                             = {currencyUtils.format(item.price * item.quantity, item.currency)}
                           </span>
                         </>
                       ) : (
-                        <span className="text-sm font-semibold text-purple-600">
+                        <span className="text-sm font-semibold text-primary-600">
                           {currencyUtils.format(item.price, item.currency)}
                         </span>
                       )}
@@ -125,7 +125,7 @@ export default function ShoppingItemCard({ item, viewMode }: ShoppingItemCardPro
                 )}
                 <button
                   onClick={() => setShowEditForm(true)}
-                  className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                  className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
                   title="Upravit"
                 >
                   <Edit className="w-4 h-4" />
@@ -205,10 +205,10 @@ export default function ShoppingItemCard({ item, viewMode }: ShoppingItemCardPro
             )}
             <button
               onClick={() => setShowEditForm(true)}
-              className="p-3 bg-white rounded-full hover:bg-purple-50 transition-colors"
+              className="p-3 bg-white rounded-full hover:bg-primary-50 transition-colors"
               title="Upravit"
             >
-              <Edit className="w-5 h-5 text-purple-600" />
+              <Edit className="w-5 h-5 text-primary-600" />
             </button>
             <button
               onClick={handleDelete}
@@ -255,7 +255,7 @@ export default function ShoppingItemCard({ item, viewMode }: ShoppingItemCardPro
                     </div>
                     <div className="flex items-center justify-between pt-1 border-t border-gray-100">
                       <span className="text-sm font-medium text-gray-700">Celkem:</span>
-                      <span className="text-sm font-bold text-purple-600">
+                      <span className="text-sm font-bold text-primary-600">
                         {currencyUtils.format(item.price * item.quantity, item.currency)}
                       </span>
                     </div>
@@ -263,7 +263,7 @@ export default function ShoppingItemCard({ item, viewMode }: ShoppingItemCardPro
                 ) : (
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-gray-700">Cena:</span>
-                    <span className="text-sm font-bold text-purple-600">
+                    <span className="text-sm font-bold text-primary-600">
                       {currencyUtils.format(item.price, item.currency)}
                     </span>
                   </div>
