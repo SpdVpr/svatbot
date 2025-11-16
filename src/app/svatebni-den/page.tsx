@@ -43,6 +43,8 @@ export default function SvatebniDenPage() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [showAIDialog, setShowAIDialog] = useState(false)
   const [isGeneratingAI, setIsGeneratingAI] = useState(false)
+  const [showPrintDialog, setShowPrintDialog] = useState(false)
+  const [aiExplanation, setAiExplanation] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     time: '',
     activity: '',
@@ -192,7 +194,7 @@ export default function SvatebniDenPage() {
     }
   }
 
-  const handleGenerateAITimeline = async (selectedActivities: any[]) => {
+  const handleGenerateAITimeline = async (selectedActivities: any[], generalNotes: string) => {
     setIsGeneratingAI(true)
     try {
       // Prepare context
@@ -217,7 +219,8 @@ export default function SvatebniDenPage() {
         },
         body: JSON.stringify({
           activities: selectedActivities,
-          context
+          context,
+          generalNotes
         })
       })
 
@@ -247,6 +250,9 @@ export default function SvatebniDenPage() {
       }))
 
       await createBulkTimelineItems(aiItems)
+
+      // Store AI explanation
+      setAiExplanation(data.explanation || null)
 
       alert('✨ AI harmonogram byl úspěšně vygenerován!')
     } catch (error) {
@@ -327,8 +333,20 @@ export default function SvatebniDenPage() {
     }
   }
 
-  const handlePrint = () => {
-    const sortedTimeline = [...timeline].sort((a, b) => a.order - b.order)
+  const handlePrint = (timelineType: 'manual' | 'ai' | 'both') => {
+    let sortedTimeline: typeof timeline = []
+    let title = 'Harmonogram svatebního dne'
+
+    if (timelineType === 'manual') {
+      sortedTimeline = [...manualTimeline].sort((a, b) => a.order - b.order)
+      title = 'Manuální harmonogram svatebního dne'
+    } else if (timelineType === 'ai') {
+      sortedTimeline = [...aiTimeline].sort((a, b) => a.order - b.order)
+      title = 'AI Harmonogram svatebního dne'
+    } else {
+      sortedTimeline = [...timeline].sort((a, b) => a.order - b.order)
+      title = 'Kompletní harmonogram svatebního dne'
+    }
 
     // Create print window
     const printWindow = window.open('', '_blank')
@@ -518,7 +536,7 @@ export default function SvatebniDenPage() {
       <body>
         <div class="header">
           <div class="decorative">❤️</div>
-          <h1>Harmonogram svatebního dne</h1>
+          <h1>${title}</h1>
           ${weddingDateStr ? `<div class="date">${weddingDateStr}</div>` : ''}
           <div class="decorative">✨</div>
         </div>
@@ -594,7 +612,17 @@ export default function SvatebniDenPage() {
         actions={
           timeline.length > 0 ? (
             <button
-              onClick={handlePrint}
+              onClick={() => {
+                // If only one type exists, print it directly
+                if (manualTimeline.length > 0 && aiTimeline.length === 0) {
+                  handlePrint('manual')
+                } else if (aiTimeline.length > 0 && manualTimeline.length === 0) {
+                  handlePrint('ai')
+                } else {
+                  // Both exist, show dialog
+                  setShowPrintDialog(true)
+                }
+              }}
               className="inline-flex items-center space-x-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-button font-medium rounded-lg transition-all duration-200 shadow-soft hover:shadow-wedding text-sm"
             >
               <Printer className="w-4 h-4" />
@@ -624,7 +652,7 @@ export default function SvatebniDenPage() {
             </h2>
             <button
               onClick={() => setShowAIDialog(true)}
-              className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-button font-medium rounded-lg transition-all duration-200 shadow-soft hover:shadow-wedding"
+              className="inline-flex items-center space-x-2 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-button font-medium rounded-lg transition-all duration-200 shadow-soft hover:shadow-wedding"
             >
               <Sparkles className="w-5 h-5" />
               <span>Vytvořit pomocí AI</span>
@@ -1089,6 +1117,7 @@ export default function SvatebniDenPage() {
                 onClick={async () => {
                   if (confirm('Opravdu chcete smazat celý AI harmonogram?')) {
                     await deleteAllAITimeline()
+                    setAiExplanation(null)
                   }
                 }}
                 className="text-sm text-red-600 hover:text-red-700 font-medium"
@@ -1096,6 +1125,23 @@ export default function SvatebniDenPage() {
                 Smazat AI harmonogram
               </button>
             </div>
+
+            {/* AI Explanation */}
+            {aiExplanation && (
+              <div className="mb-8 p-6 bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 rounded-xl">
+                <div className="flex items-start space-x-3 mb-4">
+                  <Sparkles className="w-6 h-6 text-purple-600 flex-shrink-0 mt-1" />
+                  <div>
+                    <h3 className="font-display text-xl font-semibold text-text-primary mb-3">
+                      Vysvětlení harmonogramu
+                    </h3>
+                    <div className="text-text-secondary leading-relaxed whitespace-pre-line">
+                      {aiExplanation}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Timeline */}
             <div className="space-y-0">
@@ -1163,6 +1209,24 @@ export default function SvatebniDenPage() {
                                 </div>
                               )}
                             </div>
+
+                            {/* Edit and Delete buttons - Always visible on mobile, hover on desktop */}
+                            <div className="ml-2 flex items-center space-x-1 sm:space-x-2 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex-shrink-0">
+                              <button
+                                onClick={() => handleEdit(item)}
+                                className="p-1.5 sm:p-2 text-text-muted hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-200"
+                                title="Upravit"
+                              >
+                                <Edit2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(item.id)}
+                                className="p-1.5 sm:p-2 text-text-muted hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
+                                title="Smazat"
+                              >
+                                <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -1201,6 +1265,101 @@ export default function SvatebniDenPage() {
         activities={PREDEFINED_ACTIVITIES}
         onGenerate={handleGenerateAITimeline}
       />
+
+      {/* Print Selection Dialog */}
+      {showPrintDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-text-primary">Vyberte harmonogram k tisku</h3>
+              <button
+                onClick={() => setShowPrintDialog(false)}
+                className="text-text-muted hover:text-text-primary transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {manualTimeline.length > 0 && (
+                <button
+                  onClick={() => {
+                    handlePrint('manual')
+                    setShowPrintDialog(false)
+                  }}
+                  className="w-full p-4 text-left border-2 border-primary-200 rounded-lg hover:border-primary-400 hover:bg-primary-50 transition-all duration-200 group"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-semibold text-text-primary group-hover:text-primary-600">
+                        Manuální harmonogram
+                      </div>
+                      <div className="text-sm text-text-muted mt-1">
+                        {manualTimeline.length} {manualTimeline.length === 1 ? 'aktivita' : manualTimeline.length < 5 ? 'aktivity' : 'aktivit'}
+                      </div>
+                    </div>
+                    <Calendar className="w-6 h-6 text-primary-500" />
+                  </div>
+                </button>
+              )}
+
+              {aiTimeline.length > 0 && (
+                <button
+                  onClick={() => {
+                    handlePrint('ai')
+                    setShowPrintDialog(false)
+                  }}
+                  className="w-full p-4 text-left border-2 border-purple-200 rounded-lg hover:border-purple-400 hover:bg-purple-50 transition-all duration-200 group"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-semibold text-text-primary group-hover:text-purple-600 flex items-center space-x-2">
+                        <span>AI Harmonogram</span>
+                        <span className="px-2 py-0.5 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 text-xs font-semibold rounded-full">
+                          AI
+                        </span>
+                      </div>
+                      <div className="text-sm text-text-muted mt-1">
+                        {aiTimeline.length} {aiTimeline.length === 1 ? 'aktivita' : aiTimeline.length < 5 ? 'aktivity' : 'aktivit'}
+                      </div>
+                    </div>
+                    <Sparkles className="w-6 h-6 text-purple-500" />
+                  </div>
+                </button>
+              )}
+
+              {manualTimeline.length > 0 && aiTimeline.length > 0 && (
+                <button
+                  onClick={() => {
+                    handlePrint('both')
+                    setShowPrintDialog(false)
+                  }}
+                  className="w-full p-4 text-left border-2 border-accent-200 rounded-lg hover:border-accent-400 hover:bg-accent-50 transition-all duration-200 group"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-semibold text-text-primary group-hover:text-accent-600">
+                        Oba harmonogramy
+                      </div>
+                      <div className="text-sm text-text-muted mt-1">
+                        {timeline.length} {timeline.length === 1 ? 'aktivita' : timeline.length < 5 ? 'aktivity' : 'aktivit'} celkem
+                      </div>
+                    </div>
+                    <Heart className="w-6 h-6 text-accent-500" fill="currentColor" />
+                  </div>
+                </button>
+              )}
+            </div>
+
+            <button
+              onClick={() => setShowPrintDialog(false)}
+              className="w-full mt-4 px-4 py-2 text-text-muted hover:text-text-primary border border-gray-300 rounded-lg transition-colors"
+            >
+              Zrušit
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

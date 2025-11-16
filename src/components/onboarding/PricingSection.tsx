@@ -266,7 +266,7 @@ export default function PricingSection({ onGetStarted }: PricingSectionProps) {
             </div>
             <div className="flex items-center gap-2">
               <Check className="w-5 h-5 text-pink-500" />
-              <span className="text-sm">Zrušit kdykoliv</span>
+              <span className="text-sm">Možnost zrušení kdykoliv</span>
             </div>
             <div className="flex items-center gap-2">
               <Check className="w-5 h-5 text-pink-500" />

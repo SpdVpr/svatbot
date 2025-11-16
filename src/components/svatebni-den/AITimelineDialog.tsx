@@ -10,15 +10,11 @@ interface Activity {
   icon: string
 }
 
-interface SelectedActivity extends Activity {
-  notes?: string
-}
-
 interface AITimelineDialogProps {
   isOpen: boolean
   onClose: () => void
   activities: Activity[]
-  onGenerate: (selectedActivities: SelectedActivity[]) => Promise<void>
+  onGenerate: (selectedActivities: Activity[], generalNotes: string) => Promise<void>
 }
 
 export default function AITimelineDialog({
@@ -27,26 +23,18 @@ export default function AITimelineDialog({
   activities,
   onGenerate
 }: AITimelineDialogProps) {
-  const [selectedActivities, setSelectedActivities] = useState<Map<string, SelectedActivity>>(new Map())
+  const [selectedActivities, setSelectedActivities] = useState<Set<string>>(new Set())
+  const [generalNotes, setGeneralNotes] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
 
   if (!isOpen) return null
 
   const toggleActivity = (activity: Activity) => {
-    const newSelected = new Map(selectedActivities)
+    const newSelected = new Set(selectedActivities)
     if (newSelected.has(activity.name)) {
       newSelected.delete(activity.name)
     } else {
-      newSelected.set(activity.name, { ...activity })
-    }
-    setSelectedActivities(newSelected)
-  }
-
-  const updateNotes = (activityName: string, notes: string) => {
-    const newSelected = new Map(selectedActivities)
-    const activity = newSelected.get(activityName)
-    if (activity) {
-      newSelected.set(activityName, { ...activity, notes })
+      newSelected.add(activity.name)
     }
     setSelectedActivities(newSelected)
   }
@@ -59,8 +47,12 @@ export default function AITimelineDialog({
 
     setIsGenerating(true)
     try {
-      await onGenerate(Array.from(selectedActivities.values()))
+      const selectedActivityObjects = activities.filter(a => selectedActivities.has(a.name))
+      await onGenerate(selectedActivityObjects, generalNotes)
       onClose()
+      // Reset state
+      setSelectedActivities(new Set())
+      setGeneralNotes('')
     } catch (error) {
       console.error('Error generating timeline:', error)
       alert('Chyba při generování harmonogramu')
@@ -131,59 +123,57 @@ export default function AITimelineDialog({
                     ({categoryActivities.filter(a => selectedActivities.has(a.name)).length}/{categoryActivities.length})
                   </span>
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {categoryActivities.map((activity) => {
                     const isSelected = selectedActivities.has(activity.name)
-                    const selectedActivity = selectedActivities.get(activity.name)
 
                     return (
-                      <div key={activity.name} className="border rounded-lg overflow-hidden">
-                        <button
-                          onClick={() => toggleActivity(activity)}
-                          className={`w-full p-4 text-left transition-colors ${
-                            isSelected
-                              ? 'bg-primary-50 border-primary-300'
-                              : 'bg-white hover:bg-gray-50'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
-                              <span className="text-2xl">{activity.icon}</span>
-                              <div>
-                                <div className="font-medium text-text-primary">
-                                  {activity.name}
-                                </div>
-                                <div className="text-sm text-text-muted">
-                                  {activity.duration}
-                                </div>
-                              </div>
+                      <button
+                        key={activity.name}
+                        onClick={() => toggleActivity(activity)}
+                        className={`p-4 text-left border-2 rounded-lg transition-all ${
+                          isSelected
+                            ? 'bg-primary-50 border-primary-400 shadow-sm'
+                            : 'bg-white border-gray-200 hover:border-primary-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <span className="text-2xl">{activity.icon}</span>
+                            <div className="font-medium text-text-primary text-sm">
+                              {activity.name}
                             </div>
-                            {isSelected && (
-                              <Check className="w-5 h-5 text-primary-600" />
-                            )}
                           </div>
-                        </button>
-                        {isSelected && (
-                          <div className="p-4 bg-gray-50 border-t">
-                            <label className="block text-sm font-medium text-text-primary mb-2">
-                              Poznámka (volitelné)
-                            </label>
-                            <input
-                              type="text"
-                              value={selectedActivity?.notes || ''}
-                              onChange={(e) => updateNotes(activity.name, e.target.value)}
-                              placeholder="např. Začít včas, rezervovat dostatek času..."
-                              className="input-field text-sm"
-                            />
-                          </div>
-                        )}
-                      </div>
+                          {isSelected && (
+                            <Check className="w-5 h-5 text-primary-600 flex-shrink-0" />
+                          )}
+                        </div>
+                      </button>
                     )
                   })}
                 </div>
               </div>
             ))}
           </div>
+
+          {/* General Notes Section */}
+          {selectedActivities.size > 0 && (
+            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <label className="block text-sm font-semibold text-text-primary mb-2">
+                💭 Celkový komentář (volitelné)
+              </label>
+              <textarea
+                value={generalNotes}
+                onChange={(e) => setGeneralNotes(e.target.value)}
+                placeholder="Např. Chceme začít dříve, máme hodně hostů ze zahraničí, potřebujeme více času na focení..."
+                className="input-field text-sm resize-none"
+                rows={3}
+              />
+              <p className="text-xs text-text-muted mt-2">
+                Zde můžete napsat jakékoliv speciální požadavky nebo poznámky, které by AI měla vzít v úvahu při plánování harmonogramu.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Footer */}

@@ -11,7 +11,6 @@ interface ActivitySelection {
   category: string
   duration: string
   icon: string
-  notes?: string
 }
 
 interface WeddingContext {
@@ -29,9 +28,10 @@ interface WeddingContext {
 
 export async function POST(request: NextRequest) {
   try {
-    const { activities, context } = await request.json() as {
+    const { activities, context, generalNotes } = await request.json() as {
       activities: ActivitySelection[]
       context: WeddingContext
+      generalNotes?: string
     }
 
     if (!activities || activities.length === 0) {
@@ -62,8 +62,8 @@ INFORMACE O SVATBĚ:
 - Ubytování: ${context.hasAccommodation ? `Ano (${context.accommodationCount || 0} ubytování)` : 'Ne'}
     `.trim()
 
-    const activitiesList = activities.map((a, i) => 
-      `${i + 1}. ${a.name} (${a.category}, ${a.duration})${a.notes ? ` - Poznámka: ${a.notes}` : ''}`
+    const activitiesList = activities.map((a, i) =>
+      `${i + 1}. ${a.name} (${a.category}, ${a.duration})`
     ).join('\n')
 
     const prompt = `
@@ -73,6 +73,8 @@ ${weddingInfo}
 
 VYBRANÉ AKTIVITY:
 ${activitiesList}
+
+${generalNotes ? `\nSPECIÁLNÍ POŽADAVKY UŽIVATELE:\n${generalNotes}` : ''}
 
 ÚKOL:
 Vytvoř kompletní harmonogram svatebního dne s přesnými časy pro každou aktivitu. Vezmi v úvahu:
@@ -84,7 +86,7 @@ Vytvoř kompletní harmonogram svatebního dne s přesnými časy pro každou ak
 6. Realistické časové odhady
 
 FORMÁT ODPOVĚDI (JSON):
-Vrať JSON objekt s polem "timeline" obsahujícím objekty ve formátu:
+Vrať JSON objekt s následující strukturou:
 {
   "timeline": [
     {
@@ -95,7 +97,8 @@ Vrať JSON objekt s polem "timeline" obsahujícím objekty ve formátu:
       "location": "Místo konání (pokud je relevantní)",
       "notes": "Důležité poznámky nebo tipy"
     }
-  ]
+  ],
+  "explanation": "Detailní vysvětlení harmonogramu - proč jsi zvolil tento časový plán, jaké faktory jsi vzal v úvahu, jaké jsou klíčové momenty dne. Zahrň také 3-5 konkrétních tipů nebo rad, na co se zaměřit, nebo jaké aktivity by mohli ještě přidat pro dokonalý den."
 }
 
 DŮLEŽITÉ:
@@ -104,7 +107,8 @@ DŮLEŽITÉ:
 - Přidej i aktivity, které uživatel nevybral, ale jsou důležité (např. přestávky, přesuny)
 - Každá aktivita musí mít přesný čas začátku
 - Celý harmonogram by měl trvat realisticky (obvykle 12-16 hodin)
-- Vezmi v úvahu poznámky uživatele k jednotlivým aktivitám
+- Vezmi v úvahu speciální požadavky uživatele
+- V "explanation" napiš 2-3 odstavce vysvětlení + konkrétní tipy (použij emoji pro lepší čitelnost)
 
 Vrať POUZE validní JSON objekt, žádný další text.
     `.trim()
@@ -133,10 +137,17 @@ Vrať POUZE validní JSON objekt, žádný další text.
 
     // Parse JSON from response
     let timelineItems
+    let explanation = 'Harmonogram byl vygenerován na základě vybraných aktivit a kontextu svatby.'
+
     try {
       const parsed = JSON.parse(content)
       // If response is wrapped in an object, extract the array
       timelineItems = Array.isArray(parsed) ? parsed : (parsed.timeline || parsed.items || [])
+
+      // Extract explanation if present
+      if (parsed.explanation) {
+        explanation = parsed.explanation
+      }
 
       if (!Array.isArray(timelineItems) || timelineItems.length === 0) {
         throw new Error('Invalid timeline format')
@@ -152,6 +163,7 @@ Vrať POUZE validní JSON objekt, žádný další text.
 
     return NextResponse.json({
       timeline: timelineItems,
+      explanation: explanation,
       message: 'Harmonogram byl úspěšně vygenerován pomocí AI'
     })
 

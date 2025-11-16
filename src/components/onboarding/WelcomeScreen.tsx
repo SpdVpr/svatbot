@@ -331,7 +331,7 @@ export default function WelcomeScreen() {
               Naplánujte svatbu <span className="text-gray-900">s</span> <span className="text-pink-500">SvatBot</span> asistentem
             </h1>
             <p className="text-base md:text-lg lg:text-xl text-gray-600 mb-6 md:mb-10 max-w-lg lg:max-w-xl mx-auto">
-              SvatBot.cz kombinuje AI technologie s intuitivními nástroji: inteligentní asistent, rozpočet, timeline, hosté, seating plan, svatební web a marketplace ověřených dodavatelů – vše na jedné platformě.
+              SvatBot.cz kombinuje nové AI technologie s intuitivními nástroji: checklist, rozpočet, harmonogram, správa hostů, zasedací pořádek, tvorba svatebního webu, nabídka dodavatelů a mnoho dalších – vše na jedné platformě.
             </p>
             <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 justify-center" role="group" aria-label="Hlavní akce">
               <button
@@ -413,9 +413,9 @@ export default function WelcomeScreen() {
                   <Sparkles className="w-3 h-3 text-yellow-900" />
                 </div>
               </div>
-              <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">AI Asistent</h3>
+              <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">AI Asistent a Podpora</h3>
               <p className="text-base text-gray-600 leading-relaxed">
-                Inteligentní pomocník s nejnovějším GPT-5. Doporučení, rady a automatizace 24/7.
+                Inteligentní pomocník s nejnovějším GPT-5. Doporučení, rady a automatizace 24/7. Navíc ,,živá" podpora telefonicky od tvůrců webu.
               </p>
             </div>
 
@@ -426,9 +426,9 @@ export default function WelcomeScreen() {
                   <ListChecks className="w-10 h-10 text-pink-600" />
                 </div>
               </div>
-              <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Úkoly & Checklist</h3>
+              <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Úkoly a Harmonogram</h3>
               <p className="text-base text-gray-600 leading-relaxed">
-                Předpřipravené šablony úkolů podle fází svatby s automatickými deadliny.
+                Předpřipravené šablony úkolů podle fází svatby v přehledném checklistu a jednoduchá tvorba časového harmonogramu.
               </p>
             </div>
 
@@ -439,9 +439,9 @@ export default function WelcomeScreen() {
                   <Users className="w-10 h-10 text-purple-600" />
                 </div>
               </div>
-              <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Hosté & RSVP</h3>
+              <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Hosté a Zasedací pořádek</h3>
               <p className="text-base text-gray-600 leading-relaxed">
-                Kompletní správa hostů, email pozvánky, RSVP systém a dietní omezení.
+                Kompletní správa hostů, informace o ubytování včetně zbývající kapacity a tvorba zasedacího pořádku s automatickým rozmístěním.
               </p>
             </div>
 
@@ -452,9 +452,9 @@ export default function WelcomeScreen() {
                   <DollarSign className="w-10 h-10 text-pink-600" />
                 </div>
               </div>
-              <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Rozpočet</h3>
+              <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Rozpočet a Dodavatelé</h3>
               <p className="text-base text-gray-600 leading-relaxed">
-                Real-time sledování výdajů, kategorie, platební kalendář a grafy.
+                Sledování výdajů a celkového rozpočtu, jednotlivé kategorie, přidávání faktur a dalších dokumentů, evidence vašich dodavatelů.
               </p>
             </div>
 
@@ -1011,7 +1011,6 @@ export default function WelcomeScreen() {
               </div>
 
               <div className="mt-8 pt-8 border-t border-gray-200">
-                <div className="text-sm text-gray-600 mb-3">Nebo nám napište přímo:</div>
                 <div className="flex space-x-4">
                   <button onClick={handleGetStarted} className="flex-1 px-6 py-3 bg-pink-500 text-white rounded-full font-semibold hover:bg-pink-600 hover:shadow-lg transition-all duration-300 shadow-md">
                     Začít zdarma
