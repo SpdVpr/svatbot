@@ -270,7 +270,7 @@ export async function stopRecurrence(paymentId: number): Promise<void> {
 
   console.log('🛑 Stopping recurrence for payment:', paymentId)
 
-  const response = await fetch(`${GOPAY_CONFIG.apiUrl}/payments/payment/${paymentId}/void_recurrence`, {
+  const response = await fetch(`${GOPAY_CONFIG.apiUrl}/payments/payment/${paymentId}/void-recurrence`, {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
