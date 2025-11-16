@@ -274,7 +274,6 @@ export async function stopRecurrence(paymentId: number): Promise<void> {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
-      'Content-Type': 'application/json',
       'Authorization': `Bearer ${accessToken}`
     }
   })
