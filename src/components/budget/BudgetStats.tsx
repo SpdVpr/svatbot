@@ -129,17 +129,17 @@ export default function BudgetStats({
         {/* Payment Status */}
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <div className="flex items-center space-x-2 mb-2">
-            <CreditCard className="w-5 h-5 text-green-500" />
+            <CreditCard className="w-5 h-5 text-primary-600" />
             <div className="text-sm text-text-muted">Platby</div>
           </div>
           <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-green-600">Zaplaceno</span>
-              <span className="text-lg font-bold text-green-600">{formatCurrency(stats.totalPaid)}</span>
+              <span className="text-sm text-primary-600">Zaplaceno</span>
+              <span className="text-lg font-bold text-primary-600">{formatCurrency(stats.totalPaid)}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-orange-600">Zbývá</span>
-              <span className="text-lg font-bold text-orange-600">
+              <span className="text-sm text-gray-600">Zbývá</span>
+              <span className="text-lg font-bold text-gray-900">
                 {formatCurrency(stats.totalActual - stats.totalPaid)}
               </span>
             </div>
@@ -183,7 +183,7 @@ export default function BudgetStats({
                 {formatCurrency(stats.totalActual)}
               </p>
               <p className="text-xs text-text-muted mt-1">
-                Odhadované:{' '}
+                Předběžné:{' '}
                 <span className="text-gray-900 font-semibold">
                   {formatCurrency(stats.totalEstimated)}
                 </span>
@@ -195,14 +195,14 @@ export default function BudgetStats({
         {/* Payments */}
         <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
           <div className="flex items-start space-x-3">
-            <div className="p-1.5 bg-green-100 rounded-lg flex-shrink-0">
-              <CreditCard className="w-4 h-4 text-green-600" />
+            <div className="p-1.5 bg-primary-100 rounded-lg flex-shrink-0">
+              <CreditCard className="w-4 h-4 text-primary-600" />
             </div>
             <div className="flex-1">
               <p className="text-xs font-medium text-text-muted mb-1">Platby</p>
               <div className="mb-2">
                 <p className="text-xs text-text-muted">Zaplaceno</p>
-                <p className="text-xl font-bold text-green-600">
+                <p className="text-xl font-bold text-primary-600">
                   {formatCurrency(stats.totalPaid)}
                 </p>
               </div>
@@ -255,7 +255,7 @@ export default function BudgetStats({
             </div>
           </div>
           <div className="flex items-center justify-between text-xs">
-            <span className="text-text-muted truncate">Odhadované</span>
+            <span className="text-text-muted truncate">Předběžné</span>
             <span className="font-bold text-gray-900 truncate">
               {formatCurrency(stats.totalEstimated)}
             </span>
@@ -265,12 +265,12 @@ export default function BudgetStats({
         {/* Payment Status */}
         <div className="bg-white p-4 md:p-6 rounded-xl border border-gray-200 shadow-sm">
           <div className="flex items-start space-x-2 md:space-x-3 mb-2 md:mb-3">
-            <div className="p-1.5 md:p-2 bg-green-100 rounded-lg flex-shrink-0">
-              <CreditCard className="w-4 h-4 md:w-5 md:h-5 text-green-600" />
+            <div className="p-1.5 md:p-2 bg-primary-100 rounded-lg flex-shrink-0">
+              <CreditCard className="w-4 h-4 md:w-5 md:h-5 text-primary-600" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-text-muted mb-0.5 md:mb-1">Zaplaceno</p>
-              <p className="text-xl md:text-3xl font-bold text-green-600 truncate">
+              <p className="text-xl md:text-3xl font-bold text-primary-600 truncate">
                 {formatCurrency(stats.totalPaid)}
               </p>
             </div>

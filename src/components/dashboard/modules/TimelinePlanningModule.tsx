@@ -35,8 +35,8 @@ export default function TimelinePlanningModule() {
           {/* Event Stats */}
           <div className="grid grid-cols-3 gap-2">
             <div className="text-center hover-lift">
-              <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-green-100 rounded-lg mx-auto mb-1 float-enhanced">
-                <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-600" />
+              <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-primary-100 rounded-lg mx-auto mb-1 float-enhanced">
+                <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary-600" />
               </div>
               <div className="text-sm sm:text-lg font-bold text-gray-900">
                 <NumberCounter end={stats.completedEvents} duration={1500} />
@@ -44,8 +44,8 @@ export default function TimelinePlanningModule() {
               <div className="text-xs text-gray-500">Hotovo</div>
             </div>
             <div className="text-center hover-lift">
-              <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-blue-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.2s' }}>
-                <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />
+              <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-primary-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.2s' }}>
+                <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary-600" />
               </div>
               <div className="text-sm sm:text-lg font-bold text-gray-900">
                 <NumberCounter end={stats.upcomingEvents} duration={1500} />
@@ -53,8 +53,8 @@ export default function TimelinePlanningModule() {
               <div className="text-xs text-gray-500">Nadcházející</div>
             </div>
             <div className="text-center hover-lift">
-              <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-red-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.4s' }}>
-                <AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-600" />
+              <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-primary-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.4s' }}>
+                <AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary-600" />
               </div>
               <div className="text-sm sm:text-lg font-bold text-gray-900">
                 <NumberCounter end={stats.overdueEvents} duration={1500} />

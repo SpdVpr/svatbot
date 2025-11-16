@@ -232,61 +232,6 @@ export default function MarketplacePage() {
               ))}
             </div>
           </div>
-
-          {/* Active Filters */}
-          {Object.keys(filters).length > 0 && (
-            <div className="mt-4 flex items-center space-x-2">
-              <span className="body-small text-text-muted">Aktivní filtry:</span>
-              <div className="flex flex-wrap gap-2">
-                {filters.category?.map(category => (
-                  <span
-                    key={category}
-                    className="inline-flex items-center space-x-1 px-2 py-1 rounded-md text-xs"
-                    style={{
-                      backgroundColor: currentPalette.colors.primary200,
-                      color: currentPalette.colors.primary700
-                    }}
-                  >
-                    <span>{VENDOR_CATEGORIES[category].name}</span>
-                    <button
-                      onClick={() => {
-                        const newCategories = filters.category?.filter(c => c !== category) || []
-                        setFilters({ ...filters, category: newCategories.length > 0 ? newCategories : undefined })
-                      }}
-                      style={{ color: currentPalette.colors.primary900 }}
-                      className="hover:opacity-80"
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-                {filters.search && (
-                  <span
-                    className="inline-flex items-center space-x-1 px-2 py-1 rounded-md text-xs"
-                    style={{
-                      backgroundColor: currentPalette.colors.primary200,
-                      color: currentPalette.colors.primary700
-                    }}
-                  >
-                    <span>"{filters.search}"</span>
-                    <button
-                      onClick={() => setFilters({ ...filters, search: undefined })}
-                      style={{ color: currentPalette.colors.primary900 }}
-                      className="hover:opacity-80"
-                    >
-                      ×
-                    </button>
-                  </span>
-                )}
-                <button
-                  onClick={handleClearFilters}
-                  className="text-text-muted hover:text-text-primary text-xs underline"
-                >
-                  Vymazat vše
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 

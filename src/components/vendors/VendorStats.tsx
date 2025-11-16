@@ -115,8 +115,8 @@ export default function VendorStats({
               <p className="text-xs md:text-sm font-medium text-text-muted">Celkem dodavatelů</p>
               <p className="text-2xl md:text-3xl font-bold text-gray-900 mt-0.5 md:mt-1">{stats.total}</p>
             </div>
-            <div className="hidden md:block p-3 bg-blue-100 rounded-full">
-              <Users className="w-6 h-6 text-blue-600" />
+            <div className="hidden md:block p-3 bg-primary-100 rounded-full">
+              <Users className="w-6 h-6 text-primary-600" />
             </div>
           </div>
           <div className="mt-2 md:mt-4 flex items-center text-xs md:text-sm">
@@ -131,15 +131,15 @@ export default function VendorStats({
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div className="flex-1">
               <p className="text-xs md:text-sm font-medium text-text-muted">Potvrzeno</p>
-              <p className="text-2xl md:text-3xl font-bold text-green-600 mt-0.5 md:mt-1">{stats.confirmed}</p>
+              <p className="text-2xl md:text-3xl font-bold text-primary-600 mt-0.5 md:mt-1">{stats.confirmed}</p>
             </div>
-            <div className="hidden md:block p-3 bg-green-100 rounded-full">
-              <CheckCircle2 className="w-6 h-6 text-green-600" />
+            <div className="hidden md:block p-3 bg-primary-100 rounded-full">
+              <CheckCircle2 className="w-6 h-6 text-primary-600" />
             </div>
           </div>
           <div className="mt-2 md:mt-4 flex items-center text-xs md:text-sm">
-            <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-green-500 mr-1" />
-            <span className="text-green-600">
+            <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-primary-600 mr-1" />
+            <span className="text-primary-600">
               {completionRate}% zajištěno
             </span>
           </div>
@@ -150,10 +150,10 @@ export default function VendorStats({
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div className="flex-1">
               <p className="text-xs md:text-sm font-medium text-text-muted">Rezervováno</p>
-              <p className="text-2xl md:text-3xl font-bold text-yellow-600 mt-0.5 md:mt-1">{stats.booked}</p>
+              <p className="text-2xl md:text-3xl font-bold text-primary-600 mt-0.5 md:mt-1">{stats.booked}</p>
             </div>
-            <div className="hidden md:block p-3 bg-yellow-100 rounded-full">
-              <Clock className="w-6 h-6 text-yellow-600" />
+            <div className="hidden md:block p-3 bg-primary-100 rounded-full">
+              <Clock className="w-6 h-6 text-primary-600" />
             </div>
           </div>
           <div className="mt-2 md:mt-4 flex items-center text-xs md:text-sm">

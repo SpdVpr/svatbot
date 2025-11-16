@@ -78,13 +78,13 @@ export default function ShoppingPage() {
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <p className="text-sm text-gray-600 mb-1">Celkem produktů</p>
-                <p className="text-3xl font-bold text-purple-600 mb-1">
+                <p className="text-3xl font-bold text-primary-600 mb-1">
                   {stats.totalItems}
                 </p>
                 <p className="text-xs text-gray-500">V seznamu</p>
               </div>
-              <div className="p-3 rounded-xl bg-purple-100">
-                <Package className="w-6 h-6 text-purple-600" />
+              <div className="p-3 rounded-xl bg-primary-100">
+                <Package className="w-6 h-6 text-primary-600" />
               </div>
             </div>
           </div>
@@ -93,15 +93,15 @@ export default function ShoppingPage() {
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <p className="text-sm text-gray-600 mb-1">Zakoupeno</p>
-                <p className="text-3xl font-bold text-green-600 mb-1">
+                <p className="text-3xl font-bold text-primary-600 mb-1">
                   {stats.purchasedItems}
                 </p>
                 <p className="text-xs text-gray-500">
                   {stats.totalItems > 0 ? Math.round((stats.purchasedItems / stats.totalItems) * 100) : 0}% hotovo
                 </p>
               </div>
-              <div className="p-3 rounded-xl bg-green-100">
-                <CheckCircle className="w-6 h-6 text-green-600" />
+              <div className="p-3 rounded-xl bg-primary-100">
+                <CheckCircle className="w-6 h-6 text-primary-600" />
               </div>
             </div>
           </div>
@@ -110,13 +110,13 @@ export default function ShoppingPage() {
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <p className="text-sm text-gray-600 mb-1">Zbývá koupit</p>
-                <p className="text-3xl font-bold text-orange-600 mb-1">
+                <p className="text-3xl font-bold text-primary-600 mb-1">
                   {stats.pendingItems}
                 </p>
                 <p className="text-xs text-gray-500">Produktů</p>
               </div>
-              <div className="p-3 rounded-xl bg-orange-100">
-                <Clock className="w-6 h-6 text-orange-600" />
+              <div className="p-3 rounded-xl bg-primary-100">
+                <Clock className="w-6 h-6 text-primary-600" />
               </div>
             </div>
           </div>
@@ -125,15 +125,15 @@ export default function ShoppingPage() {
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <p className="text-sm text-gray-600 mb-1">Celková hodnota</p>
-                <p className="text-3xl font-bold text-blue-600 mb-1">
+                <p className="text-3xl font-bold text-primary-600 mb-1">
                   {currencyUtils.format(stats.totalValue)}
                 </p>
                 <p className="text-xs text-gray-500">
                   Zaplaceno: {currencyUtils.format(stats.purchasedValue)}
                 </p>
               </div>
-              <div className="p-3 rounded-xl bg-blue-100">
-                <TrendingUp className="w-6 h-6 text-blue-600" />
+              <div className="p-3 rounded-xl bg-primary-100">
+                <TrendingUp className="w-6 h-6 text-primary-600" />
               </div>
             </div>
           </div>

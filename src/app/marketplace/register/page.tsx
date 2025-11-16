@@ -143,8 +143,8 @@ export default function MarketplaceRegisterPage() {
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8">
           <div className="text-center mb-6">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
-              <CheckCircle className="w-10 h-10 text-green-600" />
+            <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+              <CheckCircle className="w-10 h-10 text-primary-600" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Děkujeme za registraci!</h2>
             <p className="text-gray-600 mb-2">
@@ -291,8 +291,8 @@ export default function MarketplaceRegisterPage() {
           </div>
 
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-              <Store className="w-6 h-6 text-green-600" />
+            <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
+              <Store className="w-6 h-6 text-primary-600" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Profesionální profil
@@ -303,8 +303,8 @@ export default function MarketplaceRegisterPage() {
           </div>
 
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-              <TrendingUp className="w-6 h-6 text-blue-600" />
+            <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
+              <TrendingUp className="w-6 h-6 text-primary-600" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Růst podnikání
@@ -315,8 +315,8 @@ export default function MarketplaceRegisterPage() {
           </div>
 
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-              <Shield className="w-6 h-6 text-purple-600" />
+            <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
+              <Shield className="w-6 h-6 text-primary-600" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Ověřený dodavatel

@@ -133,7 +133,6 @@ export function useShopping() {
         priority: data.priority || null,
         status: data.status,
         isPurchased: data.status === 'purchased',
-        purchaseDate: data.status === 'purchased' ? Timestamp.now() : null,
         notes: data.notes || null,
         tags: data.tags || [],
         createdAt: Timestamp.now(),
@@ -168,7 +167,6 @@ export function useShopping() {
     // Update isPurchased based on status
     if (data.status) {
       updateData.isPurchased = data.status === 'purchased'
-      updateData.purchaseDate = data.status === 'purchased' ? Timestamp.now() : null
     }
 
     // Remove undefined values before saving to Firestore

@@ -503,7 +503,7 @@ export function useBudget(): UseBudgetReturn {
     totalActual: getTotalSpent(),
     totalPaid: budgetItems.reduce((total, item) => total + item.paidAmount, 0),
     totalRemaining: getTotalBudget() - getTotalSpent(),
-    totalEstimated: budgetItems.filter(item => item.isEstimate).reduce((total, item) => total + item.actualAmount, 0),
+    totalEstimated: budgetItems.reduce((total, item) => total + item.budgetedAmount, 0),
     budgetUsed: getTotalBudget() > 0 ? Math.round((getTotalSpent() / getTotalBudget()) * 100) : 0,
     paidPercentage: getTotalSpent() > 0 ? Math.round((budgetItems.reduce((total, item) => total + item.paidAmount, 0) / getTotalSpent()) * 100) : 0,
     remainingPercentage: getTotalBudget() > 0 ? Math.round(((getTotalBudget() - getTotalSpent()) / getTotalBudget()) * 100) : 100,

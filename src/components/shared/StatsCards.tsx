@@ -26,36 +26,36 @@ export default function StatsCards({ type, stats, className = '' }: StatsCardsPr
         value: stats.total || 0,
         subtitle: `${stats.completed || 0} dokončených`,
         icon: Target,
-        color: 'text-gray-600',
-        bgColor: 'bg-gray-100',
-        iconColor: 'text-gray-600'
+        color: 'text-primary-600',
+        bgColor: 'bg-primary-100',
+        iconColor: 'text-primary-600'
       },
       {
         title: 'Dokončeno',
         value: stats.completed || 0,
         subtitle: `${stats.completionRate || 0}% dokončeno`,
         icon: CheckCircle,
-        color: 'text-green-600',
-        bgColor: 'bg-green-100',
-        iconColor: 'text-green-600'
+        color: 'text-primary-600',
+        bgColor: 'bg-primary-100',
+        iconColor: 'text-primary-600'
       },
       {
         title: 'Přišlé termíny',
         value: stats.upcoming || 0,
         subtitle: 'Nadcházející úkoly',
         icon: Calendar,
-        color: 'text-blue-600',
-        bgColor: 'bg-blue-100',
-        iconColor: 'text-blue-600'
+        color: 'text-primary-600',
+        bgColor: 'bg-primary-100',
+        iconColor: 'text-primary-600'
       },
       {
         title: 'Urgentní úkoly',
         value: stats.overdue || 0,
         subtitle: 'Po termínu',
         icon: AlertTriangle,
-        color: 'text-red-600',
-        bgColor: 'bg-red-100',
-        iconColor: 'text-red-600'
+        color: 'text-primary-600',
+        bgColor: 'bg-primary-100',
+        iconColor: 'text-primary-600'
       }
     ]
 
@@ -131,36 +131,36 @@ export default function StatsCards({ type, stats, className = '' }: StatsCardsPr
         value: stats.total || 0,
         subtitle: `${stats.invited || 0} pozváno`,
         icon: Users,
-        color: 'text-gray-600',
-        bgColor: 'bg-gray-100',
-        iconColor: 'text-gray-600'
+        color: 'text-primary-600',
+        bgColor: 'bg-primary-100',
+        iconColor: 'text-primary-600'
       },
       {
         title: 'Potvrzeno',
         value: stats.attending || 0,
         subtitle: `${stats.total > 0 ? Math.round((stats.attending / stats.total) * 100) : 0}% potvrzeno`,
         icon: UserCheck,
-        color: 'text-green-600',
-        bgColor: 'bg-green-100',
-        iconColor: 'text-green-600'
+        color: 'text-primary-600',
+        bgColor: 'bg-primary-100',
+        iconColor: 'text-primary-600'
       },
       {
         title: 'Čeká na odpověď',
         value: stats.pending || 0,
         subtitle: 'Neodpověděli',
         icon: Clock,
-        color: 'text-yellow-600',
-        bgColor: 'bg-yellow-100',
-        iconColor: 'text-yellow-600'
+        color: 'text-primary-600',
+        bgColor: 'bg-primary-100',
+        iconColor: 'text-primary-600'
       },
       {
         title: 'Odmítli',
         value: stats.declined || 0,
         subtitle: 'Nepřijdou',
         icon: UserX,
-        color: 'text-red-600',
-        bgColor: 'bg-red-100',
-        iconColor: 'text-red-600'
+        color: 'text-primary-600',
+        bgColor: 'bg-primary-100',
+        iconColor: 'text-primary-600'
       }
     ]
 

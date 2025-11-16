@@ -48,22 +48,22 @@ export default function AccommodationManagementModule() {
             {/* Quick Stats */}
             <div className="grid grid-cols-3 gap-2">
               <div className="text-center hover-lift">
-                <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-lg mx-auto mb-1 float-enhanced">
-                  <Building2 className="w-4 h-4 text-blue-600" />
+                <div className="flex items-center justify-center w-8 h-8 bg-primary-100 rounded-lg mx-auto mb-1 float-enhanced">
+                  <Building2 className="w-4 h-4 text-primary-600" />
                 </div>
                 <div className="text-sm font-bold text-gray-900">{stats.totalAccommodations}</div>
                 <div className="text-xs text-gray-500">Ubytování</div>
               </div>
               <div className="text-center hover-lift">
-                <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.2s' }}>
-                  <Bed className="w-4 h-4 text-green-600" />
+                <div className="flex items-center justify-center w-8 h-8 bg-primary-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.2s' }}>
+                  <Bed className="w-4 h-4 text-primary-600" />
                 </div>
                 <div className="text-sm font-bold text-gray-900">{stats.availableRooms}</div>
                 <div className="text-xs text-gray-500">Dostupné</div>
               </div>
               <div className="text-center hover-lift">
-                <div className="flex items-center justify-center w-8 h-8 bg-red-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.4s' }}>
-                  <Users className="w-4 h-4 text-red-600" />
+                <div className="flex items-center justify-center w-8 h-8 bg-primary-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.4s' }}>
+                  <Users className="w-4 h-4 text-primary-600" />
                 </div>
                 <div className="text-sm font-bold text-gray-900">{stats.occupiedRooms}</div>
                 <div className="text-xs text-gray-500">Obsazené</div>

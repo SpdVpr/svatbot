@@ -35,8 +35,8 @@ export default function GuestManagementModule() {
           {/* RSVP Stats */}
           <div className="grid grid-cols-3 gap-2">
             <div className="text-center hover-lift">
-              <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg mx-auto mb-1 float-enhanced">
-                <UserCheck className="w-4 h-4 text-green-600" />
+              <div className="flex items-center justify-center w-8 h-8 bg-primary-100 rounded-lg mx-auto mb-1 float-enhanced">
+                <UserCheck className="w-4 h-4 text-primary-600" />
               </div>
               <div className="text-sm font-bold text-gray-900">
                 <NumberCounter end={stats.attending} duration={1500} />
@@ -44,8 +44,8 @@ export default function GuestManagementModule() {
               <div className="text-xs text-gray-500">Přijde</div>
             </div>
             <div className="text-center hover-lift">
-              <div className="flex items-center justify-center w-8 h-8 bg-red-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.2s' }}>
-                <UserX className="w-4 h-4 text-red-600" />
+              <div className="flex items-center justify-center w-8 h-8 bg-primary-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.2s' }}>
+                <UserX className="w-4 h-4 text-primary-600" />
               </div>
               <div className="text-sm font-bold text-gray-900">
                 <NumberCounter end={stats.declined} duration={1500} />
@@ -53,8 +53,8 @@ export default function GuestManagementModule() {
               <div className="text-xs text-gray-500">Nepřijde</div>
             </div>
             <div className="text-center hover-lift">
-              <div className="flex items-center justify-center w-8 h-8 bg-yellow-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.4s' }}>
-                <Mail className="w-4 h-4 text-yellow-600" />
+              <div className="flex items-center justify-center w-8 h-8 bg-primary-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.4s' }}>
+                <Mail className="w-4 h-4 text-primary-600" />
               </div>
               <div className="text-sm font-bold text-gray-900">
                 <NumberCounter end={stats.pending} duration={1500} />

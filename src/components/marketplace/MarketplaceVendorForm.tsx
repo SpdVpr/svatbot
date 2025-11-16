@@ -1416,10 +1416,7 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData,
                     <span>Ukládání...</span>
                   </div>
                 ) : (
-                  <>
-                    <Save className="w-4 h-4 mr-2" />
-                    {submitButtonText}
-                  </>
+                  submitButtonText
                 )}
               </button>
             )}

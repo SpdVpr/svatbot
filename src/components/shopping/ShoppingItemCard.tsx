@@ -7,8 +7,7 @@ import {
   Trash2,
   CheckCircle,
   Circle,
-  Tag,
-  Calendar
+  Tag
 } from 'lucide-react'
 import { ShoppingItem, SHOPPING_CATEGORIES } from '@/types/shopping'
 import { useShopping } from '@/hooks/useShopping'
@@ -272,13 +271,6 @@ export default function ShoppingItemCard({ item, viewMode }: ShoppingItemCardPro
               </div>
             )}
           </div>
-
-          {item.purchaseDate && (
-            <div className="flex items-center gap-1 text-xs text-gray-500">
-              <Calendar className="w-3 h-3" />
-              <span>Zakoupeno: {new Date(item.purchaseDate).toLocaleDateString('cs-CZ')}</span>
-            </div>
-          )}
         </div>
       </div>
 

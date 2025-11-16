@@ -30,15 +30,15 @@ export default function FoodDrinksModule() {
           {/* Items Count */}
           <div className="grid grid-cols-2 gap-3">
             <div className="text-center hover-lift">
-              <div className="flex items-center justify-center w-8 h-8 bg-orange-100 rounded-lg mx-auto mb-1 float-enhanced">
-                <UtensilsCrossed className="w-4 h-4 text-orange-600" />
+              <div className="flex items-center justify-center w-8 h-8 bg-primary-100 rounded-lg mx-auto mb-1 float-enhanced">
+                <UtensilsCrossed className="w-4 h-4 text-primary-600" />
               </div>
               <div className="text-sm font-bold text-gray-900">{stats.totalMenuItems}</div>
               <div className="text-xs text-gray-500">Jídel</div>
             </div>
             <div className="text-center hover-lift">
-              <div className="flex items-center justify-center w-8 h-8 bg-purple-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.2s' }}>
-                <Wine className="w-4 h-4 text-purple-600" />
+              <div className="flex items-center justify-center w-8 h-8 bg-primary-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.2s' }}>
+                <Wine className="w-4 h-4 text-primary-600" />
               </div>
               <div className="text-sm font-bold text-gray-900">{stats.totalDrinkItems}</div>
               <div className="text-xs text-gray-500">Nápojů</div>

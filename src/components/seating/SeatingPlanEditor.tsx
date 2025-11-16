@@ -128,14 +128,18 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     seatSides: 'all',
     oneSidePosition: 'bottom'
   })
-  const [viewOptions, setViewOptions] = useState<SeatingViewOptions>({
-    showGuestNames: true,
-    showTableNumbers: true,
-    showConstraints: false,
-    showStats: true,
-    highlightUnassigned: true,
-    highlightViolations: false,
-    zoom: 0.6
+  const [viewOptions, setViewOptions] = useState<SeatingViewOptions>(() => {
+    // Set default zoom based on screen size
+    const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024
+    return {
+      showGuestNames: true,
+      showTableNumbers: true,
+      showConstraints: false,
+      showStats: true,
+      highlightUnassigned: true,
+      highlightViolations: false,
+      zoom: isDesktop ? 1.0 : 0.6
+    }
   })
   const [guestSearchQuery, setGuestSearchQuery] = useState('')
 
@@ -2040,16 +2044,23 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
   // Handle drag and drop for guest assignment
   const handleGuestDrop = async (event: React.DragEvent, seatId: string) => {
     event.preventDefault()
-    const guestId = event.dataTransfer.getData('text/plain')
-    if (guestId) {
+    const personId = event.dataTransfer.getData('text/plain')
+    if (!personId) return
+
+    try {
       // Detect if it's a chair seat or table seat
       const isChairSeat = (chairSeats || []).some(s => s.id === seatId)
 
-      setSelectedSeat(seatId)
-      setSelectedSeatType(isChairSeat ? 'chair' : 'table')
-
-      // Wait for assignment to complete before clearing state
-      await handleAssignGuest(guestId)
+      // PersonId can be: "guest_id", "guest_id_plusone", or "guest_id_child_0"
+      // We store the full personId in the seat's guestId field
+      if (isChairSeat) {
+        await assignGuestToChairSeat(personId, seatId)
+      } else {
+        await assignGuestToSeat(personId, seatId)
+      }
+    } catch (error) {
+      console.error('Error assigning person via drag & drop:', error)
+      alert('Chyba při přiřazování osoby: ' + (error as Error).message)
     }
   }
 
@@ -2427,12 +2438,36 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
     const grouped: Record<string, PersonToSeat[]> = {}
 
-    unassignedPeople.forEach(person => {
+    // First, separate main guests from companions/children
+    const mainGuests = unassignedPeople.filter(p => p.type === 'guest')
+    const companions = unassignedPeople.filter(p => p.type === 'plusOne' || p.type === 'child')
+
+    // Group main guests by category
+    mainGuests.forEach(person => {
       const category = person.category || 'other'
       if (!grouped[category]) {
         grouped[category] = []
       }
       grouped[category].push(person)
+    })
+
+    // Add companions and children right after their parent guest
+    companions.forEach(companion => {
+      const category = companion.category || 'other'
+      if (grouped[category] && companion.parentGuestId) {
+        // Find the parent guest in the category
+        const parentIndex = grouped[category].findIndex(p => p.id === companion.parentGuestId)
+        if (parentIndex !== -1) {
+          // Insert companion right after parent
+          grouped[category].splice(parentIndex + 1, 0, companion)
+        } else {
+          // If parent not found (might be assigned), add at the end
+          grouped[category].push(companion)
+        }
+      } else if (grouped[category]) {
+        // Category exists but no parent found
+        grouped[category].push(companion)
+      }
     })
 
     // Sort categories by priority
@@ -2449,9 +2484,31 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
     const sortedGrouped: Record<string, PersonToSeat[]> = {}
     categoryOrder.forEach(category => {
       if (grouped[category] && grouped[category].length > 0) {
-        sortedGrouped[category] = grouped[category].sort((a, b) =>
-          a.displayName.localeCompare(b.displayName)
+        // Sort only main guests, keep companions next to their parents
+        const sorted: PersonToSeat[] = []
+        const mainGuestsInCategory = grouped[category].filter(p => p.type === 'guest')
+
+        // Sort main guests alphabetically
+        mainGuestsInCategory.sort((a, b) => a.displayName.localeCompare(b.displayName))
+
+        // For each main guest, add them and their companions/children
+        mainGuestsInCategory.forEach(mainGuest => {
+          sorted.push(mainGuest)
+          // Add their companions and children
+          const relatedPeople = grouped[category].filter(p =>
+            (p.type === 'plusOne' || p.type === 'child') && p.parentGuestId === mainGuest.id
+          )
+          sorted.push(...relatedPeople)
+        })
+
+        // Add any orphaned companions/children (whose parent is assigned)
+        const orphans = grouped[category].filter(p =>
+          (p.type === 'plusOne' || p.type === 'child') &&
+          !mainGuestsInCategory.some(mg => mg.id === p.parentGuestId)
         )
+        sorted.push(...orphans)
+
+        sortedGrouped[category] = sorted
       }
     })
 
@@ -3589,20 +3646,35 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
                   {/* People in category */}
                   <div className="space-y-1 ml-2">
-                    {people.map(person => {
-                      const bgColor = person.type === 'guest' ? 'bg-gray-50' : person.type === 'plusOne' ? 'bg-blue-50' : 'bg-purple-50'
-                      const textColor = person.type === 'guest' ? 'text-gray-900' : person.type === 'plusOne' ? 'text-blue-700' : 'text-purple-700'
+                    {people.map((person, index) => {
+                      const isMainGuest = person.type === 'guest'
+                      const isCompanion = person.type === 'plusOne' || person.type === 'child'
+
+                      // Check if next person is a companion of this guest
+                      const nextPerson = people[index + 1]
+                      const hasCompanions = isMainGuest && nextPerson && nextPerson.parentGuestId === person.id
+
+                      const bgColor = isMainGuest ? 'bg-gray-50' : person.type === 'plusOne' ? 'bg-blue-50' : 'bg-purple-50'
+                      const textColor = isMainGuest ? 'text-gray-900' : person.type === 'plusOne' ? 'text-blue-700' : 'text-purple-700'
                       const badgeColor = person.type === 'plusOne' ? 'text-blue-600 bg-blue-100' : 'text-purple-600 bg-purple-100'
-                      const borderClass = person.type !== 'guest' ? 'ml-4 border-l-2 ' + (person.type === 'plusOne' ? 'border-blue-300' : 'border-purple-300') : ''
+
+                      // Enhanced visual grouping for companions
+                      const marginClass = isCompanion ? 'ml-6' : ''
+                      const borderClass = isCompanion
+                        ? 'border-l-3 pl-2 ' + (person.type === 'plusOne' ? 'border-blue-400' : 'border-purple-400')
+                        : hasCompanions ? 'border-b border-gray-200' : ''
 
                       return (
                         <div
                           key={person.id}
-                          className={`flex items-center justify-between p-2 rounded-lg cursor-move hover:bg-primary-50 transition-colors ${bgColor} ${borderClass}`}
+                          className={`flex items-center justify-between p-2 rounded-lg cursor-move hover:bg-primary-50 transition-colors ${bgColor} ${marginClass} ${borderClass}`}
                           draggable
                           onDragStart={(e) => handleGuestDragStart(e, person.id)}
                         >
                           <div className="flex items-center space-x-2">
+                            {isCompanion && (
+                              <span className="text-gray-400 text-xs">└</span>
+                            )}
                             <span className={`text-sm font-medium ${textColor}`}>
                               {person.displayName}
                             </span>

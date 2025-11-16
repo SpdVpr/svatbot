@@ -46,8 +46,8 @@ export default function SeatingPlanModule() {
           {/* Assignment Stats */}
           <div className="grid grid-cols-2 gap-2">
             <div className="text-center hover-lift">
-              <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg mx-auto mb-1 float-enhanced">
-                <Users className="w-4 h-4 text-green-600" />
+              <div className="flex items-center justify-center w-8 h-8 bg-primary-100 rounded-lg mx-auto mb-1 float-enhanced">
+                <Users className="w-4 h-4 text-primary-600" />
               </div>
               <div className="text-sm font-bold text-gray-900">
                 <NumberCounter end={seatingStats.assignedGuests} duration={1500} />
@@ -55,8 +55,8 @@ export default function SeatingPlanModule() {
               <div className="text-xs text-gray-500">Přiřazeno</div>
             </div>
             <div className="text-center hover-lift">
-              <div className="flex items-center justify-center w-8 h-8 bg-yellow-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.2s' }}>
-                <Table className="w-4 h-4 text-yellow-600" />
+              <div className="flex items-center justify-center w-8 h-8 bg-primary-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.2s' }}>
+                <Table className="w-4 h-4 text-primary-600" />
               </div>
               <div className="text-sm font-bold text-gray-900">
                 <NumberCounter end={seatingStats.unassignedGuests} duration={1500} />
