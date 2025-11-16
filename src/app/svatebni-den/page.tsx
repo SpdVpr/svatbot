@@ -1,39 +1,48 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { Clock, Calendar, Plus, Trash2, X, Heart, Edit2, GripVertical } from 'lucide-react'
+import { Clock, Calendar, Plus, Trash2, X, Heart, Edit2, GripVertical, Printer, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import { useWeddingDayTimeline } from '@/hooks/useWeddingDayTimeline'
 import ModuleHeader from '@/components/common/ModuleHeader'
+import { useWedding } from '@/hooks/useWedding'
+import { useRobustGuests } from '@/hooks/useRobustGuests'
+import { useAccommodationWithGuests } from '@/hooks/useAccommodationWithGuests'
+import AITimelineDialog from '@/components/svatebni-den/AITimelineDialog'
 
 const PREDEFINED_ACTIVITIES = [
-  { name: 'Příjezd hostů', category: 'ceremony', duration: '30 min', icon: '🚗' },
-  { name: 'Welcome drink', category: 'reception', duration: '30 min', icon: '🥂' },
-  { name: 'Svatební obřad', category: 'ceremony', duration: '45 min', icon: '💒' },
-  { name: 'Gratulace', category: 'ceremony', duration: '30 min', icon: '🎉' },
-  { name: 'Špalír', category: 'ceremony', duration: '15 min', icon: '✨' },
-  { name: 'Skupinové focení', category: 'photography', duration: '45 min', icon: '📸' },
-  { name: 'Přípitek', category: 'reception', duration: '15 min', icon: '🍾' },
-  { name: 'Proslovy', category: 'reception', duration: '30 min', icon: '🎤' },
-  { name: 'Oběd', category: 'reception', duration: '2 hod', icon: '🍽️' },
-  { name: 'Krájení dortu', category: 'reception', duration: '15 min', icon: '🎂' },
-  { name: 'Focení novomanželů', category: 'photography', duration: '1 hod', icon: '💑' },
-  { name: 'Ubytování hostů', category: 'preparation', duration: '30 min', icon: '🏨' },
-  { name: 'Házení kyticí', category: 'party', duration: '15 min', icon: '💐' },
-  { name: 'První tanec', category: 'party', duration: '15 min', icon: '💃' },
-  { name: 'Tanec s rodiči', category: 'party', duration: '15 min', icon: '👨‍👩‍👧' },
-  { name: 'Večeře', category: 'reception', duration: '1 hod', icon: '🍴' },
-  { name: 'Volná zábava', category: 'party', duration: '3 hod', icon: '🎊' },
-  { name: 'Hry', category: 'party', duration: '1 hod', icon: '🎮' },
-  { name: 'Kvízy', category: 'party', duration: '30 min', icon: '❓' },
-  { name: 'Tradice', category: 'party', duration: '30 min', icon: '🎭' }
+  { name: 'Příjezd hostů', category: 'ceremony' as const, duration: '30 min', icon: '🚗' },
+  { name: 'Welcome drink', category: 'reception' as const, duration: '30 min', icon: '🥂' },
+  { name: 'Svatební obřad', category: 'ceremony' as const, duration: '45 min', icon: '💒' },
+  { name: 'Gratulace', category: 'ceremony' as const, duration: '30 min', icon: '🎉' },
+  { name: 'Špalír', category: 'ceremony' as const, duration: '15 min', icon: '✨' },
+  { name: 'Skupinové focení', category: 'photography' as const, duration: '45 min', icon: '📸' },
+  { name: 'Přípitek', category: 'reception' as const, duration: '15 min', icon: '🍾' },
+  { name: 'Proslovy', category: 'reception' as const, duration: '30 min', icon: '🎤' },
+  { name: 'Oběd', category: 'reception' as const, duration: '2 hod', icon: '🍽️' },
+  { name: 'Krájení dortu', category: 'reception' as const, duration: '15 min', icon: '🎂' },
+  { name: 'Focení novomanželů', category: 'photography' as const, duration: '1 hod', icon: '💑' },
+  { name: 'Ubytování hostů', category: 'preparation' as const, duration: '30 min', icon: '🏨' },
+  { name: 'Házení kyticí', category: 'party' as const, duration: '15 min', icon: '💐' },
+  { name: 'První tanec', category: 'party' as const, duration: '15 min', icon: '💃' },
+  { name: 'Tanec s rodiči', category: 'party' as const, duration: '15 min', icon: '👨‍👩‍👧' },
+  { name: 'Večeře', category: 'reception' as const, duration: '1 hod', icon: '🍴' },
+  { name: 'Volná zábava', category: 'party' as const, duration: '3 hod', icon: '🎊' },
+  { name: 'Hry', category: 'party' as const, duration: '1 hod', icon: '🎮' },
+  { name: 'Kvízy', category: 'party' as const, duration: '30 min', icon: '❓' },
+  { name: 'Tradice', category: 'party' as const, duration: '30 min', icon: '🎭' }
 ]
 
 export default function SvatebniDenPage() {
-  const { timeline, loading, createTimelineItem, updateTimelineItem, deleteTimelineItem, reorderTimeline } = useWeddingDayTimeline()
+  const { timeline, manualTimeline, aiTimeline, loading, createTimelineItem, createBulkTimelineItems, updateTimelineItem, deleteTimelineItem, deleteAllAITimeline, reorderTimeline } = useWeddingDayTimeline()
+  const { wedding } = useWedding()
+  const { guests } = useRobustGuests()
+  const { accommodations } = useAccommodationWithGuests()
   const [showCustomForm, setShowCustomForm] = useState(false)
   const [selectedActivity, setSelectedActivity] = useState<typeof PREDEFINED_ACTIVITIES[0] | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [showAIDialog, setShowAIDialog] = useState(false)
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false)
   const [formData, setFormData] = useState({
     time: '',
     activity: '',
@@ -81,7 +90,8 @@ export default function SvatebniDenPage() {
         participants: [],
         notes: formData.notes,
         order: timeline.length,
-        isCompleted: false
+        isCompleted: false,
+        source: 'manual'
       })
       setSelectedActivity(null)
       setFormData({
@@ -110,7 +120,8 @@ export default function SvatebniDenPage() {
         participants: [],
         notes: formData.notes,
         order: timeline.length,
-        isCompleted: false
+        isCompleted: false,
+        source: 'manual'
       })
       setShowCustomForm(false)
       setFormData({
@@ -178,6 +189,71 @@ export default function SvatebniDenPage() {
         console.error('Error deleting activity:', err)
         alert('Chyba při mazání aktivity')
       }
+    }
+  }
+
+  const handleGenerateAITimeline = async (selectedActivities: any[]) => {
+    setIsGeneratingAI(true)
+    try {
+      // Prepare context
+      const context = {
+        weddingDate: wedding?.weddingDate,
+        estimatedGuestCount: wedding?.estimatedGuestCount,
+        budget: wedding?.budget,
+        style: wedding?.style,
+        region: wedding?.region,
+        venue: wedding?.venue,
+        brideName: wedding?.brideName,
+        groomName: wedding?.groomName,
+        accommodationCount: accommodations.length,
+        hasAccommodation: accommodations.length > 0
+      }
+
+      // Call AI API
+      const response = await fetch('/api/ai/timeline-generator', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          activities: selectedActivities,
+          context
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to generate timeline')
+      }
+
+      const data = await response.json()
+
+      // Delete existing AI timeline
+      if (aiTimeline.length > 0) {
+        await deleteAllAITimeline()
+      }
+
+      // Create new AI timeline items
+      const aiItems = data.timeline.map((item: any, index: number) => ({
+        time: item.time,
+        activity: item.activity,
+        duration: item.duration,
+        category: item.category,
+        location: item.location || '',
+        participants: [],
+        notes: item.notes || '',
+        order: manualTimeline.length + index,
+        isCompleted: false,
+        source: 'ai' as const
+      }))
+
+      await createBulkTimelineItems(aiItems)
+
+      alert('✨ AI harmonogram byl úspěšně vygenerován!')
+    } catch (error) {
+      console.error('Error generating AI timeline:', error)
+      alert('Chyba při generování AI harmonogramu. Zkuste to prosím znovu.')
+    } finally {
+      setIsGeneratingAI(false)
     }
   }
 
@@ -251,6 +327,255 @@ export default function SvatebniDenPage() {
     }
   }
 
+  const handlePrint = () => {
+    const sortedTimeline = [...timeline].sort((a, b) => a.order - b.order)
+
+    // Create print window
+    const printWindow = window.open('', '_blank')
+    if (!printWindow) {
+      alert('Prosím povolte vyskakovací okna pro tisk')
+      return
+    }
+
+    const weddingDateStr = wedding?.weddingDate
+      ? new Date(wedding.weddingDate).toLocaleDateString('cs-CZ', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        })
+      : ''
+
+    // Get current theme color from CSS variables
+    const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--color-primary-600').trim() || '#db2777'
+    const primaryLight = getComputedStyle(document.documentElement).getPropertyValue('--color-primary-100').trim() || '#fce7f3'
+
+    // Generate HTML for print
+    const printContent = `
+      <!DOCTYPE html>
+      <html lang="cs">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Harmonogram svatebního dne</title>
+        <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+
+          body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            padding: 40px;
+            color: #333;
+            background: white;
+          }
+
+          .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 3px double ${primaryColor};
+            padding-bottom: 30px;
+          }
+
+          .header h1 {
+            font-size: 36px;
+            color: ${primaryColor};
+            margin-bottom: 10px;
+            font-weight: normal;
+            letter-spacing: 2px;
+          }
+
+          .header .date {
+            font-size: 18px;
+            color: #666;
+            font-style: italic;
+            margin-top: 10px;
+          }
+
+          .header .decorative {
+            font-size: 24px;
+            color: ${primaryColor};
+            margin: 15px 0;
+          }
+
+          .timeline {
+            max-width: 800px;
+            margin: 0 auto;
+          }
+
+          .timeline-item {
+            display: flex;
+            margin-bottom: 30px;
+            page-break-inside: avoid;
+          }
+
+          .time-column {
+            width: 120px;
+            flex-shrink: 0;
+            padding-right: 20px;
+            text-align: right;
+          }
+
+          .time {
+            font-size: 24px;
+            font-weight: bold;
+            color: ${primaryColor};
+            font-family: 'Arial', sans-serif;
+          }
+
+          .duration {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+          }
+
+          .dot-column {
+            width: 20px;
+            flex-shrink: 0;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+          }
+
+          .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: ${primaryColor};
+            border: 3px solid ${primaryLight};
+            box-shadow: 0 0 0 2px ${primaryColor};
+            z-index: 1;
+            margin-top: 8px;
+          }
+
+          .line {
+            width: 2px;
+            flex: 1;
+            background: linear-gradient(to bottom, ${primaryColor} 0%, ${primaryLight} 100%);
+            position: absolute;
+            top: 20px;
+            bottom: -30px;
+          }
+
+          .timeline-item:last-child .line {
+            display: none;
+          }
+
+          .content-column {
+            flex: 1;
+            padding-left: 20px;
+          }
+
+          .activity-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+          }
+
+          .details {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+          }
+
+          .detail-item {
+            margin-bottom: 4px;
+          }
+
+          .detail-label {
+            font-weight: bold;
+            color: #999;
+            margin-right: 8px;
+          }
+
+          .footer {
+            margin-top: 60px;
+            text-align: center;
+            padding-top: 30px;
+            border-top: 3px double ${primaryColor};
+            color: #999;
+            font-size: 12px;
+          }
+
+          @media print {
+            body {
+              padding: 20px;
+            }
+
+            .header h1 {
+              font-size: 32px;
+            }
+
+            @page {
+              margin: 1.5cm;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div class="decorative">❤️</div>
+          <h1>Harmonogram svatebního dne</h1>
+          ${weddingDateStr ? `<div class="date">${weddingDateStr}</div>` : ''}
+          <div class="decorative">✨</div>
+        </div>
+
+        <div class="timeline">
+          ${sortedTimeline.map((item, index) => `
+            <div class="timeline-item">
+              <div class="time-column">
+                <div class="time">${item.time}</div>
+                ${item.duration ? `<div class="duration">${item.duration}</div>` : ''}
+              </div>
+
+              <div class="dot-column">
+                <div class="dot"></div>
+                ${index < sortedTimeline.length - 1 ? '<div class="line"></div>' : ''}
+              </div>
+
+              <div class="content-column">
+                <div class="activity-name">${item.activity}</div>
+                <div class="details">
+                  ${item.location ? `
+                    <div class="detail-item">
+                      <span class="detail-label">📍 Místo:</span>
+                      <span>${item.location}</span>
+                    </div>
+                  ` : ''}
+                  ${item.notes ? `
+                    <div class="detail-item">
+                      <span class="detail-label">💭 Poznámka:</span>
+                      <span>${item.notes}</span>
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="footer">
+          Vytištěno ${new Date().toLocaleDateString('cs-CZ')} | svatbot.cz
+        </div>
+
+        <script>
+          window.onload = function() {
+            setTimeout(function() {
+              window.print();
+            }, 250);
+          };
+        </script>
+      </body>
+      </html>
+    `
+
+    printWindow.document.write(printContent)
+    printWindow.document.close()
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -266,6 +591,17 @@ export default function SvatebniDenPage() {
         title="Harmonogram svatebního dne"
         subtitle={`${timeline.length} aktivit naplánováno`}
         iconGradient="from-purple-500 to-pink-500"
+        actions={
+          timeline.length > 0 ? (
+            <button
+              onClick={handlePrint}
+              className="inline-flex items-center space-x-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-button font-medium rounded-lg transition-all duration-200 shadow-soft hover:shadow-wedding text-sm"
+            >
+              <Printer className="w-4 h-4" />
+              <span className="hidden sm:inline">Vytisknout</span>
+            </button>
+          ) : null
+        }
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -282,9 +618,18 @@ export default function SvatebniDenPage() {
 
         {/* Predefined Activities - Elegant Grid */}
         <div className="mb-8">
-          <h2 className="font-display text-2xl font-semibold text-text-primary mb-6 text-center">
-            Vyberte si z připravených aktivit
-          </h2>
+          <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
+            <h2 className="font-display text-2xl font-semibold text-text-primary text-center sm:text-left">
+              Vyberte si z připravených aktivit
+            </h2>
+            <button
+              onClick={() => setShowAIDialog(true)}
+              className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-button font-medium rounded-lg transition-all duration-200 shadow-soft hover:shadow-wedding"
+            >
+              <Sparkles className="w-5 h-5" />
+              <span>Vytvořit pomocí AI</span>
+            </button>
+          </div>
           <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
             {PREDEFINED_ACTIVITIES.map((activity, index) => (
               <button
@@ -510,7 +855,7 @@ export default function SvatebniDenPage() {
                   }, 100)
                 }
               }}
-              className="inline-flex items-center space-x-2 px-8 py-3 border-2 border-primary-300 text-primary-600 hover:bg-primary-50 font-button font-medium rounded-xl transition-all duration-200"
+              className="inline-flex items-center space-x-2 px-8 py-3 bg-primary-600 hover:bg-primary-700 text-white font-button font-medium rounded-xl transition-all duration-200 shadow-soft hover:shadow-wedding"
             >
               <Plus className="w-5 h-5" />
               <span>Přidat vlastní aktivitu</span>
@@ -609,8 +954,9 @@ export default function SvatebniDenPage() {
           </div>
         )}
 
-        {timeline.length > 0 && (
-          <div className="wedding-card">
+        {/* Manual Timeline */}
+        {manualTimeline.length > 0 && (
+          <div className="wedding-card mb-8">
             {/* Header with decorative line */}
             <div className="text-center mb-10">
               <div className="inline-flex items-center justify-center space-x-3 mb-4">
@@ -618,13 +964,13 @@ export default function SvatebniDenPage() {
                 <Calendar className="w-6 h-6 text-primary-500" />
                 <div className="h-px w-16 bg-gradient-to-l from-primary-300 via-primary-300 to-transparent"></div>
               </div>
-              <h2 className="font-display text-3xl font-bold text-text-primary mb-2">Váš harmonogram</h2>
-              <p className="text-text-muted">{timeline.length} {timeline.length === 1 ? 'aktivita' : timeline.length < 5 ? 'aktivity' : 'aktivit'}</p>
+              <h2 className="font-display text-3xl font-bold text-text-primary mb-2">Váš manuální harmonogram</h2>
+              <p className="text-text-muted">{manualTimeline.length} {manualTimeline.length === 1 ? 'aktivita' : manualTimeline.length < 5 ? 'aktivity' : 'aktivit'}</p>
             </div>
 
             {/* Timeline */}
             <div className="space-y-0">
-              {[...timeline].sort((a, b) => a.order - b.order).map((item, index, sortedArray) => {
+              {[...manualTimeline].sort((a, b) => a.order - b.order).map((item, index, sortedArray) => {
                 const isLast = index === sortedArray.length - 1
 
                 return (
@@ -722,6 +1068,112 @@ export default function SvatebniDenPage() {
           </div>
         )}
 
+        {/* AI Timeline */}
+        {aiTimeline.length > 0 && (
+          <div className="wedding-card mb-8">
+            {/* Header with decorative line and AI badge */}
+            <div className="text-center mb-10">
+              <div className="inline-flex items-center justify-center space-x-3 mb-4">
+                <div className="h-px w-16 bg-gradient-to-r from-transparent via-purple-300 to-purple-300"></div>
+                <Sparkles className="w-6 h-6 text-purple-500" />
+                <div className="h-px w-16 bg-gradient-to-l from-purple-300 via-purple-300 to-transparent"></div>
+              </div>
+              <div className="flex items-center justify-center space-x-3 mb-2">
+                <h2 className="font-display text-3xl font-bold text-text-primary">AI Harmonogram</h2>
+                <span className="px-3 py-1 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 text-sm font-semibold rounded-full">
+                  Vygenerováno AI
+                </span>
+              </div>
+              <p className="text-text-muted mb-4">{aiTimeline.length} {aiTimeline.length === 1 ? 'aktivita' : aiTimeline.length < 5 ? 'aktivity' : 'aktivit'}</p>
+              <button
+                onClick={async () => {
+                  if (confirm('Opravdu chcete smazat celý AI harmonogram?')) {
+                    await deleteAllAITimeline()
+                  }
+                }}
+                className="text-sm text-red-600 hover:text-red-700 font-medium"
+              >
+                Smazat AI harmonogram
+              </button>
+            </div>
+
+            {/* Timeline */}
+            <div className="space-y-0">
+              {[...aiTimeline].sort((a, b) => a.order - b.order).map((item, index, sortedArray) => {
+                const isLast = index === sortedArray.length - 1
+
+                return (
+                  <div
+                    key={item.id}
+                    className="group relative"
+                  >
+                    {/* Timeline row - Responsive layout */}
+                    <div className="flex items-start">
+                      {/* AI Badge */}
+                      <div className="flex-shrink-0 pt-4 sm:pt-6 pr-2">
+                        <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400" />
+                      </div>
+
+                      {/* Time column - Smaller on mobile */}
+                      <div className="w-16 sm:w-32 flex-shrink-0 pt-4 sm:pt-6">
+                        <div className="text-right pr-2 sm:pr-8">
+                          <div className="font-display text-base sm:text-2xl font-bold text-purple-600">{item.time}</div>
+                          {item.duration && (
+                            <div className="text-xs text-text-muted mt-1 hidden sm:block">{item.duration}</div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Timeline dot and line */}
+                      <div className="relative flex flex-col items-center flex-shrink-0">
+                        <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-purple-500 ring-2 sm:ring-4 ring-purple-100 z-10 mt-5 sm:mt-7"></div>
+                        {!isLast && (
+                          <div className="w-0.5 h-full bg-gradient-to-b from-purple-200 to-purple-100 absolute top-8 sm:top-11"></div>
+                        )}
+                      </div>
+
+                      {/* Content column - Reduced padding on mobile */}
+                      <div className="flex-1 pl-3 sm:pl-8 pb-8 sm:pb-12">
+                        <div className="bg-purple-50 border border-purple-100 rounded-xl p-3 sm:p-6 hover:shadow-soft hover:border-purple-300 transition-all duration-300 group-hover:bg-white">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-display text-base sm:text-xl font-semibold text-text-primary mb-2 sm:mb-3">
+                                {item.activity}
+                              </h3>
+
+                              {/* Duration on mobile (hidden on desktop) */}
+                              {item.duration && (
+                                <div className="text-xs text-text-muted mb-2 sm:hidden">{item.duration}</div>
+                              )}
+
+                              {(item.location || item.notes) && (
+                                <div className="space-y-1 sm:space-y-2">
+                                  {item.location && (
+                                    <div className="flex items-center space-x-2 text-xs sm:text-sm text-text-secondary">
+                                      <span className="text-purple-500 flex-shrink-0">📍</span>
+                                      <span className="truncate">{item.location}</span>
+                                    </div>
+                                  )}
+                                  {item.notes && (
+                                    <div className="flex items-start space-x-2 text-xs sm:text-sm text-text-muted">
+                                      <span className="text-purple-500 flex-shrink-0 mt-0.5">💭</span>
+                                      <span className="flex-1">{item.notes}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
         {timeline.length === 0 && (
           <div className="wedding-card text-center py-16">
             <div className="w-32 h-32 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -741,6 +1193,14 @@ export default function SvatebniDenPage() {
           </div>
         )}
       </div>
+
+      {/* AI Timeline Dialog */}
+      <AITimelineDialog
+        isOpen={showAIDialog}
+        onClose={() => setShowAIDialog(false)}
+        activities={PREDEFINED_ACTIVITIES}
+        onGenerate={handleGenerateAITimeline}
+      />
     </div>
   )
 }

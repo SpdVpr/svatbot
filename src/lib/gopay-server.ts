@@ -184,10 +184,10 @@ export async function createGoPayPaymentServer(params: {
 
   const payment = JSON.parse(responseText)
   console.log('✅ Payment created:', { id: payment.id, state: payment.state })
-  
+
   // Store payment info in Firestore using Admin SDK
   const adminDb = getAdminDb()
-  await adminDb.collection('payments').add({
+  const paymentDoc: any = {
     userId,
     userEmail,
     goPayId: payment.id,
@@ -197,7 +197,15 @@ export async function createGoPayPaymentServer(params: {
     status: 'pending',
     plan,
     createdAt: Timestamp.now()
-  })
+  }
+
+  // Mark if this payment has recurrence (for easier cancellation later)
+  if (plan === 'premium_monthly') {
+    paymentDoc.hasRecurrence = true
+    console.log('📌 Marking payment as having recurrence')
+  }
+
+  await adminDb.collection('payments').add(paymentDoc)
 
   return payment
 }
@@ -250,5 +258,33 @@ export async function refundPayment(paymentId: number, amount?: number): Promise
     console.error('GoPay refund error:', error)
     throw new Error('Nepodařilo se vrátit platbu')
   }
+}
+
+/**
+ * Stop recurring payments for a payment
+ * This cancels all future automatic recurring payments
+ */
+export async function stopRecurrence(paymentId: number): Promise<void> {
+  const accessToken = await getAccessToken('payment-all')
+  const { GOPAY_CONFIG } = await import('./gopay')
+
+  console.log('🛑 Stopping recurrence for payment:', paymentId)
+
+  const response = await fetch(`${GOPAY_CONFIG.apiUrl}/payments/payment/${paymentId}/void_recurrence`, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`
+    }
+  })
+
+  if (!response.ok) {
+    const error = await response.text()
+    console.error('GoPay stop recurrence error:', error)
+    throw new Error('Nepodařilo se zastavit opakované platby')
+  }
+
+  console.log('✅ Recurrence stopped successfully')
 }
 

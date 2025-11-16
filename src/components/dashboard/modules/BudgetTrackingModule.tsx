@@ -38,10 +38,10 @@ export default function BudgetTrackingModule() {
           {/* Financial Stats */}
           <div className="grid grid-cols-2 gap-3">
             <div className="text-center hover-lift">
-              <div className="flex items-center justify-center w-8 h-8 bg-primary-100 rounded-lg mx-auto mb-1 float-enhanced">
-                <TrendingUp className="w-4 h-4 text-primary-600" />
+              <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-primary-100 rounded-lg mx-auto mb-1 float-enhanced">
+                <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary-600" />
               </div>
-              <div className="text-sm font-bold text-gray-900">
+              <div className="text-sm sm:text-lg font-bold text-gray-900">
                 <NumberCounter
                   end={Math.round(stats.totalPaid / 1000)}
                   duration={1800}
@@ -52,10 +52,10 @@ export default function BudgetTrackingModule() {
               <div className="text-xs text-gray-500">Zaplaceno</div>
             </div>
             <div className="text-center hover-lift">
-              <div className="flex items-center justify-center w-8 h-8 bg-primary-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.3s' }}>
-                <AlertCircle className="w-4 h-4 text-primary-600" />
+              <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-primary-100 rounded-lg mx-auto mb-1 float-enhanced" style={{ animationDelay: '0.3s' }}>
+                <AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary-600" />
               </div>
-              <div className="text-sm font-bold text-gray-900">
+              <div className="text-sm sm:text-lg font-bold text-gray-900">
                 <NumberCounter
                   end={Math.round((stats.totalBudget - stats.totalPaid) / 1000)}
                   duration={1800}

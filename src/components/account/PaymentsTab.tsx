@@ -74,6 +74,16 @@ function PaymentsTab({ subscriptionData }: PaymentsTabProps) {
     }
   }
 
+  // Format currency - amount is stored in cents (haléře)
+  const formatCurrency = (amount: number, currency: string = 'CZK') => {
+    return new Intl.NumberFormat('cs-CZ', {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount / 100) // Convert from cents to whole currency
+  }
+
   return (
     <div className="space-y-6">
       {/* Payment History */}
@@ -109,7 +119,7 @@ function PaymentsTab({ subscriptionData }: PaymentsTabProps) {
                   <div>
                     <div className="flex items-center space-x-2">
                       <p className="font-medium text-gray-900">
-                        {payment.amount} {payment.currency}
+                        {formatCurrency(payment.amount, payment.currency)}
                       </p>
                       <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(payment.status)}`}>
                         {getStatusText(payment.status)}

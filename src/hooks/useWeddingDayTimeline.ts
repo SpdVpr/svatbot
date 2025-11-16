@@ -18,6 +18,7 @@ export interface WeddingDayTimelineItem {
   category: 'preparation' | 'ceremony' | 'photography' | 'reception' | 'party'
   order: number
   isCompleted: boolean
+  source: 'manual' | 'ai' // Zdroj harmonogramu - manuální nebo AI
   createdAt: Date
   updatedAt: Date
   createdBy: string
@@ -25,11 +26,15 @@ export interface WeddingDayTimelineItem {
 
 interface UseWeddingDayTimelineReturn {
   timeline: WeddingDayTimelineItem[]
+  manualTimeline: WeddingDayTimelineItem[]
+  aiTimeline: WeddingDayTimelineItem[]
   loading: boolean
   error: string | null
   createTimelineItem: (data: Omit<WeddingDayTimelineItem, 'id' | 'weddingId' | 'createdAt' | 'updatedAt' | 'createdBy'>) => Promise<WeddingDayTimelineItem>
+  createBulkTimelineItems: (items: Omit<WeddingDayTimelineItem, 'id' | 'weddingId' | 'createdAt' | 'updatedAt' | 'createdBy'>[]) => Promise<void>
   updateTimelineItem: (itemId: string, updates: Partial<WeddingDayTimelineItem>) => Promise<void>
   deleteTimelineItem: (itemId: string) => Promise<void>
+  deleteAllAITimeline: () => Promise<void>
   toggleComplete: (itemId: string) => Promise<void>
   reorderTimeline: (newOrder: WeddingDayTimelineItem[]) => Promise<void>
   stats: {
@@ -87,6 +92,7 @@ export function useWeddingDayTimeline(): UseWeddingDayTimelineReturn {
               category: data.category,
               order: data.order,
               isCompleted: data.isCompleted || false,
+              source: data.source || 'manual', // Default to manual for backward compatibility
               createdAt: convertFirestoreTimestamp(data.createdAt),
               updatedAt: convertFirestoreTimestamp(data.updatedAt),
               createdBy: data.createdBy
@@ -144,6 +150,34 @@ export function useWeddingDayTimeline(): UseWeddingDayTimelineReturn {
     }
   }, [wedding, user])
 
+  // Create bulk timeline items (for AI generation)
+  const createBulkTimelineItems = useCallback(async (
+    items: Omit<WeddingDayTimelineItem, 'id' | 'weddingId' | 'createdAt' | 'updatedAt' | 'createdBy'>[]
+  ): Promise<void> => {
+    if (!wedding || !user) {
+      throw new Error('Musíte být přihlášeni')
+    }
+
+    try {
+      const promises = items.map(data => {
+        const newItem = {
+          weddingId: wedding.id,
+          ...data,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          createdBy: user.id
+        }
+        return addDoc(collection(db, 'weddingDayTimeline'), newItem)
+      })
+
+      await Promise.all(promises)
+      console.log('✅ Created bulk wedding day timeline items:', items.length)
+    } catch (err: any) {
+      console.error('Error creating bulk wedding day timeline items:', err)
+      throw new Error('Chyba při vytváření položek')
+    }
+  }, [wedding, user])
+
   // Update timeline item
   const updateTimelineItem = useCallback(async (
     itemId: string,
@@ -181,6 +215,25 @@ export function useWeddingDayTimeline(): UseWeddingDayTimelineReturn {
     }
   }, [wedding])
 
+  // Delete all AI timeline items
+  const deleteAllAITimeline = useCallback(async (): Promise<void> => {
+    if (!wedding) {
+      throw new Error('Musíte být přihlášeni')
+    }
+
+    try {
+      const aiItems = timeline.filter(item => item.source === 'ai')
+      const deletePromises = aiItems.map(item =>
+        deleteDoc(doc(db, 'weddingDayTimeline', item.id))
+      )
+      await Promise.all(deletePromises)
+      console.log('✅ Deleted all AI wedding day timeline items:', aiItems.length)
+    } catch (err: any) {
+      console.error('Error deleting AI wedding day timeline items:', err)
+      throw new Error('Chyba při mazání AI harmonogramu')
+    }
+  }, [wedding, timeline])
+
   // Toggle complete status
   const toggleComplete = useCallback(async (itemId: string): Promise<void> => {
     const item = timeline.find(i => i.id === itemId)
@@ -210,6 +263,10 @@ export function useWeddingDayTimeline(): UseWeddingDayTimelineReturn {
     }
   }, [wedding])
 
+  // Split timeline by source
+  const manualTimeline = timeline.filter(item => item.source === 'manual')
+  const aiTimeline = timeline.filter(item => item.source === 'ai')
+
   // Calculate stats
   const stats = {
     total: timeline.length,
@@ -218,18 +275,22 @@ export function useWeddingDayTimeline(): UseWeddingDayTimelineReturn {
       return acc
     }, {} as Record<string, number>),
     completed: timeline.filter(item => item.isCompleted).length,
-    completionRate: timeline.length > 0 
+    completionRate: timeline.length > 0
       ? Math.round((timeline.filter(item => item.isCompleted).length / timeline.length) * 100)
       : 0
   }
 
   return {
     timeline,
+    manualTimeline,
+    aiTimeline,
     loading,
     error,
     createTimelineItem,
+    createBulkTimelineItems,
     updateTimelineItem,
     deleteTimelineItem,
+    deleteAllAITimeline,
     toggleComplete,
     reorderTimeline,
     stats

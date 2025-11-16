@@ -449,6 +449,24 @@
       ]
     },
     {
+      "collectionGroup": "weddingDayTimeline",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "weddingId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "source",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "order",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
       "collectionGroup": "moodEntries",
       "queryScope": "COLLECTION",
       "fields": [

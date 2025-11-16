@@ -168,7 +168,7 @@ export default function SvatbotWidget({ showMoodTracker = true, compact = false 
             </video>
           </div>
           <div className="flex-1 min-w-0">
-            <h2 className="font-bold mb-2 leading-tight" style={{ fontFamily: "var(--font-cormorant), 'Cormorant Upright', serif", fontSize: '30px' }}>Svatbot - tvůj plánovací parťák</h2>
+            <h2 className="font-bold mb-2 leading-tight" style={{ fontFamily: "var(--font-cormorant), 'Cormorant Upright', serif", fontSize: '30px' }}>Svatbot - tvůj svatební parťák</h2>
             <p className="text-white/90 text-base leading-relaxed">Jsem tu pro tebe! Povzbudím tě a budu ti dělat společnost!</p>
           </div>
         </div>
