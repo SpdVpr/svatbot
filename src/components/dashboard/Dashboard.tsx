@@ -18,7 +18,8 @@ import {
   Crown,
   Clock,
   Menu,
-  UserPlus
+  UserPlus,
+  Palette
 } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -41,6 +42,8 @@ import OnboardingWizard from '@/components/onboarding/OnboardingWizard'
 import ScrollProgress from '@/components/animations/ScrollProgress'
 import TrialExpiredModal from '@/components/subscription/TrialExpiredModal'
 import { useSearchParams } from 'next/navigation'
+import { useColorTheme } from '@/hooks/useColorTheme'
+import { COLOR_PALETTES, ColorTheme } from '@/types/colorTheme'
 // Import test utilities (only in development)
 import '@/utils/testTrialExpiry'
 
@@ -50,6 +53,7 @@ function DashboardContent() {
   const { subscription, trialDaysRemaining, hasPremiumAccess } = useSubscription()
   const { getCanvasMaxWidth } = useCanvas()
   const { startTransition } = useViewTransition()
+  const { colorTheme, changeTheme, canChangeTheme } = useColorTheme()
 
   // Check if user is demo
   const isDemoUserCheck = user?.email === 'demo@svatbot.cz'
@@ -60,6 +64,7 @@ function DashboardContent() {
   const [showAccountModal, setShowAccountModal] = useState(false)
   const [accountInitialTab, setAccountInitialTab] = useState<'profile' | 'subscription' | 'payments' | 'statistics' | 'settings' | 'feedback'>('profile')
   const [showMobileMenu, setShowMobileMenu] = useState(false)
+  const [showMobileColorMenu, setShowMobileColorMenu] = useState(false)
   const [showTrialExpiredModal, setShowTrialExpiredModal] = useState(false)
   const [showOnboardingWizardFromDashboard, setShowOnboardingWizardFromDashboard] = useState(false)
   const [isSafari, setIsSafari] = useState(false)
@@ -305,6 +310,13 @@ function DashboardContent() {
             </div>
             <div className="flex items-center space-x-1.5">
               <LiveNotifications />
+              <button
+                onClick={() => setShowMobileColorMenu(!showMobileColorMenu)}
+                className="mobile-nav-button text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                title="Barevná paleta"
+              >
+                <Palette className="w-4 h-4" />
+              </button>
               <button
                 onClick={openNotesModal}
                 className="mobile-nav-button text-gray-600 hover:text-gray-900 hover:bg-gray-100"
@@ -595,6 +607,67 @@ function DashboardContent() {
           onSwitchMode={(mode) => setAuthMode(mode)}
           showDemoOption={false}
         />
+      )}
+
+      {/* Mobile Color Menu Modal */}
+      {showMobileColorMenu && (
+        <div className="fixed inset-0 z-[300] flex items-end sm:hidden">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowMobileColorMenu(false)}
+          />
+
+          {/* Modal Content */}
+          <div className="relative w-full bg-white rounded-t-3xl shadow-xl max-h-[80vh] overflow-y-auto">
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Barevná paleta</h3>
+                <button
+                  onClick={() => setShowMobileColorMenu(false)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <span className="text-2xl text-gray-400">×</span>
+                </button>
+              </div>
+
+              {/* Color Themes */}
+              <div className="space-y-2">
+                {(Object.keys(COLOR_PALETTES) as ColorTheme[]).map((theme) => {
+                  const palette = COLOR_PALETTES[theme]
+                  return (
+                    <button
+                      key={theme}
+                      onClick={() => {
+                        changeTheme(theme)
+                        setShowMobileColorMenu(false)
+                      }}
+                      disabled={!canChangeTheme}
+                      className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-300 border-2 ${
+                        colorTheme === theme
+                          ? 'shadow-md scale-105'
+                          : 'border-transparent hover:border-gray-200'
+                      } ${!canChangeTheme ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      style={{
+                        backgroundColor: palette.colors.primaryLight,
+                        color: palette.colors.primary700,
+                        borderColor: colorTheme === theme ? palette.colors.primary400 : 'transparent'
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">{palette.name}</span>
+                        {colorTheme === theme && (
+                          <span className="text-lg">✓</span>
+                        )}
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Mobile Menu */}
