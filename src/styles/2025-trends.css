@@ -10,7 +10,7 @@
   position: fixed;
   width: 20px;
   height: 20px;
-  border: 2px solid #fb7185;
+  border: 2px solid var(--color-primary, #fb7185);
   border-radius: 50%;
   pointer-events: none;
   z-index: 9999;
@@ -21,15 +21,15 @@
 .custom-cursor.hover {
   width: 40px;
   height: 40px;
-  background: rgba(251, 113, 133, 0.1);
-  border-color: #e879f9;
+  background: color-mix(in srgb, var(--color-primary, #fb7185) 10%, transparent);
+  border-color: var(--color-secondary, #e879f9);
 }
 
 .cursor-trail {
   position: fixed;
   width: 8px;
   height: 8px;
-  background: linear-gradient(135deg, #fb7185, #e879f9);
+  background: linear-gradient(135deg, var(--color-primary, #fb7185), var(--color-secondary, #e879f9));
   border-radius: 50%;
   pointer-events: none;
   z-index: 9998;
@@ -102,7 +102,7 @@
 .morphing-blob-1 {
   width: 400px;
   height: 400px;
-  background: linear-gradient(135deg, #fb7185, #fcd34d);
+  background: linear-gradient(135deg, var(--color-primary, #fb7185), var(--color-accent, #fcd34d));
   animation-name: morphBlob1;
   top: -10%;
   left: -5%;
@@ -111,7 +111,7 @@
 .morphing-blob-2 {
   width: 350px;
   height: 350px;
-  background: linear-gradient(135deg, #e879f9, #a78bfa);
+  background: linear-gradient(135deg, var(--color-secondary, #e879f9), var(--color-secondary-400, #a78bfa));
   animation-name: morphBlob2;
   bottom: -10%;
   right: -5%;
@@ -400,7 +400,7 @@
   top: 50%;
   width: 12px;
   height: 12px;
-  background: #fb7185;
+  background: var(--color-primary, #fb7185);
   border-radius: 50%;
   transform: translateY(-50%) scale(0);
   transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -446,8 +446,8 @@
 .smart-loader {
   width: 40px;
   height: 40px;
-  border: 3px solid rgba(251, 113, 133, 0.2);
-  border-top-color: #fb7185;
+  border: 3px solid color-mix(in srgb, var(--color-primary, #fb7185) 20%, transparent);
+  border-top-color: var(--color-primary, #fb7185);
   border-radius: 50%;
   animation: smartLoader 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
 }
@@ -590,7 +590,7 @@
   top: 0;
   left: 0;
   height: 3px;
-  background: linear-gradient(to right, #fb7185, #e879f9);
+  background: linear-gradient(to right, var(--color-primary, #fb7185), var(--color-secondary, #e879f9));
   transform-origin: left;
   z-index: 9999;
   transition: transform 0.1s ease-out;

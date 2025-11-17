@@ -59,17 +59,31 @@ export default function WelcomeScreen() {
     setIsContactFormSubmitting(true)
 
     try {
-      // Send email using mailto link as fallback
-      const subject = encodeURIComponent(`Kontakt z webu: ${contactForm.name}`)
-      const body = encodeURIComponent(`Jméno: ${contactForm.name}\nEmail: ${contactForm.email}\n\nZpráva:\n${contactForm.message}`)
-      window.location.href = `mailto:info@svatbot.cz?subject=${subject}&body=${body}`
+      // Send email via API
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: contactForm.name,
+          email: contactForm.email,
+          message: contactForm.message,
+        }),
+      })
 
-      // Show success message
-      setContactFormSuccess(true)
-      setContactForm({ name: '', email: '', message: '' })
+      const data = await response.json()
 
-      // Reset success message after 5 seconds
-      setTimeout(() => setContactFormSuccess(false), 5000)
+      if (response.ok) {
+        // Show success message
+        setContactFormSuccess(true)
+        setContactForm({ name: '', email: '', message: '' })
+
+        // Reset success message after 5 seconds
+        setTimeout(() => setContactFormSuccess(false), 5000)
+      } else {
+        throw new Error(data.error || 'Nepodařilo se odeslat zprávu')
+      }
     } catch (error) {
       console.error('Contact form error:', error)
       alert('Omlouváme se, ale nepodařilo se odeslat zprávu. Prosím kontaktujte nás přímo na info@svatbot.cz nebo zavolejte na +420 732 264 276.')
@@ -415,7 +429,7 @@ export default function WelcomeScreen() {
               </div>
               <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">AI Asistent a Podpora</h3>
               <p className="text-base text-gray-600 leading-relaxed">
-                Inteligentní pomocník s nejnovějším GPT-5. Doporučení, rady a automatizace 24/7. Navíc ,,živá" podpora telefonicky od tvůrců webu.
+                Inteligentní pomocník s nejnovějším GPT-5. Doporučení, rady a automatizace 24/7.
               </p>
             </div>
 
@@ -494,8 +508,25 @@ export default function WelcomeScreen() {
                 aria-hidden="true"
               />
             </div>
+            {/* Svatební web - PREMIUM */}
+            <div className="group bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl p-8 shadow-lg border-2 border-purple-200 hover:border-purple-400 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105 relative overflow-hidden" style={{ animationDelay: '0.3s' }}>
+              <div className="absolute top-0 right-0 bg-gradient-to-br from-purple-500 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-bl-xl">
+                PREMIUM
+              </div>
+              <div className="relative mb-6">
+                <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
+                  <Cloud className="w-10 h-10 text-white" />
+                </div>
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                  <Crown className="w-3 h-3 text-white" />
+                </div>
+              </div>
+              <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Svatební web</h3>
+              <p className="text-base text-gray-600 leading-relaxed">Vytvořte vlastní svatební web s potvrzením hostů, galerií, programem svatby, ubytováním a mnoho dalších.</p>
+            </div>
+
             {/* Moodboard */}
-            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-pink-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.3s' }}>
+            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-pink-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.4s' }}>
               <div className="relative mb-6">
                 <div className="w-20 h-20 bg-gradient-to-br from-pink-100 to-rose-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
                   <Image className="w-10 h-10 text-pink-600" />
@@ -505,32 +536,18 @@ export default function WelcomeScreen() {
                 </div>
               </div>
               <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Moodboard</h3>
-              <p className="text-base text-gray-600 leading-relaxed">Vytvářejte vizuální nástěnky s inspiracemi, barvami a stylem vaší svatby. Unikátní funkce!</p>
+              <p className="text-base text-gray-600 leading-relaxed">Vytvářejte vizuální nástěnky s inspiracemi, barvami a stylem vaší svatby. Unikátní funkce díky návrhům AI asistenta.</p>
             </div>
 
-            {/* Seating Plan */}
-            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-purple-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.4s' }}>
+            {/* Nákupní seznam */}
+            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-purple-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.5s' }}>
               <div className="relative mb-6">
                 <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
-                  <Users className="w-10 h-10 text-purple-600" />
+                  <ListChecks className="w-10 h-10 text-purple-600" />
                 </div>
               </div>
-              <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Seating Plan</h3>
-              <p className="text-base text-gray-600 leading-relaxed">Interaktivní editor s drag & drop, přizpůsobitelné stoly a automatické rozmístění hostů.</p>
-            </div>
-
-            {/* Svatební web */}
-            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-pink-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.5s' }}>
-              <div className="relative mb-6">
-                <div className="w-20 h-20 bg-gradient-to-br from-pink-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
-                  <Cloud className="w-10 h-10 text-pink-600" />
-                </div>
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
-                  <Crown className="w-3 h-3 text-white" />
-                </div>
-              </div>
-              <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Svatební web</h3>
-              <p className="text-base text-gray-600 leading-relaxed">Vytvořte vlastní svatební web s RSVP, fotogalerií a vlastní doménou – bez kódování.</p>
+              <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Nákupní seznam</h3>
+              <p className="text-base text-gray-600 leading-relaxed">Vytvořte si přehledný seznam všech potřebných nákupů pro vaši svatbu a sledujte, co už máte nakoupené.</p>
             </div>
 
             {/* Marketplace */}
@@ -541,7 +558,7 @@ export default function WelcomeScreen() {
                 </div>
               </div>
               <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Marketplace</h3>
-              <p className="text-base text-gray-600 leading-relaxed">50+ ověřených dodavatelů s reálnými recenzemi a portfolii. Spojení s dodavateli.</p>
+              <p className="text-base text-gray-600 leading-relaxed">Výběr z ověřených dodavatelů. Můžete je kontaktovat na přímo přes náš web bez dalšího hledání.</p>
             </div>
           </div>
         </div>
@@ -963,7 +980,7 @@ export default function WelcomeScreen() {
               Máte otázky? <span className="text-pink-500">Kontaktujte nás!</span>
             </h2>
             <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              Náš tým je připraven vám pomoci s čímkoliv potřebujete
+              Rádi Vám pomůžeme s čímkoliv potřebujete
             </p>
           </div>
 

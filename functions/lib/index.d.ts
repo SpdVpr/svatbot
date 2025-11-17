@@ -12,6 +12,7 @@ export { default as onMarketplaceVendorCreate } from './triggers/onMarketplaceVe
 export { default as onMarketplaceVendorUpdate } from './triggers/onMarketplaceVendorUpdate';
 export { sendVendorContactEmails } from './https/sendVendorContactEmails';
 export { sendPaymentEmail } from './https/sendPaymentEmail';
+export { sendContactFormEmail } from './https/sendContactFormEmail';
 export { default as getVendors } from './callable/getVendors';
 export { default as createVendor } from './callable/createVendor';
 export { setAdminRole } from './setAdminRole';

@@ -131,6 +131,7 @@ export { default as onMarketplaceVendorUpdate } from './triggers/onMarketplaceVe
 // HTTPS functions
 export { sendVendorContactEmails } from './https/sendVendorContactEmails'
 export { sendPaymentEmail } from './https/sendPaymentEmail'
+export { sendContactFormEmail } from './https/sendContactFormEmail'
 
 // Callable functions for client-side
 export { default as getVendors } from './callable/getVendors'

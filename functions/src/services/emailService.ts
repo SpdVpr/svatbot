@@ -882,3 +882,82 @@ export async function sendCustomerContactConfirmationEmail(
   }
 }
 
+/**
+ * Send contact form notification to info@svatbot.cz
+ */
+export async function sendContactFormNotification(
+  name: string,
+  email: string,
+  message: string,
+  timestamp: string
+): Promise<boolean> {
+  try {
+    const mailOptions = {
+      from: '"SvatBot.cz" <info@svatbot.cz>',
+      to: 'info@svatbot.cz',
+      replyTo: email,
+      subject: `📧 Nová zpráva z kontaktního formuláře - ${name}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Nová zpráva z kontaktního formuláře</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+            <h1 style="margin: 0; font-size: 28px;">📧 Nová zpráva z webu</h1>
+          </div>
+
+          <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+            <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+              <h2 style="margin-top: 0; color: #ec4899;">Kontaktní údaje</h2>
+              <p style="margin: 10px 0;"><strong>Jméno:</strong> ${name}</p>
+              <p style="margin: 10px 0;"><strong>Email:</strong> <a href="mailto:${email}" style="color: #ec4899;">${email}</a></p>
+              <p style="margin: 10px 0;"><strong>Čas odeslání:</strong> ${new Date(timestamp).toLocaleString('cs-CZ')}</p>
+            </div>
+
+            <div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #ec4899;">
+              <h2 style="margin-top: 0; color: #ec4899;">Zpráva</h2>
+              <p style="white-space: pre-wrap; line-height: 1.8;">${message}</p>
+            </div>
+
+            <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #f59e0b;">
+              <p style="margin: 0;"><strong>💡 Tip:</strong> Můžete odpovědět přímo kliknutím na "Odpovědět" - email bude odeslán na ${email}</p>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #e5e7eb;">
+              <p style="color: #6b7280; font-size: 14px;">Tato zpráva byla odeslána z kontaktního formuláře na <strong>svatbot.cz</strong></p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `,
+      text: `Nová zpráva z kontaktního formuláře SvatBot.cz
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Od: ${name}
+Email: ${email}
+Čas: ${new Date(timestamp).toLocaleString('cs-CZ')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ZPRÁVA:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${message}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Odpovězte přímo na tento email pro kontaktování odesílatele.
+`
+    }
+
+    await transporter.sendMail(mailOptions)
+    console.log('✅ Contact form notification sent to info@svatbot.cz')
+    return true
+  } catch (error) {
+    console.error('❌ Error sending contact form notification:', error)
+    return false
+  }
+}
+
