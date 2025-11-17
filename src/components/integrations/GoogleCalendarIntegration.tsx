@@ -52,8 +52,11 @@ export default function GoogleCalendarIntegration() {
       const taskEvents = createCalendarEventsFromTasks(tasks, wedding?.weddingDate ? wedding.weddingDate.toISOString() : undefined)
 
       // Create wedding event
+      const venueName = wedding?.venue
+        ? (typeof wedding.venue === 'string' ? wedding.venue : wedding.venue.name)
+        : undefined
       const weddingEvents = wedding?.weddingDate ? [
-        createWeddingCalendarEvent(wedding, wedding.venue?.name)
+        createWeddingCalendarEvent(wedding, venueName)
       ] : []
 
       // Create vendor meeting events

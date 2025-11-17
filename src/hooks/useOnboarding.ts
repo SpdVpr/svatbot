@@ -193,7 +193,7 @@ export function useOnboarding() {
             hasCompletedOnboarding: false,
             currentStep: 0,
             completedSteps: [],
-            showWelcome: true,
+            showWelcome: false, // Don't auto-show wizard - user can open it manually
             lastInteraction: new Date()
           }
 

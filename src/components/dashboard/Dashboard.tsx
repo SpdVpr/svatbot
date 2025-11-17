@@ -526,8 +526,13 @@ function DashboardContent() {
       {/* Floating AI Assistant - Hidden (using Svatbot module in dashboard instead) */}
       {/* <AIAssistant compact={true} /> */}
 
-      {/* Onboarding Wizard */}
-      <OnboardingWizard />
+      {/* Onboarding Wizard - Manual only, not auto-shown */}
+      {showOnboardingWizardFromDashboard && (
+        <OnboardingWizard
+          autoShow={false}
+          onClose={() => setShowOnboardingWizardFromDashboard(false)}
+        />
+      )}
 
       {/* Live Toast Notifications */}
       <LiveToastNotifications />

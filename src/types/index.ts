@@ -20,7 +20,7 @@ export interface Wedding {
   budget: number
   style?: string // Volné pole pro styl svatby (např. "rustikální", "moderní", vlastní text)
   region: string
-  venue?: Venue
+  venue?: string | Venue // Může být string (adresa) nebo objekt Venue
   status: WeddingStatus
   progress: WeddingProgress
   createdAt: Date
@@ -531,5 +531,5 @@ export interface OnboardingData {
   estimatedGuestCount: number
   budget: number
   style?: string // Volné pole pro styl svatby (nepovinné)
-  region: string
+  venue?: string // Místo konání svatby (nepovinné)
 }

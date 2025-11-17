@@ -73,7 +73,8 @@ export default function WeddingCountdownModule({ onWeddingSettingsClick }: Weddi
     if (!wedding || !daysUntilWedding) return recs
 
     // 1. VENUE CHECK
-    if (!wedding.venue || !wedding.venue.name) {
+    const hasVenue = wedding.venue && (typeof wedding.venue === 'string' ? wedding.venue.trim() !== '' : wedding.venue.name)
+    if (!hasVenue) {
       recs.push({
         id: 'venue-missing',
         title: 'Tip: Vyberte místo konání',

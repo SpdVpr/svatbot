@@ -6,6 +6,7 @@ import { cn } from '@/utils'
 import { OnboardingData } from '@/types'
 import { useWedding } from '@/hooks/useWedding'
 import { useAuthStore } from '@/stores/authStore'
+import VenueLocationMap from '@/components/wedding/VenueLocationMap'
 
 interface OnboardingFlowProps {
   onComplete: (data: OnboardingData) => void
@@ -18,7 +19,7 @@ const STEPS = [
   { id: 'guests', title: 'Počet hostů', description: 'Kolik pozvaných hostů?' },
   { id: 'budget', title: 'Rozpočet', description: 'Jaký je váš rozpočet?' },
   { id: 'style', title: 'Styl svatby', description: 'Jaký styl preferujete?' },
-  { id: 'region', title: 'Region', description: 'Kde se chcete vzít?' },
+  { id: 'venue', title: 'Místo konání', description: 'Kde se bude svatba konat?' },
 ]
 
 export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowProps) {
@@ -34,7 +35,7 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
     estimatedGuestCount: 75,
     budget: 450000,
     style: '', // Volné pole - uživatel může zadat vlastní styl
-    region: 'Praha'
+    venue: '' // Místo konání - nepovinné
   })
 
   const currentStepData = STEPS[currentStep]
@@ -53,8 +54,8 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
         return formData.budget > 0
       case 'style':
         return true // Style is optional
-      case 'region':
-        return formData.region !== ''
+      case 'venue':
+        return true // Venue is optional
       default:
         return true
     }
@@ -100,7 +101,7 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
         estimatedGuestCount: 50,
         budget: 300000,
         style: 'classic' as const,
-        region: 'Praha'
+        venue: ''
       }
 
       // Create wedding in Firebase
@@ -359,44 +360,20 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
           </div>
         )
 
-      case 'region':
-        const regions = [
-          'Praha', 'Brno', 'Ostrava', 'Plzeň', 'Liberec',
-          'Olomouc', 'České Budějovice', 'Hradec Králové', 'Pardubice', 'Jiné'
-        ]
-
+      case 'venue':
         return (
           <div className="space-y-6">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {regions.map((region) => (
-                <button
-                  key={region}
-                  onClick={() => updateFormData({ region })}
-                  className={cn(
-                    'p-3 border-2 rounded-xl text-center transition-all duration-200',
-                    formData.region === region
-                      ? 'border-primary-500 bg-primary-50 text-primary-700'
-                      : 'border-gray-200 hover:border-primary-300 hover:bg-primary-25'
-                  )}
-                >
-                  {region}
-                </button>
-              ))}
-            </div>
+            <VenueLocationMap
+              address={formData.venue || ''}
+              onAddressChange={(value) => updateFormData({ venue: value })}
+            />
 
-            {formData.region === 'Jiné' && (
-              <div>
-                <label className="block body-small font-medium text-text-primary mb-2">
-                  Zadejte region
-                </label>
-                <input
-                  type="text"
-                  onChange={(e) => updateFormData({ region: e.target.value })}
-                  className="input-field"
-                  placeholder="Zadejte váš region"
-                />
-              </div>
-            )}
+            <div className="bg-primary-50 p-4 rounded-xl">
+              <p className="body-small text-primary-700">
+                💡 <strong>Nepovinný údaj:</strong> Místo konání zatím vědět nemusíte.
+                Můžete ho kdykoliv doplnit v nastavení.
+              </p>
+            </div>
           </div>
         )
 

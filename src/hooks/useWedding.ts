@@ -127,7 +127,8 @@ export function useWedding() {
         estimatedGuestCount: onboardingData.estimatedGuestCount,
         budget: onboardingData.budget,
         style: onboardingData.style,
-        region: onboardingData.region,
+        region: '', // Region is no longer collected in onboarding
+        venue: onboardingData.venue || undefined, // Store venue as string
         status: 'planning',
         progress: {
           overall: 15,

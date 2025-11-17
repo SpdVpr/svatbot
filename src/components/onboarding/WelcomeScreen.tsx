@@ -352,7 +352,7 @@ export default function WelcomeScreen() {
                 onClick={handleDemoLogin}
                 disabled={isDemoLoading}
                 className={cn("px-6 py-3 md:px-8 md:py-4 bg-rose-500 text-white font-semibold text-base md:text-lg rounded-full shadow-lg hover:bg-rose-600 transition-all duration-300 button-glow flex items-center justify-center demo-pulse", isDemoLoading && "opacity-50 cursor-not-allowed")}
-                aria-label="Vyzkoušet živé demo aplikace"
+                aria-label="Vyzkoušet ukázkové demo aplikace"
               >
                 {isDemoLoading ? (
                   <>
@@ -361,7 +361,7 @@ export default function WelcomeScreen() {
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-5 h-5 md:w-6 md:h-6 mr-2" aria-hidden="true" /> Vyzkoušet živé demo
+                    <Sparkles className="w-5 h-5 md:w-6 md:h-6 mr-2" aria-hidden="true" /> Vyzkoušet ukázkové demo
                   </>
                 )}
               </button>
@@ -377,7 +377,7 @@ export default function WelcomeScreen() {
           <figure className="lg:w-1/2 flex justify-center animate-fade-in w-full" style={{ animationDelay: '0.4s' }}>
             <div className="w-full max-w-[745px] aspect-[5/3.5] rounded-2xl md:rounded-3xl shadow-2xl border-2 md:border-4 border-white overflow-hidden relative">
               <img
-                src="/front5.jpg"
+                src="/front6.jpg"
                 alt="Náhled dashboardu SvatBot.cz s AI asistentem, správou rozpočtu, timeline a dalšími nástroji pro plánování svatby"
                 className="w-full object-cover"
                 style={{ height: '100%' }}
@@ -406,16 +406,16 @@ export default function WelcomeScreen() {
           </header>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 max-w-7xl mx-auto relative">
-            <div className="hidden min-[1500px]:block absolute opacity-20 pointer-events-none" style={{ width: '30rem', bottom: '-5rem', right: '-28%' }}>
-              <img 
-                src="/wed3.png" 
-                alt="" 
+            <div className="hidden min-[1500px]:block absolute opacity-20 pointer-events-none z-10" style={{ width: '30rem', bottom: '-5rem', right: '-28%' }}>
+              <img
+                src="/wed3.png"
+                alt=""
                 className="w-full h-auto"
                 aria-hidden="true"
               />
             </div>
             {/* AI Asistent - HLAVNÍ DIFERENCIÁTOR */}
-            <div className="group bg-gradient-to-br from-rose-50 to-purple-50 rounded-3xl p-8 shadow-lg border-2 border-rose-200 hover:border-rose-400 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105 relative overflow-hidden" style={{ animationDelay: '0.3s' }}>
+            <div className="group bg-gradient-to-br from-rose-50 to-purple-50 rounded-3xl p-8 shadow-lg border-2 border-rose-200 hover:border-rose-400 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105 relative overflow-hidden z-0" style={{ animationDelay: '0.3s' }}>
               <div className="absolute top-0 right-0 bg-gradient-to-br from-rose-500 to-purple-500 text-white text-xs font-bold px-3 py-1 rounded-bl-xl">
                 PREMIUM
               </div>
@@ -423,18 +423,15 @@ export default function WelcomeScreen() {
                 <div className="w-20 h-20 bg-gradient-to-br from-rose-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
                   <Bot className="w-10 h-10 text-white" />
                 </div>
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center animate-pulse">
-                  <Sparkles className="w-3 h-3 text-yellow-900" />
-                </div>
               </div>
               <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">AI Asistent a Podpora</h3>
               <p className="text-base text-gray-600 leading-relaxed">
-                Inteligentní pomocník s nejnovějším GPT-5. Doporučení, rady a automatizace 24/7.
+                Inteligentní pomocník s nejnovějším GPT-5. Doporučení, rady a automatizace 24/7. Zákaznická podpora.
               </p>
             </div>
 
             {/* Úkoly & Checklist */}
-            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-pink-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.4s' }}>
+            <div className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-pink-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105 relative z-0" style={{ animationDelay: '0.4s' }}>
               <div className="relative mb-6">
                 <div className="w-20 h-20 bg-gradient-to-br from-pink-100 to-rose-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
                   <ListChecks className="w-10 h-10 text-pink-600" />
@@ -447,7 +444,7 @@ export default function WelcomeScreen() {
             </div>
 
             {/* Hosté & RSVP */}
-            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-purple-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.5s' }}>
+            <div className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-purple-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105 relative z-0" style={{ animationDelay: '0.5s' }}>
               <div className="relative mb-6">
                 <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
                   <Users className="w-10 h-10 text-purple-600" />
@@ -455,12 +452,12 @@ export default function WelcomeScreen() {
               </div>
               <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Hosté a Zasedací pořádek</h3>
               <p className="text-base text-gray-600 leading-relaxed">
-                Kompletní správa hostů, informace o ubytování včetně zbývající kapacity a tvorba zasedacího pořádku s automatickým rozmístěním.
+                Kompletní správa hostů, informace o ubytování včetně zbývající kapacity a tvorba zasedacího pořádku s praktickým rozmístěním.
               </p>
             </div>
 
             {/* Rozpočet */}
-            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-pink-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.6s' }}>
+            <div className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-pink-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105 relative z-0" style={{ animationDelay: '0.6s' }}>
               <div className="relative mb-6">
                 <div className="w-20 h-20 bg-gradient-to-br from-pink-100 to-rose-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
                   <DollarSign className="w-10 h-10 text-pink-600" />
@@ -500,16 +497,16 @@ export default function WelcomeScreen() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 max-w-7xl mx-auto relative">
-            <div className="hidden min-[1500px]:block absolute opacity-15 pointer-events-none" style={{ width: '30rem', bottom: '-5rem', left: '-28%' }}>
-              <img 
-                src="/wed4.png" 
-                alt="" 
+            <div className="hidden min-[1500px]:block absolute opacity-15 pointer-events-none z-10" style={{ width: '30rem', bottom: '-5rem', left: '-28%' }}>
+              <img
+                src="/wed4.png"
+                alt=""
                 className="w-full h-auto"
                 aria-hidden="true"
               />
             </div>
             {/* Svatební web - PREMIUM */}
-            <div className="group bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl p-8 shadow-lg border-2 border-purple-200 hover:border-purple-400 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105 relative overflow-hidden" style={{ animationDelay: '0.3s' }}>
+            <div className="group bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl p-8 shadow-lg border-2 border-purple-200 hover:border-purple-400 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105 relative overflow-hidden z-0" style={{ animationDelay: '0.3s' }}>
               <div className="absolute top-0 right-0 bg-gradient-to-br from-purple-500 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-bl-xl">
                 PREMIUM
               </div>
@@ -517,22 +514,16 @@ export default function WelcomeScreen() {
                 <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
                   <Cloud className="w-10 h-10 text-white" />
                 </div>
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
-                  <Crown className="w-3 h-3 text-white" />
-                </div>
               </div>
               <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Svatební web</h3>
-              <p className="text-base text-gray-600 leading-relaxed">Vytvořte vlastní svatební web s potvrzením hostů, galerií, programem svatby, ubytováním a mnoho dalších.</p>
+              <p className="text-base text-gray-600 leading-relaxed">Vytvořte si vlastní svatební web s účastí hostů, fotogalerií, harmonogramem, dress codem a ubytováním.</p>
             </div>
 
             {/* Moodboard */}
-            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-pink-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.4s' }}>
+            <div className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-pink-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105 relative z-0" style={{ animationDelay: '0.4s' }}>
               <div className="relative mb-6">
                 <div className="w-20 h-20 bg-gradient-to-br from-pink-100 to-rose-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
                   <Image className="w-10 h-10 text-pink-600" />
-                </div>
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center">
-                  <Sparkles className="w-3 h-3 text-white" />
                 </div>
               </div>
               <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Moodboard</h3>
@@ -540,25 +531,25 @@ export default function WelcomeScreen() {
             </div>
 
             {/* Nákupní seznam */}
-            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-purple-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.5s' }}>
+            <div className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-purple-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105 relative z-0" style={{ animationDelay: '0.5s' }}>
               <div className="relative mb-6">
                 <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
                   <ListChecks className="w-10 h-10 text-purple-600" />
                 </div>
               </div>
               <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Nákupní seznam</h3>
-              <p className="text-base text-gray-600 leading-relaxed">Vytvořte si přehledný seznam všech potřebných nákupů pro vaši svatbu a sledujte, co už máte nakoupené.</p>
+              <p className="text-base text-gray-600 leading-relaxed">Vytvořte si přehledný seznam všech potřebných věcí pro vaši svatbu a sledujte, co už máte nakoupené.</p>
             </div>
 
             {/* Marketplace */}
-            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-purple-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.6s' }}>
+            <div className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-purple-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105 relative z-0" style={{ animationDelay: '0.6s' }}>
               <div className="relative mb-6">
                 <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
                   <Store className="w-10 h-10 text-purple-600" />
                 </div>
               </div>
               <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Marketplace</h3>
-              <p className="text-base text-gray-600 leading-relaxed">Výběr z ověřených dodavatelů. Můžete je kontaktovat na přímo přes náš web bez dalšího hledání.</p>
+              <p className="text-base text-gray-600 leading-relaxed">Výběr z ověřených dodavatelů s portfolii. Můžete je kontaktovat přímo přes náš web bez dalšího hledání.</p>
             </div>
           </div>
         </div>
@@ -589,7 +580,7 @@ export default function WelcomeScreen() {
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-5 h-5 md:w-6 md:h-6 mr-2 md:mr-3" /> Spustit DEMO nyní
+                    <Sparkles className="w-5 h-5 md:w-6 md:h-6 mr-2 md:mr-3" /> Vyzkoušet ukázkové demo
                   </>
                 )}
               </button>
@@ -650,7 +641,7 @@ export default function WelcomeScreen() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto relative">
-            <div className="hidden min-[1500px]:block absolute opacity-15 pointer-events-none" style={{ width: '18rem', bottom: '-5rem', left: '-20%' }}>
+            <div className="hidden min-[1500px]:block absolute opacity-15 pointer-events-none z-10" style={{ width: '18rem', bottom: '-5rem', left: '-20%' }}>
               <img
                 src="/wed6.png"
                 alt=""
@@ -658,7 +649,7 @@ export default function WelcomeScreen() {
                 aria-hidden="true"
               />
             </div>
-            <div className="hidden min-[1500px]:block absolute opacity-15 pointer-events-none" style={{ width: '26rem', bottom: '-5rem', right: '-28%' }}>
+            <div className="hidden min-[1500px]:block absolute opacity-15 pointer-events-none z-10" style={{ width: '26rem', bottom: '-5rem', right: '-28%' }}>
               <img
                 src="/wed7.png"
                 alt=""
@@ -667,13 +658,10 @@ export default function WelcomeScreen() {
               />
             </div>
             {/* AI technologie */}
-            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-pink-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.3s' }}>
+            <div className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-pink-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105 relative z-0" style={{ animationDelay: '0.3s' }}>
               <div className="relative mb-6">
                 <div className="w-20 h-20 bg-gradient-to-br from-pink-100 to-rose-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
                   <Sparkles className="w-10 h-10 text-pink-600" />
-                </div>
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center">
-                  <Zap className="w-3 h-3 text-white" />
                 </div>
               </div>
               <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">AI technologie</h3>
@@ -683,13 +671,10 @@ export default function WelcomeScreen() {
             </div>
 
             {/* Ušetříte čas */}
-            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-purple-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.4s' }}>
+            <div className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-purple-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105 relative z-0" style={{ animationDelay: '0.4s' }}>
               <div className="relative mb-6">
                 <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
                   <Clock className="w-10 h-10 text-purple-600" />
-                </div>
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
-                  <TrendingUp className="w-3 h-3 text-white" />
                 </div>
               </div>
               <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Ušetříte čas</h3>
@@ -699,13 +684,10 @@ export default function WelcomeScreen() {
             </div>
 
             {/* Vše na jednom místě */}
-            <div className="group bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-pink-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105" style={{ animationDelay: '0.5s' }}>
+            <div className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg border-2 border-gray-100 hover:border-pink-300 hover:shadow-2xl transition-all duration-500 text-center animate-fade-in hover:scale-105 relative z-0" style={{ animationDelay: '0.5s' }}>
               <div className="relative mb-6">
                 <div className="w-20 h-20 bg-gradient-to-br from-pink-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
                   <BarChart2 className="w-10 h-10 text-pink-600" />
-                </div>
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-3 h-3 text-white" />
                 </div>
               </div>
               <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">Vše na jednom místě</h3>
@@ -758,7 +740,6 @@ export default function WelcomeScreen() {
                 </div>
                 <div>
                   <div className="font-semibold text-gray-900">Jana & Petr</div>
-                  <div className="text-sm text-gray-600">Praha • Svatba 08/2024</div>
                 </div>
               </div>
             </div>
@@ -779,7 +760,6 @@ export default function WelcomeScreen() {
                 </div>
                 <div>
                   <div className="font-semibold text-gray-900">Markéta & Tomáš</div>
-                  <div className="text-sm text-gray-600">Brno • Svatba 06/2024</div>
                 </div>
               </div>
             </div>
@@ -800,7 +780,6 @@ export default function WelcomeScreen() {
                 </div>
                 <div>
                   <div className="font-semibold text-gray-900">Lucie & Martin</div>
-                  <div className="text-sm text-gray-600">Ostrava • Svatba 09/2024</div>
                 </div>
               </div>
             </div>
@@ -864,9 +843,6 @@ export default function WelcomeScreen() {
                 <div className="w-28 h-28 bg-pink-100 rounded-3xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
                   <Eye className="w-14 h-14 text-pink-600" />
                 </div>
-                <div className="absolute -top-2 -right-2 w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center shadow-lg">
-                  <TrendingUp className="w-4 h-4 text-white" />
-                </div>
               </div>
               <h3 className="text-2xl md:text-3xl font-display font-bold text-gray-900 mb-4">Zvyšte viditelnost</h3>
               <p className="text-base md:text-lg text-gray-600 leading-relaxed">
@@ -880,9 +856,6 @@ export default function WelcomeScreen() {
                 <div className="w-28 h-28 bg-purple-100 rounded-3xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
                   <Users className="w-14 h-14 text-purple-600" />
                 </div>
-                <div className="absolute -top-2 -right-2 w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center shadow-lg">
-                  <Sparkles className="w-4 h-4 text-white" />
-                </div>
               </div>
               <h3 className="text-2xl md:text-3xl font-display font-bold text-gray-900 mb-4">Získejte klienty</h3>
               <p className="text-base md:text-lg text-gray-600 leading-relaxed">
@@ -895,9 +868,6 @@ export default function WelcomeScreen() {
               <div className="relative mb-6">
                 <div className="w-28 h-28 bg-pink-100 rounded-3xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-shadow">
                   <Image className="w-14 h-14 text-pink-600" />
-                </div>
-                <div className="absolute -top-2 -right-2 w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center shadow-lg">
-                  <Star className="w-4 h-4 text-white" />
                 </div>
               </div>
               <h3 className="text-2xl md:text-3xl font-display font-bold text-gray-900 mb-4">Ukažte portfolio</h3>
