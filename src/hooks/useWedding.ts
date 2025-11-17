@@ -348,7 +348,7 @@ export function useWedding() {
 
   // Load wedding when user changes
   useEffect(() => {
-    if (user && !currentWedding && !loadingRef.current) {
+    if (user && !loadingRef.current) {
       // Set loading immediately to prevent flickering
       setLoading(true)
       loadUserWedding()
@@ -357,7 +357,7 @@ export function useWedding() {
       setLoading(false)
       loadingRef.current = false
     }
-  }, [user, currentWedding])
+  }, [user?.id]) // Only depend on user.id, not currentWedding to avoid infinite loop
 
   // Clear error
   const clearError = () => setError(null)
