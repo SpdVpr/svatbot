@@ -20,6 +20,9 @@ import { useDemoLock } from './useDemoLock'
 import { Wedding, OnboardingData, WeddingProgress } from '@/types'
 import logger from '@/lib/logger'
 
+// Global ref to track if wedding is being loaded (shared across all hook instances)
+const globalLoadingRef = { current: false, userId: null as string | null }
+
 export function useWedding() {
   const { user } = useAuthStore()
   const { currentWedding, setCurrentWedding, setLoading, isLoading } = useWeddingStore()
@@ -346,18 +349,40 @@ export function useWedding() {
     }
   }, [user, currentWedding?.id])
 
-  // Load wedding when user changes
+  // Load wedding when user changes - ONLY ONCE per user (globally)
   useEffect(() => {
-    if (user && !loadingRef.current) {
-      // Set loading immediately to prevent flickering
-      setLoading(true)
-      loadUserWedding()
-    } else if (!user) {
+    if (!user) {
+      // No user - clear wedding and stop loading
       setCurrentWedding(null)
       setLoading(false)
       loadingRef.current = false
+      globalLoadingRef.current = false
+      globalLoadingRef.userId = null
+      return
     }
-  }, [user?.id]) // Only depend on user.id, not currentWedding to avoid infinite loop
+
+    // Check if already loaded or loading for this user (globally)
+    if (globalLoadingRef.current && globalLoadingRef.userId === user.id) {
+      logger.log('⏭️ Skipping wedding load - already loading globally for user:', user.id)
+      return
+    }
+
+    // Check if wedding is already loaded for this user
+    if (currentWedding && currentWedding.userId === user.id) {
+      logger.log('✅ Wedding already loaded for user:', user.id)
+      return
+    }
+
+    // Mark as loading globally
+    globalLoadingRef.current = true
+    globalLoadingRef.userId = user.id
+
+    logger.log('🔄 Loading wedding for user:', user.id)
+    setLoading(true)
+    loadUserWedding().finally(() => {
+      globalLoadingRef.current = false
+    })
+  }, [user?.id, currentWedding?.userId]) // Depend on user.id and currentWedding.userId
 
   // Clear error
   const clearError = () => setError(null)
