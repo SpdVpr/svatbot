@@ -185,7 +185,8 @@ export default function BudgetPage() {
               className="btn-primary flex items-center space-x-2"
             >
               <Plus className="w-4 h-4" />
-              <span>Přidat položku</span>
+              <span className="hidden sm:inline">Přidat položku</span>
+              <span className="sm:hidden">Přidat</span>
             </button>
           </div>
         }

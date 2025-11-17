@@ -209,14 +209,6 @@
     transform: translateY(-2px);
   }
 
-  /* Hide button text on mobile, show only icons */
-  @media (max-width: 640px) {
-    .btn-primary span,
-    .btn-outline span {
-      @apply hidden;
-    }
-  }
-
   .btn-secondary {
     @apply bg-secondary-100 hover:bg-secondary-200 text-secondary-700 font-button font-medium px-6 py-3 rounded-2xl transition-all duration-300 border border-secondary-200;
     box-shadow:

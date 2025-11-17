@@ -4,6 +4,7 @@ import { MapPin, Clock, Car, Info } from 'lucide-react'
 import type { InfoContent } from '@/types/wedding-website'
 import GoogleMapsEmbed from '../../GoogleMapsEmbed'
 import { useColorTheme } from '../ColorThemeContext'
+import { useScrollReveal } from '@/hooks/useScrollReveal'
 
 interface InfoSectionProps {
   content: InfoContent
@@ -11,7 +12,10 @@ interface InfoSectionProps {
 
 export default function InfoSection({ content }: InfoSectionProps) {
   const { ceremony, reception, parking, customInfo } = content
-  const { theme } = useColorTheme()
+  const { theme, themeName } = useColorTheme()
+  const { ref: headerRef, isVisible: headerVisible } = useScrollReveal()
+  const { ref: cardRef, isVisible: cardVisible } = useScrollReveal()
+  const { ref: bottomRef, isVisible: bottomVisible } = useScrollReveal()
 
   // Check which venue sections are filled
   const hasCeremony = ceremony && (ceremony.venue || ceremony.time || ceremony.address)
@@ -37,23 +41,23 @@ export default function InfoSection({ content }: InfoSectionProps) {
   }
 
   return (
-    <section className="py-20" style={{ backgroundColor: theme.bgGradientFrom }}>
+    <section className="py-20" style={{ backgroundColor: themeName === 'default' ? '#ffffff' : theme.bgGradientFrom }}>
       <div className="max-w-7xl mx-auto px-4">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-5xl font-bold text-gray-900 mb-4 font-serif scale-in">
+        <div ref={headerRef as any} className="text-center mb-16">
+          <h2 className={`text-5xl font-bold text-gray-900 mb-4 font-serif transition-all duration-700 ${headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'}`}>
             {ceremony?.venue || reception?.venue || 'Místo konání'}
           </h2>
-          <div className="w-24 h-1 mx-auto mb-6 slide-in-left" style={{ animationDelay: '0.2s', backgroundColor: theme.primary }}></div>
-          <p className="text-gray-600 text-lg leading-relaxed max-w-3xl mx-auto slide-in-bottom" style={{ animationDelay: '0.3s' }}>
+          <div className={`w-24 h-1 mx-auto mb-6 transition-all duration-700 delay-200 ${headerVisible ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'}`} style={{ backgroundColor: theme.primary }}></div>
+          <p className={`text-gray-600 text-lg leading-relaxed max-w-3xl mx-auto transition-all duration-700 delay-300 ${headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             {ceremony?.address || reception?.address || 'Všechny důležité informace o našem velkém dni'}
           </p>
         </div>
 
         {/* Main Venue Info */}
         {(hasCeremony || hasReception) && (
-          <div className="mb-16">
-            <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-amber-100">
+          <div ref={cardRef as any} className={`mb-16 transition-all duration-700 ${cardVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}>
+            <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-amber-100 hover:shadow-2xl transition-shadow duration-300">
               {/* Venue Images - First */}
               {allVenueImages.length > 0 && (
                 <div className="p-8 flex justify-center">
@@ -94,7 +98,7 @@ export default function InfoSection({ content }: InfoSectionProps) {
                 </div>
 
                 {/* Right: Info */}
-                <div className="p-12" style={{ backgroundColor: `${theme.bgGradientFrom}80` }}>
+                <div className="p-12" style={{ backgroundColor: themeName === 'default' ? '#f9fafb' : `${theme.bgGradientFrom}80` }}>
                   <div className="space-y-8">
                     {/* Venue Name */}
                     {(ceremony?.venue || reception?.venue) && (
@@ -111,8 +115,8 @@ export default function InfoSection({ content }: InfoSectionProps) {
                     {/* Time */}
                     {(ceremony?.time || reception?.time) && (
                       <div className="flex items-start space-x-4">
-                        <div className="p-3 rounded-full flex-shrink-0" style={{ backgroundColor: theme.bgGradientTo }}>
-                          <Clock className="w-6 h-6" style={{ color: theme.primary }} />
+                        <div className="p-3 rounded-full flex-shrink-0" style={{ backgroundColor: themeName === 'default' ? '#fef3c7' : theme.bgGradientTo }}>
+                          <Clock className="w-6 h-6" style={{ color: themeName === 'default' ? '#f59e0b' : theme.primary }} />
                         </div>
                         <div>
                           <h4 className="font-semibold text-gray-900 mb-2 text-lg">Čas začátku</h4>
@@ -172,10 +176,10 @@ export default function InfoSection({ content }: InfoSectionProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Parking */}
           {parking && (
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-amber-100 hover:shadow-xl transition-shadow">
+            <div className="bg-white rounded-2xl p-8 shadow-lg border border-amber-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group cursor-pointer">
               <div className="flex flex-col items-center text-center space-y-4">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center shadow-md">
-                  <Car className="w-10 h-10 text-blue-600" />
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+                  <Car className="w-10 h-10 text-blue-600 group-hover:rotate-12 transition-transform duration-300" />
                 </div>
                 <div>
                   <h4 className="font-bold text-gray-900 mb-3 text-xl font-serif">Parkování</h4>
@@ -187,10 +191,10 @@ export default function InfoSection({ content }: InfoSectionProps) {
 
           {/* Custom Info */}
           {customInfo && customInfo.slice(0, 1).map((info) => (
-            <div key={info.id} className="bg-white rounded-2xl p-8 shadow-lg border border-amber-100 hover:shadow-xl transition-shadow">
+            <div key={info.id} className="bg-white rounded-2xl p-8 shadow-lg border border-amber-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group cursor-pointer">
               <div className="flex flex-col items-center text-center space-y-4">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center shadow-md">
-                  <Info className="w-10 h-10 text-green-600" />
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+                  <Info className="w-10 h-10 text-green-600 group-hover:rotate-12 transition-transform duration-300" />
                 </div>
                 <div>
                   <h4 className="font-bold text-gray-900 mb-3 text-xl font-serif">{info.title}</h4>
@@ -205,10 +209,10 @@ export default function InfoSection({ content }: InfoSectionProps) {
         {customInfo && customInfo.length > 1 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
             {customInfo.slice(1).map((info) => (
-              <div key={info.id} className="bg-white rounded-2xl p-8 shadow-lg border border-amber-100 hover:shadow-xl transition-shadow">
+              <div key={info.id} className="bg-white rounded-2xl p-8 shadow-lg border border-amber-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group cursor-pointer">
                 <div className="flex flex-col items-center text-center space-y-4">
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center shadow-md">
-                    <Info className="w-10 h-10 text-green-600" />
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+                    <Info className="w-10 h-10 text-green-600 group-hover:rotate-12 transition-transform duration-300" />
                   </div>
                   <div>
                     <h4 className="font-bold text-gray-900 mb-3 text-xl font-serif">{info.title}</h4>
@@ -221,13 +225,13 @@ export default function InfoSection({ content }: InfoSectionProps) {
         )}
 
         {/* Decorative bottom section */}
-        <div className="mt-16 text-center">
-          <div className="inline-flex items-center gap-4 px-10 py-5 rounded-full shadow-lg" style={{ backgroundColor: theme.bgGradientTo }}>
-            <div className="text-3xl">💒</div>
+        <div ref={bottomRef as any} className={`mt-16 text-center transition-all duration-700 ${bottomVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
+          <div className="inline-flex items-center gap-4 px-10 py-5 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer" style={{ backgroundColor: themeName === 'default' ? '#fecdd3' : theme.bgGradientTo }}>
+            <div className="text-3xl animate-bounce">💒</div>
             <p className="text-gray-800 font-bold text-lg font-serif">
               Těšíme se na vás!
             </p>
-            <div className="text-3xl">💕</div>
+            <div className="text-3xl animate-bounce" style={{ animationDelay: '0.2s' }}>💕</div>
           </div>
         </div>
       </div>

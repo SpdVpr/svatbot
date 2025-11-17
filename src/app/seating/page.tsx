@@ -143,7 +143,8 @@ export default function SeatingPage() {
               className="btn-primary flex items-center space-x-2"
             >
               <Plus className="w-4 h-4" />
-              <span>Nový plán</span>
+              <span className="hidden sm:inline">Nový plán</span>
+              <span className="sm:hidden">Přidat</span>
             </button>
           </div>
         }

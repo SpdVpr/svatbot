@@ -94,11 +94,11 @@
 }
 
 .scale-in {
-  animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 .scale-out {
-  animation: scaleOut 0.2s ease-out;
+  animation: scaleOut 0.2s ease-out forwards;
 }
 
 /* ============================================
@@ -214,15 +214,15 @@
 }
 
 .slide-in-left {
-  animation: slideInLeft 0.5s ease-out;
+  animation: slideInLeft 0.5s ease-out forwards;
 }
 
 .slide-in-right {
-  animation: slideInRight 0.5s ease-out;
+  animation: slideInRight 0.5s ease-out forwards;
 }
 
 .slide-in-bottom {
-  animation: slideInBottom 0.5s ease-out;
+  animation: slideInBottom 0.5s ease-out forwards;
 }
 
 /* ============================================
@@ -241,7 +241,7 @@
 }
 
 .rotate-in {
-  animation: rotateIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: rotateIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 /* ============================================
@@ -266,7 +266,7 @@
 }
 
 .bounce-in {
-  animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
 }
 
 /* ============================================
@@ -326,7 +326,7 @@
 }
 
 .flip-in {
-  animation: flipIn 0.6s ease-out;
+  animation: flipIn 0.6s ease-out forwards;
 }
 
 /* ============================================
@@ -349,7 +349,7 @@
 }
 
 .elastic-bounce {
-  animation: elasticBounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  animation: elasticBounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
 }
 
 /* ============================================
@@ -532,3 +532,41 @@
   }
 }
 
+/* ============================================
+   23. SCROLL REVEAL ANIMATIONS
+   ============================================ */
+
+/* Připraví elementy pro animaci - skryje je */
+.animate-ready.scale-in,
+.animate-ready.slide-in-left,
+.animate-ready.slide-in-right,
+.animate-ready.slide-in-bottom,
+.animate-ready.bounce-in,
+.animate-ready.rotate-in,
+.animate-ready.flip-in,
+.animate-ready.elastic-bounce {
+  opacity: 0;
+  animation-play-state: paused;
+}
+
+/* Spustí animaci když je element viditelný */
+.animate-ready.scale-in.animate-in,
+.animate-ready.slide-in-left.animate-in,
+.animate-ready.slide-in-right.animate-in,
+.animate-ready.slide-in-bottom.animate-in,
+.animate-ready.bounce-in.animate-in,
+.animate-ready.rotate-in.animate-in,
+.animate-ready.flip-in.animate-in,
+.animate-ready.elastic-bounce.animate-in {
+  animation-play-state: running;
+}
+
+/* Stagger items - scroll reveal */
+.animate-ready.stagger-item {
+  opacity: 0;
+  animation-play-state: paused;
+}
+
+.animate-ready.stagger-item.animate-in {
+  animation-play-state: running;
+}

@@ -76,9 +76,7 @@ export default function WeddingSettings({ onClose, onSave }: WeddingSettingsProp
       }
     }
 
-    if (!formData.location || !formData.location.trim()) {
-      newErrors.location = 'Místo konání je povinné'
-    }
+    // Location is optional - no validation needed
 
     if (formData.budget <= 0) {
       newErrors.budget = 'Rozpočet musí být větší než 0'

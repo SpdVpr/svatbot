@@ -2,6 +2,7 @@
 
 import { Heart, Sparkles, Calendar } from 'lucide-react'
 import type { StoryContent } from '@/types/wedding-website'
+import Image from 'next/image'
 
 interface StorySectionProps {
   content: StoryContent
@@ -33,90 +34,91 @@ export default function StorySection({ content }: StorySectionProps) {
           )}
         </div>
 
-        {/* Bride & Groom Profiles */}
+        {/* Couple Photos with Heart */}
         {(content.bride || content.groom) && (
-          <div className="grid md:grid-cols-2 gap-12 mb-20">
+          <div className="flex items-center justify-center gap-8 md:gap-16 mb-20 flex-wrap">
             {/* Bride */}
             {content.bride && (
-              <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-rose-400 to-pink-400 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-500"></div>
-                <div className="relative bg-white rounded-3xl p-8 shadow-xl">
-                  {content.bride.image && (
-                    <div className="mb-6 relative">
-                      <div className="absolute -top-4 -right-4 w-24 h-24 bg-rose-200 rounded-full opacity-50"></div>
-                      <img
-                        src={content.bride.image}
-                        alt={content.bride.name}
-                        className="relative w-48 h-48 rounded-full object-cover mx-auto border-4 border-white shadow-lg"
-                      />
-                    </div>
-                  )}
-                  <div className="text-center">
-                    <h3 className="text-3xl font-bold text-gray-800 mb-3" style={{ fontFamily: 'Playfair Display, serif' }}>
-                      {content.bride.name}
-                    </h3>
-                    <div className="text-4xl mb-4">👰</div>
-                    <p className="text-gray-600 leading-relaxed mb-4">
-                      {content.bride.description}
-                    </p>
-                    {content.bride.hobbies && (
-                      <div className="bg-rose-50 rounded-2xl p-4 mb-3">
-                        <p className="text-sm text-rose-700">
-                          <span className="font-semibold">Koníčky:</span> {content.bride.hobbies}
-                        </p>
-                      </div>
-                    )}
-                    {content.bride.favoriteThings && (
-                      <div className="bg-pink-50 rounded-2xl p-4">
-                        <p className="text-sm text-pink-700">
-                          <span className="font-semibold">Oblíbené:</span> {content.bride.favoriteThings}
-                        </p>
-                      </div>
-                    )}
+              <div className="text-center">
+                {content.bride.image && (
+                  <div className="w-64 h-64 md:w-80 md:h-80 mx-auto mb-6 rounded-full overflow-hidden shadow-2xl border-4 border-white relative">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-rose-400 to-pink-400 rounded-full blur opacity-30"></div>
+                    <img
+                      src={content.bride.image}
+                      alt={content.bride.name}
+                      className="relative w-full h-full object-cover"
+                    />
                   </div>
-                </div>
+                )}
+                <h3 className="text-3xl md:text-4xl font-bold text-gray-800 mb-3 uppercase tracking-wider" style={{ fontFamily: 'Playfair Display, serif' }}>
+                  {content.bride.name}
+                </h3>
+                <p className="text-gray-600 leading-relaxed max-w-xs mx-auto mb-4">
+                  {content.bride.description}
+                </p>
+                {content.bride.hobbies && (
+                  <div className="bg-rose-50 rounded-2xl p-3 mb-2 max-w-xs mx-auto">
+                    <p className="text-sm text-rose-700">
+                      <span className="font-semibold">Koníčky:</span> {content.bride.hobbies}
+                    </p>
+                  </div>
+                )}
+                {content.bride.favoriteThings && (
+                  <div className="bg-pink-50 rounded-2xl p-3 max-w-xs mx-auto">
+                    <p className="text-sm text-pink-700">
+                      <span className="font-semibold">Oblíbené:</span> {content.bride.favoriteThings}
+                    </p>
+                  </div>
+                )}
               </div>
             )}
 
+            {/* Heart Icon */}
+            <div className="flex items-center justify-center">
+              <div className="relative w-24 h-24 md:w-32 md:h-32">
+                <Image
+                  src="/hearth.png"
+                  alt="Heart"
+                  fill
+                  className="object-contain animate-pulse"
+                  style={{ filter: 'hue-rotate(330deg) saturate(1.2) brightness(1.1)' }}
+                />
+              </div>
+            </div>
+
             {/* Groom */}
             {content.groom && (
-              <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-amber-400 to-orange-400 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-500"></div>
-                <div className="relative bg-white rounded-3xl p-8 shadow-xl">
-                  {content.groom.image && (
-                    <div className="mb-6 relative">
-                      <div className="absolute -top-4 -left-4 w-24 h-24 bg-amber-200 rounded-full opacity-50"></div>
-                      <img
-                        src={content.groom.image}
-                        alt={content.groom.name}
-                        className="relative w-48 h-48 rounded-full object-cover mx-auto border-4 border-white shadow-lg"
-                      />
-                    </div>
-                  )}
-                  <div className="text-center">
-                    <h3 className="text-3xl font-bold text-gray-800 mb-3" style={{ fontFamily: 'Playfair Display, serif' }}>
-                      {content.groom.name}
-                    </h3>
-                    <div className="text-4xl mb-4">🤵</div>
-                    <p className="text-gray-600 leading-relaxed mb-4">
-                      {content.groom.description}
-                    </p>
-                    {content.groom.hobbies && (
-                      <div className="bg-amber-50 rounded-2xl p-4 mb-3">
-                        <p className="text-sm text-amber-700">
-                          <span className="font-semibold">Koníčky:</span> {content.groom.hobbies}
-                        </p>
-                      </div>
-                    )}
-                    {content.groom.favoriteThings && (
-                      <div className="bg-orange-50 rounded-2xl p-4">
-                        <p className="text-sm text-orange-700">
-                          <span className="font-semibold">Oblíbené:</span> {content.groom.favoriteThings}
-                        </p>
-                      </div>
-                    )}
+              <div className="text-center">
+                {content.groom.image && (
+                  <div className="w-64 h-64 md:w-80 md:h-80 mx-auto mb-6 rounded-full overflow-hidden shadow-2xl border-4 border-white relative">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-amber-400 to-orange-400 rounded-full blur opacity-30"></div>
+                    <img
+                      src={content.groom.image}
+                      alt={content.groom.name}
+                      className="relative w-full h-full object-cover"
+                    />
                   </div>
-                </div>
+                )}
+                <h3 className="text-3xl md:text-4xl font-bold text-gray-800 mb-3 uppercase tracking-wider" style={{ fontFamily: 'Playfair Display, serif' }}>
+                  {content.groom.name}
+                </h3>
+                <p className="text-gray-600 leading-relaxed max-w-xs mx-auto mb-4">
+                  {content.groom.description}
+                </p>
+                {content.groom.hobbies && (
+                  <div className="bg-amber-50 rounded-2xl p-3 mb-2 max-w-xs mx-auto">
+                    <p className="text-sm text-amber-700">
+                      <span className="font-semibold">Koníčky:</span> {content.groom.hobbies}
+                    </p>
+                  </div>
+                )}
+                {content.groom.favoriteThings && (
+                  <div className="bg-orange-50 rounded-2xl p-3 max-w-xs mx-auto">
+                    <p className="text-sm text-orange-700">
+                      <span className="font-semibold">Oblíbené:</span> {content.groom.favoriteThings}
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>

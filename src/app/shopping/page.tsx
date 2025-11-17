@@ -64,7 +64,8 @@ export default function ShoppingPage() {
             className="btn-primary flex items-center space-x-2"
           >
             <Plus className="w-4 h-4" />
-            <span>Přidat produkt</span>
+            <span className="hidden sm:inline">Přidat produkt</span>
+            <span className="sm:hidden">Přidat</span>
           </button>
         }
       />

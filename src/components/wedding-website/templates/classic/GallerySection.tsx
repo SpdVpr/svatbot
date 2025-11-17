@@ -10,7 +10,7 @@ interface GallerySectionProps {
 }
 
 export default function ClassicGallerySection({ content }: GallerySectionProps) {
-  const { theme } = useColorTheme()
+  const { theme, themeName } = useColorTheme()
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [showAll, setShowAll] = useState(false)
@@ -47,7 +47,7 @@ export default function ClassicGallerySection({ content }: GallerySectionProps) 
 
   if (images.length === 0) {
     return (
-      <section className="py-24" style={{ backgroundColor: theme.bgGradientFrom }}>
+      <section className="py-24" style={{ backgroundColor: themeName === 'default' ? '#ffffff' : theme.bgGradientFrom }}>
         <div className="max-w-6xl mx-auto px-4 text-center">
           <div className="mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
@@ -78,7 +78,7 @@ export default function ClassicGallerySection({ content }: GallerySectionProps) 
 
   return (
     <>
-      <section className="py-24" style={{ backgroundColor: theme.bgGradientFrom }}>
+      <section className="py-24" style={{ backgroundColor: themeName === 'default' ? '#ffffff' : theme.bgGradientFrom }}>
         <div className="max-w-6xl mx-auto px-4">
           {/* Section Header */}
           <div className="text-center mb-16">

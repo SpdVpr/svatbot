@@ -3,6 +3,7 @@
 import { Calendar, MapPin, Clock, Users, Mail, Phone } from 'lucide-react'
 import type { WeddingWebsite, SectionType } from '@/types/wedding-website'
 import { ColorThemeProvider } from './ColorThemeContext'
+import ScrollAnimations from '../ScrollAnimations'
 import Navigation from './classic/Navigation'
 import HeroSection from './classic/HeroSection'
 import InfoSection from './classic/InfoSection'
@@ -50,7 +51,7 @@ interface ClassicEleganceTemplateProps {
 
 export default function ClassicEleganceTemplate({ website }: ClassicEleganceTemplateProps) {
   const { content, style } = website
-  const colorTheme = style?.colorTheme || 'amber'
+  const colorTheme = style?.colorTheme || 'default'
   const customTheme = style?.customColors
 
   // Default section order if not specified
@@ -155,6 +156,7 @@ export default function ClassicEleganceTemplate({ website }: ClassicEleganceTemp
 
   return (
     <ColorThemeProvider themeName={colorTheme} customTheme={customTheme}>
+      <ScrollAnimations />
       <div className="min-h-screen bg-white">
         {/* Navigation */}
         <Navigation content={content} />

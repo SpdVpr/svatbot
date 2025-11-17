@@ -1,6 +1,7 @@
 'use client'
 
 import type { WeddingWebsite, SectionType } from '@/types/wedding-website'
+import ScrollAnimations from '../ScrollAnimations'
 import ModernHeroSection from './modern/HeroSection'
 import ModernInfoSection from './modern/InfoSection'
 import ModernDressCodeSection from './modern/DressCodeSection'
@@ -135,9 +136,11 @@ export default function ModernMinimalistTemplate({ website }: ModernMinimalistTe
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Render sections in custom order */}
-      {sectionOrder.map(sectionType => renderSection(sectionType))}
+    <>
+      <ScrollAnimations />
+      <div className="min-h-screen bg-white">
+        {/* Render sections in custom order */}
+        {sectionOrder.map(sectionType => renderSection(sectionType))}
 
 
       {/* Footer */}
@@ -164,6 +167,7 @@ export default function ModernMinimalistTemplate({ website }: ModernMinimalistTe
           </div>
         </div>
       </footer>
-    </div>
+      </div>
+    </>
   )
 }

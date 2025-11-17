@@ -6,12 +6,12 @@ interface GiftSectionProps {
 }
 
 export default function GiftSection({ content }: GiftSectionProps) {
-  const { theme } = useColorTheme()
+  const { theme, themeName } = useColorTheme()
 
   if (!content.enabled) return null
 
   return (
-    <section className="py-20" style={{ backgroundColor: theme.bgGradientFrom }}>
+    <section className="py-20" style={{ backgroundColor: themeName === 'default' ? '#ffffff' : theme.bgGradientFrom }}>
       <div className="max-w-4xl mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4 font-serif">

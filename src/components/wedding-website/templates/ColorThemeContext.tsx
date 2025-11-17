@@ -96,15 +96,18 @@ interface ColorThemeProviderProps {
   customTheme?: ColorTheme
 }
 
-export function ColorThemeProvider({ children, themeName = 'amber', customTheme }: ColorThemeProviderProps) {
+export function ColorThemeProvider({ children, themeName = 'default', customTheme }: ColorThemeProviderProps) {
   // Pokud je themeName 'custom' a máme customTheme, použijeme ho
+  // Pokud je themeName 'default', nepoužijeme žádnou paletu (šablona použije své vlastní barvy)
   // Jinak použijeme předpřipravenou paletu
   const theme = themeName === 'custom' && customTheme
     ? customTheme
-    : (COLOR_THEMES[themeName] || COLOR_THEMES.amber)
+    : themeName === 'default'
+    ? null
+    : (COLOR_THEMES[themeName] || null)
 
   return (
-    <ColorThemeContext.Provider value={{ theme, themeName }}>
+    <ColorThemeContext.Provider value={{ theme: theme || COLOR_THEMES.amber, themeName }}>
       {children}
     </ColorThemeContext.Provider>
   )

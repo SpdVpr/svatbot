@@ -7,14 +7,12 @@ import { useTask } from '@/hooks/useTask'
 import TaskList from '@/components/tasks/TaskList'
 import TaskStats from '@/components/tasks/TaskStats'
 import TaskForm from '@/components/tasks/TaskForm'
-import TaskDebug from '@/components/debug/TaskDebug'
 import ModuleHeader from '@/components/common/ModuleHeader'
 import Link from 'next/link'
 import logger from '@/lib/logger'
 import { TaskFormData, Task } from '@/types/task'
 import {
   Plus,
-  Download,
   CheckSquare,
   List,
   Home,
@@ -26,7 +24,6 @@ export default function TasksPage() {
   const { user } = useAuth()
   const { wedding } = useWedding()
   const {
-    initializeTasksFromTemplates,
     tasks,
     loading,
     createTask,
@@ -37,34 +34,12 @@ export default function TasksPage() {
     deleteTask,
     clearError
   } = useTask()
-  // Removed viewMode - using stats view as default (most informative)
-  const [showInitializeModal, setShowInitializeModal] = useState(false)
   const [showTaskForm, setShowTaskForm] = useState(false)
   const [taskFormLoading, setTaskFormLoading] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
 
   // Check if user has any tasks
   const hasTasks = tasks.length > 0
-
-  // Check if this is a demo user
-  const isDemoUser = user?.email === 'demo@svatbot.cz' || wedding?.id === 'demo-wedding'
-
-  // Debug logging for tasks state
-  logger.log('🔍 TasksPage render - user:', user?.id, user?.email)
-  logger.log('🔍 TasksPage render - wedding:', wedding?.id)
-  logger.log('🔍 TasksPage render - isDemoUser:', isDemoUser)
-  logger.log('🔍 TasksPage render - tasks count:', tasks.length)
-  logger.log('🔍 TasksPage render - tasks:', tasks.map(t => ({ id: t.id, title: t.title })))
-
-  // Handle initialize tasks from templates
-  const handleInitializeTasks = async () => {
-    try {
-      await initializeTasksFromTemplates()
-      setShowInitializeModal(false)
-    } catch (error) {
-      logger.error('Error initializing tasks:', error)
-    }
-  }
 
   // Handle create task
   const handleCreateTask = async (data: TaskFormData) => {
@@ -137,7 +112,8 @@ export default function TasksPage() {
             className="btn-primary flex items-center space-x-2"
           >
             <Plus className="w-4 h-4" />
-            <span>Nový úkol</span>
+            <span className="hidden sm:inline">Nový úkol</span>
+            <span className="sm:hidden">Přidat</span>
           </button>
         }
       />
@@ -167,19 +143,11 @@ export default function TasksPage() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4">
               <button
-                onClick={() => setShowInitializeModal(true)}
+                onClick={() => setShowTaskForm(true)}
                 className="btn-primary flex items-center space-x-2"
               >
-                <Download className="w-4 h-4" />
-                <span>Použít šablony úkolů</span>
-              </button>
-
-              <button
-                onClick={() => setShowTaskForm(true)}
-                className="btn-outline flex items-center space-x-2"
-              >
                 <Plus className="w-4 h-4" />
-                <span>Vytvořit vlastní úkol</span>
+                <span>Vytvořit úkol</span>
               </button>
             </div>
 
@@ -236,58 +204,17 @@ export default function TasksPage() {
                 setShowTaskForm(true)
               }}
               onEditTask={handleOpenEditModal}
-              tasks={isDemoUser ? tasks : undefined}
-              stats={isDemoUser ? stats : undefined}
-              loading={isDemoUser ? loading : undefined}
-              error={isDemoUser ? error : undefined}
-              toggleTaskStatus={isDemoUser ? toggleTaskStatus : undefined}
-              deleteTask={isDemoUser ? deleteTask : undefined}
-              clearError={isDemoUser ? clearError : undefined}
+              tasks={tasks}
+              stats={stats}
+              loading={loading}
+              error={error}
+              toggleTaskStatus={toggleTaskStatus}
+              deleteTask={deleteTask}
+              clearError={clearError}
             />
           </div>
         )}
       </div>
-
-      {/* Initialize tasks modal */}
-      {showInitializeModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Inicializovat úkoly ze šablon
-            </h3>
-            <p className="text-text-muted mb-6">
-              Vytvoříme vám předpřipravené úkoly podle fází svatebního plánování.
-              Termíny budou automaticky vypočítány podle data vaší svatby.
-            </p>
-
-            <div className="bg-blue-50 p-4 rounded-lg mb-6">
-              <h4 className="font-medium text-blue-900 mb-2">Co se vytvoří:</h4>
-              <ul className="text-sm text-blue-700 space-y-1">
-                <li>• Základní úkoly (datum, rozpočet, hosté)</li>
-                <li>• Rezervace míst (obřad, hostina)</li>
-                <li>• Organizace hostů (oznámení, RSVP)</li>
-                <li>• Dodavatelé (fotograf, hudba, catering)</li>
-                <li>• Finální přípravy</li>
-              </ul>
-            </div>
-
-            <div className="flex space-x-3">
-              <button
-                onClick={() => setShowInitializeModal(false)}
-                className="flex-1 btn-outline"
-              >
-                Zrušit
-              </button>
-              <button
-                onClick={handleInitializeTasks}
-                className="flex-1 btn-primary"
-              >
-                Vytvořit úkoly
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Task Form Modal */}
       {showTaskForm && (
@@ -310,9 +237,6 @@ export default function TasksPage() {
           } : undefined}
         />
       )}
-
-      {/* Debug component for development */}
-      <TaskDebug />
     </div>
   )
 }

@@ -26,7 +26,7 @@ interface RSVPFormData {
 }
 
 export default function RSVPSection({ content, websiteId, weddingId }: RSVPSectionProps) {
-  const { theme } = useColorTheme()
+  const { theme, themeName } = useColorTheme()
   const [formData, setFormData] = useState<RSVPFormData>({
     name: '',
     email: '',
@@ -124,7 +124,7 @@ export default function RSVPSection({ content, websiteId, weddingId }: RSVPSecti
   }
 
   return (
-    <section className="py-20" style={{ backgroundColor: theme.bgGradientFrom }}>
+    <section className="py-20" style={{ backgroundColor: themeName === 'default' ? '#ffffff' : theme.bgGradientFrom }}>
       <div className="max-w-4xl mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-12">

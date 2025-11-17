@@ -11,12 +11,12 @@ interface MenuSectionProps {
 }
 
 export default function MenuSection({ content }: MenuSectionProps) {
-  const { theme } = useColorTheme()
+  const { theme, themeName } = useColorTheme()
   const { menuItems, drinkItems, loading } = useMenu()
 
   if (loading) {
     return (
-      <section id="menu" className="py-20" style={{ backgroundColor: theme.bgGradientFrom }}>
+      <section id="menu" className="py-20" style={{ backgroundColor: themeName === 'default' ? '#ffffff' : theme.bgGradientFrom }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <p className="text-gray-600">Načítání menu...</p>
@@ -76,7 +76,7 @@ export default function MenuSection({ content }: MenuSectionProps) {
 
   return (
     <section id="menu" className="py-20 relative overflow-hidden" style={{
-      background: `linear-gradient(135deg, ${theme.bgGradientFrom} 0%, ${theme.bgGradientTo} 100%)`
+      background: themeName === 'default' ? '#ffffff' : `linear-gradient(135deg, ${theme.bgGradientFrom} 0%, ${theme.bgGradientTo} 100%)`
     }}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}

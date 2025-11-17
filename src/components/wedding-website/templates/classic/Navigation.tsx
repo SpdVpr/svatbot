@@ -3,12 +3,14 @@
 import { useState, useEffect } from 'react'
 import { Heart } from 'lucide-react'
 import type { WebsiteContent } from '@/types/wedding-website'
+import { useColorTheme } from '../ColorThemeContext'
 
 interface NavigationProps {
   content: WebsiteContent
 }
 
 export default function Navigation({ content }: NavigationProps) {
+  const { themeName } = useColorTheme()
   const [isScrolled, setIsScrolled] = useState(false)
   const [activeSection, setActiveSection] = useState('')
 
@@ -72,10 +74,13 @@ export default function Navigation({ content }: NavigationProps) {
     }
   }
 
+  const isDefaultTheme = themeName === 'default'
+  const shouldShowBackground = isScrolled || isDefaultTheme
+
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
+        shouldShowBackground
           ? 'bg-white/95 backdrop-blur-md shadow-md py-3'
           : 'bg-transparent py-4'
       }`}
@@ -86,7 +91,7 @@ export default function Navigation({ content }: NavigationProps) {
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className={`flex items-center gap-2 font-serif font-bold text-lg transition-colors ${
-              isScrolled ? 'text-gray-900' : 'text-white drop-shadow-lg'
+              shouldShowBackground ? 'text-gray-900' : 'text-white drop-shadow-lg'
             }`}
           >
             <Heart className="w-5 h-5 text-rose-400 fill-rose-400" />
@@ -100,7 +105,7 @@ export default function Navigation({ content }: NavigationProps) {
                 key={item.id}
                 onClick={() => scrollToSection(item.id)}
                 className={`text-sm font-medium transition-colors hover:text-rose-500 ${
-                  isScrolled ? 'text-gray-700' : 'text-white drop-shadow-lg'
+                  shouldShowBackground ? 'text-gray-700' : 'text-white drop-shadow-lg'
                 }`}
               >
                 {item.label}
@@ -111,7 +116,7 @@ export default function Navigation({ content }: NavigationProps) {
           {/* Mobile Menu Button */}
           <button
             className={`md:hidden p-2 rounded-lg transition-colors ${
-              isScrolled ? 'text-gray-900 hover:bg-gray-100' : 'text-white hover:bg-white/10'
+              shouldShowBackground ? 'text-gray-900 hover:bg-gray-100' : 'text-white hover:bg-white/10'
             }`}
           >
             <svg

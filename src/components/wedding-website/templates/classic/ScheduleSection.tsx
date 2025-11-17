@@ -9,7 +9,7 @@ interface ScheduleSectionProps {
 }
 
 export default function ScheduleSection({ content }: ScheduleSectionProps) {
-  const { theme } = useColorTheme()
+  const { theme, themeName } = useColorTheme()
   // Sample schedule items if none provided
   const sampleSchedule = [
     {
@@ -97,7 +97,7 @@ export default function ScheduleSection({ content }: ScheduleSectionProps) {
                     </div>
 
                     <div className="flex-shrink-0">
-                      <div className="px-3 sm:px-4 py-2 rounded-full inline-block" style={{ backgroundColor: theme.bgGradientTo }}>
+                      <div className="px-3 sm:px-4 py-2 rounded-full inline-block" style={{ backgroundColor: themeName === 'default' ? '#fecdd3' : theme.bgGradientTo }}>
                         <span className="font-bold text-gray-900 text-sm sm:text-base whitespace-nowrap">
                           {item.time}
                         </span>

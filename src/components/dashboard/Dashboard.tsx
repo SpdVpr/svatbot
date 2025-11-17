@@ -280,8 +280,8 @@ function DashboardContent() {
       }`}>
         {/* Mobile Header */}
         <div className="sm:hidden">
-          <div className="h-14 px-3 flex items-center justify-between">
-            <div className="flex items-center space-x-1">
+          <div className="h-14 px-1 flex items-center justify-between">
+            <div className="flex items-center -space-x-1">
               <button
                 onClick={openMobileMenu}
                 className="mobile-nav-button text-gray-600 hover:text-gray-900 hover:bg-gray-100"
@@ -294,8 +294,8 @@ function DashboardContent() {
                 <img
                   src="/logo-svatbot.svg"
                   alt="SvatBot.cz"
-                  className="h-9 w-auto"
-                  style={{ width: '100px', height: '36px' }}
+                  className="h-7 w-auto"
+                  style={{ width: '60px', height: '28px' }}
                 />
               ) : (
                 <video
@@ -303,26 +303,26 @@ function DashboardContent() {
                   autoPlay
                   muted
                   playsInline
-                  className="h-9 w-auto"
-                  style={{ width: '100px', height: '36px' }}
+                  className="h-7 w-auto"
+                  style={{ width: '60px', height: '28px' }}
                 />
               )}
-            </div>
-            <div className="flex items-center space-x-1.5">
               <LiveNotifications />
+            </div>
+            <div className="flex items-center gap-1">
               <button
                 onClick={() => setShowMobileColorMenu(!showMobileColorMenu)}
                 className="mobile-nav-button text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 title="Barevná paleta"
               >
-                <Palette className="w-4 h-4" />
+                <Palette className="w-6 h-6" />
               </button>
               <button
                 onClick={openNotesModal}
                 className="mobile-nav-button text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 title="Poznámky"
               >
-                <StickyNote className="w-4 h-4" />
+                <StickyNote className="w-6 h-6" />
               </button>
               {isDemoUserCheck ? (
                 <button
@@ -330,7 +330,7 @@ function DashboardContent() {
                   className="mobile-nav-button text-primary-600 hover:text-primary-700 hover:bg-primary-50"
                   title="Registrace"
                 >
-                  <UserPlus className="w-4 h-4" />
+                  <UserPlus className="w-6 h-6" />
                 </button>
               ) : (
                 <button
@@ -338,68 +338,18 @@ function DashboardContent() {
                   className="mobile-nav-button text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                   title="Účet"
                 >
-                  <User className="w-4 h-4" />
+                  <User className="w-6 h-6" />
                 </button>
               )}
+              <div className="w-2"></div>
               <button
                 onClick={logout}
                 className="mobile-nav-button text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 title="Odhlásit"
               >
-                <LogOut className="w-4 h-4" />
+                <LogOut className="w-6 h-6" />
               </button>
             </div>
-          </div>
-
-          {/* Mobile wedding info - compact layout */}
-          <div className="px-3 py-2 border-t border-gray-100">
-            {/* Names and trial/premium/date info in one row */}
-            <button
-              onClick={openWeddingSettings}
-              className="text-left w-full hover:bg-gray-50 px-2 py-1.5 rounded-lg transition-colors flex items-center gap-2"
-            >
-              <h2 className="text-base font-bold text-gray-900 truncate flex-1 leading-tight" style={{ fontFamily: "var(--font-cormorant), 'Cormorant Upright', serif" }}>
-                {wedding.brideName} & {wedding.groomName}
-              </h2>
-              {/* Show trial info instead of date on mobile */}
-              {subscription?.status === 'trialing' && subscription?.isTrialActive && trialDaysRemaining !== null ? (
-                <div
-                  className="flex items-center gap-1 flex-shrink-0"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    openAccountModal('subscription')
-                  }}
-                >
-                  <Clock className="w-3.5 h-3.5 text-amber-600" />
-                  <span className={`text-xs font-medium whitespace-nowrap ${trialDaysRemaining <= 3 ? 'text-red-600' : 'text-amber-600'}`}>
-                    {trialDaysRemaining === 0
-                      ? 'Vyprší dnes!'
-                      : `Vyprší za ${trialDaysRemaining} ${trialDaysRemaining === 1 ? 'den' : trialDaysRemaining <= 4 ? 'dny' : 'dní'}`
-                    }
-                  </span>
-                </div>
-              ) : subscription?.status === 'active' && hasPremiumAccess ? (
-                <div
-                  className="flex items-center gap-1 flex-shrink-0"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    openAccountModal('subscription')
-                  }}
-                >
-                  <Crown className="w-3.5 h-3.5 text-primary-600" fill="currentColor" />
-                  <span className="text-xs font-medium text-primary-600 whitespace-nowrap">
-                    Premium
-                  </span>
-                </div>
-              ) : (
-                <span className="text-xs text-text-muted whitespace-nowrap">
-                  {weddingDate
-                    ? dateUtils.format(weddingDate, 'dd.MM.yyyy')
-                    : 'Nastavit datum'
-                  }
-                </span>
-              )}
-            </button>
           </div>
         </div>
 

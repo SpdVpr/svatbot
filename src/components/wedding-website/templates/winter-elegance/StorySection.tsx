@@ -29,9 +29,69 @@ export default function StorySection({ content }: StorySectionProps) {
           )}
         </div>
 
+        {/* Couple Photos with Heart */}
+        {(content.bride || content.groom) && (
+          <div className="flex items-center justify-center gap-8 md:gap-16 mb-16 flex-wrap">
+            {/* Bride */}
+            {content.bride && (
+              <div className="text-center">
+                {content.bride.image && (
+                  <div className="w-64 h-64 md:w-80 md:h-80 mx-auto mb-6 rounded-full overflow-hidden shadow-2xl border-4 border-stone-200">
+                    <img
+                      src={content.bride.image}
+                      alt={content.bride.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                <h3 className="text-3xl md:text-4xl font-serif font-light text-stone-900 mb-3 uppercase tracking-widest">
+                  {content.bride.name}
+                </h3>
+                <p className="text-stone-600 leading-relaxed max-w-xs mx-auto">
+                  {content.bride.description}
+                </p>
+              </div>
+            )}
+
+            {/* Heart Icon */}
+            <div className="flex items-center justify-center">
+              <div className="relative w-24 h-24 md:w-32 md:h-32">
+                <Image
+                  src="/hearth.png"
+                  alt="Heart"
+                  fill
+                  className="object-contain"
+                  style={{ filter: 'grayscale(100%) brightness(0.6)' }}
+                />
+              </div>
+            </div>
+
+            {/* Groom */}
+            {content.groom && (
+              <div className="text-center">
+                {content.groom.image && (
+                  <div className="w-64 h-64 md:w-80 md:h-80 mx-auto mb-6 rounded-full overflow-hidden shadow-2xl border-4 border-stone-200">
+                    <img
+                      src={content.groom.image}
+                      alt={content.groom.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                <h3 className="text-3xl md:text-4xl font-serif font-light text-stone-900 mb-3 uppercase tracking-widest">
+                  {content.groom.name}
+                </h3>
+                <p className="text-stone-600 leading-relaxed max-w-xs mx-auto">
+                  {content.groom.description}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Timeline with photos */}
         {content.timeline && content.timeline.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-16">
             {content.timeline.map((item, index) => (
               <div
                 key={item.id}

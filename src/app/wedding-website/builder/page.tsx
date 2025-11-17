@@ -31,7 +31,7 @@ export default function WeddingWebsiteBuilderPage() {
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateType | null>(
     website?.template || null
   )
-  const [colorTheme, setColorTheme] = useState<string>(website?.style?.colorTheme || 'amber')
+  const [colorTheme, setColorTheme] = useState<string>(website?.style?.colorTheme || 'default')
   const [customColors, setCustomColors] = useState(website?.style?.customColors || {
     name: 'Vlastní',
     primary: '#f59e0b',
@@ -87,7 +87,7 @@ export default function WeddingWebsiteBuilderPage() {
   useEffect(() => {
     if (website) {
       setSelectedTemplate(website.template)
-      setColorTheme(website.style?.colorTheme || 'amber')
+      setColorTheme(website.style?.colorTheme || 'default')
       setCustomColors(website.style?.customColors || {
         name: 'Vlastní',
         primary: '#f59e0b',
@@ -300,7 +300,7 @@ export default function WeddingWebsiteBuilderPage() {
       } catch (error) {
         if (error instanceof Error && error.message === 'DEMO_LOCKED') {
           // Demo locked - alert already shown, revert color theme selection
-          setColorTheme(website.style?.colorTheme || 'amber')
+          setColorTheme(website.style?.colorTheme || 'default')
           return
         }
         console.error('❌ Error updating color theme:', error)

@@ -145,7 +145,8 @@ export default function GuestsPage() {
             className="btn-primary flex items-center space-x-2"
           >
             <Plus className="w-4 h-4" />
-            <span>Přidat hosta</span>
+            <span className="hidden sm:inline">Přidat hosta</span>
+            <span className="sm:hidden">Přidat</span>
           </button>
         }
       />

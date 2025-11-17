@@ -23,6 +23,8 @@ export interface HeroContent {
   weddingDate: Date
   mainImage?: string
   tagline?: string
+  imagePosition?: { x: number; y: number }
+  imageScale?: number
 }
 
 // Story Section

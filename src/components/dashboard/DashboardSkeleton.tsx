@@ -8,15 +8,19 @@ export default function DashboardSkeleton() {
       {/* Header Skeleton - Match exact header style */}
       <header className="bg-gray-50/95 backdrop-blur-xl border-b border-gray-100/50 shadow-sm sticky top-0 z-[200]">
         {/* Mobile Header */}
-        <div className="sm:hidden min-h-[64px]">
-          <div className="mobile-header">
-            <div className="flex items-center space-x-2">
+        <div className="sm:hidden">
+          <div className="h-14 px-1 flex items-center justify-between">
+            <div className="flex items-center -space-x-1">
+              <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse" />
+              <div className="h-7 w-[60px] bg-gray-200 rounded animate-pulse" />
               <div className="w-10 h-10 bg-gray-200 rounded-lg animate-pulse" />
-              <div className="h-10 w-[120px] bg-gray-200 rounded animate-pulse" />
             </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gray-200 rounded-lg animate-pulse" />
-              <div className="w-10 h-10 bg-gray-200 rounded-lg animate-pulse" />
+            <div className="flex items-center gap-1">
+              <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse" />
+              <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse" />
+              <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse" />
+              <div className="w-2"></div>
+              <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse" />
             </div>
           </div>
         </div>

@@ -97,60 +97,7 @@ const TEMPLATES: TemplateConfig[] = [
       'Boho svatby',
     ],
   },
-  {
-    id: 'luxury-gold',
-    name: 'Luxury Gold',
-    description: 'Luxusní design se zlatými akcenty a elegantní typografií',
-    thumbnail: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800',
-    category: 'Luxusní',
-    colors: {
-      primary: '#D4AF37',
-      secondary: '#1A1A1A',
-      accent: '#FFD700',
-    },
-    fonts: {
-      heading: 'Bodoni Moda',
-      body: 'Crimson Text',
-    },
-    features: [
-      'Zlaté akcenty',
-      'Luxusní typografie',
-      'Elegantní animace',
-      'Prémiový vzhled',
-    ],
-    suitableFor: [
-      'Luxusní svatby',
-      'Hotelové svatby',
-      'Velké události',
-    ],
-  },
-  {
-    id: 'garden-fresh',
-    name: 'Garden Fresh',
-    description: 'Přírodní design se zelenými tóny a organickými prvky',
-    thumbnail: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800',
-    category: 'Přírodní',
-    colors: {
-      primary: '#10B981',
-      secondary: '#F0FDF4',
-      accent: '#84CC16',
-    },
-    fonts: {
-      heading: 'Quicksand',
-      body: 'Nunito',
-    },
-    features: [
-      'Zelené tóny',
-      'Přírodní prvky',
-      'Organické tvary',
-      'Čerstvý vzhled',
-    ],
-    suitableFor: [
-      'Zahradní svatby',
-      'Eco-friendly svatby',
-      'Přírodní prostředí',
-    ],
-  },
+
   {
     id: 'winter-elegance',
     name: 'Winter Elegance',

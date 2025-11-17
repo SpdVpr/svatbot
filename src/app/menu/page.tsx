@@ -170,7 +170,8 @@ export default function MenuPage() {
             className="btn-primary flex items-center space-x-2"
           >
             <Plus className="w-4 h-4" />
-            <span>{activeTab === 'food' ? 'Přidat jídlo' : 'Přidat nápoj'}</span>
+            <span className="hidden sm:inline">{activeTab === 'food' ? 'Přidat jídlo' : 'Přidat nápoj'}</span>
+            <span className="sm:hidden">Přidat</span>
           </button>
         }
       />

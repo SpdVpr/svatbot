@@ -1,6 +1,7 @@
 'use client'
 
 import type { StoryContent } from '@/types/wedding-website'
+import Image from 'next/image'
 
 interface StorySectionProps {
   content: StoryContent
@@ -25,56 +26,66 @@ export default function StorySection({ content, heroContent }: StorySectionProps
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 mt-16">
+        {/* Couple Photos with Heart */}
+        <div className="flex items-center justify-center gap-8 md:gap-16 mb-16 flex-wrap">
           {/* Nevěsta */}
           <div className="text-center">
-            <div className="mb-8">
-              <div className="w-48 h-48 mx-auto rounded-full bg-gray-100 overflow-hidden mb-6">
-                {content.bride?.image ? (
-                  <img
-                    src={content.bride.image}
-                    alt={heroContent.bride}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-6xl">
-                    👰
-                  </div>
-                )}
-              </div>
-              <h3 className="text-3xl font-light text-gray-900 mb-4">
-                {heroContent.bride}
-              </h3>
+            <div className="w-64 h-64 md:w-80 md:h-80 rounded-full bg-gray-100 overflow-hidden mb-6 shadow-xl">
+              {content.bride?.image ? (
+                <img
+                  src={content.bride.image}
+                  alt={heroContent.bride}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-6xl">
+                  👰
+                </div>
+              )}
             </div>
+            <h3 className="text-3xl font-light text-gray-900 mb-2 uppercase tracking-wider">
+              {heroContent.bride}
+            </h3>
             {content.bride?.description && (
-              <p className="text-gray-600 leading-relaxed text-left">
+              <p className="text-gray-600 leading-relaxed max-w-xs mx-auto">
                 {content.bride.description}
               </p>
             )}
           </div>
 
+          {/* Heart Icon */}
+          <div className="flex items-center justify-center">
+            <div className="relative w-24 h-24 md:w-32 md:h-32">
+              <Image
+                src="/hearth.png"
+                alt="Heart"
+                fill
+                className="object-contain"
+                style={{ filter: 'hue-rotate(0deg) saturate(0.8)' }}
+              />
+            </div>
+          </div>
+
           {/* Ženich */}
           <div className="text-center">
-            <div className="mb-8">
-              <div className="w-48 h-48 mx-auto rounded-full bg-gray-100 overflow-hidden mb-6">
-                {content.groom?.image ? (
-                  <img
-                    src={content.groom.image}
-                    alt={heroContent.groom}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-6xl">
-                    🤵
-                  </div>
-                )}
-              </div>
-              <h3 className="text-3xl font-light text-gray-900 mb-4">
-                {heroContent.groom}
-              </h3>
+            <div className="w-64 h-64 md:w-80 md:h-80 rounded-full bg-gray-100 overflow-hidden mb-6 shadow-xl">
+              {content.groom?.image ? (
+                <img
+                  src={content.groom.image}
+                  alt={heroContent.groom}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-6xl">
+                  🤵
+                </div>
+              )}
             </div>
+            <h3 className="text-3xl font-light text-gray-900 mb-2 uppercase tracking-wider">
+              {heroContent.groom}
+            </h3>
             {content.groom?.description && (
-              <p className="text-gray-600 leading-relaxed text-left">
+              <p className="text-gray-600 leading-relaxed max-w-xs mx-auto">
                 {content.groom.description}
               </p>
             )}

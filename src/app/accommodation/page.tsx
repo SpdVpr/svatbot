@@ -68,70 +68,71 @@ export default function AccommodationPage() {
             className="btn-primary flex items-center space-x-2"
           >
             <Plus className="w-4 h-4" />
-            <span>Přidat ubytování</span>
+            <span className="hidden sm:inline">Přidat ubytování</span>
+            <span className="sm:hidden">Přidat</span>
           </button>
         }
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-8">
+          <div className="bg-white rounded-lg shadow-sm p-3 md:p-6">
             <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
+              <div className="hidden md:block p-2 bg-blue-100 rounded-lg">
                 <Building2 className="w-6 h-6 text-blue-600" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Ubytování</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalAccommodations}</p>
+              <div className="md:ml-4">
+                <p className="text-xs md:text-sm font-medium text-gray-600">Ubytování</p>
+                <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.totalAccommodations}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-lg shadow-sm p-3 md:p-6">
             <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
+              <div className="hidden md:block p-2 bg-green-100 rounded-lg">
                 <Bed className="w-6 h-6 text-green-600" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Celkem pokojů</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalRooms}</p>
+              <div className="md:ml-4">
+                <p className="text-xs md:text-sm font-medium text-gray-600">Celkem pokojů</p>
+                <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.totalRooms}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-lg shadow-sm p-3 md:p-6">
             <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-lg">
+              <div className="hidden md:block p-2 bg-purple-100 rounded-lg">
                 <Users className="w-6 h-6 text-purple-600" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Dostupné pokoje</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.availableRooms}</p>
+              <div className="md:ml-4">
+                <p className="text-xs md:text-sm font-medium text-gray-600">Dostupné pokoje</p>
+                <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.availableRooms}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-lg shadow-sm p-3 md:p-6">
             <div className="flex items-center">
-              <div className="p-2 bg-red-100 rounded-lg">
+              <div className="hidden md:block p-2 bg-red-100 rounded-lg">
                 <Users className="w-6 h-6 text-red-600" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Obsazené pokoje</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.occupiedRooms}</p>
+              <div className="md:ml-4">
+                <p className="text-xs md:text-sm font-medium text-gray-600">Obsazené pokoje</p>
+                <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.occupiedRooms}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-lg shadow-sm p-3 md:p-6">
             <div className="flex items-center">
-              <div className="p-2 bg-orange-100 rounded-lg">
+              <div className="hidden md:block p-2 bg-orange-100 rounded-lg">
                 <Users className="w-6 h-6 text-orange-600" />
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Obsazenost</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.occupancyRate}%</p>
+              <div className="md:ml-4">
+                <p className="text-xs md:text-sm font-medium text-gray-600">Obsazenost</p>
+                <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.occupancyRate}%</p>
               </div>
             </div>
           </div>

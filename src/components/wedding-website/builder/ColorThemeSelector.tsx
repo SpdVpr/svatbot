@@ -48,6 +48,35 @@ export default function ColorThemeSelector({
       <div>
         <h4 className="text-sm font-semibold text-gray-700 mb-3">Předpřipravené palety</h4>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          <button
+            onClick={() => !disabled && handleThemeSelect('default')}
+            disabled={disabled}
+            className={`
+              relative p-3 rounded-lg border-2 transition-all
+              ${selectedTheme === 'default'
+                ? 'border-purple-500 bg-purple-50 shadow-md ring-2 ring-purple-200'
+                : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+              }
+              ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+            `}
+          >
+            {selectedTheme === 'default' && (
+              <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-purple-600 rounded-full flex items-center justify-center">
+                <Check className="w-3 h-3 text-white" />
+              </div>
+            )}
+
+            <div className="text-center mb-2">
+              <h4 className="font-medium text-gray-900 text-xs">Přirozená paleta</h4>
+            </div>
+
+            <div className="flex gap-1 justify-center">
+              <div
+                className="w-6 h-6 rounded shadow-sm border border-gray-200 bg-gradient-to-br from-gray-100 to-gray-300"
+                title="Originální barvy šablony"
+              />
+            </div>
+          </button>
           {Object.entries(COLOR_THEMES).map(([key, theme]) => {
             const isSelected = selectedTheme === key
 

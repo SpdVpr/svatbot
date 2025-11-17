@@ -1,6 +1,7 @@
 'use client'
 
 import { WeddingWebsite } from '@/types/wedding-website'
+import ScrollAnimations from '../ScrollAnimations'
 import { ColorThemeProvider } from './ColorThemeContext'
 import HeroSection from './winter-elegance/HeroSection'
 import StorySection from './winter-elegance/StorySection'
@@ -73,9 +74,10 @@ export default function WinterEleganceTemplate({ website }: WinterEleganceTempla
 
   return (
     <ColorThemeProvider
-      themeName={website.style?.colorTheme || 'amber'}
+      themeName={website.style?.colorTheme || 'default'}
       customTheme={website.style?.customColors}
     >
+      <ScrollAnimations />
       <div className="min-h-screen bg-white font-light">
         <style jsx global>{`
           @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@200;300;400;500;600&display=swap');

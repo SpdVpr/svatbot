@@ -190,78 +190,32 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
 
   // Don't show loading state - let content fade in smoothly with AppTemplate
 
-  // Mobile: Use simple vertical stack layout
+  // Mobile: Use simple vertical stack layout (no edit mode on mobile)
   if (isMobile) {
     return (
       <div className="mx-auto px-1 max-w-full">
         <div className="space-y-3">
-          {/* Mobile Controls - Simplified */}
-          <div className="bg-white p-2 rounded-xl border border-gray-200">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Dashboard</h2>
-              <button
-                onClick={toggleEditMode}
-                className={`btn-outline flex items-center space-x-2 text-sm ${
-                  layout.isEditMode ? 'bg-primary-50 border-primary-400 shadow-2xl text-primary-700' : ''
-                }`}
-              >
-                <Edit3 className="w-4 h-4" />
-                <span>{layout.isEditMode ? 'Hotovo' : 'Upravit'}</span>
-              </button>
-            </div>
-            {layout.isEditMode && (
-              <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-xs text-blue-800">
-                  💡 Klikněte na ikonu oka pro skrytí/zobrazení modulů
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Mobile Modules - Vertical Stack */}
+          {/* Mobile Modules - Vertical Stack (only visible modules) */}
           <div className="space-y-4">
-            {(layout.isEditMode ? allModules : visibleModules).map((module) => (
+            {visibleModules.map((module) => (
               <div
                 key={module.id}
-                className={`bg-white rounded-xl border-2 transition-all ${
-                  !module.isVisible ? 'opacity-50 border-gray-200' : 'border-gray-200'
-                }`}
+                className="bg-white rounded-xl border-2 border-gray-200"
               >
-                {/* Mobile Module Header (Edit Mode) */}
-                {layout.isEditMode && (
-                  <div className="flex items-center justify-between p-3 border-b border-gray-200 bg-gray-50">
-                    <span className="text-sm font-medium text-gray-700">{module.title}</span>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => toggleModuleVisibility(module.id)}
-                        className="p-1.5 rounded-lg hover:bg-gray-200 transition-colors"
-                        title={module.isVisible ? 'Skrýt modul' : 'Zobrazit modul'}
-                      >
-                        {module.isVisible ? (
-                          <Eye className="w-4 h-4 text-gray-600" />
-                        ) : (
-                          <EyeOff className="w-4 h-4 text-gray-400" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                )}
                 {/* Module Content - Reduced padding on mobile */}
-                {module.isVisible && (
-                  <div className="p-2">
-                    {renderModule(module)}
-                  </div>
-                )}
+                <div className="p-2">
+                  {renderModule(module)}
+                </div>
               </div>
             ))}
           </div>
 
           {/* Empty state */}
-          {visibleModules.length === 0 && !layout.isEditMode && (
+          {visibleModules.length === 0 && (
             <div className="text-center py-12 text-gray-400">
               <div className="text-6xl mb-4">📊</div>
               <p className="text-lg font-medium">Váš dashboard je prázdný</p>
-              <p className="text-sm">Klikněte na "Upravit" a zobrazte moduly</p>
+              <p className="text-sm">Moduly můžete upravit na počítači</p>
             </div>
           )}
         </div>

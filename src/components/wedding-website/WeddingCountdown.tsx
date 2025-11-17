@@ -37,55 +37,59 @@ const toDate = (date: any): Date | null => {
 }
 
 export default function WeddingCountdown({ weddingDate, className = '', style = 'modern', compact = false }: WeddingCountdownProps) {
-  const [countdown, setCountdown] = useState<CountdownData | null>(null)
+  const calculateCountdown = () => {
+    const now = new Date()
+    const wedding = toDate(weddingDate)
+    
+    if (!wedding) return null
+
+    const diffTime = wedding.getTime() - now.getTime()
+    
+    if (diffTime <= 0) {
+      return {
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+        passed: true
+      }
+    }
+
+    const days = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+    const hours = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+    const minutes = Math.floor((diffTime % (1000 * 60 * 60)) / (1000 * 60))
+    const seconds = Math.floor((diffTime % (1000 * 60)) / 1000)
+
+    return {
+      days,
+      hours,
+      minutes,
+      seconds,
+      passed: false
+    }
+  }
+
+  const initialValue = calculateCountdown() || {
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+    passed: false
+  }
+
+  const [countdown, setCountdown] = useState<CountdownData>(initialValue)
 
   useEffect(() => {
     if (!weddingDate) return
 
-    const calculateCountdown = () => {
-      const now = new Date()
-      const wedding = toDate(weddingDate)
-      
-      if (!wedding) return null
-
-      const diffTime = wedding.getTime() - now.getTime()
-      
-      if (diffTime <= 0) {
-        return {
-          days: 0,
-          hours: 0,
-          minutes: 0,
-          seconds: 0,
-          passed: true
-        }
-      }
-
-      const days = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-      const hours = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-      const minutes = Math.floor((diffTime % (1000 * 60 * 60)) / (1000 * 60))
-      const seconds = Math.floor((diffTime % (1000 * 60)) / 1000)
-
-      return {
-        days,
-        hours,
-        minutes,
-        seconds,
-        passed: false
-      }
-    }
-
-    // Počáteční výpočet
-    setCountdown(calculateCountdown())
-
     // Aktualizace každou sekundu
     const interval = setInterval(() => {
-      setCountdown(calculateCountdown())
+      const newCountdown = calculateCountdown()
+      if (newCountdown) setCountdown(newCountdown)
     }, 1000)
 
     return () => clearInterval(interval)
   }, [weddingDate])
-
-  if (!countdown) return null
 
   if (countdown.passed) {
     return (
@@ -115,7 +119,7 @@ export default function WeddingCountdown({ weddingDate, className = '', style = 
           <div className="absolute top-0 right-0 w-8 h-8 bg-gradient-to-br from-white/20 to-transparent rounded-bl-full"></div>
           <div className={`${compact ? 'text-2xl md:text-3xl' : 'text-3xl md:text-4xl'} font-bold mb-1 ${
             modernStyle ? 'text-white drop-shadow-lg' : 'text-white drop-shadow-lg'
-          }`}>
+          }`} suppressHydrationWarning>
             {countdown.days}
           </div>
           <div className={`text-xs md:text-sm font-medium ${
@@ -135,7 +139,7 @@ export default function WeddingCountdown({ weddingDate, className = '', style = 
           <div className="absolute top-0 right-0 w-8 h-8 bg-gradient-to-br from-white/20 to-transparent rounded-bl-full"></div>
           <div className={`${compact ? 'text-2xl md:text-3xl' : 'text-3xl md:text-4xl'} font-bold mb-1 ${
             modernStyle ? 'text-white drop-shadow-lg' : 'text-white drop-shadow-lg'
-          }`}>
+          }`} suppressHydrationWarning>
             {countdown.hours}
           </div>
           <div className={`text-xs md:text-sm font-medium ${
@@ -155,7 +159,7 @@ export default function WeddingCountdown({ weddingDate, className = '', style = 
           <div className="absolute top-0 right-0 w-8 h-8 bg-gradient-to-br from-white/20 to-transparent rounded-bl-full"></div>
           <div className={`${compact ? 'text-2xl md:text-3xl' : 'text-3xl md:text-4xl'} font-bold mb-1 ${
             modernStyle ? 'text-white drop-shadow-lg' : 'text-white drop-shadow-lg'
-          }`}>
+          }`} suppressHydrationWarning>
             {countdown.minutes}
           </div>
           <div className={`text-xs md:text-sm font-medium ${
@@ -175,7 +179,7 @@ export default function WeddingCountdown({ weddingDate, className = '', style = 
           <div className="absolute top-0 right-0 w-8 h-8 bg-gradient-to-br from-white/20 to-transparent rounded-bl-full"></div>
           <div className={`${compact ? 'text-2xl md:text-3xl' : 'text-3xl md:text-4xl'} font-bold mb-1 ${
             modernStyle ? 'text-white drop-shadow-lg' : 'text-white drop-shadow-lg'
-          }`}>
+          }`} suppressHydrationWarning>
             {countdown.seconds}
           </div>
           <div className={`text-xs md:text-sm font-medium ${

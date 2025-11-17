@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Calendar, Upload, X, Image as ImageIcon, Move, RotateCw, Loader2 } from 'lucide-react'
 import { useWeddingStore } from '@/stores/weddingStore'
 import { useWeddingImageUpload } from '@/hooks/useWeddingImageUpload'
@@ -42,9 +42,14 @@ export default function HeroSectionEditor({ content, onChange }: HeroSectionEdit
   const { currentWedding: wedding } = useWeddingStore()
   const { uploadImage, uploading, progress, error: uploadError } = useWeddingImageUpload()
   const [dragOver, setDragOver] = useState(false)
-  const [imagePosition, setImagePosition] = useState({ x: 50, y: 50 }) // Procenta
-  const [imageScale, setImageScale] = useState(100) // Procenta
+  const [imagePosition, setImagePosition] = useState(content.imagePosition || { x: 50, y: 50 })
+  const [imageScale, setImageScale] = useState(content.imageScale || 100)
   const imageRef = useRef<HTMLImageElement>(null)
+
+  useEffect(() => {
+    setImagePosition(content.imagePosition || { x: 50, y: 50 })
+    setImageScale(content.imageScale || 100)
+  }, [content.imagePosition, content.imageScale])
 
   // Auto-import dat ze svatby
   const importFromWedding = () => {
@@ -275,7 +280,11 @@ export default function HeroSectionEditor({ content, onChange }: HeroSectionEdit
                     min="0"
                     max="100"
                     value={imagePosition.x}
-                    onChange={(e) => setImagePosition(prev => ({ ...prev, x: parseInt(e.target.value) }))}
+                    onChange={(e) => {
+                      const newPosition = { ...imagePosition, x: parseInt(e.target.value) }
+                      setImagePosition(newPosition)
+                      handleInputChange('imagePosition', newPosition)
+                    }}
                     className="w-full"
                   />
                   <div className="text-xs text-gray-500 mt-1">{imagePosition.x}%</div>
@@ -290,7 +299,11 @@ export default function HeroSectionEditor({ content, onChange }: HeroSectionEdit
                     min="0"
                     max="100"
                     value={imagePosition.y}
-                    onChange={(e) => setImagePosition(prev => ({ ...prev, y: parseInt(e.target.value) }))}
+                    onChange={(e) => {
+                      const newPosition = { ...imagePosition, y: parseInt(e.target.value) }
+                      setImagePosition(newPosition)
+                      handleInputChange('imagePosition', newPosition)
+                    }}
                     className="w-full"
                   />
                   <div className="text-xs text-gray-500 mt-1">{imagePosition.y}%</div>
@@ -306,7 +319,11 @@ export default function HeroSectionEditor({ content, onChange }: HeroSectionEdit
                   min="50"
                   max="200"
                   value={imageScale}
-                  onChange={(e) => setImageScale(parseInt(e.target.value))}
+                  onChange={(e) => {
+                    const newScale = parseInt(e.target.value)
+                    setImageScale(newScale)
+                    handleInputChange('imageScale', newScale)
+                  }}
                   className="w-full"
                 />
                 <div className="text-xs text-gray-500 mt-1">{imageScale}%</div>
@@ -315,8 +332,12 @@ export default function HeroSectionEditor({ content, onChange }: HeroSectionEdit
               <div className="flex gap-2">
                 <button
                   onClick={() => {
-                    setImagePosition({ x: 50, y: 50 })
-                    setImageScale(100)
+                    const defaultPosition = { x: 50, y: 50 }
+                    const defaultScale = 100
+                    setImagePosition(defaultPosition)
+                    setImageScale(defaultScale)
+                    handleInputChange('imagePosition', defaultPosition)
+                    handleInputChange('imageScale', defaultScale)
                   }}
                   className="flex items-center gap-2 px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm"
                 >

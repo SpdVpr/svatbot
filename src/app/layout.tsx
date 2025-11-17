@@ -9,7 +9,7 @@ import GlobalFeedbackButton from '@/components/common/GlobalFeedbackButton'
 import UserTrackingWrapper from '@/components/common/UserTrackingWrapper'
 import QRTrackingWrapper from '@/components/common/QRTrackingWrapper'
 import DemoLockBanner from '@/components/common/DemoLockBanner'
-import ColorThemeProvider from '@/components/theme/ColorThemeProvider'
+import ConditionalColorThemeProvider from '@/components/theme/ConditionalColorThemeProvider'
 import WeddingPattern from '@/components/theme/WeddingPattern'
 
 const inter = Inter({
@@ -302,7 +302,7 @@ export default function RootLayout({
         'min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 font-sans antialiased',
         'selection:bg-primary-200 selection:text-primary-800'
       )}>
-        <ColorThemeProvider>
+        <ConditionalColorThemeProvider>
           {/* Wedding Pattern Background */}
           <WeddingPattern />
 
@@ -331,7 +331,7 @@ export default function RootLayout({
               </Suspense>
             </UserTrackingWrapper>
           </QRTrackingWrapper>
-        </ColorThemeProvider>
+        </ConditionalColorThemeProvider>
 
         {/* Portal for modals */}
         <div id="modal-root" />

@@ -3,16 +3,17 @@
 import { Heart } from 'lucide-react'
 import type { StoryContent } from '@/types/wedding-website'
 import { useColorTheme } from '../ColorThemeContext'
+import Image from 'next/image'
 
 interface StorySectionProps {
   content: StoryContent
 }
 
 export default function StorySection({ content }: StorySectionProps) {
-  const { theme } = useColorTheme()
+  const { theme, themeName } = useColorTheme()
 
   return (
-    <section className="py-20" style={{ backgroundColor: theme.bgGradientFrom }}>
+    <section className="py-20" style={{ backgroundColor: themeName === 'default' ? '#ffffff' : theme.bgGradientFrom }}>
       <div className="max-w-6xl mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -25,14 +26,14 @@ export default function StorySection({ content }: StorySectionProps) {
           </p>
         </div>
 
-        {/* Medailonky snoubců */}
+        {/* Couple Photos with Heart */}
         {(content.bride || content.groom) && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16 max-w-4xl mx-auto">
+          <div className="flex items-center justify-center gap-8 md:gap-16 mb-16 flex-wrap">
             {/* Nevěsta */}
             {content.bride && (
-              <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
+              <div className="text-center">
                 {content.bride.image && (
-                  <div className="w-40 h-40 mx-auto mb-6 rounded-full overflow-hidden border-4 border-rose-200">
+                  <div className="w-64 h-64 md:w-80 md:h-80 mx-auto mb-6 rounded-full overflow-hidden shadow-xl" style={{ border: `4px solid ${theme.primary}` }}>
                     <img
                       src={content.bride.image}
                       alt={content.bride.name}
@@ -40,20 +41,36 @@ export default function StorySection({ content }: StorySectionProps) {
                     />
                   </div>
                 )}
-                <h3 className="text-2xl font-bold text-gray-900 mb-2 font-serif">
+                <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 font-serif uppercase tracking-wider">
                   {content.bride.name}
                 </h3>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-gray-600 leading-relaxed max-w-xs mx-auto">
                   {content.bride.description}
                 </p>
               </div>
             )}
 
+            {/* Heart Icon */}
+            <div className="flex items-center justify-center">
+              <div className="relative w-24 h-24 md:w-32 md:h-32">
+                <Image
+                  src="/hearth.png"
+                  alt="Heart"
+                  fill
+                  className="object-contain"
+                  style={{
+                    filter: `brightness(0) saturate(100%) invert(${theme.primary === '#000000' ? '0%' : '50%'})`,
+                    opacity: 0.8
+                  }}
+                />
+              </div>
+            </div>
+
             {/* Ženich */}
             {content.groom && (
-              <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
+              <div className="text-center">
                 {content.groom.image && (
-                  <div className="w-40 h-40 mx-auto mb-6 rounded-full overflow-hidden border-4 border-amber-200">
+                  <div className="w-64 h-64 md:w-80 md:h-80 mx-auto mb-6 rounded-full overflow-hidden shadow-xl" style={{ border: `4px solid ${theme.primary}` }}>
                     <img
                       src={content.groom.image}
                       alt={content.groom.name}
@@ -61,10 +78,10 @@ export default function StorySection({ content }: StorySectionProps) {
                     />
                   </div>
                 )}
-                <h3 className="text-2xl font-bold text-gray-900 mb-2 font-serif">
+                <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 font-serif uppercase tracking-wider">
                   {content.groom.name}
                 </h3>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-gray-600 leading-relaxed max-w-xs mx-auto">
                   {content.groom.description}
                 </p>
               </div>
@@ -86,7 +103,7 @@ export default function StorySection({ content }: StorySectionProps) {
               {content.timeline.map((item, index) => (
                 <div key={item.id} className="text-center">
                   {/* Fotka nebo ikona */}
-                  <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden flex items-center justify-center" style={{ backgroundColor: theme.bgGradientTo }}>
+                  <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden flex items-center justify-center" style={{ backgroundColor: themeName === 'default' ? '#fecdd3' : theme.bgGradientTo }}>
                     {item.image ? (
                       <img
                         src={item.image}

@@ -1,5 +1,6 @@
 'use client'
 
+import ScrollAnimations from '../ScrollAnimations'
 import { WeddingWebsite } from '@/types/wedding-website'
 import HeroSection from './romantic-boho/HeroSection'
 import StorySection from './romantic-boho/StorySection'
@@ -110,7 +111,9 @@ export default function RomanticBohoTemplate({ website }: RomanticBohoTemplatePr
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-rose-50 via-pink-50 to-amber-50">
+    <>
+      <ScrollAnimations />
+      <div className="min-h-screen bg-gradient-to-b from-rose-50 via-pink-50 to-amber-50">
       {/* Decorative floral background pattern */}
       <div 
         className="fixed inset-0 opacity-5 pointer-events-none"
@@ -131,7 +134,7 @@ export default function RomanticBohoTemplate({ website }: RomanticBohoTemplatePr
           </p>
         </div>
       </footer>
-    </div>
+      </div>
+    </>
   )
 }
-

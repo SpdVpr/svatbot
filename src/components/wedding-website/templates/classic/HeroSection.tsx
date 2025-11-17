@@ -56,8 +56,8 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ content }: HeroSectionProps) {
-  const { theme } = useColorTheme()
-  const { bride, groom, weddingDate, tagline, mainImage } = content
+  const { theme, themeName } = useColorTheme()
+  const { bride, groom, weddingDate, tagline, mainImage, imagePosition, imageScale } = content
 
   // Generate random positions only on client side to avoid hydration mismatch
   const [heartPositions, setHeartPositions] = useState<Array<{
@@ -85,8 +85,8 @@ export default function HeroSection({ content }: HeroSectionProps) {
       className="relative flex items-center justify-center overflow-hidden"
       style={mainImage ? {
         backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${mainImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        backgroundSize: imageScale ? `${imageScale}%` : 'cover',
+        backgroundPosition: imagePosition ? `${imagePosition.x}% ${imagePosition.y}%` : 'center',
         backgroundAttachment: 'fixed',
         minHeight: '85vh'
       } : {
@@ -95,7 +95,7 @@ export default function HeroSection({ content }: HeroSectionProps) {
     >
       {/* Background pattern overlay */}
       {!mainImage && (
-        <div className="absolute inset-0" style={{ backgroundColor: theme.bgGradientFrom }}>
+        <div className="absolute inset-0" style={{ backgroundColor: themeName === 'default' ? '#ffffff' : theme.bgGradientFrom }}>
           <div className="absolute inset-0 opacity-10">
             <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
               <defs>
