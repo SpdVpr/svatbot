@@ -92,46 +92,10 @@ export function useCalendar() {
     // Vendor appointments should be stored in a separate collection or in vendor.appointments array
     // For now, skip vendor appointments until the data structure is clarified
 
-    // Add wedding day events
-    if (wedding?.weddingDate && weddingDayEvents) {
-      weddingDayEvents.forEach(wdEvent => {
-        const weddingDate = new Date(wedding.weddingDate!)
-        const [hours, minutes] = (wdEvent.time || '00:00').split(':')
-        const eventDate = new Date(weddingDate)
-        eventDate.setHours(parseInt(hours), parseInt(minutes))
-
-        const event: CalendarEvent = {
-          id: `wedding-day-${wdEvent.id}`,
-          weddingId: wedding.id,
-          userId: user?.id || '',
-          title: wdEvent.activity,
-          description: wdEvent.notes,
-          type: 'wedding-day' as EventType,
-          source: 'wedding-day' as EventSource,
-          sourceId: wdEvent.id,
-          startDate: eventDate,
-          startTime: wdEvent.time,
-          isAllDay: false,
-          status: wdEvent.isCompleted ? 'completed' : 'upcoming',
-          priority: 'critical',
-          isCompleted: wdEvent.isCompleted,
-          location: wdEvent.location,
-          reminders: [],
-          recurrence: 'none',
-          isOnline: false,
-          createdAt: wdEvent.createdAt,
-          updatedAt: wdEvent.updatedAt,
-          createdBy: wdEvent.createdBy
-        }
-
-        aggregated.push({
-          event,
-          sourceData: { weddingDayEventId: wdEvent.id },
-          canEdit: false, // Edit in wedding day module
-          canDelete: false
-        })
-      })
-    }
+    // Note: Wedding day timeline events are NOT automatically added to calendar
+    // The wedding day timeline is a separate module for planning the actual wedding day schedule
+    // It should remain separate from the calendar to avoid cluttering it with 20+ events
+    // Users can view the wedding day timeline in the "Svatební den" module
 
     // Sort by date
     return aggregated.sort((a, b) =>

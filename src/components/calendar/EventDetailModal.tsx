@@ -388,22 +388,26 @@ export default function EventDetailModal({ event, onClose }: EventDetailModalPro
             /* View mode buttons */
             <>
               <div className="flex items-center space-x-2">
-                <button
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                  className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  <span>{isDeleting ? 'Mazání...' : 'Smazat'}</span>
-                </button>
+                {event.canDelete && (
+                  <button
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                    className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    <span>{isDeleting ? 'Mazání...' : 'Smazat'}</span>
+                  </button>
+                )}
 
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  <Edit2 className="w-4 h-4" />
-                  <span>Upravit</span>
-                </button>
+                {event.canEdit && (
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                    <span>Upravit</span>
+                  </button>
+                )}
               </div>
 
               <button
