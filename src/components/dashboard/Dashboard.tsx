@@ -555,7 +555,6 @@ function DashboardContent() {
           mode={authMode}
           onClose={() => setShowAuthModal(false)}
           onSwitchMode={(mode) => setAuthMode(mode)}
-          showDemoOption={false}
         />
       )}
 
