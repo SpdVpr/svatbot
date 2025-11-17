@@ -60,7 +60,8 @@ function HomePageContent() {
   }
 
   // Show dashboard without animation for faster perceived load
-  if (user && (user?.email === 'demo@svatbot.cz' || wedding)) {
+  // Only show dashboard if user has a wedding (or is demo user)
+  if (user && wedding) {
     return <Dashboard />
   }
 
