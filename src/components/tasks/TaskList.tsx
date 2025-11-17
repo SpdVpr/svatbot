@@ -114,6 +114,12 @@ export default function TaskList({
       return
     }
 
+    // Check if task is already in calendar
+    if (isTaskInCalendar(task)) {
+      alert('⚠️ Tento úkol už je v kalendáři! Nemůžete ho přidat znovu.')
+      return
+    }
+
     try {
       // Create calendar event from task
       await createEvent({
