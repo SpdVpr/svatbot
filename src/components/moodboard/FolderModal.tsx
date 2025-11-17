@@ -46,7 +46,7 @@ export default function FolderModal({ folder, onSave, onClose, loading }: Folder
     try {
       await onSave({
         name: name.trim(),
-        description: description.trim() || undefined,
+        description: description.trim(),
         color: selectedColor,
         icon: selectedIcon
       })

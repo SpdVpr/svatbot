@@ -418,8 +418,14 @@ export function useMoodboard() {
   const updateFolder = async (folderId: string, updates: Partial<MoodboardFolder>): Promise<void> => {
     try {
       const folderRef = doc(db, 'moodboardFolders', folderId)
+
+      // Remove undefined values to avoid Firestore errors
+      const cleanUpdates = Object.fromEntries(
+        Object.entries(updates).filter(([_, value]) => value !== undefined)
+      )
+
       await updateDoc(folderRef, {
-        ...updates,
+        ...cleanUpdates,
         updatedAt: serverTimestamp()
       })
       logger.log('✅ Folder updated:', folderId)
