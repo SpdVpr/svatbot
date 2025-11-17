@@ -57,7 +57,7 @@ export default function WeddingWebsitePage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500 mb-4"></div>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500 mb-4"></div>
           <p className="text-gray-600">Načítání...</p>
         </div>
       </div>
@@ -92,7 +92,7 @@ export default function WeddingWebsitePage() {
 
             {/* Features */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 text-left">
-              <div className="bg-pink-50 rounded-lg p-6">
+              <div className="bg-primary-50 rounded-lg p-6">
                 <div className="text-3xl mb-3">🎨</div>
                 <h3 className="font-semibold text-gray-900 mb-2">
                   Krásné šablony
@@ -102,7 +102,7 @@ export default function WeddingWebsitePage() {
                 </p>
               </div>
 
-              <div className="bg-blue-50 rounded-lg p-6">
+              <div className="bg-primary-50 rounded-lg p-6">
                 <div className="text-3xl mb-3">📱</div>
                 <h3 className="font-semibold text-gray-900 mb-2">
                   Online RSVP
@@ -112,7 +112,7 @@ export default function WeddingWebsitePage() {
                 </p>
               </div>
 
-              <div className="bg-green-50 rounded-lg p-6">
+              <div className="bg-primary-50 rounded-lg p-6">
                 <div className="text-3xl mb-3">📸</div>
                 <h3 className="font-semibold text-gray-900 mb-2">
                   Fotogalerie
@@ -125,7 +125,7 @@ export default function WeddingWebsitePage() {
 
             <Link
               href="/wedding-website/builder"
-              className="inline-flex items-center gap-2 bg-pink-500 text-white px-6 py-3 rounded-lg hover:bg-pink-600 transition-colors"
+              className="inline-flex items-center gap-2 bg-primary-500 text-white px-6 py-3 rounded-lg hover:bg-primary-600 transition-colors"
             >
               <Plus className="w-5 h-5" />
               Vytvořit svatební web
@@ -191,7 +191,7 @@ export default function WeddingWebsitePage() {
               href={websiteUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-pink-600 hover:text-pink-700 font-medium"
+              className="inline-flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 font-medium"
             >
               {website.customUrl}.svatbot.cz
               <ExternalLink className="w-4 h-4" />
@@ -250,10 +250,10 @@ export default function WeddingWebsitePage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Link
             href="/wedding-website/builder"
-            className="group bg-white rounded-lg shadow-sm p-6 border-2 border-transparent hover:border-pink-500 hover:shadow-lg transition-all cursor-pointer"
+            className="group bg-white rounded-lg shadow-sm p-6 border-2 border-transparent hover:border-primary-500 hover:shadow-lg transition-all cursor-pointer"
           >
-            <Edit className="w-8 h-8 text-pink-500 mb-3 group-hover:scale-110 transition-transform" />
-            <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-pink-600 transition-colors">
+            <Edit className="w-8 h-8 text-primary-500 mb-3 group-hover:scale-110 transition-transform" />
+            <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
               Upravit obsah →
             </h3>
             <p className="text-sm text-gray-600">
@@ -263,10 +263,10 @@ export default function WeddingWebsitePage() {
 
           <Link
             href="/wedding-website/rsvp"
-            className="group bg-white rounded-lg shadow-sm p-6 border-2 border-transparent hover:border-blue-500 hover:shadow-lg transition-all cursor-pointer"
+            className="group bg-white rounded-lg shadow-sm p-6 border-2 border-transparent hover:border-primary-500 hover:shadow-lg transition-all cursor-pointer"
           >
-            <MessageSquare className="w-8 h-8 text-blue-500 mb-3 group-hover:scale-110 transition-transform" />
-            <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+            <MessageSquare className="w-8 h-8 text-primary-500 mb-3 group-hover:scale-110 transition-transform" />
+            <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
               Správa RSVP →
             </h3>
             <p className="text-sm text-gray-600">
@@ -276,10 +276,10 @@ export default function WeddingWebsitePage() {
 
           <Link
             href="/wedding-website/analytics"
-            className="group bg-white rounded-lg shadow-sm p-6 border-2 border-transparent hover:border-green-500 hover:shadow-lg transition-all cursor-pointer"
+            className="group bg-white rounded-lg shadow-sm p-6 border-2 border-transparent hover:border-primary-500 hover:shadow-lg transition-all cursor-pointer"
           >
-            <BarChart3 className="w-8 h-8 text-green-500 mb-3 group-hover:scale-110 transition-transform" />
-            <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-green-600 transition-colors">
+            <BarChart3 className="w-8 h-8 text-primary-500 mb-3 group-hover:scale-110 transition-transform" />
+            <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
               Statistiky →
             </h3>
             <p className="text-sm text-gray-600">
@@ -295,15 +295,15 @@ export default function WeddingWebsitePage() {
               Náhled webu
             </h3>
           </div>
-          <div className="border border-gray-200 rounded-lg overflow-hidden bg-gradient-to-br from-pink-50 to-purple-50 p-8">
+          <div className="border border-gray-200 rounded-lg overflow-hidden bg-gradient-to-br from-primary-50 to-secondary-50 p-8">
             <div className="text-center">
               <div className="mb-6">
-                <Eye className="w-12 h-12 text-pink-500 mx-auto mb-4" />
+                <Eye className="w-12 h-12 text-primary-500 mx-auto mb-4" />
                 <h4 className="text-lg font-semibold text-gray-900 mb-2">
                   Váš svatební web je připraven!
                 </h4>
                 <p className="text-gray-600 mb-2 text-sm">
-                  URL: <span className="font-mono text-pink-600">{previewUrl}</span>
+                  URL: <span className="font-mono text-primary-600">{previewUrl}</span>
                 </p>
                 <p className="text-xs text-gray-500">
                   Klikněte na tlačítko níže pro zobrazení webu
@@ -312,7 +312,7 @@ export default function WeddingWebsitePage() {
               <Link
                 href={previewUrl}
                 target="_blank"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white px-6 py-3 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all"
+                className="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white px-6 py-3 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all"
               >
                 <Eye className="w-5 h-5" />
                 Zobrazit svatební web
@@ -329,10 +329,10 @@ export default function WeddingWebsitePage() {
                 QR kód webu
               </h3>
             </div>
-            <div className="border border-gray-200 rounded-lg overflow-hidden bg-gradient-to-br from-purple-50 to-pink-50 p-8">
+            <div className="border border-gray-200 rounded-lg overflow-hidden bg-gradient-to-br from-primary-50 to-secondary-50 p-8">
               <div className="text-center">
                 <div className="mb-4">
-                  <QrCode className="w-12 h-12 text-purple-500 mx-auto mb-4" />
+                  <QrCode className="w-12 h-12 text-primary-500 mx-auto mb-4" />
                   <h4 className="text-lg font-semibold text-gray-900 mb-2">
                     Sdílejte web pomocí QR kódu
                   </h4>
