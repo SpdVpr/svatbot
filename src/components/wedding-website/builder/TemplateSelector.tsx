@@ -197,8 +197,8 @@ export default function TemplateSelector({ selectedTemplate, onSelect, disabled 
                 isLocked ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'
               } ${
                 isSelected
-                  ? 'border-pink-500 shadow-lg'
-                  : 'border-gray-200 hover:border-pink-300 hover:shadow-md'
+                  ? 'border-primary-500 shadow-lg'
+                  : 'border-gray-200 hover:border-primary-300 hover:shadow-md'
               }`}
               onClick={() => !isLocked && onSelect(template.id)}
               onMouseEnter={() => setHoveredTemplate(template.id)}
@@ -223,7 +223,7 @@ export default function TemplateSelector({ selectedTemplate, onSelect, disabled 
 
               {/* Selected badge */}
               {isSelected && !isLocked && (
-                <div className="absolute top-4 right-4 z-10 bg-pink-500 text-white rounded-full p-2">
+                <div className="absolute top-4 right-4 z-10 bg-primary-500 text-white rounded-full p-2">
                   <Check className="w-5 h-5" />
                 </div>
               )}
@@ -284,7 +284,7 @@ export default function TemplateSelector({ selectedTemplate, onSelect, disabled 
                   <ul className="space-y-1">
                     {template.features.map((feature, index) => (
                       <li key={index} className="text-sm text-gray-600 flex items-center gap-2">
-                        <span className="w-1 h-1 bg-pink-500 rounded-full"></span>
+                        <span className="w-1 h-1 bg-primary-500 rounded-full"></span>
                         {feature}
                       </li>
                     ))}
@@ -300,7 +300,7 @@ export default function TemplateSelector({ selectedTemplate, onSelect, disabled 
                     {template.suitableFor.map((item, index) => (
                       <span
                         key={index}
-                        className="px-2 py-1 bg-pink-50 text-pink-600 text-xs rounded"
+                        className="px-2 py-1 bg-primary-50 text-primary-600 text-xs rounded"
                       >
                         {item}
                       </span>
@@ -330,7 +330,7 @@ export default function TemplateSelector({ selectedTemplate, onSelect, disabled 
 
               {/* Hover overlay */}
               {isHovered && !isSelected && (
-                <div className="absolute inset-0 bg-pink-500 bg-opacity-5 rounded-lg pointer-events-none" />
+                <div className="absolute inset-0 bg-primary-500 bg-opacity-5 rounded-lg pointer-events-none" />
               )}
             </div>
           )

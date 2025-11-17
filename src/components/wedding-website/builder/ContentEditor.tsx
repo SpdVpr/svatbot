@@ -391,7 +391,7 @@ export default function ContentEditor({ content, onContentChange, onSave, onExpa
               onClick={() => selectSection(section.id)}
               className={`relative p-6 rounded-xl border-2 transition-all duration-200 hover:shadow-lg hover:scale-105 ${
                 section.enabled
-                  ? 'border-pink-200 bg-gradient-to-br from-pink-50 to-purple-50 hover:border-pink-300'
+                  ? 'border-primary-200 bg-gradient-to-br from-primary-50 to-secondary-50 hover:border-primary-300'
                   : 'border-gray-200 bg-gray-50 hover:border-gray-300'
               }`}
             >
@@ -417,7 +417,7 @@ export default function ContentEditor({ content, onContentChange, onSave, onExpa
               <div className="flex justify-center mb-3">
                 <div className={`p-4 rounded-full ${
                   section.enabled
-                    ? 'bg-gradient-to-br from-pink-500 to-purple-500'
+                    ? 'bg-gradient-to-br from-primary-500 to-secondary-500'
                     : 'bg-gray-300'
                 }`}>
                   <section.icon className="w-8 h-8 text-white" />
@@ -449,9 +449,9 @@ export default function ContentEditor({ content, onContentChange, onSave, onExpa
 
       {/* Expanded Section Editor */}
       {expandedSection && (
-        <div className="bg-white rounded-xl border-2 border-pink-200 shadow-lg overflow-hidden">
+        <div className="bg-white rounded-xl border-2 border-primary-200 shadow-lg overflow-hidden">
           {/* Section Header */}
-          <div className="bg-gradient-to-r from-pink-500 to-purple-500 p-6">
+          <div className="bg-gradient-to-r from-primary-500 to-secondary-500 p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <button
@@ -479,7 +479,7 @@ export default function ContentEditor({ content, onContentChange, onSave, onExpa
                               </span>
                             )}
                           </h3>
-                          <p className="text-pink-100 text-sm">{section.description}</p>
+                          <p className="text-primary-100 text-sm">{section.description}</p>
                         </div>
                       </>
                     )
@@ -499,7 +499,7 @@ export default function ContentEditor({ content, onContentChange, onSave, onExpa
                       checked={section.enabled}
                       onChange={(e) => toggleSectionEnabled(section.id, e.target.checked)}
                       disabled={disabled}
-                      className="w-5 h-5 rounded border-white text-pink-600 focus:ring-pink-500 focus:ring-offset-0 disabled:cursor-not-allowed"
+                      className="w-5 h-5 rounded border-white text-primary-600 focus:ring-primary-500 focus:ring-offset-0 disabled:cursor-not-allowed"
                     />
                   </label>
                 )
@@ -524,7 +524,7 @@ export default function ContentEditor({ content, onContentChange, onSave, onExpa
                     <button
                       onClick={handleSaveSection}
                       disabled={isSaving || disabled}
-                      className="inline-flex items-center gap-2 bg-pink-500 text-white px-6 py-3 rounded-lg hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex items-center gap-2 bg-primary-500 text-white px-6 py-3 rounded-lg hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Save className="w-5 h-5" />
                       {isSaving ? 'Ukládání...' : 'Uložit'}
@@ -552,7 +552,7 @@ export default function ContentEditor({ content, onContentChange, onSave, onExpa
                     <button
                       onClick={handleSaveSection}
                       disabled={isSaving}
-                      className="inline-flex items-center gap-2 bg-pink-500 text-white px-6 py-3 rounded-lg hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex items-center gap-2 bg-primary-500 text-white px-6 py-3 rounded-lg hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Save className="w-5 h-5" />
                       {isSaving ? 'Uložit' : 'Zavřít'}

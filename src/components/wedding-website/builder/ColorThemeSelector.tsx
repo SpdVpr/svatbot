@@ -54,14 +54,14 @@ export default function ColorThemeSelector({
             className={`
               relative p-3 rounded-lg border-2 transition-all
               ${selectedTheme === 'default'
-                ? 'border-purple-500 bg-purple-50 shadow-md ring-2 ring-purple-200'
+                ? 'border-primary-500 bg-primary-50 shadow-md ring-2 ring-primary-200'
                 : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
               }
               ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
             `}
           >
             {selectedTheme === 'default' && (
-              <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-purple-600 rounded-full flex items-center justify-center">
+              <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-primary-600 rounded-full flex items-center justify-center">
                 <Check className="w-3 h-3 text-white" />
               </div>
             )}
@@ -88,14 +88,14 @@ export default function ColorThemeSelector({
                 className={`
                   relative p-3 rounded-lg border-2 transition-all
                   ${isSelected
-                    ? 'border-purple-500 bg-purple-50 shadow-md ring-2 ring-purple-200'
+                    ? 'border-primary-500 bg-primary-50 shadow-md ring-2 ring-primary-200'
                     : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
                   }
                   ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                 `}
               >
                 {isSelected && (
-                  <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-purple-600 rounded-full flex items-center justify-center">
+                  <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-primary-600 rounded-full flex items-center justify-center">
                     <Check className="w-3 h-3 text-white" />
                   </div>
                 )}
@@ -137,21 +137,21 @@ export default function ColorThemeSelector({
           className={`
             w-full relative p-4 rounded-lg border-2 transition-all
             ${selectedTheme === 'custom'
-              ? 'border-purple-500 bg-purple-50 shadow-md ring-2 ring-purple-200'
+              ? 'border-primary-500 bg-primary-50 shadow-md ring-2 ring-primary-200'
               : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
             }
             ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
           `}
         >
           {selectedTheme === 'custom' && (
-            <div className="absolute top-2 right-2 w-5 h-5 bg-purple-600 rounded-full flex items-center justify-center">
+            <div className="absolute top-2 right-2 w-5 h-5 bg-primary-600 rounded-full flex items-center justify-center">
               <Check className="w-3 h-3 text-white" />
             </div>
           )}
 
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br from-purple-100 to-pink-100">
-              <Palette className="w-6 h-6 text-purple-600" />
+            <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br from-primary-100 to-secondary-100">
+              <Palette className="w-6 h-6 text-primary-600" />
             </div>
             <div className="text-left flex-1">
               <h4 className="font-semibold text-gray-900 text-sm">Vytvořit vlastní paletu</h4>
@@ -163,9 +163,9 @@ export default function ColorThemeSelector({
 
       {/* Custom Color Picker */}
       {showCustomPicker && (
-        <div className="mt-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border-2 border-purple-300 p-6 space-y-6">
+        <div className="mt-4 bg-gradient-to-br from-primary-50 to-secondary-50 rounded-xl border-2 border-primary-300 p-6 space-y-6">
           <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-600">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary-600">
               <Palette className="w-5 h-5 text-white" />
             </div>
             <h4 className="font-semibold text-gray-900">Nastavte vlastní barvy</h4>

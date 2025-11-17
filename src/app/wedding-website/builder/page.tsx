@@ -377,7 +377,7 @@ export default function WeddingWebsiteBuilderPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500 mb-4"></div>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500 mb-4"></div>
           <p className="text-gray-600">Načítání...</p>
         </div>
       </div>
@@ -423,7 +423,7 @@ export default function WeddingWebsiteBuilderPage() {
                 <button
                   onClick={handlePublish}
                   disabled={Boolean(isPublishing || isLocked)}
-                  className="inline-flex items-center gap-2 bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="inline-flex items-center gap-2 bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Rocket className="w-4 h-4" />
                   {isPublishing ? 'Publikování...' : 'Publikovat'}
@@ -453,7 +453,7 @@ export default function WeddingWebsiteBuilderPage() {
                     disabled={Boolean(!isClickable)}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                       currentStep === step.id
-                        ? 'bg-pink-100 text-pink-700'
+                        ? 'bg-primary-100 text-primary-700'
                         : isClickable
                         ? 'text-gray-700 hover:bg-gray-100 cursor-pointer'
                         : 'text-gray-400 cursor-not-allowed'
@@ -462,7 +462,7 @@ export default function WeddingWebsiteBuilderPage() {
                     <div
                       className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
                         currentStep === step.id
-                          ? 'bg-pink-500 text-white'
+                          ? 'bg-primary-500 text-white'
                           : isClickable
                           ? 'bg-gray-300 text-gray-700 hover:bg-gray-400'
                           : 'bg-gray-200 text-gray-600'
@@ -508,8 +508,8 @@ export default function WeddingWebsiteBuilderPage() {
               </div>
             )}
             {website && !isSaving && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm text-blue-800">
+              <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
+                <p className="text-sm text-primary-800">
                   <strong>Tip:</strong> Změna šablony nebo barevné palety zachová všechna vaše data a nastavení.
                   Změní se pouze design webu na adrese <strong>{customUrl}.svatbot.cz</strong>
                 </p>
@@ -518,9 +518,9 @@ export default function WeddingWebsiteBuilderPage() {
 
             {/* Template Selection Section */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 px-6 py-4 border-b border-gray-200">
+              <div className="bg-gradient-to-r from-primary-50 to-secondary-50 px-6 py-4 border-b border-gray-200">
                 <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                  <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white text-sm font-bold">
+                  <span className="flex items-center justify-center w-8 h-8 rounded-full bg-primary-600 text-white text-sm font-bold">
                     1
                   </span>
                   Vyberte šablonu webu
@@ -540,9 +540,9 @@ export default function WeddingWebsiteBuilderPage() {
 
             {/* Color Theme Selection Section */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              <div className="bg-gradient-to-r from-purple-50 to-pink-50 px-6 py-4 border-b border-gray-200">
+              <div className="bg-gradient-to-r from-primary-50 to-secondary-50 px-6 py-4 border-b border-gray-200">
                 <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                  <span className="flex items-center justify-center w-8 h-8 rounded-full bg-purple-600 text-white text-sm font-bold">
+                  <span className="flex items-center justify-center w-8 h-8 rounded-full bg-primary-600 text-white text-sm font-bold">
                     2
                   </span>
                   Nastavte barevnou paletu
@@ -595,13 +595,13 @@ export default function WeddingWebsiteBuilderPage() {
               </div>
 
               {/* URL and Open Button */}
-              <div className="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center justify-between p-4 bg-primary-50 border border-primary-200 rounded-lg">
                 <div>
-                  <div className="text-sm font-medium text-blue-900 mb-1">
+                  <div className="text-sm font-medium text-primary-900 mb-1">
                     URL adresa vašeho webu:
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-lg text-blue-600">
+                    <span className="font-mono text-lg text-primary-600">
                       https://svatbot.cz/wedding/{customUrl}
                     </span>
                     {website?.isPublished && (
@@ -616,7 +616,7 @@ export default function WeddingWebsiteBuilderPage() {
                   href={`/wedding/${customUrl}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  className="inline-flex items-center gap-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
                 >
                   <ExternalLink className="w-4 h-4" />
                   Otevřít web
@@ -756,7 +756,7 @@ export default function WeddingWebsiteBuilderPage() {
                   <button
                     onClick={handlePublish}
                     disabled={Boolean(isPublishing || !canGoNext() || isLocked)}
-                    className="inline-flex items-center gap-2 bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="inline-flex items-center gap-2 bg-primary-500 text-white px-6 py-3 rounded-lg hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Rocket className="w-5 h-5" />
                     {isPublishing ? 'Publikování...' : 'Publikovat web'}
@@ -774,7 +774,7 @@ export default function WeddingWebsiteBuilderPage() {
               <button
                 onClick={handleNext}
                 disabled={Boolean(!canGoNext() || isSaving || isLocked)}
-                className="inline-flex items-center gap-2 bg-pink-500 text-white px-6 py-3 rounded-lg hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-2 bg-primary-500 text-white px-6 py-3 rounded-lg hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {currentStep === 'url' && !website ? (
                   isSaving ? 'Ukládání...' : 'Pokračovat'
