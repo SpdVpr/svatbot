@@ -339,14 +339,37 @@ export default function TaskCard({
               )}
             </div>
 
-            {/* Priority for compact mode */}
-            {compact && priorityDisplay && (
+            {/* Complete/Uncomplete button or Priority for compact mode */}
+            {compact && priorityDisplay ? (
               <div className={`
                 flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium
                 ${priorityDisplay.bg} ${priorityDisplay.color}
               `}>
                 <Flag className="w-3 h-3" />
               </div>
+            ) : !compact && (
+              <button
+                onClick={handleStatusToggle}
+                disabled={isUpdating}
+                className={`px-2.5 py-1 rounded-lg transition-all flex items-center space-x-1 ${
+                  task.status === 'completed'
+                    ? 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    : 'bg-primary-500 text-white hover:bg-primary-600 shadow-sm hover:shadow-md'
+                } ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}`}
+                title={task.status === 'completed' ? 'Označit jako nedokončené' : 'Označit jako hotové'}
+              >
+                {task.status === 'completed' ? (
+                  <>
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span className="text-xs font-medium">Hotovo</span>
+                  </>
+                ) : (
+                  <>
+                    <Circle className="w-3.5 h-3.5" />
+                    <span className="text-xs font-medium">Hotovo</span>
+                  </>
+                )}
+              </button>
             )}
           </div>
 

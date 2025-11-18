@@ -26,19 +26,37 @@ export default function NotesModal({ isOpen, onClose }: NotesModalProps) {
   const [content, setContent] = useState('')
   const [selectedColor, setSelectedColor] = useState<'yellow' | 'blue' | 'green' | 'pink' | 'purple' | 'orange'>('yellow')
   const [isSaving, setIsSaving] = useState(false)
+  const [isInitialized, setIsInitialized] = useState(false)
 
-  // Load existing note if any
+  // Load existing note only when modal opens (not on every notes change)
   useEffect(() => {
-    if (isOpen && notes.length > 0) {
-      const mainNote = notes[0]
-      setContent(mainNote.content)
-      setSelectedColor(mainNote.color || 'yellow')
-    } else if (isOpen && notes.length === 0 && !loading) {
-      // Clear content if no notes exist
-      setContent('')
-      setSelectedColor('yellow')
+    if (isOpen && !loading && !isInitialized) {
+      if (notes.length > 0) {
+        const mainNote = notes[0]
+        setContent(mainNote.content)
+        setSelectedColor(mainNote.color || 'yellow')
+      } else {
+        // Clear content if no notes exist
+        setContent('')
+        setSelectedColor('yellow')
+      }
+      setIsInitialized(true)
+    } else if (!isOpen) {
+      // Reset initialization flag when modal closes
+      setIsInitialized(false)
     }
-  }, [isOpen, notes, loading])
+  }, [isOpen, notes, loading, isInitialized])
+
+  // Update only color when it changes in the database (but keep content unchanged)
+  useEffect(() => {
+    if (isOpen && isInitialized && notes.length > 0) {
+      const mainNote = notes[0]
+      // Only update color if it's different, don't touch content
+      if (mainNote.color && mainNote.color !== selectedColor) {
+        setSelectedColor(mainNote.color)
+      }
+    }
+  }, [notes, isOpen, isInitialized])
 
   const handleSave = async () => {
     if (isSaving || isLocked) return

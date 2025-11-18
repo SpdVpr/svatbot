@@ -711,7 +711,7 @@ export default function WelcomeScreen() {
               Spokojené páry <span className="text-pink-500">po celém Česku</span>
             </h2>
             <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              Přečtěte si, jak SvatBot.cz pomohl stovkám párů naplánovat jejich vysněnou svatbu
+              Přečtěte si, jak SvatBot.cz pomohl párům naplánovat jejich vysněnou svatbu
             </p>
           </div>
 

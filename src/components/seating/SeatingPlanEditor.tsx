@@ -24,6 +24,96 @@ import {
 import { Table, Seat, ChairRow, ChairSeat, SeatingViewOptions, SeatingPlan, TableShape, TableSize, ChairRowOrientation, CustomArea } from '@/types/seating'
 import { GUEST_CATEGORY_LABELS, GUEST_CATEGORY_COLORS } from '@/utils/guestCategories'
 
+// Helper functions for table size calculations
+const getTableDimension = (size: TableSize, shape: TableShape): { width: number; height: number; radius: number } => {
+  // For round/oval tables - radius
+  const radiusMap: Record<TableSize, number> = {
+    xs: 30,    // 40px diameter (20px radius) - Nejmenší
+    small: 40,
+    medium: 50,
+    large: 60,
+    xl: 70
+  }
+
+  // For rectangular/square tables - width
+  const widthMap: Record<TableSize, number> = {
+    xs: 60,    // 40px - Nejmenší
+    small: 100,
+    medium: 140,
+    large: 180,
+    xl: 220
+  }
+
+  // For rectangular tables - height (square uses width)
+  const heightMap: Record<TableSize, number> = {
+    xs: 40,    // 40px - Nejmenší
+    small: 60,
+    medium: 80,
+    large: 100,
+    xl: 120
+  }
+
+  const width = widthMap[size]
+  const height = shape === 'square' ? width : heightMap[size]
+  const radius = radiusMap[size]
+
+  return { width, height, radius }
+}
+
+// Get display size for canvas rendering (slightly smaller than actual size)
+const getDisplaySize = (size: TableSize, shape: TableShape): { width: number; height: number } => {
+  const displayWidthMap: Record<TableSize, number> = {
+    xs: 40,    // 40px - Nejmenší
+    small: 80,
+    medium: 120,
+    large: 160,
+    xl: 200
+  }
+
+  const displayHeightMap: Record<TableSize, number> = {
+    xs: 40,    // 40px - Nejmenší
+    small: 60,
+    medium: 90,
+    large: 120,
+    xl: 150
+  }
+
+  const width = displayWidthMap[size]
+  const height = shape === 'round' || shape === 'square'
+    ? width
+    : shape === 'oval'
+      ? displayHeightMap[size]
+      : displayHeightMap[size]
+
+  return { width, height }
+}
+
+// Get seat positioning radius for round/oval tables
+const getSeatRadius = (size: TableSize): number => {
+  const radiusMap: Record<TableSize, number> = {
+    xs: 35,    // 40px - Nejmenší
+    small: 50,
+    medium: 70,
+    large: 90,
+    xl: 110
+  }
+  return radiusMap[size]
+}
+
+// Get name positioning radius for round/oval tables
+const getNameRadius = (size: TableSize, capacity: number): number => {
+  const baseRadiusMap: Record<TableSize, number> = {
+    xs: 70,    // 40px - Nejmenší
+    small: 90,
+    medium: 110,
+    large: 130,
+    xl: 150
+  }
+  const baseRadius = baseRadiusMap[size]
+  const extraRadius = Math.max(0, (capacity - 6) * 5)
+  return baseRadius + extraRadius
+}
+
 interface SeatingPlanEditorProps {
   className?: string
   currentPlan: SeatingPlan
@@ -224,7 +314,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
       // Check tables
       tables.forEach(table => {
-        const tableSize = table.size === 'small' ? 100 : table.size === 'medium' ? 140 : table.size === 'large' ? 180 : 220
+        const { width: tableSize } = getTableDimension(table.size, table.shape)
         if (Math.abs(x - table.position.x) < (objectWidth + tableSize) / 2 + 30 &&
             Math.abs(y - table.position.y) < (objectHeight + tableSize) / 2 + 30) {
           overlapCount++
@@ -1352,7 +1442,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
         // Table shape
         if (table.shape === 'round' || table.shape === 'oval') {
-          const radius = table.size === 'small' ? 40 : table.size === 'medium' ? 50 : table.size === 'large' ? 60 : 70
+          const { radius } = getTableDimension(table.size, table.shape)
           svgContent += `
             <circle
               cx="${table.position.x}"
@@ -1364,8 +1454,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
             />
           `
         } else {
-          const width = table.size === 'small' ? 100 : table.size === 'medium' ? 140 : table.size === 'large' ? 180 : 220
-          const height = table.shape === 'square' ? width : (table.size === 'small' ? 60 : table.size === 'medium' ? 80 : table.size === 'large' ? 100 : 120)
+          const { width, height } = getTableDimension(table.size, table.shape)
 
           svgContent += `
             <rect
@@ -1403,7 +1492,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
           let seatY = table.position.y
 
           if (table.shape === 'round' || table.shape === 'oval') {
-            const radius = table.size === 'small' ? 40 : table.size === 'medium' ? 50 : table.size === 'large' ? 60 : 70
+            const { radius } = getTableDimension(table.size, table.shape)
             const baseRadius = radius
             const extraRadius = Math.max(0, (tableSeats.length - 6) * 5)
             const seatRadius = baseRadius + extraRadius + 15
@@ -1415,8 +1504,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
             seatX = table.position.x + Math.cos(rad) * seatRadius
             seatY = table.position.y + Math.sin(rad) * seatRadius
           } else {
-            const width = table.size === 'small' ? 100 : table.size === 'medium' ? 140 : table.size === 'large' ? 180 : 220
-            const height = table.shape === 'square' ? width : (table.size === 'small' ? 60 : table.size === 'medium' ? 80 : table.size === 'large' ? 100 : 120)
+            const { width, height } = getTableDimension(table.size, table.shape)
 
             const seatSides = table.seatSides || 'all'
             const oneSidePosition = table.oneSidePosition || 'bottom'
@@ -2929,12 +3017,8 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                           : 'border-gray-300 bg-white hover:border-primary-300'
                       }`}
                       style={{
-                        width: table.size === 'small' ? 80 : table.size === 'medium' ? 120 : table.size === 'large' ? 160 : 200,
-                        height: table.shape === 'round' || table.shape === 'square'
-                          ? (table.size === 'small' ? 80 : table.size === 'medium' ? 120 : table.size === 'large' ? 160 : 200)
-                          : table.shape === 'oval'
-                            ? (table.size === 'small' ? 60 : table.size === 'medium' ? 90 : table.size === 'large' ? 120 : 150)
-                            : (table.size === 'small' ? 60 : table.size === 'medium' ? 80 : table.size === 'large' ? 100 : 120), // rectangular
+                        width: getDisplaySize(table.size, table.shape).width,
+                        height: getDisplaySize(table.size, table.shape).height,
                         borderRadius: table.shape === 'round' ? '50%' : table.shape === 'oval' ? '50%' : '8px',
                         backgroundColor: table.color || '#ffffff'
                       }}
@@ -2959,15 +3043,12 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                         if (table.shape === 'round' || table.shape === 'oval') {
                           // Circular positioning for round/oval tables
                           const angle = (360 / table.capacity) * seatIndex
-                          const radius = table.size === 'small' ? 50 : table.size === 'medium' ? 70 : table.size === 'large' ? 90 : 110
+                          const radius = getSeatRadius(table.size)
                           seatX = Math.cos((angle - 90) * Math.PI / 180) * radius
                           seatY = Math.sin((angle - 90) * Math.PI / 180) * radius
                         } else {
                           // Rectangular/square positioning with optional head seats and seat sides
-                          const tableWidth = table.size === 'small' ? 100 : table.size === 'medium' ? 140 : table.size === 'large' ? 180 : 220
-                          const tableHeight = table.shape === 'square'
-                            ? tableWidth
-                            : (table.size === 'small' ? 60 : table.size === 'medium' ? 80 : table.size === 'large' ? 100 : 120)
+                          const { width: tableWidth, height: tableHeight } = getTableDimension(table.size, table.shape)
 
                           const seatOffset = 10 // Distance from table edge
                           const totalSeats = table.capacity // Use table capacity for consistent positioning
@@ -3149,9 +3230,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                             // Circular positioning for round/oval tables
                             const seatAngle = (360 / table.capacity) * seatIndex
                             const totalAngle = seatAngle + table.rotation
-                            const baseRadius = table.size === 'small' ? 90 : table.size === 'medium' ? 110 : table.size === 'large' ? 130 : 150
-                            const extraRadius = Math.max(0, (table.capacity - 6) * 5)
-                            const nameRadius = baseRadius + extraRadius
+                            const nameRadius = getNameRadius(table.size, table.capacity)
                             nameX = Math.cos((totalAngle - 90) * Math.PI / 180) * nameRadius
                             nameY = Math.sin((totalAngle - 90) * Math.PI / 180) * nameRadius
 
@@ -3159,10 +3238,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                             textRotation = 0
                           } else {
                             // Rectangular/square positioning with seat sides support
-                            const tableWidth = table.size === 'small' ? 100 : table.size === 'medium' ? 140 : table.size === 'large' ? 180 : 220
-                            const tableHeight = table.shape === 'square'
-                              ? tableWidth
-                              : (table.size === 'small' ? 60 : table.size === 'medium' ? 80 : table.size === 'large' ? 100 : 120)
+                            const { width: tableWidth, height: tableHeight } = getTableDimension(table.size, table.shape)
 
                             const baseOffset = 45
                             const extraOffset = Math.max(0, (table.capacity - 6) * 3)
@@ -3780,6 +3856,7 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                   onChange={(e) => setTableFormData(prev => ({ ...prev, size: e.target.value as any }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 >
+                  <option value="xs">Nejmenší (40px)</option>
                   <option value="small">Malý (80px)</option>
                   <option value="medium">Střední (120px)</option>
                   <option value="large">Velký (160px)</option>

@@ -1,7 +1,7 @@
 // Seating Plan Types for SvatBot.cz
 
 export type TableShape = 'round' | 'rectangular' | 'square' | 'oval'
-export type TableSize = 'small' | 'medium' | 'large' | 'xl'
+export type TableSize = 'xs' | 'small' | 'medium' | 'large' | 'xl'
 export type ChairRowOrientation = 'horizontal' | 'vertical'
 
 export interface TablePosition {

@@ -482,6 +482,7 @@ export default function TaskList({
                       <button
                         onClick={() => toggleTaskStatus(task.id)}
                         className="mt-1 hover:scale-110 transition-transform"
+                        title={task.status === 'completed' ? 'Označit jako nedokončené' : 'Označit jako hotové'}
                       >
                         {getStatusIcon(task.status, isOverdue)}
                       </button>
@@ -536,6 +537,28 @@ export default function TaskList({
 
                           {/* Action buttons */}
                           <div className="flex items-center space-x-1">
+                            {/* Complete/Uncomplete button - more visible */}
+                            <button
+                              onClick={() => toggleTaskStatus(task.id)}
+                              className={`px-3 py-1.5 rounded-lg transition-all flex items-center space-x-1.5 ${
+                                task.status === 'completed'
+                                  ? 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                  : 'bg-primary-500 text-white hover:bg-primary-600 shadow-sm hover:shadow-md'
+                              }`}
+                              title={task.status === 'completed' ? 'Označit jako nedokončené' : 'Označit jako hotové'}
+                            >
+                              {task.status === 'completed' ? (
+                                <>
+                                  <CheckCircle2 className="w-4 h-4" />
+                                  <span className="text-xs font-medium">Hotovo</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Circle className="w-4 h-4" />
+                                  <span className="text-xs font-medium">Hotovo</span>
+                                </>
+                              )}
+                            </button>
                             {onEditTask && (
                               <button
                                 onClick={() => onEditTask(task)}
