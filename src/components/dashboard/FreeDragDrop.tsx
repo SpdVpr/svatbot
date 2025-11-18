@@ -114,10 +114,15 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
       // Above 1250px, use full desktop mode with drag & drop
       setIsTablet(width >= 768 && width < 1250)
     }
+    // Run immediately on mount
     checkDevice()
     window.addEventListener('resize', checkDevice)
     return () => window.removeEventListener('resize', checkDevice)
   }, [])
+
+  // If screenWidth is still 0 (initial render), assume mobile to prevent flash of desktop layout
+  const effectiveIsMobile = screenWidth === 0 ? true : isMobile
+  const effectiveIsTablet = screenWidth === 0 ? false : isTablet
 
   // Calculate responsive canvas width based on screen size
   const getResponsiveCanvasWidth = useCallback(() => {
@@ -125,7 +130,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
 
     // For tablet/medium screens (768-1250px), calculate max width that fits
     // IGNORE user's canvas width preference and auto-calculate
-    if (isTablet) {
+    if (effectiveIsTablet) {
       const padding = 80 // Total horizontal padding + scrollbar + safety margin
       const availableWidth = screenWidth - padding
 
@@ -159,7 +164,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
     }
 
     return desiredWidth
-  }, [screenWidth, isTablet, canvasWidth])
+  }, [screenWidth, effectiveIsTablet, canvasWidth])
 
   // Update canvas size when width changes or screen resizes
   useEffect(() => {
@@ -241,7 +246,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
   // Don't show loading state - let content fade in smoothly with AppTemplate
 
   // Mobile: Use simple vertical stack layout (no edit mode on mobile)
-  if (isMobile) {
+  if (effectiveIsMobile) {
     return (
       <div className="mx-auto px-1 max-w-full">
         <div className="space-y-3">
@@ -274,7 +279,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
   }
 
   // Tablet (768-1250px): Use responsive grid layout (no edit mode on tablet)
-  if (isTablet) {
+  if (effectiveIsTablet) {
     // Calculate number of columns based on canvas width
     const numColumns = canvasSize.width >= 1160 ? 3 : canvasSize.width >= 760 ? 2 : 1
 
@@ -410,7 +415,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
             {/* Right Side - Canvas Width & Edit Mode Button */}
             <div className="flex items-center space-x-1 lg:space-x-2">
               {/* Canvas Width Selector - hide on tablet */}
-              {!isTablet && (
+              {!effectiveIsTablet && (
                 <div className="relative" data-canvas-menu>
                   <button
                     onClick={() => setShowCanvasMenu(!showCanvasMenu)}
@@ -581,7 +586,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
         {(() => {
           // Calculate scale for narrow desktop screens (only for desktop, not mobile/tablet)
           // screenWidth > 0 check ensures we don't apply scale during initial render
-          const needsScale = !isMobile && !isTablet && screenWidth > 0 && screenWidth >= 1250 && screenWidth < 1400 && canvasSize.width > screenWidth - 100
+          const needsScale = !effectiveIsMobile && !effectiveIsTablet && screenWidth > 0 && screenWidth >= 1250 && screenWidth < 1400 && canvasSize.width > screenWidth - 100
           const scale = needsScale ? (screenWidth - 100) / canvasSize.width : 1
 
           return (
