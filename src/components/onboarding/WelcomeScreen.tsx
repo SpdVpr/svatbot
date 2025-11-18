@@ -347,30 +347,30 @@ export default function WelcomeScreen() {
             <p className="text-base md:text-lg lg:text-xl text-gray-600 mb-6 md:mb-10 max-w-lg lg:max-w-xl mx-auto">
               SvatBot.cz kombinuje nové AI technologie s intuitivními nástroji: checklist, rozpočet, harmonogram, správa hostů, zasedací pořádek, tvorba svatebního webu, nabídka dodavatelů a mnoho dalších – vše na jedné platformě.
             </p>
-            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 justify-center" role="group" aria-label="Hlavní akce">
+            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 lg:space-x-4 justify-center" role="group" aria-label="Hlavní akce">
               <button
                 onClick={handleDemoLogin}
                 disabled={isDemoLoading}
-                className={cn("px-6 py-3 md:px-8 md:py-4 bg-rose-500 text-white font-semibold text-base md:text-lg rounded-full shadow-lg hover:bg-rose-600 transition-all duration-300 button-glow flex items-center justify-center demo-pulse", isDemoLoading && "opacity-50 cursor-not-allowed")}
+                className={cn("px-5 py-2.5 md:px-6 md:py-3 lg:px-8 lg:py-4 bg-rose-500 text-white font-semibold text-sm md:text-base lg:text-lg rounded-full shadow-lg hover:bg-rose-600 transition-all duration-300 button-glow flex items-center justify-center demo-pulse whitespace-nowrap", isDemoLoading && "opacity-50 cursor-not-allowed")}
                 aria-label="Vyzkoušet ukázkové demo aplikace"
               >
                 {isDemoLoading ? (
                   <>
-                    <div className="w-5 h-5 md:w-6 md:h-6 loading-spinner mr-2" aria-hidden="true" />
+                    <div className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 loading-spinner mr-1.5 md:mr-2" aria-hidden="true" />
                     Načítání...
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-5 h-5 md:w-6 md:h-6 mr-2" aria-hidden="true" /> Vyzkoušet ukázkové demo
+                    <Sparkles className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 mr-1.5 md:mr-2" aria-hidden="true" /> Vyzkoušet demo
                   </>
                 )}
               </button>
               <button
                 onClick={handleGetStarted}
-                className="px-6 py-3 md:px-8 md:py-4 bg-white text-rose-600 font-semibold text-base md:text-lg rounded-full border border-rose-300 shadow-md hover:bg-rose-50 transition-all duration-300 flex items-center justify-center"
+                className="px-5 py-2.5 md:px-6 md:py-3 lg:px-8 lg:py-4 bg-white text-rose-600 font-semibold text-sm md:text-base lg:text-lg rounded-full border border-rose-300 shadow-md hover:bg-rose-50 transition-all duration-300 flex items-center justify-center whitespace-nowrap"
                 aria-label="Začít plánování svatby zdarma"
               >
-                <Heart className="w-5 h-5 md:w-6 md:h-6 mr-2 heartbeat" aria-hidden="true" /> Začít plánování zdarma
+                <Heart className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 mr-1.5 md:mr-2 heartbeat" aria-hidden="true" /> Začít zdarma
               </button>
             </div>
           </div>
@@ -406,7 +406,7 @@ export default function WelcomeScreen() {
           </header>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 max-w-7xl mx-auto relative">
-            <div className="hidden min-[1500px]:block absolute opacity-20 pointer-events-none z-10" style={{ width: '30rem', bottom: '-5rem', right: '-28%' }}>
+            <div className="hidden min-[1700px]:block absolute opacity-20 pointer-events-none z-10" style={{ width: '30rem', bottom: '-5rem', right: '-28%' }}>
               <img
                 src="/wed3.png"
                 alt=""
@@ -497,7 +497,7 @@ export default function WelcomeScreen() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 max-w-7xl mx-auto relative">
-            <div className="hidden min-[1500px]:block absolute opacity-15 pointer-events-none z-10" style={{ width: '30rem', bottom: '-5rem', left: '-28%' }}>
+            <div className="hidden min-[1700px]:block absolute opacity-15 pointer-events-none z-10" style={{ width: '30rem', bottom: '-5rem', left: '-28%' }}>
               <img
                 src="/wed4.png"
                 alt=""
@@ -564,31 +564,31 @@ export default function WelcomeScreen() {
             <p className="text-base md:text-lg lg:text-xl text-gray-600 mb-6 md:mb-8 lg:mb-10 max-w-2xl mx-auto">
               Udělejte krok k vaší dokonalé svatbě. Vyzkoušejte naše demo nebo se zaregistrujte zdarma ještě dnes!
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 lg:gap-6 justify-center">
               <button
                 onClick={handleDemoLogin}
                 disabled={isDemoLoading}
                 className={cn(
-                  "px-6 py-3 md:px-8 md:py-4 lg:px-10 lg:py-5 bg-rose-500 text-white font-semibold text-base md:text-lg lg:text-xl rounded-full shadow-lg hover:bg-rose-600 transition-all duration-300 button-glow flex items-center justify-center demo-pulse",
+                  "px-5 py-2.5 md:px-7 md:py-3.5 lg:px-10 lg:py-5 bg-rose-500 text-white font-semibold text-sm md:text-base lg:text-xl rounded-full shadow-lg hover:bg-rose-600 transition-all duration-300 button-glow flex items-center justify-center demo-pulse whitespace-nowrap",
                   isDemoLoading && "opacity-50 cursor-not-allowed"
                 )}
               >
                 {isDemoLoading ? (
                   <>
-                    <div className="w-5 h-5 md:w-6 md:h-6 loading-spinner mr-2 md:mr-3" />
+                    <div className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 loading-spinner mr-1.5 md:mr-2 lg:mr-3" />
                     Načítání...
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-5 h-5 md:w-6 md:h-6 mr-2 md:mr-3" /> Vyzkoušet ukázkové demo
+                    <Sparkles className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 mr-1.5 md:mr-2 lg:mr-3" /> Vyzkoušet demo
                   </>
                 )}
               </button>
               <button
                 onClick={handleGetStarted}
-                className="px-6 py-3 md:px-8 md:py-4 lg:px-10 lg:py-5 bg-white text-rose-600 font-semibold text-base md:text-lg lg:text-xl rounded-full border-2 border-rose-300 shadow-md hover:bg-rose-50 transition-all duration-300 flex items-center justify-center"
+                className="px-5 py-2.5 md:px-7 md:py-3.5 lg:px-10 lg:py-5 bg-white text-rose-600 font-semibold text-sm md:text-base lg:text-xl rounded-full border-2 border-rose-300 shadow-md hover:bg-rose-50 transition-all duration-300 flex items-center justify-center whitespace-nowrap"
               >
-                <Heart className="w-5 h-5 md:w-6 md:h-6 mr-2 md:mr-3 heartbeat" /> Začít plánování ZDARMA
+                <Heart className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 mr-1.5 md:mr-2 lg:mr-3 heartbeat" /> Začít zdarma
               </button>
             </div>
             <div className="grid grid-cols-3 gap-4 md:gap-6 text-center max-w-2xl mx-auto mt-6 md:mt-8 lg:mt-10 border-t border-gray-100 pt-6 md:pt-8">
@@ -641,7 +641,7 @@ export default function WelcomeScreen() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto relative">
-            <div className="hidden min-[1500px]:block absolute opacity-15 pointer-events-none z-10" style={{ width: '18rem', bottom: '-5rem', left: '-20%' }}>
+            <div className="hidden min-[1700px]:block absolute opacity-15 pointer-events-none z-10" style={{ width: '18rem', bottom: '-5rem', left: '-20%' }}>
               <img
                 src="/wed6.png"
                 alt=""
@@ -649,7 +649,7 @@ export default function WelcomeScreen() {
                 aria-hidden="true"
               />
             </div>
-            <div className="hidden min-[1500px]:block absolute opacity-15 pointer-events-none z-10" style={{ width: '26rem', bottom: '-5rem', right: '-28%' }}>
+            <div className="hidden min-[1700px]:block absolute opacity-15 pointer-events-none z-10" style={{ width: '26rem', bottom: '-5rem', right: '-28%' }}>
               <img
                 src="/wed7.png"
                 alt=""
@@ -716,7 +716,7 @@ export default function WelcomeScreen() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto relative">
-            <div className="hidden min-[1500px]:block absolute opacity-10 pointer-events-none" style={{ width: '41rem', bottom: '-17rem', right: '20%' }}>
+            <div className="hidden min-[1700px]:block absolute opacity-10 pointer-events-none" style={{ width: '41rem', bottom: '-17rem', right: '20%' }}>
               <img
                 src="/wed5.png"
                 alt=""
@@ -1088,9 +1088,9 @@ export default function WelcomeScreen() {
             </p>
           </header>
 
-          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4" itemScope itemType="https://schema.org/FAQPage">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 items-start" itemScope itemType="https://schema.org/FAQPage">
             {/* FAQ 1 */}
-            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
+            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow h-fit" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
               <summary className="font-semibold text-lg text-gray-900 cursor-pointer flex items-center justify-between" itemProp="name">
                 Co je SvatBot.cz a jak mi pomůže s plánováním svatby?
                 <ChevronDown className="w-5 h-5 text-gray-500" aria-hidden="true" />
@@ -1103,7 +1103,7 @@ export default function WelcomeScreen() {
             </details>
 
             {/* FAQ 2 */}
-            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
+            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow h-fit" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
               <summary className="font-semibold text-lg text-gray-900 cursor-pointer flex items-center justify-between" itemProp="name">
                 Je SvatBot.cz zdarma? Jaké jsou cenové plány?
                 <ChevronDown className="w-5 h-5 text-gray-500" aria-hidden="true" />
@@ -1116,7 +1116,7 @@ export default function WelcomeScreen() {
             </details>
 
             {/* FAQ 3 */}
-            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
+            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow h-fit" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
               <summary className="font-semibold text-lg text-gray-900 cursor-pointer flex items-center justify-between" itemProp="name">
                 Jak funguje AI svatební asistent?
                 <ChevronDown className="w-5 h-5 text-gray-500" aria-hidden="true" />
@@ -1129,7 +1129,7 @@ export default function WelcomeScreen() {
             </details>
 
             {/* FAQ 4 */}
-            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
+            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow h-fit" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
               <summary className="font-semibold text-lg text-gray-900 cursor-pointer flex items-center justify-between" itemProp="name">
                 Jak jednoduché je zaplatit nebo zrušit členství?
                 <ChevronDown className="w-5 h-5 text-gray-500" aria-hidden="true" />
@@ -1142,7 +1142,7 @@ export default function WelcomeScreen() {
             </details>
 
             {/* FAQ 5 */}
-            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
+            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow h-fit" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
               <summary className="font-semibold text-lg text-gray-900 cursor-pointer flex items-center justify-between" itemProp="name">
                 Jsou moje data v bezpečí?
                 <ChevronDown className="w-5 h-5 text-gray-500" aria-hidden="true" />
@@ -1155,7 +1155,7 @@ export default function WelcomeScreen() {
             </details>
 
             {/* FAQ 6 */}
-            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
+            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow h-fit" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
               <summary className="font-semibold text-lg text-gray-900 cursor-pointer flex items-center justify-between" itemProp="name">
                 Jak dlouho trvá vytvoření svatebního webu?
                 <ChevronDown className="w-5 h-5 text-gray-500" aria-hidden="true" />
@@ -1168,7 +1168,7 @@ export default function WelcomeScreen() {
             </details>
 
             {/* FAQ 7 - SEO: "svatební rozpočet" */}
-            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
+            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow h-fit" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
               <summary className="font-semibold text-lg text-gray-900 cursor-pointer flex items-center justify-between" itemProp="name">
                 Kolik stojí plánování svatby v roce 2025?
                 <ChevronDown className="w-5 h-5 text-gray-500" aria-hidden="true" />
@@ -1181,7 +1181,7 @@ export default function WelcomeScreen() {
             </details>
 
             {/* FAQ 8 - SEO: "jak naplánovat svatbu" */}
-            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
+            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow h-fit" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
               <summary className="font-semibold text-lg text-gray-900 cursor-pointer flex items-center justify-between" itemProp="name">
                 Jak dlouho trvá naplánovat svatbu?
                 <ChevronDown className="w-5 h-5 text-gray-500" aria-hidden="true" />
@@ -1194,7 +1194,7 @@ export default function WelcomeScreen() {
             </details>
 
             {/* FAQ 9 - SEO: "svatební checklist" */}
-            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
+            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow h-fit" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
               <summary className="font-semibold text-lg text-gray-900 cursor-pointer flex items-center justify-between" itemProp="name">
                 Co je svatební checklist a proč ho potřebuji?
                 <ChevronDown className="w-5 h-5 text-gray-500" aria-hidden="true" />
@@ -1207,7 +1207,7 @@ export default function WelcomeScreen() {
             </details>
 
             {/* FAQ 10 - SEO: "svatební kalkulačka" */}
-            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
+            <details className="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-shadow h-fit" itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
               <summary className="font-semibold text-lg text-gray-900 cursor-pointer flex items-center justify-between" itemProp="name">
                 Jak vytvořit svatební rozpočet?
                 <ChevronDown className="w-5 h-5 text-gray-500" aria-hidden="true" />

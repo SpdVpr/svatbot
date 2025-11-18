@@ -100,22 +100,60 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
   const [showCanvasMenu, setShowCanvasMenu] = useState(false)
   const [showColorMenu, setShowColorMenu] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [isTablet, setIsTablet] = useState(false)
+  const [screenWidth, setScreenWidth] = useState(0)
   const [showOnboardingWizard, setShowOnboardingWizard] = useState(false)
 
-  // Detect mobile device
+  // Detect mobile and tablet devices
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
+    const checkDevice = () => {
+      const width = window.innerWidth
+      setScreenWidth(width)
+      setIsMobile(width < 768)
+      // Tablet mode for screens that can't fit 3 modules comfortably (1160px + padding)
+      setIsTablet(width >= 768 && width < 1320)
     }
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
+    checkDevice()
+    window.addEventListener('resize', checkDevice)
+    return () => window.removeEventListener('resize', checkDevice)
   }, [])
 
-  // Update canvas size when width changes
+  // Calculate responsive canvas width based on screen size
+  const getResponsiveCanvasWidth = useCallback(() => {
+    if (screenWidth === 0) return CANVAS_WIDTHS['normal'].width
+
+    // For tablet/medium screens (768-1320px), calculate max width that fits
+    // IGNORE user's canvas width preference and auto-calculate
+    if (isTablet) {
+      const padding = 80 // Total horizontal padding + scrollbar + safety margin
+      const availableWidth = screenWidth - padding
+
+      // Calculate how many modules can fit (with safety margins)
+      // 1 module: 360px
+      // 2 modules: 360 + 40 + 360 = 760px
+      // 3 modules: 360 + 40 + 360 + 40 + 360 = 1160px
+
+      // Be conservative - require extra space to avoid any clipping
+      if (availableWidth >= 1240) {
+        return 1160 // 3 modules fit comfortably
+      } else if (availableWidth >= 840) {
+        return 760 // 2 modules fit comfortably
+      } else if (availableWidth >= 440) {
+        return 360 // 1 module fits
+      } else {
+        return Math.max(320, availableWidth - 20) // Minimum width
+      }
+    }
+
+    // For desktop (>= 1320px), use user's selected canvas width
+    return CANVAS_WIDTHS[canvasWidth].width
+  }, [screenWidth, isTablet, canvasWidth])
+
+  // Update canvas size when width changes or screen resizes
   useEffect(() => {
-    setCanvasSize(prev => ({ ...prev, width: CANVAS_WIDTHS[canvasWidth].width }))
-  }, [canvasWidth])
+    const responsiveWidth = getResponsiveCanvasWidth()
+    setCanvasSize(prev => ({ ...prev, width: responsiveWidth }))
+  }, [canvasWidth, getResponsiveCanvasWidth])
 
   // Close canvas menu when clicking outside
   useEffect(() => {
@@ -223,38 +261,79 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
     )
   }
 
+  // Tablet: Use responsive grid layout (no edit mode on tablet)
+  if (isTablet) {
+    // Calculate number of columns based on canvas width
+    const numColumns = canvasSize.width >= 1160 ? 3 : canvasSize.width >= 760 ? 2 : 1
+
+    return (
+      <div className="mx-auto px-3 sm:px-4 max-w-full">
+        <div className="space-y-4">
+          {/* Tablet Modules - Responsive Grid */}
+          <div
+            className="grid gap-4"
+            style={{
+              gridTemplateColumns: `repeat(${numColumns}, 1fr)`
+            }}
+          >
+            {visibleModules.map((module) => (
+              <div
+                key={module.id}
+                className="bg-white rounded-2xl border-2 border-gray-200 shadow-sm hover:shadow-md transition-shadow"
+              >
+                {/* Module Content */}
+                <div className="p-4">
+                  {renderModule(module)}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Empty state */}
+          {visibleModules.length === 0 && (
+            <div className="text-center py-16 text-gray-400">
+              <div className="text-6xl mb-4">📊</div>
+              <p className="text-lg font-medium">Váš dashboard je prázdný</p>
+              <p className="text-sm">Moduly můžete upravit v nastavení</p>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+
   // Desktop: Use drag & drop layout
   return (
-    <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-[2000px]">
-      <div className="space-y-6">
+    <div className="mx-auto px-3 sm:px-4 lg:px-8 max-w-[2000px]">
+      <div className="space-y-4 lg:space-y-6">
         {/* Dashboard Controls */}
         <div
-          className="bg-gray-50/95 backdrop-blur-xl p-5 rounded-3xl border border-gray-100/60 mx-auto shadow-lg relative z-[40]"
+          className="bg-gray-50/95 backdrop-blur-xl p-3 lg:p-5 rounded-2xl lg:rounded-3xl border border-gray-100/60 mx-auto shadow-lg relative z-[40]"
           style={{
-            maxWidth: '1240px',
+            maxWidth: isTablet ? '100%' : '1240px',
             boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
           }}
         >
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             {/* Left Side - Empty or Edit Mode Controls */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1 lg:space-x-2">
               {layout.isEditMode && (
                 <button
                   onClick={resetLayout}
-                  className="btn-outline flex items-center space-x-2 text-red-600 border-red-300 hover:bg-red-50"
+                  className="btn-outline flex items-center space-x-1 lg:space-x-2 text-red-600 border-red-300 hover:bg-red-50 px-2 lg:px-3 py-1.5 lg:py-2 text-sm"
                 >
                   <RotateCcw className="w-4 h-4" />
-                  <span className="hidden sm:inline">Reset</span>
+                  <span className="hidden md:inline">Reset</span>
                 </button>
               )}
             </div>
 
             {/* Center - Layout Mode Switcher (only in edit mode) OR Onboarding Guide */}
             {layout.isEditMode ? (
-              <div className="flex items-center space-x-2 bg-gray-100/80 backdrop-blur-xl rounded-2xl p-1.5 border border-gray-200/50">
+              <div className="flex items-center space-x-1 lg:space-x-2 bg-gray-100/80 backdrop-blur-xl rounded-xl lg:rounded-2xl p-1 lg:p-1.5 border border-gray-200/50">
                 <button
                   onClick={() => setLayoutMode('grid')}
-                  className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl transition-all duration-300 ${
+                  className={`flex items-center space-x-1 lg:space-x-2 px-2 lg:px-4 py-1.5 lg:py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${
                     layoutMode === 'grid'
                       ? 'bg-white text-primary-600 shadow-lg scale-105'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
@@ -265,11 +344,11 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
                   title="Grid layout"
                 >
                   <Grid3x3 className="w-4 h-4" />
-                  <span className="hidden lg:inline text-sm font-medium">Grid</span>
+                  <span className="hidden xl:inline text-sm font-medium">Grid</span>
                 </button>
                 <button
                   onClick={() => setLayoutMode('free')}
-                  className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl transition-all duration-300 ${
+                  className={`flex items-center space-x-1 lg:space-x-2 px-2 lg:px-4 py-1.5 lg:py-2.5 rounded-lg lg:rounded-xl transition-all duration-300 ${
                     layoutMode === 'free'
                       ? 'bg-white text-primary-600 shadow-lg scale-105'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
@@ -280,24 +359,24 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
                   title="Volný layout"
                 >
                   <Maximize2 className="w-4 h-4" />
-                  <span className="hidden lg:inline text-sm font-medium">Volný</span>
+                  <span className="hidden xl:inline text-sm font-medium">Volný</span>
                 </button>
               </div>
             ) : (
               <div
-                className="flex items-center space-x-3 px-5 py-3 bg-primary-50 rounded-2xl border border-primary-200/50 backdrop-blur-xl shadow-lg"
+                className="flex items-center space-x-2 lg:space-x-3 px-3 lg:px-5 py-2 lg:py-3 bg-primary-50 rounded-xl lg:rounded-2xl border border-primary-200/50 backdrop-blur-xl shadow-lg"
                 style={{
                   boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)'
                 }}
               >
-                <div className="flex items-center space-x-2">
-                  <Sparkles className="w-5 h-5 text-primary-600" />
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">
-                      Průvodce nastavením
+                <div className="flex items-center space-x-1.5 lg:space-x-2 min-w-0">
+                  <Sparkles className="w-4 h-4 lg:w-5 lg:h-5 text-primary-600 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-xs lg:text-sm font-semibold text-gray-900 truncate">
+                      Průvodce
                     </p>
-                    <p className="text-xs text-gray-600">
-                      {getProgress()}% dokončeno • {getNextStep()?.title || 'Vše hotovo!'}
+                    <p className="text-xs text-gray-600 truncate">
+                      {getProgress()}% • {getNextStep()?.title || 'Hotovo!'}
                     </p>
                   </div>
                 </div>
@@ -306,28 +385,29 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
                     setShowOnboardingWizard(true)
                     onOnboardingWizardChange?.(true)
                   }}
-                  className="btn-primary flex items-center space-x-1 text-sm px-4 py-2"
+                  className="btn-primary flex items-center space-x-1 text-xs lg:text-sm px-2 lg:px-4 py-1.5 lg:py-2 flex-shrink-0"
                 >
                   <BookOpen className="w-4 h-4" />
-                  <span className="hidden sm:inline">Otevřít</span>
+                  <span className="hidden md:inline">Otevřít</span>
                 </button>
               </div>
             )}
 
             {/* Right Side - Canvas Width & Edit Mode Button */}
-            <div className="flex items-center space-x-2">
-              {/* Canvas Width Selector */}
-              <div className="relative" data-canvas-menu>
-                <button
-                  onClick={() => setShowCanvasMenu(!showCanvasMenu)}
-                  className="btn-outline flex items-center space-x-2"
-                  title="Změnit šířku plochy"
-                >
-                  <Maximize className="w-4 h-4" />
-                  <span className="hidden lg:inline text-sm">
-                    {CANVAS_WIDTHS[canvasWidth].label.split(' ')[0]}
-                  </span>
-                </button>
+            <div className="flex items-center space-x-1 lg:space-x-2">
+              {/* Canvas Width Selector - hide on tablet */}
+              {!isTablet && (
+                <div className="relative" data-canvas-menu>
+                  <button
+                    onClick={() => setShowCanvasMenu(!showCanvasMenu)}
+                    className="btn-outline flex items-center space-x-1 lg:space-x-2 px-2 lg:px-3 py-1.5 lg:py-2 text-sm"
+                    title="Změnit šířku plochy"
+                  >
+                    <Maximize className="w-4 h-4" />
+                    <span className="hidden xl:inline text-sm">
+                      {CANVAS_WIDTHS[canvasWidth].label.split(' ')[0]}
+                    </span>
+                  </button>
 
                 {showCanvasMenu && (
                   <div
@@ -365,18 +445,19 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
                     </div>
                   </div>
                 )}
-              </div>
+                </div>
+              )}
 
               {/* Color Theme Selector */}
               <div className="relative" data-color-menu>
                 <button
                   onClick={() => setShowColorMenu(!showColorMenu)}
                   disabled={!canChangeTheme}
-                  className="btn-outline flex items-center space-x-2"
+                  className="btn-outline flex items-center space-x-1 lg:space-x-2 px-2 lg:px-3 py-1.5 lg:py-2 text-sm"
                   title="Změnit barevnou paletu"
                 >
                   <Palette className="w-4 h-4" />
-                  <span className="hidden lg:inline text-sm">
+                  <span className="hidden xl:inline text-sm">
                     Barvy
                   </span>
                 </button>
@@ -429,14 +510,14 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
               <button
                 onClick={toggleEditMode}
                 disabled={!canEditLayout}
-                className={`btn-outline flex items-center space-x-2 ${
+                className={`btn-outline flex items-center space-x-1 lg:space-x-2 px-2 lg:px-3 py-1.5 lg:py-2 text-sm ${
                   layout.isEditMode ? 'bg-primary-50 border-primary-400 shadow-2xl text-primary-700' : ''
                 } ${!canEditLayout ? 'opacity-50 cursor-not-allowed' : ''}`}
                 title={!canEditLayout ? 'DEMO účet je zamčený - úprava layoutu není možná' : ''}
               >
                 <Edit3 className="w-4 h-4" />
-                <span className="hidden sm:inline">
-                  {layout.isEditMode ? 'Dokončit úpravy' : 'Upravit layout'}
+                <span className="hidden md:inline">
+                  {layout.isEditMode ? 'Dokončit' : 'Upravit'}
                 </span>
               </button>
             </div>

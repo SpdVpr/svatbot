@@ -169,9 +169,9 @@ export default function AuthModal({ mode, onClose, onSwitchMode }: AuthModalProp
 
   return (
     <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black bg-opacity-50">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl flex flex-col max-h-[90vh]">
+        {/* Header - Sticky */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
           <h2 className="heading-4">
             {isLogin ? 'Přihlášení' : 'Registrace'}
           </h2>
@@ -183,8 +183,9 @@ export default function AuthModal({ mode, onClose, onSwitchMode }: AuthModalProp
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        {/* Form - Scrollable */}
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto">
+          <div className="p-6 space-y-4">
           {(errors.general || error) && (
             <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
               <p className="body-small text-red-600">
@@ -459,8 +460,12 @@ export default function AuthModal({ mode, onClose, onSwitchMode }: AuthModalProp
             </button>
           </div>
 
-          {/* Switch mode */}
-          <div className="text-center pt-4">
+          </div>
+        </form>
+
+        {/* Footer - Sticky */}
+        <div className="border-t border-gray-200 p-6 flex-shrink-0 bg-white rounded-b-2xl">
+          <div className="text-center">
             <p className="body-small text-text-secondary">
               {isLogin ? 'Nemáte účet?' : 'Již máte účet?'}{' '}
               <button
@@ -472,34 +477,37 @@ export default function AuthModal({ mode, onClose, onSwitchMode }: AuthModalProp
               </button>
             </p>
           </div>
-        </form>
+        </div>
       </div>
 
       {/* Forgot Password Modal */}
       {showForgotPassword && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[60]">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
-            <h3 className="heading-3 text-text-primary mb-4">
-              Obnovení hesla
-            </h3>
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] flex flex-col">
+            <div className="p-6 flex-shrink-0">
+              <h3 className="heading-3 text-text-primary mb-4">
+                Obnovení hesla
+              </h3>
+            </div>
 
-            {resetSuccess ? (
-              <div className="flex items-start space-x-3 text-green-600 bg-green-50 p-4 rounded-lg mb-4">
-                <CheckCircle className="h-6 w-6 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium">Email byl odeslán!</p>
-                  <p className="body-small mt-1">
-                    Zkontrolujte svou emailovou schránku a postupujte podle instrukcí pro obnovení hesla.
-                  </p>
+            <div className="flex-1 overflow-y-auto px-6">
+
+              {resetSuccess ? (
+                <div className="flex items-start space-x-3 text-green-600 bg-green-50 p-4 rounded-lg mb-4">
+                  <CheckCircle className="h-6 w-6 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium">Email byl odeslán!</p>
+                    <p className="body-small mt-1">
+                      Zkontrolujte svou emailovou schránku a postupujte podle instrukcí pro obnovení hesla.
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <>
-                <p className="body text-text-secondary mb-4">
-                  Zadejte svůj email a my vám pošleme odkaz pro obnovení hesla.
-                </p>
+              ) : (
+                <>
+                  <p className="body text-text-secondary mb-4">
+                    Zadejte svůj email a my vám pošleme odkaz pro obnovení hesla.
+                  </p>
 
-                <form onSubmit={handleForgotPassword}>
                   <div className="mb-4">
                     <label className="block body-small font-medium text-text-primary mb-2">
                       Email
@@ -523,36 +531,41 @@ export default function AuthModal({ mode, onClose, onSwitchMode }: AuthModalProp
                       <span className="body-small">{resetError}</span>
                     </div>
                   )}
+                </>
+              )}
+            </div>
 
-                  <div className="flex gap-3">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowForgotPassword(false)
-                        setResetEmail('')
-                        setResetError('')
-                      }}
-                      className="flex-1 btn-secondary"
-                    >
-                      Zrušit
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={isLoading}
-                      className={cn(
-                        'flex-1 btn-primary flex items-center justify-center',
-                        isLoading && 'opacity-50 cursor-not-allowed'
-                      )}
-                    >
-                      {isLoading ? (
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                      ) : (
-                        'Odeslat'
-                      )}
-                    </button>
-                  </div>
-                </form>
-              </>
+            {!resetSuccess && (
+              <div className="border-t border-gray-200 p-6 flex-shrink-0 bg-white rounded-b-2xl">
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowForgotPassword(false)
+                      setResetEmail('')
+                      setResetError('')
+                    }}
+                    className="flex-1 btn-secondary"
+                  >
+                    Zrušit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleForgotPassword}
+                    disabled={isLoading}
+                    className={cn(
+                      'flex-1 btn-primary flex items-center justify-center',
+                      isLoading && 'opacity-50 cursor-not-allowed'
+                    )}
+                  >
+                    {isLoading ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      'Odeslat'
+                    )}
+                  </button>
+                </div>
+              </div>
             )}
           </div>
         </div>

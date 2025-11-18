@@ -11,7 +11,7 @@ interface FAQSectionProps {
 export default function FAQSection({ content }: FAQSectionProps) {
   if (!content.enabled || !content.items || content.items.length === 0) return null
 
-  const [openIndex, setOpenIndex] = useState<number | null>(0)
+  const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
     <section className="relative py-24 bg-gradient-to-br from-pink-50 via-white to-rose-50 overflow-hidden">
@@ -40,38 +40,44 @@ export default function FAQSection({ content }: FAQSectionProps) {
 
         {/* FAQ Items */}
         <div className="space-y-4">
-          {content.items.map((item, index) => (
-            <div
-              key={index}
-              className="bg-white rounded-2xl shadow-lg border-2 border-rose-100 overflow-hidden transition-all duration-300 hover:shadow-xl"
-            >
-              <button
-                onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full px-6 py-5 flex items-center justify-between text-left transition-colors hover:bg-rose-50"
-              >
-                <span className="text-lg font-bold text-gray-800 pr-4" style={{ fontFamily: 'Playfair Display, serif' }}>
-                  {item.question}
-                </span>
-                <ChevronDown
-                  className={`w-6 h-6 text-rose-500 flex-shrink-0 transition-transform duration-300 ${
-                    openIndex === index ? 'rotate-180' : ''
-                  }`}
-                />
-              </button>
-
+          {content.items.map((item, index) => {
+            const isOpen = openIndex === index
+            return (
               <div
-                className={`overflow-hidden transition-all duration-300 ${
-                  openIndex === index ? 'max-h-96' : 'max-h-0'
-                }`}
+                key={`faq-${index}`}
+                className="bg-white rounded-2xl shadow-lg border-2 border-rose-100 overflow-hidden transition-all duration-300 hover:shadow-xl"
+                style={{ isolation: 'isolate' }}
               >
-                <div className="px-6 pb-5 pt-2">
-                  <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-xl p-4">
-                    <p className="text-gray-700 leading-relaxed">{item.answer}</p>
+                <button
+                  onClick={() => setOpenIndex(isOpen ? null : index)}
+                  className="w-full px-6 py-5 flex items-center justify-between text-left transition-colors hover:bg-rose-50"
+                  type="button"
+                >
+                  <span className="text-lg font-bold text-gray-800 pr-4" style={{ fontFamily: 'Playfair Display, serif' }}>
+                    {item.question}
+                  </span>
+                  <ChevronDown
+                    className={`w-6 h-6 text-rose-500 flex-shrink-0 transition-transform duration-300 ${
+                      isOpen ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+
+                <div
+                  className={`transition-all duration-300 ease-in-out ${
+                    isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+                  }`}
+                  style={{ overflow: 'hidden' }}
+                >
+                  <div className="px-6 pb-5 pt-2">
+                    <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-xl p-4">
+                      <p className="text-gray-700 leading-relaxed">{item.answer}</p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
         {/* Bottom note */}

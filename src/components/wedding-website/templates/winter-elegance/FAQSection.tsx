@@ -28,29 +28,39 @@ export default function FAQSection({ content }: FAQSectionProps) {
 
         {/* FAQ Items */}
         <div className="max-w-3xl mx-auto space-y-4">
-          {content.items.map((item, index) => (
-            <div
-              key={index}
-              className="bg-white rounded-xl shadow-sm overflow-hidden"
-            >
-              <button
-                onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-stone-50 transition-colors"
+          {content.items.map((item, index) => {
+            const isOpen = openIndex === index
+            return (
+              <div
+                key={`faq-${index}`}
+                className="bg-white rounded-xl shadow-sm overflow-hidden"
+                style={{ isolation: 'isolate' }}
               >
-                <span className="font-medium text-stone-900">{item.question}</span>
-                <ChevronDown
-                  className={`w-5 h-5 text-stone-600 transition-transform ${
-                    openIndex === index ? 'rotate-180' : ''
+                <button
+                  onClick={() => setOpenIndex(isOpen ? null : index)}
+                  className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-stone-50 transition-colors"
+                  type="button"
+                >
+                  <span className="font-medium text-stone-900">{item.question}</span>
+                  <ChevronDown
+                    className={`w-5 h-5 text-stone-600 transition-transform ${
+                      isOpen ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+                <div
+                  className={`transition-all duration-300 ease-in-out ${
+                    isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
                   }`}
-                />
-              </button>
-              {openIndex === index && (
-                <div className="px-6 pb-4">
-                  <p className="text-stone-600 leading-relaxed">{item.answer}</p>
+                  style={{ overflow: 'hidden' }}
+                >
+                  <div className="px-6 pb-4">
+                    <p className="text-stone-600 leading-relaxed">{item.answer}</p>
+                  </div>
                 </div>
-              )}
-            </div>
-          ))}
+              </div>
+            )
+          })}
         </div>
       </div>
     </section>

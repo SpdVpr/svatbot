@@ -354,15 +354,15 @@ function DashboardContent() {
         </div>
 
         {/* Desktop Header */}
-        <div className={`hidden sm:block mx-auto px-4 sm:px-6 lg:px-8 py-4 min-h-[112px] ${getCanvasMaxWidth()}`}>
-          <div className="flex items-center justify-between h-full">
-            <div className="flex items-center space-x-6">
+        <div className={`hidden sm:block mx-auto px-3 sm:px-4 lg:px-8 py-3 lg:py-4 min-h-[88px] lg:min-h-[112px] ${getCanvasMaxWidth()}`}>
+          <div className="flex items-center justify-between h-full gap-2 lg:gap-4">
+            <div className="flex items-center space-x-3 lg:space-x-6 min-w-0 flex-1">
               {isSafari ? (
                 <img
                   src="/logo-svatbot.svg"
                   alt="SvatBot.cz"
-                  className="h-20 w-auto"
-                  style={{ width: '80px', height: '80px' }}
+                  className="h-14 lg:h-20 w-auto flex-shrink-0"
+                  style={{ width: '56px', height: '56px' }}
                 />
               ) : (
                 <video
@@ -370,21 +370,21 @@ function DashboardContent() {
                   autoPlay
                   muted
                   playsInline
-                  className="h-20 w-auto"
-                  style={{ width: '80px', height: '80px' }}
+                  className="h-14 lg:h-20 w-auto flex-shrink-0"
+                  style={{ width: '56px', height: '56px' }}
                 />
               )}
-              <div className="border-l border-gray-300 pl-6">
+              <div className="border-l border-gray-300 pl-3 lg:pl-6 min-w-0 flex-1">
                 <button
                   onClick={openWeddingSettings}
-                  className="text-left hover:text-primary-600 transition-colors group"
+                  className="text-left hover:text-primary-600 transition-colors group w-full"
                   title="Klikněte pro úpravu"
                 >
-                  <h1 className="text-xl md:text-2xl font-bold text-text-primary leading-tight group-hover:text-primary-600 transition-colors" style={{ fontFamily: "var(--font-cormorant), 'Cormorant Upright', serif" }}>
+                  <h1 className="text-base md:text-lg lg:text-2xl font-bold text-text-primary leading-tight group-hover:text-primary-600 transition-colors truncate" style={{ fontFamily: "var(--font-cormorant), 'Cormorant Upright', serif" }}>
                     Svatba {wedding.brideName} & {wedding.groomName}
-                    <Edit className="w-4 h-4 inline ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <Edit className="w-3 h-3 lg:w-4 lg:h-4 inline ml-1 lg:ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </h1>
-                  <p className="body-small text-text-muted">
+                  <p className="text-xs lg:text-sm text-text-muted truncate">
                     {weddingDate
                       ? `${dateUtils.format(weddingDate, 'dd. MMMM yyyy')} • Dnes: ${dateUtils.format(new Date(), 'dd. MMMM yyyy')}`
                       : 'Datum zatím nestanoveno - klikněte pro nastavení'
@@ -424,45 +424,45 @@ function DashboardContent() {
               </div>
             </div>
 
-            <div className="flex items-center space-x-4">
-              <div className="hidden md:block text-right mr-4">
-                <p className="body-small text-text-muted">Přihlášen jako</p>
-                <p className="body-small font-medium">{user?.displayName || user?.email}</p>
+            <div className="flex items-center space-x-1.5 lg:space-x-4 flex-shrink-0">
+              <div className="hidden xl:block text-right mr-2 lg:mr-4">
+                <p className="text-xs text-text-muted">Přihlášen jako</p>
+                <p className="text-xs font-medium truncate max-w-[120px]">{user?.displayName || user?.email}</p>
               </div>
               <LiveNotifications />
               <button
                 onClick={openNotesModal}
-                className="btn-outline flex items-center space-x-2"
+                className="btn-outline flex items-center space-x-1 lg:space-x-2 px-2 lg:px-3 py-1.5 lg:py-2 text-sm"
                 title="Poznámky"
               >
                 <StickyNote className="w-4 h-4" />
-                <span className="hidden sm:inline">Poznámky</span>
+                <span className="hidden lg:inline">Poznámky</span>
               </button>
               {isDemoUserCheck ? (
                 <button
                   onClick={openRegistration}
-                  className="btn-primary flex items-center space-x-2"
+                  className="btn-primary flex items-center space-x-1 lg:space-x-2 px-2 lg:px-3 py-1.5 lg:py-2 text-sm"
                   title="Registrace"
                 >
                   <UserPlus className="w-4 h-4" />
-                  <span className="hidden sm:inline">Registrace</span>
+                  <span className="hidden lg:inline">Registrace</span>
                 </button>
               ) : (
                 <button
                   onClick={() => openAccountModal()}
-                  className="btn-outline flex items-center space-x-2"
+                  className="btn-outline flex items-center space-x-1 lg:space-x-2 px-2 lg:px-3 py-1.5 lg:py-2 text-sm"
                   title="Účet"
                 >
                   <User className="w-4 h-4" />
-                  <span className="hidden sm:inline">Účet</span>
+                  <span className="hidden lg:inline">Účet</span>
                 </button>
               )}
               <button
                 onClick={logout}
-                className="btn-outline flex items-center space-x-2"
+                className="btn-outline flex items-center space-x-1 lg:space-x-2 px-2 lg:px-3 py-1.5 lg:py-2 text-sm"
               >
                 <LogOut className="w-4 h-4" />
-                <span className="hidden sm:inline">Odhlásit</span>
+                <span className="hidden lg:inline">Odhlásit</span>
               </button>
               {/* Development Test Buttons - HIDDEN */}
               {false && (
