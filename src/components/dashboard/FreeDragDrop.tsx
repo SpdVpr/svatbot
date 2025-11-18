@@ -99,10 +99,30 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
   const [snapGuides, setSnapGuides] = useState<{ x: number[], y: number[] }>({ x: [], y: [] })
   const [showCanvasMenu, setShowCanvasMenu] = useState(false)
   const [showColorMenu, setShowColorMenu] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
-  const [isTablet, setIsTablet] = useState(false)
-  const [screenWidth, setScreenWidth] = useState(0)
   const [showOnboardingWizard, setShowOnboardingWizard] = useState(false)
+
+  // Initialize with actual window width if available (SSR safe)
+  const [screenWidth, setScreenWidth] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth
+    }
+    return 0
+  })
+
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 768
+    }
+    return true // Default to mobile for SSR
+  })
+
+  const [isTablet, setIsTablet] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const width = window.innerWidth
+      return width >= 768 && width < 1250
+    }
+    return false
+  })
 
   // Detect mobile and tablet devices
   useEffect(() => {
@@ -114,15 +134,15 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
       // Above 1250px, use full desktop mode with drag & drop
       setIsTablet(width >= 768 && width < 1250)
     }
-    // Run immediately on mount
+    // Run immediately on mount to update if needed
     checkDevice()
     window.addEventListener('resize', checkDevice)
     return () => window.removeEventListener('resize', checkDevice)
   }, [])
 
-  // If screenWidth is still 0 (initial render), assume mobile to prevent flash of desktop layout
-  const effectiveIsMobile = screenWidth === 0 ? true : isMobile
-  const effectiveIsTablet = screenWidth === 0 ? false : isTablet
+  // Use the actual state values directly (no need for effective values anymore)
+  const effectiveIsMobile = isMobile
+  const effectiveIsTablet = isTablet
 
   // Calculate responsive canvas width based on screen size
   const getResponsiveCanvasWidth = useCallback(() => {
