@@ -110,8 +110,9 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
       const width = window.innerWidth
       setScreenWidth(width)
       setIsMobile(width < 768)
-      // Tablet mode for screens that can't fit 3 modules comfortably (1160px + padding)
-      setIsTablet(width >= 768 && width < 1320)
+      // Tablet mode only for screens that need simplified grid layout (768-1250px)
+      // Above 1250px, use full desktop mode with drag & drop
+      setIsTablet(width >= 768 && width < 1250)
     }
     checkDevice()
     window.addEventListener('resize', checkDevice)
@@ -122,7 +123,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
   const getResponsiveCanvasWidth = useCallback(() => {
     if (screenWidth === 0) return CANVAS_WIDTHS['normal'].width
 
-    // For tablet/medium screens (768-1320px), calculate max width that fits
+    // For tablet/medium screens (768-1250px), calculate max width that fits
     // IGNORE user's canvas width preference and auto-calculate
     if (isTablet) {
       const padding = 80 // Total horizontal padding + scrollbar + safety margin
@@ -134,7 +135,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
       // 3 modules: 360 + 40 + 360 + 40 + 360 = 1160px
 
       // Be conservative - require extra space to avoid any clipping
-      if (availableWidth >= 1240) {
+      if (availableWidth >= 1160) {
         return 1160 // 3 modules fit comfortably
       } else if (availableWidth >= 840) {
         return 760 // 2 modules fit comfortably
@@ -145,8 +146,19 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
       }
     }
 
-    // For desktop (>= 1320px), use user's selected canvas width
-    return CANVAS_WIDTHS[canvasWidth].width
+    // For desktop (>= 1250px), use user's selected canvas width
+    // Always use full 1240px (normal) width for desktop, we'll scale it down if needed
+    let desiredWidth = CANVAS_WIDTHS[canvasWidth].width
+
+    // For wider screens, respect user's choice but with limits
+    if (screenWidth < 1700 && canvasWidth === 'wide') {
+      return CANVAS_WIDTHS['normal'].width
+    }
+    if (screenWidth < 2100 && canvasWidth === 'ultra-wide') {
+      return CANVAS_WIDTHS['normal'].width
+    }
+
+    return desiredWidth
   }, [screenWidth, isTablet, canvasWidth])
 
   // Update canvas size when width changes or screen resizes
@@ -261,7 +273,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
     )
   }
 
-  // Tablet: Use responsive grid layout (no edit mode on tablet)
+  // Tablet (768-1250px): Use responsive grid layout (no edit mode on tablet)
   if (isTablet) {
     // Calculate number of columns based on canvas width
     const numColumns = canvasSize.width >= 1160 ? 3 : canvasSize.width >= 760 ? 2 : 1
@@ -301,6 +313,8 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
       </div>
     )
   }
+
+  // Desktop (>= 1250px): Use full drag & drop layout with all features
 
   // Desktop: Use drag & drop layout
   return (
@@ -564,27 +578,43 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
         </div>
 
         {/* Free Canvas with Absolute Positioning */}
-        <div
-          ref={containerRef}
-          className="relative rounded-3xl overflow-hidden touch-none mx-auto bg-gray-50"
-          style={{
-            width: `${canvasSize.width}px`,
-            maxWidth: '100%',
-            height: `${canvasSize.height}px`,
-            minHeight: '1200px',
-            backgroundImage: layout.isEditMode && layoutMode === 'grid'
-              ? `linear-gradient(to right, rgba(147,51,234,0.06) 1px, transparent 1px),
-                 linear-gradient(to bottom, rgba(147,51,234,0.06) 1px, transparent 1px)`
-              : layout.isEditMode
-              ? `radial-gradient(circle at 1px 1px, rgba(147,51,234,0.08) 1px, transparent 0)`
-              : 'none',
-            backgroundSize: layout.isEditMode && layoutMode === 'grid'
-              ? `${GRID_SIZE}px ${GRID_SIZE}px, ${GRID_SIZE}px ${GRID_SIZE}px`
-              : layout.isEditMode ? '40px 40px' : 'auto',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06), inset 0 1px 2px rgba(0, 0, 0, 0.03)',
-            border: '1px solid rgba(0, 0, 0, 0.05)'
-          }}
-        >
+        {(() => {
+          // Calculate scale for narrow desktop screens
+          const needsScale = screenWidth >= 1250 && screenWidth < 1400 && canvasSize.width > screenWidth - 100
+          const scale = needsScale ? (screenWidth - 100) / canvasSize.width : 1
+
+          return (
+            <div
+              className="mx-auto"
+              style={{
+                width: needsScale ? `${canvasSize.width * scale}px` : `${canvasSize.width}px`,
+                maxWidth: '100%',
+                height: needsScale ? `${canvasSize.height * scale}px` : `${canvasSize.height}px`,
+                minHeight: needsScale ? `${1200 * scale}px` : '1200px'
+              }}
+            >
+              <div
+                ref={containerRef}
+                className="relative rounded-3xl overflow-hidden touch-none bg-gray-50"
+                style={{
+                  width: `${canvasSize.width}px`,
+                  height: `${canvasSize.height}px`,
+                  minHeight: '1200px',
+                  transform: needsScale ? `scale(${scale})` : 'none',
+                  transformOrigin: 'top left',
+                  backgroundImage: layout.isEditMode && layoutMode === 'grid'
+                    ? `linear-gradient(to right, rgba(147,51,234,0.06) 1px, transparent 1px),
+                       linear-gradient(to bottom, rgba(147,51,234,0.06) 1px, transparent 1px)`
+                    : layout.isEditMode
+                    ? `radial-gradient(circle at 1px 1px, rgba(147,51,234,0.08) 1px, transparent 0)`
+                    : 'none',
+                  backgroundSize: layout.isEditMode && layoutMode === 'grid'
+                    ? `${GRID_SIZE}px ${GRID_SIZE}px, ${GRID_SIZE}px ${GRID_SIZE}px`
+                    : layout.isEditMode ? '40px 40px' : 'auto',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06), inset 0 1px 2px rgba(0, 0, 0, 0.03)',
+                  border: '1px solid rgba(0, 0, 0, 0.05)'
+                }}
+              >
           {/* Snap Guide Lines (only in grid mode) */}
           {layout.isEditMode && layoutMode === 'grid' && snapGuides.x.map((x, i) => (
             <div
@@ -636,7 +666,10 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
               </div>
             </div>
           )}
-        </div>
+              </div>
+            </div>
+          )
+        })()}
 
         {/* Hidden Modules Panel */}
         {layout.isEditMode && allModules.some(m => !m.isVisible) && (
