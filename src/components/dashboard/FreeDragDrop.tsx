@@ -324,7 +324,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
         <div
           className="bg-gray-50/95 backdrop-blur-xl p-3 lg:p-5 rounded-2xl lg:rounded-3xl border border-gray-100/60 mx-auto shadow-lg relative z-[40]"
           style={{
-            maxWidth: isTablet ? '100%' : '1240px',
+            maxWidth: '1240px',
             boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
           }}
         >
@@ -579,8 +579,9 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
 
         {/* Free Canvas with Absolute Positioning */}
         {(() => {
-          // Calculate scale for narrow desktop screens
-          const needsScale = screenWidth >= 1250 && screenWidth < 1400 && canvasSize.width > screenWidth - 100
+          // Calculate scale for narrow desktop screens (only for desktop, not mobile/tablet)
+          // screenWidth > 0 check ensures we don't apply scale during initial render
+          const needsScale = !isMobile && !isTablet && screenWidth > 0 && screenWidth >= 1250 && screenWidth < 1400 && canvasSize.width > screenWidth - 100
           const scale = needsScale ? (screenWidth - 100) / canvasSize.width : 1
 
           return (
