@@ -143,5 +143,4 @@ export { default as createVendor } from './callable/createVendor'
 // export { default as addReview } from './callable/addReview'
 // export { default as toggleFavorite } from './callable/toggleFavorite'
 
-// Admin setup function (one-time use)
-export { setAdminRole } from './setAdminRole'
+// Admin setup function removed for security (admin already set up)

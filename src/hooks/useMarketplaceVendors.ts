@@ -168,17 +168,28 @@ export function useMarketplaceVendors() {
   // Delete vendor (admin only)
   const deleteVendor = async (vendorId: string) => {
     try {
+      console.log('🗑️ Attempting to delete vendor from marketplaceVendors:', vendorId)
       const vendorRef = doc(db, 'marketplaceVendors', vendorId)
       await deleteDoc(vendorRef)
 
       // Update local state
       setVendors(prev => prev.filter(v => v.id !== vendorId))
 
-      console.log('✅ Vendor deleted:', vendorId)
+      console.log('✅ Vendor deleted successfully from marketplaceVendors:', vendorId)
       return true
     } catch (err: any) {
-      console.error('Error deleting vendor:', err)
-      setError(err.message)
+      console.error('❌ Error deleting vendor from marketplaceVendors:', err)
+      console.error('Error code:', err.code)
+      console.error('Error message:', err.message)
+
+      // Check for permission denied error
+      if (err.code === 'permission-denied') {
+        console.error('🚫 Permission denied! You need admin role to delete vendors.')
+        console.error('Check your Firebase custom claims: auth.currentUser.getIdTokenResult()')
+        setError('Permission denied. You need admin role to delete vendors.')
+      } else {
+        setError(err.message)
+      }
       return false
     }
   }

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useMarketplace } from '@/hooks/useMarketplace'
+import { useMarketplaceVendors } from '@/hooks/useMarketplaceVendors'
 import { VENDOR_CATEGORIES } from '@/types/vendor'
 import {
   Plus,
@@ -21,10 +21,11 @@ import {
 } from 'lucide-react'
 
 export default function AdminVendorsPage() {
-  const { vendors, loading, error } = useMarketplace()
+  const { vendors, loading, error, deleteVendor } = useMarketplaceVendors()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [statusFilter, setStatusFilter] = useState<string>('')
+  const [deleting, setDeleting] = useState<string | null>(null)
 
   const filteredVendors = vendors.filter(vendor => {
     const matchesSearch = vendor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -33,7 +34,8 @@ export default function AdminVendorsPage() {
     const matchesStatus = !statusFilter ||
                          (statusFilter === 'active' && vendor.verified) ||
                          (statusFilter === 'pending' && !vendor.verified) ||
-                         (statusFilter === 'featured' && vendor.featured)
+                         (statusFilter === 'approved' && vendor.status === 'approved') ||
+                         (statusFilter === 'rejected' && vendor.status === 'rejected')
 
     return matchesSearch && matchesCategory && matchesStatus
   })
@@ -141,7 +143,7 @@ export default function AdminVendorsPage() {
                         />
                       ) : (
                         <div className="h-full w-full flex items-center justify-center text-gray-400">
-                          {VENDOR_CATEGORIES[vendor.category]?.icon || '📷'}
+                          {VENDOR_CATEGORIES[vendor.category as keyof typeof VENDOR_CATEGORIES]?.icon || '📷'}
                         </div>
                       )}
                     </div>
@@ -156,14 +158,19 @@ export default function AdminVendorsPage() {
                               <CheckCircle className="h-5 w-5 text-green-500" />
                             </div>
                           )}
-                          {vendor.featured && (
-                            <div title="Doporučené">
-                              <Star className="h-5 w-5 text-yellow-500" />
-                            </div>
+                          {vendor.status === 'approved' && (
+                            <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
+                              Schváleno
+                            </span>
                           )}
-                          {vendor.premium && (
-                            <span className="px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded-full">
-                              Premium
+                          {vendor.status === 'pending' && (
+                            <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">
+                              Čeká na schválení
+                            </span>
+                          )}
+                          {vendor.status === 'rejected' && (
+                            <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">
+                              Zamítnuto
                             </span>
                           )}
                         </div>
@@ -173,16 +180,12 @@ export default function AdminVendorsPage() {
 
                       <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
                         <span className="flex items-center space-x-1">
-                          <span>{VENDOR_CATEGORIES[vendor.category]?.icon}</span>
-                          <span>{VENDOR_CATEGORIES[vendor.category]?.name}</span>
+                          <span>{VENDOR_CATEGORIES[vendor.category as keyof typeof VENDOR_CATEGORIES]?.icon}</span>
+                          <span>{VENDOR_CATEGORIES[vendor.category as keyof typeof VENDOR_CATEGORIES]?.name}</span>
                         </span>
                         <span className="flex items-center space-x-1">
                           <MapPin className="h-4 w-4" />
                           <span>{vendor.address.city}</span>
-                        </span>
-                        <span className="flex items-center space-x-1">
-                          <Star className="h-4 w-4 text-yellow-400" />
-                          <span>{vendor.rating.overall.toFixed(1)} ({vendor.rating.count})</span>
                         </span>
                       </div>
 
@@ -226,12 +229,23 @@ export default function AdminVendorsPage() {
                       <Edit className="h-5 w-5" />
                     </Link>
                     <button
-                      className="p-2 text-red-400 hover:text-red-600"
+                      className="p-2 text-red-400 hover:text-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
                       title="Smazat"
-                      onClick={() => {
-                        if (confirm('Opravdu chcete smazat tohoto dodavatele?')) {
-                          // TODO: Implement delete functionality
-                          console.log('Delete vendor:', vendor.id)
+                      disabled={deleting === vendor.id || !vendor.id}
+                      onClick={async () => {
+                        if (!vendor.id) return
+                        if (confirm('Opravdu chcete smazat tohoto dodavatele? Tato akce je nevratná.')) {
+                          setDeleting(vendor.id)
+                          console.log('🗑️ Deleting vendor:', vendor.id)
+                          const success = await deleteVendor(vendor.id)
+                          console.log('🗑️ Delete result:', success)
+                          if (!success) {
+                            console.error('❌ Failed to delete vendor:', vendor.id)
+                            alert('Chyba při mazání dodavatele. Zkontrolujte konzoli pro více informací.')
+                          } else {
+                            console.log('✅ Vendor deleted successfully:', vendor.id)
+                          }
+                          setDeleting(null)
                         }
                       }}
                     >
