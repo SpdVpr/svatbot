@@ -18,6 +18,7 @@ export type BudgetCategory =
   | 'gifts'           // Dárky
   | 'children'        // Děti
   | 'honeymoon'       // Svatební cesta
+  | 'shopping'        // Nákupní seznam
   | 'other'           // Ostatní
 
 export type PaymentStatus = 
@@ -500,6 +501,13 @@ export const BUDGET_CATEGORIES = {
     name: 'Svatební cesta',
     icon: '✈️',
     color: 'bg-sky-100 text-sky-700',
+    defaultPercentage: 0,
+    priority: 'low'
+  },
+  shopping: {
+    name: 'Nákupní seznam',
+    icon: '🛒',
+    color: 'bg-amber-100 text-amber-700',
     defaultPercentage: 0,
     priority: 'low'
   },
