@@ -99,8 +99,11 @@ export default function OnboardingWizard({ onClose, autoShow = true }: Onboardin
   const handleAction = () => {
     if (currentStep?.actionUrl) {
       completeStep(currentStep.id)
-      router.push(currentStep.actionUrl)
+      // Close wizard first, then navigate after a short delay
       handleClose()
+      setTimeout(() => {
+        router.push(currentStep.actionUrl!)
+      }, 100)
     }
   }
 

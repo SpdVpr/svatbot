@@ -49,8 +49,8 @@ const ONBOARDING_STEPS: Omit<OnboardingStep, 'completed'>[] = [
     title: '💑 Základní informace',
     description: 'Začněme se základními informacemi o vaší svatbě. Nastavte datum, jména a rozpočet.',
     icon: '📝',
-    actionUrl: '/dashboard',
-    actionLabel: 'Nastavit základní info',
+    actionUrl: '/?openSettings=true',
+    actionLabel: 'Nastavit svatbu',
     priority: 2,
     tips: [
       'Datum svatby je klíčové pro plánování',

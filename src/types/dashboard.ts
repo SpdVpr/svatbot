@@ -27,6 +27,7 @@ export interface DashboardLayout {
   isEditMode: boolean
   isLocked: boolean
   layoutMode?: 'grid' | 'free' // Preferred layout mode
+  canvasWidth?: 'normal' | 'wide' | 'ultra-wide' // Canvas width preference
 }
 
 export interface DashboardSettings {

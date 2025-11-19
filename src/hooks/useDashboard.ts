@@ -27,7 +27,8 @@ export function useDashboard() {
             modules: DEFAULT_DASHBOARD_MODULES,
             isEditMode: false,
             isLocked: false,
-            layoutMode: parsed.layoutMode || 'grid'
+            layoutMode: parsed.layoutMode || 'grid',
+            canvasWidth: parsed.canvasWidth || 'normal'
           }
         } catch (e) {
           // Ignore parse errors
@@ -38,7 +39,8 @@ export function useDashboard() {
       modules: DEFAULT_DASHBOARD_MODULES,
       isEditMode: false,
       isLocked: false,
-      layoutMode: 'grid'
+      layoutMode: 'grid',
+      canvasWidth: 'normal'
     }
   })
 
@@ -124,7 +126,8 @@ export function useDashboard() {
                   modules: [...validModules, ...newModules],
                   isEditMode: data.isEditMode || false,
                   isLocked: data.isLocked || false,
-                  layoutMode: data.layoutMode || 'grid'
+                  layoutMode: data.layoutMode || 'grid',
+                  canvasWidth: data.canvasWidth || 'normal'
                 }
 
                 // Update the ref with the new layout
@@ -132,7 +135,8 @@ export function useDashboard() {
                   modules: updatedLayout.modules,
                   isEditMode: updatedLayout.isEditMode,
                   isLocked: updatedLayout.isLocked,
-                  layoutMode: updatedLayout.layoutMode
+                  layoutMode: updatedLayout.layoutMode,
+                  canvasWidth: updatedLayout.canvasWidth
                 })
 
                 setLayout(updatedLayout)
@@ -141,10 +145,12 @@ export function useDashboard() {
                   modules: validModules,
                   isEditMode: data.isEditMode || false,
                   isLocked: data.isLocked || false,
-                  layoutMode: data.layoutMode || 'grid'
+                  layoutMode: data.layoutMode || 'grid',
+                  canvasWidth: data.canvasWidth || 'normal'
                 }
                 logger.log('📥 Loading layout from Firebase:', {
                   layoutMode: loadedLayout.layoutMode,
+                  canvasWidth: loadedLayout.canvasWidth,
                   modulesCount: loadedLayout.modules.length,
                   isEditMode: loadedLayout.isEditMode,
                   sampleModulePositions: loadedLayout.modules.slice(0, 3).map((m: DashboardModule) => ({
@@ -160,7 +166,8 @@ export function useDashboard() {
                 modules: DEFAULT_DASHBOARD_MODULES,
                 isEditMode: false,
                 isLocked: false,
-                layoutMode: 'grid'
+                layoutMode: 'grid',
+                canvasWidth: 'normal'
               })
             }
 
@@ -195,7 +202,8 @@ export function useDashboard() {
                   modules: DEFAULT_DASHBOARD_MODULES,
                   isEditMode: false,
                   isLocked: false,
-                  layoutMode: 'grid'
+                  layoutMode: 'grid',
+                  canvasWidth: 'normal'
                 })
               }
             } else {
@@ -205,7 +213,8 @@ export function useDashboard() {
                 modules: DEFAULT_DASHBOARD_MODULES,
                 isEditMode: false,
                 isLocked: false,
-                layoutMode: 'grid'
+                layoutMode: 'grid',
+                canvasWidth: 'normal'
               })
             }
             setLoading(false)
@@ -246,7 +255,8 @@ export function useDashboard() {
       modules: layout.modules,
       isEditMode: layout.isEditMode,
       isLocked: layout.isLocked,
-      layoutMode: layout.layoutMode
+      layoutMode: layout.layoutMode,
+      canvasWidth: layout.canvasWidth
     })
 
     // If the current data matches what we last loaded from Firebase, don't save
@@ -267,6 +277,7 @@ export function useDashboard() {
       isEditMode: layout.isEditMode,
       isLocked: layout.isLocked,
       layoutMode: layout.layoutMode || 'grid',
+      canvasWidth: layout.canvasWidth || 'normal',
       userId: user.id,
       weddingId: wedding.id,
       updatedAt: new Date()
@@ -274,6 +285,7 @@ export function useDashboard() {
 
     logger.log('💾 Saving to Firebase:', {
       layoutMode: layoutData.layoutMode,
+      canvasWidth: layoutData.canvasWidth,
       isEditMode: layoutData.isEditMode,
       modulesCount: layoutData.modules.length,
       sampleModulePositions: layout.modules.slice(0, 3).map(m => ({ id: m.id, position: m.position }))
@@ -411,6 +423,20 @@ export function useDashboard() {
     }))
   }
 
+  const setCanvasWidth = (width: 'normal' | 'wide' | 'ultra-wide') => {
+    // Block only for locked DEMO account
+    if (isDemoUser && isDemoLocked) {
+      console.log('🔒 DEMO account is locked - layout editing prevented')
+      return
+    }
+
+    logger.log('📐 Setting canvas width to:', width)
+    setLayout(prev => ({
+      ...prev,
+      canvasWidth: width
+    }))
+  }
+
   const toggleModuleLock = (moduleId: string) => {
     // Block only for locked DEMO account
     if (isDemoUser && isDemoLocked) {
@@ -440,7 +466,8 @@ export function useDashboard() {
       modules: DEFAULT_DASHBOARD_MODULES,
       isEditMode: false,
       isLocked: false,
-      layoutMode: 'grid' as const // Always reset to grid layout
+      layoutMode: 'grid' as const, // Always reset to grid layout
+      canvasWidth: 'normal' as const
     }
     setLayout(newLayout)
 
@@ -473,6 +500,7 @@ export function useDashboard() {
     updateModulePosition,
     updateModuleSize,
     setLayoutMode,
+    setCanvasWidth,
     toggleEditMode,
     toggleLock,
     toggleModuleVisibility,

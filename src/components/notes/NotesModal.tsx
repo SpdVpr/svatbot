@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { X, Save, StickyNote, Palette, Lock } from 'lucide-react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { X, Save, StickyNote, Palette, Lock, Check } from 'lucide-react'
 import { useNotes } from '@/hooks/useNotes'
 import { useDemoLock } from '@/hooks/useDemoLock'
 import { getViewTransitionName } from '@/hooks/useViewTransition'
@@ -25,25 +25,79 @@ export default function NotesModal({ isOpen, onClose }: NotesModalProps) {
   const { isLocked } = useDemoLock()
   const [content, setContent] = useState('')
   const [selectedColor, setSelectedColor] = useState<'yellow' | 'blue' | 'green' | 'pink' | 'purple' | 'orange'>('yellow')
-  const [isSaving, setIsSaving] = useState(false)
   const [isInitialized, setIsInitialized] = useState(false)
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const lastLoadedNoteIdRef = useRef<string | null>(null)
 
-  // Load existing note only when modal opens (not on every notes change)
-  useEffect(() => {
-    if (isOpen && !loading && !isInitialized) {
+  // Stable save function
+  const performSave = useCallback(async (contentToSave: string, colorToSave: typeof selectedColor) => {
+    try {
       if (notes.length > 0) {
-        const mainNote = notes[0]
-        setContent(mainNote.content)
-        setSelectedColor(mainNote.color || 'yellow')
+        // Update existing note
+        await updateNote(notes[0].id, {
+          content: contentToSave,
+          color: colorToSave,
+          title: 'Poznámky'
+        })
       } else {
-        // Clear content if no notes exist
-        setContent('')
-        setSelectedColor('yellow')
+        // Create new note
+        await createNote({
+          title: 'Poznámky',
+          content: contentToSave,
+          color: colorToSave
+        })
       }
-      setIsInitialized(true)
-    } else if (!isOpen) {
+      return true
+    } catch (error) {
+      console.error('Error saving note:', error)
+      return false
+    }
+  }, [notes, createNote, updateNote])
+
+  // Handle modal close with save
+  const handleClose = useCallback(async () => {
+    // If there's a pending save, execute it immediately
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current)
+      await performSave(content, selectedColor)
+    }
+    onClose()
+  }, [content, selectedColor, performSave, onClose])
+
+  // Load existing note when modal opens or when notes update
+  useEffect(() => {
+    if (!isOpen) {
       // Reset initialization flag when modal closes
       setIsInitialized(false)
+      lastLoadedNoteIdRef.current = null
+      // Clear any pending save timeouts
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current)
+      }
+      return
+    }
+
+    // Modal is open
+    if (loading) {
+      return
+    }
+
+    if (notes.length > 0) {
+      const mainNote = notes[0]
+
+      // Only update content if:
+      // 1. Not initialized yet, OR
+      // 2. The note ID changed (different note loaded)
+      if (!isInitialized || lastLoadedNoteIdRef.current !== mainNote.id) {
+        setContent(mainNote.content)
+        setSelectedColor(mainNote.color || 'yellow')
+        lastLoadedNoteIdRef.current = mainNote.id
+        setIsInitialized(true)
+      }
+    } else if (!isInitialized) {
+      setContent('')
+      setSelectedColor('yellow')
+      setIsInitialized(true)
     }
   }, [isOpen, notes, loading, isInitialized])
 
@@ -56,35 +110,30 @@ export default function NotesModal({ isOpen, onClose }: NotesModalProps) {
         setSelectedColor(mainNote.color)
       }
     }
-  }, [notes, isOpen, isInitialized])
+  }, [notes, isOpen, isInitialized, selectedColor])
 
-  const handleSave = async () => {
-    if (isSaving || isLocked) return
-
-    setIsSaving(true)
-    try {
-      if (notes.length > 0) {
-        // Update existing note
-        await updateNote(notes[0].id, {
-          content,
-          color: selectedColor,
-          title: 'Poznámky'
-        })
-      } else {
-        // Create new note
-        await createNote({
-          title: 'Poznámky',
-          content,
-          color: selectedColor
-        })
-      }
-    } catch (error) {
-      console.error('Error saving note:', error)
-      alert('Chyba při ukládání poznámky')
-    } finally {
-      setIsSaving(false)
+  // Auto-save content with debounce
+  useEffect(() => {
+    if (!isInitialized || isLocked || !isOpen) {
+      return
     }
-  }
+
+    // Clear previous timeout
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current)
+    }
+
+    // Save after 500ms of inactivity (fast auto-save)
+    saveTimeoutRef.current = setTimeout(async () => {
+      await performSave(content, selectedColor)
+    }, 500)
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current)
+      }
+    }
+  }, [content, selectedColor, isInitialized, isLocked, isOpen, performSave])
 
   const handleColorChange = (color: typeof selectedColor) => {
     if (isLocked) return
@@ -118,7 +167,7 @@ export default function NotesModal({ isOpen, onClose }: NotesModalProps) {
       <div
         className="absolute inset-0 bg-black/50"
         style={getViewTransitionName('notes-modal-backdrop')}
-        onClick={onClose}
+        onClick={handleClose}
       />
 
       {/* Modal Content with View Transition */}
@@ -148,7 +197,7 @@ export default function NotesModal({ isOpen, onClose }: NotesModalProps) {
               ))}
             </div>
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="p-1 hover:bg-gray-100 rounded transition-colors"
             >
               <X className="w-4 h-4" />
@@ -192,11 +241,9 @@ export default function NotesModal({ isOpen, onClose }: NotesModalProps) {
           <div className="text-xs text-gray-500">
             {content.length} znaků
           </div>
-          <button
-            onClick={handleSave}
-            disabled={Boolean(isSaving || isLocked)}
-            className="px-3 py-1.5 sm:px-4 sm:py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 text-xs sm:text-sm"
-          >
+
+          {/* Auto-save status indicator */}
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
             {isLocked ? (
               <>
                 <Lock className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -204,11 +251,11 @@ export default function NotesModal({ isOpen, onClose }: NotesModalProps) {
               </>
             ) : (
               <>
-                <Save className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span>{isSaving ? 'Ukládání...' : 'Uložit'}</span>
+                <Check className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span>Uloženo</span>
               </>
             )}
-          </button>
+          </div>
         </div>
       </div>
     </div>

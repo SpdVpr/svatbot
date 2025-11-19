@@ -108,6 +108,7 @@ function DashboardContent() {
   useEffect(() => {
     const payment = searchParams.get('payment')
     const openAccount = searchParams.get('openAccount') as 'profile' | 'subscription' | 'payments' | 'statistics' | 'settings' | 'feedback' | null
+    const openSettings = searchParams.get('openSettings')
 
     if (payment === 'success') {
       showSimpleToast('success', 'Platba úspěšná! 🎉', 'Vaše předplatné bylo aktivováno. Děkujeme!')
@@ -125,6 +126,14 @@ function DashboardContent() {
       setAccountInitialTab(openAccount)
       setShowAccountModal(true)
       // Remove openAccount param from URL
+      window.history.replaceState({}, '', '/')
+    }
+
+    // Check if we should open wedding settings modal
+    if (openSettings === 'true') {
+      console.log('🔍 Opening wedding settings modal from URL')
+      setShowWeddingSettings(true)
+      // Remove openSettings param from URL
       window.history.replaceState({}, '', '/')
     }
   }, [searchParams])

@@ -105,6 +105,8 @@ export default function WeddingWebsiteBuilderPage() {
       // Pokud už web existuje a jsme na url kroku, přejdi na template step
       if (currentStep === 'url' && website.customUrl) {
         setCurrentStep('template')
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' })
       }
     }
   }, [website])
@@ -142,6 +144,8 @@ export default function WeddingWebsiteBuilderPage() {
         })
         // Po vytvoření přejdeme na výběr šablony
         setCurrentStep('template')
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' })
       } catch (error) {
         if (error instanceof Error && error.message === 'DEMO_LOCKED') {
           // Demo locked - don't show error
@@ -184,6 +188,8 @@ export default function WeddingWebsiteBuilderPage() {
     const nextIndex = currentStepIndex + 1
     if (nextIndex < steps.length) {
       setCurrentStep(steps[nextIndex].id)
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
 
@@ -191,6 +197,8 @@ export default function WeddingWebsiteBuilderPage() {
     const prevIndex = currentStepIndex - 1
     if (prevIndex >= 0) {
       setCurrentStep(steps[prevIndex].id)
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
 
@@ -362,6 +370,8 @@ export default function WeddingWebsiteBuilderPage() {
       console.log('✅ Website published successfully!')
       // Přejdi na preview krok po publikování
       setCurrentStep('preview')
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (error) {
       if (error instanceof Error && error.message === 'DEMO_LOCKED') {
         // Demo locked - alert already shown
@@ -448,6 +458,8 @@ export default function WeddingWebsiteBuilderPage() {
                         window.open(`/wedding/${customUrl}`, '_blank')
                       } else {
                         setCurrentStep(step.id)
+                        // Scroll to top
+                        window.scrollTo({ top: 0, behavior: 'smooth' })
                       }
                     }}
                     disabled={Boolean(!isClickable)}

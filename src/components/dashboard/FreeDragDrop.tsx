@@ -76,6 +76,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
     layout,
     loading,
     setLayoutMode,
+    setCanvasWidth: updateCanvasWidth,
     toggleEditMode,
     toggleModuleVisibility,
     toggleModuleLock,
@@ -94,7 +95,8 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
   const canEditLayout = !isDemoUser || !isDemoLocked
 
   const containerRef = useRef<HTMLDivElement>(null)
-  const [canvasWidth, setCanvasWidth] = useState<CanvasWidth>('normal')
+  // Initialize canvasWidth from layout or default to 'normal'
+  const [canvasWidth, setCanvasWidth] = useState<CanvasWidth>(() => layout.canvasWidth || 'normal')
   const [canvasSize, setCanvasSize] = useState({ width: CANVAS_WIDTHS['normal'].width, height: 4000 })
   const [snapGuides, setSnapGuides] = useState<{ x: number[], y: number[] }>({ x: [], y: [] })
   const [showCanvasMenu, setShowCanvasMenu] = useState(false)
@@ -143,6 +145,13 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
   // Use the actual state values directly (no need for effective values anymore)
   const effectiveIsMobile = isMobile
   const effectiveIsTablet = isTablet
+
+  // Sync canvasWidth with layout.canvasWidth when it changes (from Firebase)
+  useEffect(() => {
+    if (layout.canvasWidth && layout.canvasWidth !== canvasWidth) {
+      setCanvasWidth(layout.canvasWidth)
+    }
+  }, [layout.canvasWidth])
 
   // Calculate responsive canvas width based on screen size
   const getResponsiveCanvasWidth = useCallback(() => {
@@ -463,6 +472,7 @@ export default function FreeDragDrop({ onWeddingSettingsClick, onOnboardingWizar
                             key={width}
                             onClick={() => {
                               setCanvasWidth(width)
+                              updateCanvasWidth(width)
                               setShowCanvasMenu(false)
                             }}
                             className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-300 ${
