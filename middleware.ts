@@ -120,6 +120,16 @@ export function middleware(request: NextRequest) {
   const pathname = url.pathname
   const hostname = request.headers.get('host') || ''
 
+  // 0. Check if it's a Vercel preview/staging domain - skip wedding website routing
+  // Examples: svatbot-spdvprs-projects.vercel.app, svatbot-git-master-spdvprs-projects.vercel.app
+  const isVercelDomain = hostname.includes('.vercel.app')
+
+  if (isVercelDomain) {
+    // On Vercel preview domains, only handle explicit /wedding/[customUrl] routes
+    // Don't try to detect wedding websites from path or subdomain
+    return NextResponse.next()
+  }
+
   // 1. Check if it's a static file or Next.js internal path
   const isStaticPath = STATIC_PATHS.some(path => pathname.startsWith(path))
   if (isStaticPath) {
