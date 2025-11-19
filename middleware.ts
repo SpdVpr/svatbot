@@ -126,7 +126,7 @@ export function middleware(request: NextRequest) {
 
   if (isVercelDomain) {
     // On Vercel preview domains, only handle explicit /wedding/[customUrl] routes
-    // Don't try to detect wedding websites from path or subdomain
+    // Don't try to detect wedding websites from subdomain
     return NextResponse.next()
   }
 
@@ -147,39 +147,10 @@ export function middleware(request: NextRequest) {
   if (subdomain && !MAIN_DOMAINS.includes(subdomain)) {
     // Subdomain detected - rewrite to /wedding/[customUrl]
     url.pathname = `/wedding/${subdomain}${pathname}`
-    console.log(`[MW] Subdomain rewrite: ${hostname}${pathname} -> ${url.pathname}`)
     return NextResponse.rewrite(url)
   }
 
-  // 4. Check if it's the homepage
-  if (pathname === '/') {
-    console.log(`[MW] Homepage detected, passing through: ${hostname}${pathname}`)
-    return NextResponse.next()
-  }
-
-  // 5. Check if it's an existing route
-  const isExistingRoute = EXISTING_ROUTES.some(route => pathname.startsWith(route))
-  if (isExistingRoute) {
-    console.log(`[MW] Existing route detected, passing through: ${pathname}`)
-    return NextResponse.next()
-  }
-
-  // 6. If we got here, it's a potential path-based wedding website URL (e.g., svatbot.cz/jana-petr)
-  // Extract the custom URL (first segment after /)
-  const segments = pathname.split('/').filter(Boolean)
-
-  if (segments.length > 0) {
-    const customUrl = segments[0]
-
-    // Rewrite to /wedding/[customUrl]
-    url.pathname = `/wedding/${customUrl}`
-
-    console.log(`[MW] Path-based wedding URL rewrite: ${pathname} -> ${url.pathname}`)
-    return NextResponse.rewrite(url)
-  }
-
-  // Default: continue normally
-  console.log(`[MW] Default pass-through: ${pathname}`)
+  // 4. All other requests pass through normally (no path-based routing)
   return NextResponse.next()
 }
 
