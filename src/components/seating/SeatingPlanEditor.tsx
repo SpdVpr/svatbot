@@ -19,7 +19,8 @@ import {
   Edit3,
   Trash2,
   X,
-  Printer
+  Printer,
+  User
 } from 'lucide-react'
 import { Table, Seat, ChairRow, ChairSeat, SeatingViewOptions, SeatingPlan, TableShape, TableSize, ChairRowOrientation, CustomArea } from '@/types/seating'
 import { GUEST_CATEGORY_LABELS, GUEST_CATEGORY_COLORS } from '@/utils/guestCategories'
@@ -748,21 +749,17 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
     setRotationStartAngle(startAngle)
 
-    // Store final rotation in closure
+    // Store final rotation in closure and fixed center position
     let finalRotation = initialRotation
+    const fixedCenterX = centerX
+    const fixedCenterY = centerY
 
     const handleMouseMove = (moveEvent: MouseEvent) => {
       if (!tableId) return
 
-      const tableElement = document.querySelector(`[data-table-id="${tableId}"]`)
-      if (!tableElement) return
-
-      const rect = tableElement.getBoundingClientRect()
-      const centerX = rect.left + rect.width / 2
-      const centerY = rect.top + rect.height / 2
-
+      // Use fixed center position instead of recalculating from getBoundingClientRect
       // Calculate current angle
-      const currentAngle = Math.atan2(moveEvent.clientY - centerY, moveEvent.clientX - centerX) * (180 / Math.PI)
+      const currentAngle = Math.atan2(moveEvent.clientY - fixedCenterY, moveEvent.clientX - fixedCenterX) * (180 / Math.PI)
 
       // Calculate angle difference
       let angleDiff = currentAngle - startAngle
@@ -831,21 +828,17 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
     setChairRowRotationStartAngle(startAngle)
 
-    // Store final rotation in closure
+    // Store final rotation in closure and fixed center position
     let finalRotation = initialRotation
+    const fixedCenterX = centerX
+    const fixedCenterY = centerY
 
     const handleMouseMove = (moveEvent: MouseEvent) => {
       if (!chairRowId) return
 
-      const chairRowElement = document.querySelector(`[data-chairrow-id="${chairRowId}"]`)
-      if (!chairRowElement) return
-
-      const rect = chairRowElement.getBoundingClientRect()
-      const centerX = rect.left + rect.width / 2
-      const centerY = rect.top + rect.height / 2
-
+      // Use fixed center position instead of recalculating from getBoundingClientRect
       // Calculate current angle
-      const currentAngle = Math.atan2(moveEvent.clientY - centerY, moveEvent.clientX - centerX) * (180 / Math.PI)
+      const currentAngle = Math.atan2(moveEvent.clientY - fixedCenterY, moveEvent.clientX - fixedCenterX) * (180 / Math.PI)
 
       // Calculate angle difference
       let angleDiff = currentAngle - startAngle
@@ -906,19 +899,15 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
     setDanceFloorRotationStartAngle(startAngle)
 
-    // Store final rotation in closure
+    // Store final rotation in closure and fixed center position
     let finalRotation = initialRotation
+    const fixedCenterX = centerX
+    const fixedCenterY = centerY
 
     const handleMouseMove = (moveEvent: MouseEvent) => {
-      const danceFloorElement = document.querySelector('[data-dancefloor="true"]')
-      if (!danceFloorElement) return
-
-      const rect = danceFloorElement.getBoundingClientRect()
-      const centerX = rect.left + rect.width / 2
-      const centerY = rect.top + rect.height / 2
-
+      // Use fixed center position instead of recalculating from getBoundingClientRect
       // Calculate current angle
-      const currentAngle = Math.atan2(moveEvent.clientY - centerY, moveEvent.clientX - centerX) * (180 / Math.PI)
+      const currentAngle = Math.atan2(moveEvent.clientY - fixedCenterY, moveEvent.clientX - fixedCenterX) * (180 / Math.PI)
 
       // Calculate angle difference
       let angleDiff = currentAngle - startAngle
@@ -2980,24 +2969,28 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                 const position = isDraggedTable ? draggedTablePosition : table.position
                 const rotation = tempRotation[table.id] !== undefined ? tempRotation[table.id] : table.rotation
 
+                const tableSize = getDisplaySize(table.size, table.shape)
+
                 return (
                   <div
                     key={table.id}
                     data-table-id={table.id}
                     className={`absolute group ${
                       isSelected ? 'z-10 scale-105' : 'z-0'
-                    } ${!isDraggedTable ? 'transition-all duration-200' : ''}`}
+                    }`}
                     style={{
                       left: position.x,
                       top: position.y,
+                      width: tableSize.width,
+                      height: tableSize.height,
+                      transform: `rotate(${rotation}deg)`,
+                      transformOrigin: 'center',
+                      transition: !isDraggedTable && !isRotating ? 'left 0.2s, top 0.2s' : 'none'
                     }}
                   >
-                    {/* Table container with rotation */}
+                    {/* Table container */}
                     <div
-                      className="relative cursor-move"
-                      style={{
-                        transform: `rotate(${rotation}deg)`
-                      }}
+                      className="relative cursor-move w-full h-full"
                       onMouseDown={(e) => handleTableDragStart(table.id, e)}
                       onDoubleClick={() => handleEditTable(table)}
                       onTouchStart={(e) => handleTouchStart(table.id, e)}
@@ -3011,14 +3004,12 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                     >
                     {/* Table shape */}
                     <div
-                      className={`relative border-2 transition-colors ${
+                      className={`relative border-2 transition-colors w-full h-full ${
                         isSelected
                           ? 'border-primary-500 bg-primary-50'
                           : 'border-gray-300 bg-white hover:border-primary-300'
                       }`}
                       style={{
-                        width: getDisplaySize(table.size, table.shape).width,
-                        height: getDisplaySize(table.size, table.shape).height,
                         borderRadius: table.shape === 'round' ? '50%' : table.shape === 'oval' ? '50%' : '8px',
                         backgroundColor: table.color || '#ffffff'
                       }}
@@ -3183,7 +3174,11 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                             onDrop={(e) => handleGuestDrop(e, seat.id)}
                             onDragOver={(e) => e.preventDefault()}
                           >
-                            {seat.guestId ? renderAvatar(getAvatarForPerson(seat.guestId), 24) : seat.position}
+                            {seat.guestId ? (
+                              renderAvatar(getAvatarForPerson(seat.guestId), 24)
+                            ) : (
+                              <User className="w-4 h-4" />
+                            )}
                           </div>
                         )
                       })}
@@ -3473,14 +3468,14 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
 
                       // Calculate position with aisle consideration
                       const halfColumns = Math.floor(columns / 2)
-                      let chairX = col * spacing
+                      let chairX = col * spacing + spacing / 2
 
                       // Add aisle offset if chair is in right half and aisle is enabled
                       if (hasAisle && col >= halfColumns) {
                         chairX += aisleWidth
                       }
 
-                      const chairY = row * spacing
+                      const chairY = row * spacing + spacing / 2
 
                       const guestNameData = chairSeat ? getGuestNameForChairSeat(chairSeat) : null
                       const guestNameTooltip = guestNameData?.fullName || null
@@ -3497,7 +3492,8 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                           }`}
                           style={{
                             left: chairX,
-                            top: chairY
+                            top: chairY,
+                            transform: 'translate(-50%, -50%)'
                           }}
                           title={guestNameTooltip || `Místo ${index + 1} - levé tlačítko: přiřadit hosta`}
                           onMouseDown={(e) => {
@@ -3532,7 +3528,11 @@ export default function SeatingPlanEditor({ className = '', currentPlan }: Seati
                           onDrop={(e) => handleGuestDrop(e, chairSeat?.id || '')}
                           onDragOver={(e) => e.preventDefault()}
                         >
-                          {chairSeat?.guestId ? renderAvatar(getAvatarForPerson(chairSeat.guestId), 24) : (index + 1)}
+                          {chairSeat?.guestId ? (
+                            renderAvatar(getAvatarForPerson(chairSeat.guestId), 24)
+                          ) : (
+                            <User className="w-4 h-4" />
+                          )}
                         </div>
                       )
                     })}
