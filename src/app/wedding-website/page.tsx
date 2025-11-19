@@ -138,7 +138,6 @@ export default function WeddingWebsitePage() {
 
   // Pokud web existuje, zobraz dashboard
   const websiteUrl = `https://${website.customUrl}.svatbot.cz`
-  const previewUrl = `/wedding/${website.customUrl}`
 
   const handleDelete = async () => {
     try {
@@ -303,20 +302,21 @@ export default function WeddingWebsitePage() {
                   Váš svatební web je připraven!
                 </h4>
                 <p className="text-gray-600 mb-2 text-sm">
-                  URL: <span className="font-mono text-primary-600">{previewUrl}</span>
+                  URL: <span className="font-mono text-primary-600">{websiteUrl}</span>
                 </p>
                 <p className="text-xs text-gray-500">
                   Klikněte na tlačítko níže pro zobrazení webu
                 </p>
               </div>
-              <Link
-                href={previewUrl}
+              <a
+                href={websiteUrl}
                 target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white px-6 py-3 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all"
               >
                 <Eye className="w-5 h-5" />
                 Zobrazit svatební web
-              </Link>
+              </a>
             </div>
           </div>
         </div>

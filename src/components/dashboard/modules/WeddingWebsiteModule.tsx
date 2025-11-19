@@ -99,8 +99,7 @@ export default function WeddingWebsiteModule({ onResize }: WeddingWebsiteModuleP
   }
 
   // Pokud web existuje
-  const websiteUrl = `https://${website.subdomain}`
-  const previewUrl = `/wedding/${website.customUrl}`
+  const websiteUrl = `https://${website.customUrl}.svatbot.cz`
 
   return (
     <div className="wedding-card h-[353px] flex flex-col">
@@ -138,14 +137,15 @@ export default function WeddingWebsiteModule({ onResize }: WeddingWebsiteModuleP
 
         {/* Actions - centered in remaining space */}
         <div className="flex-1 flex items-center justify-center px-3">
-          <Link
-            href={previewUrl}
+          <a
+            href={websiteUrl}
             target="_blank"
+            rel="noopener noreferrer"
             className="w-full inline-flex items-center justify-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm"
           >
             <Eye className="w-4 h-4" />
             <span>Náhled webu</span>
-          </Link>
+          </a>
         </div>
 
         <div className="pt-3 border-t border-gray-200 flex-shrink-0">

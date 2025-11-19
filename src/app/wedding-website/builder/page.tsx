@@ -457,7 +457,7 @@ export default function WeddingWebsiteBuilderPage() {
                       if (!isClickable) return
                       // Pokud je to preview krok, otevři web v novém okně
                       if (step.id === 'preview' && customUrl) {
-                        window.open(`/wedding/${customUrl}`, '_blank')
+                        window.open(`https://${customUrl}.svatbot.cz`, '_blank')
                       } else {
                         setCurrentStep(step.id)
                         // Scroll to top
