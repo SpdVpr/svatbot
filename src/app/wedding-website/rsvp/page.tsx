@@ -7,8 +7,9 @@ import { useAuthStore } from '@/stores/authStore'
 import { useWeddingStore } from '@/stores/weddingStore'
 import { collection, query, where, orderBy, onSnapshot, Timestamp } from 'firebase/firestore'
 import { db } from '@/config/firebase'
-import { ArrowLeft, CheckCircle, XCircle, Clock, Users, Mail, Phone, Utensils, Music, MessageSquare, Calendar } from 'lucide-react'
+import { ArrowLeft, CheckCircle, XCircle, Clock, Users, Mail, Phone, Utensils, Music, MessageSquare, Calendar, Globe } from 'lucide-react'
 import Link from 'next/link'
+import ModuleHeader from '@/components/common/ModuleHeader'
 import type { RSVP } from '@/types/wedding-website'
 
 export default function RSVPManagementPage() {
@@ -121,25 +122,25 @@ export default function RSVPManagementPage() {
   }
 
   return (
-    <div className="min-h-screen py-8">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Header */}
-        <div className="mb-8">
+    <div className="min-h-screen">
+      {/* Header */}
+      <ModuleHeader
+        icon={Globe}
+        title="RSVP odpovědi"
+        subtitle={`${website.customUrl}.svatbot.cz • Správa potvrzení účasti`}
+        iconGradient="from-pink-500 to-purple-500"
+        actions={
           <Link
             href="/wedding-website"
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
+            className="btn-primary flex items-center space-x-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            Zpět na svatební web
+            <span>Zpět</span>
           </Link>
+        }
+      />
 
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            RSVP odpovědi
-          </h1>
-          <p className="text-gray-600">
-            Správa potvrzení účasti z vašeho svatebního webu
-          </p>
-        </div>
+      <div className="max-w-7xl mx-auto px-4 py-8">
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">

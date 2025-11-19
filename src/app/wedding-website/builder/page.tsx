@@ -189,7 +189,14 @@ export default function WeddingWebsiteBuilderPage() {
 
     const nextIndex = currentStepIndex + 1
     if (nextIndex < steps.length) {
-      setCurrentStep(steps[nextIndex].id)
+      const nextStep = steps[nextIndex].id
+      setCurrentStep(nextStep)
+
+      // Pokud přecházíme na preview krok, otevři web v novém okně
+      if (nextStep === 'preview' && customUrl) {
+        window.open(`https://${customUrl}.svatbot.cz`, '_blank')
+      }
+
       // Scroll to top
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
@@ -201,6 +208,9 @@ export default function WeddingWebsiteBuilderPage() {
       setCurrentStep(steps[prevIndex].id)
       // Scroll to top
       window.scrollTo({ top: 0, behavior: 'smooth' })
+    } else {
+      // Pokud jsme na prvním kroku, vrať se na /wedding-website
+      router.push('/wedding-website')
     }
   }
 
@@ -370,6 +380,10 @@ export default function WeddingWebsiteBuilderPage() {
         await publishWebsite()
       })
       console.log('✅ Website published successfully!')
+
+      // Otevři web v novém okně
+      window.open(`https://${customUrl}.svatbot.cz`, '_blank')
+
       // Přejdi na preview krok po publikování
       setCurrentStep('preview')
       // Scroll to top
@@ -404,12 +418,12 @@ export default function WeddingWebsiteBuilderPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
-                onClick={() => router.push('/')}
+                onClick={() => router.push('/wedding-website')}
                 className="inline-flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600"
-                title="Zpět na dashboard"
+                title="Zpět na svatební web"
               >
-                <Home className="w-5 h-5" />
-                <span className="text-sm font-medium">Dashboard</span>
+                <ArrowLeft className="w-5 h-5" />
+                <span className="text-sm font-medium">Zpět</span>
               </button>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">
@@ -628,7 +642,7 @@ export default function WeddingWebsiteBuilderPage() {
                   </div>
                 </div>
                 <a
-                  href={`/wedding/${customUrl}`}
+                  href={`https://${customUrl}.svatbot.cz`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
@@ -654,99 +668,107 @@ export default function WeddingWebsiteBuilderPage() {
                 </div>
               </div>
 
-              <div className="max-h-screen overflow-y-auto">
-                {selectedTemplate === 'classic-elegance' && (
-                  <ClassicEleganceTemplate
-                    website={{
-                      id: 'preview',
-                      weddingId: wedding?.id || 'preview',
-                      customUrl,
-                      template: selectedTemplate,
-                      content,
-                      style: {
-                        ...website?.style,
-                        colorTheme,
-                        customColors: colorTheme === 'custom' ? customColors : undefined,
-                      },
-                      isPublished: false,
-                      createdAt: new Date(),
-                      updatedAt: new Date()
-                    } as WeddingWebsite}
-                  />
-                )}
+              <div className="max-h-screen overflow-y-auto relative">
+                <style jsx global>{`
+                  /* Fix navigation positioning in preview */
+                  .wedding-preview-container nav {
+                    position: absolute !important;
+                  }
+                `}</style>
+                <div className="wedding-preview-container">
+                  {selectedTemplate === 'classic-elegance' && (
+                    <ClassicEleganceTemplate
+                      website={{
+                        id: 'preview',
+                        weddingId: wedding?.id || 'preview',
+                        customUrl,
+                        template: selectedTemplate,
+                        content,
+                        style: {
+                          ...website?.style,
+                          colorTheme,
+                          customColors: colorTheme === 'custom' ? customColors : undefined,
+                        },
+                        isPublished: false,
+                        createdAt: new Date(),
+                        updatedAt: new Date()
+                      } as WeddingWebsite}
+                    />
+                  )}
 
-                {selectedTemplate === 'modern-minimalist' && (
-                  <ModernMinimalistTemplate
-                    website={{
-                      id: 'preview',
-                      weddingId: wedding?.id || 'preview',
-                      customUrl,
-                      template: selectedTemplate,
-                      content,
-                      style: {
-                        ...website?.style,
-                        colorTheme,
-                        customColors: colorTheme === 'custom' ? customColors : undefined,
-                      },
-                      isPublished: false,
-                      createdAt: new Date(),
-                      updatedAt: new Date()
-                    } as WeddingWebsite}
-                  />
-                )}
+                  {selectedTemplate === 'modern-minimalist' && (
+                    <ModernMinimalistTemplate
+                      website={{
+                        id: 'preview',
+                        weddingId: wedding?.id || 'preview',
+                        customUrl,
+                        template: selectedTemplate,
+                        content,
+                        style: {
+                          ...website?.style,
+                          colorTheme,
+                          customColors: colorTheme === 'custom' ? customColors : undefined,
+                        },
+                        isPublished: false,
+                        createdAt: new Date(),
+                        updatedAt: new Date()
+                      } as WeddingWebsite}
+                    />
+                  )}
 
-                {selectedTemplate === 'romantic-boho' && (
-                  <RomanticBohoTemplate
-                    website={{
-                      id: 'preview',
-                      weddingId: wedding?.id || 'preview',
-                      customUrl,
-                      template: selectedTemplate,
-                      content,
-                      style: {
-                        ...website?.style,
-                        colorTheme,
-                        customColors: colorTheme === 'custom' ? customColors : undefined,
-                      },
-                      isPublished: false,
-                      createdAt: new Date(),
-                      updatedAt: new Date()
-                    } as WeddingWebsite}
-                  />
-                )}
+                  {selectedTemplate === 'romantic-boho' && (
+                    <RomanticBohoTemplate
+                      website={{
+                        id: 'preview',
+                        weddingId: wedding?.id || 'preview',
+                        customUrl,
+                        template: selectedTemplate,
+                        content,
+                        style: {
+                          ...website?.style,
+                          colorTheme,
+                          customColors: colorTheme === 'custom' ? customColors : undefined,
+                        },
+                        isPublished: false,
+                        createdAt: new Date(),
+                        updatedAt: new Date()
+                      } as WeddingWebsite}
+                    />
+                  )}
 
-                {selectedTemplate === 'winter-elegance' && (
-                  <WinterEleganceTemplate
-                    website={{
-                      id: 'preview',
-                      weddingId: wedding?.id || 'preview',
-                      customUrl,
-                      template: selectedTemplate,
-                      content,
-                      style: {
-                        ...website?.style,
-                        colorTheme,
-                        customColors: colorTheme === 'custom' ? customColors : undefined,
-                      },
-                      isPublished: false,
-                      createdAt: new Date(),
-                      updatedAt: new Date()
-                    } as WeddingWebsite}
-                  />
-                )}
+                  {selectedTemplate === 'winter-elegance' && (
+                    <WinterEleganceTemplate
+                      website={{
+                        id: 'preview',
+                        weddingId: wedding?.id || 'preview',
+                        customUrl,
+                        template: selectedTemplate,
+                        content,
+                        style: {
+                          ...website?.style,
+                          colorTheme,
+                          customColors: colorTheme === 'custom' ? customColors : undefined,
+                        },
+                        isPublished: false,
+                        createdAt: new Date(),
+                        updatedAt: new Date()
+                      } as WeddingWebsite}
+                    />
+                  )}
 
-                {(selectedTemplate === 'luxury-gold' || selectedTemplate === 'garden-fresh') && (
-                  <div className="flex items-center justify-center min-h-screen bg-gray-50">
-                    <div className="text-center p-8">
-                      <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                        Šablona se připravuje
-                      </h3>
-                      <p className="text-gray-600">
-                        Tato šablona bude brzy k dispozici. Zatím můžete použít jinou šablonu.
-                      </p>
+                  {(selectedTemplate === 'luxury-gold' || selectedTemplate === 'garden-fresh') && (
+                    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+                      <div className="text-center p-8">
+                        <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                          Šablona se připravuje
+                        </h3>
+                        <p className="text-gray-600">
+                          Tato šablona bude brzy k dispozici. Zatím můžete použít jinou šablonu.
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -758,11 +780,10 @@ export default function WeddingWebsiteBuilderPage() {
           <div className="flex items-center justify-between mt-8">
             <button
               onClick={handlePrevious}
-              disabled={Boolean(currentStepIndex === 0)}
-              className="inline-flex items-center gap-2 bg-white text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 bg-white text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-300"
             >
               <ArrowLeft className="w-5 h-5" />
-              Zpět
+              {currentStepIndex === 0 ? 'Zpět na přehled' : 'Zpět'}
             </button>
 
             {currentStepIndex === steps.length - 1 ? (

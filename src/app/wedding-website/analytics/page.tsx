@@ -7,6 +7,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { useWeddingStore } from '@/stores/weddingStore'
 import { ArrowLeft, Eye, Users, BarChart3, TrendingUp, Clock, Globe } from 'lucide-react'
 import Link from 'next/link'
+import ModuleHeader from '@/components/common/ModuleHeader'
 
 export default function AnalyticsPage() {
   const router = useRouter()
@@ -52,25 +53,25 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="min-h-screen py-8">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Header */}
-        <div className="mb-8">
+    <div className="min-h-screen">
+      {/* Header */}
+      <ModuleHeader
+        icon={Globe}
+        title="Statistiky a analytika"
+        subtitle={`${website.customUrl}.svatbot.cz • Návštěvnost a aktivita`}
+        iconGradient="from-pink-500 to-purple-500"
+        actions={
           <Link
             href="/wedding-website"
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
+            className="btn-primary flex items-center space-x-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            Zpět na svatební web
+            <span>Zpět</span>
           </Link>
+        }
+      />
 
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Statistiky a analytika
-          </h1>
-          <p className="text-gray-600">
-            Sledujte návštěvnost a aktivitu na vašem svatebním webu
-          </p>
-        </div>
+      <div className="max-w-7xl mx-auto px-4 py-8">
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
