@@ -41,6 +41,7 @@ export default function WeddingWebsiteBuilderPage() {
     bgGradientTo: '#fecdd3',
   })
   const [customUrl, setCustomUrl] = useState(website?.customUrl || '')
+  const [isUrlAvailable, setIsUrlAvailable] = useState(false)
   const [content, setContent] = useState<WebsiteContent>(website?.content || {
     hero: {
       bride: wedding?.brideName || '',
@@ -97,6 +98,7 @@ export default function WeddingWebsiteBuilderPage() {
         bgGradientTo: '#fecdd3',
       })
       setCustomUrl(website.customUrl)
+      setIsUrlAvailable(true) // Pokud web existuje, URL je dostupná
       // Ensure dressCode exists in content (for backward compatibility)
       setContent({
         ...website.content,
@@ -120,7 +122,7 @@ export default function WeddingWebsiteBuilderPage() {
 
   const currentStepIndex = steps.findIndex((s) => s.id === currentStep)
   const canGoNext = () => {
-    if (currentStep === 'url') return customUrl.length >= 3
+    if (currentStep === 'url') return customUrl.length >= 3 && isUrlAvailable
     if (currentStep === 'template') return selectedTemplate !== null
     return true
   }
@@ -502,6 +504,7 @@ export default function WeddingWebsiteBuilderPage() {
           <UrlConfigurator
             customUrl={customUrl}
             onUrlChange={setCustomUrl}
+            onAvailabilityChange={setIsUrlAvailable}
             disabled={Boolean(isLocked)}
           />
         )}
@@ -614,7 +617,7 @@ export default function WeddingWebsiteBuilderPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="font-mono text-lg text-primary-600">
-                      https://svatbot.cz/wedding/{customUrl}
+                      https://{customUrl}.svatbot.cz
                     </span>
                     {website?.isPublished && (
                       <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">

@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAICoach, MoodEntry } from '@/hooks/useAICoach'
 import { TrendingUp, Heart, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
+import { useAuthStore } from '@/stores/authStore'
 
 const moodOptions: Array<{
   value: MoodEntry['mood']
@@ -24,7 +25,45 @@ interface MoodTrackerProps {
   onMoodSaved?: () => void
 }
 
+// Helper function to get today's date string (YYYY-MM-DD)
+const getTodayDateString = () => {
+  const today = new Date()
+  return today.toISOString().split('T')[0]
+}
+
+// Helper function to get stored mood for today
+const getTodayMood = (userId: string): string | null => {
+  if (typeof window === 'undefined') return null
+
+  const stored = localStorage.getItem(`mood_${userId}`)
+  if (!stored) return null
+
+  try {
+    const { date, label } = JSON.parse(stored)
+    // Check if stored mood is from today
+    if (date === getTodayDateString()) {
+      return label
+    }
+    // If it's from a different day, clear it
+    localStorage.removeItem(`mood_${userId}`)
+    return null
+  } catch {
+    return null
+  }
+}
+
+// Helper function to save today's mood
+const saveTodayMood = (userId: string, label: string) => {
+  if (typeof window === 'undefined') return
+
+  localStorage.setItem(`mood_${userId}`, JSON.stringify({
+    date: getTodayDateString(),
+    label
+  }))
+}
+
 export default function MoodTracker({ compact = false, onMoodSaved }: MoodTrackerProps) {
+  const { user } = useAuthStore()
   const [selectedMood, setSelectedMood] = useState<MoodEntry['mood'] | null>(null)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -32,7 +71,50 @@ export default function MoodTracker({ compact = false, onMoodSaved }: MoodTracke
 
   const { saveMoodEntry, emotionalInsight, refreshEmotionalInsight } = useAICoach()
 
+  // Load today's mood from localStorage on mount
+  useEffect(() => {
+    if (user?.id) {
+      const todayMood = getTodayMood(user.id)
+      if (todayMood) {
+        setCurrentMoodLabel(todayMood)
+      }
+    }
+  }, [user?.id])
+
+  // Check for midnight reset every minute
+  useEffect(() => {
+    if (!user?.id) return
+
+    const checkMidnightReset = () => {
+      const stored = localStorage.getItem(`mood_${user.id}`)
+      if (stored) {
+        try {
+          const { date } = JSON.parse(stored)
+          // If stored date is not today, clear the mood
+          if (date !== getTodayDateString()) {
+            setCurrentMoodLabel(null)
+            localStorage.removeItem(`mood_${user.id}`)
+          }
+        } catch {
+          // Invalid data, clear it
+          localStorage.removeItem(`mood_${user.id}`)
+          setCurrentMoodLabel(null)
+        }
+      }
+    }
+
+    // Check immediately
+    checkMidnightReset()
+
+    // Check every minute
+    const interval = setInterval(checkMidnightReset, 60000)
+
+    return () => clearInterval(interval)
+  }, [user?.id])
+
   const handleMoodSelect = async (mood: MoodEntry['mood']) => {
+    if (!user?.id) return
+
     setSelectedMood(mood)
     setSaved(false)
     setSaving(true)
@@ -56,7 +138,11 @@ export default function MoodTracker({ compact = false, onMoodSaved }: MoodTracke
       stressed: '😟 Stres',
       overwhelmed: '😰 Přetížení'
     }
-    setCurrentMoodLabel(moodLabels[mood])
+    const label = moodLabels[mood]
+    setCurrentMoodLabel(label)
+
+    // Save to localStorage with today's date
+    saveTodayMood(user.id, label)
 
     try {
       await saveMoodEntry(mood, autoStressLevel, autoEnergyLevel, '')

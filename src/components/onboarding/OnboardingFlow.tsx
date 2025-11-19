@@ -261,7 +261,7 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
               </label>
               <input
                 type="range"
-                min="100000"
+                min="50000"
                 max="1000000"
                 step="50000"
                 value={formData.budget}
@@ -269,15 +269,15 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                 className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
               />
               <div className="flex justify-between text-sm text-text-muted mt-2">
-                <span>100k</span>
+                <span>50k</span>
                 <span>1M+</span>
               </div>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {[
-                { amount: 250000, label: '100-300k' },
-                { amount: 400000, label: '300-500k' },
+                { amount: 150000, label: '50-200k' },
+                { amount: 350000, label: '200-500k' },
                 { amount: 650000, label: '500-800k' },
                 { amount: 900000, label: '800k+' }
               ].map((option) => (

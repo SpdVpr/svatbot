@@ -401,7 +401,7 @@ export default function WelcomeScreen() {
               Všechny nástroje pro <span className="text-pink-500">dokonalou svatbu</span>
             </h2>
             <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              Od AI asistenta po svatební web – vše, co potřebujete na jedné platformě
+              Od AI asistenta po svatební web – vše, co potřebujete na jedné platformě.
             </p>
           </header>
 
@@ -492,7 +492,7 @@ export default function WelcomeScreen() {
               Vytvořte nezapomenutelný <span className="text-pink-500">zážitek</span>
             </h2>
             <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              Inspirace, vizualizace a spojení s nejlepšími svatebními dodavateli
+              Inspirace, vizualizace a spojení s nejlepšími svatebními dodavateli.
             </p>
           </div>
 
@@ -636,7 +636,7 @@ export default function WelcomeScreen() {
               Proč zvolit <span className="text-pink-500">SvatBot.cz</span>?
             </h2>
             <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              Moderní přístup k plánování svatby s nejnovějšími technologiemi
+              Moderní přístup k plánování svatby s nejnovějšími technologiemi.
             </p>
           </div>
 
@@ -711,7 +711,7 @@ export default function WelcomeScreen() {
               Spokojené páry <span className="text-pink-500">po celém Česku</span>
             </h2>
             <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              Přečtěte si, jak SvatBot.cz pomohl párům naplánovat jejich vysněnou svatbu
+              Přečtěte si, jak SvatBot.cz pomohl párům naplánovat jejich vysněnou svatbu.
             </p>
           </div>
 
@@ -831,7 +831,7 @@ export default function WelcomeScreen() {
               Jste poskytovatel <span className="text-pink-500">svatebních služeb</span>?
             </h2>
             <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              Zaregistrujte se na našem tržišti a spojte se s tisíci párů, které aktivně plánují svou svatbu
+              Zaregistrujte se na našem tržišti a spojte se s tisíci párů, které aktivně plánují svou svatbu.
             </p>
           </div>
 
@@ -921,7 +921,7 @@ export default function WelcomeScreen() {
               Jak vypadají karty dodavatelů
             </h3>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Ilustrační příklad karet dodavatelů z marketplace
+              Ilustrační příklad karet dodavatelů z marketplace.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
@@ -950,7 +950,7 @@ export default function WelcomeScreen() {
               Máte otázky? <span className="text-pink-500">Kontaktujte nás!</span>
             </h2>
             <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              Rádi Vám pomůžeme s čímkoliv potřebujete
+              Rádi Vám pomůžeme s čímkoliv potřebujete.
             </p>
           </div>
 
@@ -1068,7 +1068,7 @@ export default function WelcomeScreen() {
 
               <div className="mt-6 pt-6 border-t border-gray-200 text-center">
                 <p className="text-sm text-gray-600">
-                  Odpovídáme obvykle do <strong className="text-pink-600">24 hodin</strong>
+                  Odpovídáme obvykle do <strong className="text-pink-600">24 hodin</strong>.
                 </p>
               </div>
             </div>
@@ -1084,7 +1084,7 @@ export default function WelcomeScreen() {
               Často kladené otázky
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Odpovědi na nejčastější dotazy o svatebním plánovači SvatBot.cz
+              Odpovědi na nejčastější dotazy o svatebním plánovači SvatBot.cz.
             </p>
           </header>
 

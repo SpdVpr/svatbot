@@ -9,10 +9,11 @@ import { useWeddingStore } from '@/stores/weddingStore'
 interface UrlConfiguratorProps {
   customUrl: string
   onUrlChange: (url: string) => void
+  onAvailabilityChange?: (isAvailable: boolean) => void
   disabled?: boolean
 }
 
-export default function UrlConfigurator({ customUrl, onUrlChange, disabled = false }: UrlConfiguratorProps) {
+export default function UrlConfigurator({ customUrl, onUrlChange, onAvailabilityChange, disabled = false }: UrlConfiguratorProps) {
   const { currentWedding: wedding } = useWeddingStore()
   const { checkUrlAvailability } = useWeddingWebsite()
   
@@ -41,6 +42,7 @@ export default function UrlConfigurator({ customUrl, onUrlChange, disabled = fal
       if (!inputValue) {
         setIsAvailable(null)
         setValidationError(null)
+        onAvailabilityChange?.(false)
         return
       }
 
@@ -49,6 +51,7 @@ export default function UrlConfigurator({ customUrl, onUrlChange, disabled = fal
       if (!validation.valid) {
         setValidationError(validation.error || null)
         setIsAvailable(false)
+        onAvailabilityChange?.(false)
         return
       }
 
@@ -58,9 +61,11 @@ export default function UrlConfigurator({ customUrl, onUrlChange, disabled = fal
       try {
         const available = await checkUrlAvailability(inputValue)
         setIsAvailable(available)
+        onAvailabilityChange?.(available)
       } catch (error) {
         console.error('Error checking URL:', error)
         setIsAvailable(null)
+        onAvailabilityChange?.(false)
       } finally {
         setIsChecking(false)
       }
@@ -68,15 +73,14 @@ export default function UrlConfigurator({ customUrl, onUrlChange, disabled = fal
 
     const timeoutId = setTimeout(checkUrl, 500)
     return () => clearTimeout(timeoutId)
-  }, [inputValue, checkUrlAvailability])
+  }, [inputValue, checkUrlAvailability, onAvailabilityChange])
 
   const handleInputChange = (value: string) => {
     if (disabled) return
     const normalized = normalizeCustomUrl(value)
     setInputValue(normalized)
-    if (isAvailable) {
-      onUrlChange(normalized)
-    }
+    // Vždy aktualizuj URL v parent komponentě
+    onUrlChange(normalized)
   }
 
   const handleSuggestionClick = (suggestion: string) => {
