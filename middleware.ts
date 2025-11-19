@@ -136,9 +136,7 @@ export function middleware(request: NextRequest) {
   const subdomain = getSubdomain(hostname)
   if (subdomain && !MAIN_DOMAINS.includes(subdomain)) {
     // Subdomain detected - rewrite to /wedding/[customUrl]
-    console.log(`🌐 Subdomain detected: ${subdomain}`)
     url.pathname = `/wedding/${subdomain}${pathname}`
-    console.log(`🔄 Rewriting to: ${url.pathname}`)
     return NextResponse.rewrite(url)
   }
 
@@ -162,8 +160,6 @@ export function middleware(request: NextRequest) {
 
     // Rewrite to /wedding/[customUrl]
     url.pathname = `/wedding/${customUrl}`
-
-    console.log(`🔄 Path-based wedding URL detected: ${pathname} -> ${url.pathname}`)
 
     return NextResponse.rewrite(url)
   }
