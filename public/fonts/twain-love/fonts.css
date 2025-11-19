@@ -1,0 +1,139 @@
+/* Twain Love Template Fonts */
+
+/* Google Fonts - Great Vibes & Muli */
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Muli:wght@300;400;500;600;700&display=swap');
+
+/* Futura Font Family */
+@font-face {
+    font-family: 'Futura XBlk BT';
+    src: url('/fonts/twain-love/FuturaBT-ExtraBlack.ttf') format('truetype');
+    font-weight: 900;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Futura';
+    src: url('/fonts/twain-love/Futura-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Futura Hv BT';
+    src: url('/fonts/twain-love/FuturaBT-Heavy.ttf') format('truetype');
+    font-weight: 900;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Futura BdCn BT';
+    src: url('/fonts/twain-love/FuturaBT-BoldCondensed.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Futura Md BT';
+    src: url('/fonts/twain-love/FuturaBT-BoldItalic.ttf') format('truetype');
+    font-weight: bold;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Futura Lt BT';
+    src: url('/fonts/twain-love/FuturaBT-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Futura MdCn BT';
+    src: url('/fonts/twain-love/FuturaBT-MediumCondensed.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Futura Md BT';
+    src: url('/fonts/twain-love/FuturaBT-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Futura';
+    src: url('/fonts/twain-love/Futura-Bold_1.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Futura Lt BT';
+    src: url('/fonts/twain-love/FuturaBT-LightItalic.ttf') format('truetype');
+    font-weight: 300;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Futura Bk BT';
+    src: url('/fonts/twain-love/FuturaBT-Book.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Futura Bk BT';
+    src: url('/fonts/twain-love/FuturaBT-BookItalic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Futura';
+    src: url('/fonts/twain-love/Futura-Black-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Futura LtCn BT';
+    src: url('/fonts/twain-love/FuturaBT-LightCondensed.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Futura Md BT';
+    src: url('/fonts/twain-love/FuturaBT-MediumItalic.ttf') format('truetype');
+    font-weight: 500;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Futura XBlk BT';
+    src: url('/fonts/twain-love/FuturaBT-ExtraBlack_1.ttf') format('truetype');
+    font-weight: 900;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Futura Hv BT';
+    src: url('/fonts/twain-love/FuturaBT-HeavyItalic.ttf') format('truetype');
+    font-weight: 900;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Futura XBlkCnIt BT';
+    src: url('/fonts/twain-love/FuturaBT-ExtraBlackCondItalic.ttf') format('truetype');
+    font-weight: 900;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Futura';
+    src: url('/fonts/twain-love/Futura-CondensedLight.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
+

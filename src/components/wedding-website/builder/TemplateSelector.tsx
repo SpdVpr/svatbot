@@ -125,6 +125,33 @@ const TEMPLATES: TemplateConfig[] = [
       'Venkovské svatby',
     ],
   },
+  {
+    id: 'twain-love',
+    name: 'Twain Love',
+    description: 'Romantická šablona s animovaným hero sliderem a elegantním designem',
+    thumbnail: 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800',
+    category: 'Romantický',
+    colors: {
+      primary: '#85aaba',
+      secondary: '#b2c9d3',
+      accent: '#6a8a98',
+    },
+    fonts: {
+      heading: 'Futura',
+      body: 'Inter',
+    },
+    features: [
+      'Animovaný hero slider',
+      'Countdown odpočítávání',
+      'Zigzag story layout',
+      'Lightbox galerie',
+    ],
+    suitableFor: [
+      'Romantické svatby',
+      'Elegantní události',
+      'Moderní svatby',
+    ],
+  },
 ]
 
 export default function TemplateSelector({ selectedTemplate, onSelect, disabled = false }: TemplateSelectorProps) {

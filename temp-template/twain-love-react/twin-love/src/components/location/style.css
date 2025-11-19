@@ -1,0 +1,45 @@
+.event-text {
+    padding-top: 15px;
+}
+.event-text-2 {
+    padding-left: 30px;
+}
+
+.event-wrap {
+    margin-top: 30px;
+    background:rgba(178,201,211,.1);
+}
+.event-text h3 {
+    font-size: 30px;
+    color: #444;
+    margin-bottom: 16px;
+}
+
+.event-text a {
+    color:#8ba1aa;
+    box-shadow: 0px 10px 40px 0px rgba(50, 50, 50, 0.1);
+}
+.event-text span {
+    display: block;
+}
+
+.event-text p {
+    padding: 15px 0;
+    margin-bottom: 0;
+}
+
+.event-img img{
+  width: 100%;
+}
+@media (max-width:992px){
+    .event-text {
+        padding: 20px;
+    }
+}
+
+@media(max-width:767px){
+    .event-text {
+        padding-top: 15px;
+        padding: 20px;
+    }
+}

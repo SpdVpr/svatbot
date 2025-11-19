@@ -16,6 +16,7 @@ import ClassicEleganceTemplate from '@/components/wedding-website/templates/Clas
 import ModernMinimalistTemplate from '@/components/wedding-website/templates/ModernMinimalistTemplate'
 import RomanticBohoTemplate from '@/components/wedding-website/templates/RomanticBohoTemplate'
 import WinterEleganceTemplate from '@/components/wedding-website/templates/WinterEleganceTemplate'
+import TwainLoveTemplate from '@/components/wedding-website/templates/TwainLoveTemplate'
 import type { TemplateType, WebsiteContent, WeddingWebsite } from '@/types/wedding-website'
 
 type Step = 'url' | 'template' | 'content' | 'preview'
@@ -738,6 +739,26 @@ export default function WeddingWebsiteBuilderPage() {
 
                   {selectedTemplate === 'winter-elegance' && (
                     <WinterEleganceTemplate
+                      website={{
+                        id: 'preview',
+                        weddingId: wedding?.id || 'preview',
+                        customUrl,
+                        template: selectedTemplate,
+                        content,
+                        style: {
+                          ...website?.style,
+                          colorTheme,
+                          customColors: colorTheme === 'custom' ? customColors : undefined,
+                        },
+                        isPublished: false,
+                        createdAt: new Date(),
+                        updatedAt: new Date()
+                      } as WeddingWebsite}
+                    />
+                  )}
+
+                  {selectedTemplate === 'twain-love' && (
+                    <TwainLoveTemplate
                       website={{
                         id: 'preview',
                         weddingId: wedding?.id || 'preview',

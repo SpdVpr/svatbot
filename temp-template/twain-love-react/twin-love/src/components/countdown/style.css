@@ -1,0 +1,68 @@
+.saveday{
+    padding-top: 80px;
+}
+.countdownwrap {
+    text-align: center;
+    padding: 40px;
+    margin: auto;
+    position: relative;
+    overflow: hidden;
+}
+.react-countdown li {
+    display: inline-block;
+    margin: 0 10px;
+    text-align: center;
+    position: relative;
+    width: 195px;
+    padding: 65px 0 23px;
+    background: url(../../images/vector.png);
+    height: 200px;
+    background-size: cover;
+}
+
+.saveday.s2 .react-countdown li {
+    background: url(../../images/vector2.png);
+    background-size: cover;
+    background-position: center center;
+}
+
+.react-countdown li:after {
+ display: none;
+}
+.react-countdown .text {
+    text-transform: uppercase;
+    margin-bottom: 0;
+    font-size: 14px!important;
+    color: #333;
+}
+.react-countdown .digit {
+    font-size: 40px!important;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-bottom: 0;
+    color: #333;
+    font-family: 'Great Vibes', cursive;
+}
+.couple-area{
+    padding-top: 150px!important;
+}
+
+@media (max-width:991px){
+    .react-countdown li {
+        margin-bottom: 30px;
+    }
+    .countdownwrap{
+        padding-bottom: 0;
+    }
+
+}
+
+@media (max-width:767px){
+    .react-countdown li {
+        margin-bottom: 30px;
+    }
+    .countdownwrap{
+        padding: 0;
+    }
+
+}
