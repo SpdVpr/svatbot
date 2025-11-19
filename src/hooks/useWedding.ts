@@ -284,9 +284,27 @@ export function useWedding() {
           if (!querySnapshot.empty) {
             const weddingDoc = querySnapshot.docs[0]
             const wedding = convertFirestoreWedding(weddingDoc.id, weddingDoc.data())
+            logger.log('✅ Wedding loaded from Firestore:', wedding)
             setCurrentWedding(wedding)
           } else {
-            setCurrentWedding(null)
+            logger.warn('⚠️ No wedding found in Firestore, checking localStorage fallback')
+
+            // Try to load from localStorage as fallback
+            const savedWedding = localStorage.getItem(`wedding_${user.id}`)
+            if (savedWedding) {
+              const wedding = JSON.parse(savedWedding)
+              // Convert date strings back to Date objects
+              if (wedding.weddingDate) {
+                wedding.weddingDate = new Date(wedding.weddingDate)
+              }
+              wedding.createdAt = new Date(wedding.createdAt)
+              wedding.updatedAt = new Date(wedding.updatedAt)
+              logger.log('✅ Wedding loaded from localStorage:', wedding)
+              setCurrentWedding(wedding)
+            } else {
+              logger.log('ℹ️ No wedding found in localStorage either')
+              setCurrentWedding(null)
+            }
           }
         }
       } catch (firestoreError) {
