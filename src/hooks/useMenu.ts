@@ -48,6 +48,8 @@ interface UseMenuReturn {
   getFilteredDrinkItems: (filters: MenuFilters) => DrinkItem[]
   getTotalEstimatedCost: () => number
   getTotalActualCost: () => number
+  getTotalCostByVendor: (vendorId: string) => number
+  getMenuItemsByVendor: (vendorId: string) => { menuItems: MenuItem[], drinkItems: DrinkItem[], totalCost: number }
   clearError: () => void
 }
 
@@ -348,6 +350,32 @@ export function useMenu(): UseMenuReturn {
     return stats.totalActualCost
   }
 
+  // Get total cost by vendor (for budget synchronization)
+  const getTotalCostByVendor = (vendorId: string): number => {
+    const menuTotal = menuItems
+      .filter(item => item.vendorId === vendorId)
+      .reduce((sum, item) => sum + (item.totalCost || 0), 0)
+
+    const drinkTotal = drinkItems
+      .filter(item => item.vendorId === vendorId)
+      .reduce((sum, item) => sum + (item.totalCost || 0), 0)
+
+    return menuTotal + drinkTotal
+  }
+
+  // Get menu items by vendor with details (for budget UI)
+  const getMenuItemsByVendor = (vendorId: string) => {
+    const vendorMenuItems = menuItems.filter(item => item.vendorId === vendorId)
+    const vendorDrinkItems = drinkItems.filter(item => item.vendorId === vendorId)
+    const totalCost = getTotalCostByVendor(vendorId)
+
+    return {
+      menuItems: vendorMenuItems,
+      drinkItems: vendorDrinkItems,
+      totalCost
+    }
+  }
+
   // Load menu items from Firestore or localStorage
   useEffect(() => {
     if (!wedding?.id) {
@@ -441,6 +469,8 @@ export function useMenu(): UseMenuReturn {
     getFilteredDrinkItems,
     getTotalEstimatedCost,
     getTotalActualCost,
+    getTotalCostByVendor,
+    getMenuItemsByVendor,
     clearError
   }
 }

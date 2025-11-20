@@ -5,15 +5,16 @@ export type TaskStatus = 'pending' | 'overdue' | 'completed' | 'cancelled'
 export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent'
 
 export type TaskCategory =
-  | 'foundation'    // Základy (místo, datum, rozpočet)
-  | 'venue'         // Místo konání
-  | 'guests'        // Hosté a pozvánky
-  | 'budget'        // Rozpočet a platby
-  | 'design'        // Design a dekorace
-  | 'organization'  // Organizace a koordinace
-  | 'final'         // Finální přípravy
-  | 'custom'        // Vlastní úkoly
-  | 'uncategorized' // Bez kategorie (pro úkoly ze checklistu)
+  | 'foundation'      // Základy (místo, datum, rozpočet)
+  | 'venue'           // Místo konání
+  | 'guests'          // Hosté a pozvánky
+  | 'budget'          // Rozpočet a platby
+  | 'design'          // Design a dekorace
+  | 'organization'    // Organizace a koordinace
+  | 'final'           // Finální přípravy
+  | 'custom'          // Vlastní úkoly
+  | 'from-checklist'  // Z checklistu (úkoly přesunuté ze svatebního checklistu)
+  | 'uncategorized'   // Bez kategorie
 
 export interface Task {
   id: string

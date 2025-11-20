@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { BudgetItem, BudgetFilters, BudgetViewOptions, BUDGET_CATEGORIES } from '@/types/budget'
 import { useBudget } from '@/hooks/useBudget'
+import { useMenu } from '@/hooks/useMenu'
 import { useCurrency } from '@/contexts/CurrencyContext'
 import {
   Search,
@@ -53,6 +54,7 @@ export default function BudgetList({
     recordPayment,
     clearError
   } = useBudget()
+  const { getMenuItemsByVendor } = useMenu()
   const { currency: selectedCurrency, formatCurrency: formatCurrencyFromContext } = useCurrency()
 
   const [filters, setFilters] = useState<BudgetFilters>({})
@@ -520,6 +522,14 @@ export default function BudgetList({
                           )}
                         </div>
 
+                        {/* Menu sync indicator */}
+                        {item.syncWithMenu && item.syncVendorId && (
+                          <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded-lg flex items-center space-x-2 text-sm">
+                            <span className="text-blue-600">⚡</span>
+                            <span className="text-blue-700 font-medium">Automaticky synchronizováno s menu</span>
+                          </div>
+                        )}
+
                         {/* Financial info */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-2">
                           <div>
@@ -530,6 +540,7 @@ export default function BudgetList({
                             <span className="text-gray-500">Skutečnost:</span>
                             <p className={`font-medium ${isOverBudget ? 'text-red-600' : 'text-gray-900'}`}>
                               {formatCurrencyWithCode(item.actualAmount, item.currency)}
+                              {item.syncWithMenu && <span className="ml-1 text-blue-600 text-xs">⚡</span>}
                               {isOverBudget && (
                                 <span className="ml-1 text-xs">
                                   (+{formatCurrencyWithCode(item.actualAmount - item.budgetedAmount, item.currency)})
@@ -550,6 +561,8 @@ export default function BudgetList({
                             </p>
                           </div>
                         </div>
+
+
 
                         {/* Sub-items breakdown */}
                         {item.subItems && item.subItems.length > 0 && (
@@ -577,6 +590,52 @@ export default function BudgetList({
                             </div>
                           </div>
                         )}
+
+                        {/* Menu items detail (for synced items) */}
+                        {item.syncWithMenu && item.syncVendorId && (() => {
+                          const menuData = getMenuItemsByVendor(item.syncVendorId)
+                          const hasMenuItems = menuData.menuItems.length > 0 || menuData.drinkItems.length > 0
+
+                          if (!hasMenuItems) return null
+
+                          return (
+                            <div className="mt-3 p-3 bg-blue-50/50 rounded-lg border border-blue-200/50">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-sm font-medium text-blue-900 flex items-center space-x-1">
+                                  <span>🍽️</span>
+                                  <span>Detail z menu ({menuData.menuItems.length + menuData.drinkItems.length})</span>
+                                </span>
+                                <span className="text-sm font-bold text-blue-600">
+                                  Celkem: {formatCurrencyWithCode(menuData.totalCost, item.currency)}
+                                </span>
+                              </div>
+                              <div className="space-y-1 max-h-40 overflow-y-auto">
+                                {menuData.menuItems.map((menuItem, index) => (
+                                  <div key={menuItem.id} className="flex items-center justify-between text-sm">
+                                    <span className="text-gray-700">
+                                      🍽️ {menuItem.name}
+                                      <span className="text-gray-500 ml-1">({menuItem.estimatedQuantity}× porcí)</span>
+                                    </span>
+                                    <span className="font-medium text-gray-900">
+                                      {formatCurrencyWithCode(menuItem.totalCost || 0, item.currency)}
+                                    </span>
+                                  </div>
+                                ))}
+                                {menuData.drinkItems.map((drinkItem, index) => (
+                                  <div key={drinkItem.id} className="flex items-center justify-between text-sm">
+                                    <span className="text-gray-700">
+                                      🥤 {drinkItem.name}
+                                      <span className="text-gray-500 ml-1">({drinkItem.estimatedQuantity}× {drinkItem.volume || 'ks'})</span>
+                                    </span>
+                                    <span className="font-medium text-gray-900">
+                                      {formatCurrencyWithCode(drinkItem.totalCost || 0, item.currency)}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )
+                        })()}
 
                         {/* Vendor and dates */}
                         <div className="flex items-center space-x-4 text-sm text-gray-600">

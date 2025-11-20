@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { X, Plus, Trash2 } from 'lucide-react'
 import { MenuFormData, MenuSubItem, FOOD_CATEGORY_LABELS, MENU_STATUS_LABELS, SERVING_STYLE_OPTIONS, COMMON_ALLERGENS } from '@/types/menu'
 import { useCurrency } from '@/contexts/CurrencyContext'
+import { useVendor } from '@/hooks/useVendor'
+import { BUDGET_CATEGORIES } from '@/types/budget'
 
 interface MenuItemFormProps {
   onSubmit: (data: MenuFormData) => Promise<void>
@@ -14,6 +16,7 @@ interface MenuItemFormProps {
 
 export default function MenuItemForm({ onSubmit, onCancel, initialData, loading }: MenuItemFormProps) {
   const { currency } = useCurrency()
+  const { vendors } = useVendor()
   const [formData, setFormData] = useState<MenuFormData>({
     name: initialData?.name || '',
     description: initialData?.description || '',
@@ -29,6 +32,7 @@ export default function MenuItemForm({ onSubmit, onCancel, initialData, loading 
     allergens: initialData?.allergens || [],
     pricePerServing: initialData?.pricePerServing || undefined,
     totalPrice: initialData?.totalPrice || undefined,
+    vendorId: initialData?.vendorId || undefined,
     vendorName: initialData?.vendorName || '',
     status: initialData?.status || 'planned',
     servingStyle: initialData?.servingStyle || undefined,
@@ -395,14 +399,61 @@ export default function MenuItemForm({ onSubmit, onCancel, initialData, loading 
 
           {/* Additional Info */}
           <div className="space-y-4">
+            {/* Vendor Selection */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Dodavatel
+                Vybrat dodavatele
+              </label>
+              <select
+                value={formData.vendorId || ''}
+                onChange={(e) => {
+                  const selectedVendor = vendors.find(v => v.id === e.target.value)
+                  if (selectedVendor) {
+                    setFormData({
+                      ...formData,
+                      vendorId: selectedVendor.id,
+                      vendorName: selectedVendor.name
+                    })
+                  } else {
+                    setFormData({
+                      ...formData,
+                      vendorId: undefined,
+                      vendorName: ''
+                    })
+                  }
+                }}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+              >
+                <option value="">Žádný dodavatel</option>
+                {vendors
+                  .filter(v => v.category === 'catering' || v.category === 'venue')
+                  .map((vendor) => (
+                    <option key={vendor.id} value={vendor.id}>
+                      {vendor.name} - {BUDGET_CATEGORIES[vendor.category as keyof typeof BUDGET_CATEGORIES]?.name || vendor.category}
+                    </option>
+                  ))}
+              </select>
+              <p className="mt-1 text-xs text-gray-500">
+                Vyberte cateringového dodavatele ze seznamu nebo zadejte vlastní název níže
+              </p>
+            </div>
+
+            {/* Custom Vendor Name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Nebo zadejte vlastní název
               </label>
               <input
                 type="text"
                 value={formData.vendorName}
-                onChange={(e) => setFormData({ ...formData, vendorName: e.target.value })}
+                onChange={(e) => {
+                  setFormData({
+                    ...formData,
+                    vendorName: e.target.value,
+                    // Clear vendorId if custom name is entered
+                    vendorId: e.target.value ? undefined : formData.vendorId
+                  })
+                }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                 placeholder="Název dodavatele"
               />

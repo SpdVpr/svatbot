@@ -205,11 +205,11 @@ export default function WeddingChecklist({ compact = false }: WeddingChecklistPr
     try {
       setAddingToTasks(item.id)
 
-      // All checklist items go to "Bez kategorie" (uncategorized)
+      // All checklist items go to "Z checklistu" (from-checklist)
       const taskData: TaskFormData = {
         title: item.title,
         description: '',
-        category: 'uncategorized',
+        category: 'from-checklist',
         priority: undefined,
         dueDate: undefined,
         notes: item.tips?.join('\n') || '',

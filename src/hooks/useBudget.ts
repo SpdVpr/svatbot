@@ -17,6 +17,7 @@ import { db } from '@/config/firebase'
 import { useAuth } from './useAuth'
 import { useWedding } from './useWedding'
 import { useDemoLock } from './useDemoLock'
+import { useMenu } from './useMenu'
 import {
   BudgetItem,
   BudgetFormData,
@@ -56,6 +57,7 @@ export function useBudget(): UseBudgetReturn {
   const { user } = useAuth()
   const { wedding } = useWedding()
   const { withDemoCheck } = useDemoLock()
+  const { getTotalCostByVendor, menuItems, drinkItems } = useMenu()
 
   // Initialize with localStorage data if available
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>(() => {
@@ -165,6 +167,8 @@ export function useBudget(): UseBudgetReturn {
         ...doc,
         uploadedAt: safeConvertToDate(doc.uploadedAt) || new Date()
       })),
+      syncWithMenu: data.syncWithMenu || false,
+      syncVendorId: data.syncVendorId,
       createdAt: safeConvertToDate(data.createdAt) || new Date(),
       updatedAt: safeConvertToDate(data.updatedAt) || new Date(),
       createdBy: data.createdBy
@@ -218,6 +222,11 @@ export function useBudget(): UseBudgetReturn {
     if (item.isEstimate !== undefined) result.isEstimate = item.isEstimate
     if (item.isRecurring !== undefined) result.isRecurring = item.isRecurring
     if (item.recurringFrequency !== undefined) result.recurringFrequency = item.recurringFrequency || null
+
+    // Menu synchronization fields
+    if (item.syncWithMenu !== undefined) result.syncWithMenu = item.syncWithMenu || false
+    if (item.syncVendorId !== undefined) result.syncVendorId = item.syncVendorId || null
+
     if (item.payments !== undefined) {
       result.payments = (item.payments || []).map(payment => ({
         ...payment,
@@ -285,7 +294,10 @@ export function useBudget(): UseBudgetReturn {
         actualAmount: data.actualAmount,
         paidAmount: data.paidAmount,
         currency: data.currency,
+        vendorId: data.vendorId,
         vendorName: data.vendorName,
+        syncWithMenu: data.syncWithMenu,
+        syncVendorId: data.syncVendorId,
         paymentStatus: data.paymentStatus,
         paymentMethod: data.paymentMethod,
         paymentPeriod: data.paymentPeriod,
@@ -297,6 +309,7 @@ export function useBudget(): UseBudgetReturn {
         isEstimate: data.isEstimate,
         isRecurring: false,
         payments: data.payments || [],
+        subItems: data.subItems || [],
         documents: data.documents || [],
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -594,6 +607,36 @@ export function useBudget(): UseBudgetReturn {
 
     loadBudgetItems()
   }, [wedding?.id])
+
+  // Automatic synchronization with menu items
+  useEffect(() => {
+    if (!wedding?.id || !budgetItems.length) return
+
+    const syncBudgetWithMenu = async () => {
+      // Find all budget items that have syncWithMenu enabled
+      const itemsToSync = budgetItems.filter(item => item.syncWithMenu && item.syncVendorId)
+
+      for (const item of itemsToSync) {
+        try {
+          // Get current total cost from menu for this vendor
+          const currentMenuCost = getTotalCostByVendor(item.syncVendorId!)
+
+          // Only update if the cost has changed
+          if (item.actualAmount !== currentMenuCost) {
+            console.log(`🔄 Auto-syncing budget item "${item.name}" with menu: ${item.actualAmount} → ${currentMenuCost}`)
+
+            await updateBudgetItem(item.id, {
+              actualAmount: currentMenuCost
+            })
+          }
+        } catch (error) {
+          console.error(`Error syncing budget item ${item.id} with menu:`, error)
+        }
+      }
+    }
+
+    syncBudgetWithMenu()
+  }, [menuItems, drinkItems, budgetItems, wedding?.id, getTotalCostByVendor])
 
   // Clear error
   const clearError = () => setError(null)

@@ -90,7 +90,11 @@ export interface BudgetItem {
   // Vendor
   vendorId?: string
   vendorName?: string
-  
+
+  // Menu synchronization (for catering items)
+  syncWithMenu?: boolean      // True = automatically sync actualAmount from menu items
+  syncVendorId?: string        // Vendor ID to sync menu items from
+
   // Payment
   paymentStatus: PaymentStatus
   paymentMethod?: PaymentMethod
@@ -293,6 +297,7 @@ export interface BudgetFormData {
   paidAmount: number
   currency: string
   vendorName?: string
+  vendorId?: string
   paymentStatus: PaymentStatus
   paymentMethod?: PaymentMethod
   paymentPeriod?: PaymentPeriod
@@ -305,6 +310,8 @@ export interface BudgetFormData {
   payments?: BudgetItemPayment[]
   subItems?: BudgetSubItem[]
   documents?: Document[]
+  syncWithMenu?: boolean
+  syncVendorId?: string
 }
 
 export interface VendorFormData {

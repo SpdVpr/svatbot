@@ -89,7 +89,8 @@ export default function TaskForm({
 
   // Category options
   const categoryOptions = [
-    { value: 'uncategorized', label: 'Bez kategorie', description: 'Úkoly ze svatebního checklistu' },
+    { value: 'from-checklist', label: 'Z checklistu', description: 'Úkoly přesunuté ze svatebního checklistu' },
+    { value: 'uncategorized', label: 'Bez kategorie', description: 'Nezařazené úkoly' },
     { value: 'foundation', label: 'Základy', description: 'Datum, rozpočet, základní plánování' },
     { value: 'venue', label: 'Místo konání', description: 'Obřad, hostina, ubytování' },
     { value: 'guests', label: 'Hosté', description: 'Seznam hostů, oznámení, RSVP' },

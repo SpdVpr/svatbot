@@ -45,6 +45,7 @@ export default function BudgetForm({
     paidAmount: initialData?.paidAmount || 0,
     currency: initialData?.currency || selectedCurrency,
     vendorName: initialData?.vendorName || '',
+    vendorId: initialData?.vendorId || undefined,
     paymentStatus: initialData?.paymentStatus || 'pending',
     paymentMethod: initialData?.paymentMethod || undefined,
     paymentPeriod: initialData?.paymentPeriod || undefined,
@@ -56,7 +57,9 @@ export default function BudgetForm({
     isEstimate: initialData?.isEstimate || false,
     payments: initialData?.payments || [],
     subItems: initialData?.subItems || [],
-    documents: initialData?.documents || []
+    documents: initialData?.documents || [],
+    syncWithMenu: initialData?.syncWithMenu || false,
+    syncVendorId: initialData?.syncVendorId || undefined
   })
 
   const [documents, setDocuments] = useState<DocumentItem[]>(
@@ -69,6 +72,37 @@ export default function BudgetForm({
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [editingPayment, setEditingPayment] = useState<BudgetItemPayment | null>(null)
+
+  // Update formData when initialData changes (for edit mode)
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        name: initialData.name || '',
+        description: initialData.description || '',
+        category: initialData.category || 'other',
+        budgetedAmount: initialData.budgetedAmount || 0,
+        actualAmount: initialData.actualAmount || 0,
+        paidAmount: initialData.paidAmount || 0,
+        currency: initialData.currency || selectedCurrency,
+        vendorName: initialData.vendorName || '',
+        vendorId: initialData.vendorId || undefined,
+        syncWithMenu: initialData.syncWithMenu || false,
+        syncVendorId: initialData.syncVendorId || undefined,
+        paymentStatus: initialData.paymentStatus || 'pending',
+        paymentMethod: initialData.paymentMethod || undefined,
+        paymentPeriod: initialData.paymentPeriod || undefined,
+        dueDate: initialData.dueDate || undefined,
+        paidDate: initialData.paidDate || undefined,
+        priority: initialData.priority || undefined,
+        notes: initialData.notes || '',
+        tags: initialData.tags || [],
+        isEstimate: initialData.isEstimate || false,
+        payments: initialData.payments || [],
+        subItems: initialData.subItems || [],
+        documents: initialData.documents || []
+      })
+    }
+  }, [initialData, selectedCurrency])
 
   // Currency options
   const currencyOptions = [
@@ -158,7 +192,7 @@ export default function BudgetForm({
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!validateForm()) {
       return
     }
@@ -550,14 +584,23 @@ export default function BudgetForm({
                   Vybrat dodavatele
                 </label>
                 <select
-                  value={formData.vendorName || ''}
-                  onChange={(e) => handleChange('vendorName', e.target.value)}
+                  value={formData.vendorId || ''}
+                  onChange={(e) => {
+                    const selectedVendor = vendors.find(v => v.id === e.target.value)
+                    if (selectedVendor) {
+                      handleChange('vendorId', selectedVendor.id)
+                      handleChange('vendorName', selectedVendor.name)
+                    } else {
+                      handleChange('vendorId', undefined)
+                      handleChange('vendorName', '')
+                    }
+                  }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   disabled={loading}
                 >
                   <option value="">Žádný dodavatel</option>
                   {vendors.map((vendor) => (
-                    <option key={vendor.id} value={vendor.name}>
+                    <option key={vendor.id} value={vendor.id}>
                       {vendor.name} - {BUDGET_CATEGORIES[vendor.category as keyof typeof BUDGET_CATEGORIES]?.name || vendor.category}
                     </option>
                   ))}
@@ -567,6 +610,35 @@ export default function BudgetForm({
                 </p>
               </div>
 
+              {/* Menu Sync Checkbox - only show for catering category */}
+              {formData.category === 'catering' && formData.vendorId && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <label className="flex items-start space-x-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.syncWithMenu || false}
+                      onChange={(e) => {
+                        handleChange('syncWithMenu', e.target.checked)
+                        if (e.target.checked) {
+                          handleChange('syncVendorId', formData.vendorId)
+                        } else {
+                          handleChange('syncVendorId', undefined)
+                        }
+                      }}
+                      className="mt-1 w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                    />
+                    <div className="flex-1">
+                      <span className="text-sm font-medium text-gray-900">
+                        ⚡ Automaticky načítat cenu z menu
+                      </span>
+                      <p className="text-xs text-gray-600 mt-1">
+                        Aktuální částka se bude automaticky přepočítávat podle položek v menu od tohoto dodavatele
+                      </p>
+                    </div>
+                  </label>
+                </div>
+              )}
+
               {/* Custom Vendor Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -575,7 +647,15 @@ export default function BudgetForm({
                 <input
                   type="text"
                   value={formData.vendorName}
-                  onChange={(e) => handleChange('vendorName', e.target.value)}
+                  onChange={(e) => {
+                    handleChange('vendorName', e.target.value)
+                    // Clear vendorId if custom name is entered
+                    if (e.target.value && formData.vendorId) {
+                      handleChange('vendorId', undefined)
+                      handleChange('syncWithMenu', false)
+                      handleChange('syncVendorId', undefined)
+                    }
+                  }}
                   placeholder="např. Hotel Grandhotel, Květinářství Růže..."
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   disabled={loading}

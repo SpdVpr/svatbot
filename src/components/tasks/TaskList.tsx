@@ -255,6 +255,7 @@ export default function TaskList({
   // Get category display name
   const getCategoryName = (category: string) => {
     const categoryNames = {
+      'from-checklist': 'Z checklistu',
       uncategorized: 'Bez kategorie',
       foundation: 'Základy',
       venue: 'Místo konání',
@@ -392,6 +393,7 @@ export default function TaskList({
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                   >
                     <option value="">Všechny kategorie</option>
+                    <option value="from-checklist">Z checklistu</option>
                     <option value="uncategorized">Bez kategorie</option>
                     <option value="foundation">Základy</option>
                     <option value="venue">Místo konání</option>
@@ -683,6 +685,8 @@ function getPriorityLabel(priority?: string): string {
 // Helper function to get category label in Czech
 function getCategoryLabel(category: string): string {
   switch (category) {
+    case 'from-checklist':
+      return 'Z checklistu'
     case 'uncategorized':
       return 'Bez kategorie'
     case 'foundation':

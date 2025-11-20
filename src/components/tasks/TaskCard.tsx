@@ -87,6 +87,7 @@ export default function TaskCard({
   // Get category display
   const getCategoryDisplay = () => {
     const categories = {
+      'from-checklist': { label: 'Z checklistu', color: 'bg-teal-100 text-teal-700' },
       uncategorized: { label: 'Bez kategorie', color: 'bg-gray-100 text-gray-600' },
       foundation: { label: 'Základy', color: 'bg-purple-100 text-purple-700' },
       venue: { label: 'Místo', color: 'bg-blue-100 text-blue-700' },
