@@ -412,6 +412,12 @@ export default function MenuPage() {
                               )}
 
                               <div className="space-y-2 text-sm">
+                                {item.vendorName && (
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-600">Dodavatel:</span>
+                                    <span className="font-medium">📍 {item.vendorName}</span>
+                                  </div>
+                                )}
                                 <div className="flex justify-between">
                                   <span className="text-gray-600">Množství:</span>
                                   <span className="font-medium">{item.estimatedQuantity} porcí</span>
@@ -515,6 +521,12 @@ export default function MenuPage() {
                                 <p className="text-sm text-gray-600 mb-3">{item.description}</p>
                               )}
                               <div className="space-y-2 text-sm">
+                                {item.vendorName && (
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-600">Dodavatel:</span>
+                                    <span className="font-medium">📍 {item.vendorName}</span>
+                                  </div>
+                                )}
                                 <div className="flex justify-between">
                                   <span className="text-gray-600">Množství:</span>
                                   <span className="font-medium">{item.estimatedQuantity}x</span>
