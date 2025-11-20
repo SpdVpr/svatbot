@@ -30,7 +30,7 @@ export default function HeroSection({ content }: HeroSectionProps) {
   }
 
   return (
-    <div id="home" className="relative h-[950px] overflow-hidden">
+    <div id="home" className="relative h-screen min-h-[600px] md:min-h-[800px] lg:h-[950px] overflow-hidden">
       {/* Background Image */}
       {content.mainImage && (
         <div className="absolute inset-0">
@@ -38,8 +38,9 @@ export default function HeroSection({ content }: HeroSectionProps) {
             src={content.mainImage}
             alt="Wedding"
             fill
-            className="object-cover"
+            className="object-cover object-center"
             priority
+            sizes="100vw"
             style={{
               objectPosition: content.imagePosition
                 ? `${content.imagePosition.x}% ${content.imagePosition.y}%`
