@@ -73,6 +73,31 @@ export default function MenuSectionEditor({ content, onChange }: MenuSectionEdit
       })) as DrinkItem[]
       setDrinkItems(drinks)
 
+      // Convert to MenuItem[] format for content.items
+      const convertedItems: any[] = [
+        ...items.map(item => ({
+          id: item.id,
+          name: item.name,
+          description: item.description,
+          category: item.category,
+          dietaryInfo: [
+            ...(item.isVegetarian ? ['Vegetariánské'] : []),
+            ...(item.isVegan ? ['Veganské'] : []),
+            ...(item.isGlutenFree ? ['Bezlepkové'] : [])
+          ]
+        })),
+        ...drinks.map(drink => ({
+          id: drink.id,
+          name: drink.name,
+          description: drink.description,
+          category: 'drink' as const,
+          dietaryInfo: drink.isAlcoholic ? ['Alkoholické'] : []
+        }))
+      ]
+
+      // Update content with items
+      updateContent({ items: convertedItems })
+
       setDataLoaded(true)
       setLoading(false)
     } catch (error) {
@@ -81,12 +106,40 @@ export default function MenuSectionEditor({ content, onChange }: MenuSectionEdit
     }
   }
 
-  // Load data when component mounts
+  // Load data when component mounts and auto-sync if enabled but no items
   useEffect(() => {
     if (wedding?.id && !dataLoaded) {
       loadMenuData()
     }
   }, [wedding?.id, dataLoaded])
+
+  // Auto-sync if section is enabled but has no items
+  useEffect(() => {
+    if (content?.enabled && dataLoaded && (!content.items || content.items.length === 0) && (menuItems.length > 0 || drinkItems.length > 0)) {
+      console.log('🍽️ Auto-syncing menu items to content...')
+      const convertedItems: any[] = [
+        ...menuItems.map(item => ({
+          id: item.id,
+          name: item.name,
+          description: item.description,
+          category: item.category,
+          dietaryInfo: [
+            ...(item.isVegetarian ? ['Vegetariánské'] : []),
+            ...(item.isVegan ? ['Veganské'] : []),
+            ...(item.isGlutenFree ? ['Bezlepkové'] : [])
+          ]
+        })),
+        ...drinkItems.map(drink => ({
+          id: drink.id,
+          name: drink.name,
+          description: drink.description,
+          category: 'drink' as const,
+          dietaryInfo: drink.isAlcoholic ? ['Alkoholické'] : []
+        }))
+      ]
+      updateContent({ items: convertedItems })
+    }
+  }, [content?.enabled, dataLoaded, menuItems, drinkItems])
 
   const handleImportFromMenu = async () => {
     setImporting(true)

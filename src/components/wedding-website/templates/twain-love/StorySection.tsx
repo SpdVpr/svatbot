@@ -45,6 +45,7 @@ export default function StorySection({ content }: StorySectionProps) {
                         alt={item.title}
                         fill
                         className="object-cover hover:scale-110 transition-transform duration-500"
+                        sizes="(max-width: 768px) 100vw, 50vw"
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-[#b2c9d3] to-[#85aaba] flex items-center justify-center">

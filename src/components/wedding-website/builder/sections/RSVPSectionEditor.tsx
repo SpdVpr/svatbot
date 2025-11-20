@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { MessageSquare, Calendar, Users, Utensils, Music, Plus, X } from 'lucide-react'
+import { MessageSquare, Calendar, Users, Utensils, Music, Plus, X, Building2 } from 'lucide-react'
 import type { RSVPContent } from '@/types/wedding-website'
 
 interface RSVPSectionEditorProps {
@@ -169,6 +169,19 @@ export default function RSVPSectionEditor({ content, onChange }: RSVPSectionEdit
             <div>
               <span className="font-medium text-gray-900">Dietní omezení</span>
               <p className="text-sm text-gray-600">Pole pro alergie a dietní požadavky</p>
+            </div>
+          </label>
+
+          <label className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              checked={content.accommodationSelection || false}
+              onChange={(e) => handleInputChange('accommodationSelection', e.target.checked)}
+              className="rounded border-gray-300 text-pink-600 focus:ring-pink-500"
+            />
+            <div>
+              <span className="font-medium text-gray-900">Rezervace ubytování</span>
+              <p className="text-sm text-gray-600">Hosté si mohou vybrat a rezervovat pokoj z nabídky ubytování</p>
             </div>
           </label>
         </div>

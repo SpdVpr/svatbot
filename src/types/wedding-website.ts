@@ -142,6 +142,7 @@ export interface RSVPContent {
   plusOneAllowed: boolean
   songRequests: boolean
   dietaryRestrictions?: boolean
+  accommodationSelection?: boolean
   message?: string
   contactName?: string
   contactPhone?: string
@@ -389,6 +390,8 @@ export interface RSVPFormData {
   plusOneMealChoice?: string
   dietaryRestrictions?: string
   songRequest?: string
+  accommodationId?: string
+  roomId?: string
   message?: string
 }
 

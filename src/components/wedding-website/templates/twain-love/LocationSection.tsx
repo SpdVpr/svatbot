@@ -25,7 +25,7 @@ export default function LocationSection({ infoContent, scheduleContent }: Locati
       venue: infoContent.ceremony.venue,
       address: infoContent.ceremony.address,
       mapUrl: infoContent.ceremony.mapUrl,
-      image: '/templates/twain-love/ceremony.jpg'
+      image: infoContent.ceremony.images?.[0] || '/templates/twain-love/ceremony.jpg'
     })
   }
 
@@ -36,7 +36,7 @@ export default function LocationSection({ infoContent, scheduleContent }: Locati
       venue: infoContent.reception.venue,
       address: infoContent.reception.address,
       mapUrl: infoContent.reception.mapUrl,
-      image: '/templates/twain-love/reception.jpg'
+      image: infoContent.reception.images?.[0] || '/templates/twain-love/reception.jpg'
     })
   }
 
@@ -62,6 +62,7 @@ export default function LocationSection({ infoContent, scheduleContent }: Locati
                         alt={event.title}
                         fill
                         className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 42vw"
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-[#b2c9d3] to-[#85aaba]" />

@@ -137,7 +137,7 @@ export default function WeddingWebsiteBuilderPage() {
         await withDemoCheck(async () => {
           await createWebsite({
             customUrl,
-            template: 'classic-elegance', // Výchozí šablona
+            template: 'twain-love', // Výchozí šablona
             content,
             style: {
               colorTheme,

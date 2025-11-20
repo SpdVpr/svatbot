@@ -40,27 +40,27 @@ export default function GallerySection({ content }: GallerySectionProps) {
   }
 
   return (
-    <div id="gallery" className="py-20 bg-gray-50">
+    <div id="gallery" className="py-20" style={{ background: 'rgba(178,201,211,0.1)' }}>
       <SectionTitle title={content.title || 'Naše galerie'} />
 
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {images.map((image, index) => (
             <div
               key={image.id}
-              className="relative aspect-square overflow-hidden rounded-lg cursor-pointer group"
+              className="gallery-img cursor-pointer overflow-hidden mb-8"
               onClick={() => openLightbox(index)}
             >
-              <Image
-                src={image.url}
-                alt={image.caption || `Gallery image ${index + 1}`}
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
-                <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity text-4xl">
-                  +
-                </span>
+              <div className="thumbnail transition-transform duration-300 hover:scale-110">
+                <div className="relative w-full h-[450px]">
+                  <Image
+                    src={image.url}
+                    alt={image.caption || `Gallery image ${index + 1}`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                </div>
               </div>
             </div>
           ))}

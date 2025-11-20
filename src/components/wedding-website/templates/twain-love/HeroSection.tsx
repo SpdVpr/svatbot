@@ -40,6 +40,14 @@ export default function HeroSection({ content }: HeroSectionProps) {
             fill
             className="object-cover"
             priority
+            style={{
+              objectPosition: content.imagePosition
+                ? `${content.imagePosition.x}% ${content.imagePosition.y}%`
+                : 'center',
+              transform: content.imageScale
+                ? `scale(${content.imageScale / 100})`
+                : 'scale(1)'
+            }}
           />
           <div className="absolute inset-0 bg-black/30" />
         </div>
@@ -57,12 +65,12 @@ export default function HeroSection({ content }: HeroSectionProps) {
             <div className="relative w-[380px] h-[380px] rounded-full bg-[rgba(178,201,211,0.8)] flex flex-col items-center justify-center p-8">
               <div className="slide-subtitle mb-4">
                 <h4 className="text-white text-base tracking-wider uppercase" style={{ fontFamily: 'Muli, sans-serif' }}>
-                  We're Getting Married
+                  Bereme se
                 </h4>
               </div>
               <div className="slide-title mb-4">
                 <h2 className="text-white text-6xl" style={{ fontFamily: 'Great Vibes, cursive' }}>
-                  Save Our Date
+                  Uložte si datum
                 </h2>
               </div>
               <div className="slide-text">

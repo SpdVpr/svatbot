@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
 
 interface NavigationProps {
@@ -10,14 +10,30 @@ interface NavigationProps {
 
 export default function Navigation({ bride, groom }: NavigationProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 100)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const navItems = [
-    { label: 'Home', href: '#home' },
-    { label: 'Couple', href: '#couple' },
-    { label: 'Story', href: '#story' },
-    { label: 'Events', href: '#location' },
-    { label: 'Gallery', href: '#gallery' },
-    { label: 'Rsvp', href: '#rsvp' },
+    { label: 'Domů', href: '#home' },
+    { label: 'Náš příběh', href: '#story' },
+    { label: 'Místo konání', href: '#event' },
+    { label: 'Program', href: '#schedule' },
+    { label: 'Dress Code', href: '#dresscode' },
+    { label: 'Ubytování', href: '#accommodation' },
+    { label: 'Galerie', href: '#gallery' },
+    { label: 'RSVP', href: '#rsvp' },
+    { label: 'Dary', href: '#gift' },
+    { label: 'Menu', href: '#menu' },
+    { label: 'Kontakt', href: '#contact' },
+    { label: 'FAQ', href: '#faq' },
   ]
 
   const scrollToSection = (href: string) => {
@@ -30,13 +46,22 @@ export default function Navigation({ bride, groom }: NavigationProps) {
 
   return (
     <>
-      {/* Header - Absolute positioned over hero */}
-      <div className="absolute top-0 left-0 right-0 z-50 bg-[rgba(0,0,0,0.12)] border-b border-[rgba(255,255,255,0.1)]">
+      {/* Header - Changes from absolute to fixed on scroll */}
+      <div
+        className={`${isScrolled ? 'fixed' : 'absolute'} top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          isScrolled
+            ? 'bg-[#b2c9d3] shadow-md border-b border-[rgba(255,255,255,0.3)]'
+            : 'bg-[rgba(0,0,0,0.12)] border-b border-[rgba(255,255,255,0.1)]'
+        }`}
+      >
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <div className="py-8">
-              <h2 className="text-3xl text-white m-0" style={{ fontFamily: 'Great Vibes, cursive' }}>
+            <div className={`transition-all duration-300 ${isScrolled ? 'py-4' : 'py-8'}`}>
+              <h2
+                className="text-3xl m-0 text-white transition-colors duration-300"
+                style={{ fontFamily: 'Great Vibes, cursive' }}
+              >
                 {bride} & {groom}
               </h2>
             </div>
@@ -48,7 +73,11 @@ export default function Navigation({ bride, groom }: NavigationProps) {
                   <li key={item.href}>
                     <button
                       onClick={() => scrollToSection(item.href)}
-                      className="block px-6 py-9 text-white hover:text-[#b6e9ff] transition-colors duration-300"
+                      className={`block px-6 text-white transition-all duration-300 ${
+                        isScrolled
+                          ? 'py-6 hover:text-[#6a8a98]'
+                          : 'py-9 hover:text-[#b6e9ff]'
+                      }`}
                       style={{ fontFamily: 'Muli, sans-serif' }}
                     >
                       {item.label}
@@ -61,7 +90,7 @@ export default function Navigation({ bride, groom }: NavigationProps) {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden text-white hover:text-[#b6e9ff] transition-colors p-4"
+              className="lg:hidden text-white transition-colors p-4 hover:text-[#b6e9ff]"
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>

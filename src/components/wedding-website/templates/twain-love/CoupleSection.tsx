@@ -2,7 +2,6 @@
 
 import { StoryContent, HeroContent } from '@/types/wedding-website'
 import Image from 'next/image'
-import SectionTitle from './SectionTitle'
 
 interface CoupleSectionProps {
   content: StoryContent
@@ -15,14 +14,6 @@ export default function CoupleSection({
 }: CoupleSectionProps) {
   return (
     <div id="couple" className="py-20 bg-white">
-      <SectionTitle title={content.title || "Medailonky snoubců"} />
-
-      {content.subtitle && (
-        <p className="text-center text-gray-600 max-w-2xl mx-auto mb-12 px-4">
-          {content.subtitle}
-        </p>
-      )}
-
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto relative">
           {/* Bride */}
@@ -110,7 +101,7 @@ export default function CoupleSection({
           }
           .couple-wrap-3::after {
             position: absolute;
-            left: -30px;
+            left: -48px;
             top: 0px;
             background: url(/templates/twain-love/couple-icon2.png);
             content: '';

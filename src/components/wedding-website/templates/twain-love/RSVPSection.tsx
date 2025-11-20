@@ -1,7 +1,8 @@
 'use client'
 
 import { RSVPContent } from '@/types/wedding-website'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useAccommodation } from '@/hooks/useAccommodation'
 import SectionTitle from './SectionTitle'
 
 interface RSVPSectionProps {
@@ -10,17 +11,39 @@ interface RSVPSectionProps {
 }
 
 export default function RSVPSection({ content, websiteId }: RSVPSectionProps) {
+  const { accommodations, loading: accommodationsLoading } = useAccommodation()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     guests: '1',
     attending: 'attending',
+    accommodationId: '',
+    roomId: '',
     message: ''
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [availableRooms, setAvailableRooms] = useState<any[]>([])
+
+  // Get available rooms from selected accommodation
+  useEffect(() => {
+    if (formData.accommodationId && accommodations.length > 0) {
+      const selectedAccommodation = accommodations.find(acc => acc.id === formData.accommodationId)
+      if (selectedAccommodation && selectedAccommodation.rooms) {
+        const available = selectedAccommodation.rooms.filter(room => room.isAvailable)
+        setAvailableRooms(available)
+      } else {
+        setAvailableRooms([])
+      }
+    } else {
+      setAvailableRooms([])
+      setFormData(prev => ({ ...prev, roomId: '' }))
+    }
+  }, [formData.accommodationId, accommodations])
 
   if (!content.enabled) return null
+
+  const activeAccommodations = accommodations.filter(acc => acc.isActive)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -28,6 +51,7 @@ export default function RSVPSection({ content, websiteId }: RSVPSectionProps) {
 
     try {
       // TODO: Integrate with Firebase RSVP system
+      console.log('RSVP Form Data:', formData)
       await new Promise(resolve => setTimeout(resolve, 1000))
       setSubmitted(true)
     } catch (error) {
@@ -140,6 +164,64 @@ export default function RSVPSection({ content, websiteId }: RSVPSectionProps) {
                 </label>
               </div>
             </div>
+
+            {/* Accommodation Selection */}
+            {content.accommodationSelection && formData.attending === 'attending' && activeAccommodations.length > 0 && (
+              <div className="border-t border-gray-200 pt-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-4" style={{ fontFamily: 'Muli, sans-serif' }}>
+                  Rezervace ubytování
+                </h3>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Vyberte ubytování
+                    </label>
+                    <select
+                      value={formData.accommodationId}
+                      onChange={(e) => setFormData({ ...formData, accommodationId: e.target.value, roomId: '' })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#85aaba] focus:border-transparent"
+                    >
+                      <option value="">-- Nevybráno --</option>
+                      {activeAccommodations.map((acc) => (
+                        <option key={acc.id} value={acc.id}>
+                          {acc.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {formData.accommodationId && availableRooms.length > 0 && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Vyberte pokoj
+                      </label>
+                      <select
+                        value={formData.roomId}
+                        onChange={(e) => setFormData({ ...formData, roomId: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#85aaba] focus:border-transparent"
+                      >
+                        <option value="">-- Vyberte pokoj --</option>
+                        {availableRooms.map((room) => (
+                          <option key={room.id} value={room.id}>
+                            {room.name} - {room.pricePerNight ? `${room.pricePerNight} Kč/noc` : ''} (Kapacita: {room.capacity} {room.capacity === 1 ? 'osoba' : room.capacity <= 4 ? 'osoby' : 'osob'})
+                          </option>
+                        ))}
+                      </select>
+                      <p className="text-sm text-gray-500 mt-2">
+                        K dispozici {availableRooms.length} {availableRooms.length === 1 ? 'pokoj' : availableRooms.length <= 4 ? 'pokoje' : 'pokojů'}
+                      </p>
+                    </div>
+                  )}
+
+                  {formData.accommodationId && availableRooms.length === 0 && (
+                    <p className="text-sm text-amber-600 bg-amber-50 p-3 rounded-lg">
+                      Bohužel nejsou k dispozici žádné volné pokoje v tomto ubytování.
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">

@@ -47,12 +47,13 @@ export default function CountdownSection({ weddingDate }: CountdownSectionProps)
         <div className="flex flex-wrap justify-center items-center gap-4 md:gap-8">
           {/* Days */}
           <div
-            className="flex flex-col items-center justify-center w-[195px] h-[200px] relative pt-16 pb-6"
+            className="flex flex-col items-center justify-center w-[195px] h-[200px] relative pb-6"
             style={{
               backgroundImage: 'url(/templates/twain-love/vector2.png)',
               backgroundSize: 'cover',
               backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'center center'
+              backgroundPosition: 'center center',
+              paddingTop: '2rem'
             }}
           >
             <div className="text-4xl font-semibold text-gray-800" style={{ fontFamily: 'Great Vibes, cursive' }}>
@@ -65,12 +66,13 @@ export default function CountdownSection({ weddingDate }: CountdownSectionProps)
 
           {/* Hours */}
           <div
-            className="flex flex-col items-center justify-center w-[195px] h-[200px] relative pt-16 pb-6"
+            className="flex flex-col items-center justify-center w-[195px] h-[200px] relative pb-6"
             style={{
               backgroundImage: 'url(/templates/twain-love/vector2.png)',
               backgroundSize: 'cover',
               backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'center center'
+              backgroundPosition: 'center center',
+              paddingTop: '2rem'
             }}
           >
             <div className="text-4xl font-semibold text-gray-800" style={{ fontFamily: 'Great Vibes, cursive' }}>
@@ -83,12 +85,13 @@ export default function CountdownSection({ weddingDate }: CountdownSectionProps)
 
           {/* Minutes */}
           <div
-            className="flex flex-col items-center justify-center w-[195px] h-[200px] relative pt-16 pb-6"
+            className="flex flex-col items-center justify-center w-[195px] h-[200px] relative pb-6"
             style={{
               backgroundImage: 'url(/templates/twain-love/vector2.png)',
               backgroundSize: 'cover',
               backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'center center'
+              backgroundPosition: 'center center',
+              paddingTop: '2rem'
             }}
           >
             <div className="text-4xl font-semibold text-gray-800" style={{ fontFamily: 'Great Vibes, cursive' }}>
@@ -101,12 +104,13 @@ export default function CountdownSection({ weddingDate }: CountdownSectionProps)
 
           {/* Seconds */}
           <div
-            className="flex flex-col items-center justify-center w-[195px] h-[200px] relative pt-16 pb-6"
+            className="flex flex-col items-center justify-center w-[195px] h-[200px] relative pb-6"
             style={{
               backgroundImage: 'url(/templates/twain-love/vector2.png)',
               backgroundSize: 'cover',
               backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'center center'
+              backgroundPosition: 'center center',
+              paddingTop: '2rem'
             }}
           >
             <div className="text-4xl font-semibold text-gray-800" style={{ fontFamily: 'Great Vibes, cursive' }}>

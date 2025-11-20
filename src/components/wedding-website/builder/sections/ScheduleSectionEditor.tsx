@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
-import { Clock, Plus, X, Calendar, MapPin } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Clock, Plus, X, Calendar, MapPin, Sparkles, User } from 'lucide-react'
 import { useWeddingStore } from '@/stores/weddingStore'
+import { useWeddingDayTimeline } from '@/hooks/useWeddingDayTimeline'
 import type { ScheduleContent, ScheduleItem } from '@/types/wedding-website'
 
 interface ScheduleSectionEditorProps {
@@ -12,6 +13,8 @@ interface ScheduleSectionEditorProps {
 
 export default function ScheduleSectionEditor({ content, onChange }: ScheduleSectionEditorProps) {
   const { currentWedding: wedding } = useWeddingStore()
+  const { manualTimeline, aiTimeline, loading: timelineLoading } = useWeddingDayTimeline()
+  const [importing, setImporting] = useState(false)
 
   const handleInputChange = (field: keyof ScheduleContent, value: any) => {
     onChange({
@@ -48,82 +51,133 @@ export default function ScheduleSectionEditor({ content, onChange }: ScheduleSec
     handleInputChange('items', filteredItems)
   }
 
-  // Auto-import dat ze svatby
-  const importFromWedding = () => {
-    if (!wedding) return
+  // Map category to icon
+  const getCategoryIcon = (category: string): string => {
+    const iconMap: Record<string, string> = {
+      'preparation': '💄',
+      'ceremony': '⛪',
+      'photography': '📸',
+      'reception': '🍽️',
+      'party': '🎵'
+    }
+    return iconMap[category] || '⛪'
+  }
 
-    const weddingDate = wedding.weddingDate
-    const ceremonyTime = '14:00' // Default ceremony time
-    const receptionTime = '18:00' // Default reception time
+  // Import from manual timeline
+  const importManualTimeline = () => {
+    if (!manualTimeline || manualTimeline.length === 0) {
+      alert('Nemáte žádný ručně vytvořený harmonogram')
+      return
+    }
 
-    const defaultSchedule: ScheduleItem[] = [
-      {
-        time: ceremonyTime || '14:00',
-        title: 'Svatební obřad',
-        description: typeof wedding.venue === 'string' ? wedding.venue : wedding.venue?.name || 'Místo obřadu',
-        icon: '⛪'
-      },
-      {
-        time: '15:00',
-        title: 'Fotografování',
-        description: 'Společné fotky s rodinou a přáteli',
-        icon: '📸'
-      },
-      {
-        time: '17:00',
-        title: 'Příjezd hostů',
-        description: 'Vítání hostů na hostině',
-        icon: '🚗'
-      },
-      {
-        time: receptionTime || '18:00',
-        title: 'Svatební hostina',
-        description: 'Slavnostní večeře',
-        icon: '🍽️'
-      },
-      {
-        time: '21:00',
-        title: 'První tanec',
-        description: 'Otevření tanečního parketu',
-        icon: '💃'
-      },
-      {
-        time: '22:00',
-        title: 'Zábava do rána',
-        description: 'DJ a živá hudba',
-        icon: '🎵'
-      }
-    ]
+    setImporting(true)
+
+    const importedItems: ScheduleItem[] = manualTimeline.map(item => ({
+      time: item.time,
+      title: item.activity,
+      description: item.notes || item.location || '',
+      icon: getCategoryIcon(item.category)
+    }))
 
     const updatedContent: ScheduleContent = {
       ...content,
       enabled: true,
-      items: content.items && content.items.length > 0 ? content.items : defaultSchedule
+      items: importedItems
     }
 
     onChange(updatedContent)
+    setImporting(false)
+    alert(`✅ Naimportováno ${importedItems.length} položek z ručního harmonogramu`)
+  }
+
+  // Import from AI timeline
+  const importAITimeline = () => {
+    if (!aiTimeline || aiTimeline.length === 0) {
+      alert('Nemáte žádný AI vygenerovaný harmonogram')
+      return
+    }
+
+    setImporting(true)
+
+    const importedItems: ScheduleItem[] = aiTimeline.map(item => ({
+      time: item.time,
+      title: item.activity,
+      description: item.notes || item.location || '',
+      icon: getCategoryIcon(item.category)
+    }))
+
+    const updatedContent: ScheduleContent = {
+      ...content,
+      enabled: true,
+      items: importedItems
+    }
+
+    onChange(updatedContent)
+    setImporting(false)
+    alert(`✅ Naimportováno ${importedItems.length} položek z AI harmonogramu`)
   }
 
   return (
     <div className="p-6 space-y-6">
-      {/* Auto-import */}
+      {/* Import Options */}
       {wedding && (
-        <div className="bg-blue-50 rounded-lg p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="font-semibold text-blue-900 mb-1">
-                Importovat ze svatby
-              </h4>
-              <p className="text-sm text-blue-700">
-                Vytvoří základní program svatby na základě vašich údajů
-              </p>
+        <div className="space-y-3">
+          <h4 className="font-semibold text-gray-900 mb-3">
+            Importovat harmonogram
+          </h4>
+
+          {/* Import Manual Timeline */}
+          <div className="bg-blue-50 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <User className="w-5 h-5 text-blue-600" />
+                <div>
+                  <h5 className="font-semibold text-blue-900 mb-1">
+                    Můj harmonogram
+                  </h5>
+                  <p className="text-sm text-blue-700">
+                    {manualTimeline.length > 0
+                      ? `Naimportovat ${manualTimeline.length} položek z ručně vytvořeného harmonogramu`
+                      : 'Nemáte žádný ručně vytvořený harmonogram'
+                    }
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={importManualTimeline}
+                disabled={manualTimeline.length === 0 || importing || timelineLoading}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {importing ? 'Importuji...' : 'Importovat'}
+              </button>
             </div>
-            <button
-              onClick={importFromWedding}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm"
-            >
-              Importovat
-            </button>
+          </div>
+
+          {/* Import AI Timeline */}
+          <div className="bg-purple-50 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Sparkles className="w-5 h-5 text-purple-600" />
+                <div>
+                  <h5 className="font-semibold text-purple-900 mb-1">
+                    AI harmonogram
+                  </h5>
+                  <p className="text-sm text-purple-700">
+                    {aiTimeline.length > 0
+                      ? `Naimportovat ${aiTimeline.length} položek z AI vygenerovaného harmonogramu`
+                      : 'Nemáte žádný AI vygenerovaný harmonogram'
+                    }
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={importAITimeline}
+                disabled={aiTimeline.length === 0 || importing || timelineLoading}
+                className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {importing ? 'Importuji...' : 'Importovat'}
+              </button>
+            </div>
           </div>
         </div>
       )}
