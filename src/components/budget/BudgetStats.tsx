@@ -1,6 +1,7 @@
 'use client'
 
 import { useBudget } from '@/hooks/useBudget'
+import { useCurrency } from '@/contexts/CurrencyContext'
 import { BUDGET_CATEGORIES } from '@/types/budget'
 import BudgetList from './BudgetList'
 import {
@@ -33,14 +34,7 @@ export default function BudgetStats({
   onEditItem
 }: BudgetStatsProps) {
   const { budgetItems, stats } = useBudget()
-
-  // Format currency
-  const formatCurrency = (amount: number, currency: string = 'CZK') => {
-    return new Intl.NumberFormat('cs-CZ', {
-      style: 'currency',
-      currency: currency
-    }).format(amount)
-  }
+  const { formatCurrency } = useCurrency()
 
   // Calculate category stats
   const categoryStats = Object.entries(BUDGET_CATEGORIES).map(([key, category]) => {

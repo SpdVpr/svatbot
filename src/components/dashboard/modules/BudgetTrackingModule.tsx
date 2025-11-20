@@ -1,19 +1,20 @@
 'use client'
 
 import Link from 'next/link'
-import { DollarSign, TrendingUp, AlertCircle, ArrowRight } from 'lucide-react'
+import { DollarSign, TrendingUp, AlertCircle, ArrowRight, Coins } from 'lucide-react'
 import { useBudget } from '@/hooks/useBudget'
-import { currencyUtils } from '@/utils'
+import { useCurrency } from '@/contexts/CurrencyContext'
 import NumberCounter from '@/components/animations/NumberCounter'
 
 export default function BudgetTrackingModule() {
   const { stats } = useBudget()
+  const { formatCurrencyShort } = useCurrency()
 
   return (
     <div className="wedding-card h-[353px] flex flex-col">
       <Link href="/budget" className="block mb-4 flex-shrink-0">
         <h3 className="text-base sm:text-lg font-semibold flex items-center justify-start sm:justify-center space-x-2 hover:text-primary-600 transition-colors">
-          <span className="text-sm sm:text-base text-green-600 font-bold flex-shrink-0">Kč</span>
+          <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" />
           <span className="truncate">Rozpočet</span>
         </h3>
       </Link>
@@ -24,12 +25,7 @@ export default function BudgetTrackingModule() {
           <div className="bg-primary-50 p-3 rounded-lg glass-morphism">
             <div className="text-center">
               <div className="text-2xl font-bold text-primary-600">
-                <NumberCounter
-                  end={Math.round(stats.totalBudget / 1000)}
-                  duration={2000}
-                  suffix="k Kč"
-                  className="inline-block"
-                />
+                {formatCurrencyShort(stats.totalBudget)}
               </div>
               <div className="text-sm text-primary-700">Celkový rozpočet</div>
             </div>
@@ -42,12 +38,7 @@ export default function BudgetTrackingModule() {
                 <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary-600" />
               </div>
               <div className="text-sm sm:text-lg font-bold text-gray-900">
-                <NumberCounter
-                  end={Math.round(stats.totalPaid / 1000)}
-                  duration={1800}
-                  suffix="k Kč"
-                  className="inline-block"
-                />
+                {formatCurrencyShort(stats.totalPaid)}
               </div>
               <div className="text-xs text-gray-500">Zaplaceno</div>
             </div>
@@ -56,12 +47,7 @@ export default function BudgetTrackingModule() {
                 <AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary-600" />
               </div>
               <div className="text-sm sm:text-lg font-bold text-gray-900">
-                <NumberCounter
-                  end={Math.round((stats.totalBudget - stats.totalPaid) / 1000)}
-                  duration={1800}
-                  suffix="k Kč"
-                  className="inline-block"
-                />
+                {formatCurrencyShort(stats.totalBudget - stats.totalPaid)}
               </div>
               <div className="text-xs text-gray-500">Zbývá</div>
             </div>

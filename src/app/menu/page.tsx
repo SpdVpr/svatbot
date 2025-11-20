@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useWedding } from '@/hooks/useWedding'
 import { useMenu } from '@/hooks/useMenu'
+import { useCurrency } from '@/contexts/CurrencyContext'
 import { MenuItem, DrinkItem, MenuFormData, DrinkFormData } from '@/types/menu'
 import MenuItemForm from '@/components/menu/MenuItemForm'
 import DrinkItemForm from '@/components/menu/DrinkItemForm'
@@ -27,18 +28,19 @@ import { FOOD_CATEGORY_LABELS, DRINK_CATEGORY_LABELS, FoodCategory, DrinkCategor
 export default function MenuPage() {
   const { user } = useAuth()
   const { wedding } = useWedding()
-  const { 
-    menuItems, 
-    drinkItems, 
-    loading, 
+  const { formatCurrencyShort } = useCurrency()
+  const {
+    menuItems,
+    drinkItems,
+    loading,
     stats,
-    createMenuItem, 
+    createMenuItem,
     updateMenuItem,
     deleteMenuItem,
     createDrinkItem,
     updateDrinkItem,
     deleteDrinkItem,
-    error 
+    error
   } = useMenu()
 
   const [activeTab, setActiveTab] = useState<'food' | 'drinks'>('food')
@@ -216,7 +218,7 @@ export default function MenuPage() {
               <div>
                 <p className="text-sm text-gray-600">Odhadované náklady</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {(stats.totalEstimatedCost / 1000).toFixed(0)}k Kč
+                  {formatCurrencyShort(stats.totalEstimatedCost)}
                 </p>
               </div>
               <Coins className="w-8 h-8 text-primary-600" />

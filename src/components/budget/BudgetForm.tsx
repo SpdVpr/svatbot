@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { BudgetFormData, BudgetCategory, PaymentStatus, PaymentMethod, PaymentPeriod, BudgetItemPayment, BudgetSubItem, BUDGET_CATEGORIES, Document } from '@/types/budget'
 import { useVendor } from '@/hooks/useVendor'
+import { useCurrency } from '@/contexts/CurrencyContext'
 import DocumentUpload, { DocumentItem } from '@/components/common/DocumentUpload'
 import {
   X,
@@ -34,6 +35,7 @@ export default function BudgetForm({
   initialData
 }: BudgetFormProps) {
   const { vendors } = useVendor()
+  const { currency: selectedCurrency, formatCurrency: formatCurrencyFromContext } = useCurrency()
   const [formData, setFormData] = useState<BudgetFormData>({
     name: initialData?.name || '',
     description: initialData?.description || '',
@@ -41,7 +43,7 @@ export default function BudgetForm({
     budgetedAmount: initialData?.budgetedAmount || 0,
     actualAmount: initialData?.actualAmount || 0,
     paidAmount: initialData?.paidAmount || 0,
-    currency: initialData?.currency || 'CZK',
+    currency: initialData?.currency || selectedCurrency,
     vendorName: initialData?.vendorName || '',
     paymentStatus: initialData?.paymentStatus || 'pending',
     paymentMethod: initialData?.paymentMethod || undefined,
@@ -110,10 +112,18 @@ export default function BudgetForm({
   ]
 
   // Format currency
-  const formatCurrency = (amount: number, currency: string = 'CZK') => {
+  const formatCurrency = (amount: number) => {
+    return formatCurrencyFromContext(amount)
+  }
+
+  // Format currency with specific currency code
+  const formatCurrencyWithCode = (amount: number, currencyCode?: string) => {
+    const code = currencyCode || selectedCurrency
     return new Intl.NumberFormat('cs-CZ', {
       style: 'currency',
-      currency: currency
+      currency: code,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(amount)
   }
 
@@ -812,7 +822,7 @@ export default function BudgetForm({
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
                       <div>
                         <span className="text-gray-500">Částka:</span>
-                        <p className="font-medium">{formatCurrency(payment.amount, payment.currency)}</p>
+                        <p className="font-medium">{formatCurrencyWithCode(payment.amount, payment.currency)}</p>
                       </div>
                       <div>
                         <span className="text-gray-500">Datum:</span>

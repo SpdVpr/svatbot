@@ -3,6 +3,7 @@
 import { useState, Suspense } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useWedding } from '@/hooks/useWedding'
+import { useCurrency } from '@/contexts/CurrencyContext'
 import { useSearchParams } from 'next/navigation'
 import {
   Bot,
@@ -42,6 +43,7 @@ const formatDate = (date: any): string => {
 function AIPageContent() {
   const { user } = useAuth()
   const { wedding } = useWedding()
+  const { formatCurrency } = useCurrency()
   const searchParams = useSearchParams()
   const [quickSearchQuery, setQuickSearchQuery] = useState<string | null>(null)
 
@@ -161,7 +163,7 @@ function AIPageContent() {
                   <span className="text-gray-500">Rozpočet:</span>
                   <div className="font-medium">
                     {wedding.budget
-                      ? `${wedding.budget.toLocaleString()} Kč`
+                      ? formatCurrency(wedding.budget)
                       : 'Neurčeno'
                     }
                   </div>

@@ -4,6 +4,7 @@ import { use, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Bed, Save, Users, DollarSign, Plus, X, Copy } from 'lucide-react'
 import { useAccommodation, type RoomFormData } from '@/hooks/useAccommodation'
+import { useCurrency } from '@/contexts/CurrencyContext'
 import type { RoomType, BedType } from '@/types'
 import SimpleRoomImageUpload from '@/components/accommodation/SimpleRoomImageUpload'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
@@ -19,6 +20,7 @@ export default function NewRoomPage({ params }: NewRoomPageProps) {
   const { id } = use(params)
 
   const router = useRouter()
+  const { currency } = useCurrency()
   const { getAccommodationById, addRoom, loading, accommodations } = useAccommodation()
   const accommodation = getAccommodationById(id)
   
@@ -272,7 +274,7 @@ export default function NewRoomPage({ params }: NewRoomPageProps) {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Cena za noc (Kč) *
+                  Cena za noc ({currency}) *
                 </label>
                 <input
                   type="number"

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { BudgetItem, BudgetFilters, BudgetViewOptions, BUDGET_CATEGORIES } from '@/types/budget'
 import { useBudget } from '@/hooks/useBudget'
+import { useCurrency } from '@/contexts/CurrencyContext'
 import {
   Search,
   Filter,
@@ -42,16 +43,17 @@ export default function BudgetList({
   onCreateItem,
   onEditItem
 }: BudgetListProps) {
-  const { 
-    budgetItems, 
-    loading, 
-    error, 
-    stats, 
-    updateBudgetItem, 
+  const {
+    budgetItems,
+    loading,
+    error,
+    stats,
+    updateBudgetItem,
     deleteBudgetItem,
     recordPayment,
-    clearError 
+    clearError
   } = useBudget()
+  const { currency: selectedCurrency, formatCurrency: formatCurrencyFromContext } = useCurrency()
 
   const [filters, setFilters] = useState<BudgetFilters>({})
   const [viewOptions, setViewOptions] = useState<BudgetViewOptions>({
@@ -60,17 +62,25 @@ export default function BudgetList({
     sortOrder: 'asc',
     showPaid: true,
     showEstimates: true,
-    currency: 'CZK'
+    currency: selectedCurrency
   })
   const [searchTerm, setSearchTerm] = useState('')
   const [showFiltersPanel, setShowFiltersPanel] = useState(false)
   const [selectedItems, setSelectedItems] = useState<string[]>([])
 
   // Format currency
-  const formatCurrency = (amount: number, currency: string = 'CZK') => {
+  const formatCurrency = (amount: number) => {
+    return formatCurrencyFromContext(amount)
+  }
+
+  // Format currency with specific currency code
+  const formatCurrencyWithCode = (amount: number, currencyCode?: string) => {
+    const code = currencyCode || selectedCurrency
     return new Intl.NumberFormat('cs-CZ', {
       style: 'currency',
-      currency: currency
+      currency: code,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(amount)
   }
 
@@ -514,15 +524,15 @@ export default function BudgetList({
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-2">
                           <div>
                             <span className="text-gray-500">Předběžná částka:</span>
-                            <p className="font-medium">{formatCurrency(item.budgetedAmount, item.currency)}</p>
+                            <p className="font-medium">{formatCurrencyWithCode(item.budgetedAmount, item.currency)}</p>
                           </div>
                           <div>
                             <span className="text-gray-500">Skutečnost:</span>
                             <p className={`font-medium ${isOverBudget ? 'text-red-600' : 'text-gray-900'}`}>
-                              {formatCurrency(item.actualAmount, item.currency)}
+                              {formatCurrencyWithCode(item.actualAmount, item.currency)}
                               {isOverBudget && (
                                 <span className="ml-1 text-xs">
-                                  (+{formatCurrency(item.actualAmount - item.budgetedAmount, item.currency)})
+                                  (+{formatCurrencyWithCode(item.actualAmount - item.budgetedAmount, item.currency)})
                                 </span>
                               )}
                             </p>
@@ -530,13 +540,13 @@ export default function BudgetList({
                           <div>
                             <span className="text-gray-500">Zaplaceno:</span>
                             <p className="font-medium text-green-600">
-                              {formatCurrency(item.paidAmount, item.currency)}
+                              {formatCurrencyWithCode(item.paidAmount, item.currency)}
                             </p>
                           </div>
                           <div>
                             <span className="text-gray-500">Zbývá:</span>
                             <p className="font-medium">
-                              {formatCurrency(item.actualAmount - item.paidAmount, item.currency)}
+                              {formatCurrencyWithCode(item.actualAmount - item.paidAmount, item.currency)}
                             </p>
                           </div>
                         </div>
@@ -549,7 +559,7 @@ export default function BudgetList({
                                 Rozdělení položky ({item.subItems.length})
                               </span>
                               <span className="text-sm font-bold text-primary-600">
-                                Celkem: {formatCurrency(item.subItems.reduce((sum, sub) => sum + sub.amount, 0), item.currency)}
+                                Celkem: {formatCurrencyWithCode(item.subItems.reduce((sum, sub) => sum + sub.amount, 0), item.currency)}
                               </span>
                             </div>
                             <div className="space-y-1">
@@ -560,7 +570,7 @@ export default function BudgetList({
                                     {subItem.notes && <span className="text-gray-600 ml-1">({subItem.notes})</span>}
                                   </span>
                                   <span className="font-medium text-gray-900">
-                                    {formatCurrency(subItem.amount, subItem.currency)}
+                                    {formatCurrencyWithCode(subItem.amount, subItem.currency)}
                                   </span>
                                 </div>
                               ))}
@@ -589,7 +599,7 @@ export default function BudgetList({
                                 Platby ({item.payments.length})
                               </span>
                               <span className="text-sm text-gray-500">
-                                Celkem: {formatCurrency(item.payments.reduce((sum, p) => sum + p.amount, 0))}
+                                Celkem: {formatCurrencyWithCode(item.payments.reduce((sum, p) => sum + p.amount, 0), item.currency)}
                               </span>
                             </div>
                             <div className="space-y-2">
@@ -602,7 +612,7 @@ export default function BudgetList({
                                       payment.status === 'failed' ? 'bg-red-500' :
                                       'bg-gray-400'
                                     }`} />
-                                    <span className="font-medium">{formatCurrency(payment.amount, payment.currency)}</span>
+                                    <span className="font-medium">{formatCurrencyWithCode(payment.amount, payment.currency)}</span>
                                     <span className="text-gray-500">
                                       {payment.date instanceof Date ?
                                         payment.date.toLocaleDateString('cs-CZ') :

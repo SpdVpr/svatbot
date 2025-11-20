@@ -15,7 +15,7 @@ import {
   List
 } from 'lucide-react'
 import { useShopping } from '@/hooks/useShopping'
-import { currencyUtils } from '@/utils'
+import { useCurrency } from '@/contexts/CurrencyContext'
 import ShoppingItemCard from '@/components/shopping/ShoppingItemCard'
 import ShoppingItemForm from '@/components/shopping/ShoppingItemForm'
 import ModuleHeader from '@/components/common/ModuleHeader'
@@ -24,6 +24,7 @@ import { ShoppingCategory, SHOPPING_CATEGORIES } from '@/types/shopping'
 export default function ShoppingPage() {
   const router = useRouter()
   const { items, stats, loading } = useShopping()
+  const { formatCurrency } = useCurrency()
   const [showForm, setShowForm] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [filterCategory, setFilterCategory] = useState<ShoppingCategory | 'all'>('all')
@@ -56,7 +57,7 @@ export default function ShoppingPage() {
       <ModuleHeader
         icon={ShoppingCart}
         title="Nákupní seznam"
-        subtitle={`${stats.totalItems} produktů • ${stats.purchasedItems} zakoupeno • ${currencyUtils.format(stats.totalValue)} Kč`}
+        subtitle={`${stats.totalItems} produktů • ${stats.purchasedItems} zakoupeno • ${formatCurrency(stats.totalValue)}`}
         iconGradient="from-amber-500 to-orange-500"
         actions={
           <button
@@ -127,10 +128,10 @@ export default function ShoppingPage() {
               <div className="flex-1">
                 <p className="text-sm text-gray-600 mb-1">Celková hodnota</p>
                 <p className="text-3xl font-bold text-primary-600 mb-1">
-                  {currencyUtils.format(stats.totalValue)}
+                  {formatCurrency(stats.totalValue)}
                 </p>
                 <p className="text-xs text-gray-500">
-                  Zaplaceno: {currencyUtils.format(stats.purchasedValue)}
+                  Zaplaceno: {formatCurrency(stats.purchasedValue)}
                 </p>
               </div>
               <div className="p-3 rounded-xl bg-primary-100">

@@ -21,6 +21,7 @@ import {
 } from 'lucide-react'
 import { useAccommodationWithGuests } from '@/hooks/useAccommodationWithGuests'
 import { useAccommodation } from '@/hooks/useAccommodation'
+import { useCurrency } from '@/contexts/CurrencyContext'
 import type { Room } from '@/types'
 import RoomImageGallery, { useRoomImageGallery } from '@/components/accommodation/RoomImageGallery'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
@@ -36,6 +37,7 @@ export default function AccommodationDetailPage({ params }: AccommodationDetailP
   const { id } = use(params)
 
   const router = useRouter()
+  const { formatCurrency } = useCurrency()
   const { getAccommodationWithOccupancy, loading, accommodations } = useAccommodationWithGuests()
   const { deleteRoom } = useAccommodation()
   // Removed tabs - show rooms directly
@@ -232,7 +234,7 @@ export default function AccommodationDetailPage({ params }: AccommodationDetailP
                           <span>{room.capacity} osob</span>
                         </div>
                         <div className="font-semibold text-primary-600">
-                          {room.pricePerNight.toLocaleString()} Kč/noc
+                          {formatCurrency(room.pricePerNight)}/noc
                         </div>
                       </div>
 

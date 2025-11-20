@@ -1,13 +1,13 @@
 'use client'
 
 import Link from 'next/link'
-import { 
-  List, 
-  Users, 
-  DollarSign, 
-  Calendar, 
-  Briefcase, 
-  Grid3X3, 
+import {
+  List,
+  Users,
+  DollarSign,
+  Calendar,
+  Briefcase,
+  Grid3X3,
   Mail,
   ArrowRight,
   CheckCircle
@@ -16,12 +16,14 @@ import { useTask } from '@/hooks/useTask'
 import { useGuest } from '@/hooks/useGuest'
 import { useBudget } from '@/hooks/useBudget'
 import { useCalendar } from '@/hooks/useCalendar'
+import { useCurrency } from '@/contexts/CurrencyContext'
 
 export default function MainFeaturesModule() {
   const { stats } = useTask()
   const { stats: guestStats } = useGuest()
   const { stats: budgetStats } = useBudget()
   const { stats: calendarStats } = useCalendar()
+  const { formatCurrencyShort } = useCurrency()
 
   const mainFeatures = [
     {
@@ -49,7 +51,7 @@ export default function MainFeaturesModule() {
       title: 'Budget Tracking',
       subtitle: 'Rozpočet svatby',
       description: budgetStats.totalBudget > 0 ? `${budgetStats.budgetUsed}% využito` : 'Sledujte svatební rozpočet',
-      value: budgetStats.totalBudget > 0 ? `${Math.round(budgetStats.totalPaid / 1000)}k Kč` : '0 Kč',
+      value: budgetStats.totalBudget > 0 ? formatCurrencyShort(budgetStats.totalPaid) : formatCurrencyShort(0),
       color: 'text-green-600 bg-green-100',
       href: '/budget',
       status: budgetStats.totalBudget > 0 ? 'active' : 'empty'

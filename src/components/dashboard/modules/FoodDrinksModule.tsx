@@ -3,10 +3,11 @@
 import Link from 'next/link'
 import { UtensilsCrossed, Wine, ArrowRight } from 'lucide-react'
 import { useMenu } from '@/hooks/useMenu'
-import { currencyUtils } from '@/utils'
+import { useCurrency } from '@/contexts/CurrencyContext'
 
 export default function FoodDrinksModule() {
   const { stats } = useMenu()
+  const { formatCurrencyShort } = useCurrency()
 
   return (
     <div className="wedding-card h-[353px] flex flex-col">
@@ -22,7 +23,7 @@ export default function FoodDrinksModule() {
           {/* Cost Overview */}
           <div className="bg-primary-50 p-3 rounded-lg text-center glass-morphism">
             <div className="text-2xl font-bold text-primary-600">
-              {currencyUtils.formatShort(stats.totalEstimatedCost)}
+              {formatCurrencyShort(stats.totalEstimatedCost)}
             </div>
             <div className="text-sm text-primary-700">Odhadované náklady</div>
           </div>

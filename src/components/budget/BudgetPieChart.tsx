@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { PieChart as PieChartIcon } from 'lucide-react'
 import { BUDGET_CATEGORIES } from '@/types/budget'
+import { useCurrency } from '@/contexts/CurrencyContext'
 
 interface CategoryStat {
   key: string
@@ -49,20 +50,11 @@ const CHART_COLORS = [
 
 export default function BudgetPieChart({ categoryStats }: BudgetPieChartProps) {
   const [isClient, setIsClient] = useState(false)
+  const { formatCurrency } = useCurrency()
 
   useEffect(() => {
     setIsClient(true)
   }, [])
-
-  // Formátování měny
-  const formatCurrency = (amount: number, currency: string = 'CZK') => {
-    return new Intl.NumberFormat('cs-CZ', {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(amount)
-  }
 
   // Příprava dat pro graf - používáme skutečné náklady (actual)
   const chartData = categoryStats

@@ -22,7 +22,8 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { Vendor, VendorFilters, VENDOR_CATEGORIES, VENDOR_STATUSES } from '@/types/vendor'
-import { currencyUtils, dateUtils } from '@/utils'
+import { useCurrency } from '@/contexts/CurrencyContext'
+import { dateUtils } from '@/utils'
 import { useColorTheme } from '@/hooks/useColorTheme'
 
 interface VendorListProps {
@@ -43,6 +44,7 @@ export default function VendorList({
   loading = false
 }: VendorListProps) {
   const { currentPalette } = useColorTheme()
+  const { formatCurrencyShort } = useCurrency()
   const [filters, setFilters] = useState<VendorFilters>({
     search: '',
     showCompleted: true
@@ -456,18 +458,18 @@ export default function VendorList({
                                           {/* Original price (crossed out) with discount percentage */}
                                           <div className="text-xs text-gray-500 line-through">
                                             {originalMin === originalMax ? (
-                                              <span>{currencyUtils.formatShort(originalMin)}</span>
+                                              <span>{formatCurrencyShort(originalMin)}</span>
                                             ) : (
-                                              <span>{currencyUtils.formatShort(originalMin)} - {currencyUtils.formatShort(originalMax)}</span>
+                                              <span>{formatCurrencyShort(originalMin)} - {formatCurrencyShort(originalMax)}</span>
                                             )}
                                             <span className="text-green-600 font-medium ml-1 no-underline">-{discountPercent}%</span>
                                           </div>
                                           {/* Discounted price (larger, main) */}
                                           <div className="text-base font-bold text-gray-900 mt-1">
                                             {vendor.priceRange.min === vendor.priceRange.max ? (
-                                              <span>{currencyUtils.formatShort(vendor.priceRange.min)}</span>
+                                              <span>{formatCurrencyShort(vendor.priceRange.min)}</span>
                                             ) : (
-                                              <span>{currencyUtils.formatShort(vendor.priceRange.min)} - {currencyUtils.formatShort(vendor.priceRange.max)}</span>
+                                              <span>{formatCurrencyShort(vendor.priceRange.min)} - {formatCurrencyShort(vendor.priceRange.max)}</span>
                                             )}
                                           </div>
                                           {/* Price type */}
@@ -485,9 +487,9 @@ export default function VendorList({
                                     <div>
                                       <div className="text-sm font-medium text-gray-900">
                                         {vendor.priceRange.min === vendor.priceRange.max ? (
-                                          <span>{currencyUtils.formatShort(vendor.priceRange.min)}</span>
+                                          <span>{formatCurrencyShort(vendor.priceRange.min)}</span>
                                         ) : (
-                                          <span>{currencyUtils.formatShort(vendor.priceRange.min)} - {currencyUtils.formatShort(vendor.priceRange.max)}</span>
+                                          <span>{formatCurrencyShort(vendor.priceRange.min)} - {formatCurrencyShort(vendor.priceRange.max)}</span>
                                         )}
                                       </div>
                                       {/* Price type */}
@@ -517,7 +519,7 @@ export default function VendorList({
                                       <div key={idx}>
                                         {displayPrice ? (
                                           <div>
-                                            <span>{currencyUtils.formatShort(displayPrice)}</span>
+                                            <span>{formatCurrencyShort(displayPrice)}</span>
                                             {hasDiscount && (
                                               <span className="text-green-600 ml-1">(-{discountPercent}%)</span>
                                             )}

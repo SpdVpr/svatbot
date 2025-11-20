@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { X, Plus, Trash2 } from 'lucide-react'
 import { MenuFormData, MenuSubItem, FOOD_CATEGORY_LABELS, MENU_STATUS_LABELS, SERVING_STYLE_OPTIONS, COMMON_ALLERGENS } from '@/types/menu'
+import { useCurrency } from '@/contexts/CurrencyContext'
 
 interface MenuItemFormProps {
   onSubmit: (data: MenuFormData) => Promise<void>
@@ -12,6 +13,7 @@ interface MenuItemFormProps {
 }
 
 export default function MenuItemForm({ onSubmit, onCancel, initialData, loading }: MenuItemFormProps) {
+  const { currency } = useCurrency()
   const [formData, setFormData] = useState<MenuFormData>({
     name: initialData?.name || '',
     description: initialData?.description || '',
@@ -223,7 +225,7 @@ export default function MenuItemForm({ onSubmit, onCancel, initialData, loading 
                           />
                           <input
                             type="number"
-                            placeholder="Cena (Kč)"
+                            placeholder={`Cena (${currency})`}
                             value={subItem.price || ''}
                             onChange={(e) => updateSubItem(subItem.id, 'price', e.target.value ? parseFloat(e.target.value) : undefined)}
                             className="col-span-3 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -283,7 +285,7 @@ export default function MenuItemForm({ onSubmit, onCancel, initialData, loading 
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Cena za porci (Kč)
+                  Cena za porci ({currency})
                 </label>
                 <input
                   type="number"
@@ -296,7 +298,7 @@ export default function MenuItemForm({ onSubmit, onCancel, initialData, loading 
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Celková cena (Kč)
+                  Celková cena ({currency})
                 </label>
                 <input
                   type="number"

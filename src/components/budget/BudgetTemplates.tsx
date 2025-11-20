@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import { BudgetTemplate, BUDGET_CATEGORIES } from '@/types/budget'
-import { 
-  X, 
-  Target, 
+import { useCurrency } from '@/contexts/CurrencyContext'
+import {
+  X,
+  Target,
   Check,
   AlertCircle,
   DollarSign,
@@ -311,6 +312,7 @@ export default function BudgetTemplates({
   loading = false, 
   error 
 }: BudgetTemplatesProps) {
+  const { formatCurrency: formatCurrencyFromContext } = useCurrency()
   const [selectedTemplate, setSelectedTemplate] = useState<BudgetTemplate | null>(null)
   const [customBudget, setCustomBudget] = useState<number>(0)
   const [step, setStep] = useState<'select' | 'configure'>('select')
@@ -335,10 +337,7 @@ export default function BudgetTemplates({
 
   // Format currency
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('cs-CZ', {
-      style: 'currency',
-      currency: 'CZK'
-    }).format(amount)
+    return formatCurrencyFromContext(amount)
   }
 
   // Get template icon

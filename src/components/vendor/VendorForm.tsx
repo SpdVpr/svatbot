@@ -17,6 +17,7 @@ import {
   FileText
 } from 'lucide-react'
 import { VendorFormData, VendorCategory, VendorStatus, VendorDocument, VENDOR_CATEGORIES, VENDOR_STATUSES } from '@/types/vendor'
+import { useCurrency } from '@/contexts/CurrencyContext'
 import { ensureUrlProtocol } from '@/utils/url'
 import DocumentUpload, { DocumentItem } from '@/components/common/DocumentUpload'
 
@@ -28,6 +29,7 @@ interface VendorFormProps {
 }
 
 export default function VendorForm({ onSubmit, onCancel, initialData, isEditing = false }: VendorFormProps) {
+  const { currency } = useCurrency()
   const [formData, setFormData] = useState<VendorFormData>({
     name: initialData?.name || '',
     category: initialData?.category || 'photographer',
@@ -505,7 +507,7 @@ export default function VendorForm({ onSubmit, onCancel, initialData, isEditing 
                     {/* Price */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Cena (Kč)
+                        Cena ({currency})
                       </label>
                       <input
                         type="number"
@@ -521,7 +523,7 @@ export default function VendorForm({ onSubmit, onCancel, initialData, isEditing 
                     {/* Discounted Price */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Po slevě (Kč)
+                        Po slevě ({currency})
                       </label>
                       <input
                         type="number"

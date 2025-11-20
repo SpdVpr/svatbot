@@ -11,6 +11,7 @@ import QRTrackingWrapper from '@/components/common/QRTrackingWrapper'
 import DemoLockBanner from '@/components/common/DemoLockBanner'
 import ConditionalColorThemeProvider from '@/components/theme/ConditionalColorThemeProvider'
 import WeddingPattern from '@/components/theme/WeddingPattern'
+import { CurrencyProvider } from '@/contexts/CurrencyContext'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -302,36 +303,38 @@ export default function RootLayout({
         'min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 font-sans antialiased',
         'selection:bg-primary-200 selection:text-primary-800'
       )}>
-        <ConditionalColorThemeProvider>
-          {/* Wedding Pattern Background */}
-          <WeddingPattern />
+        <CurrencyProvider>
+          <ConditionalColorThemeProvider>
+            {/* Wedding Pattern Background */}
+            <WeddingPattern />
 
-          <QRTrackingWrapper>
-            <UserTrackingWrapper>
-              {/* Demo Lock Banner - Shows when demo account is locked */}
-              <Suspense fallback={null}>
-                <DemoLockBanner />
-              </Suspense>
+            <QRTrackingWrapper>
+              <UserTrackingWrapper>
+                {/* Demo Lock Banner - Shows when demo account is locked */}
+                <Suspense fallback={null}>
+                  <DemoLockBanner />
+                </Suspense>
 
-              <div id="root" className="relative">
-                {children}
-              </div>
+                <div id="root" className="relative">
+                  {children}
+                </div>
 
-              {/* Affiliate Tracking */}
-              <Suspense fallback={null}>
-                <AffiliateTracker />
-              </Suspense>
+                {/* Affiliate Tracking */}
+                <Suspense fallback={null}>
+                  <AffiliateTracker />
+                </Suspense>
 
-              {/* Cookie Banner */}
-              <CookieBanner />
+                {/* Cookie Banner */}
+                <CookieBanner />
 
-              {/* Global Feedback Button */}
-              <Suspense fallback={null}>
-                <GlobalFeedbackButton />
-              </Suspense>
-            </UserTrackingWrapper>
-          </QRTrackingWrapper>
-        </ConditionalColorThemeProvider>
+                {/* Global Feedback Button */}
+                <Suspense fallback={null}>
+                  <GlobalFeedbackButton />
+                </Suspense>
+              </UserTrackingWrapper>
+            </QRTrackingWrapper>
+          </ConditionalColorThemeProvider>
+        </CurrencyProvider>
 
         {/* Portal for modals */}
         <div id="modal-root" />

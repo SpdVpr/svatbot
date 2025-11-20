@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useWedding } from '@/hooks/useWedding'
 import { useBudget } from '@/hooks/useBudget'
+import { useCurrency } from '@/contexts/CurrencyContext'
 import BudgetList from '@/components/budget/BudgetList'
 import BudgetStats from '@/components/budget/BudgetStats'
 import BudgetForm from '@/components/budget/BudgetForm'
@@ -27,6 +28,7 @@ export default function BudgetPage() {
   const { user } = useAuth()
   const { wedding } = useWedding()
   const { budgetItems, loading, createBudgetItem, updateBudgetItem, error, stats } = useBudget()
+  const { formatCurrencyShort, currency } = useCurrency()
   // Removed viewMode - using stats view as default (most informative)
   const [showBudgetForm, setShowBudgetForm] = useState(false)
   const [showTemplates, setShowTemplates] = useState(false)
@@ -169,7 +171,7 @@ export default function BudgetPage() {
       <ModuleHeader
         icon={DollarSign}
         title="Rozpočet"
-        subtitle={`${Math.round(stats.totalBudget / 1000)}k Kč rozpočet • ${stats.budgetUsed}% využito`}
+        subtitle={`${formatCurrencyShort(stats.totalBudget)} rozpočet • ${stats.budgetUsed}% využito`}
         iconGradient="from-primary-500 to-accent-500"
         actions={
           <div className="flex items-center space-x-2">

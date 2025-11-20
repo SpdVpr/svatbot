@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { X, Link as LinkIcon, Image as ImageIcon, Coins, Tag, Loader } from 'lucide-react'
 import { ShoppingItem, ShoppingFormData, SHOPPING_CATEGORIES } from '@/types/shopping'
 import { useShopping } from '@/hooks/useShopping'
+import { useCurrency } from '@/contexts/CurrencyContext'
 import ShoppingImageUpload from './ShoppingImageUpload'
 
 interface ShoppingItemFormProps {
@@ -13,6 +14,7 @@ interface ShoppingItemFormProps {
 
 export default function ShoppingItemForm({ item, onClose }: ShoppingItemFormProps) {
   const { addItem, updateItem } = useShopping()
+  const { currency: selectedCurrency } = useCurrency()
   const [loading, setLoading] = useState(false)
   const [fetchingMetadata, setFetchingMetadata] = useState(false)
   const [lastFetchedUrl, setLastFetchedUrl] = useState<string>('')
@@ -22,7 +24,7 @@ export default function ShoppingItemForm({ item, onClose }: ShoppingItemFormProp
     imageUrl: item?.imageUrl || '',
     price: item?.price || undefined,
     quantity: item?.quantity || undefined,
-    currency: item?.currency || 'CZK',
+    currency: item?.currency || selectedCurrency,
     description: item?.description || '',
     category: item?.category || undefined,
     priority: item?.priority || undefined,

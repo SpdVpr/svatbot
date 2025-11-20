@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
 import { DrinkFormData, DRINK_CATEGORY_LABELS, MENU_STATUS_LABELS } from '@/types/menu'
+import { useCurrency } from '@/contexts/CurrencyContext'
 
 interface DrinkItemFormProps {
   onSubmit: (data: DrinkFormData) => Promise<void>
@@ -12,6 +13,7 @@ interface DrinkItemFormProps {
 }
 
 export default function DrinkItemForm({ onSubmit, onCancel, initialData, loading }: DrinkItemFormProps) {
+  const { currency } = useCurrency()
   const [formData, setFormData] = useState<DrinkFormData>({
     name: initialData?.name || '',
     description: initialData?.description || '',
@@ -158,7 +160,7 @@ export default function DrinkItemForm({ onSubmit, onCancel, initialData, loading
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Cena za kus (Kč)
+                  Cena za kus ({currency})
                 </label>
                 <input
                   type="number"

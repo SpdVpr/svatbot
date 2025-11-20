@@ -44,6 +44,7 @@ import TrialExpiredModal from '@/components/subscription/TrialExpiredModal'
 import { useSearchParams } from 'next/navigation'
 import { useColorTheme } from '@/hooks/useColorTheme'
 import { COLOR_PALETTES, ColorTheme } from '@/types/colorTheme'
+import CurrencySwitcher from '@/components/common/CurrencySwitcher'
 // Import test utilities (only in development)
 import '@/utils/testTrialExpiry'
 
@@ -319,6 +320,7 @@ function DashboardContent() {
               <LiveNotifications />
             </div>
             <div className="flex items-center gap-1">
+              <CurrencySwitcher />
               <button
                 onClick={() => setShowMobileColorMenu(!showMobileColorMenu)}
                 className="mobile-nav-button text-gray-600 hover:text-gray-900 hover:bg-gray-100"
@@ -438,6 +440,7 @@ function DashboardContent() {
                 <p className="text-xs text-text-muted">Přihlášen jako</p>
                 <p className="text-xs font-medium truncate max-w-[120px]">{user?.displayName || user?.email}</p>
               </div>
+              <CurrencySwitcher />
               <LiveNotifications />
               <button
                 onClick={openNotesModal}
