@@ -152,6 +152,33 @@ const TEMPLATES: TemplateConfig[] = [
       'Moderní svatby',
     ],
   },
+  {
+    id: 'pretty',
+    name: 'Pretty',
+    description: 'Krásná šablona s květinovými dekoracemi a elegantním designem',
+    thumbnail: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800',
+    category: 'Romantický',
+    colors: {
+      primary: '#b19a56',
+      secondary: '#faf8f3',
+      accent: '#e1d9bf',
+    },
+    fonts: {
+      heading: 'Great Vibes',
+      body: 'Muli',
+    },
+    features: [
+      'Květinové dekorace',
+      'Countdown odpočítávání',
+      'Lightbox galerie',
+      'Interaktivní RSVP formulář',
+    ],
+    suitableFor: [
+      'Romantické svatby',
+      'Jarní svatby',
+      'Elegantní události',
+    ],
+  },
 ]
 
 export default function TemplateSelector({ selectedTemplate, onSelect, disabled = false }: TemplateSelectorProps) {

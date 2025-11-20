@@ -8,6 +8,7 @@ import ModernMinimalistTemplate from '@/components/wedding-website/templates/Mod
 import RomanticBohoTemplate from '@/components/wedding-website/templates/RomanticBohoTemplate'
 import WinterEleganceTemplate from '@/components/wedding-website/templates/WinterEleganceTemplate'
 import TwainLoveTemplate from '@/components/wedding-website/templates/TwainLoveTemplate'
+import PrettyTemplate from '@/components/wedding-website/templates/PrettyTemplate'
 import WeddingWebsiteAnalytics from '@/components/wedding-website/WeddingWebsiteAnalytics'
 
 // Helper function to recursively convert Firestore Timestamps to ISO strings
@@ -172,6 +173,8 @@ export default async function WeddingWebsitePage({ params }: PageProps) {
         return <WinterEleganceTemplate website={website} />
       case 'twain-love':
         return <TwainLoveTemplate website={website} />
+      case 'pretty':
+        return <PrettyTemplate website={website} />
       case 'luxury-gold':
       case 'garden-fresh':
         // Fallback to classic for templates in development

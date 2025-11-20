@@ -14,6 +14,7 @@ export type TemplateType =
   | 'winter-elegance'
   | 'vintage-charm'
   | 'twain-love'
+  | 'pretty'
 
 export type RSVPStatus = 'attending' | 'declined' | 'maybe'
 
