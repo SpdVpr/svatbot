@@ -74,6 +74,29 @@ export default function DressCodeSection({ content }: DressCodeSectionProps) {
               </div>
             </div>
           )}
+
+          {/* Dress Code Images */}
+          {content.images && content.images.length > 0 && (
+            <div className="bg-white p-8 rounded-lg shadow-lg mt-8">
+              <h3
+                className="text-3xl mb-6 text-center"
+                style={{ fontFamily: 'Great Vibes, cursive', color: '#b19a56' }}
+              >
+                Inspirace
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {content.images.map((image, index) => (
+                  <div key={index} className="aspect-square overflow-hidden rounded-lg shadow-md">
+                    <img
+                      src={image}
+                      alt={`Dress code inspiration ${index + 1}`}
+                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>

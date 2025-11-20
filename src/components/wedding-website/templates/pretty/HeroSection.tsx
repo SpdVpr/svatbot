@@ -86,8 +86,12 @@ export default function HeroSection({ content }: HeroSectionProps) {
               style={{
                 backgroundImage: `url(${slide})`,
                 backgroundSize: 'cover',
-                backgroundPosition: 'center center',
-                backgroundRepeat: 'no-repeat'
+                backgroundPosition: content.imagePosition
+                  ? `${content.imagePosition.x}% ${content.imagePosition.y}%`
+                  : 'center center',
+                backgroundRepeat: 'no-repeat',
+                transform: content.imageScale ? `scale(${content.imageScale})` : 'none',
+                transformOrigin: 'center center'
               }}
             >
               {/* Dark overlay for better text readability */}

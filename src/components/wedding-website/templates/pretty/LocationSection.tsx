@@ -32,13 +32,15 @@ export default function LocationSection({ infoContent, scheduleContent }: Locati
             {/* Ceremony */}
             {infoContent.ceremony && (
               <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                <div className="h-48 overflow-hidden">
-                  <img
-                    src="https://images.unsplash.com/photo-1519167758481-83f29da8c2b0?w=800"
-                    alt="Ceremony"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+                {infoContent.ceremony.images && infoContent.ceremony.images.length > 0 && (
+                  <div className="h-48 overflow-hidden">
+                    <img
+                      src={infoContent.ceremony.images[0]}
+                      alt="Ceremony"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
                 <div className="p-6">
                   <h3
                     className="text-3xl mb-4"
@@ -78,13 +80,15 @@ export default function LocationSection({ infoContent, scheduleContent }: Locati
             {/* Reception */}
             {infoContent.reception && (
               <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                <div className="h-48 overflow-hidden">
-                  <img
-                    src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800"
-                    alt="Reception"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+                {infoContent.reception.images && infoContent.reception.images.length > 0 && (
+                  <div className="h-48 overflow-hidden">
+                    <img
+                      src={infoContent.reception.images[0]}
+                      alt="Reception"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
                 <div className="p-6">
                   <h3
                     className="text-3xl mb-4"

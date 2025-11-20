@@ -20,7 +20,7 @@ export default function ScheduleSection({ content }: ScheduleSectionProps) {
             {content.items.map((item, index) => (
               <div
                 key={index}
-                className="flex flex-col items-center text-center group"
+                className="flex flex-col items-center text-center group relative"
               >
                 {/* Time */}
                 <div className="mb-3">
@@ -32,8 +32,9 @@ export default function ScheduleSection({ content }: ScheduleSectionProps) {
                 {/* Timeline Dot */}
                 <div className="relative mb-4">
                   <div className="w-4 h-4 rounded-full border-4 border-white shadow-lg relative z-10" style={{ backgroundColor: '#b19a56' }}></div>
+                  {/* Connecting Line */}
                   {index < content.items.length - 1 && (
-                    <div className="absolute top-4 left-1/2 -translate-x-1/2 w-0.5 h-12" style={{ backgroundColor: '#e1d9bf' }}></div>
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-0.5 h-16" style={{ backgroundColor: '#e1d9bf' }}></div>
                   )}
                 </div>
 

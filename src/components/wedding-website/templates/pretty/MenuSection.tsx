@@ -19,8 +19,8 @@ export default function MenuSection({ content }: MenuSectionProps) {
   const hasAppetizers = appetizers.length > 0
   const hasSoups = soups.length > 0
   const hasMainCourses = mainCourses.length > 0
-  const hasDesserts = desserts.length > 0 && content.showDesserts
-  const hasDrinks = drinks.length > 0 && content.showDrinks
+  const hasDesserts = desserts.length > 0 && (content.showDesserts !== false)
+  const hasDrinks = drinks.length > 0 && (content.showDrinks !== false)
 
   return (
     <section className="py-20" style={{ background: 'linear-gradient(to bottom, #ffffff 0%, #faf8f3 100%)' }}>
@@ -40,6 +40,31 @@ export default function MenuSection({ content }: MenuSectionProps) {
                 </h3>
                 <ul className="space-y-4">
                   {appetizers.map((item) => (
+                    <li key={item.id} className="border-b border-gray-200 pb-3">
+                      <h4 className="font-semibold text-gray-800">{item.name}</h4>
+                      {item.description && (
+                        <p className="text-sm text-gray-600 mt-1">{item.description}</p>
+                      )}
+                      {content.showDietaryInfo && item.dietaryInfo && item.dietaryInfo.length > 0 && (
+                        <p className="text-xs text-gray-500 mt-1">{item.dietaryInfo.join(', ')}</p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Soups */}
+            {hasSoups && (
+              <div className="bg-white p-8 rounded-lg shadow-lg">
+                <h3
+                  className="text-3xl mb-6 text-center"
+                  style={{ fontFamily: 'Great Vibes, cursive', color: '#b19a56' }}
+                >
+                  Polévky
+                </h3>
+                <ul className="space-y-4">
+                  {soups.map((item) => (
                     <li key={item.id} className="border-b border-gray-200 pb-3">
                       <h4 className="font-semibold text-gray-800">{item.name}</h4>
                       {item.description && (

@@ -13,7 +13,7 @@ export default function CoupleSection({ content, heroContent }: CoupleSectionPro
   return (
     <section id="couple" className="py-20 bg-white">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center gap-8 lg:gap-12">
           {/* Bride Info */}
           <div className="flex-1 text-center lg:text-right">
             {/* Bride Photo */}
