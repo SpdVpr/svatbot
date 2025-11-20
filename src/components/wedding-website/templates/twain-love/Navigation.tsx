@@ -29,7 +29,7 @@ export default function Navigation({ bride, groom }: NavigationProps) {
     { label: 'Dress Code', href: '#dresscode' },
     { label: 'Ubytování', href: '#accommodation' },
     { label: 'Galerie', href: '#gallery' },
-    { label: 'RSVP', href: '#rsvp' },
+    { label: 'Potvrzení účasti', href: '#rsvp' },
     { label: 'Dary', href: '#gift' },
     { label: 'Menu', href: '#menu' },
     { label: 'Kontakt', href: '#contact' },

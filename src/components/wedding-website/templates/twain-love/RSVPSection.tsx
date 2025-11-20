@@ -65,7 +65,7 @@ export default function RSVPSection({ content, websiteId }: RSVPSectionProps) {
   if (submitted) {
     return (
       <div id="rsvp" className="py-20 bg-white">
-        <SectionTitle title="RSVP" />
+        <SectionTitle title="Potvrzení účasti" />
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto text-center">
             <div className="bg-green-50 border border-green-200 rounded-lg p-8">
@@ -85,7 +85,7 @@ export default function RSVPSection({ content, websiteId }: RSVPSectionProps) {
 
   return (
     <div id="rsvp" className="py-20 bg-white">
-      <SectionTitle title="RSVP" />
+      <SectionTitle title="Potvrzení účasti" />
 
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto">

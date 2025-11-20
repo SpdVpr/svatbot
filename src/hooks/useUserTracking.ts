@@ -82,6 +82,37 @@ export function useUserTracking() {
       }
     })
 
+    // Handle page unload - end session before closing
+    const handleBeforeUnload = () => {
+      console.log('🚪 Page unloading - ending session')
+      if (sessionStartRef.current && sessionIdRef.current && previousUserId) {
+        // Calculate session duration
+        const sessionEnd = new Date()
+        const sessionDuration = Math.floor((sessionEnd.getTime() - sessionStartRef.current.getTime()) / 1000 / 60)
+
+        console.log('📤 Ending session on page unload, duration:', sessionDuration, 'minutes')
+
+        // Call endSession - it will be best effort
+        endSession(previousUserId)
+      }
+    }
+
+    // Handle visibility change - end session when tab becomes hidden for a while
+    const handleVisibilityChange = () => {
+      if (document.hidden && sessionStartRef.current && sessionIdRef.current && previousUserId) {
+        console.log('👁️ Tab hidden - ending session')
+        endSession(previousUserId)
+      } else if (!document.hidden && previousUserId && auth.currentUser) {
+        console.log('👁️ Tab visible - starting new session')
+        startSession(auth.currentUser)
+        setupActivityTracking(auth.currentUser)
+      }
+    }
+
+    // Add event listeners
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
     // Cleanup on unmount
     return () => {
       console.log('🛑 Cleaning up tracking')
@@ -91,6 +122,8 @@ export function useUserTracking() {
       if (activityIntervalRef.current) {
         clearInterval(activityIntervalRef.current)
       }
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
       unsubscribe()
     }
   }, [])

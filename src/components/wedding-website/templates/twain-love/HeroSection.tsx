@@ -54,29 +54,33 @@ export default function HeroSection({ content }: HeroSectionProps) {
       )}
 
       {/* Content */}
-      <div className="relative h-full flex items-center justify-center pt-20">
-        <div className="text-center">
-          {/* Animated Circle Container */}
-          <div className="relative inline-block">
-            {/* Pulsing outer circle */}
-            <div className="absolute inset-0 -m-2 rounded-full bg-[rgba(178,201,211,0.3)] animate-pulse" />
-            
-            {/* Main content circle */}
-            <div className="relative w-[380px] h-[380px] rounded-full bg-[rgba(178,201,211,0.8)] flex flex-col items-center justify-center p-8">
-              <div className="slide-subtitle mb-4">
-                <h4 className="text-white text-base tracking-wider uppercase" style={{ fontFamily: 'Muli, sans-serif' }}>
-                  Bereme se
-                </h4>
-              </div>
-              <div className="slide-title mb-4">
-                <h2 className="text-white text-6xl" style={{ fontFamily: 'Great Vibes, cursive' }}>
-                  Uložte si datum
-                </h2>
-              </div>
-              <div className="slide-text">
-                <p className="text-white text-lg" style={{ fontFamily: 'Muli, sans-serif' }}>
-                  {content.weddingDate && formatDate(content.weddingDate)}
-                </p>
+      <div className="relative h-full flex items-end justify-center pb-12 md:pb-16">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-center">
+            {/* Rectangle Container */}
+            <div className="relative inline-block">
+              {/* Pulsing outer rectangle */}
+              <div className="absolute inset-0 -m-2 rounded-lg bg-[rgba(178,201,211,0.3)] animate-pulse" />
+
+              {/* Main content rectangle */}
+              <div className="relative px-8 py-6 md:px-12 md:py-8 rounded-lg bg-[rgba(178,201,211,0.9)] backdrop-blur-sm">
+                <div className="flex flex-col items-center text-center">
+                  <div className="slide-subtitle mb-2">
+                    <h4 className="text-white text-sm md:text-base tracking-wider uppercase" style={{ fontFamily: 'Muli, sans-serif' }}>
+                      Bereme se
+                    </h4>
+                  </div>
+                  <div className="slide-title mb-2">
+                    <h2 className="text-white text-4xl md:text-5xl lg:text-6xl" style={{ fontFamily: 'Great Vibes, cursive' }}>
+                      Uložte si datum
+                    </h2>
+                  </div>
+                  <div className="slide-text">
+                    <p className="text-white text-base md:text-lg" style={{ fontFamily: 'Muli, sans-serif' }}>
+                      {content.weddingDate && formatDate(content.weddingDate)}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -110,14 +114,16 @@ export default function HeroSection({ content }: HeroSectionProps) {
             transform: scale3d(1.05, 1.05, 1.05);
           }
         }
-        
+
         @media (max-width: 767px) {
-          .relative.inline-block > div:last-child {
-            width: 280px !important;
-            height: 280px !important;
-          }
           .slide-title h2 {
-            font-size: 2.25rem !important;
+            font-size: 2rem !important;
+          }
+          .slide-subtitle h4 {
+            font-size: 0.75rem !important;
+          }
+          .slide-text p {
+            font-size: 0.875rem !important;
           }
         }
       `}</style>

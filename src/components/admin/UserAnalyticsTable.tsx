@@ -96,7 +96,10 @@ export default function UserAnalyticsTable() {
     })
   }
 
-  const formatDuration = (minutes: number) => {
+  const formatDuration = (minutes: number | undefined | null) => {
+    // Handle undefined, null, or 0
+    if (!minutes || minutes === 0) return '0 min'
+
     if (minutes < 60) return `${Math.round(minutes)} min`
     const hours = Math.floor(minutes / 60)
     const mins = Math.round(minutes % 60)
@@ -104,7 +107,7 @@ export default function UserAnalyticsTable() {
   }
 
   const fixUserAnalytics = async () => {
-    if (!confirm('Opravit chybějící email a displayName v userAnalytics? Toto může trvat několik sekund.')) {
+    if (!confirm('Opravit chybějící email, displayName a totalSessionTime v userAnalytics? Toto může trvat několik sekund.')) {
       return
     }
 
@@ -113,10 +116,12 @@ export default function UserAnalyticsTable() {
       const analyticsSnapshot = await getDocs(collection(db, 'userAnalytics'))
       let fixed = 0
       let skipped = 0
+      let sessionTimeFixed = 0
 
       for (const analyticsDoc of analyticsSnapshot.docs) {
         const data = analyticsDoc.data()
         const userId = analyticsDoc.id
+        const updates: any = {}
 
         // Check if email or displayName is missing
         if (!data.email || !data.displayName || data.displayName === 'Unknown') {
@@ -125,7 +130,6 @@ export default function UserAnalyticsTable() {
 
             if (userDoc.exists()) {
               const userData = userDoc.data()
-              const updates: any = {}
 
               if (!data.email && userData.email) {
                 updates.email = userData.email
@@ -136,25 +140,50 @@ export default function UserAnalyticsTable() {
               } else if ((!data.displayName || data.displayName === 'Unknown') && userData.email) {
                 updates.displayName = userData.email.split('@')[0]
               }
-
-              if (Object.keys(updates).length > 0) {
-                await updateDoc(doc(db, 'userAnalytics', userId), updates)
-                fixed++
-              } else {
-                skipped++
-              }
-            } else {
-              skipped++
             }
           } catch (error) {
-            console.error(`Error fixing user ${userId}:`, error)
+            console.error(`Error loading user data for ${userId}:`, error)
+          }
+        }
+
+        // Check if totalSessionTime needs to be calculated from sessions
+        if ((!data.totalSessionTime || data.totalSessionTime === 0) && data.sessions && data.sessions.length > 0) {
+          // Calculate total session time from all sessions
+          let calculatedTime = 0
+          data.sessions.forEach((session: any) => {
+            if (session.duration && session.duration > 0) {
+              calculatedTime += session.duration
+            } else if (session.startTime && session.endTime) {
+              // Calculate duration from start and end time
+              const start = session.startTime.toDate ? session.startTime.toDate() : new Date(session.startTime)
+              const end = session.endTime.toDate ? session.endTime.toDate() : new Date(session.endTime)
+              const duration = Math.floor((end.getTime() - start.getTime()) / 1000 / 60)
+              if (duration > 0) {
+                calculatedTime += duration
+              }
+            }
+          })
+
+          if (calculatedTime > 0) {
+            updates.totalSessionTime = calculatedTime
+            sessionTimeFixed++
+          }
+        }
+
+        // Apply updates if any
+        if (Object.keys(updates).length > 0) {
+          try {
+            await updateDoc(doc(db, 'userAnalytics', userId), updates)
+            fixed++
+          } catch (error) {
+            console.error(`Error updating user ${userId}:`, error)
           }
         } else {
           skipped++
         }
       }
 
-      alert(`Opraveno: ${fixed} záznamů\nPřeskočeno: ${skipped} záznamů`)
+      alert(`Opraveno: ${fixed} záznamů\nCelkový čas opraven: ${sessionTimeFixed} uživatelů\nPřeskočeno: ${skipped} záznamů`)
     } catch (error) {
       console.error('Error fixing analytics:', error)
       alert('Chyba při opravě dat')
