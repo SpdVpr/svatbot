@@ -35,6 +35,7 @@ export interface MusicVendor {
   contact: string
   email: string
   type?: string // např. "DJ", "Smyčcový kvartet", "Živá kapela"
+  vendorId?: string // Reference to vendor from /vendors module
 }
 
 export interface MusicData {

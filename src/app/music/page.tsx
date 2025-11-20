@@ -10,10 +10,12 @@ import { SpotifyTrack, spotifyClient } from '@/lib/spotify'
 import { useMusic, Song } from '@/hooks/useMusic'
 import ModuleHeader from '@/components/common/ModuleHeader'
 import SharePlaylistButton from '@/components/music/SharePlaylistButton'
+import { useVendor } from '@/hooks/useVendor'
 
 function MusicPageContent() {
   const router = useRouter()
   const { currentSong, isPlaying, toggle } = useMusicPlayer()
+  const { vendors: allVendors } = useVendor()
   const {
     vendors,
     categories,
@@ -34,6 +36,13 @@ function MusicPageContent() {
   const [showAddVendor, setShowAddVendor] = useState(false)
   const [showAddSong, setShowAddSong] = useState<string | null>(null)
   const [showHidden, setShowHidden] = useState(false)
+  const [selectedVendorId, setSelectedVendorId] = useState<string>('')
+  const [useExistingVendor, setUseExistingVendor] = useState(true)
+
+  // Filter vendors for music category
+  const musicVendors = allVendors.filter(v =>
+    v.category === 'music' || v.category === 'entertainment'
+  )
 
   const handleAddSpotifyTrack = (categoryId: string, track: SpotifyTrack) => {
     console.log('🎵 Adding Spotify track:', {
@@ -61,14 +70,34 @@ function MusicPageContent() {
 
   const handleAddVendor = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const formData = new FormData(e.currentTarget)
-    addVendor({
-      name: formData.get('name') as string,
-      contact: formData.get('contact') as string,
-      email: formData.get('email') as string,
-      type: formData.get('type') as string
-    })
+
+    if (useExistingVendor && selectedVendorId) {
+      // Use existing vendor from /vendors module
+      const vendor = allVendors.find(v => v.id === selectedVendorId)
+      if (vendor) {
+        const primaryContact = vendor.contacts?.[0]
+        addVendor({
+          name: vendor.name,
+          contact: primaryContact?.phone || '',
+          email: primaryContact?.email || '',
+          type: vendor.category === 'music' ? 'Hudba' : 'Zábava',
+          vendorId: vendor.id
+        })
+      }
+    } else {
+      // Create new vendor manually
+      const formData = new FormData(e.currentTarget)
+      addVendor({
+        name: formData.get('name') as string,
+        contact: formData.get('contact') as string,
+        email: formData.get('email') as string,
+        type: formData.get('type') as string
+      })
+    }
+
     setShowAddVendor(false)
+    setSelectedVendorId('')
+    setUseExistingVendor(true)
   }
 
   if (loading) {
@@ -162,18 +191,25 @@ function MusicPageContent() {
                         <div>
                           <div className="flex items-start justify-between mb-2">
                             <div className="flex-1">
-                              <div className="font-medium text-gray-900">{vendor.name}</div>
+                              <div className="font-medium text-gray-900 flex items-center space-x-1">
+                                <span>{vendor.name}</span>
+                                {vendor.vendorId && (
+                                  <span className="text-sm" title="Propojeno s modulem Dodavatelé">📍</span>
+                                )}
+                              </div>
                               {vendor.type && (
                                 <div className="text-xs text-purple-600 mt-0.5">{vendor.type}</div>
                               )}
                             </div>
                             <div className="flex items-center space-x-1">
-                              <button
-                                onClick={() => setEditingVendorId(vendor.id)}
-                                className="p-1 hover:bg-gray-200 rounded"
-                              >
-                                <Edit2 className="w-3 h-3 text-gray-600" />
-                              </button>
+                              {!vendor.vendorId && (
+                                <button
+                                  onClick={() => setEditingVendorId(vendor.id)}
+                                  className="p-1 hover:bg-gray-200 rounded"
+                                >
+                                  <Edit2 className="w-3 h-3 text-gray-600" />
+                                </button>
+                              )}
                               <button
                                 onClick={() => removeVendor(vendor.id)}
                                 className="p-1 hover:bg-red-100 rounded"
@@ -192,6 +228,16 @@ function MusicPageContent() {
                             <div className="flex items-center space-x-1 text-xs text-gray-600 mt-1">
                               <Mail className="w-3 h-3" />
                               <span>{vendor.email}</span>
+                            </div>
+                          )}
+                          {vendor.vendorId && (
+                            <div className="mt-2 pt-2 border-t border-gray-200">
+                              <button
+                                onClick={() => router.push('/vendors')}
+                                className="text-xs text-purple-600 hover:underline"
+                              >
+                                → Zobrazit v modulu Dodavatelé
+                              </button>
                             </div>
                           )}
                         </div>
@@ -390,55 +436,127 @@ function MusicPageContent() {
           <div className="bg-white rounded-lg max-w-md w-full p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Přidat dodavatele hudby</h3>
             <form onSubmit={handleAddVendor} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Název / Jméno *
+              {/* Toggle between existing and new vendor */}
+              <div className="flex items-center space-x-4 pb-2 border-b">
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    checked={useExistingVendor}
+                    onChange={() => setUseExistingVendor(true)}
+                    className="text-purple-600 focus:ring-purple-500"
+                  />
+                  <span className="text-sm font-medium text-gray-700">Vybrat existujícího</span>
                 </label>
-                <input
-                  type="text"
-                  name="name"
-                  required
-                  placeholder="DJ Martin Hudba"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Typ
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    checked={!useExistingVendor}
+                    onChange={() => setUseExistingVendor(false)}
+                    className="text-purple-600 focus:ring-purple-500"
+                  />
+                  <span className="text-sm font-medium text-gray-700">Zadat nového</span>
                 </label>
-                <input
-                  type="text"
-                  name="type"
-                  placeholder="DJ, Smyčcový kvartet, Živá kapela..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Telefon
-                </label>
-                <input
-                  type="tel"
-                  name="contact"
-                  placeholder="+420 777 888 999"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="martin@djhudba.cz"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
-              </div>
+
+              {useExistingVendor ? (
+                <>
+                  {/* Select from existing vendors */}
+                  {musicVendors.length > 0 ? (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Vyberte dodavatele *
+                      </label>
+                      <select
+                        value={selectedVendorId}
+                        onChange={(e) => setSelectedVendorId(e.target.value)}
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      >
+                        <option value="">-- Vyberte dodavatele --</option>
+                        {musicVendors.map((vendor) => (
+                          <option key={vendor.id} value={vendor.id}>
+                            {vendor.name} ({vendor.category === 'music' ? 'Hudba' : 'Zábava'})
+                          </option>
+                        ))}
+                      </select>
+                      <p className="mt-2 text-xs text-gray-500">
+                        💡 Dodavatele můžete spravovat v modulu <button type="button" onClick={() => router.push('/vendors')} className="text-purple-600 hover:underline">Dodavatelé</button>
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <p className="text-sm text-yellow-800 mb-2">
+                        Nemáte žádné dodavatele hudby v modulu Dodavatelé.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => router.push('/vendors')}
+                        className="text-sm text-purple-600 hover:underline font-medium"
+                      >
+                        → Přejít do modulu Dodavatelé
+                      </button>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  {/* Manual vendor entry */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Název / Jméno *
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      required
+                      placeholder="DJ Martin Hudba"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Typ
+                    </label>
+                    <input
+                      type="text"
+                      name="type"
+                      placeholder="DJ, Smyčcový kvartet, Živá kapela..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Telefon
+                    </label>
+                    <input
+                      type="tel"
+                      name="contact"
+                      placeholder="+420 777 888 999"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="martin@djhudba.cz"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                  </div>
+                </>
+              )}
+
               <div className="flex space-x-3 pt-2">
                 <button
                   type="button"
-                  onClick={() => setShowAddVendor(false)}
+                  onClick={() => {
+                    setShowAddVendor(false)
+                    setSelectedVendorId('')
+                    setUseExistingVendor(true)
+                  }}
                   className="flex-1 btn-outline"
                 >
                   Zrušit
@@ -446,6 +564,7 @@ function MusicPageContent() {
                 <button
                   type="submit"
                   className="flex-1 btn-primary"
+                  disabled={useExistingVendor && !selectedVendorId}
                 >
                   Přidat
                 </button>

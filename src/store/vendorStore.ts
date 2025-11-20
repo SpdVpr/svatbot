@@ -1,14 +1,13 @@
 'use client'
 
 import { MarketplaceVendor } from '@/types/vendor'
-import { marketplaceVendors } from '@/data/marketplaceVendors'
 import { db } from '@/lib/firebase'
 import { collection, query, where, onSnapshot, Timestamp } from 'firebase/firestore'
 import logger from '@/lib/logger'
 
-// Global vendor store for real-time updates
+// Global vendor store for real-time updates from Firebase only
 class VendorStore {
-  private vendors: MarketplaceVendor[] = [...marketplaceVendors]
+  private vendors: MarketplaceVendor[] = []
   private listeners: Set<() => void> = new Set()
   private unsubscribe: (() => void) | null = null
   private isInitialized = false
@@ -149,30 +148,22 @@ class VendorStore {
             firestoreVendors.push(vendor)
           })
 
-          // Merge with mock data (keep mock data for now, but Firestore takes priority)
-          const mockVendorIds = marketplaceVendors.map(v => v.id)
-          const firestoreVendorIds = firestoreVendors.map(v => v.id)
-
-          // Keep mock vendors that don't conflict with Firestore
-          const nonConflictingMockVendors = marketplaceVendors.filter(
-            v => !firestoreVendorIds.includes(v.id)
-          )
-
-          this.vendors = [...firestoreVendors, ...nonConflictingMockVendors]
-          logger.log('✅ VendorStore updated:', this.vendors.length, 'total vendors')
+          // Use only Firebase vendors (no mock data)
+          this.vendors = firestoreVendors
+          logger.log('✅ VendorStore updated:', this.vendors.length, 'total vendors from Firebase')
           this.notifyListeners()
         },
         (error) => {
           logger.error('❌ Firestore vendors listener error:', error)
-          // Fall back to mock data on error
-          this.vendors = [...marketplaceVendors]
+          // Keep empty array on error (no fallback to mock data)
+          this.vendors = []
           this.notifyListeners()
         }
       )
     } catch (error) {
       logger.error('❌ Failed to initialize Firestore listener:', error)
-      // Fall back to mock data
-      this.vendors = [...marketplaceVendors]
+      // Keep empty array on error (no fallback to mock data)
+      this.vendors = []
       this.notifyListeners()
     }
   }
@@ -183,9 +174,9 @@ class VendorStore {
     this.initializeFirestore()
   }
 
-  // Reset to default data
+  // Reset to empty data (Firebase only)
   reset(): void {
-    this.vendors = [...marketplaceVendors]
+    this.vendors = []
     this.notifyListeners()
     localStorage.removeItem('marketplace_vendors')
   }

@@ -35,9 +35,9 @@ function cleanForFirestore(obj: any): any {
 }
 
 interface PageProps {
-  params: {
+  params: Promise<{
     token: string
-  }
+  }>
 }
 
 export default function MarketplaceEditPage({ params }: PageProps) {
@@ -48,9 +48,19 @@ export default function MarketplaceEditPage({ params }: PageProps) {
   const [vendorData, setVendorData] = useState<MarketplaceVendorFormData | null>(null)
   const [vendorId, setVendorId] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
+  const [token, setToken] = useState<string | null>(null)
+
+  // Resolve params first
+  useEffect(() => {
+    params.then(resolvedParams => {
+      setToken(resolvedParams.token)
+    })
+  }, [params])
 
   // Load vendor data by token
   useEffect(() => {
+    if (!token) return
+
     const loadVendorData = async () => {
       try {
         setLoading(true)
@@ -58,7 +68,7 @@ export default function MarketplaceEditPage({ params }: PageProps) {
 
         // Query Firestore for vendor with this edit token
         const vendorsRef = collection(db, 'marketplaceVendors')
-        const q = query(vendorsRef, where('editToken', '==', params.token))
+        const q = query(vendorsRef, where('editToken', '==', token))
         const querySnapshot = await getDocs(q)
 
         if (querySnapshot.empty) {
@@ -84,7 +94,7 @@ export default function MarketplaceEditPage({ params }: PageProps) {
     }
 
     loadVendorData()
-  }, [params.token])
+  }, [token])
 
   const handleSubmit = async (data: MarketplaceVendorFormData) => {
     if (!vendorId) {
