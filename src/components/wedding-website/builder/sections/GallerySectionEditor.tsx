@@ -20,6 +20,8 @@ export default function GallerySectionEditor({ content, onChange }: GallerySecti
   const [error, setError] = useState<string | null>(null)
   const [dragOver, setDragOver] = useState(false)
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null)
+  const [draggedImageId, setDraggedImageId] = useState<string | null>(null)
+  const [dragOverImageId, setDragOverImageId] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleInputChange = (field: keyof GalleryContent, value: any) => {
@@ -141,10 +143,57 @@ export default function GallerySectionEditor({ content, onChange }: GallerySecti
 
   const updateImageCaption = (imageId: string, caption: string) => {
     const images = content.images || []
-    const updatedImages = images.map(img => 
+    const updatedImages = images.map(img =>
       img.id === imageId ? { ...img, caption } : img
     )
     handleInputChange('images', updatedImages)
+  }
+
+  const handleImageDragStart = (e: React.DragEvent, imageId: string) => {
+    setDraggedImageId(imageId)
+    e.dataTransfer.effectAllowed = 'move'
+  }
+
+  const handleImageDragOver = (e: React.DragEvent, imageId: string) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    setDragOverImageId(imageId)
+  }
+
+  const handleImageDragLeave = () => {
+    setDragOverImageId(null)
+  }
+
+  const handleImageDrop = (e: React.DragEvent, targetImageId: string) => {
+    e.preventDefault()
+    setDragOverImageId(null)
+
+    if (!draggedImageId || draggedImageId === targetImageId) {
+      setDraggedImageId(null)
+      return
+    }
+
+    const images = content.images || []
+    const draggedIndex = images.findIndex(img => img.id === draggedImageId)
+    const targetIndex = images.findIndex(img => img.id === targetImageId)
+
+    if (draggedIndex === -1 || targetIndex === -1) {
+      setDraggedImageId(null)
+      return
+    }
+
+    // Reorder images
+    const newImages = [...images]
+    const [draggedImage] = newImages.splice(draggedIndex, 1)
+    newImages.splice(targetIndex, 0, draggedImage)
+
+    handleInputChange('images', newImages)
+    setDraggedImageId(null)
+  }
+
+  const handleImageDragEnd = () => {
+    setDraggedImageId(null)
+    setDragOverImageId(null)
   }
 
   const importFromWedding = () => {
@@ -308,33 +357,51 @@ export default function GallerySectionEditor({ content, onChange }: GallerySecti
       {content.images && content.images.length > 0 && (
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Nahrané fotky ({content.images.length})
-            </h3>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Nahrané fotky ({content.images.length})
+              </h3>
+              <p className="text-sm text-gray-500 mt-1">
+                Přetáhněte fotky pro změnu pořadí
+              </p>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {content.images.map((image) => (
-              <div key={image.id} className="relative">
-                <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden group">
+              <div
+                key={image.id}
+                className={`relative transition-all ${
+                  dragOverImageId === image.id ? 'scale-105 ring-2 ring-pink-500' : ''
+                } ${draggedImageId === image.id ? 'opacity-50' : ''}`}
+                draggable
+                onDragStart={(e) => handleImageDragStart(e, image.id)}
+                onDragOver={(e) => handleImageDragOver(e, image.id)}
+                onDragLeave={handleImageDragLeave}
+                onDrop={(e) => handleImageDrop(e, image.id)}
+                onDragEnd={handleImageDragEnd}
+              >
+                <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden group relative cursor-move">
                   <img
                     src={image.thumbnailUrl || image.url}
                     alt={image.alt}
                     className="w-full h-full object-cover"
                   />
 
-                  {/* Overlay - only on image, not on caption */}
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                    <div className="flex gap-2">
+                  {/* Overlay - only on image hover */}
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
+                    <div className="flex gap-2 pointer-events-auto">
                       <button
                         onClick={() => setSelectedImage(image)}
                         className="bg-white text-gray-900 p-2 rounded-full hover:bg-gray-100 transition-colors"
+                        title="Zobrazit"
                       >
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteImage(image.id)}
                         className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors"
+                        title="Smazat"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -342,7 +409,7 @@ export default function GallerySectionEditor({ content, onChange }: GallerySecti
                   </div>
                 </div>
 
-                {/* Caption - outside of group hover area */}
+                {/* Caption - outside of image container */}
                 <div className="mt-2">
                   <input
                     type="text"

@@ -28,8 +28,8 @@ export default function GiftSection({ content }: GiftSectionProps) {
           <div className="flex flex-wrap justify-center gap-8">
             {/* Bank Account */}
             {content.bankAccount && (
-              <div className="bg-white rounded-lg p-8 shadow-lg w-full md:w-[calc(50%-1rem)] max-w-md">
-                <div className="flex items-center gap-3 mb-4">
+              <div className="bg-white rounded-lg p-8 shadow-lg w-full md:w-[calc(50%-1rem)] max-w-md text-center">
+                <div className="flex flex-col items-center gap-3 mb-4">
                   <div className="w-12 h-12 rounded-full bg-[#b2c9d3] flex items-center justify-center">
                     <CreditCard className="w-6 h-6 text-white" />
                   </div>
@@ -48,8 +48,8 @@ export default function GiftSection({ content }: GiftSectionProps) {
 
             {/* Registry */}
             {hasRegistry && (
-              <div className="bg-white rounded-lg p-8 shadow-lg w-full md:w-[calc(50%-1rem)] max-w-md">
-                <div className="flex items-center gap-3 mb-4">
+              <div className="bg-white rounded-lg p-8 shadow-lg w-full md:w-[calc(50%-1rem)] max-w-md text-center">
+                <div className="flex flex-col items-center gap-3 mb-4">
                   <div className="w-12 h-12 rounded-full bg-[#b2c9d3] flex items-center justify-center">
                     <Gift className="w-6 h-6 text-white" />
                   </div>
