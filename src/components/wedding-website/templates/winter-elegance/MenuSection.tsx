@@ -19,10 +19,19 @@ export default function MenuSection({ content, websiteId }: MenuSectionProps) {
   const [drinkItems, setDrinkItems] = useState<DrinkItem[]>([])
   const [loading, setLoading] = useState(true)
 
+  // Debug logging
+  console.log('🍽️ MenuSection render:', {
+    websiteId,
+    enabled: content.enabled,
+    contentKeys: Object.keys(content),
+    content: content
+  })
+
   // Load menu items for this wedding website (public access)
   useEffect(() => {
     const loadMenuItems = async () => {
       try {
+        console.log('🍽️ MenuSection: Starting to load menu items for websiteId:', websiteId)
         setLoading(true)
 
         // First, get the weddingId from the website
@@ -30,15 +39,16 @@ export default function MenuSection({ content, websiteId }: MenuSectionProps) {
         const websiteSnap = await getDoc(websiteRef)
 
         if (!websiteSnap.exists()) {
-          console.log('Website not found')
+          console.log('🍽️ MenuSection: Website not found:', websiteId)
           setLoading(false)
           return
         }
 
         const weddingId = websiteSnap.data().weddingId
+        console.log('🍽️ MenuSection: Found weddingId:', weddingId)
 
         if (!weddingId) {
-          console.log('No weddingId in website')
+          console.log('🍽️ MenuSection: No weddingId in website')
           setLoading(false)
           return
         }
@@ -69,7 +79,9 @@ export default function MenuSection({ content, websiteId }: MenuSectionProps) {
           updatedAt: doc.data().updatedAt?.toDate() || new Date()
         })) as DrinkItem[]
 
-        console.log('🍽️ Loaded menu items:', items.length, 'drinks:', drinks.length)
+        console.log('🍽️ MenuSection: Loaded menu items:', items.length, 'drinks:', drinks.length)
+        console.log('🍽️ MenuSection: Menu items:', items)
+        console.log('🍽️ MenuSection: Drink items:', drinks)
         setMenuItems(items)
         setDrinkItems(drinks)
       } catch (error) {
@@ -84,7 +96,10 @@ export default function MenuSection({ content, websiteId }: MenuSectionProps) {
     }
   }, [websiteId])
 
-  if (!content.enabled) return null
+  if (!content.enabled) {
+    console.log('🍽️ MenuSection: Section is DISABLED, returning null')
+    return null
+  }
 
   if (loading) {
     return (
@@ -114,6 +129,16 @@ export default function MenuSection({ content, websiteId }: MenuSectionProps) {
 
   const hasMenuItems = filteredMenuItems.length > 0
   const hasDrinkItems = content.showDrinks && drinkItems.length > 0
+
+  console.log('🍽️ MenuSection: Rendering section', {
+    enabled: content.enabled,
+    loading,
+    hasMenuItems,
+    hasDrinkItems,
+    filteredMenuItemsCount: filteredMenuItems.length,
+    drinkItemsCount: drinkItems.length,
+    showDrinks: content.showDrinks
+  })
 
   return (
     <section id="menu" className="py-20 bg-stone-50">

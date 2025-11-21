@@ -17,6 +17,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Google Maps Autocomplete z-index fix */
+.pac-container {
+  z-index: 10001 !important;
+}
+
 @layer base {
   :root {
     /* SvatBot.cz custom properties */

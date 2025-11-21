@@ -13,7 +13,6 @@ interface VenueLocationMapProps {
 declare global {
   interface Window {
     google: any
-    initMap?: () => void
   }
 }
 
@@ -21,55 +20,105 @@ export default function VenueLocationMap({ address, onAddressChange, className =
   const mapRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const autocompleteRef = useRef<any>(null)
+  const autocompleteServiceRef = useRef<any>(null)
+  const placesServiceRef = useRef<any>(null)
   const mapInstanceRef = useRef<any>(null)
   const markerRef = useRef<any>(null)
   const [isLoaded, setIsLoaded] = useState(false)
   const [isLoadingLocation, setIsLoadingLocation] = useState(false)
   const [inputValue, setInputValue] = useState(address)
+  const [suggestions, setSuggestions] = useState<any[]>([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
 
-  // Load Google Maps API
+  // Load Google Maps API - simplified approach
   useEffect(() => {
     // Check if already loaded
-    if (typeof window !== 'undefined' && typeof (window as any).google !== 'undefined' && (window as any).google.maps) {
+    if (typeof window !== 'undefined' && window.google?.maps?.places) {
+      console.log('✅ Google Maps already loaded')
       setIsLoaded(true)
       return
     }
 
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
     if (!apiKey) {
-      console.error('Google Maps API key not found')
+      console.error('❌ Google Maps API key not found')
       return
     }
 
     // Check if script already exists
     const existingScript = document.querySelector('script[src*="maps.googleapis.com"]')
     if (existingScript) {
-      const checkLoaded = setInterval(() => {
-        if (typeof (window as any).google !== 'undefined' && (window as any).google.maps) {
+      console.log('📜 Google Maps script exists, waiting for load...')
+      // Poll for Google Maps to be ready
+      const checkInterval = setInterval(() => {
+        if (window.google?.maps?.places) {
+          console.log('✅ Google Maps loaded (existing script)')
           setIsLoaded(true)
-          clearInterval(checkLoaded)
+          clearInterval(checkInterval)
         }
       }, 100)
-      setTimeout(() => clearInterval(checkLoaded), 10000)
+
+      // Timeout after 10 seconds
+      setTimeout(() => {
+        clearInterval(checkInterval)
+        if (!window.google?.maps?.places) {
+          console.error('❌ Google Maps failed to load within timeout')
+        }
+      }, 10000)
       return
     }
 
-    // Load the script
+    console.log('📥 Loading Google Maps API...')
+
+    // Load without callback - simpler approach
     const script = document.createElement('script')
     script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&language=cs&region=CZ`
     script.async = true
     script.defer = true
-    script.onload = () => setIsLoaded(true)
-    script.onerror = () => console.error('Failed to load Google Maps API')
+
+    script.onload = () => {
+      console.log('📜 Script loaded, waiting for Google Maps API...')
+      // Poll for Google Maps to be ready
+      const checkInterval = setInterval(() => {
+        if (window.google?.maps?.places) {
+          console.log('✅ Google Maps API ready')
+          setIsLoaded(true)
+          clearInterval(checkInterval)
+        }
+      }, 50)
+
+      // Timeout after 5 seconds
+      setTimeout(() => {
+        clearInterval(checkInterval)
+        if (!window.google?.maps?.places) {
+          console.error('❌ Google Maps API not ready after script load')
+        }
+      }, 5000)
+    }
+
+    script.onerror = () => {
+      console.error('❌ Failed to load Google Maps script')
+    }
+
     document.head.appendChild(script)
   }, [])
 
   // Initialize map and autocomplete
   useEffect(() => {
-    if (!isLoaded || !mapRef.current || !inputRef.current) return
+    if (!isLoaded || !mapRef.current || !inputRef.current) {
+      console.log('⏸️ Waiting for map initialization:', { isLoaded, hasMapRef: !!mapRef.current, hasInputRef: !!inputRef.current })
+      return
+    }
+
+    // Prevent re-initialization
+    if (mapInstanceRef.current) {
+      console.log('⏭️ Map already initialized, skipping')
+      return
+    }
 
     try {
       const google = (window as any).google
+      console.log('🗺️ Initializing Google Maps...')
 
       // Initialize map centered on Czech Republic
       mapInstanceRef.current = new google.maps.Map(mapRef.current, {
@@ -79,21 +128,33 @@ export default function VenueLocationMap({ address, onAddressChange, className =
         streetViewControl: false,
         fullscreenControl: true,
       })
+      console.log('✅ Map initialized')
 
-      // Initialize autocomplete
+      // Initialize autocomplete with standard API
+      console.log('🔍 Initializing autocomplete...')
+      console.log('🔍 Input element:', inputRef.current)
+      console.log('🔍 Google Places API available:', !!google.maps.places)
+      console.log('🔍 Autocomplete constructor:', google.maps.places.Autocomplete)
+
       autocompleteRef.current = new google.maps.places.Autocomplete(inputRef.current, {
         types: ['establishment', 'geocode'],
         componentRestrictions: { country: 'cz' },
         fields: ['formatted_address', 'geometry', 'name']
       })
+      console.log('✅ Autocomplete initialized:', autocompleteRef.current)
+      console.log('✅ Autocomplete bounds:', autocompleteRef.current.getBounds())
 
       // Handle place selection
       autocompleteRef.current.addListener('place_changed', () => {
+        console.log('📍 Place changed event triggered')
         const place = autocompleteRef.current?.getPlace()
+        console.log('📍 Selected place:', place)
+
         if (place && place.geometry && place.geometry.location) {
           const location = place.geometry.location
           const newAddress = place.formatted_address || place.name || ''
-          
+          console.log('✅ Valid place selected:', newAddress)
+
           // Update input
           setInputValue(newAddress)
           if (onAddressChange) {
@@ -114,15 +175,18 @@ export default function VenueLocationMap({ address, onAddressChange, className =
               title: newAddress
             })
           }
+        } else {
+          console.warn('⚠️ Invalid place selected:', place)
         }
       })
 
       // If we have an initial address, geocode it
       if (address && address.trim()) {
+        console.log('📍 Geocoding initial address:', address)
         geocodeAddress(address)
       }
     } catch (error) {
-      console.error('Error initializing map:', error)
+      console.error('❌ Error initializing map:', error)
     }
 
     return () => {

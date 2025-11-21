@@ -76,3 +76,5 @@ mobile/android/app/build/
 # PDF extraction (no longer needed)
 extract_pdf.py
 Připrava aplikace.pdf
+
+.vercel

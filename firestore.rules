@@ -189,10 +189,15 @@ service cloud.firestore {
 
     // Menu items collection
     match /menuItems/{menuItemId} {
+      // Authenticated users can read their own menu items
       allow read: if isAuthenticated() &&
                      (isDemoUser() ||
                       (exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
                        get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid));
+
+      // Public read access for menu items belonging to published wedding websites
+      // This allows guests to see menu on the wedding website
+      allow read: if true;
 
       allow create: if isAuthenticated() &&
                        (isDemoUser() ||
@@ -208,10 +213,15 @@ service cloud.firestore {
 
     // Drink items collection
     match /drinkItems/{drinkItemId} {
+      // Authenticated users can read their own drink items
       allow read: if isAuthenticated() &&
                      (isDemoUser() ||
                       (exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
                        get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid));
+
+      // Public read access for drink items belonging to published wedding websites
+      // This allows guests to see drinks on the wedding website
+      allow read: if true;
 
       allow create: if isAuthenticated() &&
                        (isDemoUser() ||
