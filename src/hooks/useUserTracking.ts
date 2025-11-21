@@ -29,8 +29,10 @@ export function useUserTracking() {
   const sessionIdRef = useRef<string | null>(null)
   const lastActivityRef = useRef<Date>(new Date())
   const activityIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const sessionSaveIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const pageViewsRef = useRef<Set<string>>(new Set())
   const lastUserIdRef = useRef<string | null>(null)
+  const lastSavedTimeRef = useRef<number>(0) // Track last saved session time
 
   // Initialize session when user logs in - listen to Firebase Auth directly
   useEffect(() => {
@@ -82,30 +84,25 @@ export function useUserTracking() {
       }
     })
 
-    // Handle page unload - end session before closing
+    // Handle page unload - save session time before closing
     const handleBeforeUnload = () => {
-      console.log('🚪 Page unloading - ending session')
+      console.log('🚪 Page unloading - saving session time')
       if (sessionStartRef.current && sessionIdRef.current && previousUserId) {
-        // Calculate session duration
-        const sessionEnd = new Date()
-        const sessionDuration = Math.floor((sessionEnd.getTime() - sessionStartRef.current.getTime()) / 1000 / 60)
-
-        console.log('📤 Ending session on page unload, duration:', sessionDuration, 'minutes')
-
-        // Call endSession - it will be best effort
-        endSession(previousUserId)
+        // Save current session time immediately (best effort)
+        saveSessionTime(previousUserId, true)
       }
     }
 
-    // Handle visibility change - end session when tab becomes hidden for a while
+    // Handle visibility change - save time when tab becomes hidden
     const handleVisibilityChange = () => {
       if (document.hidden && sessionStartRef.current && sessionIdRef.current && previousUserId) {
-        console.log('👁️ Tab hidden - ending session')
-        endSession(previousUserId)
+        console.log('👁️ Tab hidden - saving session time')
+        // Save session time but don't end session
+        saveSessionTime(previousUserId, false)
       } else if (!document.hidden && previousUserId && auth.currentUser) {
-        console.log('👁️ Tab visible - starting new session')
-        startSession(auth.currentUser)
-        setupActivityTracking(auth.currentUser)
+        console.log('👁️ Tab visible - resuming tracking')
+        // Update last activity time when tab becomes visible again
+        lastActivityRef.current = new Date()
       }
     }
 
@@ -117,10 +114,13 @@ export function useUserTracking() {
     return () => {
       console.log('🛑 Cleaning up tracking')
       if (sessionStartRef.current && sessionIdRef.current && previousUserId) {
-        endSession(previousUserId)
+        saveSessionTime(previousUserId, true)
       }
       if (activityIntervalRef.current) {
         clearInterval(activityIntervalRef.current)
+      }
+      if (sessionSaveIntervalRef.current) {
+        clearInterval(sessionSaveIntervalRef.current)
       }
       window.removeEventListener('beforeunload', handleBeforeUnload)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
@@ -201,6 +201,47 @@ export function useUserTracking() {
     }
   }
 
+  const saveSessionTime = async (userId: string, markOffline: boolean = false) => {
+    if (!userId || !sessionStartRef.current || !sessionIdRef.current) {
+      console.log('⚠️ Cannot save session time - missing data')
+      return
+    }
+
+    const now = new Date()
+    const totalSessionDuration = Math.floor((now.getTime() - sessionStartRef.current.getTime()) / 1000 / 60) // minutes
+    const newTime = totalSessionDuration - lastSavedTimeRef.current
+
+    // Only save if there's new time to add (at least 1 minute)
+    if (newTime < 1) {
+      console.log('⏭️ Skipping save - no new time to add')
+      return
+    }
+
+    console.log('💾 Saving session time for userId:', userId, 'New time:', newTime, 'minutes', 'Total so far:', totalSessionDuration, 'minutes')
+
+    const analyticsRef = doc(db, 'userAnalytics', userId)
+
+    try {
+      const updates: any = {
+        totalSessionTime: increment(newTime),
+        lastActivityAt: serverTimestamp()
+      }
+
+      if (markOffline) {
+        updates.isOnline = false
+      }
+
+      await setDoc(analyticsRef, updates, { merge: true })
+
+      // Update last saved time
+      lastSavedTimeRef.current = totalSessionDuration
+
+      console.log('✅ Session time saved successfully:', newTime, 'minutes added')
+    } catch (error) {
+      console.error('❌ Error saving session time:', error)
+    }
+  }
+
   const endSession = async (userId?: string) => {
     // Use provided userId or current user
     const targetUserId = userId || auth.currentUser?.uid
@@ -210,39 +251,38 @@ export function useUserTracking() {
       return
     }
 
-    const sessionEnd = new Date()
-    const sessionDuration = Math.floor((sessionEnd.getTime() - sessionStartRef.current.getTime()) / 1000 / 60) // minutes
+    console.log('🏁 Ending session for userId:', targetUserId)
 
-    console.log('🏁 Ending session for userId:', targetUserId, 'Duration:', sessionDuration, 'minutes')
-
-    const analyticsRef = doc(db, 'userAnalytics', targetUserId)
-
-    try {
-      await setDoc(analyticsRef, {
-        isOnline: false,
-        totalSessionTime: increment(sessionDuration),
-        lastActivityAt: serverTimestamp()
-      }, { merge: true })
-
-      console.log('✅ Session ended successfully:', sessionIdRef.current, 'Total duration added:', sessionDuration, 'minutes')
-    } catch (error) {
-      console.error('❌ Error ending session:', error)
-    }
+    // Save any remaining time and mark offline
+    await saveSessionTime(targetUserId, true)
 
     sessionStartRef.current = null
     sessionIdRef.current = null
+    lastSavedTimeRef.current = 0
   }
 
   const setupActivityTracking = (firebaseUser: any) => {
-    // Clear any existing interval
+    // Clear any existing intervals
     if (activityIntervalRef.current) {
       clearInterval(activityIntervalRef.current)
+    }
+    if (sessionSaveIntervalRef.current) {
+      clearInterval(sessionSaveIntervalRef.current)
     }
 
     // Update activity every 30 seconds
     activityIntervalRef.current = setInterval(() => {
       updateActivity(firebaseUser)
     }, 30000)
+
+    // Save session time every 2 minutes (120 seconds)
+    // This ensures we don't lose time even if the session doesn't end properly
+    sessionSaveIntervalRef.current = setInterval(() => {
+      if (firebaseUser?.uid) {
+        console.log('⏰ Periodic session time save')
+        saveSessionTime(firebaseUser.uid, false)
+      }
+    }, 120000) // 2 minutes
 
     // Track user interactions
     const handleActivity = () => {

@@ -66,16 +66,16 @@ export default function AdminDashboard() {
   ]
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6 px-4 md:px-0">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-        <p className="text-gray-600">Správa a analytika SvatBot.cz</p>
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+        <p className="text-sm md:text-base text-gray-600">Správa a analytika SvatBot.cz</p>
       </div>
 
       {/* Navigation Tabs */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <nav className="flex space-x-4 p-4 overflow-x-auto">
+        <nav className="flex space-x-2 md:space-x-4 p-2 md:p-4 overflow-x-auto scrollbar-hide">
           {tabs.map((tab) => {
             const Icon = tab.icon
             const isActive = activeTab === tab.id
@@ -84,14 +84,14 @@ export default function AdminDashboard() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-colors ${
+                className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 rounded-lg font-medium text-xs md:text-sm whitespace-nowrap transition-colors ${
                   isActive
                     ? 'bg-primary-600 text-white'
                     : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
-                <Icon className="w-5 h-5" />
-                {tab.label}
+                <Icon className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
+                <span className="hidden sm:inline">{tab.label}</span>
               </button>
             )
           })}
@@ -115,12 +115,9 @@ export default function AdminDashboard() {
 
 function OverviewTab({ stats }: { stats: any }) {
   return (
-    <div className="space-y-6">
-      {/* DEMO Account Management Panel */}
-      <DemoAccountPanel />
-
+    <div className="space-y-4 md:space-y-6">
       {/* Main Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         <StatCard
           title="Celkem uživatelů"
           value={stats?.totalUsers || 0}
@@ -151,83 +148,94 @@ function OverviewTab({ stats }: { stats: any }) {
         />
       </div>
 
-      {/* Email Statistics Panel */}
-      <EmailStatsPanel />
-
-      {/* Email Testing Panel */}
-      <EmailTestPanel />
-
       {/* Subscription & Revenue Stats */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-medium text-gray-900">Měsíční příjmy</h3>
-            <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center">
-              <DollarSign className="h-6 w-6 text-green-600" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
+        <div className="bg-white p-4 md:p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="flex items-center justify-between mb-3 md:mb-4">
+            <h3 className="text-base md:text-lg font-medium text-gray-900">Měsíční příjmy</h3>
+            <div className="h-10 w-10 md:h-12 md:w-12 bg-green-100 rounded-full flex items-center justify-center">
+              <DollarSign className="h-5 w-5 md:h-6 md:w-6 text-green-600" />
             </div>
           </div>
-          <p className="text-3xl font-bold text-green-600">
+          <p className="text-2xl md:text-3xl font-bold text-green-600">
             {stats?.monthlyRevenue?.toLocaleString('cs-CZ')} Kč
           </p>
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-xs md:text-sm text-gray-500 mt-2">
             Celkem: {stats?.totalRevenue?.toLocaleString('cs-CZ')} Kč
           </p>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-medium text-gray-900">Aktivní předplatné</h3>
-            <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
-              <CheckCircle className="h-6 w-6 text-blue-600" />
+        <div className="bg-white p-4 md:p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="flex items-center justify-between mb-3 md:mb-4">
+            <h3 className="text-base md:text-lg font-medium text-gray-900">Aktivní předplatné</h3>
+            <div className="h-10 w-10 md:h-12 md:w-12 bg-blue-100 rounded-full flex items-center justify-center">
+              <CheckCircle className="h-5 w-5 md:h-6 md:w-6 text-blue-600" />
             </div>
           </div>
-          <p className="text-3xl font-bold text-blue-600">
+          <p className="text-2xl md:text-3xl font-bold text-blue-600">
             {stats?.activeSubscriptions || 0}
           </p>
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-xs md:text-sm text-gray-500 mt-2">
             Trial: {stats?.trialUsers || 0} uživatelů
           </p>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-medium text-gray-900">Průměrná doba relace</h3>
-            <div className="h-12 w-12 bg-purple-100 rounded-full flex items-center justify-center">
-              <Clock className="h-6 w-6 text-purple-600" />
+        <div className="bg-white p-4 md:p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="flex items-center justify-between mb-3 md:mb-4">
+            <h3 className="text-base md:text-lg font-medium text-gray-900">Průměrná doba relace</h3>
+            <div className="h-10 w-10 md:h-12 md:w-12 bg-purple-100 rounded-full flex items-center justify-center">
+              <Clock className="h-5 w-5 md:h-6 md:w-6 text-purple-600" />
             </div>
           </div>
-          <p className="text-3xl font-bold text-purple-600">
+          <p className="text-2xl md:text-3xl font-bold text-purple-600">
             {stats?.avgSessionTime || 0} min
           </p>
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-xs md:text-sm text-gray-500 mt-2">
             Celkem relací: {stats?.totalSessions?.toLocaleString('cs-CZ') || 0}
           </p>
         </div>
       </div>
 
       {/* User Growth Chart Placeholder */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Růst uživatelů</h3>
-        <div className="space-y-3">
+      <div className="bg-white p-4 md:p-6 rounded-lg shadow-sm border border-gray-200">
+        <h3 className="text-base md:text-lg font-medium text-gray-900 mb-3 md:mb-4">Růst uživatelů</h3>
+        <div className="space-y-2 md:space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">Tento měsíc</span>
-            <span className="text-lg font-semibold text-gray-900">
+            <span className="text-xs md:text-sm text-gray-600">Tento měsíc</span>
+            <span className="text-base md:text-lg font-semibold text-gray-900">
               +{stats?.newUsersThisMonth || 0} uživatelů
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">Tento týden</span>
-            <span className="text-lg font-semibold text-gray-900">
+            <span className="text-xs md:text-sm text-gray-600">Tento týden</span>
+            <span className="text-base md:text-lg font-semibold text-gray-900">
               +{stats?.newUsersThisWeek || 0} uživatelů
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">Dnes</span>
-            <span className="text-lg font-semibold text-gray-900">
+            <span className="text-xs md:text-sm text-gray-600">Dnes</span>
+            <span className="text-base md:text-lg font-semibold text-gray-900">
               +{stats?.newUsersToday || 0} uživatelů
             </span>
           </div>
         </div>
+      </div>
+
+      {/* Separator */}
+      <div className="border-t border-gray-200 my-6"></div>
+
+      {/* Less Important Sections */}
+      <div className="space-y-4 md:space-y-6">
+        <h3 className="text-base md:text-lg font-medium text-gray-500">Další nástroje</h3>
+
+        {/* DEMO Account Management Panel */}
+        <DemoAccountPanel />
+
+        {/* Email Statistics Panel */}
+        <EmailStatsPanel />
+
+        {/* Email Testing Panel */}
+        <EmailTestPanel />
       </div>
     </div>
   )
@@ -353,17 +361,17 @@ function StatCard({
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+    <div className="bg-white p-4 md:p-6 rounded-lg shadow-sm border border-gray-200">
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className="text-2xl font-bold text-gray-900">{value.toLocaleString('cs-CZ')}</p>
+        <div className="flex-1 min-w-0">
+          <p className="text-xs md:text-sm font-medium text-gray-600 truncate">{title}</p>
+          <p className="text-xl md:text-2xl font-bold text-gray-900">{value.toLocaleString('cs-CZ')}</p>
           {subtitle && (
-            <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
+            <p className="text-xs md:text-sm text-gray-500 mt-1 truncate">{subtitle}</p>
           )}
         </div>
-        <div className={`h-12 w-12 rounded-full flex items-center justify-center ${colorClasses[color as keyof typeof colorClasses]}`}>
-          <Icon className="h-6 w-6" />
+        <div className={`h-10 w-10 md:h-12 md:w-12 rounded-full flex items-center justify-center flex-shrink-0 ml-2 ${colorClasses[color as keyof typeof colorClasses]}`}>
+          <Icon className="h-5 w-5 md:h-6 md:w-6" />
         </div>
       </div>
     </div>

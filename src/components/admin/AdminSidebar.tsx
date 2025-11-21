@@ -11,7 +11,6 @@ import {
   ShoppingCart,
   BarChart3,
   Settings,
-  Plus,
   Heart,
   Menu,
   X,
@@ -38,12 +37,6 @@ const navigation: NavigationItem[] = [
     href: '/admin/vendors',
     icon: Store,
     permission: { resource: 'vendors', action: 'read' }
-  },
-  {
-    name: 'Přidat dodavatele',
-    href: '/admin/vendors/new',
-    icon: Plus,
-    permission: { resource: 'vendors', action: 'create' }
   },
   {
     name: 'Marketplace registrace',
