@@ -22,10 +22,11 @@ export default function StorySection({ content }: StorySectionProps) {
     : defaultTimeline
 
   return (
-    <section 
-      id="story" 
+    <section
+      id="story"
       className="py-20 relative"
       style={{
+        background: 'linear-gradient(to bottom, #ffffff 0%, #fdfcf9 50%, #faf8f3 100%)',
         backgroundImage: 'url(/templates/pretty/images/story-bg.png)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',

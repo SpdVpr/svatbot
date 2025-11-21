@@ -97,6 +97,36 @@ const TEMPLATES: TemplateConfig[] = [
       'Elegantní události',
     ],
   },
+  {
+    id: 'eternity',
+    name: 'Eternity - Modern Wedding',
+    description: 'Sofistikovaná moderní šablona se sage green a zlatou estetikou',
+    thumbnail: 'https://images.unsplash.com/photo-1627389955689-2640b4f87d80?w=800',
+    category: 'Moderní',
+    colors: {
+      primary: '#2C362B',
+      secondary: '#5F6F52',
+      accent: '#C5A880',
+    },
+    fonts: {
+      heading: 'Cormorant Garamond',
+      body: 'Montserrat',
+    },
+    features: [
+      'Moderní minimalistický design',
+      'Sage green & zlatá paleta',
+      'Hladké animace',
+      'Responzivní layout',
+      'Lightbox galerie',
+      'Interaktivní RSVP',
+    ],
+    suitableFor: [
+      'Moderní svatby',
+      'Elegantní události',
+      'Přírodní svatby',
+      'Boho svatby',
+    ],
+  },
 ]
 
 export default function TemplateSelector({ selectedTemplate, onSelect, disabled = false }: TemplateSelectorProps) {

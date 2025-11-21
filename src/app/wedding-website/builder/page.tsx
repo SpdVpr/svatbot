@@ -15,6 +15,7 @@ import DomainStatus from '@/components/wedding-website/DomainStatus'
 import WinterEleganceTemplate from '@/components/wedding-website/templates/WinterEleganceTemplate'
 import TwainLoveTemplate from '@/components/wedding-website/templates/TwainLoveTemplate'
 import PrettyTemplate from '@/components/wedding-website/templates/PrettyTemplate'
+import EternityTemplate from '@/components/wedding-website/templates/EternityTemplate'
 import type { TemplateType, WebsiteContent, WeddingWebsite } from '@/types/wedding-website'
 
 type Step = 'url' | 'template' | 'content' | 'preview'
@@ -741,6 +742,13 @@ export default function WeddingWebsiteBuilderPage() {
                         createdAt: new Date(),
                         updatedAt: new Date()
                       } as WeddingWebsite}
+                    />
+                  )}
+
+                  {selectedTemplate === 'eternity' && (
+                    <EternityTemplate
+                      content={content}
+                      websiteId="preview"
                     />
                   )}
                 </div>

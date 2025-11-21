@@ -14,7 +14,7 @@ export default function GiftSection({ content }: GiftSectionProps) {
   const hasBankAccount = !!content.bankAccount
 
   return (
-    <section id="gift" className="py-20 relative bg-white">
+    <section id="gift" className="py-20 relative" style={{ background: 'linear-gradient(to bottom, #faf8f3 0%, #f7f5f0 50%, #ffffff 100%)' }}>
       {/* Decorative Elements */}
       <div
         className="absolute right-0 top-1/2 -translate-y-1/2 w-32 h-32 opacity-15 hidden lg:block"

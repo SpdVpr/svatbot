@@ -11,7 +11,7 @@ export default function ScheduleSection({ content }: ScheduleSectionProps) {
   if (!content.enabled || !content.items || content.items.length === 0) return null
 
   return (
-    <section id="schedule" className="py-20 relative bg-white">
+    <section id="schedule" className="py-20 relative" style={{ background: 'linear-gradient(to bottom, #faf8f3 0%, #f7f5f0 50%, #ffffff 100%)' }}>
       {/* Decorative Elements */}
       <div
         className="absolute right-0 top-1/4 w-32 h-32 opacity-15 hidden lg:block"

@@ -35,7 +35,7 @@ export default function ContactSection({ content }: ContactSectionProps) {
   if (contacts.length === 0) return null
 
   return (
-    <section id="contact" className="py-20 relative bg-white">
+    <section id="contact" className="py-20 relative" style={{ background: 'linear-gradient(to bottom, #ffffff 0%, #fdfcf9 50%, #faf8f3 100%)' }}>
       {/* Decorative Elements */}
       <div
         className="absolute right-0 bottom-20 w-28 h-28 opacity-15 hidden lg:block"

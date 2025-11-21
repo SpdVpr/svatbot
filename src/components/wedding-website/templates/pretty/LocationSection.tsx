@@ -24,7 +24,7 @@ export default function LocationSection({ infoContent, scheduleContent }: Locati
 
   return (
     <>
-      <section id="events" className="py-20 bg-gray-50">
+      <section id="events" className="py-20" style={{ background: 'linear-gradient(to bottom, #ffffff 0%, #fdfcf9 50%, #faf8f3 100%)' }}>
         <div className="container mx-auto px-4">
           <SectionTitle title="Místo konání" />
 

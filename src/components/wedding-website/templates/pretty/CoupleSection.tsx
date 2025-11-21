@@ -11,7 +11,7 @@ export default function CoupleSection({ content, heroContent }: CoupleSectionPro
   if (!content.enabled) return null
 
   return (
-    <section id="couple" className="py-20 bg-white">
+    <section id="couple" className="py-20" style={{ background: 'linear-gradient(to bottom, #faf8f3 0%, #f7f5f0 50%, #ffffff 100%)' }}>
       <div className="container mx-auto px-4">
         <div className="flex flex-col lg:flex-row items-start lg:items-center gap-8 lg:gap-12">
           {/* Bride Info */}

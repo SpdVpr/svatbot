@@ -39,7 +39,7 @@ export default function GallerySection({ content }: GallerySectionProps) {
 
   return (
     <>
-      <section id="gallery" className="py-20 relative" style={{ background: 'linear-gradient(to bottom, #faf8f3 0%, #ffffff 100%)' }}>
+      <section id="gallery" className="py-20 relative" style={{ background: 'linear-gradient(to bottom, #ffffff 0%, #fdfcf9 50%, #faf8f3 100%)' }}>
         {/* Decorative Elements */}
         <div
           className="absolute left-0 bottom-20 w-28 h-28 opacity-15 hidden lg:block"

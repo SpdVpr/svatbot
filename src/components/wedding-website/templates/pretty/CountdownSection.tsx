@@ -46,7 +46,7 @@ export default function CountdownSection({ weddingDate }: CountdownSectionProps)
   const formattedDate = format(new Date(weddingDate), 'd MMMM yyyy', { locale: cs })
 
   return (
-    <section className="py-20" style={{ background: 'linear-gradient(to bottom, #faf8f3 0%, #ffffff 100%)' }}>
+    <section className="py-20" style={{ background: 'linear-gradient(to bottom, #ffffff 0%, #fdfcf9 50%, #faf8f3 100%)' }}>
       <div className="container mx-auto px-4">
         <div className="text-center">
           <h2 

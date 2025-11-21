@@ -112,7 +112,7 @@ export default function MenuSection({ content, websiteId }: MenuSectionProps) {
   const hasDrinks = drinkItems.length > 0 && (content.showDrinks === true)
 
   return (
-    <section id="menu" className="py-20 relative" style={{ background: 'linear-gradient(to bottom, #ffffff 0%, #faf8f3 100%)' }}>
+    <section id="menu" className="py-20 relative" style={{ background: 'linear-gradient(to bottom, #faf8f3 0%, #f7f5f0 50%, #ffffff 100%)' }}>
       {/* Decorative Elements */}
       <div
         className="absolute left-0 top-20 w-24 h-24 opacity-20 hidden lg:block"

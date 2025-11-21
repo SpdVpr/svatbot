@@ -20,7 +20,7 @@ export default function AccommodationSection({ content }: AccommodationSectionPr
   }
 
   return (
-    <section id="accommodation" className="py-20 relative" style={{ background: 'linear-gradient(to bottom, #ffffff 0%, #faf8f3 100%)' }}>
+    <section id="accommodation" className="py-20 relative" style={{ background: 'linear-gradient(to bottom, #faf8f3 0%, #f7f5f0 50%, #ffffff 100%)' }}>
       {/* Decorative Elements */}
       <div
         className="absolute left-0 top-1/4 w-28 h-28 opacity-15 hidden lg:block"
