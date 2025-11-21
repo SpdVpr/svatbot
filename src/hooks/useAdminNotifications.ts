@@ -63,6 +63,13 @@ export function useAdminNotifications() {
       limit(50)
     )
 
+    // Listen to recent marketplace vendor registrations
+    const vendorRegistrationsQuery = query(
+      collection(db, 'marketplaceVendors'),
+      orderBy('createdAt', 'desc'),
+      limit(50)
+    )
+
     const allNotifications: AdminNotification[] = []
 
     // Subscribe to users
@@ -153,7 +160,65 @@ export function useAdminNotifications() {
       })
       
       updateNotifications(inquiryNotifications, 'inquiry')
+    })
+
+    // Subscribe to feedback
+    const unsubFeedback = onSnapshot(feedbackQuery, (snapshot) => {
+      const feedbackNotifications: AdminNotification[] = []
+      snapshot.forEach((doc) => {
+        const data = doc.data()
+        const createdAt = data.createdAt as Timestamp
+
+        // Only show feedback from last 7 days
+        const sevenDaysAgo = new Date()
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+
+        if (createdAt && createdAt.toDate() > sevenDaysAgo) {
+          feedbackNotifications.push({
+            id: `feedback-${doc.id}`,
+            type: 'feedback',
+            title: 'Nový feedback',
+            message: `${data.userName || data.userEmail} poslal feedback: ${data.subject}`,
+            data: { feedbackId: doc.id },
+            read: false,
+            createdAt,
+            userName: data.userName,
+            userEmail: data.userEmail
+          })
+        }
+      })
+
+      updateNotifications(feedbackNotifications, 'feedback')
       setLoading(false)
+    })
+
+    // Subscribe to marketplace vendor registrations
+    const unsubVendorRegistrations = onSnapshot(vendorRegistrationsQuery, (snapshot) => {
+      const vendorNotifications: AdminNotification[] = []
+      snapshot.forEach((doc) => {
+        const data = doc.data()
+        const createdAt = data.createdAt as Timestamp
+
+        // Only show registrations from last 7 days
+        const sevenDaysAgo = new Date()
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+
+        if (createdAt && createdAt.toDate() > sevenDaysAgo) {
+          vendorNotifications.push({
+            id: `vendor-reg-${doc.id}`,
+            type: 'vendor_registration',
+            title: 'Nová registrace dodavatele',
+            message: `${data.name} se zaregistroval jako ${data.category}`,
+            data: { vendorId: doc.id, category: data.category, status: data.status },
+            read: false,
+            createdAt,
+            userName: data.name,
+            userEmail: data.email
+          })
+        }
+      })
+
+      updateNotifications(vendorNotifications, 'vendor_registration')
     })
 
     function updateNotifications(newNotifs: AdminNotification[], type: string) {
@@ -171,6 +236,8 @@ export function useAdminNotifications() {
       unsubUsers()
       unsubPayments()
       unsubInquiries()
+      unsubFeedback()
+      unsubVendorRegistrations()
     }
   }, [])
 

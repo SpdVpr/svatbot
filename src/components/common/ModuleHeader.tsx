@@ -21,6 +21,8 @@ interface ModuleHeaderProps {
   actions?: React.ReactNode
   /** Stats to display on the right side (desktop only) */
   stats?: React.ReactNode
+  /** Hide the default back button (useful when actions contains a custom back button) */
+  hideBackButton?: boolean
 }
 
 export default function ModuleHeader({
@@ -30,7 +32,8 @@ export default function ModuleHeader({
   iconGradient = 'from-purple-500 to-pink-500',
   iconColor,
   actions,
-  stats
+  stats,
+  hideBackButton = false
 }: ModuleHeaderProps) {
   const router = useRouter()
   const [showMobileMenu, setShowMobileMenu] = useState(false)
@@ -52,13 +55,15 @@ export default function ModuleHeader({
               </button>
 
               {/* Back button (visible only on desktop) */}
-              <button
-                onClick={() => router.push('/')}
-                className="hidden sm:block p-2 hover:bg-gray-100 rounded-lg transition-colors group flex-shrink-0"
-                title="Zpět na dashboard"
-              >
-                <ArrowLeft className="w-5 h-5 text-gray-600 group-hover:text-gray-900" />
-              </button>
+              {!hideBackButton && (
+                <button
+                  onClick={() => router.push('/')}
+                  className="hidden sm:block p-2 hover:bg-gray-100 rounded-lg transition-colors group flex-shrink-0"
+                  title="Zpět na dashboard"
+                >
+                  <ArrowLeft className="w-5 h-5 text-gray-600 group-hover:text-gray-900" />
+                </button>
+              )}
 
               {/* Home icon */}
               <Link

@@ -129,6 +129,7 @@ export default function RSVPManagementPage() {
         title="RSVP odpovědi"
         subtitle={`${website.customUrl}.svatbot.cz • Správa potvrzení účasti`}
         iconGradient="from-pink-500 to-purple-500"
+        hideBackButton={true}
         actions={
           <Link
             href="/wedding-website"

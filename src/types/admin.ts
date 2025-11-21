@@ -202,6 +202,11 @@ export interface AdminStats {
   totalSessions: number
   avgSessionsPerUser: number
 
+  // Wedding Website Analytics
+  totalWebsiteViews: number
+  totalUniqueVisitors: number
+  publishedWebsites: number
+
   // Support
   openConversations: number
   pendingFeedback: number

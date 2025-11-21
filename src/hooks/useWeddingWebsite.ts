@@ -146,7 +146,7 @@ export function useWeddingWebsite(customUrl?: string) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Načtení svatebního webu podle wedding ID (pro editaci)
+  // Načtení svatebního webu podle wedding ID (pro editaci) - s real-time updates
   useEffect(() => {
     if (!user || !wedding || customUrl) {
       // Pokud je customUrl, použije se jiný useEffect níže
@@ -156,16 +156,16 @@ export function useWeddingWebsite(customUrl?: string) {
       return
     }
 
-    const loadWebsiteByWeddingId = async () => {
-      try {
-        setLoading(true)
-        setError(null)
+    setLoading(true)
+    setError(null)
 
-        // Hledáme web podle weddingId
-        const websitesRef = collection(db, 'weddingWebsites')
-        const q = query(websitesRef, where('weddingId', '==', wedding.id))
-        const querySnapshot = await getDocs(q)
+    // Hledáme web podle weddingId
+    const websitesRef = collection(db, 'weddingWebsites')
+    const q = query(websitesRef, where('weddingId', '==', wedding.id))
 
+    // Real-time listener
+    const unsubscribe = onSnapshot(q,
+      (querySnapshot) => {
         if (querySnapshot.empty) {
           setWebsite(null)
           setLoading(false)
@@ -185,16 +185,16 @@ export function useWeddingWebsite(customUrl?: string) {
         } as WeddingWebsite
 
         setWebsite(loadedWebsite)
-
-      } catch (err: any) {
+        setLoading(false)
+      },
+      (err) => {
         console.error('Error loading website by wedding ID:', err)
         setError('Chyba při načítání svatebního webu')
-      } finally {
         setLoading(false)
       }
-    }
+    )
 
-    loadWebsiteByWeddingId()
+    return () => unsubscribe()
   }, [user, wedding, customUrl])
 
   // Načtení svatebního webu podle custom URL (pro veřejný přístup)

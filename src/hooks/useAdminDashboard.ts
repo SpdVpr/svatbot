@@ -46,13 +46,15 @@ export function useAdminDashboard(includeTestAccounts: boolean = false) {
         subscriptions,
         payments,
         conversations,
-        feedback
+        feedback,
+        weddingWebsites
       ] = await Promise.all([
         getDocs(collection(db, 'userAnalytics')),
         getDocs(collection(db, 'subscriptions')),
         getDocs(collection(db, 'payments')),
         getDocs(collection(db, 'adminMessages')),
-        getDocs(collection(db, 'feedback'))
+        getDocs(collection(db, 'feedback')),
+        getDocs(collection(db, 'weddingWebsites'))
       ])
 
       // Calculate user stats
@@ -72,6 +74,11 @@ export function useAdminDashboard(includeTestAccounts: boolean = false) {
       let newUsersThisMonth = 0
       let totalSessionTime = 0
       let totalSessions = 0
+
+      // Wedding website analytics
+      let totalWebsiteViews = 0
+      let totalUniqueVisitors = 0
+      let publishedWebsites = 0
 
       userAnalytics.forEach(doc => {
         const data = doc.data() as UserAnalytics
@@ -102,6 +109,25 @@ export function useAdminDashboard(includeTestAccounts: boolean = false) {
 
         totalSessionTime += data.totalSessionTime || 0
         totalSessions += data.sessions?.length || 0
+      })
+
+      // Calculate wedding website analytics (excluding test accounts)
+      weddingWebsites.forEach(doc => {
+        const data = doc.data() as any
+
+        // Skip test accounts if not including them
+        if (!includeTestAccounts && data.userId && testAccountUserIds.has(data.userId)) return
+
+        // Count published websites
+        if (data.isPublished) {
+          publishedWebsites++
+        }
+
+        // Sum up views and unique visitors
+        if (data.analytics) {
+          totalWebsiteViews += data.analytics.views || 0
+          totalUniqueVisitors += data.analytics.uniqueVisitors || 0
+        }
       })
 
       // Calculate subscription stats (excluding test accounts)
@@ -194,6 +220,9 @@ export function useAdminDashboard(includeTestAccounts: boolean = false) {
         avgSessionTime,
         totalSessions,
         avgSessionsPerUser,
+        totalWebsiteViews,
+        totalUniqueVisitors,
+        publishedWebsites,
         openConversations,
         pendingFeedback,
         avgResponseTime: 0, // TODO: Calculate from messages

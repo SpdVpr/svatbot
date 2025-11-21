@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   collection,
   doc,
@@ -58,6 +58,9 @@ export function useBudget(): UseBudgetReturn {
   const { wedding } = useWedding()
   const { withDemoCheck } = useDemoLock()
   const { getTotalCostByVendor, menuItems, drinkItems } = useMenu()
+
+  // Ref to track if sync is in progress to prevent infinite loops
+  const isSyncingRef = useRef(false)
 
   // Initialize with localStorage data if available
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>(() => {
@@ -610,33 +613,45 @@ export function useBudget(): UseBudgetReturn {
 
   // Automatic synchronization with menu items
   useEffect(() => {
-    if (!wedding?.id || !budgetItems.length) return
+    if (!wedding?.id || !budgetItems.length || isSyncingRef.current) return
 
     const syncBudgetWithMenu = async () => {
       // Find all budget items that have syncWithMenu enabled
       const itemsToSync = budgetItems.filter(item => item.syncWithMenu && item.syncVendorId)
 
-      for (const item of itemsToSync) {
-        try {
-          // Get current total cost from menu for this vendor
-          const currentMenuCost = getTotalCostByVendor(item.syncVendorId!)
+      if (itemsToSync.length === 0) return
 
-          // Only update if the cost has changed
-          if (item.actualAmount !== currentMenuCost) {
-            console.log(`🔄 Auto-syncing budget item "${item.name}" with menu: ${item.actualAmount} → ${currentMenuCost}`)
+      // Set syncing flag to prevent re-entry
+      isSyncingRef.current = true
 
-            await updateBudgetItem(item.id, {
-              actualAmount: currentMenuCost
-            })
+      try {
+        for (const item of itemsToSync) {
+          try {
+            // Get current total cost from menu for this vendor
+            const currentMenuCost = getTotalCostByVendor(item.syncVendorId!)
+
+            // Only update if the cost has changed
+            if (item.actualAmount !== currentMenuCost) {
+              console.log(`🔄 Auto-syncing budget item "${item.name}" with menu: ${item.actualAmount} → ${currentMenuCost}`)
+
+              await updateBudgetItem(item.id, {
+                actualAmount: currentMenuCost
+              })
+            }
+          } catch (error) {
+            console.error(`Error syncing budget item ${item.id} with menu:`, error)
           }
-        } catch (error) {
-          console.error(`Error syncing budget item ${item.id} with menu:`, error)
         }
+      } finally {
+        // Reset syncing flag after a delay to allow Firestore updates to propagate
+        setTimeout(() => {
+          isSyncingRef.current = false
+        }, 1000)
       }
     }
 
     syncBudgetWithMenu()
-  }, [menuItems, drinkItems, budgetItems, wedding?.id, getTotalCostByVendor])
+  }, [menuItems, drinkItems, wedding?.id, getTotalCostByVendor])
 
   // Clear error
   const clearError = () => setError(null)

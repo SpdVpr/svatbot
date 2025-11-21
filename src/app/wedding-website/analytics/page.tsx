@@ -52,6 +52,14 @@ export default function AnalyticsPage() {
     )
   }
 
+  // Debug logging
+  console.log('📊 Website analytics data:', {
+    websiteId: website.id,
+    analytics: website.analytics,
+    views: website.analytics?.views,
+    uniqueVisitors: website.analytics?.uniqueVisitors
+  })
+
   return (
     <div className="min-h-screen">
       {/* Header */}
@@ -60,6 +68,7 @@ export default function AnalyticsPage() {
         title="Statistiky a analytika"
         subtitle={`${website.customUrl}.svatbot.cz • Návštěvnost a aktivita`}
         iconGradient="from-pink-500 to-purple-500"
+        hideBackButton={true}
         actions={
           <Link
             href="/wedding-website"
@@ -81,7 +90,7 @@ export default function AnalyticsPage() {
               <Eye className="w-5 h-5 text-blue-500" />
             </div>
             <div className="text-3xl font-bold text-gray-900">
-              {website.analytics.views}
+              {website.analytics?.views || 0}
             </div>
             <p className="text-sm text-gray-500 mt-1">
               Od publikování
@@ -94,7 +103,7 @@ export default function AnalyticsPage() {
               <Users className="w-5 h-5 text-green-500" />
             </div>
             <div className="text-3xl font-bold text-gray-900">
-              {website.analytics.uniqueVisitors}
+              {website.analytics?.uniqueVisitors || 0}
             </div>
             <p className="text-sm text-gray-500 mt-1">
               Různých uživatelů

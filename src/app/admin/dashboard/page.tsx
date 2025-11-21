@@ -33,7 +33,9 @@ import {
   FileText,
   QrCode,
   ClipboardCheck,
-  TestTube
+  TestTube,
+  Eye,
+  Globe
 } from 'lucide-react'
 
 type TabType = 'overview' | 'users' | 'messages' | 'feedback' | 'payments' | 'invoices' | 'vendors' | 'reviews' | 'marketing' | 'testing'
@@ -184,6 +186,54 @@ function OverviewTab({ stats, includeTestAccounts }: { stats: any; includeTestAc
           color="orange"
           subtitle="Aktivní dnes"
         />
+      </div>
+
+      {/* Wedding Website Analytics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
+        <div className="bg-white p-4 md:p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="flex items-center justify-between mb-3 md:mb-4">
+            <h3 className="text-base md:text-lg font-medium text-gray-900">Zobrazení webů</h3>
+            <div className="h-10 w-10 md:h-12 md:w-12 bg-cyan-100 rounded-full flex items-center justify-center">
+              <Eye className="h-5 w-5 md:h-6 md:w-6 text-cyan-600" />
+            </div>
+          </div>
+          <p className="text-2xl md:text-3xl font-bold text-cyan-600">
+            {stats?.totalWebsiteViews?.toLocaleString('cs-CZ') || 0}
+          </p>
+          <p className="text-xs md:text-sm text-gray-500 mt-2">
+            Celkem zobrazení subdomén
+          </p>
+        </div>
+
+        <div className="bg-white p-4 md:p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="flex items-center justify-between mb-3 md:mb-4">
+            <h3 className="text-base md:text-lg font-medium text-gray-900">Unikátní návštěvníci</h3>
+            <div className="h-10 w-10 md:h-12 md:w-12 bg-teal-100 rounded-full flex items-center justify-center">
+              <Users className="h-5 w-5 md:h-6 md:w-6 text-teal-600" />
+            </div>
+          </div>
+          <p className="text-2xl md:text-3xl font-bold text-teal-600">
+            {stats?.totalUniqueVisitors?.toLocaleString('cs-CZ') || 0}
+          </p>
+          <p className="text-xs md:text-sm text-gray-500 mt-2">
+            Různých návštěvníků
+          </p>
+        </div>
+
+        <div className="bg-white p-4 md:p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="flex items-center justify-between mb-3 md:mb-4">
+            <h3 className="text-base md:text-lg font-medium text-gray-900">Publikované weby</h3>
+            <div className="h-10 w-10 md:h-12 md:w-12 bg-emerald-100 rounded-full flex items-center justify-center">
+              <Globe className="h-5 w-5 md:h-6 md:w-6 text-emerald-600" />
+            </div>
+          </div>
+          <p className="text-2xl md:text-3xl font-bold text-emerald-600">
+            {stats?.publishedWebsites || 0}
+          </p>
+          <p className="text-xs md:text-sm text-gray-500 mt-2">
+            Aktivních svatebních webů
+          </p>
+        </div>
       </div>
 
       {/* Subscription & Revenue Stats */}
