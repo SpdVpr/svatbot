@@ -99,7 +99,7 @@ export default function Navigation({ bride, groom, content }: NavigationProps) {
                   <li key={item.href}>
                     <button
                       onClick={() => scrollToSection(item.href)}
-                      className={`block px-6 text-white transition-all duration-300 ${
+                      className={`block px-3 text-white transition-all duration-300 ${
                         isScrolled
                           ? 'py-6 hover:text-[#6a8a98]'
                           : 'py-9 hover:text-[#b6e9ff]'

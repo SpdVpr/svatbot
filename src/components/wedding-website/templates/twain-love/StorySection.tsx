@@ -14,7 +14,7 @@ export default function StorySection({ content }: StorySectionProps) {
   }
 
   const formatDate = (dateString: string) => {
-    if (!dateString) return ''
+    if (!dateString || dateString.trim() === '') return ''
 
     // Try to parse as date
     const date = new Date(dateString)
@@ -37,7 +37,7 @@ export default function StorySection({ content }: StorySectionProps) {
       <SectionTitle title={content.title || 'Náš příběh'} />
 
       {content.subtitle && (
-        <p className="text-center text-[#85aaba] text-lg mb-2 px-4" style={{ fontFamily: 'Great Vibes, cursive' }}>
+        <p className="text-center text-[#85aaba] px-4" style={{ fontFamily: 'Great Vibes, cursive', fontSize: '1.8rem', marginBottom: '1.5rem' }}>
           {content.subtitle}
         </p>
       )}
@@ -77,13 +77,13 @@ export default function StorySection({ content }: StorySectionProps) {
                 {/* Text - right for even, left for odd */}
                 <div className={`${isEven ? 'md:order-2' : 'md:order-1'} flex items-center`}>
                   <div className={`p-12 ${isEven ? 'md:text-left' : 'md:text-right'}`}>
-                    <h3 className="text-3xl font-light text-gray-800 mb-3">
+                    <h3 className="text-3xl text-gray-800 mb-3" style={{ fontFamily: 'Great Vibes, cursive' }}>
                       {item.title}
                     </h3>
-                    <span className="inline-block text-[#85aaba] text-sm uppercase tracking-wider mb-4">
+                    <span className="inline-block text-[#85aaba] text-sm uppercase tracking-wider mb-4" style={{ fontFamily: 'Muli, sans-serif' }}>
                       {formatDate(item.date)}
                     </span>
-                    <p className="text-gray-600 leading-relaxed">
+                    <p className="text-gray-600 leading-relaxed" style={{ fontFamily: 'Muli, sans-serif' }}>
                       {item.description}
                     </p>
                   </div>

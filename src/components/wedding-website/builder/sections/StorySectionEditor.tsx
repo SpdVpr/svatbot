@@ -359,7 +359,7 @@ export default function StorySectionEditor({ content, onChange }: StorySectionEd
                       type="text"
                       value={item.date}
                       onChange={(e) => updateTimelineItem(item.id, 'date', e.target.value)}
-                      placeholder="Datum (např. Léto 2020)"
+                      placeholder="Datum (např. Léto 2020, Červenec 2023, 2020)"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                     />
                   </div>

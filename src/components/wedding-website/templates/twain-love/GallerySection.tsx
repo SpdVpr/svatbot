@@ -44,7 +44,7 @@ export default function GallerySection({ content }: GallerySectionProps) {
       <SectionTitle title={content.title || 'Naše galerie'} />
 
       {content.subtitle && (
-        <p className="text-center text-[#85aaba] text-lg mb-2 px-4" style={{ fontFamily: 'Great Vibes, cursive' }}>
+        <p className="text-center text-[#85aaba] px-4" style={{ fontFamily: 'Great Vibes, cursive', fontSize: '1.8rem', marginBottom: '1.5rem' }}>
           {content.subtitle}
         </p>
       )}
@@ -75,8 +75,8 @@ export default function GallerySection({ content }: GallerySectionProps) {
 
                   {/* Caption bar on hover */}
                   {image.caption && (
-                    <div className="absolute bottom-0 left-0 right-0 bg-black/75 text-white py-3 px-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                      <p className="text-sm text-center" style={{ fontFamily: 'Muli, sans-serif' }}>
+                    <div className="absolute bottom-0 left-0 right-0 bg-black/80 text-white py-4 px-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                      <p className="text-sm text-center leading-relaxed" style={{ fontFamily: 'Muli, sans-serif' }}>
                         {image.caption}
                       </p>
                     </div>
