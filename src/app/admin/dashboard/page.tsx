@@ -15,6 +15,7 @@ import DemoAccountPanel from '@/components/admin/DemoAccountPanel'
 import AdminQRCode from '@/components/admin/AdminQRCode'
 import QRCodeStats from '@/components/admin/QRCodeStats'
 import TestFeedbackManagement from '@/components/admin/TestFeedbackManagement'
+import AdminNotifications from '@/components/admin/AdminNotifications'
 import {
   Users,
   Clock,
@@ -220,6 +221,9 @@ function OverviewTab({ stats }: { stats: any }) {
           </div>
         </div>
       </div>
+
+      {/* Admin Notifications */}
+      <AdminNotifications />
 
       {/* Separator */}
       <div className="border-t border-gray-200 my-6"></div>

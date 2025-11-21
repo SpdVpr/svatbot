@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setAdminRole = exports.createVendor = exports.getVendors = exports.sendContactFormEmail = exports.sendPaymentEmail = exports.sendVendorContactEmails = exports.onMarketplaceVendorUpdate = exports.onMarketplaceVendorCreate = exports.checkTrialExpiry = exports.onPaymentSuccess = exports.scheduledCleanup = exports.onInquiryCreate = exports.onReviewUpdate = exports.onReviewCreate = exports.onVendorUpdate = exports.onUserCreate = exports.api = void 0;
+exports.createVendor = exports.getVendors = exports.sendContactFormEmail = exports.sendPaymentEmail = exports.sendVendorContactEmails = exports.onMarketplaceVendorUpdate = exports.onMarketplaceVendorCreate = exports.checkTrialExpiry = exports.onPaymentSuccess = exports.scheduledCleanup = exports.onInquiryCreate = exports.onReviewUpdate = exports.onReviewCreate = exports.onVendorUpdate = exports.onUserCreate = exports.api = void 0;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const express_1 = __importDefault(require("express"));
@@ -179,7 +179,5 @@ Object.defineProperty(exports, "createVendor", { enumerable: true, get: function
 // export { default as sendInquiry } from './callable/sendInquiry'
 // export { default as addReview } from './callable/addReview'
 // export { default as toggleFavorite } from './callable/toggleFavorite'
-// Admin setup function (one-time use)
-var setAdminRole_1 = require("./setAdminRole");
-Object.defineProperty(exports, "setAdminRole", { enumerable: true, get: function () { return setAdminRole_1.setAdminRole; } });
+// Admin setup function removed for security (admin already set up)
 //# sourceMappingURL=index.js.map

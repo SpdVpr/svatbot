@@ -15,5 +15,4 @@ export { sendPaymentEmail } from './https/sendPaymentEmail';
 export { sendContactFormEmail } from './https/sendContactFormEmail';
 export { default as getVendors } from './callable/getVendors';
 export { default as createVendor } from './callable/createVendor';
-export { setAdminRole } from './setAdminRole';
 //# sourceMappingURL=index.d.ts.map
