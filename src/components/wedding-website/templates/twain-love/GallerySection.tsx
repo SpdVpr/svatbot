@@ -60,11 +60,11 @@ export default function GallerySection({ content }: GallerySectionProps) {
           {images.map((image, index) => (
             <div
               key={image.id}
-              className="gallery-img cursor-pointer overflow-hidden mb-8"
+              className="gallery-img cursor-pointer overflow-hidden mb-8 group"
               onClick={() => openLightbox(index)}
             >
-              <div className="thumbnail transition-transform duration-300 hover:scale-110">
-                <div className="relative w-full h-[450px]">
+              <div className="thumbnail transition-transform duration-300 hover:scale-110 relative">
+                <div className="relative w-full h-[450px] overflow-hidden rounded-lg">
                   <Image
                     src={image.url}
                     alt={image.caption || `Gallery image ${index + 1}`}
@@ -72,6 +72,15 @@ export default function GallerySection({ content }: GallerySectionProps) {
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
+
+                  {/* Caption bar on hover */}
+                  {image.caption && (
+                    <div className="absolute bottom-0 left-0 right-0 bg-black/75 text-white py-3 px-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                      <p className="text-sm text-center" style={{ fontFamily: 'Muli, sans-serif' }}>
+                        {image.caption}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
