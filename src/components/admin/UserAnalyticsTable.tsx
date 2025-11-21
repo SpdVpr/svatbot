@@ -605,11 +605,10 @@ function UserDetailPanel({ user }: { user: UserAnalytics }) {
     })
   }
 
-  // Get most visited pages
+  // Get most visited pages (all pages, sorted by count)
   const pageViews = user.pageViews || {}
-  const topPages = Object.entries(pageViews)
+  const allPages = Object.entries(pageViews)
     .sort(([, a], [, b]) => (b as number) - (a as number))
-    .slice(0, 5)
 
   // Get recent sessions (last 10)
   const recentSessions = user.sessions
@@ -702,9 +701,9 @@ function UserDetailPanel({ user }: { user: UserAnalytics }) {
             <Eye className="w-4 h-4" />
             Nejnavštěvovanější stránky
           </h4>
-          <div className="space-y-2">
-            {topPages.length > 0 ? (
-              topPages.map(([page, count]) => (
+          <div className="max-h-96 overflow-y-auto space-y-2">
+            {allPages.length > 0 ? (
+              allPages.map(([page, count]) => (
                 <div key={page} className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded text-sm">
                   <span className="text-gray-600 truncate flex-1">
                     {page.replace(/_/g, '/')}
