@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useAuth } from './useAuth'
 import {
   doc,
@@ -33,6 +33,7 @@ export function useUserTracking() {
   const pageViewsRef = useRef<Set<string>>(new Set())
   const lastUserIdRef = useRef<string | null>(null)
   const lastSavedTimeRef = useRef<number>(0) // Track last saved session time
+  const [isSessionReady, setIsSessionReady] = useState(false)
 
   // Initialize session when user logs in - listen to Firebase Auth directly
   useEffect(() => {
@@ -76,6 +77,9 @@ export function useUserTracking() {
 
         // Start new session
         await startSession(firebaseUser)
+
+        // Mark session as ready for page tracking
+        setIsSessionReady(true)
 
         // Set up activity tracking
         setupActivityTracking(firebaseUser)
@@ -130,10 +134,24 @@ export function useUserTracking() {
 
   // Track page views
   useEffect(() => {
-    if (!user || !pathname) return
+    if (!pathname || !auth.currentUser || !isSessionReady) {
+      console.log('⏭️ Skipping page view tracking:', {
+        pathname,
+        hasUser: !!auth.currentUser,
+        isSessionReady
+      })
+      return
+    }
 
-    trackPageView(pathname)
-  }, [pathname, user?.id])
+    console.log('🎯 Page view effect triggered for:', pathname)
+
+    // Small delay to ensure session is fully initialized
+    const timer = setTimeout(() => {
+      trackPageView(pathname)
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [pathname, isSessionReady])
 
   const startSession = async (firebaseUser: any) => {
     if (!firebaseUser) return
@@ -362,16 +380,24 @@ export function useUserTracking() {
   }
 
   const trackPageView = async (page: string) => {
-    if (!user || !sessionIdRef.current) return
+    const currentUser = auth.currentUser
+    if (!currentUser || !sessionIdRef.current) {
+      console.log('⚠️ Cannot track page view - no user or session')
+      return
+    }
 
-    const analyticsRef = doc(db, 'userAnalytics', user.id)
+    const analyticsRef = doc(db, 'userAnalytics', currentUser.uid)
     const pageKey = page.replace(/\//g, '_')
+
+    console.log('📄 Tracking page view:', page, 'for user:', currentUser.email)
 
     try {
       // Always increment page view count
       await setDoc(analyticsRef, {
         [`pageViews.${pageKey}`]: increment(1)
       }, { merge: true })
+
+      console.log('✅ Page view count incremented for:', pageKey)
 
       // Also add page to current session's pages array if not already there
       if (!pageViewsRef.current.has(page)) {
@@ -397,12 +423,18 @@ export function useUserTracking() {
               await setDoc(analyticsRef, {
                 sessions
               }, { merge: true })
+
+              console.log('✅ Page added to session:', page)
             }
+          } else {
+            console.log('⚠️ Current session not found in sessions array')
           }
         }
+      } else {
+        console.log('⏭️ Page already tracked in this session:', page)
       }
     } catch (error) {
-      console.error('Error tracking page view:', error)
+      console.error('❌ Error tracking page view:', error)
     }
   }
 
