@@ -15,7 +15,7 @@ export default function ScheduleSection({ content }: ScheduleSectionProps) {
 
   return (
     <div id="schedule" className="py-20 bg-white">
-      <SectionTitle title="Program svatby" />
+      <SectionTitle title="Harmonogram svatby" />
 
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">

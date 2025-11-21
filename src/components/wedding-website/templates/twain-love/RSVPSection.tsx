@@ -83,6 +83,29 @@ export default function RSVPSection({ content, websiteId }: RSVPSectionProps) {
     )
   }
 
+  const formatDeadline = (date: Date | any) => {
+    if (!date) return ''
+
+    let dateObj: Date
+    if (date instanceof Date) {
+      dateObj = date
+    } else if (typeof date === 'string') {
+      dateObj = new Date(date)
+    } else if (date.seconds) {
+      dateObj = new Date(date.seconds * 1000)
+    } else if (date.toDate && typeof date.toDate === 'function') {
+      dateObj = date.toDate()
+    } else {
+      return ''
+    }
+
+    return dateObj.toLocaleDateString('cs-CZ', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    })
+  }
+
   return (
     <div id="rsvp" className="py-20 bg-white">
       <SectionTitle title="Potvrzení účasti" />
@@ -90,8 +113,14 @@ export default function RSVPSection({ content, websiteId }: RSVPSectionProps) {
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto">
           {content.message && (
-            <p className="text-center text-gray-600 mb-8">
+            <p className="text-center text-gray-600 mb-4" style={{ fontFamily: 'Muli, sans-serif' }}>
               {content.message}
+            </p>
+          )}
+
+          {content.deadline && (
+            <p className="text-center text-[#85aaba] font-medium mb-8" style={{ fontFamily: 'Muli, sans-serif' }}>
+              Prosíme o potvrzení do: {formatDeadline(content.deadline)}
             </p>
           )}
 

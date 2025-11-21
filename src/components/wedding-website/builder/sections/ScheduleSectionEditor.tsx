@@ -182,12 +182,12 @@ export default function ScheduleSectionEditor({ content, onChange }: ScheduleSec
         </div>
       )}
 
-      {/* Program svatby */}
+      {/* Harmonogram svatby */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Clock className="w-5 h-5 text-pink-600" />
-            <h3 className="text-lg font-semibold text-gray-900">Program svatby</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Harmonogram svatby</h3>
           </div>
           <button
             onClick={addScheduleItem}
@@ -230,23 +230,6 @@ export default function ScheduleSectionEditor({ content, onChange }: ScheduleSec
                     rows={2}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                   />
-                  
-                  <div className="flex items-center gap-3">
-                    <label className="text-sm font-medium text-gray-700">Ikona:</label>
-                    <div className="flex gap-2">
-                      {['⛪', '📸', '🚗', '🍽️', '💃', '🎵', '🥂', '🎉', '💒', '🌹'].map((emoji) => (
-                        <button
-                          key={emoji}
-                          onClick={() => updateScheduleItem(index, 'icon', emoji)}
-                          className={`w-8 h-8 rounded-lg border-2 flex items-center justify-center hover:border-pink-300 transition-colors ${
-                            item.icon === emoji ? 'border-pink-500 bg-pink-50' : 'border-gray-200'
-                          }`}
-                        >
-                          {emoji}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
                 </div>
                 
                 <button
@@ -282,7 +265,7 @@ export default function ScheduleSectionEditor({ content, onChange }: ScheduleSec
         <div className="bg-white rounded-lg p-6 border border-gray-200">
           <div className="text-center mb-8">
             <h3 className="text-2xl font-bold text-gray-900 mb-2">
-              Program svatby
+              Harmonogram svatby
             </h3>
             <p className="text-gray-600">Jak bude náš velký den probíhat</p>
           </div>

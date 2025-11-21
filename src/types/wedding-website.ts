@@ -12,6 +12,7 @@ export interface HeroContent {
   bride: string
   groom: string
   weddingDate: Date
+  venue?: string
   mainImage?: string
   tagline?: string
   imagePosition?: { x: number; y: number }

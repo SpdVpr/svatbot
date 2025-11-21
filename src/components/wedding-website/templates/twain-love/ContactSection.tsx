@@ -13,17 +13,20 @@ export default function ContactSection({ content }: ContactSectionProps) {
     return null
   }
 
-  const contacts = []
+  const mainContacts = []
 
   if (content.bride) {
-    contacts.push({ ...content.bride, role: 'Nevěsta' })
+    mainContacts.push({ ...content.bride, role: 'Nevěsta' })
   }
 
   if (content.groom) {
-    contacts.push({ ...content.groom, role: 'Ženich' })
+    mainContacts.push({ ...content.groom, role: 'Ženich' })
   }
 
-  if (contacts.length === 0) {
+  const hasBridesmaids = content.bridesmaids && content.bridesmaids.length > 0
+  const hasGroomsmen = content.groomsmen && content.groomsmen.length > 0
+
+  if (mainContacts.length === 0 && !hasBridesmaids && !hasGroomsmen) {
     return null
   }
 
@@ -32,10 +35,12 @@ export default function ContactSection({ content }: ContactSectionProps) {
       <SectionTitle title="Kontakty" />
 
       <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-8">
-            {contacts.map((contact, index) => (
-              <div key={index} className="bg-white rounded-lg shadow-md p-6">
+        <div className="max-w-4xl mx-auto space-y-12">
+          {/* Main Contacts - Bride & Groom */}
+          {mainContacts.length > 0 && (
+            <div className="grid md:grid-cols-2 gap-8">
+              {mainContacts.map((contact, index) => (
+                <div key={index} className="bg-white rounded-lg shadow-md p-6">
                 <div className="text-center mb-6">
                   <div className="w-20 h-20 bg-[#b2c9d3] rounded-full mx-auto mb-4 flex items-center justify-center">
                     <User className="w-10 h-10 text-white" />
@@ -79,7 +84,68 @@ export default function ContactSection({ content }: ContactSectionProps) {
                 </div>
               </div>
             ))}
-          </div>
+            </div>
+          )}
+
+          {/* Bridesmaids */}
+          {hasBridesmaids && (
+            <div>
+              <h3 className="text-2xl text-center mb-6 text-gray-800" style={{ fontFamily: 'Great Vibes, cursive' }}>
+                Družičky
+              </h3>
+              <div className="grid md:grid-cols-3 gap-6">
+                {content.bridesmaids?.map((bridesmaid, index) => (
+                  <div key={index} className="bg-white rounded-lg shadow-md p-4 text-center">
+                    <div className="w-16 h-16 bg-[#b2c9d3] rounded-full mx-auto mb-3 flex items-center justify-center">
+                      <User className="w-8 h-8 text-white" />
+                    </div>
+                    <h4 className="text-lg font-medium text-gray-800 mb-2" style={{ fontFamily: 'Muli, sans-serif' }}>
+                      {bridesmaid.name}
+                    </h4>
+                    {bridesmaid.phone && (
+                      <a
+                        href={`tel:${bridesmaid.phone}`}
+                        className="text-[#85aaba] hover:underline text-sm"
+                        style={{ fontFamily: 'Muli, sans-serif' }}
+                      >
+                        {bridesmaid.phone}
+                      </a>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Groomsmen */}
+          {hasGroomsmen && (
+            <div>
+              <h3 className="text-2xl text-center mb-6 text-gray-800" style={{ fontFamily: 'Great Vibes, cursive' }}>
+                Svědci
+              </h3>
+              <div className="grid md:grid-cols-3 gap-6">
+                {content.groomsmen?.map((groomsman, index) => (
+                  <div key={index} className="bg-white rounded-lg shadow-md p-4 text-center">
+                    <div className="w-16 h-16 bg-[#b2c9d3] rounded-full mx-auto mb-3 flex items-center justify-center">
+                      <User className="w-8 h-8 text-white" />
+                    </div>
+                    <h4 className="text-lg font-medium text-gray-800 mb-2" style={{ fontFamily: 'Muli, sans-serif' }}>
+                      {groomsman.name}
+                    </h4>
+                    {groomsman.phone && (
+                      <a
+                        href={`tel:${groomsman.phone}`}
+                        className="text-[#85aaba] hover:underline text-sm"
+                        style={{ fontFamily: 'Muli, sans-serif' }}
+                      >
+                        {groomsman.phone}
+                      </a>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

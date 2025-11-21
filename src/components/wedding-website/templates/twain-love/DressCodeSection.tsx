@@ -39,7 +39,7 @@ export default function DressCodeSection({ content }: DressCodeSectionProps) {
           {hasColors && (
             <div className="mt-12">
               <h3 className="text-2xl text-center mb-8 text-gray-800" style={{ fontFamily: 'Great Vibes, cursive' }}>
-                Svatební barvy
+                {content.dressCode || 'Inspirace pro oblečení'}
               </h3>
 
               {/* Each color in its own column with images below */}

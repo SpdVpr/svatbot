@@ -212,6 +212,23 @@ export default function HeroSectionEditor({ content, onChange }: HeroSectionEdit
         </div>
       </div>
 
+      {/* Místo konání */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Místo konání (volitelné)
+        </label>
+        <input
+          type="text"
+          value={content.venue || ''}
+          onChange={(e) => handleInputChange('venue', e.target.value)}
+          placeholder="Zámek Průhonice"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+        />
+        <p className="text-sm text-gray-500 mt-1">
+          Název místa, kde se svatba koná
+        </p>
+      </div>
+
       {/* Tagline */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
