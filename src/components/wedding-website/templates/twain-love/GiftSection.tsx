@@ -20,15 +20,15 @@ export default function GiftSection({ content }: GiftSectionProps) {
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           {content.message && (
-            <p className="text-center text-gray-600 mb-12 text-lg">
+            <p className="text-center text-gray-600 mb-12" style={{ fontFamily: 'Muli, sans-serif' }}>
               {content.message}
             </p>
           )}
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="flex flex-wrap justify-center gap-8">
             {/* Bank Account */}
             {content.bankAccount && (
-              <div className="bg-white rounded-lg p-8 shadow-lg">
+              <div className="bg-white rounded-lg p-8 shadow-lg w-full md:w-[calc(50%-1rem)] max-w-md">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 rounded-full bg-[#b2c9d3] flex items-center justify-center">
                     <CreditCard className="w-6 h-6 text-white" />
@@ -48,7 +48,7 @@ export default function GiftSection({ content }: GiftSectionProps) {
 
             {/* Registry */}
             {hasRegistry && (
-              <div className="bg-white rounded-lg p-8 shadow-lg">
+              <div className="bg-white rounded-lg p-8 shadow-lg w-full md:w-[calc(50%-1rem)] max-w-md">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 rounded-full bg-[#b2c9d3] flex items-center justify-center">
                     <Gift className="w-6 h-6 text-white" />
@@ -79,7 +79,7 @@ export default function GiftSection({ content }: GiftSectionProps) {
 
             {/* Custom message if no bank or registry */}
             {!content.bankAccount && !hasRegistry && (
-              <div className="md:col-span-2 bg-white rounded-lg p-8 shadow-lg text-center">
+              <div className="bg-white rounded-lg p-8 shadow-lg text-center w-full max-w-md">
                 <div className="w-16 h-16 rounded-full bg-[#b2c9d3] flex items-center justify-center mx-auto mb-4">
                   <Home className="w-8 h-8 text-white" />
                 </div>

@@ -65,22 +65,38 @@ export default function HeroSection({ content }: HeroSectionProps) {
 
               {/* Main content rectangle */}
               <div className="relative px-8 py-6 md:px-12 md:py-8 rounded-lg bg-[rgba(178,201,211,0.9)] backdrop-blur-sm">
-                <div className="flex flex-col items-center text-center">
-                  <div className="slide-subtitle mb-2">
-                    <h4 className="text-white text-sm md:text-base tracking-wider uppercase" style={{ fontFamily: 'Muli, sans-serif' }}>
-                      Bereme se
+                <div className="flex flex-col items-center text-center gap-3">
+                  {/* BEREME SE */}
+                  <div className="slide-subtitle">
+                    <h4 className="text-white text-sm md:text-base tracking-wider uppercase font-semibold" style={{ fontFamily: 'Muli, sans-serif' }}>
+                      BEREME SE
                     </h4>
                   </div>
-                  <div className="slide-title mb-2">
-                    <h2 className="text-white text-4xl md:text-5xl lg:text-6xl" style={{ fontFamily: 'Great Vibes, cursive' }}>
-                      Uložte si datum
+
+                  {/* Jména svatebčanů */}
+                  <div className="slide-title">
+                    <h2 className="text-white text-3xl md:text-4xl lg:text-5xl" style={{ fontFamily: 'Great Vibes, cursive' }}>
+                      {content.bride} & {content.groom}
                     </h2>
                   </div>
-                  <div className="slide-text">
-                    <p className="text-white text-base md:text-lg" style={{ fontFamily: 'Muli, sans-serif' }}>
-                      {content.weddingDate && formatDate(content.weddingDate)}
-                    </p>
-                  </div>
+
+                  {/* Místo konání */}
+                  {content.venue && (
+                    <div className="slide-venue">
+                      <p className="text-white text-base md:text-lg font-medium" style={{ fontFamily: 'Muli, sans-serif' }}>
+                        {content.venue}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Datum svatby */}
+                  {content.weddingDate && (
+                    <div className="slide-text">
+                      <p className="text-white text-base md:text-lg" style={{ fontFamily: 'Muli, sans-serif' }}>
+                        {formatDate(content.weddingDate)}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -118,10 +134,13 @@ export default function HeroSection({ content }: HeroSectionProps) {
 
         @media (max-width: 767px) {
           .slide-title h2 {
-            font-size: 2rem !important;
+            font-size: 1.75rem !important;
           }
           .slide-subtitle h4 {
             font-size: 0.75rem !important;
+          }
+          .slide-venue p {
+            font-size: 0.875rem !important;
           }
           .slide-text p {
             font-size: 0.875rem !important;

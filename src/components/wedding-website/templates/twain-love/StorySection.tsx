@@ -14,21 +14,40 @@ export default function StorySection({ content }: StorySectionProps) {
   }
 
   const formatDate = (dateString: string) => {
-    try {
-      return new Date(dateString).toLocaleDateString('cs-CZ', {
+    if (!dateString) return ''
+
+    // Try to parse as date
+    const date = new Date(dateString)
+
+    // Check if it's a valid date
+    if (!isNaN(date.getTime())) {
+      return date.toLocaleDateString('cs-CZ', {
         day: 'numeric',
         month: 'long',
         year: 'numeric'
       })
-    } catch {
-      return dateString
     }
+
+    // If not a valid date, return the string as-is (e.g., "Léto 2020")
+    return dateString
   }
 
   return (
     <div id="story" className="py-20 bg-gray-50">
       <SectionTitle title={content.title || 'Náš příběh'} />
-      
+
+      {content.subtitle && (
+        <p className="text-center text-[#85aaba] text-lg mb-2 px-4" style={{ fontFamily: 'Great Vibes, cursive' }}>
+          {content.subtitle}
+        </p>
+      )}
+
+      {content.description && (
+        <p className="text-center text-gray-600 max-w-2xl mx-auto mb-12 px-4" style={{ fontFamily: 'Muli, sans-serif' }}>
+          {content.description}
+        </p>
+      )}
+
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto space-y-0">
           {content.timeline.map((item, index) => {

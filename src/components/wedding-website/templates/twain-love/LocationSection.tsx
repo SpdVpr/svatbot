@@ -4,7 +4,7 @@ import { InfoContent, ScheduleContent } from '@/types/wedding-website'
 import Image from 'next/image'
 import { useState } from 'react'
 import SectionTitle from './SectionTitle'
-import { MapPin, Clock } from 'lucide-react'
+import { MapPin, Clock, Car, Info } from 'lucide-react'
 
 interface LocationSectionProps {
   infoContent: InfoContent
@@ -109,6 +109,35 @@ export default function LocationSection({ infoContent, scheduleContent }: Locati
               </div>
             )
           })}
+
+          {/* Additional Information */}
+          {(infoContent.parking || infoContent.accessibility) && (
+            <div className="mt-16 bg-[rgba(178,201,211,0.1)] rounded-lg p-8">
+              <h3 className="text-2xl font-light text-gray-800 mb-6 text-center">
+                Důležité informace
+              </h3>
+              <div className="grid md:grid-cols-2 gap-6">
+                {infoContent.parking && (
+                  <div className="flex items-start gap-3">
+                    <Car className="w-6 h-6 text-[#85aaba] flex-shrink-0 mt-1" />
+                    <div>
+                      <h4 className="font-medium text-gray-800 mb-2">Parkování</h4>
+                      <p className="text-gray-600 whitespace-pre-line">{infoContent.parking}</p>
+                    </div>
+                  </div>
+                )}
+                {infoContent.accessibility && (
+                  <div className="flex items-start gap-3">
+                    <Info className="w-6 h-6 text-[#85aaba] flex-shrink-0 mt-1" />
+                    <div>
+                      <h4 className="font-medium text-gray-800 mb-2">Přístupnost</h4>
+                      <p className="text-gray-600 whitespace-pre-line">{infoContent.accessibility}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

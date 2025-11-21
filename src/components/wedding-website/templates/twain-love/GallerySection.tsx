@@ -43,6 +43,18 @@ export default function GallerySection({ content }: GallerySectionProps) {
     <div id="gallery" className="py-20" style={{ background: 'rgba(178,201,211,0.1)' }}>
       <SectionTitle title={content.title || 'Naše galerie'} />
 
+      {content.subtitle && (
+        <p className="text-center text-[#85aaba] text-lg mb-2 px-4" style={{ fontFamily: 'Great Vibes, cursive' }}>
+          {content.subtitle}
+        </p>
+      )}
+
+      {content.description && (
+        <p className="text-center text-gray-600 max-w-2xl mx-auto mb-12 px-4" style={{ fontFamily: 'Muli, sans-serif' }}>
+          {content.description}
+        </p>
+      )}
+
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {images.map((image, index) => (

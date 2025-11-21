@@ -788,6 +788,8 @@ export default function WeddingWebsiteBuilderPage() {
               >
                 {currentStep === 'url' && !website ? (
                   isSaving ? 'Ukládání...' : 'Pokračovat'
+                ) : currentStep === 'content' ? (
+                  'Do náhledu'
                 ) : (
                   'Další'
                 )}
