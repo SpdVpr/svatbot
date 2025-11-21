@@ -17,97 +17,15 @@ interface TemplateSelectorProps {
 // Konfigurace šablon
 const TEMPLATES: TemplateConfig[] = [
   {
-    id: 'classic-elegance',
-    name: 'Classic Elegance',
-    description: 'Elegantní a časeless design s jemnými detaily',
-    thumbnail: '/templates/classic-elegance.jpg',
-    category: 'Elegantní',
-    colors: {
-      primary: '#D4AF37',
-      secondary: '#F7E7CE',
-      accent: '#8B7355',
-    },
-    fonts: {
-      heading: 'Playfair Display',
-      body: 'Cormorant',
-    },
-    features: [
-      'Serif fonty',
-      'Zlaté akcenty',
-      'Ornamentální prvky',
-      'Jemné animace',
-    ],
-    suitableFor: [
-      'Tradiční svatby',
-      'Zámecké svatby',
-      'Formální události',
-    ],
-  },
-  {
-    id: 'modern-minimalist',
-    name: 'Modern Minimalist',
-    description: 'Čistý a minimalistický design s moderním vzhledem',
-    thumbnail: '/templates/modern-minimalist.jpg',
-    category: 'Moderní',
-    colors: {
-      primary: '#1A1A1A',
-      secondary: '#F5F5F5',
-      accent: '#FF6B6B',
-    },
-    fonts: {
-      heading: 'Montserrat',
-      body: 'Inter',
-    },
-    features: [
-      'Sans-serif fonty',
-      'Geometrické tvary',
-      'Plochý design',
-      'Minimální animace',
-    ],
-    suitableFor: [
-      'Moderní svatby',
-      'Městské svatby',
-      'Neformální události',
-    ],
-  },
-  {
-    id: 'romantic-boho',
-    name: 'Romantic Boho',
-    description: 'Romantický boho styl s květinovými prvky a jemnými barvami',
-    thumbnail: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800',
-    category: 'Romantický',
-    colors: {
-      primary: '#F43F5E',
-      secondary: '#FDF2F8',
-      accent: '#F59E0B',
-    },
-    fonts: {
-      heading: 'Playfair Display',
-      body: 'Lora',
-    },
-    features: [
-      'Květinové vzory',
-      'Jemné přechody',
-      'Organické tvary',
-      'Romantické animace',
-    ],
-    suitableFor: [
-      'Venkovní svatby',
-      'Zahradní svatby',
-      'Boho svatby',
-    ],
-  },
-
-  {
     id: 'winter-elegance',
     name: 'Winter Elegance',
-    description: 'Elegantní zimní design s teplými tóny a jemnými detaily',
-    thumbnail: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800',
-    category: 'Zimní',
+    description: 'Elegantní zimní design s jemnými detaily a kamennou paletou',
+    thumbnail: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800',
+    category: 'Elegantní',
     colors: {
       primary: '#78716c',
       secondary: '#f5f5f4',
-      accent: '#1e2a5e',
+      accent: '#57534e',
     },
     fonts: {
       heading: 'Playfair Display',
@@ -115,14 +33,14 @@ const TEMPLATES: TemplateConfig[] = [
     },
     features: [
       'Serif fonty',
-      'Teplé barvy',
-      'Zimní atmosféra',
+      'Kamenná paleta',
       'Elegantní design',
+      'Jemné animace',
     ],
     suitableFor: [
       'Zimní svatby',
       'Elegantní události',
-      'Venkovské svatby',
+      'Formální svatby',
     ],
   },
   {
@@ -191,8 +109,8 @@ export default function TemplateSelector({ selectedTemplate, onSelect, disabled 
   const plan = subscription?.plan || 'free_trial'
   const canAccessAllTemplates = hasPremiumAccess || isDemoUser // Demo user má přístup ke všem šablonám
 
-  // First 2 templates are free (classic-elegance, modern-minimalist)
-  const FREE_TEMPLATES = ['classic-elegance', 'modern-minimalist']
+  // First template is free (winter-elegance)
+  const FREE_TEMPLATES = ['winter-elegance']
 
   const isTemplateLocked = (templateId: string) => {
     if (disabled) return true // Lock all templates if disabled
@@ -221,7 +139,7 @@ export default function TemplateSelector({ selectedTemplate, onSelect, disabled 
               </div>
               <div>
                 <p className="text-sm font-medium text-amber-900">
-                  Máte přístup ke 2 základním šablonám
+                  Máte přístup k 1 základní šabloně
                 </p>
                 <p className="text-xs text-amber-700">
                   Upgrade na Premium pro přístup ke všem designům
@@ -288,7 +206,7 @@ export default function TemplateSelector({ selectedTemplate, onSelect, disabled 
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
                     <div className="text-6xl mb-2">
-                      {template.id === 'classic-elegance' ? '💍' : '⚪'}
+                      💍
                     </div>
                     <div className="text-sm text-gray-500">
                       Náhled šablony

@@ -140,6 +140,7 @@ export default function PrettyTemplate({ website }: PrettyTemplateProps) {
         <Navigation
           bride={content.hero.bride}
           groom={content.hero.groom}
+          content={content}
         />
 
         {/* Render sections in custom order */}

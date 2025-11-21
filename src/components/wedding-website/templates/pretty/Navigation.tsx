@@ -1,13 +1,15 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import type { WebsiteContent } from '@/types/wedding-website'
 
 interface NavigationProps {
   bride: string
   groom: string
+  content: WebsiteContent
 }
 
-export default function Navigation({ bride, groom }: NavigationProps) {
+export default function Navigation({ bride, groom, content }: NavigationProps) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -26,6 +28,37 @@ export default function Navigation({ bride, groom }: NavigationProps) {
       element.scrollIntoView({ behavior: 'smooth' })
       setIsMobileMenuOpen(false)
     }
+  }
+
+  // Build navigation items based on enabled sections
+  const navItems = []
+
+  if (content.story?.enabled && (content.story.bride || content.story.groom)) {
+    navItems.push({ id: 'couple', label: 'Couple' })
+  }
+  if (content.story?.enabled) {
+    navItems.push({ id: 'story', label: 'Story' })
+  }
+  if (content.info?.enabled || content.schedule?.enabled) {
+    navItems.push({ id: 'events', label: 'Events' })
+  }
+  if (content.gallery?.enabled) {
+    navItems.push({ id: 'gallery', label: 'Gallery' })
+  }
+  if (content.rsvp?.enabled) {
+    navItems.push({ id: 'rsvp', label: 'RSVP' })
+  }
+  if (content.gift?.enabled) {
+    navItems.push({ id: 'gift', label: 'Gifts' })
+  }
+  if (content.menu?.enabled) {
+    navItems.push({ id: 'menu', label: 'Menu' })
+  }
+  if (content.contact?.enabled) {
+    navItems.push({ id: 'contact', label: 'Contact' })
+  }
+  if (content.faq?.enabled) {
+    navItems.push({ id: 'faq', label: 'FAQ' })
   }
 
   return (
@@ -53,56 +86,18 @@ export default function Navigation({ bride, groom }: NavigationProps) {
 
           {/* Desktop Menu */}
           <ul className="hidden md:flex items-center gap-8">
-            <li>
-              <button
-                onClick={() => scrollToSection('couple')}
-                className="text-gray-700 transition-colors"
-                onMouseEnter={(e) => e.currentTarget.style.color = '#b19a56'}
-                onMouseLeave={(e) => e.currentTarget.style.color = '#374151'}
-              >
-                Couple
-              </button>
-            </li>
-            <li>
-              <button
-                onClick={() => scrollToSection('story')}
-                className="text-gray-700 transition-colors"
-                onMouseEnter={(e) => e.currentTarget.style.color = '#b19a56'}
-                onMouseLeave={(e) => e.currentTarget.style.color = '#374151'}
-              >
-                Story
-              </button>
-            </li>
-            <li>
-              <button
-                onClick={() => scrollToSection('events')}
-                className="text-gray-700 transition-colors"
-                onMouseEnter={(e) => e.currentTarget.style.color = '#b19a56'}
-                onMouseLeave={(e) => e.currentTarget.style.color = '#374151'}
-              >
-                Events
-              </button>
-            </li>
-            <li>
-              <button
-                onClick={() => scrollToSection('gallery')}
-                className="text-gray-700 transition-colors"
-                onMouseEnter={(e) => e.currentTarget.style.color = '#b19a56'}
-                onMouseLeave={(e) => e.currentTarget.style.color = '#374151'}
-              >
-                Gallery
-              </button>
-            </li>
-            <li>
-              <button
-                onClick={() => scrollToSection('rsvp')}
-                className="text-gray-700 transition-colors"
-                onMouseEnter={(e) => e.currentTarget.style.color = '#b19a56'}
-                onMouseLeave={(e) => e.currentTarget.style.color = '#374151'}
-              >
-                RSVP
-              </button>
-            </li>
+            {navItems.map((item) => (
+              <li key={item.id}>
+                <button
+                  onClick={() => scrollToSection(item.id)}
+                  className="text-gray-700 transition-colors"
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#b19a56'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#374151'}
+                >
+                  {item.label}
+                </button>
+              </li>
+            ))}
           </ul>
 
           {/* Mobile Menu Button */}
@@ -123,56 +118,18 @@ export default function Navigation({ bride, groom }: NavigationProps) {
         {isMobileMenuOpen && (
           <div className="md:hidden py-4 border-t">
             <ul className="space-y-4">
-              <li>
-                <button
-                  onClick={() => scrollToSection('couple')}
-                  className="block w-full text-left text-gray-700 transition-colors"
-                  onMouseEnter={(e) => e.currentTarget.style.color = '#b19a56'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = '#374151'}
-                >
-                  Couple
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => scrollToSection('story')}
-                  className="block w-full text-left text-gray-700 transition-colors"
-                  onMouseEnter={(e) => e.currentTarget.style.color = '#b19a56'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = '#374151'}
-                >
-                  Story
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => scrollToSection('events')}
-                  className="block w-full text-left text-gray-700 transition-colors"
-                  onMouseEnter={(e) => e.currentTarget.style.color = '#b19a56'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = '#374151'}
-                >
-                  Events
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => scrollToSection('gallery')}
-                  className="block w-full text-left text-gray-700 transition-colors"
-                  onMouseEnter={(e) => e.currentTarget.style.color = '#b19a56'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = '#374151'}
-                >
-                  Gallery
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => scrollToSection('rsvp')}
-                  className="block w-full text-left text-gray-700 transition-colors"
-                  onMouseEnter={(e) => e.currentTarget.style.color = '#b19a56'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = '#374151'}
-                >
-                  RSVP
-                </button>
-              </li>
+              {navItems.map((item) => (
+                <li key={item.id}>
+                  <button
+                    onClick={() => scrollToSection(item.id)}
+                    className="block w-full text-left text-gray-700 transition-colors"
+                    onMouseEnter={(e) => e.currentTarget.style.color = '#b19a56'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = '#374151'}
+                  >
+                    {item.label}
+                  </button>
+                </li>
+              ))}
             </ul>
           </div>
         )}

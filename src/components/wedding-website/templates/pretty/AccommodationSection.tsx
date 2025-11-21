@@ -1,7 +1,6 @@
 'use client'
 
 import { AccommodationContent } from '@/types/wedding-website'
-import { useAccommodation } from '@/hooks/useAccommodation'
 import SectionTitle from './SectionTitle'
 import { Building2 } from 'lucide-react'
 
@@ -10,15 +9,13 @@ interface AccommodationSectionProps {
 }
 
 export default function AccommodationSection({ content }: AccommodationSectionProps) {
-  const { accommodations, loading } = useAccommodation()
-
-  if (!content.enabled || loading) {
+  if (!content.enabled) {
     return null
   }
 
-  const activeAccommodations = accommodations.filter(acc => acc.isActive)
+  const accommodations = content.accommodations || []
 
-  if (activeAccommodations.length === 0) {
+  if (accommodations.length === 0) {
     return null
   }
 
@@ -31,7 +28,7 @@ export default function AccommodationSection({ content }: AccommodationSectionPr
         />
 
         <div className="space-y-8 max-w-6xl mx-auto">
-          {activeAccommodations.map((accommodation) => (
+          {accommodations.map((accommodation) => (
             <div
               key={accommodation.id}
               className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow p-6"
@@ -44,10 +41,10 @@ export default function AccommodationSection({ content }: AccommodationSectionPr
               </h3>
 
               {/* Image */}
-              {accommodation.images && accommodation.images.length > 0 ? (
+              {accommodation.image ? (
                 <div className="h-64 overflow-hidden rounded-lg mb-4">
                   <img
-                    src={accommodation.images[0]}
+                    src={accommodation.image}
                     alt={accommodation.name}
                     className="w-full h-full object-cover"
                   />
@@ -68,17 +65,17 @@ export default function AccommodationSection({ content }: AccommodationSectionPr
                 {accommodation.address && (
                   <p className="text-gray-600 mb-2 flex items-start gap-2">
                     <i className="ti-location-pin mt-1" style={{ color: '#b19a56' }}></i>
-                    <span>{accommodation.address.street}, {accommodation.address.city}</span>
+                    <span>{accommodation.address}</span>
                   </p>
                 )}
-                {accommodation.contactInfo?.phone && (
+                {accommodation.phone && (
                   <p className="text-gray-600 mb-2">
-                    📞 {accommodation.contactInfo.phone}
+                    📞 {accommodation.phone}
                   </p>
                 )}
-                {accommodation.contactInfo?.email && (
+                {accommodation.email && (
                   <p className="text-gray-600 mb-4">
-                    ✉️ {accommodation.contactInfo.email}
+                    ✉️ {accommodation.email}
                   </p>
                 )}
 
@@ -98,12 +95,17 @@ export default function AccommodationSection({ content }: AccommodationSectionPr
                             <p className="text-sm text-gray-600 mb-2">{room.description}</p>
                           )}
                           <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-600">
-                              👥 {room.capacity} {room.capacity === 1 ? 'osoba' : room.capacity < 5 ? 'osoby' : 'osob'}
-                            </span>
+                            <div className="text-sm text-gray-600">
+                              <div>👥 {room.capacity} {room.capacity === 1 ? 'osoba' : room.capacity < 5 ? 'osoby' : 'osob'}</div>
+                              {content.showAvailability && (
+                                <div className="text-xs text-gray-500 mt-1">
+                                  🛏️ {room.count}× k dispozici
+                                </div>
+                              )}
+                            </div>
                             {content.showPrices && (
                               <span className="font-semibold" style={{ color: '#b19a56' }}>
-                                {room.pricePerNight} Kč/noc
+                                {room.pricePerNight.toLocaleString('cs-CZ')} Kč/noc
                               </span>
                             )}
                           </div>

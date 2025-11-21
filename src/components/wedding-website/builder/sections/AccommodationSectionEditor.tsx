@@ -1,16 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-import { Building2, Phone, Mail, Eye, EyeOff, DollarSign, Users, Download } from 'lucide-react'
+import { Building2, Phone, Mail, Eye, EyeOff, DollarSign, Users, Download, Trash2, Edit2 } from 'lucide-react'
 import { useAccommodation } from '@/hooks/useAccommodation'
-import type { AccommodationContent } from '@/types/wedding-website'
+import type { AccommodationContent, WebsiteAccommodation, WebsiteRoom } from '@/types/wedding-website'
 
 interface AccommodationSectionEditorProps {
   content?: AccommodationContent
   onChange: (content: AccommodationContent) => void
+  onSave?: () => Promise<void>
 }
 
-export default function AccommodationSectionEditor({ content, onChange }: AccommodationSectionEditorProps) {
+export default function AccommodationSectionEditor({ content, onChange, onSave }: AccommodationSectionEditorProps) {
   const { accommodations, loading } = useAccommodation()
   const totalRooms = accommodations.reduce((sum, acc) => sum + acc.rooms.length, 0)
   const [importing, setImporting] = useState(false)
@@ -22,6 +23,7 @@ export default function AccommodationSectionEditor({ content, onChange }: Accomm
     description: content?.description || 'Doporučujeme následující ubytování pro naše svatební hosty.',
     showPrices: content?.showPrices ?? true,
     showAvailability: content?.showAvailability ?? true,
+    accommodations: content?.accommodations || [],
     contactInfo: content?.contactInfo || {
       name: '',
       phone: '',
@@ -30,9 +32,12 @@ export default function AccommodationSectionEditor({ content, onChange }: Accomm
     }
   }
 
-  const updateContent = (updates: Partial<AccommodationContent>) => {
+  const updateContent = (updates: Partial<AccommodationContent> | AccommodationContent) => {
     const newContent = { ...currentContent, ...updates }
+    console.log('🔄 updateContent called with:', updates)
+    console.log('📦 New content:', newContent)
     onChange(newContent)
+    console.log('✅ onChange called')
   }
 
   const updateContactInfo = (field: string, value: string) => {
@@ -46,12 +51,81 @@ export default function AccommodationSectionEditor({ content, onChange }: Accomm
   const importFromAccommodation = () => {
     setImporting(true)
 
-    // Import se provede automaticky - data se načítají z useAccommodation hooku
-    // a zobrazují se v template při renderování
+    try {
+      console.log('🔄 Starting import...', { accommodationsCount: accommodations.length })
 
-    setTimeout(() => {
+      // Group identical rooms and convert to website format
+      const websiteAccommodations: WebsiteAccommodation[] = accommodations
+        .filter(acc => acc.isActive)
+        .map(acc => {
+          // Group identical rooms
+          const roomGroups: Record<string, WebsiteRoom> = {}
+
+          acc.rooms.forEach(room => {
+            // Create unique key based on room properties
+            const baseName = room.name.replace(/\s*\d+$/, '') // Remove trailing numbers
+            const key = `${baseName}-${room.pricePerNight}-${room.capacity}-${room.description || ''}`
+
+            if (!roomGroups[key]) {
+              roomGroups[key] = {
+                name: baseName,
+                description: room.description,
+                pricePerNight: room.pricePerNight,
+                capacity: room.capacity,
+                count: 1
+              }
+            } else {
+              roomGroups[key].count++
+            }
+          })
+
+          return {
+            id: acc.id,
+            name: acc.name,
+            description: acc.description,
+            address: `${acc.address.street}, ${acc.address.city} ${acc.address.postalCode}`.trim(),
+            phone: acc.contactInfo.phone,
+            email: acc.contactInfo.email,
+            website: acc.website,
+            image: acc.images?.[0],
+            rooms: Object.values(roomGroups)
+          }
+        })
+
+      console.log('✅ Import completed:', {
+        websiteAccommodationsCount: websiteAccommodations.length,
+        roomTypesCount: websiteAccommodations.reduce((sum, acc) => sum + acc.rooms.length, 0)
+      })
+      console.log('📦 Imported data:', websiteAccommodations)
+
+      const newContent = {
+        ...currentContent,
+        enabled: true,
+        accommodations: websiteAccommodations
+      }
+
+      console.log('💾 Updating content with:', newContent)
+      updateContent(newContent)
+
+      // Automaticky uložit po importu
+      setTimeout(async () => {
+        if (onSave) {
+          console.log('💾 Auto-saving after import...')
+          try {
+            await onSave()
+            console.log('✅ Auto-save completed')
+          } catch (error) {
+            console.error('❌ Auto-save failed:', error)
+          }
+        }
+        setImporting(false)
+        alert(`✅ Naimportováno ${websiteAccommodations.length} ubytování s ${websiteAccommodations.reduce((sum, acc) => sum + acc.rooms.length, 0)} typy pokojů`)
+      }, 500)
+    } catch (error) {
+      console.error('❌ Error importing accommodations:', error)
       setImporting(false)
-    }, 500)
+      alert('❌ Chyba při importu ubytování')
+    }
   }
 
   return (
@@ -246,19 +320,83 @@ export default function AccommodationSectionEditor({ content, onChange }: Accomm
             </div>
           </div>
 
-          {/* Preview Note */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div className="flex items-start gap-3">
-              <Eye className="w-5 h-5 text-blue-600 mt-0.5" />
-              <div>
-                <h5 className="font-medium text-blue-900 mb-1">Náhled ubytování</h5>
-                <p className="text-sm text-blue-700">
-                  Ubytování se automaticky načítají z vaší správy ubytování. 
-                  Přidejte ubytování v sekci "Ubytování" na hlavním dashboardu.
-                </p>
+          {/* Imported Accommodations */}
+          {currentContent.accommodations && currentContent.accommodations.length > 0 && (
+            <div className="bg-white border border-gray-200 rounded-lg p-6">
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">
+                Importovaná ubytování ({currentContent.accommodations.length})
+              </h4>
+
+              <div className="space-y-4">
+                {currentContent.accommodations.map((acc, accIndex) => (
+                  <div key={acc.id} className="border border-gray-200 rounded-lg p-4">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <h5 className="font-semibold text-gray-900">{acc.name}</h5>
+                        <p className="text-sm text-gray-600 mt-1">{acc.address}</p>
+                        {acc.description && (
+                          <p className="text-sm text-gray-600 mt-1">{acc.description}</p>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => {
+                          const newAccommodations = currentContent.accommodations!.filter((_, i) => i !== accIndex)
+                          updateContent({ accommodations: newAccommodations })
+                        }}
+                        className="text-red-600 hover:text-red-700 p-2"
+                        title="Odstranit ubytování"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    {/* Rooms */}
+                    <div className="mt-3 space-y-2">
+                      <h6 className="text-sm font-medium text-gray-700">
+                        Pokoje ({acc.rooms.length} typů)
+                      </h6>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {acc.rooms.map((room, roomIndex) => (
+                          <div key={roomIndex} className="bg-gray-50 rounded p-3 text-sm">
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1">
+                                <p className="font-medium text-gray-900">{room.name}</p>
+                                {room.description && (
+                                  <p className="text-xs text-gray-600 mt-1">{room.description}</p>
+                                )}
+                                <div className="flex items-center gap-3 mt-2 text-xs text-gray-600">
+                                  <span>👥 {room.capacity} {room.capacity === 1 ? 'osoba' : room.capacity < 5 ? 'osoby' : 'osob'}</span>
+                                  <span>🛏️ {room.count}× k dispozici</span>
+                                </div>
+                              </div>
+                              <span className="text-primary-600 font-semibold whitespace-nowrap ml-2">
+                                {room.pricePerNight.toLocaleString('cs-CZ')} Kč
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
+          )}
+
+          {/* Preview Note */}
+          {(!currentContent.accommodations || currentContent.accommodations.length === 0) && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <Eye className="w-5 h-5 text-blue-600 mt-0.5" />
+                <div>
+                  <h5 className="font-medium text-blue-900 mb-1">Žádná ubytování</h5>
+                  <p className="text-sm text-blue-700">
+                    Klikněte na tlačítko "Importovat" výše pro načtení ubytování z modulu Ubytování.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>

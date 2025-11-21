@@ -140,6 +140,7 @@ export default function TwainLoveTemplate({ website }: TwainLoveTemplateProps) {
         <Navigation
           bride={content.hero.bride}
           groom={content.hero.groom}
+          content={content}
         />
 
         {/* Render sections in custom order */}

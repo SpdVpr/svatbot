@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
+import type { WebsiteContent } from '@/types/wedding-website'
 
 interface NavigationProps {
   bride: string
   groom: string
+  content: WebsiteContent
 }
 
-export default function Navigation({ bride, groom }: NavigationProps) {
+export default function Navigation({ bride, groom, content }: NavigationProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
 
@@ -21,20 +23,44 @@ export default function Navigation({ bride, groom }: NavigationProps) {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // Build navigation items based on enabled sections
   const navItems = [
-    { label: 'Domů', href: '#home' },
-    { label: 'Náš příběh', href: '#story' },
-    { label: 'Místo konání', href: '#event' },
-    { label: 'Program', href: '#schedule' },
-    { label: 'Dress Code', href: '#dresscode' },
-    { label: 'Ubytování', href: '#accommodation' },
-    { label: 'Galerie', href: '#gallery' },
-    { label: 'Potvrzení účasti', href: '#rsvp' },
-    { label: 'Dary', href: '#gift' },
-    { label: 'Menu', href: '#menu' },
-    { label: 'Kontakt', href: '#contact' },
-    { label: 'FAQ', href: '#faq' },
+    { label: 'Domů', href: '#home' }, // Always visible
   ]
+
+  if (content.story?.enabled) {
+    navItems.push({ label: 'Náš příběh', href: '#story' })
+  }
+  if (content.info?.enabled) {
+    navItems.push({ label: 'Místo konání', href: '#event' })
+  }
+  if (content.schedule?.enabled) {
+    navItems.push({ label: 'Program', href: '#schedule' })
+  }
+  if (content.dressCode?.enabled) {
+    navItems.push({ label: 'Dress Code', href: '#dresscode' })
+  }
+  if (content.accommodation?.enabled) {
+    navItems.push({ label: 'Ubytování', href: '#accommodation' })
+  }
+  if (content.gallery?.enabled) {
+    navItems.push({ label: 'Galerie', href: '#gallery' })
+  }
+  if (content.rsvp?.enabled) {
+    navItems.push({ label: 'Potvrzení účasti', href: '#rsvp' })
+  }
+  if (content.gift?.enabled) {
+    navItems.push({ label: 'Dary', href: '#gift' })
+  }
+  if (content.menu?.enabled) {
+    navItems.push({ label: 'Menu', href: '#menu' })
+  }
+  if (content.contact?.enabled) {
+    navItems.push({ label: 'Kontakt', href: '#contact' })
+  }
+  if (content.faq?.enabled) {
+    navItems.push({ label: 'FAQ', href: '#faq' })
+  }
 
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href)

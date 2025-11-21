@@ -3,9 +3,6 @@ import { notFound } from 'next/navigation'
 import { doc, getDoc } from 'firebase/firestore'
 import { db } from '@/config/firebase'
 import type { WeddingWebsite } from '@/types/wedding-website'
-import ClassicEleganceTemplate from '@/components/wedding-website/templates/ClassicEleganceTemplate'
-import ModernMinimalistTemplate from '@/components/wedding-website/templates/ModernMinimalistTemplate'
-import RomanticBohoTemplate from '@/components/wedding-website/templates/RomanticBohoTemplate'
 import WinterEleganceTemplate from '@/components/wedding-website/templates/WinterEleganceTemplate'
 import TwainLoveTemplate from '@/components/wedding-website/templates/TwainLoveTemplate'
 import PrettyTemplate from '@/components/wedding-website/templates/PrettyTemplate'
@@ -135,6 +132,11 @@ export default async function WeddingWebsitePage({ params }: PageProps) {
       imagesCount: website.content?.dressCode?.images?.length || 0,
       images: website.content?.dressCode?.images
     })
+    console.log('🏨 Accommodation data:', {
+      enabled: website.content?.accommodation?.enabled,
+      accommodationsCount: website.content?.accommodation?.accommodations?.length || 0,
+      accommodations: website.content?.accommodation?.accommodations
+    })
   }
 
   // Pokud web neexistuje nebo není publikovaný, zobraz 404
@@ -163,24 +165,15 @@ export default async function WeddingWebsitePage({ params }: PageProps) {
   // Render appropriate template based on website.template
   const renderTemplate = () => {
     switch (website.template) {
-      case 'classic-elegance':
-        return <ClassicEleganceTemplate website={website} />
-      case 'modern-minimalist':
-        return <ModernMinimalistTemplate website={website} />
-      case 'romantic-boho':
-        return <RomanticBohoTemplate website={website} />
       case 'winter-elegance':
         return <WinterEleganceTemplate website={website} />
       case 'twain-love':
         return <TwainLoveTemplate website={website} />
       case 'pretty':
         return <PrettyTemplate website={website} />
-      case 'luxury-gold':
-      case 'garden-fresh':
-        // Fallback to classic for templates in development
-        return <ClassicEleganceTemplate website={website} />
       default:
-        return <ClassicEleganceTemplate website={website} />
+        // Fallback to winter-elegance for unknown templates
+        return <WinterEleganceTemplate website={website} />
     }
   }
 

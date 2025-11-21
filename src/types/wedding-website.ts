@@ -1,18 +1,7 @@
 // Wedding Website Types
 
 export type TemplateType =
-  | 'classic-elegance'
-  | 'modern-minimalist'
-  | 'romantic-boho'
-  | 'luxury-gold'
-  | 'garden-fresh'
-  | 'rustic-romance'
-  | 'bohemian-dream'
-  | 'garden-party'
-  | 'beach-vibes'
-  | 'winter-wonderland'
   | 'winter-elegance'
-  | 'vintage-charm'
   | 'twain-love'
   | 'pretty'
 
@@ -151,12 +140,33 @@ export interface RSVPContent {
 }
 
 // Accommodation Section
+export interface WebsiteAccommodation {
+  id: string
+  name: string
+  description?: string
+  address: string
+  phone?: string
+  email?: string
+  website?: string
+  image?: string
+  rooms: WebsiteRoom[]
+}
+
+export interface WebsiteRoom {
+  name: string
+  description?: string
+  pricePerNight: number
+  capacity: number
+  count: number // Number of identical rooms available
+}
+
 export interface AccommodationContent {
   enabled: boolean
   title?: string
   description?: string
   showPrices: boolean
   showAvailability: boolean
+  accommodations?: WebsiteAccommodation[] // Imported accommodations
   contactInfo?: {
     name: string
     phone?: string

@@ -12,9 +12,6 @@ import ColorThemeSelector from '@/components/wedding-website/builder/ColorThemeS
 import UrlConfigurator from '@/components/wedding-website/builder/UrlConfigurator'
 import ContentEditor from '@/components/wedding-website/builder/ContentEditor'
 import DomainStatus from '@/components/wedding-website/DomainStatus'
-import ClassicEleganceTemplate from '@/components/wedding-website/templates/ClassicEleganceTemplate'
-import ModernMinimalistTemplate from '@/components/wedding-website/templates/ModernMinimalistTemplate'
-import RomanticBohoTemplate from '@/components/wedding-website/templates/RomanticBohoTemplate'
 import WinterEleganceTemplate from '@/components/wedding-website/templates/WinterEleganceTemplate'
 import TwainLoveTemplate from '@/components/wedding-website/templates/TwainLoveTemplate'
 import PrettyTemplate from '@/components/wedding-website/templates/PrettyTemplate'
@@ -29,7 +26,10 @@ export default function WeddingWebsiteBuilderPage() {
   const { website, createWebsite, updateWebsite, publishWebsite, loading } = useWeddingWebsite()
   const { withDemoCheck, canMakeChanges, isLocked } = useDemoLock()
 
-  const [currentStep, setCurrentStep] = useState<Step>('url')
+  // Pokud už existuje web s šablonou, začni na kroku 'content', jinak na 'url'
+  const [currentStep, setCurrentStep] = useState<Step>(
+    website?.template ? 'content' : 'url'
+  )
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateType | null>(
     website?.template || null
   )
@@ -106,9 +106,9 @@ export default function WeddingWebsiteBuilderPage() {
         ...website.content,
         dressCode: website.content.dressCode || { enabled: false }
       })
-      // Pokud už web existuje a jsme na url kroku, přejdi na template step
-      if (currentStep === 'url' && website.customUrl) {
-        setCurrentStep('template')
+      // Pokud už web existuje s šablonou a jsme na url kroku, přejdi na content step
+      if (currentStep === 'url' && website.customUrl && website.template) {
+        setCurrentStep('content')
         // Scroll to top
         window.scrollTo({ top: 0, behavior: 'smooth' })
       }
@@ -222,7 +222,10 @@ export default function WeddingWebsiteBuilderPage() {
     console.log('💾 Saving website...', {
       dressCodeEnabled: content.dressCode?.enabled,
       dressCodeImagesCount: content.dressCode?.images?.length || 0,
-      dressCodeImages: content.dressCode?.images
+      dressCodeImages: content.dressCode?.images,
+      accommodationEnabled: content.accommodation?.enabled,
+      accommodationsCount: content.accommodation?.accommodations?.length || 0,
+      accommodations: content.accommodation?.accommodations
     })
 
     setIsSaving(true)
@@ -602,6 +605,8 @@ export default function WeddingWebsiteBuilderPage() {
             onSave={handleSave}
             onExpandedChange={setIsSectionExpanded}
             disabled={Boolean(isLocked)}
+            colorTheme={colorTheme}
+            customColors={customColors}
           />
         )}
 
@@ -678,66 +683,6 @@ export default function WeddingWebsiteBuilderPage() {
                   }
                 `}</style>
                 <div className="wedding-preview-container">
-                  {selectedTemplate === 'classic-elegance' && (
-                    <ClassicEleganceTemplate
-                      website={{
-                        id: 'preview',
-                        weddingId: wedding?.id || 'preview',
-                        customUrl,
-                        template: selectedTemplate,
-                        content,
-                        style: {
-                          ...website?.style,
-                          colorTheme,
-                          customColors: colorTheme === 'custom' ? customColors : undefined,
-                        },
-                        isPublished: false,
-                        createdAt: new Date(),
-                        updatedAt: new Date()
-                      } as WeddingWebsite}
-                    />
-                  )}
-
-                  {selectedTemplate === 'modern-minimalist' && (
-                    <ModernMinimalistTemplate
-                      website={{
-                        id: 'preview',
-                        weddingId: wedding?.id || 'preview',
-                        customUrl,
-                        template: selectedTemplate,
-                        content,
-                        style: {
-                          ...website?.style,
-                          colorTheme,
-                          customColors: colorTheme === 'custom' ? customColors : undefined,
-                        },
-                        isPublished: false,
-                        createdAt: new Date(),
-                        updatedAt: new Date()
-                      } as WeddingWebsite}
-                    />
-                  )}
-
-                  {selectedTemplate === 'romantic-boho' && (
-                    <RomanticBohoTemplate
-                      website={{
-                        id: 'preview',
-                        weddingId: wedding?.id || 'preview',
-                        customUrl,
-                        template: selectedTemplate,
-                        content,
-                        style: {
-                          ...website?.style,
-                          colorTheme,
-                          customColors: colorTheme === 'custom' ? customColors : undefined,
-                        },
-                        isPublished: false,
-                        createdAt: new Date(),
-                        updatedAt: new Date()
-                      } as WeddingWebsite}
-                    />
-                  )}
-
                   {selectedTemplate === 'winter-elegance' && (
                     <WinterEleganceTemplate
                       website={{
@@ -796,19 +741,6 @@ export default function WeddingWebsiteBuilderPage() {
                         updatedAt: new Date()
                       } as WeddingWebsite}
                     />
-                  )}
-
-                  {(selectedTemplate === 'luxury-gold' || selectedTemplate === 'garden-fresh') && (
-                    <div className="flex items-center justify-center min-h-screen bg-gray-50">
-                      <div className="text-center p-8">
-                        <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                          Šablona se připravuje
-                        </h3>
-                        <p className="text-gray-600">
-                          Tato šablona bude brzy k dispozici. Zatím můžete použít jinou šablonu.
-                        </p>
-                      </div>
-                    </div>
                   )}
                 </div>
               </div>

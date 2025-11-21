@@ -1,7 +1,6 @@
 'use client'
 
 import { AccommodationContent } from '@/types/wedding-website'
-import { useAccommodation } from '@/hooks/useAccommodation'
 import Image from 'next/image'
 import SectionTitle from './SectionTitle'
 import { MapPin, Phone, Mail, ExternalLink, Building2 } from 'lucide-react'
@@ -11,16 +10,14 @@ interface AccommodationSectionProps {
 }
 
 export default function AccommodationSection({ content }: AccommodationSectionProps) {
-  const { accommodations, loading } = useAccommodation()
-
-  if (!content.enabled || loading) {
+  if (!content.enabled) {
     return null
   }
 
-  // Filter only active accommodations
-  const activeAccommodations = accommodations.filter(acc => acc.isActive)
+  // Use accommodations from content (imported data)
+  const accommodations = content.accommodations || []
 
-  if (activeAccommodations.length === 0) {
+  if (accommodations.length === 0) {
     return null
   }
 
@@ -36,14 +33,14 @@ export default function AccommodationSection({ content }: AccommodationSectionPr
 
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto space-y-8">
-          {activeAccommodations.map((accommodation) => (
+          {accommodations.map((accommodation) => (
             <div key={accommodation.id} className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="grid md:grid-cols-2 gap-6">
                 {/* Image */}
-                {accommodation.images && accommodation.images.length > 0 ? (
+                {accommodation.image ? (
                   <div className="relative h-[300px] md:h-auto">
                     <Image
-                      src={accommodation.images[0]}
+                      src={accommodation.image}
                       alt={accommodation.name}
                       fill
                       className="object-cover"
@@ -73,25 +70,25 @@ export default function AccommodationSection({ content }: AccommodationSectionPr
                       <div className="flex items-start gap-2 text-gray-700">
                         <MapPin className="w-5 h-5 mt-0.5 flex-shrink-0 text-[#85aaba]" />
                         <span style={{ fontFamily: 'Muli, sans-serif' }}>
-                          {accommodation.address.street}, {accommodation.address.city}
+                          {accommodation.address}
                         </span>
                       </div>
                     )}
 
-                    {accommodation.contactInfo?.phone && (
+                    {accommodation.phone && (
                       <div className="flex items-center gap-2 text-gray-700">
                         <Phone className="w-5 h-5 flex-shrink-0 text-[#85aaba]" />
-                        <a href={`tel:${accommodation.contactInfo.phone}`} className="hover:text-[#85aaba]" style={{ fontFamily: 'Muli, sans-serif' }}>
-                          {accommodation.contactInfo.phone}
+                        <a href={`tel:${accommodation.phone}`} className="hover:text-[#85aaba]" style={{ fontFamily: 'Muli, sans-serif' }}>
+                          {accommodation.phone}
                         </a>
                       </div>
                     )}
 
-                    {accommodation.contactInfo?.email && (
+                    {accommodation.email && (
                       <div className="flex items-center gap-2 text-gray-700">
                         <Mail className="w-5 h-5 flex-shrink-0 text-[#85aaba]" />
-                        <a href={`mailto:${accommodation.contactInfo.email}`} className="hover:text-[#85aaba]" style={{ fontFamily: 'Muli, sans-serif' }}>
-                          {accommodation.contactInfo.email}
+                        <a href={`mailto:${accommodation.email}`} className="hover:text-[#85aaba]" style={{ fontFamily: 'Muli, sans-serif' }}>
+                          {accommodation.email}
                         </a>
                       </div>
                     )}
@@ -111,82 +108,53 @@ export default function AccommodationSection({ content }: AccommodationSectionPr
                       </div>
                     )}
 
-                    {/* Room count and amenities */}
+                    {/* Room count */}
                     {accommodation.rooms && accommodation.rooms.length > 0 && content.showAvailability && (
                       <div className="mt-4 text-sm text-gray-600" style={{ fontFamily: 'Muli, sans-serif' }}>
-                        Počet pokojů: {accommodation.rooms.length}
+                        Typů pokojů: {accommodation.rooms.length}
                       </div>
                     )}
                   </div>
                 </div>
               </div>
 
-              {/* Room Prices */}
-              {content.showPrices && accommodation.rooms && accommodation.rooms.length > 0 && (() => {
-                // Group rooms by type (name without number, price, description, capacity)
-                const roomGroups = accommodation.rooms.reduce((groups, room) => {
-                  // Remove numbers from room name to group similar rooms
-                  const baseName = room.name.replace(/\s*\d+\s*$/, '').trim()
-                  const key = `${baseName}-${room.pricePerNight}-${room.capacity}-${room.description || ''}`
-
-                  if (!groups[key]) {
-                    groups[key] = {
-                      baseName,
-                      pricePerNight: room.pricePerNight,
-                      description: room.description,
-                      capacity: room.capacity,
-                      count: 0,
-                      availableCount: 0
-                    }
-                  }
-
-                  groups[key].count++
-                  if (room.isAvailable) {
-                    groups[key].availableCount++
-                  }
-
-                  return groups
-                }, {} as Record<string, any>)
-
-                const groupedRooms = Object.values(roomGroups)
-
-                return (
-                  <div className="p-6 border-t border-gray-200">
-                    <h4 className="text-xl mb-4 text-gray-800" style={{ fontFamily: 'Great Vibes, cursive' }}>
-                      Dostupné pokoje
-                    </h4>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      {groupedRooms.map((roomGroup: any, index: number) => (
-                        <div key={index} className="p-4 bg-gray-50 rounded-lg">
-                          <div className="flex justify-between items-start mb-2">
-                            <div>
-                              <h5 className="font-medium text-gray-800" style={{ fontFamily: 'Muli, sans-serif' }}>
-                                {roomGroup.baseName}
-                              </h5>
-                              {content.showAvailability && (
-                                <p className="text-xs text-gray-500 mt-1" style={{ fontFamily: 'Muli, sans-serif' }}>
-                                  {roomGroup.count} {roomGroup.count === 1 ? 'pokoj' : roomGroup.count < 5 ? 'pokoje' : 'pokojů'} k dispozici
-                                </p>
-                              )}
-                            </div>
-                            <span className="text-[#85aaba] font-semibold whitespace-nowrap ml-2" style={{ fontFamily: 'Muli, sans-serif' }}>
-                              {roomGroup.pricePerNight.toLocaleString('cs-CZ')} Kč/noc
-                            </span>
+              {/* Room Prices - rooms are already grouped during import */}
+              {content.showPrices && accommodation.rooms && accommodation.rooms.length > 0 && (
+                <div className="p-6 border-t border-gray-200">
+                  <h4 className="text-xl mb-4 text-gray-800" style={{ fontFamily: 'Great Vibes, cursive' }}>
+                    Dostupné pokoje
+                  </h4>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {accommodation.rooms.map((room, index) => (
+                      <div key={index} className="p-4 bg-gray-50 rounded-lg">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <h5 className="font-medium text-gray-800" style={{ fontFamily: 'Muli, sans-serif' }}>
+                              {room.name}
+                            </h5>
+                            {content.showAvailability && (
+                              <p className="text-xs text-gray-500 mt-1" style={{ fontFamily: 'Muli, sans-serif' }}>
+                                {room.count} {room.count === 1 ? 'pokoj' : room.count < 5 ? 'pokoje' : 'pokojů'} k dispozici
+                              </p>
+                            )}
                           </div>
-                          {roomGroup.description && (
-                            <p className="text-sm text-gray-600 mb-2" style={{ fontFamily: 'Muli, sans-serif' }}>
-                              {roomGroup.description}
-                            </p>
-                          )}
-                          <div className="text-xs text-gray-500" style={{ fontFamily: 'Muli, sans-serif' }}>
-                            Kapacita: {roomGroup.capacity} {roomGroup.capacity === 1 ? 'osoba' : roomGroup.capacity < 5 ? 'osoby' : 'osob'}
-                          </div>
+                          <span className="text-[#85aaba] font-semibold whitespace-nowrap ml-2" style={{ fontFamily: 'Muli, sans-serif' }}>
+                            {room.pricePerNight.toLocaleString('cs-CZ')} Kč/noc
+                          </span>
                         </div>
-                      ))}
-                    </div>
+                        {room.description && (
+                          <p className="text-sm text-gray-600 mb-2" style={{ fontFamily: 'Muli, sans-serif' }}>
+                            {room.description}
+                          </p>
+                        )}
+                        <div className="text-xs text-gray-500" style={{ fontFamily: 'Muli, sans-serif' }}>
+                          Kapacita: {room.capacity} {room.capacity === 1 ? 'osoba' : room.capacity < 5 ? 'osoby' : 'osob'}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                )
-              })()}
+                </div>
+              )}
             </div>
           ))}
         </div>

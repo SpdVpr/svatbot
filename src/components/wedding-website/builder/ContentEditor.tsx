@@ -15,6 +15,7 @@ import FAQSectionEditor from './sections/FAQSectionEditor'
 import GiftSectionEditor from './sections/GiftSectionEditor'
 import MenuSectionEditor from './sections/MenuSectionEditor'
 import SectionOrderEditor from './SectionOrderEditor'
+import { COLOR_THEMES, ColorTheme } from '../templates/ColorThemeContext'
 import type { WebsiteContent, SectionType } from '@/types/wedding-website'
 
 interface ContentEditorProps {
@@ -23,6 +24,8 @@ interface ContentEditorProps {
   onSave?: () => Promise<void>
   onExpandedChange?: (expanded: boolean) => void
   disabled?: boolean
+  colorTheme?: string
+  customColors?: ColorTheme
 }
 
 interface Section {
@@ -34,9 +37,14 @@ interface Section {
   enabled: boolean
 }
 
-export default function ContentEditor({ content, onContentChange, onSave, onExpandedChange, disabled = false }: ContentEditorProps) {
+export default function ContentEditor({ content, onContentChange, onSave, onExpandedChange, disabled = false, colorTheme = 'default', customColors }: ContentEditorProps) {
   const [expandedSection, setExpandedSection] = useState<SectionType | null>(null)
   const [isSaving, setIsSaving] = useState(false)
+
+  // Get current color theme
+  const currentTheme = colorTheme === 'custom' && customColors
+    ? customColors
+    : (COLOR_THEMES[colorTheme] || COLOR_THEMES.rose) // Použij vybranou paletu nebo růžovou jako fallback
 
   // Notify parent when expanded state changes
   useEffect(() => {
@@ -325,6 +333,7 @@ export default function ContentEditor({ content, onContentChange, onSave, onExpa
           <AccommodationSectionEditor
             content={content.accommodation}
             onChange={(accommodationContent) => updateSectionContent('accommodation', accommodationContent)}
+            onSave={onSave}
           />
         )
       case 'contact':
@@ -451,14 +460,17 @@ export default function ContentEditor({ content, onContentChange, onSave, onExpa
       {expandedSection && (
         <div className="bg-white rounded-xl border-2 border-primary-200 shadow-lg overflow-hidden">
           {/* Section Header */}
-          <div className="bg-gradient-to-r from-primary-500 to-secondary-500 p-6">
+          <div
+            className="border-b border-gray-200 p-6"
+            style={{ backgroundColor: currentTheme.bgGradientFrom }}
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setExpandedSection(null)}
-                  className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
+                  className="p-2 bg-white/60 hover:bg-white/80 rounded-lg transition-colors"
                 >
-                  <ChevronDown className="w-6 h-6 text-white transform rotate-90" />
+                  <ChevronDown className="w-6 h-6 text-gray-700 transform rotate-90" />
                 </button>
 
                 <div className="flex items-center gap-3">
@@ -467,19 +479,25 @@ export default function ContentEditor({ content, onContentChange, onSave, onExpa
                     if (!section) return null
                     return (
                       <>
-                        <div className="p-3 bg-white/20 rounded-lg">
-                          <section.icon className="w-6 h-6 text-white" />
+                        <div
+                          className="p-3 rounded-lg"
+                          style={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                            color: currentTheme.primary
+                          }}
+                        >
+                          <section.icon className="w-6 h-6" />
                         </div>
                         <div>
-                          <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                          <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                             {section.title}
                             {section.required && (
-                              <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full">
+                              <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full font-medium">
                                 Povinné
                               </span>
                             )}
                           </h3>
-                          <p className="text-primary-100 text-sm">{section.description}</p>
+                          <p className="text-gray-700 text-sm">{section.description}</p>
                         </div>
                       </>
                     )
@@ -492,14 +510,25 @@ export default function ContentEditor({ content, onContentChange, onSave, onExpa
                 const section = sections.find(s => s.id === expandedSection)
                 if (!section || section.required) return null
                 return (
-                  <label className={`flex items-center gap-3 bg-white/20 px-4 py-2 rounded-lg transition-colors ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-white/30'}`}>
-                    <span className="text-sm font-medium text-white">Zobrazit na webu</span>
+                  <label
+                    className={`flex items-center gap-3 px-5 py-3 rounded-lg transition-all shadow-md ${
+                      disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:opacity-90'
+                    }`}
+                    style={{
+                      backgroundColor: section.enabled
+                        ? currentTheme.primary
+                        : '#d1d5db'
+                    }}
+                  >
+                    <span className={`text-sm font-semibold ${section.enabled ? 'text-white' : 'text-gray-700'}`}>
+                      Zobrazit na webu
+                    </span>
                     <input
                       type="checkbox"
                       checked={section.enabled}
                       onChange={(e) => toggleSectionEnabled(section.id, e.target.checked)}
                       disabled={disabled}
-                      className="w-5 h-5 rounded border-white text-primary-600 focus:ring-primary-500 focus:ring-offset-0 disabled:cursor-not-allowed"
+                      className="w-5 h-5 rounded border-2 border-white text-primary-600 focus:ring-2 focus:ring-white focus:ring-offset-0 disabled:cursor-not-allowed"
                     />
                   </label>
                 )
