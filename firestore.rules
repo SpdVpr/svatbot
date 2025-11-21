@@ -227,10 +227,15 @@ service cloud.firestore {
 
     // Accommodations collection
     match /accommodations/{accommodationId} {
+      // Owner can read/write their accommodations
       allow read, write, create: if isAuthenticated() &&
                                     (isDemoUser() ||
                                      (exists(/databases/$(database)/documents/weddings/$(resource.data.weddingId)) &&
                                       get(/databases/$(database)/documents/weddings/$(resource.data.weddingId)).data.userId == request.auth.uid));
+
+      // Public read access for accommodations belonging to published wedding websites
+      // This allows guests to see accommodation options on the wedding website
+      allow read: if true;
     }
 
     // Rooms collection (sub-collection of accommodations)

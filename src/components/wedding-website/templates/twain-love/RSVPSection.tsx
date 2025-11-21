@@ -2,7 +2,9 @@
 
 import { RSVPContent } from '@/types/wedding-website'
 import { useState, useEffect } from 'react'
-import { useAccommodation } from '@/hooks/useAccommodation'
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore'
+import { db } from '@/config/firebase'
+import { Accommodation } from '@/types'
 import SectionTitle from './SectionTitle'
 
 interface RSVPSectionProps {
@@ -11,7 +13,8 @@ interface RSVPSectionProps {
 }
 
 export default function RSVPSection({ content, websiteId }: RSVPSectionProps) {
-  const { accommodations, loading: accommodationsLoading } = useAccommodation()
+  const [accommodations, setAccommodations] = useState<Accommodation[]>([])
+  const [accommodationsLoading, setAccommodationsLoading] = useState(true)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -24,6 +27,56 @@ export default function RSVPSection({ content, websiteId }: RSVPSectionProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [availableRooms, setAvailableRooms] = useState<any[]>([])
+
+  // Load accommodations for this wedding website (public access)
+  useEffect(() => {
+    const loadAccommodations = async () => {
+      try {
+        setAccommodationsLoading(true)
+
+        // First, get the weddingId from the website
+        const websiteRef = doc(db, 'weddingWebsites', websiteId)
+        const websiteSnap = await getDoc(websiteRef)
+
+        if (!websiteSnap.exists()) {
+          console.log('Website not found')
+          setAccommodationsLoading(false)
+          return
+        }
+
+        const weddingId = websiteSnap.data().weddingId
+
+        if (!weddingId) {
+          console.log('No weddingId in website')
+          setAccommodationsLoading(false)
+          return
+        }
+
+        // Load accommodations for this wedding
+        const accommodationsRef = collection(db, 'accommodations')
+        const q = query(accommodationsRef, where('weddingId', '==', weddingId))
+        const snapshot = await getDocs(q)
+
+        const accommodationData = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt?.toDate() || new Date(),
+          updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+        })) as Accommodation[]
+
+        console.log('🏨 Loaded accommodations for RSVP:', accommodationData.length)
+        setAccommodations(accommodationData)
+      } catch (error) {
+        console.error('Error loading accommodations:', error)
+      } finally {
+        setAccommodationsLoading(false)
+      }
+    }
+
+    if (websiteId) {
+      loadAccommodations()
+    }
+  }, [websiteId])
 
   // Get available rooms from selected accommodation
   useEffect(() => {
