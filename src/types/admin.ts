@@ -38,6 +38,7 @@ export interface UserAnalytics {
   pageViews: Record<string, number>
   featuresUsed: string[]
   aiQueriesCount?: number // Total AI queries from usageStats
+  isTestAccount?: boolean // Flag for test accounts to exclude from production stats
 }
 
 export interface UserSession {

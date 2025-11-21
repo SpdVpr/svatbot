@@ -5,6 +5,7 @@ import { useUserAnalytics } from '@/hooks/useAdminDashboard'
 import { UserAnalytics } from '@/types/admin'
 import { db } from '@/config/firebase'
 import { collection, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore'
+import { showSimpleToast } from '@/components/notifications/SimpleToast'
 import {
   User,
   Clock,
@@ -21,7 +22,9 @@ import {
   ChevronDown,
   ChevronRight,
   Eye,
-  TrendingUp
+  TrendingUp,
+  TestTube,
+  CheckCircle
 } from 'lucide-react'
 
 type SortField = 'lastActivity' | 'loginCount' | 'sessionTime' | 'aiQueries'
@@ -31,10 +34,12 @@ export default function UserAnalyticsTable() {
   const { users, loading } = useUserAnalytics()
   const [searchTerm, setSearchTerm] = useState('')
   const [filterOnline, setFilterOnline] = useState<'all' | 'online' | 'offline'>('all')
+  const [filterTestAccounts, setFilterTestAccounts] = useState<'all' | 'production' | 'test'>('all')
   const [sortBy, setSortBy] = useState<SortField>('lastActivity')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
   const [fixing, setFixing] = useState(false)
   const [expandedUserId, setExpandedUserId] = useState<string | null>(null)
+  const [togglingUserId, setTogglingUserId] = useState<string | null>(null)
 
   const handleSort = (field: SortField) => {
     if (sortBy === field) {
@@ -44,6 +49,39 @@ export default function UserAnalyticsTable() {
       // Set new field with default desc direction
       setSortBy(field)
       setSortDirection('desc')
+    }
+  }
+
+  const toggleTestAccount = async (userId: string, currentStatus: boolean) => {
+    setTogglingUserId(userId)
+    try {
+      const newStatus = !currentStatus
+      await updateDoc(doc(db, 'userAnalytics', userId), {
+        isTestAccount: newStatus
+      })
+
+      // Show success toast
+      showSimpleToast(
+        'success',
+        'Účet aktualizován',
+        `Účet byl ${newStatus ? 'označen jako testovací' : 'odznačen jako testovací'}`,
+        3000
+      )
+
+      // Wait a bit for Firestore to propagate the change
+      await new Promise(resolve => setTimeout(resolve, 300))
+
+      // The onSnapshot listener in useUserAnalytics will automatically update the UI
+    } catch (error) {
+      console.error('Error toggling test account:', error)
+      showSimpleToast(
+        'error',
+        'Chyba',
+        'Nepodařilo se změnit status účtu',
+        5000
+      )
+    } finally {
+      setTogglingUserId(null)
     }
   }
 
@@ -58,7 +96,12 @@ export default function UserAnalyticsTable() {
         (filterOnline === 'online' && user.isOnline) ||
         (filterOnline === 'offline' && !user.isOnline)
 
-      return matchesSearch && matchesFilter
+      const matchesTestFilter =
+        filterTestAccounts === 'all' ||
+        (filterTestAccounts === 'production' && !user.isTestAccount) ||
+        (filterTestAccounts === 'test' && user.isTestAccount)
+
+      return matchesSearch && matchesFilter && matchesTestFilter
     })
     .sort((a, b) => {
       let comparison = 0
@@ -291,6 +334,16 @@ export default function UserAnalyticsTable() {
               <option value="online">Online</option>
               <option value="offline">Offline</option>
             </select>
+
+            <select
+              value={filterTestAccounts}
+              onChange={(e) => setFilterTestAccounts(e.target.value as any)}
+              className="flex-1 sm:flex-none px-3 md:px-4 py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="all">Všechny účty</option>
+              <option value="production">🚀 Produkční</option>
+              <option value="test">🧪 Testovací</option>
+            </select>
           </div>
         </div>
       </div>
@@ -408,8 +461,16 @@ export default function UserAnalyticsTable() {
                         </span>
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {user.displayName}
+                        <div className="flex items-center gap-2">
+                          <div className="text-sm font-medium text-gray-900">
+                            {user.displayName}
+                          </div>
+                          {user.isTestAccount && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                              <TestTube className="w-3 h-3" />
+                              Test
+                            </span>
+                          )}
                         </div>
                         <div className="text-sm text-gray-500">
                           {user.email}
@@ -418,16 +479,33 @@ export default function UserAnalyticsTable() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
-                      user.isOnline
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      <span className={`w-2 h-2 rounded-full ${
-                        user.isOnline ? 'bg-green-500' : 'bg-gray-400'
-                      }`}></span>
-                      {user.isOnline ? 'Online' : 'Offline'}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
+                        user.isOnline
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        <span className={`w-2 h-2 rounded-full ${
+                          user.isOnline ? 'bg-green-500' : 'bg-gray-400'
+                        }`}></span>
+                        {user.isOnline ? 'Online' : 'Offline'}
+                      </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          toggleTestAccount(user.id, user.isTestAccount || false)
+                        }}
+                        disabled={togglingUserId === user.id}
+                        className={`p-1.5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                          user.isTestAccount
+                            ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                        title={user.isTestAccount ? 'Odznačit jako testovací' : 'Označit jako testovací'}
+                      >
+                        <TestTube className={`w-4 h-4 ${togglingUserId === user.id ? 'animate-pulse' : ''}`} />
+                      </button>
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <div className="flex items-center gap-2">

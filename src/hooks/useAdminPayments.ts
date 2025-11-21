@@ -88,7 +88,7 @@ export interface AdminSubscriptionRecord {
   updatedAt: Date
 }
 
-export function useAdminPayments(onNewPayment?: (payment: AdminPaymentRecord) => void) {
+export function useAdminPayments(onNewPayment?: (payment: AdminPaymentRecord) => void, includeTestAccounts: boolean = false) {
   const [stats, setStats] = useState<AdminPaymentStats | null>(null)
   const [payments, setPayments] = useState<AdminPaymentRecord[]>([])
   const [subscriptions, setSubscriptions] = useState<AdminSubscriptionRecord[]>([])
@@ -150,16 +150,32 @@ export function useAdminPayments(onNewPayment?: (payment: AdminPaymentRecord) =>
     })
 
     return () => unsubscribe()
-  }, [lastPaymentId, onNewPayment])
+  }, [lastPaymentId, onNewPayment, includeTestAccounts])
 
   const loadPaymentData = async () => {
     try {
       setLoading(true)
 
+      // First, load test account IDs from userAnalytics
+      const testAccountUserIds = new Set<string>()
+      if (!includeTestAccounts) {
+        const analyticsSnapshot = await getDocs(collection(db, 'userAnalytics'))
+        analyticsSnapshot.forEach(doc => {
+          const data = doc.data()
+          if (data.isTestAccount === true) {
+            testAccountUserIds.add(doc.id)
+            // Also add userId if different from doc.id
+            if (data.userId && data.userId !== doc.id) {
+              testAccountUserIds.add(data.userId)
+            }
+          }
+        })
+      }
+
       // Load all data in parallel
       await Promise.all([
-        loadPayments(),
-        loadSubscriptions()
+        loadPayments(testAccountUserIds),
+        loadSubscriptions(testAccountUserIds)
       ])
 
       setLoading(false)
@@ -170,11 +186,12 @@ export function useAdminPayments(onNewPayment?: (payment: AdminPaymentRecord) =>
     }
   }
 
-  const loadPayments = async () => {
+  const loadPayments = async (testAccountUserIds: Set<string>) => {
     try {
-      const paymentsRef = collection(db, 'payments')
+      // Load from invoices collection (GoPay payments) instead of old payments collection (Stripe)
+      const invoicesRef = collection(db, 'invoices')
       const q = query(
-        paymentsRef,
+        invoicesRef,
         orderBy('createdAt', 'desc'),
         limit(500)
       )
@@ -184,11 +201,16 @@ export function useAdminPayments(onNewPayment?: (payment: AdminPaymentRecord) =>
 
       for (const docSnap of snapshot.docs) {
         const data = docSnap.data()
-        
-        // Get user info
+
+        // Skip test accounts if not including them
+        if (testAccountUserIds.size > 0 && data.userId && testAccountUserIds.has(data.userId)) {
+          continue
+        }
+
+        // Get user info from invoice data
         let userEmail = data.userEmail || 'Unknown'
-        let userName = data.userName
-        
+        let userName = data.customerName
+
         if (data.userId && !userName) {
           try {
             const userDoc = await getDoc(doc(db, 'users', data.userId))
@@ -198,8 +220,18 @@ export function useAdminPayments(onNewPayment?: (payment: AdminPaymentRecord) =>
               userName = userData.displayName || userData.email?.split('@')[0]
             }
           } catch (err) {
-            console.log('Could not fetch user data for payment:', data.userId)
+            console.log('Could not fetch user data for invoice:', data.userId)
           }
+        }
+
+        // Map invoice status to payment status
+        let paymentStatus: 'succeeded' | 'failed' | 'pending' | 'processing' | 'refunded' | 'canceled' = 'pending'
+        if (data.status === 'paid') {
+          paymentStatus = 'succeeded'
+        } else if (data.status === 'cancelled') {
+          paymentStatus = 'canceled'
+        } else if (data.status === 'issued') {
+          paymentStatus = 'pending'
         }
 
         paymentsData.push({
@@ -207,19 +239,19 @@ export function useAdminPayments(onNewPayment?: (payment: AdminPaymentRecord) =>
           userId: data.userId,
           userEmail,
           userName,
-          subscriptionId: data.subscriptionId,
-          amount: data.amount,
+          subscriptionId: data.paymentId || '', // Use paymentId from invoice
+          amount: data.total, // Use total from invoice
           currency: data.currency,
-          status: data.status,
-          paymentMethod: data.paymentMethod,
-          last4: data.last4,
+          status: paymentStatus,
+          paymentMethod: data.paymentMethod || 'card',
+          last4: undefined, // Not stored in invoices
           createdAt: data.createdAt?.toDate() || new Date(),
           paidAt: data.paidAt?.toDate(),
-          invoiceUrl: data.invoiceUrl,
+          invoiceUrl: data.invoicePdfUrl,
           invoiceNumber: data.invoiceNumber,
-          stripePaymentIntentId: data.stripePaymentIntentId,
-          stripeInvoiceId: data.stripeInvoiceId,
-          plan: data.plan
+          stripePaymentIntentId: undefined, // GoPay doesn't use Stripe
+          stripeInvoiceId: undefined,
+          plan: data.items?.[0]?.description || 'Unknown' // Get plan from first item description
         })
       }
 
@@ -227,12 +259,12 @@ export function useAdminPayments(onNewPayment?: (payment: AdminPaymentRecord) =>
       calculateStats(paymentsData, subscriptions)
     } catch (err: any) {
       if (err?.code !== 'permission-denied' && !err?.message?.includes('permission')) {
-        console.error('Error loading payments:', err)
+        console.error('Error loading payments from invoices:', err)
       }
     }
   }
 
-  const loadSubscriptions = async () => {
+  const loadSubscriptions = async (testAccountUserIds: Set<string>) => {
     try {
       const subscriptionsRef = collection(db, 'subscriptions')
       const q = query(
@@ -246,27 +278,36 @@ export function useAdminPayments(onNewPayment?: (payment: AdminPaymentRecord) =>
 
       for (const docSnap of snapshot.docs) {
         const data = docSnap.data()
-        
+
+        // Use doc.id as userId (subscriptions collection uses userId as document ID)
+        const userId = docSnap.id
+        const dataUserId = data.userId
+
+        // Skip test accounts if not including them (check both doc.id and data.userId)
+        if (testAccountUserIds.size > 0 && (testAccountUserIds.has(userId) || (dataUserId && testAccountUserIds.has(dataUserId)))) {
+          continue
+        }
+
         // Get user info
         let userEmail = 'Unknown'
         let userName = undefined
-        
-        if (data.userId) {
+
+        if (data.userId || userId) {
           try {
-            const userDoc = await getDoc(doc(db, 'users', data.userId))
+            const userDoc = await getDoc(doc(db, 'users', data.userId || userId))
             if (userDoc.exists()) {
               const userData = userDoc.data()
               userEmail = userData.email || userEmail
               userName = userData.displayName || userData.email?.split('@')[0]
             }
           } catch (err) {
-            console.log('Could not fetch user data for subscription:', data.userId)
+            console.log('Could not fetch user data for subscription:', data.userId || userId)
           }
         }
 
         subscriptionsData.push({
           id: docSnap.id,
-          userId: data.userId,
+          userId: data.userId || userId,
           userEmail,
           userName,
           weddingId: data.weddingId,

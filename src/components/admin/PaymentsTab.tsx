@@ -18,7 +18,8 @@ import {
   Filter,
   Calendar,
   Crown,
-  AlertCircle
+  AlertCircle,
+  TestTube
 } from 'lucide-react'
 
 export default function PaymentsTab() {
@@ -44,7 +45,8 @@ export default function PaymentsTab() {
     }
   }, [])
 
-  const { stats, payments, subscriptions, loading, refresh } = useAdminPayments(handleNewPayment)
+  // ALWAYS exclude test accounts from payments tab
+  const { stats, payments, subscriptions, loading, refresh } = useAdminPayments(handleNewPayment, false)
 
   if (loading) {
     return (
@@ -141,6 +143,14 @@ export default function PaymentsTab() {
 
   return (
     <div className="space-y-6">
+      {/* Info Banner */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="flex items-center gap-2 text-blue-800">
+          <TestTube className="w-5 h-5" />
+          <span className="font-medium">Testovací účty jsou automaticky vyfiltrovány z platebních statistik</span>
+        </div>
+      </div>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard

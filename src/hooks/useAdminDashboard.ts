@@ -27,14 +27,14 @@ import {
   AffiliatePartner
 } from '@/types/admin'
 
-export function useAdminDashboard() {
+export function useAdminDashboard(includeTestAccounts: boolean = false) {
   const [stats, setStats] = useState<AdminStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     loadDashboardStats()
-  }, [])
+  }, [includeTestAccounts])
 
   const loadDashboardStats = async () => {
     try {
@@ -61,6 +61,9 @@ export function useAdminDashboard() {
       const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
       const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000)
 
+      // Create set of test account user IDs for filtering
+      const testAccountUserIds = new Set<string>()
+
       let totalUsers = 0
       let activeUsers = 0
       let onlineUsers = 0
@@ -72,12 +75,21 @@ export function useAdminDashboard() {
 
       userAnalytics.forEach(doc => {
         const data = doc.data() as UserAnalytics
+
+        // Track test accounts
+        if (data.isTestAccount) {
+          testAccountUserIds.add(doc.id)
+          if (!includeTestAccounts) {
+            return // Skip test accounts in production stats
+          }
+        }
+
         totalUsers++
-        
+
         if (data.isOnline) onlineUsers++
-        
+
         const lastActivity = data.lastActivityAt?.toDate()
-        if (lastActivity && (now.getTime() - lastActivity.getTime()) < 24 * 60 * 60 * 1000) {
+        if (lastActivity && (now.getTime() - lastActivity.getTime()) < 30 * 24 * 60 * 60 * 1000) {
           activeUsers++
         }
 
@@ -92,19 +104,34 @@ export function useAdminDashboard() {
         totalSessions += data.sessions?.length || 0
       })
 
-      // Calculate subscription stats
+      // Calculate subscription stats (excluding test accounts)
       let activeSubscriptions = 0
       let trialUsers = 0
       let monthlyRevenue = 0
       let totalRevenue = 0
 
       subscriptions.forEach(doc => {
-        const data = doc.data() as UserSubscription
-        if (data.status === 'active') activeSubscriptions++
-        if (data.status === 'trial') trialUsers++
-        
-        const startDate = data.startDate?.toDate()
-        if (startDate && startDate >= monthAgo) {
+        const data = doc.data() as any // Use any to access all possible fields
+
+        // Use doc.id as userId (subscriptions collection uses userId as document ID)
+        const userId = doc.id
+
+        // Skip test accounts if not including them
+        if (!includeTestAccounts && testAccountUserIds.has(userId)) return
+
+        // Count active subscriptions (status: 'active' and amount > 0)
+        if (data.status === 'active' && (data.amount || 0) > 0) {
+          activeSubscriptions++
+        }
+
+        // Count trial users (status: 'trialing' or 'trial', or isTrialActive: true)
+        if (data.status === 'trialing' || data.status === 'trial' || data.isTrialActive === true) {
+          trialUsers++
+        }
+
+        // Calculate monthly revenue from subscriptions started this month
+        const startDate = data.startDate?.toDate() || data.currentPeriodStart?.toDate()
+        if (startDate && startDate >= monthAgo && (data.amount || 0) > 0) {
           monthlyRevenue += data.amount || 0
         }
       })
@@ -112,6 +139,13 @@ export function useAdminDashboard() {
       // Calculate total revenue from payments
       payments.forEach(doc => {
         const data = doc.data() as Payment
+
+        // Get userId from data (payments have userId field)
+        const userId = data.userId
+
+        // Skip test accounts if not including them
+        if (!includeTestAccounts && userId && testAccountUserIds.has(userId)) return
+
         if (data.status === 'completed') {
           totalRevenue += data.amount || 0
         }
@@ -252,7 +286,8 @@ export function useUserAnalytics() {
               sessions: data.sessions || [],
               pageViews: pageViews, // Use extracted pageViews instead of data.pageViews
               featuresUsed: data.featuresUsed || [],
-              aiQueriesCount: 0
+              aiQueriesCount: 0,
+              isTestAccount: data.isTestAccount || false // Include test account flag
             }
 
             // Try to load AI queries from usageStats

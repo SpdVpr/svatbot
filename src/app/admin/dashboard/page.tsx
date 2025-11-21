@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useAdminStats } from '@/hooks/useAdmin'
+import { useAdminDashboard } from '@/hooks/useAdminDashboard'
 import AdminDashboardStats from '@/components/admin/AdminDashboardStats'
 import UserAnalyticsTable from '@/components/admin/UserAnalyticsTable'
 import AdminMessaging from '@/components/admin/AdminMessaging'
@@ -16,6 +17,8 @@ import AdminQRCode from '@/components/admin/AdminQRCode'
 import QRCodeStats from '@/components/admin/QRCodeStats'
 import TestFeedbackManagement from '@/components/admin/TestFeedbackManagement'
 import AdminNotifications from '@/components/admin/AdminNotifications'
+import TestAccountCleanup from '@/components/admin/TestAccountCleanup'
+import SimpleToastContainer from '@/components/notifications/SimpleToast'
 import {
   Users,
   Clock,
@@ -29,14 +32,18 @@ import {
   Star,
   FileText,
   QrCode,
-  ClipboardCheck
+  ClipboardCheck,
+  TestTube
 } from 'lucide-react'
 
 type TabType = 'overview' | 'users' | 'messages' | 'feedback' | 'payments' | 'invoices' | 'vendors' | 'reviews' | 'marketing' | 'testing'
 
 export default function AdminDashboard() {
-  const { stats, loading } = useAdminStats()
+  const [includeTestAccounts, setIncludeTestAccounts] = useState(false)
+  const { stats: dashboardStats, loading: dashboardLoading } = useAdminDashboard(includeTestAccounts)
   const [activeTab, setActiveTab] = useState<TabType>('overview')
+
+  const loading = dashboardLoading
 
   if (loading) {
     return (
@@ -69,9 +76,26 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-4 md:space-y-6 px-4 md:px-0">
       {/* Header */}
-      <div>
-        <h1 className="text-xl md:text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-        <p className="text-sm md:text-base text-gray-600">Správa a analytika SvatBot.cz</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+          <p className="text-sm md:text-base text-gray-600">Správa a analytika SvatBot.cz</p>
+        </div>
+
+        {/* Test Accounts Toggle */}
+        <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg border border-gray-200">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={includeTestAccounts}
+              onChange={(e) => setIncludeTestAccounts(e.target.checked)}
+              className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+            />
+            <span className="text-sm font-medium text-gray-700">
+              Zahrnout testovací účty
+            </span>
+          </label>
+        </div>
       </div>
 
       {/* Navigation Tabs */}
@@ -100,7 +124,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Content */}
-      {activeTab === 'overview' && <OverviewTab stats={stats} />}
+      {activeTab === 'overview' && <OverviewTab stats={dashboardStats} includeTestAccounts={includeTestAccounts} />}
       {activeTab === 'users' && <UserAnalyticsTable />}
       {activeTab === 'marketing' && <MarketingTab />}
       {activeTab === 'testing' && <TestFeedbackManagement />}
@@ -110,13 +134,26 @@ export default function AdminDashboard() {
       {activeTab === 'messages' && <AdminMessaging />}
       {activeTab === 'feedback' && <FeedbackManagement />}
       {activeTab === 'vendors' && <VendorsTab />}
+
+      {/* Toast Notifications */}
+      <SimpleToastContainer />
     </div>
   )
 }
 
-function OverviewTab({ stats }: { stats: any }) {
+function OverviewTab({ stats, includeTestAccounts }: { stats: any; includeTestAccounts: boolean }) {
   return (
     <div className="space-y-4 md:space-y-6">
+      {/* Test Accounts Warning */}
+      {includeTestAccounts && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+          <div className="flex items-center gap-2 text-amber-800">
+            <TestTube className="w-5 h-5" />
+            <span className="font-medium">Statistiky zahrnují testovací účty</span>
+          </div>
+        </div>
+      )}
+
       {/* Main Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         <StatCard
@@ -231,6 +268,9 @@ function OverviewTab({ stats }: { stats: any }) {
       {/* Less Important Sections */}
       <div className="space-y-4 md:space-y-6">
         <h3 className="text-base md:text-lg font-medium text-gray-500">Další nástroje</h3>
+
+        {/* Test Account Cleanup - Important for production launch */}
+        <TestAccountCleanup />
 
         {/* DEMO Account Management Panel */}
         <DemoAccountPanel />
