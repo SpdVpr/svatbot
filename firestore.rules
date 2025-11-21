@@ -508,6 +508,13 @@ service cloud.firestore {
 
       // Allow checking if document exists (for URL availability)
       allow get: if true;
+
+      // Allow anyone (including unauthenticated users) to update analytics fields only
+      // This is for tracking website visits from guests
+      allow update: if request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['analytics', 'updatedAt']) ||
+                       request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['analytics']);
     }
 
     // Notes collection - allow all operations for authenticated users on their own notes
