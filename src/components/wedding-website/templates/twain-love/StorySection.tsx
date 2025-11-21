@@ -16,19 +16,8 @@ export default function StorySection({ content }: StorySectionProps) {
   const formatDate = (dateString: string) => {
     if (!dateString || dateString.trim() === '') return ''
 
-    // Try to parse as date
-    const date = new Date(dateString)
-
-    // Check if it's a valid date
-    if (!isNaN(date.getTime())) {
-      return date.toLocaleDateString('cs-CZ', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-      })
-    }
-
-    // If not a valid date, return the string as-is (e.g., "Léto 2020")
+    // Simply return the string as-is - users can enter any text they want
+    // (e.g., "Léto 2020", "Červenec 2023", "2019", "15. června 2022")
     return dateString
   }
 
