@@ -245,11 +245,17 @@ export function useUserTracking() {
 
         if (currentSessionIndex !== -1) {
           // Update the specific session's duration
-          sessions[currentSessionIndex] = {
+          const updatedSession: any = {
             ...sessions[currentSessionIndex],
-            duration: totalSessionDuration,
-            endTime: markOffline ? now : undefined
+            duration: totalSessionDuration
           }
+
+          // Only add endTime if marking offline (don't set undefined)
+          if (markOffline) {
+            updatedSession.endTime = now
+          }
+
+          sessions[currentSessionIndex] = updatedSession
           updates.sessions = sessions
         }
       }
