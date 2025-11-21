@@ -204,6 +204,16 @@ export function useUserAnalytics() {
           snapshot.docs.map(async (analyticsDoc) => {
             const data = analyticsDoc.data()
 
+            // Extract pageViews from nested fields
+            // Firestore stores pageViews._ as flat fields, not as nested object
+            const pageViews: Record<string, number> = {}
+            Object.keys(data).forEach(key => {
+              if (key.startsWith('pageViews.')) {
+                const pageName = key.replace('pageViews.', '')
+                pageViews[pageName] = data[key]
+              }
+            })
+
             // If email or displayName is missing, try to load from users collection
             let email = data.email || ''
             let displayName = data.displayName || ''
@@ -240,7 +250,7 @@ export function useUserAnalytics() {
               loginCount: data.loginCount || 0,
               totalSessionTime: data.totalSessionTime || 0,
               sessions: data.sessions || [],
-              pageViews: data.pageViews || {},
+              pageViews: pageViews, // Use extracted pageViews instead of data.pageViews
               featuresUsed: data.featuresUsed || [],
               aiQueriesCount: 0
             }
