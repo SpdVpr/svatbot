@@ -78,17 +78,17 @@ export async function sendRegistrationEmail(
           <title>Vítejte v SvatBot.cz</title>
         </head>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+          <div style="background: linear-gradient(135deg, #f472b6 0%, #db2777 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
             <h1 style="margin: 0; font-size: 28px;">🎉 Vítejte v SvatBot.cz!</h1>
           </div>
-          
-          <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+
+          <div style="background: #fdf2f8; padding: 30px; border-radius: 0 0 10px 10px;">
             <p style="font-size: 16px;">Ahoj <strong>${firstName}</strong>,</p>
-            
+
             <p>Děkujeme za registraci! Jsme rádi, že jste se rozhodli plánovat svou svatbu s námi.</p>
-            
-            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #667eea;">
-              <h2 style="margin-top: 0; color: #667eea;">🎁 Váš 30denní zkušební přístup</h2>
+
+            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f472b6;">
+              <h2 style="margin-top: 0; color: #db2777;">🎁 Váš 30denní zkušební přístup</h2>
               <p>Máte nyní <strong>30 dní zdarma</strong> pro vyzkoušení všech Premium funkcí:</p>
               <ul style="line-height: 2;">
                 <li>✅ Neomezený počet hostů</li>
@@ -99,15 +99,15 @@ export async function sendRegistrationEmail(
                 <li>✅ Marketplace dodavatelů</li>
               </ul>
             </div>
-            
+
             <div style="text-align: center; margin: 30px 0;">
-              <a href="https://svatbot.cz" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
+              <a href="https://svatbot.cz" style="display: inline-block; background: linear-gradient(135deg, #f472b6 0%, #db2777 100%); color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
                 Začít plánovat svatbu
               </a>
             </div>
-            
+
             <p style="color: #666; font-size: 14px; margin-top: 30px;">
-              Potřebujete pomoc? Napište nám na <a href="mailto:info@svatbot.cz" style="color: #667eea;">info@svatbot.cz</a>
+              Potřebujete pomoc? Napište nám na <a href="mailto:info@svatbot.cz" style="color: #db2777;">info@svatbot.cz</a>
             </p>
           </div>
           
@@ -192,17 +192,17 @@ export async function sendPaymentSuccessEmail(
           <title>Platba přijata</title>
         </head>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+          <div style="background: linear-gradient(135deg, #f472b6 0%, #db2777 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
             <h1 style="margin: 0; font-size: 28px;">✅ Platba úspěšně přijata!</h1>
           </div>
-          
-          <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+
+          <div style="background: #fdf2f8; padding: 30px; border-radius: 0 0 10px 10px;">
             <p style="font-size: 16px;">Ahoj <strong>${firstName}</strong>,</p>
-            
+
             <p>Děkujeme za vaši platbu! Váš Premium přístup byl aktivován.</p>
-            
-            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10b981;">
-              <h2 style="margin-top: 0; color: #10b981;">📋 Detaily platby</h2>
+
+            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f472b6;">
+              <h2 style="margin-top: 0; color: #db2777;">📋 Detaily platby</h2>
               <table style="width: 100%; border-collapse: collapse;">
                 <tr>
                   <td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Plán:</strong></td>
@@ -219,8 +219,8 @@ export async function sendPaymentSuccessEmail(
               </table>
             </div>
             
-            <div style="background: #e0f2fe; padding: 20px; border-radius: 8px; margin: 20px 0;">
-              <p style="margin: 0; color: #0369a1;">
+            <div style="background: #fce7f3; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <p style="margin: 0; color: #be185d;">
                 <strong>💡 Tip:</strong> Nyní máte přístup ke všem Premium funkcím včetně AI asistenta, neomezeného počtu hostů a pokročilé analytiky.
               </p>
             </div>
@@ -242,13 +242,13 @@ export async function sendPaymentSuccessEmail(
             ` : ''}
 
             <div style="text-align: center; margin: 30px 0;">
-              <a href="https://svatbot.cz" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
+              <a href="https://svatbot.cz" style="display: inline-block; background: linear-gradient(135deg, #f472b6 0%, #db2777 100%); color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
                 Pokračovat v plánování
               </a>
             </div>
-            
+
             <p style="color: #666; font-size: 14px; margin-top: 30px;">
-              Máte dotazy? Napište nám na <a href="mailto:info@svatbot.cz" style="color: #10b981;">info@svatbot.cz</a>
+              Máte dotazy? Napište nám na <a href="mailto:info@svatbot.cz" style="color: #db2777;">info@svatbot.cz</a>
             </p>
           </div>
           
@@ -318,15 +318,15 @@ export async function sendTrialReminderEmail(
           <title>Zkušební období končí</title>
         </head>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+          <div style="background: linear-gradient(135deg, #f472b6 0%, #db2777 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
             <h1 style="margin: 0; font-size: 28px;">⏰ Zkušební období brzy končí</h1>
           </div>
-          
-          <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+
+          <div style="background: #fdf2f8; padding: 30px; border-radius: 0 0 10px 10px;">
             <p style="font-size: 16px;">Ahoj <strong>${firstName}</strong>,</p>
 
             <p style="font-size: 16px; line-height: 1.8;">
-              Vaše 30denní zkušební období končí <strong style="color: #d97706;">${formattedDate}</strong>.
+              Vaše 30denní zkušební období končí <strong style="color: #db2777;">${formattedDate}</strong>.
               Už jste začali plánovat svou vysněnou svatbu a bylo by škoda o vše přijít!
             </p>
 
@@ -339,8 +339,8 @@ export async function sendTrialReminderEmail(
               </p>
             </div>
 
-            <div style="background: white; padding: 25px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #10b981;">
-              <h2 style="margin-top: 0; color: #10b981; font-size: 20px;">💎 Co získáte s Premium plánem</h2>
+            <div style="background: white; padding: 25px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #f472b6;">
+              <h2 style="margin-top: 0; color: #db2777; font-size: 20px;">💎 Co získáte s Premium plánem</h2>
               <ul style="line-height: 2.2; padding-left: 20px; margin: 15px 0;">
                 <li style="margin-bottom: 8px;">✅ <strong>Neomezený přístup</strong> ke všem funkcím a vašim datům</li>
                 <li style="margin-bottom: 8px;">✅ <strong>AI asistent</strong> pro inteligentní plánování svatby</li>
@@ -366,38 +366,38 @@ export async function sendTrialReminderEmail(
                   za měsíc
                 </div>
                 <div style="text-align: center; margin-top: 15px;">
-                  <a href="https://svatbot.cz/pricing?plan=monthly" style="display: inline-block; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 12px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 15px;">
+                  <a href="https://svatbot.cz/pricing?plan=monthly" style="display: inline-block; background: linear-gradient(135deg, #f472b6 0%, #db2777 100%); color: white; padding: 12px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 15px;">
                     Vybrat měsíční plán
                   </a>
                 </div>
               </div>
 
-              <div style="background: white; padding: 20px; border-radius: 8px; border: 3px solid #10b981; position: relative; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-                <div style="position: absolute; top: -12px; right: 20px; background: #10b981; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+              <div style="background: white; padding: 20px; border-radius: 8px; border: 3px solid #f472b6; position: relative; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                <div style="position: absolute; top: -12px; right: 20px; background: #db2777; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold;">
                   NEJLEPŠÍ VOLBA
                 </div>
                 <div style="margin-bottom: 10px;">
                   <strong style="color: #92400e; font-size: 16px;">Roční plán</strong>
                 </div>
-                <div style="font-size: 32px; font-weight: bold; color: #10b981; margin: 10px 0;">
+                <div style="font-size: 32px; font-weight: bold; color: #db2777; margin: 10px 0;">
                   2 999 Kč
                 </div>
                 <div style="color: #78716c; font-size: 14px; margin-bottom: 8px;">
                   za rok (249 Kč/měsíc)
                 </div>
-                <div style="background: #d1fae5; color: #065f46; padding: 8px 12px; border-radius: 6px; font-size: 14px; font-weight: bold; display: inline-block;">
+                <div style="background: #fce7f3; color: #be185d; padding: 8px 12px; border-radius: 6px; font-size: 14px; font-weight: bold; display: inline-block;">
                   🎉 Ušetříte 589 Kč
                 </div>
                 <div style="text-align: center; margin-top: 15px;">
-                  <a href="https://svatbot.cz/pricing?plan=yearly" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 12px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 15px;">
+                  <a href="https://svatbot.cz/pricing?plan=yearly" style="display: inline-block; background: linear-gradient(135deg, #f472b6 0%, #db2777 100%); color: white; padding: 12px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 15px;">
                     Vybrat roční plán
                   </a>
                 </div>
               </div>
             </div>
 
-            <div style="background: #e0f2fe; padding: 20px; border-radius: 8px; margin: 25px 0; text-align: center;">
-              <p style="margin: 0; color: #0369a1; font-size: 15px; line-height: 1.8;">
+            <div style="background: #fce7f3; padding: 20px; border-radius: 8px; margin: 25px 0; text-align: center;">
+              <p style="margin: 0; color: #be185d; font-size: 15px; line-height: 1.8;">
                 <strong>💡 Tip:</strong> S ročním plánem ušetříte téměř 600 Kč a máte jistotu,
                 že budete mít přístup k aplikaci po celou dobu plánování svatby!
               </p>
@@ -469,7 +469,7 @@ export async function sendVendorRegistrationEmail(
           <title>Registrace přijata</title>
         </head>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+          <div style="background: linear-gradient(135deg, #f472b6 0%, #db2777 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
             <h1 style="margin: 0; font-size: 28px;">✅ Registrace přijata!</h1>
           </div>
 
@@ -530,7 +530,7 @@ export async function sendVendorRegistrationEmail(
             </ol>
 
             <p style="font-size: 14px; color: #666; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
-              Máte otázky? Kontaktujte nás na <a href="mailto:info@svatbot.cz" style="color: #667eea;">info@svatbot.cz</a>
+              Máte otázky? Kontaktujte nás na <a href="mailto:info@svatbot.cz" style="color: #db2777;">info@svatbot.cz</a>
             </p>
 
             <p style="font-size: 14px; color: #666; margin-top: 20px;">
@@ -604,7 +604,7 @@ export async function sendVendorApprovalEmail(
           <title>Inzerát schválen</title>
         </head>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+          <div style="background: linear-gradient(135deg, #f472b6 0%, #db2777 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
             <h1 style="margin: 0; font-size: 28px;">🎉 Gratulujeme!</h1>
             <p style="margin: 10px 0 0 0; font-size: 18px;">Váš inzerát byl schválen</p>
           </div>
@@ -655,7 +655,7 @@ export async function sendVendorApprovalEmail(
             </div>
 
             <p style="font-size: 14px; color: #666; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
-              Máte otázky nebo potřebujete pomoc? Kontaktujte nás na <a href="mailto:info@svatbot.cz" style="color: #667eea;">info@svatbot.cz</a>
+              Máte otázky nebo potřebujete pomoc? Kontaktujte nás na <a href="mailto:info@svatbot.cz" style="color: #db2777;">info@svatbot.cz</a>
             </p>
 
             <p style="font-size: 14px; color: #666; margin-top: 20px;">
@@ -732,11 +732,11 @@ export async function sendVendorContactEmail(
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-            .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
-            .info-box { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #667eea; }
+            .header { background: linear-gradient(135deg, #f472b6 0%, #db2777 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: #fdf2f8; padding: 30px; border-radius: 0 0 10px 10px; }
+            .info-box { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f472b6; }
             .info-row { margin: 10px 0; }
-            .label { font-weight: bold; color: #667eea; }
+            .label { font-weight: bold; color: #db2777; }
             .message-box { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
             .button { display: inline-block; padding: 12px 30px; background: #667eea; color: white; text-decoration: none; border-radius: 6px; margin: 20px 0; }
             .footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; }
@@ -754,7 +754,7 @@ export async function sendVendorContactEmail(
               <p>Obdrželi jste novou poptávku od zákazníka, který má zájem o vaše služby pro svou svatbu.</p>
 
               <div class="info-box">
-                <h3 style="margin-top: 0; color: #667eea;">📋 Informace o zákazníkovi</h3>
+                <h3 style="margin-top: 0; color: #db2777;">📋 Informace o zákazníkovi</h3>
                 <div class="info-row">
                   <span class="label">Jméno:</span> ${inquiry.customerName}
                 </div>
@@ -770,7 +770,7 @@ export async function sendVendorContactEmail(
               </div>
 
               <div class="message-box">
-                <h3 style="margin-top: 0; color: #667eea;">💬 Zpráva od zákazníka</h3>
+                <h3 style="margin-top: 0; color: #db2777;">💬 Zpráva od zákazníka</h3>
                 <p style="white-space: pre-wrap;">${inquiry.message}</p>
               </div>
 
@@ -823,9 +823,9 @@ export async function sendCustomerContactConfirmationEmail(
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-            .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
-            .success-box { background: #d1fae5; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10b981; }
+            .header { background: linear-gradient(135deg, #f472b6 0%, #db2777 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: #fdf2f8; padding: 30px; border-radius: 0 0 10px 10px; }
+            .success-box { background: #fce7f3; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f472b6; }
             .info-box { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
             .button { display: inline-block; padding: 12px 30px; background: #667eea; color: white; text-decoration: none; border-radius: 6px; margin: 20px 0; }
             .footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; }
@@ -848,7 +848,7 @@ export async function sendCustomerContactConfirmationEmail(
               <p>Dodavatel obdržel vaše kontaktní údaje a zprávu. Měl by vás kontaktovat v nejbližší době.</p>
 
               <div class="info-box">
-                <h3 style="margin-top: 0; color: #667eea;">📞 Co dál?</h3>
+                <h3 style="margin-top: 0; color: #db2777;">📞 Co dál?</h3>
                 <ul style="margin: 10px 0; padding-left: 20px;">
                   <li>Dodavatel vás bude kontaktovat na uvedený email nebo telefon</li>
                   <li>Obvykle odpovídají do 24-48 hodin</li>
