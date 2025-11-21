@@ -2,17 +2,36 @@
 
 import { InfoContent, ScheduleContent } from '@/types/wedding-website'
 import Image from 'next/image'
-import { useState } from 'react'
 import SectionTitle from './SectionTitle'
-import { MapPin, Clock, Car, Info } from 'lucide-react'
+import { MapPin, Clock, Car, Info, ExternalLink } from 'lucide-react'
 
 interface LocationSectionProps {
   infoContent: InfoContent
   scheduleContent?: ScheduleContent
 }
 
+// Helper function to extract place_id from Google Maps URL
+const extractPlaceId = (url: string): string | null => {
+  if (!url) return null
+  const match = url.match(/place_id[=:]([^&]+)/)
+  return match ? match[1] : null
+}
+
+// Helper function to create Google Maps Embed URL
+const createEmbedUrl = (mapUrl: string, address: string): string => {
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+  const placeId = extractPlaceId(mapUrl)
+
+  if (placeId) {
+    return `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=place_id:${placeId}&zoom=15`
+  } else if (address) {
+    return `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${encodeURIComponent(address)}&zoom=15`
+  }
+
+  return ''
+}
+
 export default function LocationSection({ infoContent, scheduleContent }: LocationSectionProps) {
-  const [showMap, setShowMap] = useState<string | null>(null)
 
   if (!infoContent.enabled) return null
 
@@ -50,62 +69,82 @@ export default function LocationSection({ infoContent, scheduleContent }: Locati
         <div className="max-w-6xl mx-auto space-y-12">
           {events.map((event, index) => {
             const isEven = index % 2 === 0
-            
+
             return (
-              <div key={index} className="grid md:grid-cols-12 gap-8 items-center">
-                {/* Image */}
-                <div className={`md:col-span-5 ${isEven ? 'md:order-1' : 'md:order-2'}`}>
-                  <div className="relative h-[350px] rounded-lg overflow-hidden shadow-lg">
-                    {event.image ? (
-                      <Image
-                        src={event.image}
-                        alt={event.title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, 42vw"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-[#b2c9d3] to-[#85aaba]" />
-                    )}
+              <div key={index} className="space-y-6">
+                <div className="grid md:grid-cols-12 gap-8 items-center">
+                  {/* Image */}
+                  <div className={`md:col-span-5 ${isEven ? 'md:order-1' : 'md:order-2'}`}>
+                    <div className="relative h-[350px] rounded-lg overflow-hidden shadow-lg">
+                      {event.image ? (
+                        <Image
+                          src={event.image}
+                          alt={event.title}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, 42vw"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-[#b2c9d3] to-[#85aaba]" />
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                {/* Content */}
-                <div className={`md:col-span-7 ${isEven ? 'md:order-2' : 'md:order-1'}`}>
-                  <div className="space-y-4">
-                    <h3 className="text-3xl font-light text-gray-800">
-                      {event.title}
-                    </h3>
-                    
-                    {event.time && (
-                      <div className="flex items-center gap-2 text-[#85aaba]">
-                        <Clock className="w-5 h-5" />
-                        <span>{event.time}</span>
-                      </div>
-                    )}
+                  {/* Content */}
+                  <div className={`md:col-span-7 ${isEven ? 'md:order-2' : 'md:order-1'}`}>
+                    <div className="space-y-4">
+                      <h3 className="text-3xl font-light text-gray-800">
+                        {event.title}
+                      </h3>
 
-                    {event.venue && (
-                      <div className="flex items-start gap-2 text-gray-700">
-                        <MapPin className="w-5 h-5 mt-1 flex-shrink-0" />
-                        <div>
-                          <div className="font-medium">{event.venue}</div>
-                          {event.address && (
-                            <div className="text-sm text-gray-600">{event.address}</div>
-                          )}
+                      {event.time && (
+                        <div className="flex items-center gap-2 text-[#85aaba]">
+                          <Clock className="w-5 h-5" />
+                          <span>{event.time}</span>
                         </div>
-                      </div>
-                    )}
+                      )}
 
-                    {event.mapUrl && (
-                      <button
-                        onClick={() => setShowMap(event.mapUrl || null)}
-                        className="px-6 py-2 bg-[#85aaba] text-white rounded hover:bg-[#6a8a98] transition-colors"
-                      >
-                        Zobrazit mapu
-                      </button>
-                    )}
+                      {event.venue && (
+                        <div className="flex items-start gap-2 text-gray-700">
+                          <MapPin className="w-5 h-5 mt-1 flex-shrink-0" />
+                          <div>
+                            <div className="font-medium">{event.venue}</div>
+                            {event.address && (
+                              <div className="text-sm text-gray-600">{event.address}</div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
+
+                {/* Embedded Map */}
+                {event.mapUrl && event.address && (
+                  <div className="w-full">
+                    <div className="relative w-full h-64 rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+                      <iframe
+                        src={createEmbedUrl(event.mapUrl, event.address)}
+                        className="w-full h-full"
+                        style={{ border: 0 }}
+                        allowFullScreen
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                      />
+                    </div>
+                    <div className="mt-2 text-center">
+                      <a
+                        href={event.mapUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm text-[#85aaba] hover:text-[#6a8a98] transition-colors"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        Otevřít v Google Maps
+                      </a>
+                    </div>
+                  </div>
+                )}
               </div>
             )
           })}
@@ -140,36 +179,6 @@ export default function LocationSection({ infoContent, scheduleContent }: Locati
           )}
         </div>
       </div>
-
-      {/* Map Modal */}
-      {showMap && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-          onClick={() => setShowMap(null)}
-        >
-          <div 
-            className="bg-white rounded-lg max-w-4xl w-full p-6"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-medium">Mapa</h3>
-              <button
-                onClick={() => setShowMap(null)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="aspect-video">
-              <iframe
-                src={showMap}
-                className="w-full h-full rounded"
-                loading="lazy"
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

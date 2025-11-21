@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import { Calendar, Upload, X, Image as ImageIcon, Move, RotateCw, Loader2 } from 'lucide-react'
+import { useState } from 'react'
+import { Calendar, Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react'
 import { useWeddingStore } from '@/stores/weddingStore'
 import { useWeddingImageUpload } from '@/hooks/useWeddingImageUpload'
 import type { HeroContent } from '@/types/wedding-website'
@@ -42,14 +42,6 @@ export default function HeroSectionEditor({ content, onChange }: HeroSectionEdit
   const { currentWedding: wedding } = useWeddingStore()
   const { uploadImage, uploading, progress, error: uploadError } = useWeddingImageUpload()
   const [dragOver, setDragOver] = useState(false)
-  const [imagePosition, setImagePosition] = useState(content.imagePosition || { x: 50, y: 50 })
-  const [imageScale, setImageScale] = useState(content.imageScale || 100)
-  const imageRef = useRef<HTMLImageElement>(null)
-
-  useEffect(() => {
-    setImagePosition(content.imagePosition || { x: 50, y: 50 })
-    setImageScale(content.imageScale || 100)
-  }, [content.imagePosition, content.imageScale])
 
   // Auto-import dat ze svatby
   const importFromWedding = () => {
@@ -251,117 +243,26 @@ export default function HeroSectionEditor({ content, onChange }: HeroSectionEdit
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Hlavní fotka
         </label>
-        
+
         {content.mainImage ? (
           <div className="space-y-4">
-            {/* Image Preview */}
-            <div className="relative bg-gray-100 rounded-lg overflow-hidden" style={{ height: '300px' }}>
-              <img
-                ref={imageRef}
-                src={content.mainImage}
-                alt="Hlavní fotka"
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-200"
-                style={{
-                  objectPosition: `${imagePosition.x}% ${imagePosition.y}%`,
-                  transform: `scale(${imageScale / 100})`
-                }}
-              />
-
-              {/* Overlay controls */}
-              <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 hover:opacity-100">
-                <div className="bg-white rounded-lg p-2 shadow-lg">
-                  <Move className="w-5 h-5 text-gray-600" />
+            <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                  <ImageIcon className="w-6 h-6 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Fotka nahrána</p>
+                  <p className="text-xs text-gray-500">Fotka se zobrazí na hlavní stránce</p>
                 </div>
               </div>
-
-              {/* Remove button */}
               <button
                 onClick={() => handleInputChange('mainImage', undefined)}
-                className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
+                className="flex items-center gap-2 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
               >
                 <X className="w-4 h-4" />
+                Odstranit
               </button>
-            </div>
-
-            {/* Position Controls */}
-            <div className="bg-gray-50 rounded-lg p-4 space-y-4">
-              <h4 className="font-medium text-gray-900 mb-3">Pozice a velikost fotky</h4>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Horizontální pozice
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={imagePosition.x}
-                    onChange={(e) => {
-                      const newPosition = { ...imagePosition, x: parseInt(e.target.value) }
-                      setImagePosition(newPosition)
-                      handleInputChange('imagePosition', newPosition)
-                    }}
-                    className="w-full"
-                  />
-                  <div className="text-xs text-gray-500 mt-1">{imagePosition.x}%</div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Vertikální pozice
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={imagePosition.y}
-                    onChange={(e) => {
-                      const newPosition = { ...imagePosition, y: parseInt(e.target.value) }
-                      setImagePosition(newPosition)
-                      handleInputChange('imagePosition', newPosition)
-                    }}
-                    className="w-full"
-                  />
-                  <div className="text-xs text-gray-500 mt-1">{imagePosition.y}%</div>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Velikost fotky
-                </label>
-                <input
-                  type="range"
-                  min="50"
-                  max="200"
-                  value={imageScale}
-                  onChange={(e) => {
-                    const newScale = parseInt(e.target.value)
-                    setImageScale(newScale)
-                    handleInputChange('imageScale', newScale)
-                  }}
-                  className="w-full"
-                />
-                <div className="text-xs text-gray-500 mt-1">{imageScale}%</div>
-              </div>
-
-              <div className="flex gap-2">
-                <button
-                  onClick={() => {
-                    const defaultPosition = { x: 50, y: 50 }
-                    const defaultScale = 100
-                    setImagePosition(defaultPosition)
-                    setImageScale(defaultScale)
-                    handleInputChange('imagePosition', defaultPosition)
-                    handleInputChange('imageScale', defaultScale)
-                  }}
-                  className="flex items-center gap-2 px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm"
-                >
-                  <RotateCw className="w-4 h-4" />
-                  Resetovat
-                </button>
-              </div>
             </div>
           </div>
         ) : (
