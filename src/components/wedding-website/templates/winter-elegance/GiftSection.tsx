@@ -14,7 +14,7 @@ export default function GiftSection({ content }: GiftSectionProps) {
   if (!content.enabled) return null
 
   return (
-    <section className="py-20 bg-stone-50">
+    <section id="gift" className="py-20 bg-stone-50">
       <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">

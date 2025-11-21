@@ -14,8 +14,19 @@ export default function GiftSection({ content }: GiftSectionProps) {
   const hasBankAccount = !!content.bankAccount
 
   return (
-    <section className="py-20 bg-white">
-      <div className="container mx-auto px-4">
+    <section id="gift" className="py-20 relative bg-white">
+      {/* Decorative Elements */}
+      <div
+        className="absolute right-0 top-1/2 -translate-y-1/2 w-32 h-32 opacity-15 hidden lg:block"
+        style={{
+          backgroundImage: 'url(/templates/pretty/images/rsvp-right-flower.png)',
+          backgroundSize: 'contain',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center'
+        }}
+      />
+
+      <div className="container mx-auto px-4 relative z-10">
         <SectionTitle
           title="Svatební dary"
           subtitle={content.message}

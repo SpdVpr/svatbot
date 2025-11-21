@@ -35,8 +35,19 @@ export default function ContactSection({ content }: ContactSectionProps) {
   if (contacts.length === 0) return null
 
   return (
-    <section className="py-20 bg-white">
-      <div className="container mx-auto px-4">
+    <section id="contact" className="py-20 relative bg-white">
+      {/* Decorative Elements */}
+      <div
+        className="absolute right-0 bottom-20 w-28 h-28 opacity-15 hidden lg:block"
+        style={{
+          backgroundImage: 'url(/templates/pretty/images/rsvp-right-flower.png)',
+          backgroundSize: 'contain',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center'
+        }}
+      />
+
+      <div className="container mx-auto px-4 relative z-10">
         <SectionTitle title="Kontakty" />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">

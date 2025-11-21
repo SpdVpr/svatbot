@@ -39,8 +39,19 @@ export default function GallerySection({ content }: GallerySectionProps) {
 
   return (
     <>
-      <section id="gallery" className="py-20" style={{ backgroundColor: '#faf8f3' }}>
-        <div className="container mx-auto px-4">
+      <section id="gallery" className="py-20 relative" style={{ background: 'linear-gradient(to bottom, #faf8f3 0%, #ffffff 100%)' }}>
+        {/* Decorative Elements */}
+        <div
+          className="absolute left-0 bottom-20 w-28 h-28 opacity-15 hidden lg:block"
+          style={{
+            backgroundImage: 'url(/templates/pretty/images/rsvp-left-flower.png)',
+            backgroundSize: 'contain',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'center'
+          }}
+        />
+
+        <div className="container mx-auto px-4 relative z-10">
           <SectionTitle title={content.title || "Galerie"} subtitle={content.subtitle} />
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">

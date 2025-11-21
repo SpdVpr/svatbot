@@ -29,9 +29,10 @@ export default function MenuSectionEditor({ content, onChange }: MenuSectionEdit
     description: content?.description || 'Připravili jsme pro vás výběr chutných jídel a nápojů.',
     showCategories: content?.showCategories ?? true,
     showDietaryInfo: content?.showDietaryInfo ?? true,
-    showDrinks: content?.showDrinks ?? true,
-    showSideDishes: content?.showSideDishes ?? true,
-    showDesserts: content?.showDesserts ?? true
+    showAppetizers: content?.showAppetizers ?? false,
+    showDrinks: content?.showDrinks ?? false,
+    showSideDishes: content?.showSideDishes ?? false,
+    showDesserts: content?.showDesserts ?? false
   }
 
   const updateContent = (updates: Partial<MenuContent>) => {
@@ -289,6 +290,32 @@ export default function MenuSectionEditor({ content, onChange }: MenuSectionEdit
                 </label>
               </div>
 
+              {/* Info about always shown categories */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-sm text-blue-800">
+                  <strong>Poznámka:</strong> Polévky a hlavní chody se zobrazují vždy (pokud existují). Níže můžete navolit zobrazení dalších kategorií.
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <UtensilsCrossed className="w-5 h-5 text-gray-400" />
+                  <div>
+                    <p className="font-medium text-gray-900">Zobrazit předkrmy</p>
+                    <p className="text-sm text-gray-600">Ukázat předkrmy v menu</p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={content?.showAppetizers ?? false}
+                    onChange={(e) => updateContent({ showAppetizers: e.target.checked })}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                </label>
+              </div>
+
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <UtensilsCrossed className="w-5 h-5 text-gray-400" />
@@ -300,7 +327,7 @@ export default function MenuSectionEditor({ content, onChange }: MenuSectionEdit
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={content?.showSideDishes ?? true}
+                    checked={content?.showSideDishes ?? false}
                     onChange={(e) => updateContent({ showSideDishes: e.target.checked })}
                     className="sr-only peer"
                   />
@@ -319,7 +346,7 @@ export default function MenuSectionEditor({ content, onChange }: MenuSectionEdit
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={content?.showDesserts ?? true}
+                    checked={content?.showDesserts ?? false}
                     onChange={(e) => updateContent({ showDesserts: e.target.checked })}
                     className="sr-only peer"
                   />
@@ -338,7 +365,7 @@ export default function MenuSectionEditor({ content, onChange }: MenuSectionEdit
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={content?.showDrinks ?? true}
+                    checked={content?.showDrinks ?? false}
                     onChange={(e) => updateContent({ showDrinks: e.target.checked })}
                     className="sr-only peer"
                   />

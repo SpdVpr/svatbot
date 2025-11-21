@@ -13,7 +13,7 @@ export default function ScheduleSection({ content }: ScheduleSectionProps) {
   if (!content.enabled || !content.items || content.items.length === 0) return null
 
   return (
-    <section className="py-20 bg-white">
+    <section id="schedule" className="py-20 bg-white">
       <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">

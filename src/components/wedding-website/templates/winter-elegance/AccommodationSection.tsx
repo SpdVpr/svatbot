@@ -34,7 +34,7 @@ export default function AccommodationSection({ content }: AccommodationSectionPr
 
         {/* Accommodations */}
         {accommodations.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+          <div className={`grid grid-cols-1 ${accommodations.length > 1 ? 'md:grid-cols-2' : 'max-w-2xl mx-auto'} gap-8 mb-12`}>
             {accommodations.map((accommodation) => (
               <div key={accommodation.id} className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
                 {/* Image */}

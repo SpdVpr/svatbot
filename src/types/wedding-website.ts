@@ -251,6 +251,7 @@ export interface MenuContent {
   description?: string
   showCategories: boolean
   showDietaryInfo: boolean
+  showAppetizers: boolean
   showDrinks: boolean
   showSideDishes: boolean
   showDesserts: boolean

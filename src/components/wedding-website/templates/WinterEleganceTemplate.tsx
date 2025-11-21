@@ -3,6 +3,7 @@
 import { WeddingWebsite } from '@/types/wedding-website'
 import ScrollAnimations from '../ScrollAnimations'
 import { ColorThemeProvider } from './ColorThemeContext'
+import Navigation from './winter-elegance/Navigation'
 import HeroSection from './winter-elegance/HeroSection'
 import StorySection from './winter-elegance/StorySection'
 import InfoSection from './winter-elegance/InfoSection'
@@ -67,7 +68,7 @@ export default function WinterEleganceTemplate({ website }: WinterEleganceTempla
       case 'faq':
         return <FAQSection key="faq" content={content.faq} />
       case 'menu':
-        return <MenuSection key="menu" content={content.menu} />
+        return <MenuSection key="menu" content={content.menu} websiteId={website.id} />
       default:
         return null
     }
@@ -137,6 +138,13 @@ export default function WinterEleganceTemplate({ website }: WinterEleganceTempla
             color: white;
           }
         `}</style>
+
+        {/* Navigation */}
+        <Navigation
+          bride={content.hero.bride}
+          groom={content.hero.groom}
+          content={content}
+        />
 
         {/* Render sections in order */}
         {sectionOrder.map((sectionType) => renderSection(sectionType))}

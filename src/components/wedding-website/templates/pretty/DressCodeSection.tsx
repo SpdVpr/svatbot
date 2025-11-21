@@ -11,11 +11,22 @@ export default function DressCodeSection({ content }: DressCodeSectionProps) {
   if (!content.enabled) return null
 
   return (
-    <section className="py-20" style={{ background: 'linear-gradient(to bottom, #faf8f3 0%, #ffffff 100%)' }}>
-      <div className="container mx-auto px-4">
+    <section id="dressCode" className="py-20 relative" style={{ background: 'linear-gradient(to bottom, #faf8f3 0%, #ffffff 100%)' }}>
+      {/* Decorative Elements */}
+      <div
+        className="absolute left-0 top-1/3 w-28 h-28 opacity-15 hidden lg:block"
+        style={{
+          backgroundImage: 'url(/templates/pretty/images/rsvp-left-flower.png)',
+          backgroundSize: 'contain',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center'
+        }}
+      />
+
+      <div className="container mx-auto px-4 relative z-10">
         <SectionTitle title="Dress Code" />
 
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           {/* Dress Code Text */}
           {content.dressCode && (
             <div className="bg-white p-8 rounded-lg shadow-lg mb-8 text-center">
@@ -75,8 +86,45 @@ export default function DressCodeSection({ content }: DressCodeSectionProps) {
             </div>
           )}
 
-          {/* Dress Code Images */}
-          {content.images && content.images.length > 0 && (
+          {/* Dress Code Images - New structure with colors */}
+          {content.colors && content.colors.length > 0 && content.colors.some(c => c.images && c.images.length > 0) && (
+            <div className="bg-white p-8 rounded-lg shadow-lg mt-8">
+              <h3
+                className="text-3xl mb-6 text-center"
+                style={{ fontFamily: 'Great Vibes, cursive', color: '#b19a56' }}
+              >
+                Inspirace
+              </h3>
+              <div className="space-y-8">
+                {content.colors.map((colorItem, colorIndex) => (
+                  colorItem.images && colorItem.images.length > 0 && (
+                    <div key={colorIndex}>
+                      {colorItem.name && (
+                        <h4 className="text-xl font-semibold text-gray-800 mb-4 text-center">
+                          {colorItem.name}
+                        </h4>
+                      )}
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {colorItem.images.map((image, imageIndex) => (
+                          <div key={imageIndex} className="aspect-square overflow-hidden rounded-lg shadow-md">
+                            <img
+                              src={image}
+                              alt={`${colorItem.name || 'Dress code'} inspiration ${imageIndex + 1}`}
+                              className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Legacy Dress Code Images - fallback for old structure */}
+          {(!content.colors || content.colors.length === 0 || !content.colors.some(c => c.images && c.images.length > 0)) &&
+           content.images && content.images.length > 0 && content.images.filter(img => img && img.trim() !== '').length > 0 && (
             <div className="bg-white p-8 rounded-lg shadow-lg mt-8">
               <h3
                 className="text-3xl mb-6 text-center"
@@ -85,7 +133,7 @@ export default function DressCodeSection({ content }: DressCodeSectionProps) {
                 Inspirace
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {content.images.map((image, index) => (
+                {content.images.filter(img => img && img.trim() !== '').map((image, index) => (
                   <div key={index} className="aspect-square overflow-hidden rounded-lg shadow-md">
                     <img
                       src={image}

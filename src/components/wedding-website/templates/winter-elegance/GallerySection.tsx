@@ -14,7 +14,7 @@ export default function GallerySection({ content }: GallerySectionProps) {
   if (!content.enabled) return null
 
   return (
-    <section className="py-20 bg-white">
+    <section id="gallery" className="py-20 bg-white">
       <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">

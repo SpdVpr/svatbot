@@ -115,7 +115,7 @@ export default function PrettyTemplate({ website }: PrettyTemplateProps) {
 
       case 'menu':
         return content.menu?.enabled ? (
-          <MenuSection key="menu" content={content.menu} />
+          <MenuSection key="menu" content={content.menu} websiteId={website.id} />
         ) : null
 
       case 'contact':

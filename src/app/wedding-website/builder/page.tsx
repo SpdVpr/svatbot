@@ -72,9 +72,10 @@ export default function WeddingWebsiteBuilderPage() {
       description: 'Připravili jsme pro vás výběr chutných jídel a nápojů.',
       showCategories: true,
       showDietaryInfo: true,
-      showDrinks: true,
-      showSideDishes: true,
-      showDesserts: true
+      showAppetizers: false,
+      showDrinks: false,
+      showSideDishes: false,
+      showDesserts: false
     },
   })
   const [isSaving, setIsSaving] = useState(false)

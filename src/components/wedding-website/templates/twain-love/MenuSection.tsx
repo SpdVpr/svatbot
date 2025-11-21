@@ -3,27 +3,111 @@
 import { MenuContent } from '@/types/wedding-website'
 import SectionTitle from './SectionTitle'
 import { UtensilsCrossed, Wine } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore'
+import { db } from '@/config/firebase'
+import { MenuItem, DrinkItem } from '@/types/menu'
 
 interface MenuSectionProps {
   content: MenuContent
+  websiteId: string
 }
 
-export default function MenuSection({ content }: MenuSectionProps) {
+export default function MenuSection({ content, websiteId }: MenuSectionProps) {
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([])
+  const [drinkItems, setDrinkItems] = useState<DrinkItem[]>([])
+  const [loading, setLoading] = useState(true)
+
+  // Load menu items for this wedding website (public access)
+  useEffect(() => {
+    const loadMenuItems = async () => {
+      try {
+        setLoading(true)
+
+        // First, get the weddingId from the website
+        const websiteRef = doc(db, 'weddingWebsites', websiteId)
+        const websiteSnap = await getDoc(websiteRef)
+
+        if (!websiteSnap.exists()) {
+          console.log('Website not found')
+          setLoading(false)
+          return
+        }
+
+        const weddingId = websiteSnap.data().weddingId
+
+        if (!weddingId) {
+          console.log('No weddingId in website')
+          setLoading(false)
+          return
+        }
+
+        // Load menu items for this wedding
+        const menuQuery = query(
+          collection(db, 'menuItems'),
+          where('weddingId', '==', weddingId)
+        )
+        const menuSnapshot = await getDocs(menuQuery)
+        const items = menuSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt?.toDate() || new Date(),
+          updatedAt: doc.data().updatedAt?.toDate() || new Date()
+        })) as MenuItem[]
+
+        // Load drink items for this wedding
+        const drinkQuery = query(
+          collection(db, 'drinkItems'),
+          where('weddingId', '==', weddingId)
+        )
+        const drinkSnapshot = await getDocs(drinkQuery)
+        const drinks = drinkSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt?.toDate() || new Date(),
+          updatedAt: doc.data().updatedAt?.toDate() || new Date()
+        })) as DrinkItem[]
+
+        console.log('🍽️ Loaded menu items:', items.length, 'drinks:', drinks.length)
+        setMenuItems(items)
+        setDrinkItems(drinks)
+      } catch (error) {
+        console.error('Error loading menu items:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (websiteId) {
+      loadMenuItems()
+    }
+  }, [websiteId])
+
   if (!content.enabled) {
     return null
   }
 
-  const items = content.items || []
+  if (loading) {
+    return (
+      <div id="menu" className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <p className="text-gray-600">Načítání menu...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
-  // Separate food and drinks
-  const foodItems = items.filter(item =>
-    item.category === 'appetizer' ||
-    item.category === 'soup' ||
-    item.category === 'main' ||
-    item.category === 'dessert' ||
-    item.category === 'other'
-  )
-  const drinkItems = items.filter(item => item.category === 'drink')
+  // Filter menu items by category
+  const appetizers = menuItems.filter(item => item.category === 'appetizer')
+  const soups = menuItems.filter(item => item.category === 'soup')
+  const mainCourses = menuItems.filter(item => item.category === 'main-course')
+  const sideDishes = menuItems.filter(item => item.category === 'side-dish')
+  const desserts = menuItems.filter(item => item.category === 'dessert')
+
+  // Combine all food items
+  const foodItems = [...appetizers, ...soups, ...mainCourses, ...sideDishes, ...desserts]
 
   const hasFoodItems = foodItems.length > 0
   const hasDrinkItems = drinkItems.length > 0
@@ -86,13 +170,23 @@ export default function MenuSection({ content }: MenuSectionProps) {
                           {item.description}
                         </p>
                       )}
-                      {content.showDietaryInfo && item.dietaryInfo && item.dietaryInfo.length > 0 && (
+                      {content.showDietaryInfo && (
                         <div className="mt-2 flex flex-wrap gap-1">
-                          {item.dietaryInfo.map((info, idx) => (
-                            <span key={idx} className="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded">
-                              {info}
+                          {item.isVegetarian && (
+                            <span className="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded">
+                              Vegetariánské
                             </span>
-                          ))}
+                          )}
+                          {item.isVegan && (
+                            <span className="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded">
+                              Veganské
+                            </span>
+                          )}
+                          {item.isGlutenFree && (
+                            <span className="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded">
+                              Bezlepkové
+                            </span>
+                          )}
                         </div>
                       )}
                     </div>
@@ -124,13 +218,11 @@ export default function MenuSection({ content }: MenuSectionProps) {
                           {item.description}
                         </p>
                       )}
-                      {content.showDietaryInfo && item.dietaryInfo && item.dietaryInfo.length > 0 && (
+                      {content.showDietaryInfo && item.isAlcoholic && (
                         <div className="mt-2 flex flex-wrap gap-1">
-                          {item.dietaryInfo.map((info, idx) => (
-                            <span key={idx} className="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded">
-                              {info}
-                            </span>
-                          ))}
+                          <span className="inline-block px-2 py-1 bg-amber-100 text-amber-800 text-xs rounded">
+                            Alkoholické
+                          </span>
                         </div>
                       )}
                     </div>

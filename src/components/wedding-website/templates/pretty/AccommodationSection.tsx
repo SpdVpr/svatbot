@@ -20,8 +20,19 @@ export default function AccommodationSection({ content }: AccommodationSectionPr
   }
 
   return (
-    <section className="py-20 bg-white">
-      <div className="container mx-auto px-4">
+    <section id="accommodation" className="py-20 relative" style={{ background: 'linear-gradient(to bottom, #ffffff 0%, #faf8f3 100%)' }}>
+      {/* Decorative Elements */}
+      <div
+        className="absolute left-0 top-1/4 w-28 h-28 opacity-15 hidden lg:block"
+        style={{
+          backgroundImage: 'url(/templates/pretty/images/rsvp-left-flower.png)',
+          backgroundSize: 'contain',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center'
+        }}
+      />
+
+      <div className="container mx-auto px-4 relative z-10">
         <SectionTitle
           title={content.title || "Ubytování"}
           subtitle={content.description}

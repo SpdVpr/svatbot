@@ -4,6 +4,7 @@ import { useColorTheme } from '../ColorThemeContext'
 import { HeroContent } from '@/types/wedding-website'
 import { Heart, ChevronDown } from 'lucide-react'
 import Image from 'next/image'
+import { useState, useEffect } from 'react'
 
 interface HeroSectionProps {
   content: HeroContent
@@ -11,6 +12,23 @@ interface HeroSectionProps {
 
 export default function HeroSection({ content }: HeroSectionProps) {
   const { theme } = useColorTheme()
+  const [daysUntilWedding, setDaysUntilWedding] = useState<number | null>(null)
+
+  useEffect(() => {
+    const calculateDays = () => {
+      const weddingDate = new Date(content.weddingDate)
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      weddingDate.setHours(0, 0, 0, 0)
+      const diffTime = weddingDate.getTime() - today.getTime()
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+      setDaysUntilWedding(diffDays)
+    }
+
+    calculateDays()
+    const interval = setInterval(calculateDays, 1000 * 60 * 60) // Update every hour
+    return () => clearInterval(interval)
+  }, [content.weddingDate])
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString('cs-CZ', {
@@ -28,7 +46,7 @@ export default function HeroSection({ content }: HeroSectionProps) {
   }
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image */}
       {content.mainImage && (
         <div className="absolute inset-0 z-0">
@@ -70,10 +88,24 @@ export default function HeroSection({ content }: HeroSectionProps) {
 
           {/* Tagline */}
           {content.tagline && (
-            <div className="mb-12">
+            <div className="mb-8">
               <p className="text-xl md:text-2xl text-white/90 font-light italic text-shadow-md">
                 {content.tagline}
               </p>
+            </div>
+          )}
+
+          {/* Countdown */}
+          {daysUntilWedding !== null && daysUntilWedding > 0 && (
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-8 py-6 inline-block">
+              <div className="text-center">
+                <div className="text-5xl md:text-6xl font-serif font-light text-white mb-2">
+                  {daysUntilWedding}
+                </div>
+                <div className="text-sm md:text-base text-white/90 uppercase tracking-wider">
+                  {daysUntilWedding === 1 ? 'den do svatby' : daysUntilWedding <= 4 ? 'dny do svatby' : 'dní do svatby'}
+                </div>
+              </div>
             </div>
           )}
         </div>

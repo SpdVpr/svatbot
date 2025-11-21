@@ -9,10 +9,10 @@ interface HeroSectionProps {
 
 export default function HeroSection({ content }: HeroSectionProps) {
   const [currentSlide, setCurrentSlide] = useState(0)
-  
+
   // Default images if none provided
-  const slides = content.mainImage 
-    ? [content.mainImage] 
+  const slides = (content.mainImage && content.mainImage.trim() !== '')
+    ? [content.mainImage]
     : [
         'https://images.unsplash.com/photo-1519741497674-611481863552?w=1920',
         'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=1920'
@@ -90,7 +90,7 @@ export default function HeroSection({ content }: HeroSectionProps) {
                   ? `${content.imagePosition.x}% ${content.imagePosition.y}%`
                   : 'center center',
                 backgroundRepeat: 'no-repeat',
-                transform: content.imageScale ? `scale(${content.imageScale})` : 'none',
+                transform: content.imageScale ? `scale(${content.imageScale / 100})` : 'scale(1)',
                 transformOrigin: 'center center'
               }}
             >

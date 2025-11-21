@@ -3,15 +3,86 @@
 import { useColorTheme } from '../ColorThemeContext'
 import { MenuContent } from '@/types/wedding-website'
 import { Utensils, Wine, Coffee, Leaf, Wheat } from 'lucide-react'
-import { useMenu } from '@/hooks/useMenu'
+import { useState, useEffect } from 'react'
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore'
+import { db } from '@/config/firebase'
+import { MenuItem, DrinkItem } from '@/types/menu'
 
 interface MenuSectionProps {
   content: MenuContent
+  websiteId: string
 }
 
-export default function MenuSection({ content }: MenuSectionProps) {
+export default function MenuSection({ content, websiteId }: MenuSectionProps) {
   const { theme } = useColorTheme()
-  const { menuItems, drinkItems, loading } = useMenu()
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([])
+  const [drinkItems, setDrinkItems] = useState<DrinkItem[]>([])
+  const [loading, setLoading] = useState(true)
+
+  // Load menu items for this wedding website (public access)
+  useEffect(() => {
+    const loadMenuItems = async () => {
+      try {
+        setLoading(true)
+
+        // First, get the weddingId from the website
+        const websiteRef = doc(db, 'weddingWebsites', websiteId)
+        const websiteSnap = await getDoc(websiteRef)
+
+        if (!websiteSnap.exists()) {
+          console.log('Website not found')
+          setLoading(false)
+          return
+        }
+
+        const weddingId = websiteSnap.data().weddingId
+
+        if (!weddingId) {
+          console.log('No weddingId in website')
+          setLoading(false)
+          return
+        }
+
+        // Load menu items for this wedding
+        const menuQuery = query(
+          collection(db, 'menuItems'),
+          where('weddingId', '==', weddingId)
+        )
+        const menuSnapshot = await getDocs(menuQuery)
+        const items = menuSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt?.toDate() || new Date(),
+          updatedAt: doc.data().updatedAt?.toDate() || new Date()
+        })) as MenuItem[]
+
+        // Load drink items for this wedding
+        const drinkQuery = query(
+          collection(db, 'drinkItems'),
+          where('weddingId', '==', weddingId)
+        )
+        const drinkSnapshot = await getDocs(drinkQuery)
+        const drinks = drinkSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt?.toDate() || new Date(),
+          updatedAt: doc.data().updatedAt?.toDate() || new Date()
+        })) as DrinkItem[]
+
+        console.log('🍽️ Loaded menu items:', items.length, 'drinks:', drinks.length)
+        setMenuItems(items)
+        setDrinkItems(drinks)
+      } catch (error) {
+        console.error('Error loading menu items:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (websiteId) {
+      loadMenuItems()
+    }
+  }, [websiteId])
 
   if (!content.enabled) return null
 
@@ -45,7 +116,7 @@ export default function MenuSection({ content }: MenuSectionProps) {
   const hasDrinkItems = content.showDrinks && drinkItems.length > 0
 
   return (
-    <section className="py-20 bg-stone-50">
+    <section id="menu" className="py-20 bg-stone-50">
       <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">

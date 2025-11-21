@@ -1,9 +1,10 @@
 'use client'
 
 import { RSVPContent } from '@/types/wedding-website'
-import { useState } from 'react'
-import { collection, addDoc } from 'firebase/firestore'
+import { useState, useEffect } from 'react'
+import { collection, addDoc, query, where, getDocs, doc, getDoc } from 'firebase/firestore'
 import { db } from '@/config/firebase'
+import { Accommodation } from '@/types'
 
 interface RSVPSectionProps {
   content: RSVPContent
@@ -11,15 +12,86 @@ interface RSVPSectionProps {
 }
 
 export default function RSVPSection({ content, websiteId }: RSVPSectionProps) {
+  const [accommodations, setAccommodations] = useState<Accommodation[]>([])
+  const [accommodationsLoading, setAccommodationsLoading] = useState(true)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     guests: '1',
     attending: 'all',
+    accommodationId: '',
+    roomId: '',
     message: ''
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'success' | 'error' | null>(null)
+  const [availableRooms, setAvailableRooms] = useState<any[]>([])
+
+  // Load accommodations for this wedding website (public access)
+  useEffect(() => {
+    const loadAccommodations = async () => {
+      try {
+        setAccommodationsLoading(true)
+
+        // First, get the weddingId from the website
+        const websiteRef = doc(db, 'weddingWebsites', websiteId)
+        const websiteSnap = await getDoc(websiteRef)
+
+        if (!websiteSnap.exists()) {
+          console.log('Website not found')
+          setAccommodationsLoading(false)
+          return
+        }
+
+        const weddingId = websiteSnap.data().weddingId
+
+        if (!weddingId) {
+          console.log('No weddingId in website')
+          setAccommodationsLoading(false)
+          return
+        }
+
+        // Load accommodations for this wedding
+        const accommodationsRef = collection(db, 'accommodations')
+        const q = query(accommodationsRef, where('weddingId', '==', weddingId))
+        const snapshot = await getDocs(q)
+
+        const accommodationData = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt?.toDate() || new Date(),
+          updatedAt: doc.data().updatedAt?.toDate() || new Date(),
+        })) as Accommodation[]
+
+        console.log('🏨 Loaded accommodations for RSVP:', accommodationData.length)
+        setAccommodations(accommodationData)
+      } catch (error) {
+        console.error('Error loading accommodations:', error)
+      } finally {
+        setAccommodationsLoading(false)
+      }
+    }
+
+    if (websiteId) {
+      loadAccommodations()
+    }
+  }, [websiteId])
+
+  // Get available rooms from selected accommodation
+  useEffect(() => {
+    if (formData.accommodationId && accommodations.length > 0) {
+      const selectedAccommodation = accommodations.find(acc => acc.id === formData.accommodationId)
+      if (selectedAccommodation && selectedAccommodation.rooms) {
+        const available = selectedAccommodation.rooms.filter(room => room.isAvailable)
+        setAvailableRooms(available)
+      } else {
+        setAvailableRooms([])
+      }
+    } else {
+      setAvailableRooms([])
+      setFormData(prev => ({ ...prev, roomId: '' }))
+    }
+  }, [formData.accommodationId, accommodations])
 
   if (!content.enabled) return null
 
@@ -29,7 +101,7 @@ export default function RSVPSection({ content, websiteId }: RSVPSectionProps) {
     setSubmitStatus(null)
 
     try {
-      await addDoc(collection(db, 'rsvpResponses'), {
+      const rsvpData: any = {
         websiteId,
         name: formData.name,
         email: formData.email,
@@ -37,7 +109,15 @@ export default function RSVPSection({ content, websiteId }: RSVPSectionProps) {
         attending: formData.attending,
         message: formData.message,
         createdAt: new Date()
-      })
+      }
+
+      // Add accommodation info if selected
+      if (formData.attending !== 'no' && formData.accommodationId && formData.roomId) {
+        rsvpData.accommodationId = formData.accommodationId
+        rsvpData.roomId = formData.roomId
+      }
+
+      await addDoc(collection(db, 'rsvpResponses'), rsvpData)
 
       setSubmitStatus('success')
       setFormData({
@@ -45,6 +125,8 @@ export default function RSVPSection({ content, websiteId }: RSVPSectionProps) {
         email: '',
         guests: '1',
         attending: 'all',
+        accommodationId: '',
+        roomId: '',
         message: ''
       })
     } catch (error) {
@@ -139,11 +221,56 @@ export default function RSVPSection({ content, websiteId }: RSVPSectionProps) {
                 onChange={(e) => setFormData({ ...formData, attending: e.target.value })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent focus:ring-[#b19a56]"
               >
-                <option value="all">Všechny události</option>
-                <option value="ceremony">Pouze obřad</option>
-                <option value="reception">Pouze hostina</option>
+                <option value="all">Zúčastním se</option>
+                <option value="no">Nezúčastním se</option>
               </select>
             </div>
+
+            {/* Accommodation Selection - only show if attending */}
+            {formData.attending !== 'no' && accommodations.length > 0 && (
+              <div className="space-y-4 border-t border-gray-200 pt-4">
+                <h4 className="font-semibold text-gray-800">Ubytování (volitelné)</h4>
+
+                <div>
+                  <select
+                    value={formData.accommodationId}
+                    onChange={(e) => setFormData({ ...formData, accommodationId: e.target.value, roomId: '' })}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent focus:ring-[#b19a56]"
+                  >
+                    <option value="">Nevybráno</option>
+                    {accommodations.map((acc) => (
+                      <option key={acc.id} value={acc.id}>
+                        {acc.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {formData.accommodationId && availableRooms.length > 0 && (
+                  <div>
+                    <select
+                      value={formData.roomId}
+                      onChange={(e) => setFormData({ ...formData, roomId: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent focus:ring-[#b19a56]"
+                    >
+                      <option value="">Vyberte pokoj</option>
+                      {availableRooms.map((room) => (
+                        <option key={room.id} value={room.id}>
+                          {room.name} - {room.capacity} {room.capacity === 1 ? 'osoba' : room.capacity <= 4 ? 'osoby' : 'osob'}
+                          {room.pricePerNight && ` - ${room.pricePerNight} Kč/noc`}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {formData.accommodationId && availableRooms.length === 0 && (
+                  <p className="text-sm text-gray-600">
+                    Pro toto ubytování nejsou momentálně dostupné žádné pokoje.
+                  </p>
+                )}
+              </div>
+            )}
 
             <div>
               <textarea
