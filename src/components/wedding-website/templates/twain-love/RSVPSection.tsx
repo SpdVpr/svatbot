@@ -2,7 +2,7 @@
 
 import { RSVPContent } from '@/types/wedding-website'
 import { useState, useEffect } from 'react'
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore'
+import { collection, query, where, getDocs, doc, getDoc, addDoc } from 'firebase/firestore'
 import { db } from '@/config/firebase'
 import { Accommodation } from '@/types'
 import SectionTitle from './SectionTitle'
@@ -103,12 +103,25 @@ export default function RSVPSection({ content, websiteId }: RSVPSectionProps) {
     setIsSubmitting(true)
 
     try {
-      // TODO: Integrate with Firebase RSVP system
       console.log('RSVP Form Data:', formData)
-      await new Promise(resolve => setTimeout(resolve, 1000))
+
+      // Save RSVP response to Firestore
+      await addDoc(collection(db, 'rsvpResponses'), {
+        websiteId,
+        name: formData.name,
+        email: formData.email,
+        guestCount: parseInt(formData.guests),
+        attending: formData.attending,
+        accommodationId: formData.accommodationId || null,
+        roomId: formData.roomId || null,
+        message: formData.message,
+        createdAt: new Date()
+      })
+
+      console.log('✅ RSVP response saved to Firestore')
       setSubmitted(true)
     } catch (error) {
-      console.error('Error submitting RSVP:', error)
+      console.error('❌ Error submitting RSVP:', error)
       alert('Chyba při odesílání. Zkuste to prosím znovu.')
     } finally {
       setIsSubmitting(false)

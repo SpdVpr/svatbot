@@ -28,18 +28,17 @@ export default function RSVPManagementPage() {
   }, [user, router])
 
   useEffect(() => {
-    if (!website || !wedding) {
+    if (!website) {
       setLoading(false)
       return
     }
 
-    // Load RSVPs from Firestore
+    // Load RSVPs from Firestore (rsvpResponses collection)
     // Note: We don't use orderBy here to avoid requiring a composite index
     // Instead, we sort the data on the client side
     const rsvpsQuery = query(
-      collection(db, 'weddingWebsiteRSVPs'),
-      where('websiteId', '==', website.id),
-      where('weddingId', '==', wedding.id)
+      collection(db, 'rsvpResponses'),
+      where('websiteId', '==', website.id)
     )
 
     const unsubscribe = onSnapshot(
@@ -49,10 +48,19 @@ export default function RSVPManagementPage() {
           const data = doc.data()
           return {
             id: doc.id,
-            ...data,
-            submittedAt: data.submittedAt instanceof Timestamp
-              ? data.submittedAt.toDate()
-              : new Date(data.submittedAt)
+            websiteId: data.websiteId,
+            weddingId: wedding?.id || '',
+            name: data.name,
+            email: data.email,
+            guestCount: data.guestCount,
+            status: data.attending === 'attending' ? 'attending' : 'declined',
+            message: data.message || '',
+            accommodationId: data.accommodationId || null,
+            roomId: data.roomId || null,
+            confirmed: false,
+            submittedAt: data.createdAt instanceof Timestamp
+              ? data.createdAt.toDate()
+              : new Date(data.createdAt)
           } as RSVP
         })
 
@@ -63,6 +71,7 @@ export default function RSVPManagementPage() {
           return dateB - dateA
         })
 
+        console.log('📋 Loaded RSVP responses:', rsvpData.length)
         setRsvps(rsvpData)
         setLoading(false)
       },
@@ -73,7 +82,7 @@ export default function RSVPManagementPage() {
     )
 
     return () => unsubscribe()
-  }, [website, wedding])
+  }, [website])
 
   if (websiteLoading || loading) {
     return (

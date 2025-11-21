@@ -573,6 +573,22 @@ service cloud.firestore {
                        exists(/databases/$(database)/documents/weddingWebsites/$(request.resource.data.websiteId));
     }
 
+    // RSVP Responses collection - RSVP responses submitted through wedding website
+    match /rsvpResponses/{responseId} {
+      // Anyone can create RSVP response (guests submitting through website)
+      allow create: if request.resource.data.keys().hasAll(['websiteId', 'name', 'email', 'guestCount', 'attending', 'createdAt']);
+
+      // Owner can read all RSVP responses for their wedding website
+      allow read: if isAuthenticated() &&
+                     exists(/databases/$(database)/documents/weddingWebsites/$(resource.data.websiteId)) &&
+                     get(/databases/$(database)/documents/weddingWebsites/$(resource.data.websiteId)).data.userId == request.auth.uid;
+
+      // Owner can update/delete RSVP responses
+      allow update, delete: if isAuthenticated() &&
+                               exists(/databases/$(database)/documents/weddingWebsites/$(resource.data.websiteId)) &&
+                               get(/databases/$(database)/documents/weddingWebsites/$(resource.data.websiteId)).data.userId == request.auth.uid;
+    }
+
     // Dashboards collection - user's dashboard layout preferences
     match /dashboards/{dashboardId} {
       // Allow read if authenticated
