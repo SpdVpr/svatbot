@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { Globe, Plus, Eye, ExternalLink, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { useWeddingWebsite } from '@/hooks/useWeddingWebsite'
+import { collection, query, where, getDocs } from 'firebase/firestore'
+import { db } from '@/config/firebase'
 
 interface WeddingWebsiteModuleProps {
   onResize?: (width: number, height: number) => void
@@ -12,6 +14,7 @@ interface WeddingWebsiteModuleProps {
 export default function WeddingWebsiteModule({ onResize }: WeddingWebsiteModuleProps) {
   const { website, loading, error } = useWeddingWebsite()
   const [mounted, setMounted] = useState(false)
+  const [rsvpCount, setRsvpCount] = useState(0)
 
   useEffect(() => {
     setMounted(true)
@@ -23,6 +26,28 @@ export default function WeddingWebsiteModule({ onResize }: WeddingWebsiteModuleP
       onResize(1, 1) // This module takes 1x1 grid space
     }
   }, [onResize])
+
+  // Load RSVP count
+  useEffect(() => {
+    const loadRsvpCount = async () => {
+      if (!website?.id) {
+        return
+      }
+
+      try {
+        const rsvpsQuery = query(
+          collection(db, 'rsvpResponses'),
+          where('websiteId', '==', website.id)
+        )
+        const snapshot = await getDocs(rsvpsQuery)
+        setRsvpCount(snapshot.size)
+      } catch (error) {
+        console.error('Error loading RSVP count:', error)
+      }
+    }
+
+    loadRsvpCount()
+  }, [website?.id])
 
   if (!mounted) {
     return (
@@ -128,9 +153,9 @@ export default function WeddingWebsiteModule({ onResize }: WeddingWebsiteModuleP
             </div>
             <div className="text-center hover-lift">
               <div className="text-lg font-bold text-primary-600">
-                0
+                {rsvpCount}
               </div>
-              <div className="text-xs text-primary-700">RSVP</div>
+              <div className="text-xs text-primary-700">Odpovědi</div>
             </div>
           </div>
         </div>

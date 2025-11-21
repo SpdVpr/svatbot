@@ -30,19 +30,19 @@ export default function WeddingWebsitePage() {
   // Load RSVP count
   useEffect(() => {
     const loadRsvpCount = async () => {
-      if (!website || !wedding) {
+      if (!website) {
         setStatsLoading(false)
         return
       }
 
       try {
         const rsvpsQuery = query(
-          collection(db, 'weddingWebsiteRSVPs'),
-          where('websiteId', '==', website.id),
-          where('weddingId', '==', wedding.id)
+          collection(db, 'rsvpResponses'),
+          where('websiteId', '==', website.id)
         )
         const snapshot = await getDocs(rsvpsQuery)
         setRsvpCount(snapshot.size)
+        console.log('📊 Loaded RSVP count for wedding website:', snapshot.size)
       } catch (error) {
         console.error('Error loading RSVP count:', error)
       } finally {
@@ -51,7 +51,7 @@ export default function WeddingWebsitePage() {
     }
 
     loadRsvpCount()
-  }, [website, wedding])
+  }, [website])
 
   if (loading) {
     return (
