@@ -7,6 +7,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { storage } from '@/config/firebase'
 import { compressImage } from '@/utils/imageCompression'
 import type { InfoContent, VenueInfo } from '@/types/wedding-website'
+import VenueAddressAutocomplete from '../VenueAddressAutocomplete'
 
 interface InfoSectionEditorProps {
   content: InfoContent
@@ -204,38 +205,20 @@ export default function InfoSectionEditor({ content, onChange }: InfoSectionEdit
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Adresa
-            </label>
-            <input
-              type="text"
-              value={content.ceremony?.address || ''}
-              onChange={(e) => handleInputChange('ceremony', {
+            <VenueAddressAutocomplete
+              address={content.ceremony?.address || ''}
+              onAddressChange={(address) => handleInputChange('ceremony', {
                 ...content.ceremony,
-                address: e.target.value
+                address
+              })}
+              mapUrl={content.ceremony?.mapUrl}
+              onMapUrlChange={(mapUrl) => handleInputChange('ceremony', {
+                ...content.ceremony,
+                mapUrl
               })}
               placeholder="Václavské náměstí 1, Praha 1"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+              label="Adresa"
             />
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Google Maps odkaz
-            </label>
-            <input
-              type="text"
-              value={content.ceremony?.mapUrl || ''}
-              onChange={(e) => handleInputChange('ceremony', {
-                ...content.ceremony,
-                mapUrl: e.target.value
-              })}
-              placeholder="https://maps.google.com/..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Vložte odkaz z Google Maps (Sdílet → Vložit mapu → Zkopírovat odkaz)
-            </p>
           </div>
         </div>
 
@@ -333,38 +316,20 @@ export default function InfoSectionEditor({ content, onChange }: InfoSectionEdit
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Adresa
-            </label>
-            <input
-              type="text"
-              value={content.reception?.address || ''}
-              onChange={(e) => handleInputChange('reception', {
+            <VenueAddressAutocomplete
+              address={content.reception?.address || ''}
+              onAddressChange={(address) => handleInputChange('reception', {
                 ...content.reception,
-                address: e.target.value
+                address
+              })}
+              mapUrl={content.reception?.mapUrl}
+              onMapUrlChange={(mapUrl) => handleInputChange('reception', {
+                ...content.reception,
+                mapUrl
               })}
               placeholder="Národní třída 10, Praha 1"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+              label="Adresa"
             />
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Google Maps odkaz
-            </label>
-            <input
-              type="text"
-              value={content.reception?.mapUrl || ''}
-              onChange={(e) => handleInputChange('reception', {
-                ...content.reception,
-                mapUrl: e.target.value
-              })}
-              placeholder="https://maps.google.com/..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Vložte odkaz z Google Maps (Sdílet → Vložit mapu → Zkopírovat odkaz)
-            </p>
           </div>
         </div>
 
