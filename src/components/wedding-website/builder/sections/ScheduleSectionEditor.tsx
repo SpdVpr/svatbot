@@ -202,10 +202,6 @@ export default function ScheduleSectionEditor({ content, onChange }: ScheduleSec
           <div className="space-y-4">
             {content.items.map((item, index) => (
               <div key={index} className="flex gap-4 p-4 bg-gray-50 rounded-lg">
-                <div className="flex-shrink-0 w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center">
-                  <span className="text-xl">{item.icon}</span>
-                </div>
-                
                 <div className="flex-1 space-y-3">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <input
@@ -222,7 +218,7 @@ export default function ScheduleSectionEditor({ content, onChange }: ScheduleSec
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                     />
                   </div>
-                  
+
                   <textarea
                     value={item.description || ''}
                     onChange={(e) => updateScheduleItem(index, 'description', e.target.value)}
@@ -231,7 +227,7 @@ export default function ScheduleSectionEditor({ content, onChange }: ScheduleSec
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                   />
                 </div>
-                
+
                 <button
                   onClick={() => removeScheduleItem(index)}
                   className="text-red-500 hover:text-red-700 p-1"
@@ -245,7 +241,7 @@ export default function ScheduleSectionEditor({ content, onChange }: ScheduleSec
           <div className="text-center py-8">
             <Clock className="w-12 h-12 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500 mb-4">
-              Zatím nemáte žádné položky v programu
+              Zatím nemáte žádné položky v harmonogramu
             </p>
             <button
               onClick={addScheduleItem}
@@ -260,7 +256,7 @@ export default function ScheduleSectionEditor({ content, onChange }: ScheduleSec
 
       {/* Náhled */}
       <div className="bg-gray-50 rounded-lg p-6">
-        <h4 className="font-semibold text-gray-900 mb-4">Náhled programu</h4>
+        <h4 className="font-semibold text-gray-900 mb-4">Náhled harmonogramu</h4>
         
         <div className="bg-white rounded-lg p-6 border border-gray-200">
           <div className="text-center mb-8">
@@ -274,9 +270,6 @@ export default function ScheduleSectionEditor({ content, onChange }: ScheduleSec
             <div className="space-y-6">
               {content.items.slice(0, 4).map((item, index) => (
                 <div key={index} className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center">
-                    <span className="text-lg">{item.icon}</span>
-                  </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-1">
                       <h4 className="font-semibold text-gray-900">{item.title}</h4>
@@ -290,7 +283,7 @@ export default function ScheduleSectionEditor({ content, onChange }: ScheduleSec
                   </div>
                 </div>
               ))}
-              
+
               {content.items.length > 4 && (
                 <p className="text-center text-gray-500 text-sm">
                   ... a další {content.items.length - 4} událostí

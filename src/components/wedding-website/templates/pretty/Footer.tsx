@@ -42,7 +42,15 @@ export default function Footer({ bride, groom, weddingDate }: FooterProps) {
           </h3>
 
           <p className="text-gray-600 text-sm">
-            Copyright {new Date().getFullYear()}, Vytvořeno s láskou
+            Copyright {new Date().getFullYear()}, Vytvořeno s ❤️ pomocí{' '}
+            <a
+              href="https://svatbot.cz"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#b19a56] hover:opacity-80 transition-opacity"
+            >
+              SvatBot.cz
+            </a>
           </p>
         </div>
       </div>

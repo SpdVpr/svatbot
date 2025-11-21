@@ -18,6 +18,7 @@ import MenuSection from './twain-love/MenuSection'
 import ContactSection from './twain-love/ContactSection'
 import FAQSection from './twain-love/FAQSection'
 import Footer from './twain-love/Footer'
+import StructuredData from '../StructuredData'
 import { useEffect } from 'react'
 
 interface TwainLoveTemplateProps {
@@ -134,6 +135,7 @@ export default function TwainLoveTemplate({ website }: TwainLoveTemplateProps) {
 
   return (
     <>
+      <StructuredData website={website} />
       <ScrollAnimations />
       <div className="min-h-screen bg-white" style={{ fontFamily: 'Muli, sans-serif' }}>
         {/* Navigation */}

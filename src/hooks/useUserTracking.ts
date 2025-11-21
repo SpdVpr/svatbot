@@ -142,6 +142,9 @@ export function useUserTracking() {
     sessionIdRef.current = sessionId
     sessionStartRef.current = new Date()
 
+    // Reset page views for new session
+    pageViewsRef.current.clear()
+
     const analyticsRef = doc(db, 'userAnalytics', firebaseUser.uid)
 
     try {
@@ -222,6 +225,9 @@ export function useUserTracking() {
     const analyticsRef = doc(db, 'userAnalytics', userId)
 
     try {
+      // Get current document to update the specific session
+      const analyticsDoc = await getDoc(analyticsRef)
+
       const updates: any = {
         totalSessionTime: increment(newTime),
         lastActivityAt: serverTimestamp()
@@ -229,6 +235,23 @@ export function useUserTracking() {
 
       if (markOffline) {
         updates.isOnline = false
+      }
+
+      // Update the duration of the current session in the sessions array
+      if (analyticsDoc.exists()) {
+        const data = analyticsDoc.data()
+        const sessions = data.sessions || []
+        const currentSessionIndex = sessions.findIndex((s: any) => s.sessionId === sessionIdRef.current)
+
+        if (currentSessionIndex !== -1) {
+          // Update the specific session's duration
+          sessions[currentSessionIndex] = {
+            ...sessions[currentSessionIndex],
+            duration: totalSessionDuration,
+            endTime: markOffline ? now : undefined
+          }
+          updates.sessions = sessions
+        }
       }
 
       await setDoc(analyticsRef, updates, { merge: true })
@@ -333,16 +356,45 @@ export function useUserTracking() {
   }
 
   const trackPageView = async (page: string) => {
-    if (!user || pageViewsRef.current.has(page)) return
-
-    pageViewsRef.current.add(page)
+    if (!user || !sessionIdRef.current) return
 
     const analyticsRef = doc(db, 'userAnalytics', user.id)
+    const pageKey = page.replace(/\//g, '_')
 
     try {
+      // Always increment page view count
       await setDoc(analyticsRef, {
-        [`pageViews.${page.replace(/\//g, '_')}`]: increment(1)
+        [`pageViews.${pageKey}`]: increment(1)
       }, { merge: true })
+
+      // Also add page to current session's pages array if not already there
+      if (!pageViewsRef.current.has(page)) {
+        pageViewsRef.current.add(page)
+
+        const analyticsDoc = await getDoc(analyticsRef)
+        if (analyticsDoc.exists()) {
+          const data = analyticsDoc.data()
+          const sessions = data.sessions || []
+          const currentSessionIndex = sessions.findIndex((s: any) => s.sessionId === sessionIdRef.current)
+
+          if (currentSessionIndex !== -1) {
+            const currentSession = sessions[currentSessionIndex]
+            const pages = currentSession.pages || []
+
+            if (!pages.includes(page)) {
+              pages.push(page)
+              sessions[currentSessionIndex] = {
+                ...currentSession,
+                pages
+              }
+
+              await setDoc(analyticsRef, {
+                sessions
+              }, { merge: true })
+            }
+          }
+        }
+      }
     } catch (error) {
       console.error('Error tracking page view:', error)
     }

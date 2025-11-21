@@ -18,6 +18,7 @@ import MenuSection from './pretty/MenuSection'
 import ContactSection from './pretty/ContactSection'
 import FAQSection from './pretty/FAQSection'
 import Footer from './pretty/Footer'
+import StructuredData from '../StructuredData'
 import { useEffect } from 'react'
 
 interface PrettyTemplateProps {
@@ -134,6 +135,7 @@ export default function PrettyTemplate({ website }: PrettyTemplateProps) {
 
   return (
     <>
+      <StructuredData website={website} />
       <ScrollAnimations />
       <div className="min-h-screen bg-white" style={{ fontFamily: 'Muli, sans-serif' }}>
         {/* Navigation */}

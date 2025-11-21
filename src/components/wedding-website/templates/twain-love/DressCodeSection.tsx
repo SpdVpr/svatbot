@@ -21,17 +21,12 @@ export default function DressCodeSection({ content }: DressCodeSectionProps) {
 
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
-          {/* Dress Code */}
-          {content.dressCode && (
+          {/* Dress Code Details */}
+          {content.dressCodeDetails && (
             <div className="text-center mb-12">
-              <h3 className="text-3xl mb-4 text-gray-800" style={{ fontFamily: 'Great Vibes, cursive' }}>
-                {content.dressCode}
-              </h3>
-              {content.dressCodeDetails && (
-                <p className="text-gray-600 leading-relaxed" style={{ fontFamily: 'Muli, sans-serif' }}>
-                  {content.dressCodeDetails}
-                </p>
-              )}
+              <p className="text-gray-600 leading-relaxed max-w-2xl mx-auto" style={{ fontFamily: 'Muli, sans-serif' }}>
+                {content.dressCodeDetails}
+              </p>
             </div>
           )}
 

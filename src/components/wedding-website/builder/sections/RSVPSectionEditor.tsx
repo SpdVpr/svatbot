@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { MessageSquare, Calendar, Users, Utensils, Music, Plus, X, Building2 } from 'lucide-react'
+import { MessageSquare, Calendar, Users, Building2 } from 'lucide-react'
 import type { RSVPContent } from '@/types/wedding-website'
 
 interface RSVPSectionEditorProps {
@@ -15,33 +15,6 @@ export default function RSVPSectionEditor({ content, onChange }: RSVPSectionEdit
       ...content,
       [field]: value
     })
-  }
-
-  const addMealOption = () => {
-    const mealOptions = content.mealOptions || []
-    const newOption = {
-      id: Date.now().toString(),
-      name: '',
-      description: ''
-    }
-    
-    handleInputChange('mealOptions', [...mealOptions, newOption])
-  }
-
-  const updateMealOption = (id: string, field: string, value: string) => {
-    const mealOptions = content.mealOptions || []
-    const updatedOptions = mealOptions.map(option => 
-      option.id === id ? { ...option, [field]: value } : option
-    )
-    
-    handleInputChange('mealOptions', updatedOptions)
-  }
-
-  const removeMealOption = (id: string) => {
-    const mealOptions = content.mealOptions || []
-    const filteredOptions = mealOptions.filter(option => option.id !== id)
-    
-    handleInputChange('mealOptions', filteredOptions)
   }
 
   const formatDateForInput = (date: Date | any | null) => {
@@ -136,45 +109,6 @@ export default function RSVPSectionEditor({ content, onChange }: RSVPSectionEdit
           <label className="flex items-center gap-3">
             <input
               type="checkbox"
-              checked={content.mealSelection || false}
-              onChange={(e) => handleInputChange('mealSelection', e.target.checked)}
-              className="rounded border-gray-300 text-pink-600 focus:ring-pink-500"
-            />
-            <div>
-              <span className="font-medium text-gray-900">Výběr jídla</span>
-              <p className="text-sm text-gray-600">Hosté si mohou vybrat z nabídky jídel</p>
-            </div>
-          </label>
-
-          <label className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              checked={content.songRequests || false}
-              onChange={(e) => handleInputChange('songRequests', e.target.checked)}
-              className="rounded border-gray-300 text-pink-600 focus:ring-pink-500"
-            />
-            <div>
-              <span className="font-medium text-gray-900">Přání písniček</span>
-              <p className="text-sm text-gray-600">Hosté mohou navrhnout písničky pro DJ</p>
-            </div>
-          </label>
-
-          <label className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              checked={content.dietaryRestrictions || false}
-              onChange={(e) => handleInputChange('dietaryRestrictions', e.target.checked)}
-              className="rounded border-gray-300 text-pink-600 focus:ring-pink-500"
-            />
-            <div>
-              <span className="font-medium text-gray-900">Dietní omezení</span>
-              <p className="text-sm text-gray-600">Pole pro alergie a dietní požadavky</p>
-            </div>
-          </label>
-
-          <label className="flex items-center gap-3">
-            <input
-              type="checkbox"
               checked={content.accommodationSelection || false}
               onChange={(e) => handleInputChange('accommodationSelection', e.target.checked)}
               className="rounded border-gray-300 text-pink-600 focus:ring-pink-500"
@@ -186,70 +120,6 @@ export default function RSVPSectionEditor({ content, onChange }: RSVPSectionEdit
           </label>
         </div>
       </div>
-
-      {/* Výběr jídla */}
-      {content.mealSelection && (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Utensils className="w-5 h-5 text-pink-600" />
-              <h3 className="text-lg font-semibold text-gray-900">Menu</h3>
-            </div>
-            <button
-              onClick={addMealOption}
-              className="inline-flex items-center gap-2 bg-pink-500 text-white px-3 py-2 rounded-lg hover:bg-pink-600 transition-colors text-sm"
-            >
-              <Plus className="w-4 h-4" />
-              Přidat jídlo
-            </button>
-          </div>
-
-          {content.mealOptions && content.mealOptions.length > 0 ? (
-            <div className="space-y-4">
-              {content.mealOptions.map((option) => (
-                <div key={option.id} className="flex gap-4 p-4 bg-gray-50 rounded-lg">
-                  <div className="flex-1 space-y-3">
-                    <input
-                      type="text"
-                      value={option.name}
-                      onChange={(e) => updateMealOption(option.id, 'name', e.target.value)}
-                      placeholder="Název jídla (např. Kuřecí steak)"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                    />
-                    <textarea
-                      value={option.description}
-                      onChange={(e) => updateMealOption(option.id, 'description', e.target.value)}
-                      placeholder="Popis jídla a příloh..."
-                      rows={2}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                    />
-                  </div>
-                  <button
-                    onClick={() => removeMealOption(option.id)}
-                    className="text-red-500 hover:text-red-700 p-1"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <Utensils className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 mb-4">
-                Zatím nemáte žádné možnosti jídla
-              </p>
-              <button
-                onClick={addMealOption}
-                className="inline-flex items-center gap-2 bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                Přidat první jídlo
-              </button>
-            </div>
-          )}
-        </div>
-      )}
 
       {/* Kontaktní informace */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">

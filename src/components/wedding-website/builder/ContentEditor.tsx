@@ -98,7 +98,7 @@ export default function ContentEditor({ content, onContentChange, onSave, onExpa
     },
     {
       id: 'rsvp',
-      title: 'RSVP formulář',
+      title: 'Potvrzení účasti',
       description: 'Potvrzení účasti hostů',
       icon: MessageSquare,
       required: false,
@@ -114,7 +114,7 @@ export default function ContentEditor({ content, onContentChange, onSave, onExpa
     },
     {
       id: 'schedule',
-      title: 'Program svatby',
+      title: 'Harmonogram svatby',
       description: 'Časový harmonogram dne',
       icon: Calendar,
       required: false,

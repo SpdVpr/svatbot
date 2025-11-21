@@ -45,7 +45,15 @@ export default function Footer({ bride, groom, weddingDate }: FooterProps) {
 
           {/* Credit */}
           <p className="text-gray-500 text-sm">
-            Vytvořeno s ❤️ pomocí SvatBot.cz
+            Vytvořeno s ❤️ pomocí{' '}
+            <a
+              href="https://svatbot.cz"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#b2c9d3] hover:text-[#85aaba] transition-colors"
+            >
+              SvatBot.cz
+            </a>
           </p>
         </div>
       </div>

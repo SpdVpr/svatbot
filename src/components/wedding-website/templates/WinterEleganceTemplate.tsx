@@ -15,6 +15,7 @@ import GallerySection from './winter-elegance/GallerySection'
 import ContactSection from './winter-elegance/ContactSection'
 import FAQSection from './winter-elegance/FAQSection'
 import MenuSection from './winter-elegance/MenuSection'
+import StructuredData from '../StructuredData'
 
 interface WinterEleganceTemplateProps {
   website: WeddingWebsite
@@ -77,6 +78,7 @@ export default function WinterEleganceTemplate({ website }: WinterEleganceTempla
       themeName={website.style?.colorTheme || 'default'}
       customTheme={website.style?.customColors}
     >
+      <StructuredData website={website} />
       <ScrollAnimations />
       <div className="min-h-screen bg-white font-light">
         <style jsx global>{`
@@ -147,12 +149,23 @@ export default function WinterEleganceTemplate({ website }: WinterEleganceTempla
               <div className="w-px h-6 bg-white/40"></div>
               <span className="text-2xl font-serif font-light">{content.hero.groom}</span>
             </div>
-            <p className="text-stone-400 text-sm">
+            <p className="text-stone-400 text-sm mb-4">
               {new Date(content.hero.weddingDate).toLocaleDateString('cs-CZ', {
                 day: 'numeric',
                 month: 'long',
                 year: 'numeric',
               })}
+            </p>
+            <p className="text-stone-500 text-sm">
+              Vytvořeno s ❤️ pomocí{' '}
+              <a
+                href="https://svatbot.cz"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-stone-400 hover:text-stone-300 transition-colors"
+              >
+                SvatBot.cz
+              </a>
             </p>
           </div>
         </footer>

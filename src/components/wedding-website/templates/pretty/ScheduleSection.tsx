@@ -13,7 +13,7 @@ export default function ScheduleSection({ content }: ScheduleSectionProps) {
   return (
     <section className="py-20 bg-white">
       <div className="container mx-auto px-4">
-        <SectionTitle title="Program svatby" />
+        <SectionTitle title="Harmonogram svatby" />
 
         <div className="max-w-2xl mx-auto">
           <div className="space-y-6">
