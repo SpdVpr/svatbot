@@ -274,6 +274,7 @@ export interface VendorEditForm {
   }
 
   // Images
+  logo?: string
   mainImage: string
   mainVideoUrl?: string
   images: string[]

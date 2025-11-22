@@ -211,6 +211,7 @@ function getEmptyForm(): VendorEditForm {
       currency: 'CZK',
       unit: 'per-event'
     },
+    logo: '',
     mainImage: '',
     mainVideoUrl: '',
     images: [],
@@ -262,6 +263,7 @@ function vendorToForm(vendor: MarketplaceVendor): VendorEditForm {
       popular: service.popular
     })) || [],
     priceRange: vendor.priceRange,
+    logo: vendor.logo || '',
     mainImage: vendor.mainImage || vendor.images?.[0] || '',
     mainVideoUrl: vendor.mainVideoUrl || '',
     images: vendor.images || [],
@@ -342,6 +344,7 @@ function formToVendorData(form: VendorEditForm): any {
     businessId: form.businessId || '',
     services: form.services || [],
     priceRange: form.priceRange,
+    logo: form.logo || '',
     mainImage: form.mainImage || '',
     mainVideoUrl: form.mainVideoUrl || '',
     images: form.images || [],

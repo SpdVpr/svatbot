@@ -114,6 +114,7 @@ class VendorStore {
               category: data.category,
               description: data.description || '',
               shortDescription: data.shortDescription || '',
+              logo: data.logo || undefined,
               mainImage: data.mainImage || data.images?.[0] || '',
               mainVideoUrl: data.mainVideoUrl || undefined,
               images: data.images || [],

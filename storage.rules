@@ -77,6 +77,15 @@ service firebase.storage {
       allow delete: if isOwner(userId) || isAdmin();
     }
 
+    // Vendor logos
+    match /logos/{userId}/{fileName} {
+      allow read: if true; // Public read
+      // Allow write for authenticated users (owner) or anonymous vendor registration
+      allow write: if (isAuthenticated() && isOwner(userId) && isValidImageFile()) ||
+                      (userId == 'anonymous' && isValidImageFile());
+      allow delete: if isOwner(userId) || isAdmin();
+    }
+
     // Vendor profile images
     match /vendors/{vendorId}/images/{fileName} {
       allow read: if true; // Public read

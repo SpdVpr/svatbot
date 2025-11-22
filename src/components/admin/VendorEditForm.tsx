@@ -24,10 +24,15 @@ import {
   Facebook,
   Youtube,
   Linkedin,
-  Video
+  Video,
+  Loader2
 } from 'lucide-react'
 import { ensureUrlProtocol } from '@/utils/url'
 import PlaceIdFinder from '@/components/marketplace/PlaceIdFinder'
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { storage } from '@/config/firebase'
+import { compressImage } from '@/utils/imageCompression'
+import { useAuth } from '@/hooks/useAuth'
 
 interface VendorEditFormProps {
   formData: VendorFormData
@@ -934,6 +939,50 @@ function ImagesTab({
   formData: VendorFormData
   onUpdate: (updates: Partial<VendorFormData>) => void
 }) {
+  const { user } = useAuth()
+  const [uploadingLogo, setUploadingLogo] = useState(false)
+
+  const handleLogoUpload = async (file: File) => {
+    if (!user?.id) {
+      console.error('❌ User not authenticated')
+      return
+    }
+
+    try {
+      setUploadingLogo(true)
+      console.log(`📸 Komprese loga: ${file.name}`)
+
+      // Compress logo - smaller size for logos
+      const compressedResult = await compressImage(file, {
+        maxWidth: 512,
+        maxHeight: 512,
+        quality: 0.9,
+        maxSizeKB: 200
+      })
+
+      console.log(`✅ Komprese dokončena`)
+
+      // Create unique filename
+      const timestamp = Date.now()
+      const filename = `logos/${user.id}/${timestamp}_${file.name.replace(/\s+/g, '_')}`
+
+      // Upload to Firebase Storage
+      const storageRef = ref(storage, filename)
+      const snapshot = await uploadBytes(storageRef, compressedResult.file)
+      const downloadURL = await getDownloadURL(snapshot.ref)
+
+      console.log(`🔥 Logo nahráno do Firebase Storage: ${filename}`)
+
+      // Update form data
+      onUpdate({ logo: downloadURL })
+    } catch (error) {
+      console.error('❌ Chyba při nahrávání loga:', error)
+      alert('Chyba při nahrávání loga. Zkuste to prosím znovu.')
+    } finally {
+      setUploadingLogo(false)
+    }
+  }
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'main' | 'portfolio') => {
     const files = Array.from(e.target.files || [])
     files.forEach(file => {
@@ -974,8 +1023,81 @@ function ImagesTab({
 
   return (
     <div className="space-y-8">
-      {/* Main Image */}
+      {/* Logo */}
       <div>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          <ImageIcon className="inline h-5 w-5 mr-2" />
+          Logo firmy (volitelné)
+        </h3>
+        <p className="text-sm text-gray-600 mb-4">
+          Čtvercové nebo kruhové logo vaší firmy. Zobrazí se v interaktivní animaci na hlavní stránce marketplace.
+        </p>
+
+        {formData.logo && (
+          <div className="mb-4">
+            <div className="relative group inline-block">
+              <div className="w-32 h-32 bg-white rounded-lg border border-gray-200 flex items-center justify-center p-2">
+                <img
+                  src={formData.logo}
+                  alt="Logo"
+                  className="max-w-full max-h-full object-contain"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => onUpdate({ logo: '' })}
+                className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div>
+            <label className={`btn-outline cursor-pointer flex items-center space-x-2 ${uploadingLogo ? 'opacity-50 cursor-not-allowed' : ''}`}>
+              {uploadingLogo ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <span>Nahrávám...</span>
+                </>
+              ) : (
+                <>
+                  <Upload className="h-5 w-5" />
+                  <span>Nahrát logo</span>
+                </>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                disabled={uploadingLogo}
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file) {
+                    handleLogoUpload(file)
+                  }
+                }}
+                className="hidden"
+              />
+            </label>
+          </div>
+
+          <div className="flex-1">
+            <input
+              type="url"
+              placeholder="Nebo vložte URL loga..."
+              value={formData.logo || ''}
+              onChange={(e) => onUpdate({ logo: e.target.value })}
+              disabled={uploadingLogo}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-50"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Main Image */}
+      <div className="border-t border-gray-200 pt-6">
         <h3 className="text-lg font-medium text-gray-900 mb-4">
           <ImageIcon className="inline h-5 w-5 mr-2" />
           Hlavní fotka *

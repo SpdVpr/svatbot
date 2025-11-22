@@ -95,6 +95,7 @@ export interface MarketplaceVendorFormData {
   }
 
   // Images (URLs for now, later can be file uploads)
+  logo?: string // Company logo (square/circular) - used in physics animation
   mainImage: string // Main cover image (required)
   mainVideoUrl?: string // Main video (optional) - replaces main image in detail
   images: string[] // Legacy field
@@ -175,6 +176,7 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData,
         end: '18:00'
       }
     },
+    logo: initialData?.logo || '',
     mainImage: initialData?.mainImage || initialData?.images?.[0] || '',
     mainVideoUrl: initialData?.mainVideoUrl || '',
     images: initialData?.images || [],
@@ -1351,6 +1353,18 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData,
                       </select>
                     </div>
                   </div>
+                </div>
+
+                {/* Logo */}
+                <div className="border-t border-gray-200 pt-4">
+                  <ImageUploadSection
+                    images={formData.logo ? [formData.logo] : []}
+                    onImagesChange={(images) => handleChange('logo', images[0] || '')}
+                    maxImages={1}
+                    title="Logo firmy (volitelné)"
+                    description="Čtvercové nebo kruhové logo vaší firmy. Zobrazí se v interaktivní animaci na hlavní stránce marketplace."
+                    type="main"
+                  />
                 </div>
 
                 {/* Main Image */}

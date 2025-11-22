@@ -8,6 +8,8 @@ import Link from 'next/link'
 import { useFavoriteVendors } from '@/hooks/useFavoriteVendors'
 import { useRouter } from 'next/navigation'
 import VendorCard from '@/components/marketplace/VendorCard'
+import InteractiveLogoCanvas from '@/components/marketplace/InteractiveLogoCanvas'
+import { useMarketplaceSettings } from '@/hooks/useMarketplaceSettings'
 
 export default function MarketplacePage() {
   const {
@@ -25,6 +27,7 @@ export default function MarketplacePage() {
   const [activeCategory, setActiveCategory] = useState<VendorCategory | 'all' | 'favorites'>('all')
 
   const { favorites, isFavorite, toggleFavorite } = useFavoriteVendors()
+  const { settings: marketplaceSettings } = useMarketplaceSettings()
 
   // All categories including "Vše" and "Oblíbené"
   const allCategories = [
@@ -115,18 +118,36 @@ export default function MarketplacePage() {
 
       {/* 2. HERO SECTION */}
       <div className="relative bg-stone-900 text-white overflow-hidden min-h-[500px] md:h-[600px] flex items-center justify-center">
-        {/* Background Image */}
-        <div className="absolute inset-0 opacity-40">
-          <img
-            src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2000&auto=format&fit=crop"
-            alt="Wedding Background"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-stone-900/80 via-stone-900/40 to-stone-900/90" />
+        {/* Background - Conditional: Physics Animation or Static Image */}
+        {marketplaceSettings?.enablePhysicsAnimation ? (
+          <div className="absolute inset-0 pointer-events-auto">
+            <InteractiveLogoCanvas
+              vendors={filteredVendors}
+              maxLogos={50}
+              height={600}
+            />
+          </div>
+        ) : (
+          <>
+            {/* Static Background Image */}
+            <div className="absolute inset-0 opacity-40 pointer-events-none">
+              <img
+                src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2000&auto=format&fit=crop"
+                alt="Wedding Background"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-b from-stone-900/80 via-stone-900/40 to-stone-900/90 pointer-events-none" />
+          </>
+        )}
+
+        {/* Dark overlay for better text readability - lighter when physics is enabled */}
+        {marketplaceSettings?.enablePhysicsAnimation && (
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-900/40 via-transparent to-stone-900/50 pointer-events-none" />
+        )}
 
         {/* Content */}
-        <div className="relative z-10 text-center max-w-4xl px-4 w-full">
+        <div className="relative z-10 text-center max-w-4xl px-4 w-full pointer-events-none">
           <span className="inline-block py-1 px-3 rounded-full bg-pink-400/20 backdrop-blur-md border border-pink-400/40 text-pink-100 text-xs font-bold tracking-wider uppercase mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
             Svatbot Marketplace
           </span>
@@ -136,41 +157,40 @@ export default function MarketplacePage() {
           <p className="text-lg text-stone-200 mb-10 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
             Od kouzelných míst až po talentované fotografy. Vše na jednom místě, ověřené a s garancí kvality.
           </p>
-
-          {/* Search Bar */}
-          <div className="bg-white p-2 rounded-full max-w-3xl mx-auto flex flex-col md:flex-row gap-2 shadow-2xl animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
-             <div className="flex-1 flex items-center px-4 md:border-r border-stone-100 py-3 md:py-0">
-                <Search className="text-stone-400 mr-3" size={20} />
-                <input
-                  type="text"
-                  placeholder="Co hledáte? (např. Fotograf, Zámek...)"
-                  className="w-full outline-none text-stone-800 placeholder:text-stone-400 font-medium"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-             </div>
-             <div className="flex-1 flex items-center px-4 py-3 md:py-0">
-                <MapPin className="text-stone-400 mr-3" size={20} />
-                <input
-                  type="text"
-                  placeholder="Kde? (Praha, Brno...)"
-                  className="w-full outline-none text-stone-800 placeholder:text-stone-400 font-medium"
-                  value={locationTerm}
-                  onChange={(e) => setLocationTerm(e.target.value)}
-                />
-             </div>
-             <button
-               onClick={handleSearch}
-               className="bg-pink-400 text-stone-900 px-8 py-3 md:py-4 rounded-full font-bold hover:bg-pink-500 transition-all hover:shadow-lg hover:shadow-pink-400/30"
-             >
-               Hledat
-             </button>
-          </div>
         </div>
       </div>
 
-      {/* 3. CATEGORIES GRID */}
+      {/* 3. SEARCH BAR & CATEGORIES */}
       <div className="py-12 px-4 md:px-6 lg:px-8 max-w-[1800px] mx-auto w-full">
+        {/* Search Bar */}
+        <div className="bg-white p-2 rounded-full max-w-3xl mx-auto flex flex-col md:flex-row gap-2 shadow-2xl mb-12 -mt-20 relative z-20">
+           <div className="flex-1 flex items-center px-4 md:border-r border-stone-100 py-3 md:py-0">
+              <Search className="text-stone-400 mr-3" size={20} />
+              <input
+                type="text"
+                placeholder="Co hledáte? (např. Fotograf, Zámek...)"
+                className="w-full outline-none text-stone-800 placeholder:text-stone-400 font-medium"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+           </div>
+           <div className="flex-1 flex items-center px-4 py-3 md:py-0">
+              <MapPin className="text-stone-400 mr-3" size={20} />
+              <input
+                type="text"
+                placeholder="Kde? (Praha, Brno...)"
+                className="w-full outline-none text-stone-800 placeholder:text-stone-400 font-medium"
+                value={locationTerm}
+                onChange={(e) => setLocationTerm(e.target.value)}
+              />
+           </div>
+           <button
+             onClick={handleSearch}
+             className="bg-pink-400 text-stone-900 px-8 py-3 md:py-4 rounded-full font-bold hover:bg-pink-500 transition-all hover:shadow-lg hover:shadow-pink-400/30"
+           >
+             Hledat
+           </button>
+        </div>
         <div className="flex justify-between items-end mb-8">
           <h2 className="text-2xl font-serif font-bold text-stone-900">Kategorie</h2>
           <div className="text-stone-500 font-bold text-xs uppercase tracking-wide flex items-center gap-1">

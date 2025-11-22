@@ -364,9 +364,9 @@ export default function VendorDetailPage() {
 
                 {/* Logo & Name Block */}
                 <div className="flex items-center gap-4 mb-6">
-                  {vendor.mainImage && (
-                    <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden border border-stone-100 shadow-sm shrink-0">
-                      <img src={vendor.mainImage} alt="Logo" className="w-full h-full object-cover" />
+                  {(vendor.logo || vendor.mainImage) && (
+                    <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl border border-stone-100 shadow-sm shrink-0 bg-white flex items-center justify-center p-2">
+                      <img src={vendor.logo || vendor.mainImage} alt="Logo" className="max-w-full max-h-full object-contain" />
                     </div>
                   )}
                   <div>

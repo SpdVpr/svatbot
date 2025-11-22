@@ -1233,6 +1233,15 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
+    // Marketplace Settings - Global marketplace configuration
+    match /marketplaceSettings/{settingId} {
+      // Anyone can read marketplace settings (needed for physics animation toggle)
+      allow read: if true;
+
+      // Only admins can create/update/delete marketplace settings
+      allow create, update, delete: if isAdmin();
+    }
+
     // Deny all other access
     match /{document=**} {
       allow read, write: if false;

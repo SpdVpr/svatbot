@@ -2,20 +2,21 @@
 
 import { useState } from 'react'
 import { useMarketplaceVendors } from '@/hooks/useMarketplaceVendors'
-import { 
-  CheckCircle, 
-  XCircle, 
-  Eye, 
-  Trash2, 
-  Clock, 
-  Mail, 
-  Phone, 
+import {
+  CheckCircle,
+  XCircle,
+  Eye,
+  Trash2,
+  Clock,
+  Mail,
+  Phone,
   Globe,
   MapPin,
   Loader2,
   AlertCircle
 } from 'lucide-react'
 import { VENDOR_CATEGORIES } from '@/types/vendor'
+import MarketplaceSettingsPanel from '@/components/admin/MarketplaceSettingsPanel'
 
 export default function AdminMarketplacePage() {
   const {
@@ -106,6 +107,9 @@ export default function AdminMarketplacePage() {
           Schvalujte nové registrace a spravujte marketplace dodavatele
         </p>
       </div>
+
+      {/* Marketplace Settings Panel */}
+      <MarketplaceSettingsPanel />
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

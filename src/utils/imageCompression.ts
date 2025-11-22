@@ -59,6 +59,17 @@ export async function compressImage(
       canvas.width = width
       canvas.height = height
 
+      // Detect if image has transparency (PNG)
+      const isPNG = file.type === 'image/png'
+      const outputType = isPNG ? 'image/png' : 'image/jpeg'
+
+      // For PNG with transparency, don't fill background
+      if (!isPNG) {
+        // For JPEG, fill with white background
+        ctx.fillStyle = '#FFFFFF'
+        ctx.fillRect(0, 0, width, height)
+      }
+
       // Draw and compress image
       ctx.drawImage(img, 0, 0, width, height)
 
@@ -79,8 +90,11 @@ export async function compressImage(
 
             // If size is acceptable or we've tried enough times, use this result
             if (compressedSizeKB <= maxSizeKB || attempts >= maxAttempts) {
-              const compressedFile = new File([blob], file.name, {
-                type: 'image/jpeg',
+              // Preserve original extension for PNG files
+              const fileName = isPNG ? file.name : file.name.replace(/\.(png|webp)$/i, '.jpg')
+
+              const compressedFile = new File([blob], fileName, {
+                type: outputType,
                 lastModified: Date.now()
               })
 
@@ -97,7 +111,7 @@ export async function compressImage(
               tryCompress()
             }
           },
-          'image/jpeg',
+          outputType,
           currentQuality
         )
       }

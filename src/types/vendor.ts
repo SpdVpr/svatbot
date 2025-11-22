@@ -85,6 +85,7 @@ export interface MarketplaceVendor {
   }
 
   // Portfolio and media
+  logo?: string // Company logo (square/circular) - used in physics animation and branding
   mainImage: string // Main cover image (required) - shown in catalog and detail
   mainVideoUrl?: string // Main video (optional) - replaces main image in detail if provided
   images: string[] // Legacy field - kept for backward compatibility
