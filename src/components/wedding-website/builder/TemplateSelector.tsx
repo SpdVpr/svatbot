@@ -127,6 +127,36 @@ const TEMPLATES: TemplateConfig[] = [
       'Boho svatby',
     ],
   },
+  {
+    id: 'noir-blanc',
+    name: 'Noir & Blanc',
+    description: 'Editoriální svatební šablona s módním designem, oversized typografií a monochromní estetikou',
+    thumbnail: 'https://images.unsplash.com/photo-1606800052052-a08af7148866?w=800',
+    category: 'Editoriální',
+    colors: {
+      primary: '#1a1a1a',
+      secondary: '#f2f0ea',
+      accent: '#d4b0aa',
+    },
+    fonts: {
+      heading: 'Bodoni Moda',
+      body: 'Space Grotesk',
+    },
+    features: [
+      'Editoriální módní design',
+      'Oversized typografie',
+      'Marquee scrolling text',
+      'Grayscale fotografie',
+      'Mix-blend efekty',
+      'Minimalistická elegance',
+    ],
+    suitableFor: [
+      'Módní svatby',
+      'Městské svatby',
+      'Minimalistické události',
+      'Umělecké svatby',
+    ],
+  },
 ]
 
 export default function TemplateSelector({ selectedTemplate, onSelect, disabled = false }: TemplateSelectorProps) {

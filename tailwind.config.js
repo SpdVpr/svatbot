@@ -115,6 +115,9 @@ module.exports = {
         'wave': 'wave 1s ease-in-out infinite',
         'page-enter': 'pageEnter 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
         'page-exit': 'pageExit 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+        'marquee': 'marquee 60s linear infinite',
+        'marquee-reverse': 'marquee-reverse 60s linear infinite',
+        'reveal': 'reveal 0.3s ease-out',
       },
       keyframes: {
         fadeIn: {
@@ -136,6 +139,18 @@ module.exports = {
         pageExit: {
           '0%': { opacity: '1', transform: 'scale(1) translateY(0)' },
           '100%': { opacity: '0', transform: 'scale(1.04) translateY(-10px)' },
+        },
+        marquee: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
+        'marquee-reverse': {
+          '0%': { transform: 'translateX(-50%)' },
+          '100%': { transform: 'translateX(0)' },
+        },
+        reveal: {
+          '0%': { opacity: '0', transform: 'scale(0.95)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
         },
       },
       transitionTimingFunction: {

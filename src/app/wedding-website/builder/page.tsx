@@ -16,6 +16,7 @@ import WinterEleganceTemplate from '@/components/wedding-website/templates/Winte
 import TwainLoveTemplate from '@/components/wedding-website/templates/TwainLoveTemplate'
 import PrettyTemplate from '@/components/wedding-website/templates/PrettyTemplate'
 import EternityTemplate from '@/components/wedding-website/templates/EternityTemplate'
+import NoirBlancTemplate from '@/components/wedding-website/templates/NoirBlancTemplate'
 import type { TemplateType, WebsiteContent, WeddingWebsite } from '@/types/wedding-website'
 
 type Step = 'url' | 'template' | 'content' | 'preview'
@@ -749,6 +750,26 @@ export default function WeddingWebsiteBuilderPage() {
                     <EternityTemplate
                       content={content}
                       websiteId="preview"
+                    />
+                  )}
+
+                  {selectedTemplate === 'noir-blanc' && (
+                    <NoirBlancTemplate
+                      website={{
+                        id: 'preview',
+                        weddingId: wedding?.id || 'preview',
+                        customUrl,
+                        template: selectedTemplate,
+                        content,
+                        style: {
+                          ...website?.style,
+                          colorTheme,
+                          customColors: colorTheme === 'custom' ? customColors : undefined,
+                        },
+                        isPublished: false,
+                        createdAt: new Date(),
+                        updatedAt: new Date()
+                      } as WeddingWebsite}
                     />
                   )}
                 </div>

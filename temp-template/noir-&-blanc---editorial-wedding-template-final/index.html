@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="cs">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jana & Petr | 15.06.2025</title>
+    <meta name="description" content="Svatební stránka Jany a Petra" />
+    
+    <!-- Google Fonts: Bodoni Moda (Editorial Serif) & Space Grotesk (Tech/Modern Sans) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,600;0,6..96,900;1,6..96,400&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Space Grotesk', 'sans-serif'],
+              serif: ['Bodoni Moda', 'serif'],
+            },
+            colors: {
+              black: '#1a1a1a',
+              white: '#ffffff',
+              cream: '#f2f0ea',
+              accent: '#d4b0aa', // Dusty Rose subtle
+              charcoal: '#2d2d2d',
+            },
+            animation: {
+              'marquee': 'marquee 25s linear infinite',
+              'marquee-reverse': 'marqueeReverse 25s linear infinite',
+              'reveal': 'reveal 1.2s cubic-bezier(0.77, 0, 0.175, 1) forwards',
+            },
+            keyframes: {
+              marquee: {
+                '0%': { transform: 'translateX(0%)' },
+                '100%': { transform: 'translateX(-100%)' },
+              },
+              marqueeReverse: {
+                '0%': { transform: 'translateX(-100%)' },
+                '100%': { transform: 'translateX(0%)' },
+              },
+              reveal: {
+                '0%': { transform: 'translateY(100%)' },
+                '100%': { transform: 'translateY(0)' },
+              }
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      html {
+        scroll-behavior: smooth;
+        background-color: #f2f0ea;
+      }
+      /* Hide scrollbar for clean look but allow scroll */
+      body::-webkit-scrollbar {
+        width: 4px;
+      }
+      body::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      body::-webkit-scrollbar-thumb {
+        background: #1a1a1a;
+      }
+      
+      ::selection {
+        background: #1a1a1a;
+        color: #f2f0ea;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-cream text-black antialiased overflow-x-hidden">
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
