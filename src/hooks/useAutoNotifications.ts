@@ -22,7 +22,7 @@ export function useAutoNotifications() {
   const { user } = useAuth()
   const { wedding } = useWedding()
   const { tasks } = useTask()
-  const { createNotification } = useWeddingNotifications()
+  const { createNotification, deleteOldNotifications } = useWeddingNotifications()
   const { showToast } = useLiveToastNotifications()
   const {
     celebrateTaskCompletion,
@@ -39,13 +39,30 @@ export function useAutoNotifications() {
   const lastCheckRef = useRef<Date | null>(null)
   const hasShownWelcomeRef = useRef(false)
 
-  // Load last check date from localStorage on mount
+  // Track which tasks have already been celebrated to prevent duplicates
+  const celebratedTasksRef = useRef<Set<string>>(new Set())
+
+  // Load last check date and celebrated tasks from localStorage on mount
   useEffect(() => {
+    if (!user?.id) return
+
     const stored = localStorage.getItem('svatbot_last_notification_check')
     if (stored) {
       lastCheckRef.current = new Date(stored)
     }
-  }, [])
+
+    // Load celebrated tasks for this user
+    const celebratedKey = `svatbot_celebrated_tasks_${user.id}`
+    const celebratedStored = localStorage.getItem(celebratedKey)
+    if (celebratedStored) {
+      try {
+        const celebratedData = JSON.parse(celebratedStored)
+        celebratedTasksRef.current = new Set(celebratedData)
+      } catch (error) {
+        console.error('Error loading celebrated tasks:', error)
+      }
+    }
+  }, [user?.id])
 
   // Check if it's a new day
   const isNewDay = useCallback(() => {
@@ -140,9 +157,9 @@ export function useAutoNotifications() {
     }
   }, [weddingDate, celebrateMilestone, showToast])
 
-  // Task completion celebrations
+  // Task completion celebrations - with deduplication
   const checkTaskCompletions = useCallback(async () => {
-    if (!tasks || tasks.length === 0) return
+    if (!tasks || tasks.length === 0 || !user?.id) return
 
     const now = new Date()
     const recentlyCompleted = tasks.filter(t =>
@@ -151,9 +168,38 @@ export function useAutoNotifications() {
       (now.getTime() - new Date(t.completedAt).getTime()) < 60 * 60 * 1000 // Last hour
     )
 
-    for (const task of recentlyCompleted) {
+    // Cleanup: Remove tasks from celebrated list if they were uncompleted
+    // This allows re-celebration if task is completed again
+    const completedTaskIds = new Set(tasks.filter(t => t.status === 'completed').map(t => t.id))
+    const celebratedArray = Array.from(celebratedTasksRef.current)
+    const stillValidCelebrations = celebratedArray.filter(taskId => completedTaskIds.has(taskId))
+
+    if (stillValidCelebrations.length !== celebratedArray.length) {
+      celebratedTasksRef.current = new Set(stillValidCelebrations)
+      const celebratedKey = `svatbot_celebrated_tasks_${user.id}`
+      localStorage.setItem(celebratedKey, JSON.stringify(stillValidCelebrations))
+      console.log(`🧹 Cleaned up ${celebratedArray.length - stillValidCelebrations.length} uncompleted tasks from celebration list`)
+    }
+
+    // Only celebrate tasks that haven't been celebrated yet
+    const newlyCompleted = recentlyCompleted.filter(t =>
+      !celebratedTasksRef.current.has(t.id)
+    )
+
+    if (newlyCompleted.length === 0) return
+
+    console.log(`🎉 Found ${newlyCompleted.length} newly completed tasks to celebrate`)
+
+    for (const task of newlyCompleted) {
+      // Mark as celebrated BEFORE creating notification to prevent race conditions
+      celebratedTasksRef.current.add(task.id)
+
+      // Save to localStorage
+      const celebratedKey = `svatbot_celebrated_tasks_${user.id}`
+      localStorage.setItem(celebratedKey, JSON.stringify(Array.from(celebratedTasksRef.current)))
+
       await celebrateTaskCompletion(task.title)
-      
+
       // Show toast
       showToast(
         'success',
@@ -162,7 +208,7 @@ export function useAutoNotifications() {
         { priority: 'medium', duration: 5000 }
       )
     }
-  }, [tasks, celebrateTaskCompletion, showToast])
+  }, [tasks, user?.id, celebrateTaskCompletion, showToast])
 
   // Overdue task reminders
   const checkOverdueTasks = useCallback(async () => {
@@ -253,6 +299,9 @@ export function useAutoNotifications() {
         await sendRandomTip()
         await sendRandomRelationshipReminder()
 
+        // Clean up old notifications once per day
+        await deleteOldNotifications()
+
         const now = new Date()
         lastCheckRef.current = now
         localStorage.setItem('svatbot_last_notification_check', now.toISOString())
@@ -273,7 +322,8 @@ export function useAutoNotifications() {
     checkUpcomingTasks,
     checkTaskCompletions,
     sendRandomTip,
-    sendRandomRelationshipReminder
+    sendRandomRelationshipReminder,
+    deleteOldNotifications
   ])
 
   // Run checks on mount and periodically
