@@ -20,10 +20,57 @@ export default function InteractiveLogoCanvas({
   const renderRef = useRef<Matter.Render | null>(null)
   const runnerRef = useRef<Matter.Runner | null>(null)
   const mouseConstraintRef = useRef<Matter.MouseConstraint | null>(null)
+  const impulseIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
+  const initializedRef = useRef(false)
+
+  // Cleanup only on unmount
+  useEffect(() => {
+    return () => {
+      console.log('🧹 Cleaning up physics engine on unmount')
+
+      // Reset initialized flag so it can be recreated on next mount
+      initializedRef.current = false
+
+      if (impulseIntervalRef.current) {
+        clearInterval(impulseIntervalRef.current)
+      }
+      if (runnerRef.current) {
+        Matter.Runner.stop(runnerRef.current)
+      }
+      if (renderRef.current) {
+        Matter.Render.stop(renderRef.current)
+      }
+      if (engineRef.current) {
+        Matter.Engine.clear(engineRef.current)
+      }
+      if (renderRef.current?.canvas) {
+        renderRef.current.canvas.remove()
+      }
+      if (renderRef.current?.textures) {
+        renderRef.current.textures = {}
+      }
+
+      // Clear refs
+      engineRef.current = null
+      renderRef.current = null
+      runnerRef.current = null
+      mouseConstraintRef.current = null
+    }
+  }, []) // Empty deps - only run on mount/unmount
 
   useEffect(() => {
     if (!canvasRef.current) return
+
+    // Wait for vendors to load before initializing
+    if (vendors.length === 0) return
+
+    // Only initialize once
+    if (initializedRef.current) {
+      console.log('🎨 Engine already initialized, skipping')
+      return
+    }
+    initializedRef.current = true
 
     const container = canvasRef.current
     const width = container.clientWidth
@@ -31,119 +78,96 @@ export default function InteractiveLogoCanvas({
 
     console.log('🎨 InteractiveLogoCanvas initializing:', { width, height: canvasHeight, vendorCount: vendors.length })
 
-    // Async initialization function
-    const initPhysics = async () => {
-      // Create engine with very gentle gravity
-      const engine = Matter.Engine.create({
-        gravity: { x: 0, y: 0.15 } // Very gentle gravity for floating effect
-      })
-      engineRef.current = engine
+    // Create engine with very gentle gravity
+    const engine = Matter.Engine.create({
+      gravity: { x: 0, y: 0.105 } // Very gentle gravity (30% less than 0.15)
+    })
+    engineRef.current = engine
 
-      // Create renderer
-      const render = Matter.Render.create({
-        element: container,
-        engine: engine,
-        options: {
-          width,
-          height: canvasHeight,
-          wireframes: false,
-          background: 'transparent',
-          pixelRatio: window.devicePixelRatio || 1
-        }
-      })
-      renderRef.current = render
-
-      // Style the canvas
-      if (render.canvas) {
-        render.canvas.style.display = 'block'
-        render.canvas.style.width = '100%'
-        render.canvas.style.height = '100%'
+    // Create renderer
+    const render = Matter.Render.create({
+      element: container,
+      engine: engine,
+      options: {
+        width,
+        height: canvasHeight,
+        wireframes: false,
+        background: 'transparent',
+        pixelRatio: window.devicePixelRatio || 1
       }
+    })
+    renderRef.current = render
 
-      // Create walls (invisible boundaries)
-      const wallThickness = 50
-      const walls = [
-        // Bottom
-        Matter.Bodies.rectangle(width / 2, canvasHeight + wallThickness / 2, width, wallThickness, {
-          isStatic: true,
-          render: { fillStyle: 'transparent' }
-        }),
-        // Left
-        Matter.Bodies.rectangle(-wallThickness / 2, canvasHeight / 2, wallThickness, canvasHeight, {
-          isStatic: true,
-          render: { fillStyle: 'transparent' }
-        }),
-        // Right
-        Matter.Bodies.rectangle(width + wallThickness / 2, canvasHeight / 2, wallThickness, canvasHeight, {
-          isStatic: true,
-          render: { fillStyle: 'transparent' }
-        }),
-        // Top
-        Matter.Bodies.rectangle(width / 2, -wallThickness / 2, width, wallThickness, {
-          isStatic: true,
-          render: { fillStyle: 'transparent' }
-        })
-      ]
+    // Style the canvas
+    if (render.canvas) {
+      render.canvas.style.display = 'block'
+      render.canvas.style.width = '100%'
+      render.canvas.style.height = '100%'
+    }
 
-      Matter.Composite.add(engine.world, walls)
-
-      // Get all vendors (limit to maxLogos)
-      // We'll show logo if available, otherwise text with vendor name
-      const selectedVendors = vendors.slice(0, maxLogos)
-
-      // Calculate logo size based on count
-      const vendorCount = selectedVendors.length
-      const fillerCount = Math.max(30, 60 - vendorCount) // At least 30 filler balls for better visual
-      const totalObjects = vendorCount + fillerCount
-
-      // Dynamic sizing: more objects = smaller size
-      const baseSize = totalObjects < 40 ? 60 : totalObjects < 80 ? 50 : 40
-      const logoSize = baseSize * 1.3 // Logos slightly bigger
-      const ballSize = baseSize // Balls same size as base
-
-      // Preload logo images for custom rendering
-      const logoImages = new Map<string, HTMLImageElement>()
-      const logoLoadPromises: Promise<void>[] = []
-
-      selectedVendors.forEach((vendor) => {
-        if (vendor.logo) {
-          const img = new Image()
-          // Don't set crossOrigin for Firebase Storage URLs to avoid CORS issues
-          // Firebase Storage already allows same-origin access
-          img.src = vendor.logo
-
-          // Create promise for image loading
-          const loadPromise = new Promise<void>((resolve, reject) => {
-            img.onload = () => resolve()
-            img.onerror = () => {
-              console.warn(`⚠️ Failed to load logo for ${vendor.name}`)
-              resolve() // Resolve anyway to not block other images
-            }
-            // Timeout after 5 seconds
-            setTimeout(() => {
-              console.warn(`⏱️ Logo loading timeout for ${vendor.name}`)
-              resolve()
-            }, 5000)
-          })
-
-          logoLoadPromises.push(loadPromise)
-          logoImages.set(vendor.id, img)
-        }
+    // Create walls (invisible boundaries)
+    const wallThickness = 50
+    const walls = [
+      // Bottom
+      Matter.Bodies.rectangle(width / 2, canvasHeight + wallThickness / 2, width, wallThickness, {
+        isStatic: true,
+        render: { fillStyle: 'transparent' }
+      }),
+      // Left
+      Matter.Bodies.rectangle(-wallThickness / 2, canvasHeight / 2, wallThickness, canvasHeight, {
+        isStatic: true,
+        render: { fillStyle: 'transparent' }
+      }),
+      // Right
+      Matter.Bodies.rectangle(width + wallThickness / 2, canvasHeight / 2, wallThickness, canvasHeight, {
+        isStatic: true,
+        render: { fillStyle: 'transparent' }
+      }),
+      // Top
+      Matter.Bodies.rectangle(width / 2, -wallThickness / 2, width, wallThickness, {
+        isStatic: true,
+        render: { fillStyle: 'transparent' }
       })
+    ]
 
-      // Wait for all logos to load before starting physics
-      await Promise.all(logoLoadPromises)
+    Matter.Composite.add(engine.world, walls)
 
-      // Create vendor bodies - start them visible on canvas
-      // All vendors will use custom rendering (either logo or text)
-      const vendorBodies = selectedVendors.map((vendor, index) => {
-        const x = Math.random() * (width - 100) + 50
-        const y = Math.random() * (canvasHeight * 0.3) + 50 // Start in upper 30% of canvas
-        const radius = logoSize / 2
+    // Get all vendors (limit to maxLogos)
+    // We'll show logo if available, otherwise text with vendor name
+    const selectedVendors = vendors.slice(0, maxLogos)
 
-        const body = Matter.Bodies.circle(x, y, radius, {
-          restitution: 0.6,
-        friction: 0.1,
+    // Calculate logo size based on count
+    const vendorCount = selectedVendors.length
+    const fillerCount = Math.max(30, 60 - vendorCount) // At least 30 filler balls for better visual
+    const totalObjects = vendorCount + fillerCount
+
+    // Dynamic sizing: more objects = smaller size
+    const baseSize = totalObjects < 40 ? 60 : totalObjects < 80 ? 50 : 40
+    const logoSize = baseSize * 1.3 // Logos slightly bigger
+    const ballSize = baseSize // Balls same size as base
+
+    // Preload logo images for custom rendering
+    // Start loading immediately but don't wait - logos will appear as they load
+    const logoImages = new Map<string, HTMLImageElement>()
+
+    selectedVendors.forEach((vendor) => {
+      if (vendor.logo) {
+        const img = new Image()
+        img.src = vendor.logo
+        logoImages.set(vendor.id, img)
+      }
+    })
+
+    // Create vendor bodies - start them visible on canvas
+    // All vendors will use custom rendering (either logo or text)
+    const vendorBodies = selectedVendors.map((vendor, index) => {
+      const x = Math.random() * (width - 100) + 50
+      const y = Math.random() * (canvasHeight * 0.3) + 50 // Start in upper 30% of canvas
+      const radius = logoSize / 2
+
+      const body = Matter.Bodies.circle(x, y, radius, {
+        restitution: 0.8, // Higher bounce
+        friction: 0.05, // Less friction for more movement
         density: 0.002, // Slightly heavier than balls
         render: {
           // Completely invisible - we'll render custom in afterRender
@@ -186,8 +210,8 @@ export default function InteractiveLogoCanvas({
       const color = colors[Math.floor(Math.random() * colors.length)]
 
       const body = Matter.Bodies.circle(x, y, radius, {
-        restitution: 0.7, // More bouncy
-        friction: 0.05,
+        restitution: 0.85, // Higher bounce
+        friction: 0.03, // Less friction
         density: 0.0008,
         render: {
           fillStyle: color,
@@ -377,38 +401,32 @@ export default function InteractiveLogoCanvas({
 
     // Create and run runner
     const runner = Matter.Runner.create()
-      runnerRef.current = runner
-      Matter.Runner.run(runner, engine)
-      Matter.Render.run(render)
+    runnerRef.current = runner
+    Matter.Runner.run(runner, engine)
+    Matter.Render.run(render)
 
-      console.log('✅ Physics engine started, canvas:', render.canvas)
-      console.log('✅ Runner created and started')
-      setIsLoaded(true)
-    }
+    console.log('✅ Physics engine started, canvas:', render.canvas)
+    console.log('✅ Runner created and started')
+    setIsLoaded(true)
 
-    // Start async initialization
-    initPhysics()
+    // Add random impulses to keep objects moving
+    impulseIntervalRef.current = setInterval(() => {
+      const allBodies = Matter.Composite.allBodies(engine.world)
 
-    // Cleanup
-    return () => {
-      console.log('🧹 Cleaning up physics engine')
-      if (runnerRef.current) {
-        Matter.Runner.stop(runnerRef.current)
+      // Apply random impulse to 2-3 random objects
+      const numToMove = Math.floor(Math.random() * 2) + 2
+      for (let i = 0; i < numToMove; i++) {
+        const randomBody = allBodies[Math.floor(Math.random() * allBodies.length)]
+        if (randomBody && !randomBody.isStatic) {
+          const impulse = {
+            x: (Math.random() - 0.5) * 0.02,
+            y: (Math.random() - 0.5) * 0.02
+          }
+          Matter.Body.applyForce(randomBody, randomBody.position, impulse)
+        }
       }
-      if (renderRef.current) {
-        Matter.Render.stop(renderRef.current)
-      }
-      if (engineRef.current) {
-        Matter.Engine.clear(engineRef.current)
-      }
-      if (renderRef.current?.canvas) {
-        renderRef.current.canvas.remove()
-      }
-      if (renderRef.current?.textures) {
-        renderRef.current.textures = {}
-      }
-    }
-  }, [vendors, maxLogos, height])
+    }, 3000) // Every 3 seconds
+  }, [vendors.length]) // vendors.length to trigger when vendors load, but initializedRef prevents re-init
 
   return (
     <div className="relative w-full overflow-hidden" style={{ height: `${height}px` }}>
