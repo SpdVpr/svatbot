@@ -85,21 +85,21 @@ export default function LocationSection({ content }: LocationSectionProps) {
 
         {/* Reception */}
         {content.reception && (
-          <div className="relative h-[600px] lg:h-[800px] group overflow-hidden bg-[#f2f0ea] text-black flex flex-col justify-between p-8 md:p-16">
+          <div className="relative h-[600px] lg:h-[800px] group overflow-hidden bg-black text-[#f2f0ea] flex flex-col justify-between p-8 md:p-16">
             {content.reception.images && content.reception.images.length > 0 ? (
               <Image
                 src={content.reception.images[0]}
                 alt={content.reception.venue}
                 fill
-                className="absolute inset-0 object-cover opacity-10 group-hover:opacity-5 transition-opacity duration-500"
+                className="absolute inset-0 object-cover opacity-40 group-hover:opacity-20 transition-opacity duration-500"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
             ) : (
-              <div className="absolute inset-0 bg-gradient-to-br from-[#f2f0ea] to-white opacity-10" />
+              <div className="absolute inset-0 bg-gradient-to-br from-black to-[#2d2d2d] opacity-40" />
             )}
             <div className="relative z-10">
-              <SubHeading>Part 02</SubHeading>
-              <Heading>Hostina</Heading>
+              <SubHeading className="text-[#f2f0ea]/60">Part 02</SubHeading>
+              <Heading className="text-[#f2f0ea]">Hostina</Heading>
             </div>
             <div className="relative z-10 space-y-4">
               <div className="flex items-center gap-3">
@@ -112,11 +112,11 @@ export default function LocationSection({ content }: LocationSectionProps) {
                   <p className="font-bold uppercase tracking-widest">{content.reception.venue}</p>
                   <p className="font-light opacity-80 mb-4">{content.reception.address}</p>
                   {content.reception.mapUrl && (
-                    <a 
-                      href={content.reception.mapUrl} 
-                      target="_blank" 
-                      rel="noreferrer" 
-                      className="inline-block border-b border-black pb-1 text-sm uppercase hover:text-[#d4b0aa] hover:border-[#d4b0aa] transition-colors"
+                    <a
+                      href={content.reception.mapUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-block border-b border-[#f2f0ea] pb-1 text-sm uppercase hover:text-[#d4b0aa] hover:border-[#d4b0aa] transition-colors"
                     >
                       Otevřít mapu
                     </a>
@@ -131,9 +131,9 @@ export default function LocationSection({ content }: LocationSectionProps) {
 
       {/* Extra Info Bar */}
       {(content.parking || content.accessibility) && (
-        <div className="bg-black text-[#f2f0ea] p-8 md:p-12 grid grid-cols-1 md:grid-cols-2 gap-8 text-center md:text-left">
+        <div className="bg-black text-[#f2f0ea] p-8 md:p-12 text-center">
           {content.parking && (
-            <div>
+            <div className="mb-6">
               <h4 className="uppercase tracking-widest font-bold mb-2 text-sm">Parkování</h4>
               <p className="opacity-70 font-light">{content.parking}</p>
             </div>
