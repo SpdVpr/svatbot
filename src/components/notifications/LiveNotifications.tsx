@@ -173,7 +173,7 @@ export default function LiveNotifications() {
                         <p className="text-xs sm:text-sm font-medium text-gray-900">
                           {notification.title}
                         </p>
-                        <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-2">
+                        <p className="text-xs sm:text-sm text-gray-600 mt-1 whitespace-pre-wrap break-words">
                           {notification.message}
                         </p>
                         <p className="text-[10px] sm:text-xs text-gray-500 mt-1 sm:mt-2">

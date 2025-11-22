@@ -236,7 +236,7 @@ export default function NotificationsPage() {
                         </div>
                       </div>
 
-                      <p className="text-gray-700 mb-3">{notification.message}</p>
+                      <p className="text-gray-700 mb-3 whitespace-pre-wrap break-words">{notification.message}</p>
 
                       <div className="flex items-center justify-between text-sm text-gray-500">
                         <div className="flex items-center space-x-4">
