@@ -882,6 +882,20 @@
           "order": "DESCENDING"
         }
       ]
+    },
+    {
+      "collectionGroup": "marketplaceVendors",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "google.placeId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
+      ]
     }
   ],
   "fieldOverrides": []

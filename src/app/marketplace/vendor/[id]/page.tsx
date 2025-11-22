@@ -32,6 +32,7 @@ import { useFavoriteVendors } from '@/hooks/useFavoriteVendors'
 import { useVendorReviews } from '@/hooks/useVendorReviews'
 import ReviewForm from '@/components/marketplace/ReviewForm'
 import ReviewList from '@/components/marketplace/ReviewList'
+import GoogleReviewCard from '@/components/marketplace/GoogleReviewCard'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 
@@ -289,19 +290,46 @@ export default function VendorDetailPage() {
               </div>
 
               {/* Rating */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-                <div className="flex items-center space-x-2">
-                  <div className="flex items-center space-x-1">
-                    <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                    <span className="text-xl font-bold text-gray-900">
-                      {vendor.rating.overall.toFixed(1)}
-                    </span>
+              <div className="space-y-3">
+                {/* SvatBot Rating */}
+                {vendor.rating.count > 0 && (
+                  <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-2 bg-gradient-to-r from-pink-50 to-purple-50 px-4 py-2 rounded-lg border border-pink-200">
+                      <Star className="w-5 h-5 text-pink-500 fill-current" />
+                      <span className="text-xl font-bold text-gray-900">
+                        {vendor.rating.overall.toFixed(1)}
+                      </span>
+                      <span className="text-sm text-gray-600">
+                        ({vendor.rating.count} {vendor.rating.count === 1 ? 'recenze' : vendor.rating.count < 5 ? 'recenze' : 'recenzí'})
+                      </span>
+                      <span className="text-xs font-medium text-pink-600 ml-2">SvatBot</span>
+                    </div>
                   </div>
-                  <span className="text-gray-600">
-                    ({vendor.rating.count} recenzí)
-                  </span>
-                </div>
+                )}
 
+                {/* Google Rating */}
+                {vendor.google?.rating && vendor.google.reviewCount && vendor.google.reviewCount > 0 && (
+                  <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-2 bg-white px-4 py-2 rounded-lg border border-gray-200">
+                      <Star className="w-5 h-5 text-yellow-400 fill-current" />
+                      <span className="text-xl font-bold text-gray-900">
+                        {vendor.google.rating.toFixed(1)}
+                      </span>
+                      <span className="text-sm text-gray-600">
+                        ({vendor.google.reviewCount} {vendor.google.reviewCount === 1 ? 'recenze' : vendor.google.reviewCount < 5 ? 'recenze' : 'recenzí'})
+                      </span>
+                      <svg className="w-4 h-4 ml-2" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                      </svg>
+                      <span className="text-xs font-medium text-gray-600">Google</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Years in Business */}
                 <div className="flex items-center space-x-2 text-gray-600">
                   <Award className="w-4 h-4" />
                   <span>{vendor.yearsInBusiness} let v oboru</span>
@@ -491,40 +519,149 @@ export default function VendorDetailPage() {
 
             {/* Reviews Section */}
             <div className="wedding-card">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Recenze a hodnocení</h2>
-                {user && !hasUserReviewed(vendorId) && (
-                  <button
-                    onClick={() => setShowReviewForm(true)}
-                    className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors whitespace-nowrap"
-                  >
-                    <Edit3 className="w-4 h-4" />
-                    <span>Napsat recenzi</span>
-                  </button>
-                )}
-                {user && hasUserReviewed(vendorId) && (
-                  <span className="flex items-center space-x-2 text-sm text-gray-600">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
-                    <span>Již jste recenzovali</span>
-                  </span>
-                )}
-                {!user && (
-                  <Link
-                    href="/auth/login"
-                    className="text-sm text-primary-600 hover:underline text-center sm:text-left"
-                  >
-                    Přihlaste se pro napsání recenze
-                  </Link>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-6">Recenze a hodnocení</h2>
+
+              {/* SvatBot Reviews */}
+              <div className="mb-8 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl p-6 border border-pink-200">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-lg flex items-center justify-center">
+                      <Star className="w-6 h-6 text-white fill-current" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">SvatBot recenze</h3>
+                      <p className="text-xs text-gray-600">Ověřené recenze od skutečných párů</p>
+                    </div>
+                  </div>
+                  {user && !hasUserReviewed(vendorId) && (
+                    <button
+                      onClick={() => setShowReviewForm(true)}
+                      className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors whitespace-nowrap"
+                    >
+                      <Edit3 className="w-4 h-4" />
+                      <span>Napsat recenzi</span>
+                    </button>
+                  )}
+                  {user && hasUserReviewed(vendorId) && (
+                    <span className="flex items-center space-x-2 text-sm text-gray-600">
+                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      <span>Již jste recenzovali</span>
+                    </span>
+                  )}
+                  {!user && (
+                    <Link
+                      href="/auth/login"
+                      className="text-sm text-primary-600 hover:underline text-center sm:text-left"
+                    >
+                      Přihlaste se pro napsání recenze
+                    </Link>
+                  )}
+                </div>
+
+                {reviewsLoading ? (
+                  <div className="text-center py-8">
+                    <div className="w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                    <p className="text-gray-500 mt-4">Načítání recenzí...</p>
+                  </div>
+                ) : (
+                  <ReviewList reviews={reviews} stats={stats} showStats={true} />
                 )}
               </div>
 
-              {reviewsLoading ? (
-                <div className="text-center py-8">
-                  <div className="w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-                  <p className="text-gray-500 mt-4">Načítání recenzí...</p>
+              {/* Google Reviews */}
+              {vendor.google?.reviews && vendor.google.reviews.length > 0 && (
+                <div className="border-t-2 border-gray-200 pt-8">
+                  <div className="bg-white rounded-xl p-6 border border-gray-200">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-6">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-white border-2 border-gray-200 rounded-lg flex items-center justify-center">
+                          <svg className="w-6 h-6" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                          </svg>
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900">Google recenze</h3>
+                          <div className="flex items-center space-x-2">
+                            <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                            <span className="font-semibold text-gray-900 text-sm">
+                              {vendor.google.rating?.toFixed(1)}
+                            </span>
+                            {vendor.google.reviewCount && (
+                              <span className="text-gray-600 text-xs">
+                                ({vendor.google.reviewCount} {vendor.google.reviewCount === 1 ? 'recenze' : vendor.google.reviewCount < 5 ? 'recenze' : 'recenzí'})
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      {vendor.google.mapsUrl && (
+                        <a
+                          href={vendor.google.mapsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center space-x-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors whitespace-nowrap"
+                        >
+                          <Globe className="w-4 h-4" />
+                          <span>Zobrazit všechny na Google</span>
+                        </a>
+                      )}
+                    </div>
+
+                    <div className="space-y-4">
+                      {vendor.google.reviews.map((review, index) => (
+                        <GoogleReviewCard key={index} review={review} />
+                      ))}
+                    </div>
+
+                    {vendor.google.lastUpdated && (
+                      <p className="text-xs text-gray-500 mt-6 text-center">
+                        Naposledy aktualizováno: {new Date(vendor.google.lastUpdated).toLocaleDateString('cs-CZ')}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              ) : (
-                <ReviewList reviews={reviews} stats={stats} showStats={true} />
+              )}
+
+              {/* No Google Reviews - Show Link */}
+              {vendor.google?.mapsUrl && (!vendor.google?.reviews || vendor.google.reviews.length === 0) && (
+                <div className="border-t border-gray-200 pt-8">
+                  <div className="text-center py-8 bg-gray-50 rounded-lg">
+                    <div className="flex items-center justify-center space-x-2 mb-3">
+                      <svg className="w-8 h-8" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                      </svg>
+                      <h3 className="text-lg font-semibold text-gray-900">Google hodnocení</h3>
+                    </div>
+                    {vendor.google.rating && vendor.google.reviewCount ? (
+                      <div className="mb-4">
+                        <div className="flex items-center justify-center space-x-2 mb-2">
+                          <Star className="w-6 h-6 text-yellow-400 fill-current" />
+                          <span className="text-2xl font-bold text-gray-900">
+                            {vendor.google.rating.toFixed(1)}
+                          </span>
+                        </div>
+                        <p className="text-gray-600">
+                          {vendor.google.reviewCount} recenzí na Google
+                        </p>
+                      </div>
+                    ) : null}
+                    <a
+                      href={vendor.google.mapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center space-x-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                    >
+                      <Globe className="w-5 h-5" />
+                      <span>Zobrazit recenze na Google Maps</span>
+                    </a>
+                  </div>
+                </div>
               )}
             </div>
           </div>

@@ -59,6 +59,14 @@ export interface MarketplaceVendorRegistration {
   responseTime: string
   verified: boolean
   status: 'pending' | 'approved' | 'rejected'
+  google?: {
+    placeId?: string
+    mapsUrl?: string
+    rating?: number
+    reviewCount?: number
+    reviews?: any[]
+    lastUpdated?: any
+  }
   createdAt?: any
   updatedAt?: any
 }

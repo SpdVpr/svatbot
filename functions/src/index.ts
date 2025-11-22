@@ -128,6 +128,9 @@ export { default as checkTrialExpiry } from './triggers/checkTrialExpiry'
 export { default as onMarketplaceVendorCreate } from './triggers/onMarketplaceVendorCreate'
 export { default as onMarketplaceVendorUpdate } from './triggers/onMarketplaceVendorUpdate'
 
+// Scheduled Google ratings update
+export { updateGoogleRatings } from './triggers/updateGoogleRatings'
+
 // HTTPS functions
 export { sendVendorContactEmails } from './https/sendVendorContactEmails'
 export { sendPaymentEmail } from './https/sendPaymentEmail'
@@ -136,6 +139,7 @@ export { sendContactFormEmail } from './https/sendContactFormEmail'
 // Callable functions for client-side
 export { default as getVendors } from './callable/getVendors'
 export { default as createVendor } from './callable/createVendor'
+export { default as refreshGoogleRating } from './callable/refreshGoogleRating'
 // export { default as updateVendor } from './callable/updateVendor'
 // export { default as deleteVendor } from './callable/deleteVendor'
 // export { default as uploadImages } from './callable/uploadImages'

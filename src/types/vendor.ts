@@ -26,6 +26,18 @@ import { DocumentType, Document } from './budget'
 export type VendorDocumentType = DocumentType
 export type VendorDocument = Document
 
+// Google Review interface
+export interface GoogleReview {
+  author_name: string
+  author_url?: string // Link to reviewer's Google profile
+  language: string
+  profile_photo_url?: string
+  rating: number // 1-5
+  relative_time_description: string // e.g., "2 months ago"
+  text: string
+  time: number // Unix timestamp
+}
+
 // Marketplace vendor - předpřipravený dodavatel
 export interface MarketplaceVendor {
   id: string
@@ -78,6 +90,16 @@ export interface MarketplaceVendor {
       value: number
       professionalism: number
     }
+  }
+
+  // Google integration
+  google?: {
+    placeId?: string // Google Place ID (e.g., "ChIJN1t_tDeuEmsRUsoyG83frY4")
+    mapsUrl?: string // Full Google Maps URL
+    rating?: number // Google rating (0-5)
+    reviewCount?: number // Number of Google reviews
+    reviews?: GoogleReview[] // Up to 5 most recent Google reviews
+    lastUpdated?: Date // Last time Google data was fetched
   }
 
   // Features and specialties

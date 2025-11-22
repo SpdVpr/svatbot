@@ -17,8 +17,11 @@ import {
   MapPin,
   Phone,
   Mail,
-  Globe
+  Globe,
+  RefreshCw
 } from 'lucide-react'
+import { getFunctions, httpsCallable } from 'firebase/functions'
+import app from '@/lib/firebase'
 
 export default function AdminVendorsPage() {
   const { vendors, loading, error, deleteVendor } = useMarketplaceVendors()
@@ -26,6 +29,50 @@ export default function AdminVendorsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [statusFilter, setStatusFilter] = useState<string>('')
   const [deleting, setDeleting] = useState<string | null>(null)
+  const [refreshing, setRefreshing] = useState<string | null>(null)
+
+  const functions = getFunctions(app, 'europe-west1')
+  const refreshGoogleRating = httpsCallable(functions, 'refreshGoogleRating')
+
+  const handleRefreshGoogleRating = async (vendorId: string) => {
+    if (!vendorId) return
+
+    setRefreshing(vendorId)
+    try {
+      const result = await refreshGoogleRating({ vendorId })
+      const data = result.data as any
+
+      if (data.success) {
+        alert(`✅ Google hodnocení aktualizováno!\n\nRating: ${data.data.rating} ⭐\nPočet recenzí: ${data.data.reviewCount}\nNačteno recenzí: ${data.data.reviewsCount}`)
+        // Reload vendors to show updated data
+        window.location.reload()
+      } else {
+        alert('❌ Chyba při aktualizaci Google hodnocení')
+      }
+    } catch (error: any) {
+      console.error('Error refreshing Google rating:', error)
+
+      // Parse Firebase error message
+      let errorMessage = 'Chyba při aktualizaci Google hodnocení'
+      if (error.message) {
+        if (error.message.includes('resource-exhausted')) {
+          errorMessage = 'Google data byla aktualizována nedávno. Zkuste to prosím později (max 1× za 24 hodin).'
+        } else if (error.message.includes('failed-precondition')) {
+          errorMessage = 'Dodavatel nemá platné Google Place ID.'
+        } else if (error.message.includes('unauthenticated')) {
+          errorMessage = 'Nejste přihlášeni.'
+        } else if (error.message.includes('permission-denied')) {
+          errorMessage = 'Nemáte oprávnění k této akci.'
+        } else {
+          errorMessage = error.message
+        }
+      }
+
+      alert(`❌ ${errorMessage}`)
+    } finally {
+      setRefreshing(null)
+    }
+  }
 
   const filteredVendors = vendors.filter(vendor => {
     const matchesSearch = vendor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -214,6 +261,21 @@ export default function AdminVendorsPage() {
 
                   {/* Actions */}
                   <div className="flex items-center space-x-2">
+                    {/* Refresh Google Rating */}
+                    {vendor.google?.placeId && vendor.id && (
+                      <button
+                        className="p-2 text-green-400 hover:text-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                        title={`Aktualizovat Google hodnocení${vendor.google?.lastUpdated ? `\nNaposledy: ${new Date(vendor.google.lastUpdated).toLocaleDateString('cs-CZ')}` : ''}`}
+                        disabled={refreshing === vendor.id}
+                        onClick={() => handleRefreshGoogleRating(vendor.id!)}
+                      >
+                        {refreshing === vendor.id ? (
+                          <div className="w-5 h-5 border-2 border-green-400 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <RefreshCw className="h-5 w-5" />
+                        )}
+                      </button>
+                    )}
                     <Link
                       href={`/marketplace/vendor/${vendor.id}`}
                       className="p-2 text-gray-400 hover:text-gray-600"

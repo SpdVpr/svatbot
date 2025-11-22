@@ -1,17 +1,19 @@
 'use client'
 
+import { use } from 'react'
 import { useRouter } from 'next/navigation'
 import { useVendorEdit } from '@/hooks/useVendorEdit'
 import VendorEditForm from '@/components/admin/VendorEditForm'
 import { Loader2, AlertCircle } from 'lucide-react'
 
 interface VendorEditPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default function VendorEditPage({ params }: VendorEditPageProps) {
+  const { id } = use(params)
   const router = useRouter()
   const {
     vendor,
@@ -21,7 +23,7 @@ export default function VendorEditPage({ params }: VendorEditPageProps) {
     error,
     saveVendor,
     updateFormData
-  } = useVendorEdit(params.id)
+  } = useVendorEdit(id)
 
   const handleSave = async (data: any) => {
     const success = await saveVendor(data)

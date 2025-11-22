@@ -288,6 +288,16 @@ export interface VendorEditForm {
   // SEO
   tags: string[]
   keywords: string[]
+
+  // Google Integration
+  google?: {
+    placeId?: string
+    mapsUrl?: string
+    rating?: number
+    reviewCount?: number
+    reviews?: any[]
+    lastUpdated?: any
+  }
 }
 
 export interface ImageUpload {

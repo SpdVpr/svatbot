@@ -140,6 +140,15 @@ class VendorStore {
               certifications: data.certifications || [],
               tags: data.tags || [],
               keywords: data.keywords || [],
+              // Google integration
+              google: data.google ? {
+                placeId: data.google.placeId,
+                mapsUrl: data.google.mapsUrl,
+                rating: data.google.rating,
+                reviewCount: data.google.reviewCount,
+                reviews: data.google.reviews || [],
+                lastUpdated: data.google.lastUpdated instanceof Timestamp ? data.google.lastUpdated.toDate() : undefined
+              } : undefined,
               createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
               updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate() : new Date(),
               lastActive: data.lastActive instanceof Timestamp ? data.lastActive.toDate() : new Date()
