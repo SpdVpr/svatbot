@@ -269,11 +269,6 @@ export default function InteractiveLogoCanvas({
 
     // Add mouse control
     const mouse = Matter.Mouse.create(render.canvas)
-
-    // Enable scroll wheel to pass through
-    mouse.element.removeEventListener('wheel', mouse.mousewheel)
-    mouse.element.removeEventListener('DOMMouseScroll', mouse.mousewheel)
-
     const mouseConstraint = Matter.MouseConstraint.create(engine, {
       mouse: mouse,
       constraint: {
