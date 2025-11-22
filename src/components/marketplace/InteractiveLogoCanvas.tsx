@@ -23,6 +23,19 @@ export default function InteractiveLogoCanvas({
   const impulseIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
   const initializedRef = useRef(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Check if mobile on mount
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768) // Hide on screens smaller than md breakpoint
+    }
+
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // Cleanup only on unmount
   useEffect(() => {
@@ -61,6 +74,9 @@ export default function InteractiveLogoCanvas({
 
   useEffect(() => {
     if (!canvasRef.current) return
+
+    // Don't initialize on mobile
+    if (isMobile) return
 
     // Wait for vendors to load before initializing
     if (vendors.length === 0) return
@@ -427,6 +443,21 @@ export default function InteractiveLogoCanvas({
       }
     }, 3000) // Every 3 seconds
   }, [vendors.length]) // vendors.length to trigger when vendors load, but initializedRef prevents re-init
+
+  // Don't render canvas on mobile
+  if (isMobile) {
+    return (
+      <div className="relative w-full overflow-hidden" style={{ height: `${height}px` }}>
+        {/* Gradient background only on mobile */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(236, 72, 153, 0.2) 50%, rgba(244, 63, 94, 0.2) 100%)'
+          }}
+        />
+      </div>
+    )
+  }
 
   return (
     <div className="relative w-full overflow-hidden" style={{ height: `${height}px` }}>
