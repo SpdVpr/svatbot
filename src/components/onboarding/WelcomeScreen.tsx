@@ -127,6 +127,7 @@ export default function WelcomeScreen() {
         currency: 'CZK',
         unit: 'per-event'
       },
+      mainImage: 'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800&q=80',
       images: [
         'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800&q=80'
       ],
@@ -196,6 +197,7 @@ export default function WelcomeScreen() {
         currency: 'CZK',
         unit: 'per-person'
       },
+      mainImage: 'https://images.unsplash.com/photo-1555244162-803834f70033?w=800&q=80',
       images: [
         'https://images.unsplash.com/photo-1555244162-803834f70033?w=800&q=80'
       ],
@@ -265,6 +267,7 @@ export default function WelcomeScreen() {
         currency: 'CZK',
         unit: 'per-event'
       },
+      mainImage: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&q=80',
       images: [
         'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&q=80'
       ],

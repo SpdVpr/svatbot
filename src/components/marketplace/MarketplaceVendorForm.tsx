@@ -33,6 +33,15 @@ export interface MarketplaceVendorFormData {
   phone: string
   website?: string
 
+  // Social media
+  socialMedia?: {
+    instagram?: string
+    facebook?: string
+    youtube?: string
+    tiktok?: string
+    linkedin?: string
+  }
+
   // Google integration
   google?: {
     placeId?: string
@@ -86,9 +95,11 @@ export interface MarketplaceVendorFormData {
   }
 
   // Images (URLs for now, later can be file uploads)
-  images: string[]
+  mainImage: string // Main cover image (required)
+  mainVideoUrl?: string // Main video (optional) - replaces main image in detail
+  images: string[] // Legacy field
   portfolioImages: string[]
-  videoUrl?: string
+  videoUrl?: string // Legacy field
 
   // Response time
   responseTime: string
@@ -119,6 +130,13 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData,
     email: initialData?.email || '',
     phone: initialData?.phone || '',
     website: initialData?.website || '',
+    socialMedia: initialData?.socialMedia || {
+      instagram: '',
+      facebook: '',
+      youtube: '',
+      tiktok: '',
+      linkedin: ''
+    },
     google: initialData?.google || {
       placeId: '',
       mapsUrl: ''
@@ -157,6 +175,8 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData,
         end: '18:00'
       }
     },
+    mainImage: initialData?.mainImage || initialData?.images?.[0] || '',
+    mainVideoUrl: initialData?.mainVideoUrl || '',
     images: initialData?.images || [],
     portfolioImages: initialData?.portfolioImages || [],
     videoUrl: initialData?.videoUrl || '',
@@ -228,8 +248,10 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData,
     }
 
     if (step === 4) {
-      // Portfolio and availability - optional, no blocking validation
-      // Users can proceed to summary even without images
+      // Portfolio and availability - main image is required
+      if (!formData.mainImage || formData.mainImage.trim() === '') {
+        newErrors.mainImage = 'Hlavní fotka je povinná'
+      }
     }
 
     // Step 5 is summary - no validation needed
@@ -288,7 +310,15 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData,
       const dataToSubmit = {
         ...formData,
         website: formData.website ? ensureUrlProtocol(formData.website) : undefined,
-        videoUrl: formData.videoUrl ? ensureUrlProtocol(formData.videoUrl) : undefined
+        mainVideoUrl: formData.mainVideoUrl ? ensureUrlProtocol(formData.mainVideoUrl) : undefined,
+        videoUrl: formData.videoUrl ? ensureUrlProtocol(formData.videoUrl) : undefined,
+        socialMedia: formData.socialMedia ? {
+          instagram: formData.socialMedia.instagram ? ensureUrlProtocol(formData.socialMedia.instagram) : undefined,
+          facebook: formData.socialMedia.facebook ? ensureUrlProtocol(formData.socialMedia.facebook) : undefined,
+          youtube: formData.socialMedia.youtube ? ensureUrlProtocol(formData.socialMedia.youtube) : undefined,
+          tiktok: formData.socialMedia.tiktok ? ensureUrlProtocol(formData.socialMedia.tiktok) : undefined,
+          linkedin: formData.socialMedia.linkedin ? ensureUrlProtocol(formData.socialMedia.linkedin) : undefined,
+        } : undefined
       }
       await onSubmit(dataToSubmit)
     } catch (error) {
@@ -652,6 +682,86 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData,
                       placeholder="www.vase-stranky.cz"
                       className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     />
+                  </div>
+                </div>
+
+                {/* Social Media Section */}
+                <div className="border-t border-gray-200 pt-4 mt-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Sociální sítě</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Přidejte odkazy na vaše sociální sítě. Budou zobrazeny v detailu vašeho inzerátu.
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Instagram */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Instagram
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.socialMedia?.instagram || ''}
+                        onChange={(e) => handleNestedChange('socialMedia', 'instagram', e.target.value)}
+                        placeholder="instagram.com/vase_firma"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      />
+                    </div>
+
+                    {/* Facebook */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Facebook
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.socialMedia?.facebook || ''}
+                        onChange={(e) => handleNestedChange('socialMedia', 'facebook', e.target.value)}
+                        placeholder="facebook.com/vase_firma"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      />
+                    </div>
+
+                    {/* YouTube */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        YouTube
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.socialMedia?.youtube || ''}
+                        onChange={(e) => handleNestedChange('socialMedia', 'youtube', e.target.value)}
+                        placeholder="youtube.com/@vase_firma"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      />
+                    </div>
+
+                    {/* TikTok */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        TikTok
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.socialMedia?.tiktok || ''}
+                        onChange={(e) => handleNestedChange('socialMedia', 'tiktok', e.target.value)}
+                        placeholder="tiktok.com/@vase_firma"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      />
+                    </div>
+
+                    {/* LinkedIn */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        LinkedIn
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.socialMedia?.linkedin || ''}
+                        onChange={(e) => handleNestedChange('socialMedia', 'linkedin', e.target.value)}
+                        placeholder="linkedin.com/company/vase-firma"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -1243,44 +1353,50 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData,
                   </div>
                 </div>
 
+                {/* Main Image */}
                 <div className="border-t border-gray-200 pt-4">
                   <ImageUploadSection
-                    images={formData.images}
-                    onImagesChange={(images) => handleChange('images', images)}
-                    maxImages={5}
-                    title="Hlavní obrázky"
-                    description="Nahrájte hlavní fotografie vaší firmy, vybavení nebo prostoru (max 5 obrázků)"
+                    images={formData.mainImage ? [formData.mainImage] : []}
+                    onImagesChange={(images) => handleChange('mainImage', images[0] || '')}
+                    maxImages={1}
+                    title="Hlavní fotka *"
+                    description="Tato fotka se zobrazí v katalogu a jako hlavní v detailu (povinné)"
                     type="main"
                   />
+                  {errors.mainImage && (
+                    <p className="mt-1 text-sm text-red-600">{errors.mainImage}</p>
+                  )}
                 </div>
 
+                {/* Main Video */}
+                <div className="border-t border-gray-200 pt-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-900 mb-2">
+                      Hlavní video (volitelné)
+                    </label>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Pokud vyplníte, video nahradí hlavní fotku v detailu a spustí se automaticky. Vložte odkaz na YouTube nebo Vimeo video.
+                    </p>
+                    <input
+                      type="text"
+                      value={formData.mainVideoUrl}
+                      onChange={(e) => handleChange('mainVideoUrl', e.target.value)}
+                      placeholder="www.youtube.com/watch?v=..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                {/* Portfolio Gallery */}
                 <div className="border-t border-gray-200 pt-4">
                   <ImageUploadSection
                     images={formData.portfolioImages}
                     onImagesChange={(images) => handleChange('portfolioImages', images)}
                     maxImages={15}
-                    title="Portfolio"
+                    title="Galerie / Portfolio"
                     description="Ukažte svou práci! Nahrájte fotografie z vašich svateb nebo projektů (max 15 obrázků)"
                     type="portfolio"
                   />
-                </div>
-
-                <div className="border-t border-gray-200 pt-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-2">
-                      Video URL (volitelné)
-                    </label>
-                    <p className="text-sm text-gray-600 mb-3">
-                      Odkaz na YouTube nebo Vimeo video prezentující vaši práci
-                    </p>
-                    <input
-                      type="text"
-                      value={formData.videoUrl}
-                      onChange={(e) => handleChange('videoUrl', e.target.value)}
-                      placeholder="www.youtube.com/watch?v=..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    />
-                  </div>
                 </div>
 
               </div>
@@ -1389,11 +1505,15 @@ export default function MarketplaceVendorForm({ onSubmit, onCancel, initialData,
                   </h3>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Hlavní obrázky:</span>
-                      <span className="font-medium">{formData.images.length} obrázků</span>
+                      <span className="text-gray-600">Hlavní fotka:</span>
+                      <span className="font-medium">{formData.mainImage ? '✓ Nahrána' : '✗ Chybí'}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Portfolio:</span>
+                      <span className="text-gray-600">Hlavní video:</span>
+                      <span className="font-medium">{formData.mainVideoUrl ? '✓ Přidáno' : '—'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Galerie:</span>
                       <span className="font-medium">{formData.portfolioImages.length} obrázků</span>
                     </div>
                     <div className="flex justify-between">

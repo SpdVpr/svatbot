@@ -23,6 +23,10 @@ interface ModuleHeaderProps {
   stats?: React.ReactNode
   /** Hide the default back button (useful when actions contains a custom back button) */
   hideBackButton?: boolean
+  /** Use full width container instead of max-w-7xl */
+  fullWidth?: boolean
+  /** Custom max width (e.g., "max-w-[1600px]") */
+  maxWidth?: string
 }
 
 export default function ModuleHeader({
@@ -33,15 +37,22 @@ export default function ModuleHeader({
   iconColor,
   actions,
   stats,
-  hideBackButton = false
+  hideBackButton = false,
+  fullWidth = false,
+  maxWidth
 }: ModuleHeaderProps) {
   const router = useRouter()
   const [showMobileMenu, setShowMobileMenu] = useState(false)
 
+  // Determine container class based on props
+  const containerClass = fullWidth
+    ? `px-4 md:px-6 lg:px-8 mx-auto ${maxWidth || 'max-w-[1600px]'}`
+    : 'container-desktop'
+
   return (
     <>
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="container-desktop py-2 sm:py-4">
+        <div className={`${containerClass} py-2 sm:py-4`}>
           <div className="flex items-center justify-between gap-2 sm:gap-4">
             {/* Left side - Navigation and Title */}
             <div className="flex items-center gap-1 sm:gap-3 min-w-0 flex-1">

@@ -232,6 +232,15 @@ export interface VendorEditForm {
   email: string
   phone: string
 
+  // Social Media
+  socialMedia?: {
+    instagram?: string
+    facebook?: string
+    youtube?: string
+    tiktok?: string
+    linkedin?: string
+  }
+
   // Address
   address: {
     street: string
@@ -265,8 +274,11 @@ export interface VendorEditForm {
   }
 
   // Images
+  mainImage: string
+  mainVideoUrl?: string
   images: string[]
   portfolioImages: string[]
+  videoUrl?: string
 
   // Features & Specialties
   features: string[]

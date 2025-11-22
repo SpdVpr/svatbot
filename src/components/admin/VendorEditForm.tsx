@@ -19,7 +19,12 @@ import {
   DollarSign,
   Star,
   Tag,
-  Settings
+  Settings,
+  Instagram,
+  Facebook,
+  Youtube,
+  Linkedin,
+  Video
 } from 'lucide-react'
 import { ensureUrlProtocol } from '@/utils/url'
 import PlaceIdFinder from '@/components/marketplace/PlaceIdFinder'
@@ -550,6 +555,132 @@ function ContactTab({
         </div>
       </div>
 
+      {/* Social Media Section */}
+      <div className="border-t border-gray-200 pt-6">
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          Sociální sítě
+        </h3>
+        <p className="text-sm text-gray-600 mb-4">
+          Přidejte odkazy na sociální sítě dodavatele. Budou zobrazeny v detailu inzerátu.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Instagram */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <Instagram className="inline h-4 w-4 mr-1" />
+              Instagram
+            </label>
+            <input
+              type="text"
+              value={formData.socialMedia?.instagram || ''}
+              onChange={(e) => onUpdate({
+                socialMedia: {
+                  instagram: e.target.value,
+                  facebook: formData.socialMedia?.facebook || '',
+                  youtube: formData.socialMedia?.youtube || '',
+                  tiktok: formData.socialMedia?.tiktok || '',
+                  linkedin: formData.socialMedia?.linkedin || ''
+                }
+              })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              placeholder="instagram.com/firma"
+            />
+          </div>
+
+          {/* Facebook */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <Facebook className="inline h-4 w-4 mr-1" />
+              Facebook
+            </label>
+            <input
+              type="text"
+              value={formData.socialMedia?.facebook || ''}
+              onChange={(e) => onUpdate({
+                socialMedia: {
+                  instagram: formData.socialMedia?.instagram || '',
+                  facebook: e.target.value,
+                  youtube: formData.socialMedia?.youtube || '',
+                  tiktok: formData.socialMedia?.tiktok || '',
+                  linkedin: formData.socialMedia?.linkedin || ''
+                }
+              })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              placeholder="facebook.com/firma"
+            />
+          </div>
+
+          {/* YouTube */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <Youtube className="inline h-4 w-4 mr-1" />
+              YouTube
+            </label>
+            <input
+              type="text"
+              value={formData.socialMedia?.youtube || ''}
+              onChange={(e) => onUpdate({
+                socialMedia: {
+                  instagram: formData.socialMedia?.instagram || '',
+                  facebook: formData.socialMedia?.facebook || '',
+                  youtube: e.target.value,
+                  tiktok: formData.socialMedia?.tiktok || '',
+                  linkedin: formData.socialMedia?.linkedin || ''
+                }
+              })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              placeholder="youtube.com/@firma"
+            />
+          </div>
+
+          {/* TikTok */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              TikTok
+            </label>
+            <input
+              type="text"
+              value={formData.socialMedia?.tiktok || ''}
+              onChange={(e) => onUpdate({
+                socialMedia: {
+                  instagram: formData.socialMedia?.instagram || '',
+                  facebook: formData.socialMedia?.facebook || '',
+                  youtube: formData.socialMedia?.youtube || '',
+                  tiktok: e.target.value,
+                  linkedin: formData.socialMedia?.linkedin || ''
+                }
+              })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              placeholder="tiktok.com/@firma"
+            />
+          </div>
+
+          {/* LinkedIn */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <Linkedin className="inline h-4 w-4 mr-1" />
+              LinkedIn
+            </label>
+            <input
+              type="text"
+              value={formData.socialMedia?.linkedin || ''}
+              onChange={(e) => onUpdate({
+                socialMedia: {
+                  instagram: formData.socialMedia?.instagram || '',
+                  facebook: formData.socialMedia?.facebook || '',
+                  youtube: formData.socialMedia?.youtube || '',
+                  tiktok: formData.socialMedia?.tiktok || '',
+                  linkedin: e.target.value
+                }
+              })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              placeholder="linkedin.com/company/firma"
+            />
+          </div>
+        </div>
+      </div>
+
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Pracovní rádius (km)
@@ -837,47 +968,57 @@ function ImagesTab({
     }
   }
 
+  const setMainImage = (url: string) => {
+    onUpdate({ mainImage: url.trim() })
+  }
+
   return (
     <div className="space-y-8">
-      {/* Main Images */}
+      {/* Main Image */}
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">
           <ImageIcon className="inline h-5 w-5 mr-2" />
-          Hlavní fotografie
+          Hlavní fotka *
         </h3>
         <p className="text-sm text-gray-600 mb-4">
-          Hlavní fotografie se zobrazují na kartě dodavatele v marketplace
+          Tato fotka se zobrazí v katalogu a jako hlavní v detailu (povinné)
         </p>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-          {formData.images.map((image, index) => (
-            <div key={index} className="relative group">
+        {formData.mainImage && (
+          <div className="mb-4">
+            <div className="relative group inline-block">
               <img
-                src={image}
-                alt={`Hlavní fotografie ${index + 1}`}
-                className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                src={formData.mainImage}
+                alt="Hlavní fotka"
+                className="w-64 h-40 object-cover rounded-lg border border-gray-200"
               />
               <button
                 type="button"
-                onClick={() => removeImage(index, 'main')}
+                onClick={() => onUpdate({ mainImage: '' })}
                 className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
-          ))}
-        </div>
+          </div>
+        )}
 
         <div className="flex flex-col sm:flex-row gap-4">
           <div>
             <label className="btn-outline cursor-pointer flex items-center space-x-2">
               <Upload className="h-5 w-5" />
-              <span>Nahrát fotografie</span>
+              <span>Nahrát hlavní fotku</span>
               <input
                 type="file"
-                multiple
                 accept="image/*"
-                onChange={(e) => handleImageUpload(e, 'main')}
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file) {
+                    handleImageUpload(e, 'main')
+                    // After upload, set the first image as main
+                    // This will be handled by the upload function
+                  }
+                }}
                 className="hidden"
               />
             </label>
@@ -886,24 +1027,45 @@ function ImagesTab({
           <div className="flex-1">
             <input
               type="url"
-              placeholder="Nebo vložte URL fotografie..."
+              placeholder="Nebo vložte URL hlavní fotky..."
+              value={formData.mainImage}
+              onChange={(e) => setMainImage(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault()
-                  addImageUrl((e.target as HTMLInputElement).value, 'main')
-                  ;(e.target as HTMLInputElement).value = ''
-                }
-              }}
             />
           </div>
         </div>
       </div>
 
-      {/* Portfolio Images */}
-      <div>
+      {/* Main Video */}
+      <div className="border-t border-gray-200 pt-6">
         <h3 className="text-lg font-medium text-gray-900 mb-4">
-          Portfolio fotografie
+          <Video className="inline h-5 w-5 mr-2" />
+          Hlavní video (volitelné)
+        </h3>
+        <p className="text-sm text-gray-600 mb-4">
+          Pokud vyplníte, video nahradí hlavní fotku v detailu a spustí se automaticky
+        </p>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Video URL
+          </label>
+          <input
+            type="text"
+            value={formData.mainVideoUrl || ''}
+            onChange={(e) => onUpdate({ mainVideoUrl: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            placeholder="https://www.youtube.com/watch?v=..."
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Podporované platformy: YouTube, Vimeo
+          </p>
+        </div>
+      </div>
+
+      {/* Portfolio Images */}
+      <div className="border-t border-gray-200 pt-6">
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          Galerie / Portfolio
         </h3>
         <p className="text-sm text-gray-600 mb-4">
           Portfolio fotografie se zobrazují na detailní stránce dodavatele
@@ -959,6 +1121,8 @@ function ImagesTab({
           </div>
         </div>
       </div>
+
+
     </div>
   )
 }

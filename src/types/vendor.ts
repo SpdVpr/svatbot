@@ -61,6 +61,15 @@ export interface MarketplaceVendor {
     }
   }
 
+  // Social media
+  socialMedia?: {
+    instagram?: string
+    facebook?: string
+    youtube?: string
+    tiktok?: string
+    linkedin?: string
+  }
+
   // Business details
   businessName?: string
   businessId?: string // IČO
@@ -76,9 +85,11 @@ export interface MarketplaceVendor {
   }
 
   // Portfolio and media
-  images: string[]
-  portfolioImages: string[]
-  videoUrl?: string
+  mainImage: string // Main cover image (required) - shown in catalog and detail
+  mainVideoUrl?: string // Main video (optional) - replaces main image in detail if provided
+  images: string[] // Legacy field - kept for backward compatibility
+  portfolioImages: string[] // Gallery images
+  videoUrl?: string // Legacy field - kept for backward compatibility
 
   // Ratings and reviews
   rating: {

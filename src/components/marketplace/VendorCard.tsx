@@ -115,7 +115,7 @@ export default function VendorCard({ vendor, compact = false, isFavorite, toggle
         {/* Image */}
         <div className="relative h-48 overflow-hidden rounded-t-xl">
           <img
-            src={vendor.images[0] || '/placeholder-vendor.jpg'}
+            src={vendor.mainImage || vendor.images[0] || '/placeholder-vendor.jpg'}
             alt={vendor.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />

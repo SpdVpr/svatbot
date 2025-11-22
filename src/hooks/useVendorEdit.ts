@@ -189,6 +189,13 @@ function getEmptyForm(): VendorEditForm {
     website: '',
     email: '',
     phone: '',
+    socialMedia: {
+      instagram: '',
+      facebook: '',
+      youtube: '',
+      tiktok: '',
+      linkedin: ''
+    },
     address: {
       street: '',
       city: '',
@@ -204,8 +211,11 @@ function getEmptyForm(): VendorEditForm {
       currency: 'CZK',
       unit: 'per-event'
     },
+    mainImage: '',
+    mainVideoUrl: '',
     images: [],
     portfolioImages: [],
+    videoUrl: '',
     features: [],
     specialties: [],
     workingRadius: 50,
@@ -231,6 +241,13 @@ function vendorToForm(vendor: MarketplaceVendor): VendorEditForm {
     website: vendor.website || '',
     email: vendor.email || '',
     phone: vendor.phone || '',
+    socialMedia: vendor.socialMedia || {
+      instagram: '',
+      facebook: '',
+      youtube: '',
+      tiktok: '',
+      linkedin: ''
+    },
     address: vendor.address,
     businessName: vendor.businessName || '',
     businessId: vendor.businessId || '',
@@ -245,8 +262,11 @@ function vendorToForm(vendor: MarketplaceVendor): VendorEditForm {
       popular: service.popular
     })) || [],
     priceRange: vendor.priceRange,
+    mainImage: vendor.mainImage || vendor.images?.[0] || '',
+    mainVideoUrl: vendor.mainVideoUrl || '',
     images: vendor.images || [],
     portfolioImages: vendor.portfolioImages || [],
+    videoUrl: vendor.videoUrl || '',
     features: vendor.features || [],
     specialties: vendor.specialties || [],
     workingRadius: vendor.workingRadius || 50,
@@ -322,8 +342,11 @@ function formToVendorData(form: VendorEditForm): any {
     businessId: form.businessId || '',
     services: form.services || [],
     priceRange: form.priceRange,
+    mainImage: form.mainImage || '',
+    mainVideoUrl: form.mainVideoUrl || '',
     images: form.images || [],
     portfolioImages: form.portfolioImages || [],
+    videoUrl: form.videoUrl || '',
     features: form.features || [],
     specialties: form.specialties || [],
     workingRadius: form.workingRadius || 50,
@@ -333,6 +356,21 @@ function formToVendorData(form: VendorEditForm): any {
     premium: form.premium,
     tags: form.tags || [],
     keywords: form.keywords || []
+  }
+
+  // Only add socialMedia if at least one field has a value
+  if (form.socialMedia) {
+    const socialMedia: any = {}
+    if (form.socialMedia.instagram?.trim()) socialMedia.instagram = form.socialMedia.instagram.trim()
+    if (form.socialMedia.facebook?.trim()) socialMedia.facebook = form.socialMedia.facebook.trim()
+    if (form.socialMedia.youtube?.trim()) socialMedia.youtube = form.socialMedia.youtube.trim()
+    if (form.socialMedia.tiktok?.trim()) socialMedia.tiktok = form.socialMedia.tiktok.trim()
+    if (form.socialMedia.linkedin?.trim()) socialMedia.linkedin = form.socialMedia.linkedin.trim()
+
+    // Only add socialMedia to data if at least one field exists
+    if (Object.keys(socialMedia).length > 0) {
+      data.socialMedia = socialMedia
+    }
   }
 
   // Only add google field if it has data
