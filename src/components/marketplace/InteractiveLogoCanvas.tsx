@@ -31,95 +31,118 @@ export default function InteractiveLogoCanvas({
 
     console.log('🎨 InteractiveLogoCanvas initializing:', { width, height: canvasHeight, vendorCount: vendors.length })
 
-    // Create engine with very gentle gravity
-    const engine = Matter.Engine.create({
-      gravity: { x: 0, y: 0.15 } // Very gentle gravity for floating effect
-    })
-    engineRef.current = engine
-
-    // Create renderer
-    const render = Matter.Render.create({
-      element: container,
-      engine: engine,
-      options: {
-        width,
-        height: canvasHeight,
-        wireframes: false,
-        background: 'transparent',
-        pixelRatio: window.devicePixelRatio || 1
-      }
-    })
-    renderRef.current = render
-
-    // Style the canvas
-    if (render.canvas) {
-      render.canvas.style.display = 'block'
-      render.canvas.style.width = '100%'
-      render.canvas.style.height = '100%'
-    }
-
-    // Create walls (invisible boundaries)
-    const wallThickness = 50
-    const walls = [
-      // Bottom
-      Matter.Bodies.rectangle(width / 2, canvasHeight + wallThickness / 2, width, wallThickness, {
-        isStatic: true,
-        render: { fillStyle: 'transparent' }
-      }),
-      // Left
-      Matter.Bodies.rectangle(-wallThickness / 2, canvasHeight / 2, wallThickness, canvasHeight, {
-        isStatic: true,
-        render: { fillStyle: 'transparent' }
-      }),
-      // Right
-      Matter.Bodies.rectangle(width + wallThickness / 2, canvasHeight / 2, wallThickness, canvasHeight, {
-        isStatic: true,
-        render: { fillStyle: 'transparent' }
-      }),
-      // Top
-      Matter.Bodies.rectangle(width / 2, -wallThickness / 2, width, wallThickness, {
-        isStatic: true,
-        render: { fillStyle: 'transparent' }
+    // Async initialization function
+    const initPhysics = async () => {
+      // Create engine with very gentle gravity
+      const engine = Matter.Engine.create({
+        gravity: { x: 0, y: 0.15 } // Very gentle gravity for floating effect
       })
-    ]
+      engineRef.current = engine
 
-    Matter.Composite.add(engine.world, walls)
+      // Create renderer
+      const render = Matter.Render.create({
+        element: container,
+        engine: engine,
+        options: {
+          width,
+          height: canvasHeight,
+          wireframes: false,
+          background: 'transparent',
+          pixelRatio: window.devicePixelRatio || 1
+        }
+      })
+      renderRef.current = render
 
-    // Get all vendors (limit to maxLogos)
-    // We'll show logo if available, otherwise text with vendor name
-    const selectedVendors = vendors.slice(0, maxLogos)
-
-    // Calculate logo size based on count
-    const vendorCount = selectedVendors.length
-    const fillerCount = Math.max(30, 60 - vendorCount) // At least 30 filler balls for better visual
-    const totalObjects = vendorCount + fillerCount
-
-    // Dynamic sizing: more objects = smaller size
-    const baseSize = totalObjects < 40 ? 60 : totalObjects < 80 ? 50 : 40
-    const logoSize = baseSize * 1.3 // Logos slightly bigger
-    const ballSize = baseSize // Balls same size as base
-
-    // Preload logo images for custom rendering
-    const logoImages = new Map<string, HTMLImageElement>()
-    selectedVendors.forEach((vendor) => {
-      if (vendor.logo) {
-        const img = new Image()
-        // Don't set crossOrigin for Firebase Storage URLs to avoid CORS issues
-        // Firebase Storage already allows same-origin access
-        img.src = vendor.logo
-        logoImages.set(vendor.id, img)
+      // Style the canvas
+      if (render.canvas) {
+        render.canvas.style.display = 'block'
+        render.canvas.style.width = '100%'
+        render.canvas.style.height = '100%'
       }
-    })
 
-    // Create vendor bodies - start them visible on canvas
-    // All vendors will use custom rendering (either logo or text)
-    const vendorBodies = selectedVendors.map((vendor, index) => {
-      const x = Math.random() * (width - 100) + 50
-      const y = Math.random() * (canvasHeight * 0.3) + 50 // Start in upper 30% of canvas
-      const radius = logoSize / 2
+      // Create walls (invisible boundaries)
+      const wallThickness = 50
+      const walls = [
+        // Bottom
+        Matter.Bodies.rectangle(width / 2, canvasHeight + wallThickness / 2, width, wallThickness, {
+          isStatic: true,
+          render: { fillStyle: 'transparent' }
+        }),
+        // Left
+        Matter.Bodies.rectangle(-wallThickness / 2, canvasHeight / 2, wallThickness, canvasHeight, {
+          isStatic: true,
+          render: { fillStyle: 'transparent' }
+        }),
+        // Right
+        Matter.Bodies.rectangle(width + wallThickness / 2, canvasHeight / 2, wallThickness, canvasHeight, {
+          isStatic: true,
+          render: { fillStyle: 'transparent' }
+        }),
+        // Top
+        Matter.Bodies.rectangle(width / 2, -wallThickness / 2, width, wallThickness, {
+          isStatic: true,
+          render: { fillStyle: 'transparent' }
+        })
+      ]
 
-      const body = Matter.Bodies.circle(x, y, radius, {
-        restitution: 0.6,
+      Matter.Composite.add(engine.world, walls)
+
+      // Get all vendors (limit to maxLogos)
+      // We'll show logo if available, otherwise text with vendor name
+      const selectedVendors = vendors.slice(0, maxLogos)
+
+      // Calculate logo size based on count
+      const vendorCount = selectedVendors.length
+      const fillerCount = Math.max(30, 60 - vendorCount) // At least 30 filler balls for better visual
+      const totalObjects = vendorCount + fillerCount
+
+      // Dynamic sizing: more objects = smaller size
+      const baseSize = totalObjects < 40 ? 60 : totalObjects < 80 ? 50 : 40
+      const logoSize = baseSize * 1.3 // Logos slightly bigger
+      const ballSize = baseSize // Balls same size as base
+
+      // Preload logo images for custom rendering
+      const logoImages = new Map<string, HTMLImageElement>()
+      const logoLoadPromises: Promise<void>[] = []
+
+      selectedVendors.forEach((vendor) => {
+        if (vendor.logo) {
+          const img = new Image()
+          // Don't set crossOrigin for Firebase Storage URLs to avoid CORS issues
+          // Firebase Storage already allows same-origin access
+          img.src = vendor.logo
+
+          // Create promise for image loading
+          const loadPromise = new Promise<void>((resolve, reject) => {
+            img.onload = () => resolve()
+            img.onerror = () => {
+              console.warn(`⚠️ Failed to load logo for ${vendor.name}`)
+              resolve() // Resolve anyway to not block other images
+            }
+            // Timeout after 5 seconds
+            setTimeout(() => {
+              console.warn(`⏱️ Logo loading timeout for ${vendor.name}`)
+              resolve()
+            }, 5000)
+          })
+
+          logoLoadPromises.push(loadPromise)
+          logoImages.set(vendor.id, img)
+        }
+      })
+
+      // Wait for all logos to load before starting physics
+      await Promise.all(logoLoadPromises)
+
+      // Create vendor bodies - start them visible on canvas
+      // All vendors will use custom rendering (either logo or text)
+      const vendorBodies = selectedVendors.map((vendor, index) => {
+        const x = Math.random() * (width - 100) + 50
+        const y = Math.random() * (canvasHeight * 0.3) + 50 // Start in upper 30% of canvas
+        const radius = logoSize / 2
+
+        const body = Matter.Bodies.circle(x, y, radius, {
+          restitution: 0.6,
         friction: 0.1,
         density: 0.002, // Slightly heavier than balls
         render: {
@@ -354,13 +377,17 @@ export default function InteractiveLogoCanvas({
 
     // Create and run runner
     const runner = Matter.Runner.create()
-    runnerRef.current = runner
-    Matter.Runner.run(runner, engine)
-    Matter.Render.run(render)
+      runnerRef.current = runner
+      Matter.Runner.run(runner, engine)
+      Matter.Render.run(render)
 
-    console.log('✅ Physics engine started, canvas:', render.canvas)
-    console.log('✅ Runner created and started')
-    setIsLoaded(true)
+      console.log('✅ Physics engine started, canvas:', render.canvas)
+      console.log('✅ Runner created and started')
+      setIsLoaded(true)
+    }
+
+    // Start async initialization
+    initPhysics()
 
     // Cleanup
     return () => {
@@ -368,13 +395,17 @@ export default function InteractiveLogoCanvas({
       if (runnerRef.current) {
         Matter.Runner.stop(runnerRef.current)
       }
-      Matter.Render.stop(render)
-      Matter.Engine.clear(engine)
-      if (render.canvas) {
-        render.canvas.remove()
+      if (renderRef.current) {
+        Matter.Render.stop(renderRef.current)
       }
-      if (render.textures) {
-        render.textures = {}
+      if (engineRef.current) {
+        Matter.Engine.clear(engineRef.current)
+      }
+      if (renderRef.current?.canvas) {
+        renderRef.current.canvas.remove()
+      }
+      if (renderRef.current?.textures) {
+        renderRef.current.textures = {}
       }
     }
   }, [vendors, maxLogos, height])
