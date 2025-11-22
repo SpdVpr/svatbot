@@ -321,7 +321,7 @@ export default function VendorDetailPage() {
     <div className="min-h-screen">
       {/* Module Header */}
       <ModuleHeader
-        icon={Store}
+        icon={categoryConfig?.icon || '📋'}
         title={vendor?.name || 'Detail dodavatele'}
         subtitle={categoryConfig?.name || 'Marketplace'}
         fullWidth={true}
@@ -331,7 +331,6 @@ export default function VendorDetailPage() {
             href="/marketplace"
             className="btn-outline flex items-center space-x-2 whitespace-nowrap"
           >
-            <ArrowLeft className="w-4 h-4" />
             <span className="hidden sm:inline">Zpět na marketplace</span>
             <span className="sm:hidden">Zpět</span>
           </Link>

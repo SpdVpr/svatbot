@@ -7,8 +7,8 @@ import { useState } from 'react'
 import MobileMenu from '@/components/navigation/MobileMenu'
 
 interface ModuleHeaderProps {
-  /** Icon component from lucide-react */
-  icon: LucideIcon
+  /** Icon component from lucide-react or emoji string */
+  icon: LucideIcon | string
   /** Module title (e.g., "Úkoly", "Hosté", "Rozpočet") */
   title: string
   /** Subtitle/description text */
@@ -30,7 +30,7 @@ interface ModuleHeaderProps {
 }
 
 export default function ModuleHeader({
-  icon: Icon,
+  icon,
   title,
   subtitle,
   iconGradient = 'from-purple-500 to-pink-500',
@@ -44,6 +44,10 @@ export default function ModuleHeader({
   const router = useRouter()
   const [showMobileMenu, setShowMobileMenu] = useState(false)
 
+  // Check if icon is a string (emoji) or a component
+  const isEmojiIcon = typeof icon === 'string'
+  const Icon = !isEmojiIcon ? icon as LucideIcon : null
+
   // Determine container class based on props
   const containerClass = fullWidth
     ? `px-4 md:px-6 lg:px-8 mx-auto ${maxWidth || 'max-w-[1600px]'}`
@@ -51,7 +55,7 @@ export default function ModuleHeader({
 
   return (
     <>
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className={`${containerClass} py-2 sm:py-4`}>
           <div className="flex items-center justify-between gap-2 sm:gap-4">
             {/* Left side - Navigation and Title */}
@@ -65,31 +69,15 @@ export default function ModuleHeader({
                 <Menu className="w-4 h-4 text-gray-600 group-hover:text-gray-900" />
               </button>
 
-              {/* Back button (visible only on desktop) */}
-              {!hideBackButton && (
-                <button
-                  onClick={() => router.push('/')}
-                  className="hidden sm:block p-2 hover:bg-gray-100 rounded-lg transition-colors group flex-shrink-0"
-                  title="Zpět na dashboard"
-                >
-                  <ArrowLeft className="w-5 h-5 text-gray-600 group-hover:text-gray-900" />
-                </button>
-              )}
-
-              {/* Home icon */}
-              <Link
-                href="/"
-                className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
-                title="Dashboard"
-              >
-                <Home className="w-4 h-4 text-gray-400 hover:text-gray-600" />
-              </Link>
-
               {/* Module icon in square */}
               <div
                 className="w-8 h-8 sm:w-12 sm:h-12 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0"
               >
-                <Icon className="w-4 h-4 sm:w-6 sm:h-6 text-primary-600" />
+                {isEmojiIcon ? (
+                  <span className="text-lg sm:text-2xl">{icon}</span>
+                ) : Icon ? (
+                  <Icon className="w-4 h-4 sm:w-6 sm:h-6 text-primary-600" />
+                ) : null}
               </div>
 
               {/* Title and subtitle */}
