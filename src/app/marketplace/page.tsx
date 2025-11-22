@@ -154,9 +154,6 @@ export default function MarketplacePage() {
           <h1 className="text-4xl md:text-6xl font-serif font-bold mb-6 leading-tight animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
             Najděte ty nejlepší profesionály <br className="hidden md:block"/> pro vaši svatbu snů.
           </h1>
-          <p className="text-lg text-stone-200 mb-10 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
-            Od kouzelných míst až po talentované fotografy. Vše na jednom místě, ověřené a s garancí kvality.
-          </p>
         </div>
       </div>
 

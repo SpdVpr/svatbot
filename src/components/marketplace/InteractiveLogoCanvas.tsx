@@ -205,18 +205,16 @@ export default function InteractiveLogoCanvas({
       return body
     })
 
-    // Create colorful filler balls
+    // Create pink/rose filler balls
     const colors = [
+      '#fda4af', // rose-300
+      '#fb7185', // rose-400
       '#f43f5e', // rose-500
+      '#e11d48', // rose-600
+      '#f9a8d4', // pink-300
+      '#f472b6', // pink-400
       '#ec4899', // pink-500
-      '#a855f7', // purple-500
-      '#8b5cf6', // violet-500
-      '#6366f1', // indigo-500
-      '#3b82f6', // blue-500
-      '#06b6d4', // cyan-500
-      '#10b981', // emerald-500
-      '#f59e0b', // amber-500
-      '#ef4444', // red-500
+      '#db2777', // pink-600
     ]
 
     const fillerBalls = Array.from({ length: fillerCount }, (_, index) => {
@@ -271,6 +269,11 @@ export default function InteractiveLogoCanvas({
 
     // Add mouse control
     const mouse = Matter.Mouse.create(render.canvas)
+
+    // Enable scroll wheel to pass through
+    mouse.element.removeEventListener('wheel', mouse.mousewheel)
+    mouse.element.removeEventListener('DOMMouseScroll', mouse.mousewheel)
+
     const mouseConstraint = Matter.MouseConstraint.create(engine, {
       mouse: mouse,
       constraint: {
